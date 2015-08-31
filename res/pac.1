@@ -1,0 +1,132 @@
+.\" Preview this file with
+.\" groff -man -Tascii pac.1
+.\" Copy to /usr/share/man/man1
+.\"
+.TH pac 1 "MARCH 2013" Linux "User Manuals"
+.SH "NAME"
+pac \- Perl Auto Connector
+.SH SYNOPSIS
+.B pac [options]
+.SH "DESCRIPTION"
+.B pac
+is a (simple?) GUI to manage/launch connections to remote machines with:
+.br
+Simple GUI to manage/launch connections to remote machines.
+.br
+Scripting possibilities, 'ala' SecureCRT
+.br
+Configurable [Pre|Post]-connection local commands execution.
+.br
+Configurable list of macros (commands) to execute locally when connected or to send to connected client.
+.br
+Configurable list of conditional executions on connected machine via 'Expect':
+.br
+	. forget about SSH certificates
+.br
+	. chain multiple ssh connections
+.br
+	. automate tunnels creation
+.br
+	. with line-send delay capabilities!! etc...
+.br
+KeePassX integration!
+.br
+Ability to connect to machines through a Proxy server!
+.br
+CLUSTER connections.
+.br
+TABBED/WINDOWED terminals
+.br
+Wake On LAN capabilities
+.br
+Local and Global variables, eg.: write down a password once, use it ANY where, centralizing its modification for faster changes! use them for: 
+.br
+	. password vault
+.br
+	. reusing connection strings
+.br
+Seamless Gnome/Gtk integration.
+.br
+Tray icon for quick launching connections. Screenshots and statistics also available!
+.br
+DEB, RPM and .TAR.GZ packages available
+.br
+Written in Perl/Gtk (wait, *is* that a feature? Well, it is for me! ;=)
+.br
+It is FREE (as in freedom)!! and licensed under GNU GPLv3.
+.SH "OPTIONS"
+.IP --help
+ this help
+.IP --no-backup
+ do no create alternative PAC config files as a backup (faster shutdown)
+.IP --start-shell
+ start a local terminal
+.IP --start-uuid=<uuid>[:<cluster]
+ start connection in cluster (if given)
+.IP --edit-uuid=<uuid>
+ edit connection
+.IP --start-script=<script>
+ start given script
+.IP --password=<pwd>
+ automatically logon with given password without prompting user
+.IP --dump-uuid=<uuid>
+ dump given UUID's data
+.IP --scripts
+ open scripts window
+.IP --preferences
+ open global preferences dialog
+.IP --quick-conn
+ open the Quick Connect dialog on startup
+.IP --list-uuids
+ list existing connections/groups and their UUIDs
+.IP --no-splash
+ no splash screen on startup
+.IP --iconified
+ make PAC go to tray once started
+.IP --readonly
+ start in read only mode (no config changes allowed)
+.SH FILES
+.I ~/.config/pac/
+.RS
+Per user configuration directory.
+.SH "ENVIRONMENT"
+Uses next Gnome's configuration paths:
+.IP
+/system/http_proxy/host
+or
+/system/proxy/http/host
+ - Takes this proxy path
+.IP
+/system/http_proxy/port
+or
+/system/proxy/http/port
+ - Takes this proxy port
+.IP
+/system/http_proxy/authentication_user
+or
+/system/proxy/http/host/authentication-user
+ - Takes this proxy user name
+.IP
+/system/http_proxy/authentication_password
+or
+/system/proxy/http/host/authentication-password
+ - Takes this proxy password
+.SH "BUGS"
+Well... I thinks that by this version, there should not be *many* bugs but... I'm sure you 'will' find some! When that happens, please, let me know :)
+.SH "AUTHOR"
+David Torrejón Vaquerizas <david.tv@gmail.com>
+
+Visit:
+
+http://sourceforge.net/projects/pacmanager/
+
+https://sites.google.com/site/davidtv/
+.SH "SEE ALSO"
+.BR ssh (1),
+.BR sftp (1),
+.BR telnet (1)
+.BR rdesktop (1)
+.BR vncviewer (1)
+.BR remote-tty (1)
+.BR cu (1)
+

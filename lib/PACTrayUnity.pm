@@ -1,0 +1,138 @@
+package PACTrayUnity;
+
+###################################################################
+# This file is part of PAC( Perl Auto Connector)
+#
+# Copyright (C) 2010-2014  David Torrejon Vaquerizas
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+###################################################################
+
+$|++;
+
+###################################################################
+# Import Modules
+
+# Standard
+use strict;
+use warnings;
+use FindBin qw ( $RealBin $Bin $Script );
+
+# GTK2
+use Gtk2 '-init';
+eval { require Gtk2::AppIndicator; }; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
+
+# PAC modules
+use PACUtils;
+
+# END: Import Modules
+###################################################################
+
+###################################################################
+# Define GLOBAL CLASS variables
+
+my $APPNAME			= $PACUtils::APPNAME;
+my $APPVERSION		= $PACUtils::APPVERSION;
+my $APPICON			= $RealBin . '/res/pac64x64.png';
+my $TRAYICON		= $RealBin . '/res/pac_tray.png';
+my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
+# END: Define GLOBAL CLASS variables
+###################################################################
+
+###################################################################
+# START: Define PUBLIC CLASS methods
+
+sub new {
+	my $class	= shift;
+	
+	my $self	= {};
+	
+	$self -> {_MAIN}	= shift;
+	
+	$self -> {_TRAY}	= undef;
+	
+	$TRAYICON = $$self{_MAIN}{_CFG}{'defaults'}{'use bw icon'} ? 'pac_tray_bw' : 'pac';
+
+	# Build the GUI
+	_initGUI( $self ) or return 0;
+
+	bless( $self, $class );
+	return $self;
+}
+
+# DESTRUCTOR
+sub DESTROY {
+	my $self = shift;
+	undef $self;
+	return 1;
+}
+
+# END: Define PUBLIC CLASS methods
+###################################################################
+
+###################################################################
+# START: Define PRIVATE CLASS functions
+
+sub _initGUI {
+	my $self = shift;
+	
+	$$self{_TRAY} = Gtk2::AppIndicator -> new( 'pac', $TRAYICON );
+	$$self{_TRAY} -> set_icon_theme_path( $RealBin . '/res' );
+	$$self{_TRAY} -> set_active;
+	$$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = ! $@;
+	return 1;
+}
+
+sub _setTrayMenu {
+	my $self	= shift;
+	my $widget	= shift;
+	my $event	= shift;
+	
+	my @m;
+	
+	push( @m, { label => 'Local Shell',		stockicon => $PACMain::UNITY ? '' : 'gtk-home',				code => sub { $PACMain::FUNCS{_MAIN}{_GUI}{shellBtn} -> clicked; } } );
+	push( @m, { separator => 1 } );
+	push( @m, { label => 'Clusters',		stockicon => $PACMain::UNITY ? '' : 'pac-cluster-manager',	submenu => _menuClusterConnections } ) unless $PACMain::UNITY;
+	push( @m, { label => 'Favourites',		stockicon => $PACMain::UNITY ? '' : 'pac-favourite-on',		submenu => _menuFavouriteConnections } );
+	push( @m, { label => 'Connect to',		stockicon => 'pac-group',									submenu => _menuAvailableConnections( $PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data} ) } );
+	push( @m, { separator => 1 } );
+	push( @m, { label => 'Preferences...',	stockicon => 'gtk-preferences',								code => sub { $$self{_MAIN}{_CONFIG} -> show; } } );
+	push( @m, { label => 'Clusters...',		stockicon => $PACMain::UNITY ? '' : 'gtk-justify-fill'	,	code => sub { $$self{_MAIN}{_CLUSTER} -> show; }  } );
+	push( @m, { label => 'Show Window',		stockicon => $PACMain::UNITY ? '' : 'gtk-home',				code => sub {
+		# Check if show password is required
+		if ( $$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'} ) {
+			# Trigger the "unlock" procedure
+			$$self{_MAIN}{_GUI}{lockPACBtn} -> set_active( 0 );
+			if ( ! $$self{_MAIN}{_GUI}{lockPACBtn} -> get_active ) {
+				$$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY} -> set_active : $$self{_TRAY} -> set_passive;
+				$$self{_MAIN} -> _showConnectionsList;
+			}
+		} else {
+			$$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY} -> set_active : $$self{_TRAY} -> set_passive;
+			$$self{_MAIN} -> _showConnectionsList;
+		}
+	} } );
+	push( @m, { separator => 1 } );
+	push( @m, { label => 'About PAC',		stockicon => 'gtk-about',									code => sub { $$self{_MAIN} -> _showAboutWindow; } }  );
+	push( @m, { label => 'Exit',			stockicon => 'gtk-quit',									code => sub { $$self{_MAIN} -> _quitProgram; } } );
+	
+	$$self{_TRAY} -> set_menu( _wPopUpMenu( \@m, $event, 'below calling widget', 'get_menu_ref' ) );
+	
+	return 1;
+}
+
+# END: Define PRIVATE CLASS functions
+###################################################################
+
+1;

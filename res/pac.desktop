@@ -1,0 +1,24 @@
+[Desktop Entry]
+Name=PAC
+Comment=Perl Auto Connector (auto start)
+Terminal=false
+Icon=pac
+Type=Application
+Exec=/usr/bin/pac
+StartupNotify=true
+Name[en_US]=PAC
+Comment[en_US]=Perl Auto Connector
+Categories=Applications;Network;
+X-GNOME-Autostart-enabled=false
+Actions=Shell;Quick;
+
+[Desktop Action Shell]
+Name=Start local shell
+Exec=pac --start-shell
+#OnlyShowIn=Unity;
+
+[Desktop Action Quick]
+Name=Quick connect...
+Exec=pac --quick-conn
+#OnlyShowIn=Unity;
+
