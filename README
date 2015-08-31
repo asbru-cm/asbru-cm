@@ -17,12 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-<script 
-    data-amount="10.00" 
-    data-name="PAC Manager" 
-    data-button="donate" src="https://www.paypalobjects.com/js/external/paypal-button.min.js?merchant=david.tv@gmail.com" async="async"
-></script>
-
 * PAC (Perl Auto Connector), by David Torrejon Vaquerizas (david.tv@gmail.com), is FREE software, released under GNU's GPLv3 license.
 
 * PAC is a SecureCRT/Putty/etc (connections manager with automations) equivalent for the Linux world.
