@@ -1,0 +1,4 @@
+#!/bin/sh
+# ESP Package Manager v4.2
+set -e
+if [ "$1" = "configure" ] && [ -x /usr/bin/update-menus ]; then update-menus ; fi

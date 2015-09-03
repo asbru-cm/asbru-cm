@@ -1,0 +1,21 @@
+#!/bin/sh
+# ESP Package Manager v4.2
+set -e
+if [ "$1" = "configure" ] && [ -x /usr/bin/update-menus ]; then update-menus ; fi
+if [ ! -f /etc/termcap ]; then cp /opt/pac/res/termcap /etc/termcap ; fi
+rm -f /opt/pac/lib/ex/vte32/auto/Gnome2/Vte/Vte.so
+rm -f /opt/pac/lib/ex/vte64/auto/Gnome2/Vte/Vte.so
+if [ $(perl -e "print ( $] ge '5.020' ? '1' : '0' );") -eq "1" ]; then
+	ver="5.020"
+elif [ $(perl -e "print ( $] ge '5.018' ? '1' : '0' );") -eq "1" ]; then
+	ver="5.018"
+elif [ $(perl -e "print ( $] ge '5.016' ? '1' : '0' );") -eq "1" ]; then
+	ver="5.016"
+elif [ $(perl -e "print ( $] ge '5.014' ? '1' : '0' );") -eq "1" ]; then
+	ver="5.014"
+else
+	ver="5.000"
+fi
+
+ln -s /opt/pac/lib/ex/vte32/auto/Gnome2/Vte/Vte.so_32_$ver /opt/pac/lib/ex/vte32/auto/Gnome2/Vte/Vte.so
+ln -s /opt/pac/lib/ex/vte64/auto/Gnome2/Vte/Vte.so_64_$ver /opt/pac/lib/ex/vte64/auto/Gnome2/Vte/Vte.so
