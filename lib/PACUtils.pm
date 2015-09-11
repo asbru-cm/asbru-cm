@@ -126,6 +126,7 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'von Karman Institute',
 	'Julian Thomas Bourne',
 	'iPERFEX',
 	'Joaquín Ferrero San Pedro',
