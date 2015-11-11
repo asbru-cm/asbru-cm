@@ -3,7 +3,7 @@ package PACUtils;
 ##################################################################
 # This file is part of PAC( Perl Auto Connector)
 #
-# Copyright (C) 2010-2014  David Torrejon Vaquerizas
+# Copyright (C) 2010-2015  David Torrejon Vaquerizas
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME		= 'PAC';
-our $APPVERSION		= '4.5.5.6';
+our $APPVERSION		= '4.5.5.8';
 our $DEBUG_LEVEL	= 1;
 our $ARCH			= '';
 my $ARCH_TMP		= `/bin/uname -m 2>&1`;
@@ -126,6 +126,9 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Timo Büttner',
+	'Max Maskevich',
+	'1one - 18mind',
 	'von Karman Institute',
 	'Julian Thomas Bourne',
 	'iPERFEX',

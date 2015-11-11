@@ -18,7 +18,7 @@ $icondir=/usr/share/pixmaps
 
 # Common header
 %product PAC Perl Auto Connector
-%copyright 2010-2014 by David Torrejón Vaquerizas, released under the GNU GPLv3 license
+%copyright 2010-2015 by David Torrejón Vaquerizas, released under the GNU GPLv3 license
 %vendor David Torrejón Vaquerizas (david.tv@gmail.com)
 %license ${src_basedir}/LICENSE
 %readme ${src_basedir}/README
@@ -33,7 +33,7 @@ $icondir=/usr/share/pixmaps
 %description deb http://archive.getdeb.net/ubuntu <your_distrib_name_here>-getdeb apps
 %description .
 %description (Or visit: http://www.getdeb.net to get further info and software)
-%version 4.5.5.6
+%version 4.5.5.8
 %requires perl
 %requires gtk2-engines-pixbuf
 %requires libvte9
@@ -102,6 +102,7 @@ f 644 root root ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.014 ${src_li
 f 644 root root ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.016 ${src_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.016 nostrip()
 f 644 root root ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.018 ${src_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.018 nostrip()
 f 644 root root ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.020 ${src_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.020 nostrip()
+f 644 root root ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.022 ${src_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so_64_5.022 nostrip()
 f 644 root root ${dest_libdir}/ex/vteARM/auto/Gnome2/Vte/Vte.o ${src_libdir}/ex/vteARM/auto/Gnome2/Vte/Vte.o nostrip()
 f 644 root root ${dest_libdir}/ex/vteARMV7L/auto/Gnome2/Vte/Vte.o ${src_libdir}/ex/vteARMV7L/auto/Gnome2/Vte/Vte.o nostrip()
 f 644 root root ${dest_libdir}/ex/vtePPC64/auto/Gnome2/Vte/Vte.so ${src_libdir}/ex/vtePPC64/auto/Gnome2/Vte/Vte.so nostrip()
@@ -204,7 +205,9 @@ if [ "$$1" = "configure" ] && [ -x /usr/bin/update-menus ]; then update-menus ; 
 if [ ! -f /etc/termcap ]; then cp ${dest_resdir}/termcap /etc/termcap ; fi
 rm -f ${dest_libdir}/ex/vte32/auto/Gnome2/Vte/Vte.so
 rm -f ${dest_libdir}/ex/vte64/auto/Gnome2/Vte/Vte.so
-if [ $$(perl -e "print ( $$] ge '5.020' ? '1' : '0' );") -eq "1" ]; then
+if [ $$(perl -e "print ( $$] ge '5.022' ? '1' : '0' );") -eq "1" ]; then
+	ver="5.022"
+elif [ $$(perl -e "print ( $$] ge '5.020' ? '1' : '0' );") -eq "1" ]; then
 	ver="5.020"
 elif [ $$(perl -e "print ( $$] ge '5.018' ? '1' : '0' );") -eq "1" ]; then
 	ver="5.018"

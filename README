@@ -1,7 +1,7 @@
 #######################################################################
 # This file is part of PAC( Perl Auto Connector)
 #
-# Copyright (C) 2010-2014 David Torrejon Vaquerizas
+# Copyright (C) 2010-2015 David Torrejon Vaquerizas
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,8 +54,17 @@
 
 * VERSIONS:
 
+	- 4.5.5.8:
+
+		. 
+
+	- 4.5.5.7:
+
+		. Fixed *for real* the Vte.so for perl 5.22 64 bit (... so tired... Forget about 4.5.5.6, it was just bullshit, and may be this will also be the same).
+
 	- 4.5.5.6:
 
+		. Added support for perl 5.22 64bit for library Vte.so
 		. Minor variable substitution (<ASK:desc|opt1|opt2|...|optN>) bugfixing
 
 	- 4.5.5.5:
