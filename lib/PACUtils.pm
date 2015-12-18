@@ -126,6 +126,12 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Carlos Bragatto',
+	'Nicklas Börjesson',
+	'Peter Taylor',
+	'Javier Martin Garcia-Asenjo',
+	'Helmut Kleinhans',
+	'Richard Kozel',
 	'Timo Büttner',
 	'Max Maskevich',
 	'1one - 18mind',
