@@ -1121,6 +1121,12 @@ elsif ( ( $METHOD =~ /^.*vncviewer$/ ) || ( $METHOD eq 'VNC' ) ) {
 			ctrl( "CONNECTED" );
 		}],
 		
+		# No auth is needed
+		[ '^.*No authentication needed*$', sub {
+			$CONNECTED = 1;
+			ctrl( "CONNECTED" );
+		}],
+		
 		# Found login string
 		[ '^.*Conn:\s+connected to host\s+.+\s+port\s+\d+.*$', sub {
 			$CONNECTED = 1;
