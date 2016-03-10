@@ -435,9 +435,9 @@ sub stop {
 	$PACMain::FUNCS{_CLUSTER} -> _updateGUI;
 	
 	defined $$self{_SOCKET_CLIENT} and $$self{_SOCKET_CLIENT} -> close;
-	defined $$self{_SOCKET_CLIENT_WATCH} and Glib::Source -> remove( $self -> {_SOCKET_CLIENT_WATCH} );
-	defined $$self{_SEND_STRING} and Glib::Source -> remove( $self -> {_SEND_STRING} );
-	defined $$self{_EMBED_KIDNAP} and Glib::Source -> remove( $self -> {_EMBED_KIDNAP} );
+	defined $$self{_SOCKET_CLIENT_WATCH}	and eval { Glib::Source -> remove( $$self{_SOCKET_CLIENT_WATCH} ); };
+	defined $$self{_SEND_STRING}			and eval { Glib::Source -> remove( $$self{_SEND_STRING} ); };
+	defined $$self{_EMBED_KIDNAP}			and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
 	
 	unlink( $$self{_TMPCFG} );
 	unlink( $$self{_TMPPIPE} );
@@ -998,8 +998,8 @@ sub _setupCallbacks {
 		
 		defined $$self{_SOCKET_CLIENT}		and $$self{_SOCKET_CLIENT}		-> close;
 		defined $$self{_SOCKET_CLIENT_EXEC}	and $$self{_SOCKET_CLIENT_EXEC} -> close;
-		defined $$self{_SEND_STRING}		and Glib::Source -> remove( $$self{_SEND_STRING} );
-		defined $$self{_EMBED_KIDNAP}		and Glib::Source -> remove( $$self{_EMBED_KIDNAP} );
+		defined $$self{_SEND_STRING}		and eval { Glib::Source -> remove( $$self{_SEND_STRING} );  };
+		defined $$self{_EMBED_KIDNAP}		and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
 		
 		$self -> _setTabColour;
 		$self -> _updateStatus;
@@ -1054,7 +1054,7 @@ sub _watchConnectionData {
 			$self -> _updateCFG;
 			$data = $self -> _checkSendKeystrokes( $data );
 			
-			Glib::Source -> remove( $$self{_EMBED_KIDNAP} ) if defined $$self{_EMBED_KIDNAP};
+			defined $$self{_EMBED_KIDNAP} and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
 			$$self{_EMBED_KIDNAP} = Glib::Timeout -> add( 100, sub {
 				my $title = 'FreeRDP: ' . $$self{_CFG}{environments}{$$self{_UUID}}{ip} . ( $$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}" );
 				$title = $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' ?

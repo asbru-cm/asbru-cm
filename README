@@ -1529,3 +1529,6 @@
 	Q: Oohh... so many questions...  why 'YAML', why 'Gnome2:Vte', why...???
 	A: Blah blah blah... shut the f**k up and simply use it if you dare!! ;)
  
+* LICENSES:
+  
+  - PAC uses Gnome2::Vte (http://search.cpan.org/CPAN/authors/id/X/XA/XAOC/Gnome2-Vte-0.11.tar.gz) without modifications, providing a binary set of files in order to help those Linux distros without them.
