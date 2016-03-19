@@ -211,10 +211,21 @@ sub _initGUI {
 
 sub __checkRBAuth {
 	my $self = shift;
-	
+
 	if ( _( $self, 'comboMethod' ) -> get_active_text !~ /RDP|VNC|Generic|3270/go ) {
-		_( $self, 'frameExpect' )	-> set_sensitive( ! _( $self, 'rbCfgAuthManual' ) -> get_active );
-		_( $self, 'labelExpect' )	-> set_sensitive( ! _( $self, 'rbCfgAuthManual' ) -> get_active );
+		if( _( $self, 'rbCfgAuthManual' ) -> get_active ) {
+			_( $self, 'frameExpect' )->set_sensitive( 0 );
+			_( $self, 'labelExpect' )->set_sensitive( 0 );
+			_( $self, 'labelExpect' )->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
+			_( $self, 'alignExpect' )->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
+		}
+		else{
+			_( $self, 'frameExpect' )->set_sensitive( 1 );
+			_( $self, 'labelExpect' )->set_sensitive( 1 );
+			_( $self, 'labelExpect' )->set_tooltip_text("EXPECT remote patterns AND-THEN-EXECUTE remote commands");
+			_( $self, 'alignExpect' )->set_has_tooltip( 0 );
+
+		}
 	}
 	
 	_( $self, 'alignUserPass' )		-> set_sensitive( _( $self, 'rbCfgAuthUserPass' ) -> get_active );
