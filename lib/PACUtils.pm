@@ -126,6 +126,7 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Andre Geißler',
 	'Arend de Boer',
 	'Taylor Finklea',
 	'Egbert Gerber',
