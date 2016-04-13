@@ -98,6 +98,7 @@ sub update {
 	$$self{gui}{chNoTLS}				-> set_active( $$options{noTLS} // 0 );
 	$$self{gui}{chNoNLA}				-> set_active( $$options{noNLA} // 0 );
 	$$self{gui}{chFontSmooth}			-> set_active( $$options{fontSmooth} // 0 );
+	$$self{gui}{chNoGrabKbd}			-> set_active( $$options{noGrabKbd} // 0 );
 	$$self{gui}{entryStartupShell}		-> set_text( $$options{startupshell} // '' );
 
 	# Destroy previuos widgets
@@ -140,6 +141,7 @@ sub get_cfg {
 	$options{noTLS}             = $$self{gui}{chNoTLS}				-> get_active;
 	$options{noNLA}             = $$self{gui}{chNoNLA}				-> get_active;
 	$options{fontSmooth}		= $$self{gui}{chFontSmooth}			-> get_active;
+	$options{noGrabKbd}		= $$self{gui}{chNoGrabKbd}			-> get_active;
 	$options{startupshell}		= $$self{gui}{entryStartupShell}	-> get_chars( 0, -1 );
 
 	foreach my $w ( @{ $$self{listRedir} } ) {
@@ -189,35 +191,37 @@ sub _parseCfgToOptions {
 	$hash{noTLS}            = 0;
 	$hash{noNLA}            = 0;
 	$hash{fontSmooth}		= 0;
+        $hash{noGrabKbd}                = 0;
 	$hash{startupshell}		= '';
 	
-	my @opts = split( /\s+-/, $cmd_line );
+	my @opts = split( /\s+\/?/, $cmd_line );
 	foreach my $opt ( @opts ) {
 		next unless $opt ne '';
 		$opt =~ s/\s+$//go;
 		
-		$opt =~ /^a\s+(8|15|16|24)$/go		and	$hash{bpp}				= $1;
-		$opt eq '0'							and	$hash{attachToConsole}	= 1;
-		$opt eq 'z'							and	$hash{useCompression}	= 1;
-		if ( $opt =~ /^s\s+'(.+?)'$/go )	 {	$hash{startupshell} = $1; }
-		if ( $opt eq 'f' ) {					$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^g\s+(\d+)\%$/go ) {		$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^g\s+(\d+)x(\d+)$/go ) {	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
-		$opt =~ /^k\s+(.+)$/go				and	$hash{keyboardLocale}	= $1;
-		$opt =~ /^-plugin\s+rdpsnd$/go		and	$hash{redirSound}		= 1;
-		$opt =~ /^-plugin\s+cliprdr$/go		and	$hash{redirClipboard}	= 1;
-		$opt =~ /^d\s+(.+)$/go				and	$hash{domain}			= $1;
-		$opt =~ /^-ignore-certificate$/go	and	$hash{ignoreCert}		= 1;
-		$opt =~ /^-no-auth$/go				and	$hash{noAuth}			= 1;
-		$opt =~ /^-no-fastpath$/go			and	$hash{nofastPath}		= 1;
-		$opt =~ /^-rfx$/go					and	$hash{rfx}				= 1;
-		$opt =~ /^-nsc$/go					and	$hash{nsCodec}			= 1;
-		$opt =~ /^-no-rdp$/go				and	$hash{noRDP}			= 1;
-		$opt =~ /^-no-tls$/go				and	$hash{noTLS}			= 1;
-		$opt =~ /^-no-nla$/go				and	$hash{noNLA}			= 1;
-		$opt =~ /^x\s+80$/go				and	$hash{fontSmooth}		= 1;
+		$opt =~ /^bpp:(8|15|16|24)$/go	  and	$hash{bpp}				= $1;
+		$opt eq 'admin'	                  and	$hash{attachToConsole}	= 1;
+		$opt eq '+compression'		  and	$hash{useCompression}	= 1;
+		if ( $opt =~ /^shell\s+'(.+?)'$/go )  {	$hash{startupshell} = $1; }
+		if ( $opt eq 'f' )                    {	$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
+		if ( $opt =~ /^size:(\d+)\%$/go )     {	$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
+		if ( $opt =~ /^size:(\d+)x(\d+)$/go ) {	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
+		$opt =~ /^kbd:(.+)$/go		and	$hash{keyboardLocale}	= $1;
+		$opt =~ /^sound:sys:alsa$/go	and	$hash{redirSound}	= 1;
+		$opt =~ /^\+clipboard$/go	and	$hash{redirClipboard}	= 1;
+		$opt =~ /^d:(.+)$/go		and	$hash{domain}		= $1;
+		$opt =~ /^cert-ignore$/go	and	$hash{ignoreCert}	= 1;
+		$opt =~ /^-authentication$/go	and	$hash{noAuth}		= 1;
+		$opt =~ /^-fast-path$/go	and	$hash{nofastPath}	= 1;
+		$opt =~ /^rfx$/go		and	$hash{rfx}		= 1;
+		$opt =~ /^nsc$/go		and	$hash{nsCodec}		= 1;
+		$opt =~ /^-sec-rdp$/go		and	$hash{noRDP}		= 1;
+		$opt =~ /^-sec-tls$/go		and	$hash{noTLS}		= 1;
+		$opt =~ /^-sec-nla$/go		and	$hash{noNLA}		= 1;
+		$opt =~ /^\+fonts$/go		and	$hash{fontSmooth}	= 1;
+		$opt =~ /^-grab-keyboard$/go	and	$hash{noGrabKbd}	= 1;
 		
-		while ( $opt =~ /^-data\s+disk:(.+):\"(.+)\"/go )
+		while ( $opt =~ /^drive:(.+):(.+)/go )
 		{
 			my %redir;
 			$redir{redirDiskShare}	= $1;
@@ -234,35 +238,35 @@ sub _parseOptionsToCfg {
 	
 	my $txt = '';
 	
-	$txt .= ' -a ' . $$hash{bpp};
-	$txt .= ' -0' if $$hash{attachToConsole};
-	$txt .= ' -z' if $$hash{useCompression};
-	$txt .= ' -f' if $$hash{fullScreen};
+	$txt .= ' /bpp:' . $$hash{bpp};
+	$txt .= ' /admin' if $$hash{attachToConsole};
+	$txt .= ' +compression' if $$hash{useCompression};
+	$txt .= ' /f' if $$hash{fullScreen};
 	if ( $$hash{percent} )
 	{
-		$txt .= ' -g ' . $$hash{geometry} . '%';
+		$txt .= ' /size:' . $$hash{geometry} . '%';
 	}
 	elsif ( $$hash{wh} )
 	{
-		$txt .= ' -g ' . $$hash{width} . 'x' . $$hash{height};
+		$txt .= ' /size:' . $$hash{width} . 'x' . $$hash{height};
 	}
-	$txt .= ' -k ' . $$hash{keyboardLocale} if $$hash{keyboardLocale} ne '';
-	$txt .= " -s '$$hash{startupshell}'" if $$hash{startupshell} ne '';
-	$txt .= " -d $$hash{domain}" if $$hash{domain} ne '';
-	$txt .= ' --plugin cliprdr' if $$hash{redirClipboard};
-	$txt .= ' --plugin rdpsnd' if $$hash{redirSound};
+	$txt .= ' /kbd:' . $$hash{keyboardLocale} if $$hash{keyboardLocale} ne '';
+	$txt .= ' /shell ' . $$hash{startupshell} if $$hash{startupshell} ne '';
+	$txt .= ' /d:' . $$hash{domain} if $$hash{domain} ne '';
+	$txt .= ' +clipboard' if $$hash{redirClipboard};
+	$txt .= ' +sound:sys:alsa' if $$hash{redirSound};
+	$txt .= ' /cert-ignore' if $$hash{ignoreCert};
+	$txt .= ' -authentication' if $$hash{noAuth};
+	$txt .= ' -fast-path' if $$hash{nofastPath};
+	$txt .= ' /rfx' if $$hash{rfx};
+	$txt .= ' /nsc' if $$hash{nsCodec};
+	$txt .= ' -sec-rdp' if $$hash{noRDP};
+	$txt .= ' -sec-tls' if $$hash{noTLS};
+	$txt .= ' -sec-nla' if $$hash{noNLA};
+	$txt .= ' +fonts' if $$hash{fontSmooth};
+	$txt .= ' -grab-keyboard' if $$hash{noGrabKbd};
 	
-	$txt .= ' --ignore-certificate' if $$hash{ignoreCert};
-	$txt .= ' --no-auth' if $$hash{noAuth};
-	$txt .= ' --no-fastpath' if $$hash{nofastPath};
-	$txt .= ' --rfx' if $$hash{rfx};
-	$txt .= ' --nsc' if $$hash{nsCodec};
-	$txt .= ' --no-rdp' if $$hash{noRDP};
-	$txt .= ' --no-tls' if $$hash{noTLS};
-	$txt .= ' --no-nla' if $$hash{noNLA};
-	$txt .= ' -x 80' if $$hash{fontSmooth};
-	
-	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " --plugin rdpdr --data disk:$$redir{redirDiskShare}:\"$$redir{redirDiskPath}\" --"; }
+	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " /drive:$$redir{redirDiskShare}:$$redir{redirDiskPath}"; }
 	
 	return $txt;
 }
@@ -288,7 +292,7 @@ sub _buildGUI {
 			$w{frBPP} = Gtk2::Frame -> new( 'BPP:' );
 			$w{hbox1} -> pack_start( $w{frBPP}, 0, 1, 0 );
 			$w{frBPP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
-			$w{frBPP} -> set_tooltip_text( '[-a] : Sets the colour depth for the connection (8, 15, 16 or 24)' );
+			$w{frBPP} -> set_tooltip_text( '[/bpp:] : Sets the colour depth for the connection (8, 15, 16 or 24)' );
 				
 				$w{cbBPP} = Gtk2::ComboBox -> new_text;
 				$w{frBPP} -> add( $w{cbBPP} );
@@ -296,53 +300,57 @@ sub _buildGUI {
 			
 			$w{chAttachToConsole} = Gtk2::CheckButton -> new_with_label( 'Attach to console' );
 			$w{hbox1} -> pack_start( $w{chAttachToConsole}, 0, 1, 0 );
-			$w{chAttachToConsole} -> set_tooltip_text( '[-0] : Attach to console of server (requires Windows Server 2003 or newer)' );
+			$w{chAttachToConsole} -> set_tooltip_text( '[/admin] : Attach to admin console of server (requires Windows Server 2003 or newer)' );
 			
 			$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Compression' );
 			$w{hbox1} -> pack_start( $w{chUseCompression}, 0, 1, 0 );
-			$w{chUseCompression} -> set_tooltip_text( '[-z] : Enable compression of the RDP datastream' );
+			$w{chUseCompression} -> set_tooltip_text( '[+compression] : Enable compression of the RDP datastream' );
 			
 			$w{chIgnoreCert} = Gtk2::CheckButton -> new_with_label( 'Ignore verification of logon certificate' );
 			$w{hbox1} -> pack_start( $w{chIgnoreCert}, 0, 1, 0 );
-			$w{chIgnoreCert} -> set_tooltip_text( "--ignore-certificate: ignore verification of logon certificate" );
+			$w{chIgnoreCert} -> set_tooltip_text( "/cert-ignore: ignore verification of logon certificate" );
 			
 			$w{chFontSmooth} = Gtk2::CheckButton -> new_with_label( 'Font Smooth' );
 			$w{hbox1} -> pack_start( $w{chFontSmooth}, 0, 1, 0 );
-			$w{chFontSmooth} -> set_tooltip_text( "-x 80: enable font smoothing" );
+			$w{chFontSmooth} -> set_tooltip_text( "+fonts: enable font smoothing" );
+
+			$w{chNoGrabKbd} = Gtk2::CheckButton -> new_with_label( 'Do not grab keyboard' );
+			$w{hbox1} -> pack_start( $w{chNoGrabKbd}, 0, 1, 0 );
+			$w{chNoGrabKbd} -> set_tooltip_text( "-grab-keyboard: do not grab keyboard" );
 		
 		$w{hbox3} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox3}, 0, 1, 5 );
 			
 			$w{chNoAuth} = Gtk2::CheckButton -> new_with_label( 'No Authentication' );
 			$w{hbox3} -> pack_start( $w{chNoAuth}, 0, 1, 0 );
-			$w{chNoAuth} -> set_tooltip_text( "--no-auth: disable authentication" );
+			$w{chNoAuth} -> set_tooltip_text( "-authentication: disable authentication" );
 			
 			$w{chNoFastPath} = Gtk2::CheckButton -> new_with_label( 'No Fast Path' );
 			$w{hbox3} -> pack_start( $w{chNoFastPath}, 0, 1, 0 );
-			$w{chNoFastPath} -> set_tooltip_text( "--no-fastpath: disable fast-path" );
+			$w{chNoFastPath} -> set_tooltip_text( "-fast-path: disable fast-path" );
 			
 			$w{chRFX} = Gtk2::CheckButton -> new_with_label( 'Enable RemoteFX' );
 			$w{hbox3} -> pack_start( $w{chRFX}, 0, 1, 0 );
-			$w{chRFX} -> set_tooltip_text( "--rfx: enable RemoteFX" );
+			$w{chRFX} -> set_tooltip_text( "/rfx: enable RemoteFX" );
 			
 			$w{chNSCodec} = Gtk2::CheckButton -> new_with_label( 'Enable NSCodec' );
 			$w{hbox3} -> pack_start( $w{chNSCodec}, 0, 1, 0 );
-			$w{chNSCodec} -> set_tooltip_text( "--nsc: enable NSCodec (experimental)" );
+			$w{chNSCodec} -> set_tooltip_text( "/nsc: enable NSCodec (experimental)" );
 			
 		$w{hbox4} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox4}, 0, 1, 5 );
 			
 			$w{chNoRDP} = Gtk2::CheckButton -> new_with_label( 'Disable RDP encryption' );
 			$w{hbox4} -> pack_start( $w{chNoRDP}, 0, 1, 0 );
-			$w{chNoRDP} -> set_tooltip_text( "--no-rdp: disable Standard RDP encryption" );
+			$w{chNoRDP} -> set_tooltip_text( "-sec-rdp: disable Standard RDP encryption" );
 			
 			$w{chNoTLS} = Gtk2::CheckButton -> new_with_label( 'Disable TLS encryption' );
 			$w{hbox4} -> pack_start( $w{chNoTLS}, 0, 1, 0 );
-			$w{chNoTLS} -> set_tooltip_text( "--no-tls: disable TLS encryption" );
+			$w{chNoTLS} -> set_tooltip_text( "-sec-tls: disable TLS encryption" );
 			
 			$w{chNoNLA} = Gtk2::CheckButton -> new_with_label( 'Disable Network Level Authentication' );
 			$w{hbox4} -> pack_start( $w{chNoNLA}, 0, 1, 0 );
-			$w{chNoNLA} -> set_tooltip_text( "--no-nla: disable network level authentication" );
+			$w{chNoNLA} -> set_tooltip_text( "-sec-nla: disable network level authentication" );
 		
 		$w{hboxss} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hboxss}, 0, 1, 5 );
@@ -351,7 +359,7 @@ sub _buildGUI {
 			$w{hboxss} -> pack_start( $w{lblStartupShell}, 0, 1, 0 );
 			
 			$w{entryStartupShell} = Gtk2::Entry -> new;
-			$w{entryStartupShell} -> set_tooltip_text( "[-s 'startupshell command'] : start given startupshell/command instead of explorer" );
+			$w{entryStartupShell} -> set_tooltip_text( "[/shell 'startupshell command'] : start given startupshell/command instead of explorer" );
 			$w{hboxss} -> pack_start( $w{entryStartupShell}, 1, 1, 5 );
 		
 		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
@@ -359,7 +367,7 @@ sub _buildGUI {
 			
 			$w{frGeometry} = Gtk2::Frame -> new( ' RDP Window size: ' );
 			$w{hbox2} -> pack_start( $w{frGeometry}, 1, 1, 0 );
-			$w{frGeometry} -> set_tooltip_text( '[-g] : Amount of screen to use' );
+			$w{frGeometry} -> set_tooltip_text( '[/size] : Amount of screen to use' );
 				
 				$w{hboxsize} = Gtk2::VBox -> new( 0, 5 );
 				$w{frGeometry} -> add( $w{hboxsize} );
@@ -369,7 +377,7 @@ sub _buildGUI {
 					
 					$w{chFullscreen} = Gtk2::RadioButton -> new_with_label( undef, 'Fullscreen' );
 					$w{hboxfsebpc} -> pack_start( $w{chFullscreen}, 1, 1, 0 );
-					$w{chFullscreen} -> set_tooltip_text( '[-f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)' );
+					$w{chFullscreen} -> set_tooltip_text( '[/f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)' );
 					
 					$w{chEmbed} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Embed in TAB(*)' );
 					$w{hboxfsebpc} -> pack_start( $w{chEmbed}, 1, 1, 0 );
@@ -381,7 +389,7 @@ sub _buildGUI {
 					$w{hboxfsebpc} -> pack_start( $w{hbox69}, 1, 1, 0 );
 						
 						$w{chWidthHeight} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Width x Height:' );
-						$w{chWidthHeight} -> set_tooltip_text( '[-g WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window' );
+						$w{chWidthHeight} -> set_tooltip_text( '[/size:WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window' );
 						$w{hbox69} -> pack_start( $w{chWidthHeight}, 0, 1, 0 );
 						
 						$w{hboxWidthHeight} = Gtk2::HBox -> new( 0, 5 );
@@ -397,7 +405,7 @@ sub _buildGUI {
 					$w{hboxsize} -> pack_start( $w{hboxPercentage}, 0, 1, 0 );
 						
 						$w{chPercentage} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Screen percentage:' );
-						$w{chPercentage} -> set_tooltip_text( '[-g percentage%] : Amount of screen to use' );
+						$w{chPercentage} -> set_tooltip_text( '[/size:percentage%] : Amount of screen to use' );
 						$w{chPercentage} -> set_active( 1 );
 						$w{hboxPercentage} -> pack_start( $w{chPercentage}, 0, 1, 0 );
 						
@@ -406,7 +414,7 @@ sub _buildGUI {
 			
 			$w{frKeyboard} = Gtk2::Frame -> new( 'Keyboard layout:' );
 			$w{hbox2} -> pack_start( $w{frKeyboard}, 0, 1, 0 );
-			$w{frKeyboard} -> set_tooltip_text( '[-k] : Keyboard layout' );
+			$w{frKeyboard} -> set_tooltip_text( '[/kbd] : Keyboard layout' );
 				
 				$w{entryKeyboard} = Gtk2::Entry -> new;
 				$w{frKeyboard} -> add( $w{entryKeyboard} );
@@ -426,7 +434,7 @@ sub _buildGUI {
 		
 		$w{frameRedirDisk} = Gtk2::Frame -> new( ' Disk redirects: ' );
 		$w{vbox} -> pack_start( $w{frameRedirDisk}, 1, 1, 0 );
-		$w{frameRedirDisk} -> set_tooltip_text( '[-r disk:<8_chars_sharename>=<path>] : Redirects a <path> to the share \\tsclient\<8_chars_sharename> on the server' );
+		$w{frameRedirDisk} -> set_tooltip_text( '[/drive:<8_chars_sharename>:<path>] : Redirects a <path> to the share \\tsclient\<8_chars_sharename> on the server' );
 			
 			$w{vbox_enesimo} = Gtk2::VBox -> new( 0, 0);
 			$w{frameRedirDisk} -> add( $w{vbox_enesimo}, );
