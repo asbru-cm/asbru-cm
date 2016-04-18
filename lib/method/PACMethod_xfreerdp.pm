@@ -221,7 +221,7 @@ sub _parseCfgToOptions {
 		$opt =~ /^\+fonts$/go		and	$hash{fontSmooth}	= 1;
 		$opt =~ /^-grab-keyboard$/go	and	$hash{noGrabKbd}	= 1;
 		
-		while ( $opt =~ /^drive:(.+):(.+)/go )
+		while ( $opt =~ /^drive:(.+),(.+)/go )
 		{
 			my %redir;
 			$redir{redirDiskShare}	= $1;
@@ -266,7 +266,7 @@ sub _parseOptionsToCfg {
 	$txt .= ' +fonts' if $$hash{fontSmooth};
 	$txt .= ' -grab-keyboard' if $$hash{noGrabKbd};
 	
-	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " /drive:$$redir{redirDiskShare}:$$redir{redirDiskPath}"; }
+	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " /drive:$$redir{redirDiskShare},$$redir{redirDiskPath}"; }
 	
 	return $txt;
 }
