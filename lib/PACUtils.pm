@@ -126,6 +126,10 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	"Brian's Consultant Services",
+	'Cheah CH',
+	'Joseph Whipple',
+	'Felix Brack',
 	'Kalmykov Alexander',
 	'Paul Verreth',
 	'Iftimie Catalin Panaite',
