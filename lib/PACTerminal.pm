@@ -1055,7 +1055,7 @@ sub _watchConnectionData {
 			$data = $self -> _checkSendKeystrokes( $data );
 			
 			defined $$self{_EMBED_KIDNAP} and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
-			$$self{_EMBED_KIDNAP} = Glib::Timeout -> add( 100, sub {
+			$$self{_EMBED_KIDNAP} = Glib::Timeout -> add( 500, sub {
 				my $title = 'FreeRDP: ' . $$self{_CFG}{environments}{$$self{_UUID}}{ip} . ( $$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}" );
 				$title = $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' ?
 					"FreeRDP: $$self{_CFG}{environments}{$$self{_UUID}}{ip}" . ( $$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}" ) :

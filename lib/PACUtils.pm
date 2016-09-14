@@ -3041,7 +3041,7 @@ sub _getXWindowsList {
 			$list{'by_pid'}{$data_pid}{'xid'}		= $xid;
 			$list{'by_pid'}{$data_pid}{'command'}	= $data_command;
 		}
-	}   
+	}
 	
 	#my $tw = Gtk2::Window -> new;
 	#my $vb = Gtk2::VBox -> new( 0, 0 );
@@ -3055,7 +3055,7 @@ sub _getXWindowsList {
 	#my $sock = Gtk2::Socket -> new;
 	#$vb -> add( $sock );
 	#$tw -> show_all;
-	#$sock -> add_id( $$list{'by_name'}{'Calculator'}{'xid'} );
+	#$sock -> add_id( $list{'by_name'}{'Calculator'}{'xid'} );
 
 	return \%list;
 }

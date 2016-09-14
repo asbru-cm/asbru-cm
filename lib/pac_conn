@@ -665,13 +665,6 @@ sub _execScript {
 		$EXP -> clear_accum;
 		send_slow( $EXP, $txt );
 	};
-	$TERMINAL{get_prompt}	= sub {
-		my $del_esq = shift // 1;
-		ctrl( "SCRIPT_SUB_GET_PROMPT[NAME:$name][PID:$$][PARAMS:]" );
-		my $prompt = _getPrompt();
-		$del_esq and $prompt = _removeEscapeSeqs( $prompt );
-		return "\Q$prompt\E";
-	};
 	$TERMINAL{send_get}	= sub {
 		my $txt		= shift // '';
 		my $intro	= shift // 1;
@@ -682,6 +675,13 @@ sub _execScript {
 		return undef unless defined $out;
 		$out =~ s/^.+?\R//go;
 		return _removeEscapeSeqs( $out );
+	};
+	$TERMINAL{get_prompt}	= sub {
+		my $del_esq = shift // 1;
+		ctrl( "SCRIPT_SUB_GET_PROMPT[NAME:$name][PID:$$][PARAMS:]" );
+		my $prompt = _getPrompt();
+		$del_esq and $prompt = _removeEscapeSeqs( $prompt );
+		return "\Q$prompt\E";
 	};
 	$TERMINAL{expect}	= sub {
 		my $pattern	= shift // '';
