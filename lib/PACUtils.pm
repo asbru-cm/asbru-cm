@@ -126,6 +126,7 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Jeff Bakst',
 	'Sebastian Treu',
 	"Brian's Consultant Services",
 	'Cheah CH',
@@ -1851,7 +1852,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'screenshots external viewer'}	//= '/usr/bin/xdg-open';
 	$$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
 	$$cfg{'defaults'}{'sort groups first'}				//= 1;
-	$$cfg{'defaults'}{'word characters'}				//= '\.:_\/-A-Za-z0-9';
+	$$cfg{'defaults'}{'word characters'}				//= '\.:_\/a-zA-Z0-9-';
 	$$cfg{'defaults'}{'terminal emulation'}				//= 'xterm';
 	$$cfg{'defaults'}{'show tray icon'}					//= 1;
 	$$cfg{'defaults'}{'unsplit disconnected terminals'}	//= 0;
