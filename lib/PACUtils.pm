@@ -126,6 +126,15 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Jeff Bakst',
+	'Sebastian Treu',
+	"Brian's Consultant Services",
+	'Cheah CH',
+	'Joseph Whipple',
+	'Felix Brack',
+	'Kalmykov Alexander',
+	'Paul Verreth',
+	'Iftimie Catalin Panaite',
 	'Andre Geißler',
 	'Arend de Boer',
 	'Taylor Finklea',
@@ -1843,7 +1852,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'screenshots external viewer'}	//= '/usr/bin/xdg-open';
 	$$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
 	$$cfg{'defaults'}{'sort groups first'}				//= 1;
-	$$cfg{'defaults'}{'word characters'}				//= '\.:_\/-A-Za-z0-9';
+	$$cfg{'defaults'}{'word characters'}				//= '\.:_\/a-zA-Z0-9-';
 	$$cfg{'defaults'}{'terminal emulation'}				//= 'xterm';
 	$$cfg{'defaults'}{'show tray icon'}					//= 1;
 	$$cfg{'defaults'}{'unsplit disconnected terminals'}	//= 0;
@@ -3034,7 +3043,7 @@ sub _getXWindowsList {
 			$list{'by_pid'}{$data_pid}{'xid'}		= $xid;
 			$list{'by_pid'}{$data_pid}{'command'}	= $data_command;
 		}
-	}   
+	}
 	
 	#my $tw = Gtk2::Window -> new;
 	#my $vb = Gtk2::VBox -> new( 0, 0 );
@@ -3048,7 +3057,7 @@ sub _getXWindowsList {
 	#my $sock = Gtk2::Socket -> new;
 	#$vb -> add( $sock );
 	#$tw -> show_all;
-	#$sock -> add_id( $$list{'by_name'}{'Calculator'}{'xid'} );
+	#$sock -> add_id( $list{'by_name'}{'Calculator'}{'xid'} );
 
 	return \%list;
 }

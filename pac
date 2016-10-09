@@ -113,6 +113,7 @@ if ( ! ( $PAC = PACMain -> new( @ARGV ) ) ) {
 	print STDERR "PAC not starting. PAC already running?\n";
 	exit 0
 }
+use Data::Dumper; print Dumper( PACUtils::_getXWindowsList );
 $PAC -> start;
 
 print "Finished $Script (PID:$$)...\n";

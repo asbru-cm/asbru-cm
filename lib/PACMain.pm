@@ -894,8 +894,12 @@ sub _initGUI {
 		$self -> _updateFavouritesList;
 		$self -> _updateGUIFavourites;
 	}
-	else {
+	elsif ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 2 );
+		$self -> _updateGUIClusters;
+	}
+	else {
+		$$self{_GUI}{nbTree} -> set_current_page( 3 );
 		$self -> _updateGUIHistory;
 	}
 	

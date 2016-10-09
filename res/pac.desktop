@@ -10,7 +10,7 @@ Name[en_US]=PAC
 Comment[en_US]=Perl Auto Connector
 Categories=Applications;Network;
 X-GNOME-Autostart-enabled=false
-Actions=Shell;Quick;
+Actions=Shell;Quick;ReadOnly;
 
 [Desktop Action Shell]
 Name=Start local shell
@@ -20,5 +20,10 @@ Exec=pac --start-shell
 [Desktop Action Quick]
 Name=Quick connect...
 Exec=pac --quick-conn
+#OnlyShowIn=Unity;
+
+[Desktop Action ReadOnly]
+Name=Start Read-Only instance
+Exec=pac --readonly --no-backup
 #OnlyShowIn=Unity;
 
