@@ -254,7 +254,7 @@ sub _parseOptionsToCfg {
 	$txt .= ' /shell ' . $$hash{startupshell} if $$hash{startupshell} ne '';
 	$txt .= ' /d:' . $$hash{domain} if $$hash{domain} ne '';
 	$txt .= ' +clipboard' if $$hash{redirClipboard};
-	$txt .= ' +sound:sys:alsa' if $$hash{redirSound};
+        $txt .= ' /sound:sys:alsa' if $$hash{redirSound};
 	$txt .= ' /cert-ignore' if $$hash{ignoreCert};
 	$txt .= ' -authentication' if $$hash{noAuth};
 	$txt .= ' -fast-path' if $$hash{nofastPath};
