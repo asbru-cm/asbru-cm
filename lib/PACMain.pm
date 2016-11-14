@@ -3478,7 +3478,8 @@ sub _showConnectionsList {
 	my $move = shift // 1;
 	
 	$$self{_GUI}{main} -> show;
-	$$self{_GUI}{main} -> present_with_time( time );
+	#$$self{_GUI}{main} -> present_with_time( time );
+	$$self{_GUI}{main} -> present;
 	
 	$move and $$self{_GUI}{main} -> move( $$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0 );
 }
