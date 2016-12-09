@@ -126,6 +126,8 @@ my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
 our @DONATORS_LIST	= (
+	'Angelo Maria Lambiasi',
+	'TWEB Inc',
 	'Jeff Bakst',
 	'Sebastian Treu',
 	"Brian's Consultant Services",
