@@ -3273,10 +3273,27 @@ sub _updateCFG {
 	
 	_setTabColour( $self );
 	
+	my $colors = [Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'color black'} // '#000000000000' ),		# black
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color red'}),				# red
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color green'}),				# green
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color yellow'}),				# yellow (=brown)
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color blue'}),				# blue
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color magenta'}),				# magenta
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color cyan'}),				# cyan
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color white'}),				# white (=light grey)
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright black'}),			# light black (=dark grey)
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright red'}),			# light red
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright green'}),			# light green
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright yellow'}),			# light yellow
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright blue'}),			# light blue
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright magenta'}),			# light magenta
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright cyan'}),			# light cyan
+	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright white'})];			# light white
 	# Update some VTE options
 	if ( ( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ) && ( defined $$self{_GUI}{_VTE} ) ) {
 		$$self{_GUI}{_VTE} -> set_background_transparent( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal transparency'} > 0 );
 		$$self{_GUI}{_VTE} -> set_background_saturation( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal transparency'} );
+		$$self{_GUI}{_VTE} -> set_colors( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
 		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ) );
 		$$self{_GUI}{_VTE} -> set_color_background( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ) );
 		$$self{_GUI}{_VTE} -> set_color_bold( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} : $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color'} ) );
@@ -3291,6 +3308,7 @@ sub _updateCFG {
 	} elsif ( defined $$self{_GUI}{_VTE} ) {
 		$$self{_GUI}{_VTE} -> set_background_transparent( $$self{_CFG}{'defaults'}{'terminal transparency'} > 0 );
 		$$self{_GUI}{_VTE} -> set_background_saturation( $$self{_CFG}{'defaults'}{'terminal transparency'} );
+		$$self{_GUI}{_VTE} -> set_colors( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
 		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'text color'} ) );
 		$$self{_GUI}{_VTE} -> set_color_background( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'back color'} ) );
 		$$self{_GUI}{_VTE} -> set_color_bold( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'} ) );

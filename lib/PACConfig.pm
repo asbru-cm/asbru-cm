@@ -641,7 +641,25 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgShowTerminalStatus' )	-> set_active( $$cfg{'defaults'}{'terminal show status bar'} );
 	_( $self, 'rbCfgSwitchTabsCtrl' )		-> set_active( ! $$cfg{'defaults'}{'how to switch tabs'} );
 	_( $self, 'rbCfgSwitchTabsAlt' )		-> set_active( $$cfg{'defaults'}{'how to switch tabs'} );
-	
+
+	# Terminal Colors
+	_( $self, 'colorBlack' )                        -> set_color( _( $self, 'colorBlack' ) -> get_color -> parse( $$cfg{'defaults'}{'color black'} // _( $self, 'colorBlack' ) -> get_color -> to_string ) );
+	_( $self, 'colorRed' )                          -> set_color( _( $self, 'colorRed' ) -> get_color -> parse( $$cfg{'defaults'}{'color red'} // _( $self, 'colorRed' ) -> get_color -> to_string ) );
+	_( $self, 'colorGreen' )                        -> set_color( _( $self, 'colorGreen' ) -> get_color -> parse( $$cfg{'defaults'}{'color green'} // _( $self, 'colorGreen' ) -> get_color -> to_string ) );
+	_( $self, 'colorYellow' )                       -> set_color( _( $self, 'colorYellow' ) -> get_color -> parse( $$cfg{'defaults'}{'color yellow'} // _( $self, 'colorYellow' ) -> get_color -> to_string ) );
+	_( $self, 'colorBlue' )                         -> set_color( _( $self, 'colorBlue' ) -> get_color -> parse( $$cfg{'defaults'}{'color blue'} // _( $self, 'colorBlue' ) -> get_color -> to_string ) );
+	_( $self, 'colorMagenta' )                      -> set_color( _( $self, 'colorMagenta' ) -> get_color -> parse( $$cfg{'defaults'}{'color magenta'} // _( $self, 'colorMagenta' ) -> get_color -> to_string ) );
+	_( $self, 'colorCyan' )                         -> set_color( _( $self, 'colorCyan' ) -> get_color -> parse( $$cfg{'defaults'}{'color cyan'} // _( $self, 'colorCyan' ) -> get_color -> to_string ) );
+	_( $self, 'colorWhite' )                        -> set_color( _( $self, 'colorWhite' ) -> get_color -> parse( $$cfg{'defaults'}{'color white'} // _( $self, 'colorWhite' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightBlack' )                  -> set_color( _( $self, 'colorBrightBlack' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright black'} // _( $self, 'colorBrightBlack' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightRed' )                    -> set_color( _( $self, 'colorBrightRed' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright red'} // _( $self, 'colorBrightRed' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightGreen' )                  -> set_color( _( $self, 'colorBrightGreen' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright green'} // _( $self, 'colorBrightGreen' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightYellow' )                 -> set_color( _( $self, 'colorBrightYellow' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright yellow'} // _( $self, 'colorBrightYellow' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightBlue' )                   -> set_color( _( $self, 'colorBrightBlue' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright blue'} // _( $self, 'colorBrightBlue' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightMagenta' )                -> set_color( _( $self, 'colorBrightMagenta' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright magenta'} // _( $self, 'colorBrightMagenta' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightCyan' )                   -> set_color( _( $self, 'colorBrightCyan' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright cyan'} // _( $self, 'colorBrightCyan' ) -> get_color -> to_string ) );
+	_( $self, 'colorBrightWhite' )                  -> set_color( _( $self, 'colorBrightWhite' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright white'} // _( $self, 'colorBrightWhite' ) -> get_color -> to_string ) );
+
 	# Local Shell Options
 	_( $self, 'entryCfgShellBinary' )		-> set_text( $$cfg{'defaults'}{'shell binary'} || '/bin/bash' );
 	_( $self, 'entryCfgShellOptions' )		-> set_text( $$cfg{'defaults'}{'shell options'} );
@@ -784,6 +802,24 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'remove control chars'}			= _( $self, 'cbCfgRemoveCtrlCharsConf' )	-> get_active;
 	$$self{_CFG}{'defaults'}{'allow more instances'}			= _( $self, 'cbCfgAllowMoreInstances' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'show favourites in unity'}		= _( $self, 'cbCfgShowFavOnUnity' )			-> get_active;
+	
+	# Terminal colors
+	$$self{_CFG}{'defaults'}{'color black'}						= _( $self, 'colorBlack' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color red'}						= _( $self, 'colorRed' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color green'}						= _( $self, 'colorGreen' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color yellow'}					= _( $self, 'colorYellow' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color blue'}						= _( $self, 'colorBlue' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color magenta'}					= _( $self, 'colorMagenta' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color cyan'}						= _( $self, 'colorCyan' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color white'}						= _( $self, 'colorWhite' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright black'}					= _( $self, 'colorBrightBlack' )				-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright red'}					= _( $self, 'colorBrightRed' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright green'}					= _( $self, 'colorBrightGreen' )				-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright yellow'}					= _( $self, 'colorBrightYellow' )				-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright blue'}					= _( $self, 'colorBrightBlue' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright magenta'}				= _( $self, 'colorBrightMagenta' )				-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright cyan'}					= _( $self, 'colorBrightCyan' )					-> get_color -> to_string;
+	$$self{_CFG}{'defaults'}{'color bright white'}					= _( $self, 'colorBrightWhite' )				-> get_color -> to_string;
 	
 	if		( _( $self, 'rbOnNoTabsNothing' ) -> get_active )	{ $$self{_CFG}{'defaults'}{'when no more tabs'} = 0; }
 	elsif	( _( $self, 'rbOnNoTabsClose' ) -> get_active )		{ $$self{_CFG}{'defaults'}{'when no more tabs'} = 1; }
