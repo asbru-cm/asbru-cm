@@ -1814,7 +1814,6 @@ sub _setupCallbacks {
 			
 			if ( $$self{_CFG}{defaults}{'ctrl tab'} eq 'last' ) {
 				$$self{_GUI}{nb} -> set_current_page( $$self{_PREVTAB} );
-				$$self{_PREVTAB} = $curr_page;
 			} else {
 				if ( $curr_page == 0 )	{ $$self{_GUI}{nb} -> set_current_page( $$self{_GUI}{nb} -> get_n_pages - 1 ); }
 				else					{ $$self{_GUI}{nb} -> prev_page; }
@@ -1825,26 +1824,22 @@ sub _setupCallbacks {
 		elsif ( $ctrl && ( ! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} ) ) {
 			# Capture <Ctrl>PgUp/Left --> select previous tab
 			if ( $keyval eq 'Page_Up' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'} ) {
-				$$self{_PREVTAB} = $curr_page;
 				if ( $curr_page == 0 )	{ $$self{_GUI}{nb} -> set_current_page( -1 ); }
 				else					{ $$self{_GUI}{nb} -> prev_page; }
 			}
 			# Capture <Ctrl>PgDwn/Right --> select next tab
 			elsif ( $keyval eq 'Page_Down' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'} ) {
-				$$self{_PREVTAB} = $curr_page;
 				if ( $curr_page == $$self{_GUI}{nb} -> get_n_pages - 1 )	{ $$self{_GUI}{nb} -> set_current_page( 0 ); }
 				else														{ $$self{_GUI}{nb} -> next_page; }
 			}
 			# Capture <Ctrl>number --> select number tab
 			elsif ( $keyval =~ /^\d$/go ) {
-				$$self{_PREVTAB} = $curr_page;
 				$$self{_GUI}{nb} -> set_current_page( $keyval - ( $$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1 ) );
 			}
 			# Capture <Ctrl>TAB --> switch between tabs
 			elsif ( $keyval eq 'Tab' ) {
 				if ( $$self{_CFG}{defaults}{'ctrl tab'} eq 'last' ) {
 					$$self{_GUI}{nb} -> set_current_page( $$self{_PREVTAB} );
-					$$self{_PREVTAB} = $curr_page;
 				} else {
 					if ( $curr_page == $$self{_GUI}{nb} -> get_n_pages - 1 )	{ $$self{_GUI}{nb} -> set_current_page( 0 ); }
 					else														{ $$self{_GUI}{nb} -> next_page; }
@@ -1856,13 +1851,11 @@ sub _setupCallbacks {
 		} elsif ( $alt && ( ! $$self{_CFG}{'defaults'}{'disable ALT key bindings'} ) && $$self{_CFG}{'defaults'}{'how to switch tabs'} ) {
 			# Capture <Alt>PgUp/Left --> select previous tab
 			if ( $keyval eq 'Left' ) {
-				$$self{_PREVTAB} = $curr_page;
 				if ( $curr_page == 0 )	{ $$self{_GUI}{nb} -> set_current_page( -1 ); }
 				else					{ $$self{_GUI}{nb} -> prev_page; }
 			}
 			# Capture <Alt>PgDwn/Right --> select next tab
 			elsif ( $keyval eq 'Right' ) {
-				$$self{_PREVTAB} = $curr_page;
 				if ( $curr_page == $$self{_GUI}{nb} -> get_n_pages - 1 )	{ $$self{_GUI}{nb} -> set_current_page( 0 ); }
 				else														{ $$self{_GUI}{nb} -> next_page; }
 			} else { return 0; }
@@ -1908,6 +1901,8 @@ sub _setupCallbacks {
 		#if ( $pnum == 0 && $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 1 ); }
 		#elsif ( $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 0 ); }
 		
+		$$self{_PREVTAB}=$nb->get_current_page;
+
 		my $tab_page = $nb -> get_nth_page( $pnum );
 		
 		$$self{_HAS_FOCUS} = '';
