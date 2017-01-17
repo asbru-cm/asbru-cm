@@ -236,7 +236,7 @@ sub _parseCfgToOptions
 	@{ $hash{remotePort} }			= ();
 	@{ $hash{advancedOption} }		= ();
 	
-	my @opts = split( /\s+-/, $cmd_line );
+	my @opts = split( /\s+-(?=([^\"]*\"[^\"]*\")*[^\"]*$)/, $cmd_line );
 	foreach my $opt ( @opts )
 	{
 		next unless $opt ne '';
