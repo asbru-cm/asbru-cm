@@ -33,6 +33,12 @@ We recommend installing Ásbrú Connection Manager using one of the [pre-built p
 
 Once installed on your system, find the application under "Applications" -> "Ásbrú Connection Manager", or type "acm" in your terminal.
 
+### Frequenty Asked Questions
+
+- Why did you call that project "Ásbrú" ?
+
+In Norse mythology, [Ásbrú](https://en.wikipedia.org/wiki/Bifr%C3%B6st) refers to a burning rainbow bridge that connects Midgard (Earth) and Asgard, the realm of the gods.
+
 ### Contributing
 
 If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
@@ -42,4 +48,4 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 
 ### License
 
-Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A fully copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
+Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
