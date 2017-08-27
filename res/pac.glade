@@ -4,7 +4,7 @@
   <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkWindow" id="windowConfig">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">PAC Preferences</property>
+    <property name="title" translatable="yes">Preferences</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
@@ -118,7 +118,7 @@
                                     </child>
                                     <child>
                                       <widget class="GtkCheckButton" id="cbCfgAutoStart">
-                                        <property name="label" translatable="yes">Start PAC at session startup</property>
+                                        <property name="label" translatable="yes">Start at session startup</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -139,7 +139,7 @@
                               <widget class="GtkLabel" id="label53">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes"> Start PAC: </property>
+                                <property name="label" translatable="yes"> Start: </property>
                                 <property name="use_markup">True</property>
                               </widget>
                               <packing>
@@ -186,7 +186,7 @@
                                     </child>
                                     <child>
                                       <widget class="GtkCheckButton" id="cbCfgConfirmExit">
-                                        <property name="label" translatable="yes">Confirm PAC exit</property>
+                                        <property name="label" translatable="yes">Confirm exit</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -222,7 +222,7 @@
                               <widget class="GtkLabel" id="label54">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes"> At PAC exit: </property>
+                                <property name="label" translatable="yes"> At exit: </property>
                                 <property name="use_markup">True</property>
                               </widget>
                               <packing>
@@ -317,12 +317,12 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip" translatable="yes">Here you can select which key bindings will not be available in PAC's Tabbed window (the one containing the launched connections in TABs)</property>
+                        <property name="tooltip" translatable="yes">Here you can select which key bindings will not be available in tabbed window (the one containing the launched connections in TABs)</property>
                         <child>
                           <widget class="GtkLabel" id="label57">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes"> Select key bindings to disable from PAC's TABs Window: </property>
+                            <property name="label" translatable="yes"> Select key bindings to disable from TABs Window: </property>
                             <property name="use_markup">True</property>
                           </widget>
                           <packing>
@@ -389,7 +389,7 @@
                         <property name="can_focus">False</property>
                         <child>
                           <widget class="GtkCheckButton" id="cbCfgUseGUIPassword">
-                            <property name="label" translatable="yes">Protect PAC with password</property>
+                            <property name="label" translatable="yes">Protect with password</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -455,7 +455,7 @@
                         <property name="can_focus">False</property>
                         <child>
                           <widget class="GtkCheckButton" id="cbCfgCheckVersions">
-                            <property name="label" translatable="yes">Check for new PAC versions on PAC startup</property>
+                            <property name="label" translatable="yes">Check for new versions on startup</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -493,7 +493,7 @@
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgHideOnConnect">
-                        <property name="label" translatable="yes">Hide PAC on connection</property>
+                        <property name="label" translatable="yes">Hide on connection</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -614,7 +614,7 @@ connecting (timeout is in seconds)</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgAutoSave">
-                        <property name="label" translatable="yes">Automatically save every PAC configuration change</property>
+                        <property name="label" translatable="yes">Automatically save every configuration change</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -647,7 +647,7 @@ connecting (timeout is in seconds)</property>
                       <widget class="GtkLabel" id="lblRestartRequired">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;i&gt;(*) Requires restarting PAC for the change(s) to take effect&lt;/i&gt;</property>
+                        <property name="label" translatable="yes">&lt;i&gt;(*) Requires restart to take effect&lt;/i&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
@@ -1095,7 +1095,7 @@ connecting (timeout is in seconds)</property>
                           <widget class="GtkLabel" id="label66">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Start PAC on: </property>
+                            <property name="label" translatable="yes">Start on: </property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -1412,7 +1412,7 @@ connecting (timeout is in seconds)</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgAllowMoreInstances">
-                        <property name="label" translatable="yes">Allow more than one PAC instance to run at the same time</property>
+                        <property name="label" translatable="yes">Allow more than one instance to run at the same time</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -1429,7 +1429,7 @@ connecting (timeout is in seconds)</property>
                       <widget class="GtkLabel" id="lblRestartRequired1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">(*) Requires restarting PAC for the change(s) to take effect</property>
+                        <property name="label" translatable="yes">(*) Requires restart to take effect</property>
                       </widget>
                       <packing>
                         <property name="expand">True</property>
@@ -1853,7 +1853,7 @@ sudo -p sudo_prompt_string ...</property>
                           <widget class="GtkLabel" id="label7">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">PAC config files location: </property>
+                            <property name="label" translatable="yes">Config files location: </property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -1867,7 +1867,7 @@ sudo -p sudo_prompt_string ...</property>
                             <property name="can_focus">False</property>
                             <property name="action">select-folder</property>
                             <property name="focus_on_click">False</property>
-                            <property name="title" translatable="yes">Choose a folder for saving PAC config files</property>
+                            <property name="title" translatable="yes">Choose a folder for saving config files</property>
                           </widget>
                           <packing>
                             <property name="expand">True</property>
@@ -1945,7 +1945,7 @@ sudo -p sudo_prompt_string ...</property>
                   <widget class="GtkLabel" id="label1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">PAC Main Options</property>
+                    <property name="label" translatable="yes">Main Options</property>
                   </widget>
                   <packing>
                     <property name="expand">True</property>
@@ -2076,7 +2076,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip" translatable="yes">A 0 value makes PAC keep ALL the session logs</property>
+                                        <property name="tooltip" translatable="yes">0 to keep ALL the session logs</property>
                                         <property name="label" translatable="yes"> Files to save: </property>
                                       </widget>
                                       <packing>
@@ -2090,7 +2090,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip" translatable="yes">A 0 value makes PAC keep ALL the session logs</property>
+                                        <property name="tooltip" translatable="yes">A to keep ALL the session logs</property>
                                         <property name="invisible_char">•</property>
                                         <property name="invisible_char_set">True</property>
                                         <property name="primary_icon_activatable">False</property>
@@ -2137,7 +2137,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip" translatable="yes">Logfile pattern:
 
-&lt;UUID&gt; -&gt; PAC's UUID for this connection
+&lt;UUID&gt; -&gt; UUID for this connection
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -4103,7 +4103,7 @@ tty</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip" translatable="yes">If checked, lots of debug info will be output on every terminal. It will also make PAC save a .yml (YAML) config faile is "Save" button is clicked. BEWARE!! This option will make appear plain text passwords!!</property>
+                        <property name="tooltip" translatable="yes">If checked, lots of debug info will be output on every terminal. It will also save a .yml (YAML) config faile is "Save" button is clicked. BEWARE!! This option will make appear plain text passwords!!</property>
                         <property name="use_action_appearance">False</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4216,7 +4216,7 @@ tty</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip" translatable="yes">If checked, PAC will not react to pressing F11</property>
+                        <property name="tooltip" translatable="yes">If checked, ignore any F11 key press</property>
                         <property name="use_action_appearance">False</property>
                         <property name="draw_indicator">True</property>
                       </widget>
@@ -4447,7 +4447,7 @@ tty</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgAutoStartShell">
-                        <property name="label" translatable="yes">Start a Shell upon PAC startup</property>
+                        <property name="label" translatable="yes">Start a shell upon startup</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -4610,7 +4610,7 @@ tty</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="has_tooltip">True</property>
-                            <property name="tooltip" translatable="yes">This option will make PAC try to use GConf's configured proxy (if any)</property>
+                            <property name="tooltip" translatable="yes">Try to use GConf's configured proxy (if any)</property>
                             <property name="use_action_appearance">False</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -5496,7 +5496,7 @@ tty</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="has_tooltip">True</property>
-                                                        <property name="tooltip" translatable="yes">If checked, 'sudo' command will be prepended to the connection method, along with the "-p &lt;selected_prompt&gt;" command line option configured in "Preferences -&gt; PAC Main Options -&gt; Advanced", and the also selected password will be used when that prompt is found</property>
+                                                        <property name="tooltip" translatable="yes">If checked, 'sudo' command will be prepended to the connection method, along with the "-p &lt;selected_prompt&gt;" command line option configured in "Preferences -&gt; Main Options -&gt; Advanced", and the also selected password will be used when that prompt is found</property>
                                                         <child>
                                                           <widget class="GtkCheckButton" id="cbEditUseSudo">
                                                             <property name="visible">True</property>
@@ -5757,12 +5757,12 @@ tty</property>
                                             <property name="can_focus">False</property>
                                             <child>
                                               <widget class="GtkCheckButton" id="cbCfgStartupLaunch">
-                                                <property name="label" translatable="yes">Launch at PAC startup</property>
+                                                <property name="label" translatable="yes">Launch at startup</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
-                                                <property name="tooltip" translatable="yes">If checked, this session will be executed upon PAC startup</property>
+                                                <property name="tooltip" translatable="yes">If checked, this session will be executed upon startup</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="draw_indicator">True</property>
                                               </widget>
@@ -5792,7 +5792,7 @@ tty</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
-                                                <property name="tooltip" translatable="yes">If checked, PAC will reconnect this session when disconnection happens with exit status &lt;&gt; 0</property>
+                                                <property name="tooltip" translatable="yes">If checked, reconnect this session when disconnection happens with exit status &lt;&gt; 0</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="draw_indicator">True</property>
                                               </widget>
@@ -6679,7 +6679,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="can_focus">False</property>
                                 <child>
                                   <widget class="GtkCheckButton" id="cbStartScript">
-                                    <property name="label" translatable="yes">Start next PAC Script when connection is launched: </property>
+                                    <property name="label" translatable="yes">Start next script when connection is launched: </property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
@@ -6821,7 +6821,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="has_tooltip">True</property>
-                                                <property name="tooltip" translatable="yes">A 0 value makes PAC keep ALL the session logs</property>
+                                                <property name="tooltip" translatable="yes">0 to keep ALL the session logs</property>
                                                 <property name="label" translatable="yes"> Files to save (0=infinite): </property>
                                               </widget>
                                               <packing>
@@ -6835,7 +6835,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="has_tooltip">True</property>
-                                                <property name="tooltip" translatable="yes">A 0 value makes PAC keep ALL the session logs</property>
+                                                <property name="tooltip" translatable="yes">0 to keep ALL the session logs</property>
                                                 <property name="invisible_char">•</property>
                                                 <property name="invisible_char_set">True</property>
                                                 <property name="primary_icon_activatable">False</property>
@@ -6883,7 +6883,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="has_tooltip">True</property>
                                                 <property name="tooltip" translatable="yes">Logfile pattern:
 
-&lt;UUID&gt; -&gt; PAC's UUID for this connection
+&lt;UUID&gt; -&gt; UUID for this connection
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -7057,7 +7057,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="can_focus">False</property>
                                     <child>
                                       <widget class="GtkRadioButton" id="rbUseProxyIfCFG">
-                                        <property name="label" translatable="yes">Use PAC Global Options to decide</property>
+                                        <property name="label" translatable="yes">Use global options to decide</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>

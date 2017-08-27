@@ -17,23 +17,22 @@ $menudir=/usr/share/applications
 $icondir=/usr/share/pixmaps
 
 # Common header
-%product PAC Perl Auto Connector
-%copyright 2010-2015 by David Torrejón Vaquerizas, released under the GNU GPLv3 license
-%vendor David Torrejón Vaquerizas (david.tv@gmail.com)
+%product Ásbrú Connection Manager
+%copyright 2017 by Ásbrú Connection Manager team, 2010-2016 by David Torrejón Vaquerizas, released under the GNU GPLv3 license
+%vendor Ásbrú Connection Manager team (https://asbru-cm.net)
 %license ${src_basedir}/LICENSE
 %readme ${src_basedir}/README
 %description .
-%description Gnome's SecureCRT/Putty/blah blah... equivalent (on steroids!) written in Perl/GTK.
+%description Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 %description .
-%description PAC is a telnet/ssh/rsh/etc connection manager/automator written in Perl GTK
-%description aimed at making both administrators and switchers (from Windoze) live easier.
+%description Ásbrú Connection Manager is a telnet/ssh/rsh/etc connection manager/automator written in Perl GTK
+%description aimed at making both administrators and switchers (from Windows) live easier.
+%description .
 %description This is free software, licensed under GNU's GLPv3 version
-%description If possible, use the next repository to update/install PAC:
 %description .
-%description deb http://archive.getdeb.net/ubuntu <your_distrib_name_here>-getdeb apps
+%description Check the project website https://asbru-cm.net/
 %description .
-%description (Or visit: http://www.getdeb.net to get further info and software)
-%version 4.5.5.8
+%version 5.0.0
 %requires perl
 %requires gtk2-engines-pixbuf
 %requires libvte9

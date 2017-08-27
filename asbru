@@ -1,33 +1,35 @@
 #!/usr/bin/perl
 
-###################################################################
-# This file is part of PAC( Perl Auto Connector)
+###############################################################################
+# This file is part of Ásbrú Connection Manager
 #
+# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# Ásbrú Connection Manager is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# This program is distributed in the hope that it will be useful,
+# Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################
+# You should have received a copy of the GNU General Public License version 3
+# along with Ásbrú Connection Manager.
+# If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+###############################################################################
 
 $|++;
 
 BEGIN {
 	if ( grep( { /^-{1,2}(help|h)$/gi } @ARGV ) ) {
 		print "\n";
-		print "Usage: pac [options]\n";
+		print "Usage: $0 [options]\n";
 		print "Options:\n";
-		print "\t--help : this help\n";
-		print "\t--no-backup : do no create alternative PAC config files as a backup (faster shutdown)\n";
+		print "\t--help : show this message\n";
+		print "\t--no-backup : do no create alternative config files as a backup (faster shutdown)\n";
 		print "\t--start-shell : start a local terminal\n";
 		print "\t--password=<pwd> : automatically logon with given password without prompting user\n";
 		print "\t--start-uuid=<uuid>[:<cluster] : start connection in cluster (if given)\n";
@@ -39,10 +41,10 @@ BEGIN {
 		print "\t--quick-conn : open the Quick Connect dialog on startup\n";
 		print "\t--list-uuids : list existing connections/groups and their UUIDs\n";
 		print "\t--no-splash : no splash screen on startup\n";
-		print "\t--iconified : make PAC go to tray once started\n";
-		print "\t--readonly : start PAC in read only mode (no config changes allowed)\n";
+		print "\t--iconified : go to tray once started\n";
+		print "\t--readonly : start in read only mode (no config changes allowed)\n";
 		print "\n";
-		print "See 'man pac' for more info.\n";
+		print "See 'man asbru' for additional information.\n";
 		print "\n";
 		exit 0;
 	}
@@ -71,7 +73,7 @@ my $CFG_DIR			= $ENV{'HOME'}	. '/.config/pac';
 my $OLD_CFG_DIR		= $ENV{'HOME'}	. '/.pac';
 my $CFG_FILE		= $CFG_DIR		. '/pac.cfg';
 
-my $PAC;
+my $ASBRU;
 
 # END: Define GLOBAL variables
 ###################################################################
@@ -79,14 +81,14 @@ my $PAC;
 ###################################################################
 # START: MAIN program
 
-print "PAC started ($Script) with PID $$\n";
+print "Ásbrù started ($Script) with PID $$\n";
 
-# Check for Unity's systray-whitelist presence of 'pac'
+# Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
-if ( ( $? eq 0 ) && ( ! grep( /'pac'/, $wl ) ) ) {
-	print " - Adding 'pac' to Unity's 'systray-whitelist'\n";
-	$wl =~ s/'\s*]/', 'pac']/;
+if ( ( $? eq 0 ) && ( ! grep( /'asbru'/, $wl ) ) ) {
+	print " - Adding 'asbru' to Unity's 'systray-whitelist'\n";
+	$wl =~ s/'\s*]/', 'asbru']/;
 	`gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
 }
 
@@ -108,13 +110,12 @@ if ( ( $? eq 0 ) && ( ! grep( /'pac'/, $wl ) ) ) {
 -d $CFG_DIR . '/scripts/sample3.pl'		or copy( $RealBin . '/res/sample3.pl', $CFG_DIR . '/scripts/' );
 -d $CFG_DIR . '/scripts/sample4.pl'		or copy( $RealBin . '/res/sample4.pl', $CFG_DIR . '/scripts/' );
 
-# Start PAC!!
-if ( ! ( $PAC = PACMain -> new( @ARGV ) ) ) {
-	print STDERR "PAC not starting. PAC already running?\n";
+# Start Àsbrú Connection Manager :)
+if ( ! ( $ASBRU = PACMain -> new( @ARGV ) ) ) {
+	print STDERR "Ásbrù not started. Is Ásbrù already running?\n";
 	exit 0
 }
-#use Data::Dumper; print Dumper( PACUtils::_getXWindowsList );
-$PAC -> start;
+$ASBRU -> start;
 
 print "Finished $Script (PID:$$)...\n";
 exit 0;

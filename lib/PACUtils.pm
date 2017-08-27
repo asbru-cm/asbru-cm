@@ -1,23 +1,25 @@
 package PACUtils;
 
-##################################################################
-# This file is part of PAC( Perl Auto Connector)
+###############################################################################
+# This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2010-2016  David Torrejon Vaquerizas
+# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# Ásbrú Connection Manager is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# This program is distributed in the hope that it will be useful,
+# Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################
+# You should have received a copy of the GNU General Public License version 3
+# along with Ásbrú Connection Manager.
+# If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+###############################################################################
 
 $|++;
 
@@ -41,7 +43,7 @@ use YAML;
 use OSSP::uuid;
 use Encode;
 use KeePass;
-use DynaLoader; # Required for PACTerminal and PACShell PAC modules
+use DynaLoader; # Required for PACTerminal and PACShell modules
 
 # GTK2
 use Gtk2 '-init';
@@ -104,8 +106,8 @@ require Exporter;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-our $APPNAME		= 'PAC';
-our $APPVERSION		= '4.5.5.8';
+our $APPNAME		= decode( 'UTF-8', 'Ásbrú Connection Manager' );
+our $APPVERSION		= '5.0.0';
 our $DEBUG_LEVEL	= 1;
 our $ARCH			= '';
 my $ARCH_TMP		= `/bin/uname -m 2>&1`;
@@ -197,7 +199,7 @@ our @PACDESKTOP		= (
 'Terminal=false',
 'Icon=pac',
 'Type=Application',
-'Exec=/usr/bin/pac --no-splash',
+'Exec=/usr/bin/asbru --no-splash',
 'StartupNotify=false',
 'Name[en_US]=PAC',
 'Comment[en_US]=Perl Auto Connector (auto start)',
@@ -278,15 +280,15 @@ sub _splash {
 		$WINDOWSPLASH{_GUI} -> set_type_hint( 'splashscreen' );
 		$WINDOWSPLASH{_GUI} -> set_position('center');
 		$WINDOWSPLASH{_GUI} -> set_keep_above( 1 );
-			
-			$WINDOWSPLASH{_VBOX} = Gtk2::VBox -> new( 0, 0 );
-			$WINDOWSPLASH{_GUI} -> add( $WINDOWSPLASH{_VBOX} );
-				
-				$WINDOWSPLASH{_IMG} = Gtk2::Image -> new_from_file( $SPLASH_IMG );
-				$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_IMG}, 1, 1, 0 );
-				
-				$WINDOWSPLASH{_LBL} = Gtk2::ProgressBar -> new;
-				$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_LBL}, 1, 1, 5 );
+
+		$WINDOWSPLASH{_VBOX} = Gtk2::VBox -> new( 0, 0 );
+		$WINDOWSPLASH{_GUI} -> add( $WINDOWSPLASH{_VBOX} );
+
+		$WINDOWSPLASH{_IMG} = Gtk2::Image -> new_from_file( $SPLASH_IMG );
+		$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_IMG}, 1, 1, 0 );
+
+		$WINDOWSPLASH{_LBL} = Gtk2::ProgressBar -> new;
+		$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_LBL}, 1, 1, 5 );
 	}
 	
 	$WINDOWSPLASH{_LBL} -> set_text( $txt );
@@ -1751,7 +1753,7 @@ sub _wSetPACPassword {
 	
 	# Ask for old password
 	if ( $ask_old ) {
-		my $old_pass = _wEnterValue( $self, 'PAC GUI Password Change', "Please, enter *OLD* PAC GUI Password...", undef, 0, 'pac-protected' );
+		my $old_pass = _wEnterValue( $self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected' );
 		return 0 unless defined $old_pass;
 		
 		if ( $CIPHER -> encrypt_hex( $old_pass ) ne $$self{_CFG}{'defaults'}{'gui password'} ) {
@@ -1761,11 +1763,11 @@ sub _wSetPACPassword {
 	}
 	
 	# Ask for new password
-	my $new_pass1 = _wEnterValue( $self, '<b>PAC GUI Password Change</b>', "Please, enter *NEW* PAC GUI Password...", undef, 0, 'pac-protected' );
+	my $new_pass1 = _wEnterValue( $self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected' );
 	return 0 unless defined $new_pass1;
 	
 	# Re-type new password
-	my $new_pass2 = _wEnterValue( $self, '<b>PAC GUI Password Change</b>', "Please, repeat *NEW* PAC GUI Password...", undef, 0, 'pac-protected' );
+	my $new_pass2 = _wEnterValue( $self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected' );
 	return 0 unless defined $new_pass2;
 	
 	if ( $new_pass1 ne $new_pass2 ) {
@@ -1877,10 +1879,10 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'disable SHIFT key bindings'}		//= 0;
 	$$cfg{'defaults'}{'disable ALT key bindings'}		//= 0;
 	$$cfg{'defaults'}{'prevent F11'}					//= 0;
-	$$cfg{'defaults'}{'autostart shell upon PAC start'}	//= 0;
+	$$cfg{'defaults'}{'autostart shell upon start'}	//= 0;
 	$$cfg{'defaults'}{'tree on right side'}				//= 0;
 	$$cfg{'defaults'}{'prevent mouse over show tree'}	//= 0;
-	$$cfg{'defaults'}{'start PAC tree on'}				//= 'connections';
+	$$cfg{'defaults'}{'start tree on'}				//= 'connections';
 	$$cfg{'defaults'}{'show connections tooltips'}		//= 0;
 	$$cfg{'defaults'}{'hide connections submenu'}		//= 0;
 	$$cfg{'defaults'}{'tree font'}						//= 'Normal';
@@ -1931,8 +1933,8 @@ sub _cfgSanityCheck {
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'_protected'}			= 0;
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'parent'}				= '__PAC__ROOT__';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'name'}					= "PACShell";
-	$$cfg{'environments'}{'__PAC_SHELL__'}{'description'}			= "PACShell";
-	$$cfg{'environments'}{'__PAC_SHELL__'}{'title'}					= 'PACShell';
+	$$cfg{'environments'}{'__PAC_SHELL__'}{'description'}			= "A shell on the location machine";
+	$$cfg{'environments'}{'__PAC_SHELL__'}{'title'}					= 'Local';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'ip'}					= 'bash';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'port'}					= 22;
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'user'}					= '';
@@ -3111,10 +3113,10 @@ sub _showUpdate {
 	$lbl2 -> set( 'relief', 'none' );
 	
 	if ( ( ! $NEW_VERSION ) || ( $APPVERSION ge $NEW_VERSION ) ) {
-		$lbl -> set_markup( "There is <b>NO</b> new PAC version available" );
+		$lbl -> set_markup( "There is <b>NO</b> new version available" );
 		$windowConfirm -> signal_connect( 'response', sub { $windowConfirm -> destroy; } );
 	} else {
-		$lbl -> set_markup( "There is a <b><big>NEW</big></b> PAC version available: <b><big>$NEW_VERSION</big></b>" );
+		$lbl -> set_markup( "There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>" );
 		
 		# Create a scrolled window to contain the textview
 		my $scrollDescription = Gtk2::ScrolledWindow -> new;
@@ -3427,10 +3429,10 @@ sub _makeDesktopFile {
 	my $dal	= 'Actions=Shell;Quick;';
 	my $da	= "\n[Desktop Action Shell]\n";
 	$da		.= "Name=<Start local shell>\n";
-	$da		.= "Exec=pac --start-shell\n";
+	$da		.= "Exec=asbru --start-shell\n";
 	$da		.= "\n[Desktop Action Quick]\n";
 	$da		.= "Name=<Quick connect...>\n";
-	$da		.= "Exec=pac --quick-conn\n";
+	$da		.= "Exec=asbru --quick-conn\n";
 	my $action = 0;
 	foreach my $uuid ( keys %{ $$cfg{environments} } ) {
 		next if ( ( $uuid eq '__PAC__ROOT__' ) || ( ! $$cfg{'environments'}{$uuid}{'favourite'} ) );
@@ -3438,7 +3440,7 @@ sub _makeDesktopFile {
 		$dal .= $action . ';';
 		$da .= "\n" . '[Desktop Action ' . $action++ . "]\n";
 		$da .= "Name=" . ( $$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go ) . "\n";
-		$da .= "Exec=pac --start-uuid=$uuid\n";
+		$da .= "Exec=asbru --start-uuid=$uuid\n";
 	}
 	
 	open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;

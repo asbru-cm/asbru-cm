@@ -1,23 +1,25 @@
 package PACConfig;
 
-###################################################################
-# This file is part of PAC( Perl Auto Connector)
+###############################################################################
+# This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2010-2016  David Torrejon Vaquerizas
+# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# Ásbrú Connection Manager is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# This program is distributed in the hope that it will be useful,
+# Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################
+# You should have received a copy of the GNU General Public License version 3
+# along with Ásbrú Connection Manager.
+# If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+###############################################################################
 
 $|++;
 
@@ -515,7 +517,7 @@ sub _updateGUIPreferences {
 	
 	_( $self, 'btnCheckVersion' ) -> set_sensitive( ! $PACMain::FUNCS{_MAIN}{_UPDATING} );
 	
-	# PAC Main Options
+	# Main options
 	#_( $self, 'btnCfgLocation' )			-> set_uri( 'file://' . $$self{_CFG}{'defaults'}{'config location'} );
 	_( $self, 'cbCfgAutoAcceptKeys' )		-> set_active( $$cfg{'defaults'}{'auto accept key'} );
 	_( $self, 'cbCfgHideOnConnect' )		-> set_active( $$cfg{'defaults'}{'hide on connect'} );

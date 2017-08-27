@@ -1,23 +1,25 @@
 package PACMain;
 
-###################################################################
-# This file is part of PAC( Perl Auto Connector)
+###############################################################################
+# This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2010-2016  David Torrejon Vaquerizas
+# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# Ásbrú Connection Manager is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# This program is distributed in the hope that it will be useful,
+# Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-###################################################################
+# You should have received a copy of the GNU General Public License version 3
+# along with Ásbrú Connection Manager.
+# If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+###############################################################################
 
 $|++;
 
@@ -128,7 +130,7 @@ sub new {
 		defined $$self{_CONFIG} and _( $$self{_CONFIG}, 'btnCheckVersion' ) -> set_sensitive( 1 );
 	};
 	$SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
-		print STDERR "INFO: Signal '$_[0]' received. Exiting PAC...\n";
+		print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
 		_quitProgram( $self, 'force' );
 	};
 
@@ -322,7 +324,7 @@ sub start {
 		_( $$self{_CONFIG}, 'cbCfgShowTrayIcon' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see PAC's tray icon." );
 		if ( ! -f "$CFG_DIR/pac_notray.notified" ) {
 			$$self{_GUI}{main} -> present;
-			_wMessage( $$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see PAC's tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences' -> 'PAC Main Options' -> 'Behaviour' -> 'At PAC Exit' -> 'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'." );
+			_wMessage( $$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see PAC's tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences' -> 'Main Options' -> 'Behaviour' -> 'At PAC Exit' -> 'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'." );
 			open F, ">$CFG_DIR/pac_notray.notified"; close F;
 		}
 	}
@@ -772,7 +774,7 @@ sub _initGUI {
 						$$self{_GUI}{lockPACBtn} -> set_active( 0 );
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{lockPACBtn}, 0, 1, 0 );
 						$$self{_GUI}{lockPACBtn} -> set( 'can-focus' => 0 );
-						$$self{_GUI}{lockPACBtn} -> set_tooltip_text( 'Password [un]lock PAC GUI. In order to use this functionality, check the "Protect PAC with password" field under "Preferences" -> "PAC Main Options"' );
+						$$self{_GUI}{lockPACBtn} -> set_tooltip_text( 'Password [un]lock PAC GUI. In order to use this functionality, check the "Protect PAC with password" field under "Preferences" -> "Main Options"' );
 						
 						# Create aboutBtn button
 						$$self{_GUI}{aboutBtn} = Gtk2::Button -> new;
@@ -1178,7 +1180,7 @@ sub _setupCallbacks {
 			return 0 unless ( ( $event -> state == [ qw( mod1-mask ) ] ) && ( ! $$self{_CFG}{'defaults'}{'disable ALT key bindings'} ) );
 			
 			my @sel = $$self{_GUI}{$what} -> _getSelectedUUIDs;
-			# e --> Show PAC Main Edit Connection Window
+			# e --> Show main edit connection window
 			if ( chr( $keyval ) eq 'e' ) { $$self{_GUI}{connEditBtn} -> clicked unless $sel[0] eq '__PAC_SHELL__'; return 1; }
 			
 			return 0;
@@ -1218,7 +1220,7 @@ sub _setupCallbacks {
 		return 0 unless my @sel = $$self{_GUI}{treeClusters} -> _getSelectedNames;
 		
 		if ( ( $event -> state == [ qw( mod1-mask ) ] ) && ( ! $$self{_CFG}{'defaults'}{'disable ALT key bindings'} ) ) {
-			# e --> Show PAC Main Edit Connection Window
+			# e --> Show main edit connection Window
 			if ( chr( $keyval ) eq 'e' ) {
 				$$self{_CLUSTER} -> show( $sel[0] );
 				return 1;
@@ -1289,7 +1291,7 @@ sub _setupCallbacks {
 		}
 		# <Alt>
 		elsif ( ( $alt ) && ( ! $$self{_CFG}{'defaults'}{'disable ALT key bindings'} ) ) {
-			# e --> Show PAC Main Edit Connection Window
+			# e --> Show main edit connection window
 			if ( chr( $keyval ) eq 'e' ) { $$self{_GUI}{connEditBtn} -> clicked unless $is_root; return 1; }
 			# r --> Toggle protection flag
 			elsif ( chr( $keyval ) eq 'r' ) { $self -> __treeToggleProtection unless $is_root; return 1; }
@@ -2665,8 +2667,8 @@ sub _showAboutWindow {
 	$dialog -> set_program_name( $APPNAME );
 	$dialog -> set_version( $APPVERSION );
 	$dialog -> set_logo( _pixBufFromFile( $RES_DIR . '/pac256x256.jpg' ) );
-	$dialog -> set_copyright( 'Copyright 2010-2014 David Torrejon Vaquerizas' );
-	$dialog -> set_website( 'http://sourceforge.net/projects/pacmanager/' );
+	$dialog -> set_copyright( "Copyright 2017 Asbru Connection Manager Project\nCopyright 2010-2016 David Torrejon Vaquerizas" );
+	$dialog -> set_website( 'https://asbru-cm.net/' );
 	$dialog -> set_authors( "David Torrejon Vaquerizas <david.tv\@gmail.com>\nDonations accepted at:\nhttp://sourceforge.net/project/project_donations.php?group_id=299598\n\nDONATORS LIST:\n" . join( "\n", @PACUtils::DONATORS_LIST ) );
 	$dialog -> set_license( "
 PAC( Perl Auto Connector): Your connections manager!
@@ -3215,25 +3217,17 @@ sub _updateGUIWithUUID {
  
  - To create a New GROUP of Connections:
  
-	1- 'click' over 'AVAILABLE CONNECTIONS' (to create it at root) or any other GROUP
-	2- 'click' on the most left icon over the connections tree (or right-click over selected GROUP)
-	3- Follow instructions
-
+   1- 'click' over 'AVAILABLE CONNECTIONS' (to create it at root) or any other GROUP
+   2- 'click' on the most left icon over the connections tree (or right-click over selected GROUP)
+   3- Follow instructions
 
  - To create a New CONNECTION in a selected Group or at root:
  
-	1- Select the container group to create the new connection into (or 'AVAILABLE CONNECTIONS' to create it at root)
-	2- 'click' on the second most left icon over the connections tree (or right-click over selected GROUP)
-	3- Follow instructions
+   1- Select the container group to create the new connection into (or 'AVAILABLE CONNECTIONS' to create it at root)
+   2- 'click' on the second most left icon over the connections tree (or right-click over selected GROUP)
+   3- Follow instructions
 
- 
- - Visit:
-   
-   'http://sourceforge.net/projects/pacmanager'
-   'https://sites.google.com/site/davidtv/'
-   'http://www.getdeb.net/updates/Ubuntu/'
-   
-   for latest news.
+ - For the latest news, check the project website <a href="https://asbru-cm.net">https://asbru-cm.net/</a>.
 
 __PAC__ROOT__DESCRIPTION__
 	} else {
