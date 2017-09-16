@@ -124,7 +124,7 @@ sub _setTrayMenu {
 		}
 	} } );
 	push( @m, { separator => 1 } );
-	push( @m, { label => 'About PAC',		stockicon => 'gtk-about',									code => sub { $$self{_MAIN} -> _showAboutWindow; } }  );
+	push( @m, { label => 'About',		stockicon => 'gtk-about',									code => sub { $$self{_MAIN} -> _showAboutWindow; } }  );
 	push( @m, { label => 'Exit',			stockicon => 'gtk-quit',									code => sub { $$self{_MAIN} -> _quitProgram; } } );
 	
 	$$self{_TRAY} -> set_menu( _wPopUpMenu( \@m, $event, 'below calling widget', 'get_menu_ref' ) );

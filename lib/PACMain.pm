@@ -77,7 +77,7 @@ my $APPVERSION		= $PACUtils::APPVERSION;
 my $AUTOSTART_FILE	= $RealBin . '/res/pac_start.desktop';
 my $RES_DIR			= $RealBin . '/res';
 
-# Register PAC's icons on Gtk
+# Register icons on Gtk
 &_registerPACIcons;
 
 my $INIT_CFG_FILE		= $RealBin . '/res/pac.yml';
@@ -172,7 +172,7 @@ sub new {
 	$self	-> {_PING} -> tcp_service_check( 1 );
 	
 	# Read the config/connections file...
-	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Reading PAC config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	_readConfiguration( $self );
 	
 	map( { if ( /^--dump-uuid=(.+)$/ ) { require Data::Dumper; print Data::Dumper::Dumper( $$self{_CFG}{environments}{$1 } ); exit 0; } } @{ $$self{_OPTS} } );
@@ -202,8 +202,8 @@ sub new {
 		my $pass;
 		grep( { if ( /^--password=(.+)$/ ) { $pass = $1; } } @{ $$self{_OPTS} } );
 		if ( ! defined $pass ) {
-			PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Waiting for PAC password...", $PAC_START_PROGRESS, $PAC_START_TOTAL );
-			$pass = _wEnterValue( $self, 'PAC GUI Password Protection', 'Please, enter PAC GUI Password...', undef, 0, 'pac-protected' );
+			PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL );
+			$pass = _wEnterValue( $self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected' );
 		}
 		exit 0 unless defined $pass;
 		if ( $CIPHER -> encrypt_hex( $pass ) ne $$self{_CFG}{'defaults'}{'gui password'} ) {
@@ -212,9 +212,9 @@ sub new {
 		}
 	}
 	
-	# Check if only one instance of PAC is allowed
+	# Check if only one instance is allowed
 	if ( $$self{_APP} -> is_running ) {
-		print "INFO: PAC already running\n";
+		print "INFO: Ásbrú already running\n";
 		
 		my $getout = 0;
 		my $uuid;
@@ -244,7 +244,7 @@ sub new {
 				$$self{_READONLY} = 1;
 			}
 			elsif ( ! $$self{_CFG}{'defaults'}{'allow more instances'} ) {
-				print "INFO: No more PAC instances allowed!\n";
+				print "INFO: No more instances allowed!\n";
 				$$self{_APP} -> send_message( 4, text => '' );
 				Gtk2::Gdk -> notify_startup_complete;
 				return 0;
@@ -313,18 +313,18 @@ sub start {
 	$self -> _launchTerminals( \@idx ) if scalar( @idx );
 	
 	# Autostart Shell if so is configured
-	$$self{_GUI}{shellBtn} -> clicked if $$self{_CFG}{'defaults'}{'autostart shell upon PAC start'};
+	$$self{_GUI}{shellBtn} -> clicked if $$self{_CFG}{'defaults'}{'autostart shell upon start'};
 	
 	$$self{_GUI}{statistics} -> update( '__PAC__ROOT__', $$self{_CFG} );
 	
-	# Is PAC's TRAY available (Gnome2 OR Unity)?
+	# Is tray available (Gnome2 OR Unity)?
 	if ( $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
-		_( $$self{_CONFIG}, 'cbCfgStartIconified' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see PAC's tray icon." );
-		_( $$self{_CONFIG}, 'cbCfgCloseToTray' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see PAC's tray icon." );
-		_( $$self{_CONFIG}, 'cbCfgShowTrayIcon' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see PAC's tray icon." );
+		_( $$self{_CONFIG}, 'cbCfgStartIconified' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon." );
+		_( $$self{_CONFIG}, 'cbCfgCloseToTray' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon." );
+		_( $$self{_CONFIG}, 'cbCfgShowTrayIcon' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon." );
 		if ( ! -f "$CFG_DIR/pac_notray.notified" ) {
 			$$self{_GUI}{main} -> present;
-			_wMessage( $$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see PAC's tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences' -> 'Main Options' -> 'Behaviour' -> 'At PAC Exit' -> 'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'." );
+			_wMessage( $$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences' -> 'Main Options' -> 'Behaviour' -> 'At Exit' -> 'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'." );
 			open F, ">$CFG_DIR/pac_notray.notified"; close F;
 		}
 	}
@@ -774,21 +774,21 @@ sub _initGUI {
 						$$self{_GUI}{lockPACBtn} -> set_active( 0 );
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{lockPACBtn}, 0, 1, 0 );
 						$$self{_GUI}{lockPACBtn} -> set( 'can-focus' => 0 );
-						$$self{_GUI}{lockPACBtn} -> set_tooltip_text( 'Password [un]lock PAC GUI. In order to use this functionality, check the "Protect PAC with password" field under "Preferences" -> "Main Options"' );
+						$$self{_GUI}{lockPACBtn} -> set_tooltip_text( 'Password [un]lock GUI. In order to use this functionality, check the "Protect with password" field under "Preferences" -> "Main Options"' );
 						
 						# Create aboutBtn button
 						$$self{_GUI}{aboutBtn} = Gtk2::Button -> new;
 						$$self{_GUI}{aboutBtn} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-about', 'button' ) );
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{aboutBtn}, 1, 1, 0 );
 						$$self{_GUI}{aboutBtn} -> set( 'can-focus' => 0 );
-						$$self{_GUI}{aboutBtn} -> set_tooltip_text( 'Show the *so needed* "About PAC" dialog' );
+						$$self{_GUI}{aboutBtn} -> set_tooltip_text( 'Show the *so needed* "About" dialog' );
 						
 						# Create quitBtn button
 						$$self{_GUI}{quitBtn} = Gtk2::Button -> new_with_mnemonic( '_Quit' );
 						$$self{_GUI}{quitBtn} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-quit', 'button' ) );
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{quitBtn}, 1, 1, 0 );
 						$$self{_GUI}{quitBtn} -> set( 'can-focus' => 0 );
-						$$self{_GUI}{quitBtn} -> set_tooltip_text( 'Exit PAC' );
+						$$self{_GUI}{quitBtn} -> set_tooltip_text( 'Exit' );
 	
 	# Setup some window properties.
 	$$self{_GUI}{main} -> set_title( "$APPNAME (v$APPVERSION)" . ( $$self{_READONLY} ? ' - READ ONLY MODE' : '' ) );
@@ -888,15 +888,15 @@ sub _initGUI {
 	$$self{_GUI}{_vboxSearch} -> hide;
 	
 	$self -> _updateGUIPreferences;
-	if ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'connections' ) {
+	if ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'connections' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 0 );
 	}
-	elsif ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'favourites' ) {
+	elsif ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'favourites' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 1 );
 		$self -> _updateFavouritesList;
 		$self -> _updateGUIFavourites;
 	}
-	elsif ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history' ) {
+	elsif ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'history' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 2 );
 		$self -> _updateGUIClusters;
 	}
@@ -949,7 +949,7 @@ sub _setupCallbacks {
 	# Setup some drag and drop operations
 	my $drag_dest = ( $$self{_CFG}{'defaults'}{'tabs in main window'} ) ? $$self{_GUI}{vbox5} : $$self{_GUI}{nb};
 	
-	$drag_dest -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'copy', 'move' ], { target => 'PAC Connect', flags => [] } );
+	$drag_dest -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'copy', 'move' ], { target => 'Connect', flags => [] } );
 	$drag_dest -> signal_connect( 'drag_motion' => sub { $_[0] -> get_parent_window -> raise; return 1; } );
 	$drag_dest -> signal_connect( 'drag_drop' => sub {
 
@@ -1007,7 +1007,7 @@ sub _setupCallbacks {
 			
 			return 1;
 		} );
-		$$self{_GUI}{$what} -> drag_source_set( 'GDK_BUTTON1_MASK', [ 'copy', 'move' ], { 'target' => 'PAC Connect', 'flags' => [], 'info' => 0 } );
+		$$self{_GUI}{$what} -> drag_source_set( 'GDK_BUTTON1_MASK', [ 'copy', 'move' ], { 'target' => 'Connect', 'flags' => [], 'info' => 0 } );
 		$$self{_GUI}{$what} -> signal_connect( 'drag_begin' => sub {
 			my ( $me, $context, $x, $y, $data, $info, $time ) = @_;
 			
@@ -1040,7 +1040,7 @@ sub _setupCallbacks {
 			# User cancelled the drop operation: finish
 			$_[2] eq 'user-cancelled' and return 0;
 			
-			# Drop happened out of PAC window: launch terminals
+			# Drop happened out of window: launch terminals
 			if ( ( $px < 0 ) || ( $py < 0 ) || ( $px > $wsx ) || ( $py > $wsy ) ) {
 				my @idx;
 				my %tmp;
@@ -1060,7 +1060,7 @@ sub _setupCallbacks {
 				return 1;
 			}
 			
-			# Drop happened inside of PAC window: finish
+			# Drop happened inside of window: finish
 			
 			return 0;
 		} );
@@ -1676,7 +1676,7 @@ sub _setupCallbacks {
 			$$self{_EDIT} -> show( $sel[0] );
 		}
 		elsif ( ( scalar( @sel ) > 1 ) || ( ( scalar( @sel ) == 1 ) && $is_group ) ) {
-			my ( $list, $all ) = $self -> _bulkEdit( "$APPNAME (v$APPVERSION) : Bulk Edit", "Bulk Editing <b>" . scalar( @sel ) . "</b> nodes.\nSelect and change the values you want to modify in the list below.\n<b>Only those checked will be affected.</b>\nFor Regular Expressions, PAC will substitute <b>Match pattern</b> for <b>New value</b>,\nmuch like Perl's: <b>s/<span foreground=\"#E60023\">Match pattern</span>/<span foreground=\"#04C100\">New value</span>/g</b>", $is_group );
+			my ( $list, $all ) = $self -> _bulkEdit( "$APPNAME (v$APPVERSION) : Bulk Edit", "Bulk Editing <b>" . scalar( @sel ) . "</b> nodes.\nSelect and change the values you want to modify in the list below.\n<b>Only those checked will be affected.</b>\nFor Regular Expressions, <b>Match pattern</b> will substituted with <b>New value</b>,\nmuch like Perl's: <b>s/<span foreground=\"#E60023\">Match pattern</span>/<span foreground=\"#04C100\">New value</span>/g</b>", $is_group );
 			return 1 unless defined $list;
 			
 			foreach my $parent_uuid ( @sel ) {
@@ -1980,7 +1980,7 @@ sub _setupCallbacks {
 		
 		# F --> FIND in treeView
 		if( $_[1] -> keyval == 102 )		{ $$self{_SHOWFINDTREE} = 1; $$self{_GUI}{_vboxSearch} -> show; $$self{_GUI}{_entrySearch} -> grab_focus; return 1; }
-		# Q --> Finish PAC
+		# Q --> Finish
 		elsif ( $_[1] -> keyval == 113 )	{ $PACMain::FUNCS{_MAIN} -> _quitProgram; return 1; }
 		# T --> Open local shell
 		elsif ( lc $keyval eq 't' )			{ $$self{_GUI}{shellBtn} -> clicked; return 1; }
@@ -2016,7 +2016,7 @@ sub _lockPAC {
 sub _unlockPAC {
 	my $self = shift;
 	
-	my $pass = _wEnterValue( $self, 'PAC GUI Unlock', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected' );
+	my $pass = _wEnterValue( $self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected' );
 	if ( ( ! defined $pass ) || ( $CIPHER -> encrypt_hex( $pass ) ne $$self{_CFG}{'defaults'}{'gui password'} ) ) {
 		$$self{_GUI}{lockPACBtn} -> set_active( 1 );
 		_wMessage( $$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!' );
@@ -2785,7 +2785,7 @@ sub _launchTerminals {
 	foreach my $sel ( @{ $terminals } ) {
 		my $uuid	= $$sel[0];
 		if ( ! defined $$self{_CFG}{'environments'}{$uuid} ) {
-			_wMessage( $$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in PAC DDBB\nNot starting connection!", 1 );
+			_wMessage( $$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1 );
 			next;
 		} elsif ( $$self{_CFG}{'environments'}{$uuid}{_is_group} || ( $uuid eq '__PAC__ROOT__' ) ) {
 			_wMessage( $$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1 );
@@ -2869,9 +2869,9 @@ sub _quitProgram {
 		}
 	}
 	
-	print "PAC finishing ($Script) with pid $$\n";
+	print "Finishing ($Script) with pid $$\n";
 	
-	# Hide every GUI component to look like PAC has already finished
+	# Hide every GUI component has already finished
 	if ( $UNITY ) {
 		$$self{_TRAY}{_TRAY} -> set_passive;
 	} else {
@@ -2927,9 +2927,9 @@ sub _saveConfiguration {
 	_cfgSanityCheck( $cfg );
 	
 	_cipherCFG( $cfg );
-	nstore( $cfg, $CFG_FILE_NFREEZE ) or _wMessage( $$self{_GUI}{main}, "ERROR: Could not save PAC config file '$CFG_FILE_NFREEZE':\n\n$!" );
+	nstore( $cfg, $CFG_FILE_NFREEZE ) or _wMessage( $$self{_GUI}{main}, "ERROR: Could not save config file '$CFG_FILE_NFREEZE':\n\n$!" );
 	if ( $R_CFG_FILE ) {
-		nstore( $cfg, $R_CFG_FILE ) or _wMessage( $$self{_GUI}{main}, "ERROR: Could not save PAC config file '$R_CFG_FILE':\n\n$!\n\nLocal copy saved at '$CFG_FILE_NFREEZE'" );
+		nstore( $cfg, $R_CFG_FILE ) or _wMessage( $$self{_GUI}{main}, "ERROR: Could not save config file '$R_CFG_FILE':\n\n$!\n\nLocal copy saved at '$CFG_FILE_NFREEZE'" );
 	}
 	_decipherCFG( $cfg );
 	
@@ -2966,7 +2966,7 @@ sub _readConfiguration {
 			print STDERR "WARNING: There were errors reading '$CFG_FILE_NFREEZE' config file: $@\n";
 		} else {
 			print STDERR "INFO: Used config file '$CFG_FILE_NFREEZE'\n";
-			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote PAC config file '$R_CFG_FILE': $!"; }
+			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote config file '$R_CFG_FILE': $!"; }
 			$continue = 0;
 		}
 	}
@@ -2976,8 +2976,8 @@ sub _readConfiguration {
 			print STDERR "WARNING: Could not load config file '$CFG_FILE': $!\n";
 		} else {
 			print STDERR "INFO: Used config file '$CFG_FILE'\n";
-			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote PAC config file '$R_CFG_FILE': $!"; }
-			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die "ERROR: Could not save PAC config file '$CFG_FILE_NFREEZE': $!";
+			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote config file '$R_CFG_FILE': $!"; }
+			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die "ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
 			$continue = 0;
 		}
 	}
@@ -2990,12 +2990,12 @@ sub _readConfiguration {
 		my $VAR1;
 		eval $data;
 		if ( $@ ) {
-			print STDERR "ERROR: Could not load PAC config file from '$CFG_FILE_DUMPER': $@\n";
+			print STDERR "ERROR: Could not load config file from '$CFG_FILE_DUMPER': $@\n";
 		} else {
 			print STDERR "INFO: Used config file '$CFG_FILE_DUMPER'\n";
 			$$self{_CFG} = $VAR1;
-			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die "ERROR: Could not save PAC config file '$CFG_FILE_NFREEZE': $!";
-			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote PAC config file '$R_CFG_FILE': $!"; }
+			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die "ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
+			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote config file '$R_CFG_FILE': $!"; }
 			$continue = 0;
 		}
 	}
@@ -3006,25 +3006,25 @@ sub _readConfiguration {
 			print STDERR "WARNING: There were errors reading the '$CFG_FILE_FREEZE' config file: $@\n";
 		} else {
 			print STDERR "INFO: Used config file '$CFG_FILE_FREEZE'\n";
-			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die"ERROR: Could not save PAC config file '$CFG_FILE_NFREEZE': $!";
-			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote PAC config file '$R_CFG_FILE': $!"; }
+			nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
+			if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote config file '$R_CFG_FILE': $!"; }
 			unlink( $CFG_FILE_FREEZE );
 			$continue = 0;
 		}
 	}
 	
 	if ( $continue && ( ! -f "${CFG_FILE}.prev3" ) && ( -f $CFG_FILE ) ) {
-		print STDERR "INFO: Migratin PAC config file to v3...\n";
-		PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Migrating PAC config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+		print STDERR "INFO: Migrating config file to v3...\n";
+		PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Migrating config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 		$$self{_CFG} = _cfgCheckMigrationV3;
 		copy( $CFG_FILE, "${CFG_FILE}.prev3" ) or die "ERROR: Could not copy pre v.3 cfg file '$CFG_FILE' to '$CFG_FILE.prev3': $!";
-		nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die"ERROR: Could not save PAC config file '$CFG_FILE_NFREEZE': $!";
-		if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote PAC config file '$R_CFG_FILE': $!"; }
+		nstore( $$self{_CFG}, $CFG_FILE_NFREEZE ) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
+		if ( $R_CFG_FILE ) { nstore( $$self{_CFG}, $R_CFG_FILE ) or die "ERROR: Could not save remote config file '$R_CFG_FILE': $!"; }
 		$continue = 0;
 	}
 	
-	if ( $R_CFG_FILE ) { $continue and print STDERR "ERROR: PAC was unable to load *any* config file from remote '$CFG_DIR'... Now starting from scratch..."; }
-	$continue and print STDERR "ERROR: PAC was unable to load *any* config file from '$CFG_DIR'... Now starting from scratch...";
+	if ( $R_CFG_FILE ) { $continue and print STDERR "ERROR: unable to load *any* config file from remote '$CFG_DIR'... Now starting from scratch..."; }
+	$continue and print STDERR "ERROR: unable to load *any* config file from '$CFG_DIR'... Now starting from scratch...";
 	
 	# Make some sanity checks
 	$splash and PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5 );
@@ -3084,7 +3084,7 @@ sub _saveTreeExpanded {
 	my $modelsort	= $tree -> get_model;
 	my $model		= $modelsort -> get_model;
 	
-	open( F, ">$CFG_FILE.tree" ) or die "ERROR: Could not save PAC Tree Config file '$CFG_FILE.tree': $!";
+	open( F, ">$CFG_FILE.tree" ) or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
 	$modelsort -> foreach( sub {
 		my ( $store, $path, $iter, $tmp ) = @_;
 		my $uuid = $store -> get_value( $iter, 2 );
@@ -3131,7 +3131,7 @@ sub _loadTreeExpanded {
 	my %TREE_TABS;
 	
 	if ( -f "$CFG_FILE.tree" ) {
-		open( F, "$CFG_FILE.tree" ) or die "ERROR: Could not read PAC Tree Config file '$CFG_FILE.tree': $!";;
+		open( F, "$CFG_FILE.tree" ) or die "ERROR: Could not read Tree Config file '$CFG_FILE.tree': $!";;
 		foreach my $uuid ( <F> ) {
 
 			chomp $uuid;
@@ -3156,7 +3156,7 @@ sub _loadTreeExpanded {
 sub _saveGUIData {
 	my $self = shift;
 	
-	open( F, ">$CFG_FILE.gui" ) or die "ERROR: Could not save PAC GUI Config file '$CFG_FILE.gui': $!";;
+	open( F, ">$CFG_FILE.gui" ) or die "ERROR: Could not save GUI Config file '$CFG_FILE.gui': $!";;
 	
 	# Save Top Window size/position
 	if ( $$self{_GUI}{maximized} ) {
@@ -3182,7 +3182,7 @@ sub _loadGUIData {
 	
 	return 1 unless -f "$CFG_FILE.gui";
 	
-	open( F, "$CFG_FILE.gui" ) or die "ERROR: Could not read PAC GUI Config file '$CFG_FILE.gui': $!";
+	open( F, "$CFG_FILE.gui" ) or die "ERROR: Could not read GUI Config file '$CFG_FILE.gui': $!";
 	
 	# Read top level window's psize/position
 	my $win = <F>;
@@ -3640,7 +3640,7 @@ sub __exportNodes {
 		_wMessage( $$self{_WINDOWCONFIG}, "Connection(s) succesfully exported to:\n\n$file" );
 	} else {
 		$w -> destroy;
-		_wMessage( $$self{_WINDOWCONFIG}, "ERROR: Could not export PAC connection(s) to file '$file':\n\n$!" );
+		_wMessage( $$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file '$file':\n\n$!" );
 	}
 	
 	return 1;
@@ -3664,7 +3664,7 @@ sub __importNodes {
 	$choose -> set_do_overwrite_confirmation( 1 );
 	$choose -> set_current_folder( $ENV{'HOME'} // '/tmp' );
 	my $filter = Gtk2::FileFilter -> new;
-	$filter -> set_name( 'PAC YAML Files' );
+	$filter -> set_name( 'YAML Files' );
 	$filter -> add_pattern( '*.yml' );
 	$choose -> add_filter( $filter );
 	
@@ -3681,7 +3681,7 @@ sub __importNodes {
 	eval { $$self{_COPY}{'data'} = YAML::LoadFile( $file ); };
 	if ( $@ ) {
 		$w -> destroy;
-		_wMessage( $$self{_WINDOWCONFIG}, "ERROR: Could not import PAC connection from file '$file':\n\n$@" );
+		_wMessage( $$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file '$file':\n\n$@" );
 		return 1;
 	}
 	
@@ -3689,7 +3689,7 @@ sub __importNodes {
 	
 	# Full export file? (including config!)
 	if ( defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__FULL__'} ) {
-		if ( ! _wConfirm( $$self{_GUI}{main}, "Selected PAC config file is a <b>FULL</b> backup.\nImporting it will result in all current data being <b>substituted</b> by the new one.\n<b>Plus, it REQUIRES restarting PAC</b>.\nReplace current configuration?" ) ) {
+		if ( ! _wConfirm( $$self{_GUI}{main}, "Selected config file is a <b>FULL</b> backup.\nImporting it will result in all current data being <b>substituted</b> by the new one.\n<b>Plus, it REQUIRES restarting the application</b>.\nReplace current configuration?" ) ) {
 			delete $$self{_COPY}{'data'}{'children'};
 			$w -> destroy;
 			return 1;
@@ -3712,7 +3712,7 @@ sub __importNodes {
 		$self -> _setCFGChanged( 1 );
 		delete $$self{_CFG}{'__PAC__EXPORTED__'};
 		delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-		_wMessage( $$self{_WINDOWCONFIG}, "File '$file' succesfully imported.\nPAC will now <b>restart</b> (wait 3 seconds...)", 0 );
+		_wMessage( $$self{_WINDOWCONFIG}, "File '$file' succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0 );
 		system( "(sleep 3; $0) &" );
 		sleep 2;
 		exit 0;
@@ -3721,7 +3721,7 @@ sub __importNodes {
 	} elsif ( ! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'} ) {
 		delete $$self{_COPY}{'data'}{'children'};
 		$w -> destroy;
-		_wMessage( $$self{_WINDOWCONFIG}, "File '$file' does not look like a valid PAC Exported Connection!" );
+		_wMessage( $$self{_WINDOWCONFIG}, "File '$file' does not look like a valid exported connection!" );
 		return 1;
 		
 	# Correct partial export file
@@ -3748,7 +3748,7 @@ sub __importNodes {
 sub _bulkEdit {
 	my $self	= shift;
 	my $title	= shift // "$APPNAME (v$APPVERSION) : Bulk Edit";
-	my $label	= shift // "Select and change the values you want to modify in the list below.\n<b>Only those checked will be affected.</b>\nFor Regular Expressions, PAC will substitute <b>Match pattern</b> for <b>New value</b>,\nmuch like Perl's: <b>s/Match pattern/New value/g</b>";
+	my $label	= shift // "Select and change the values you want to modify in the list below.\n<b>Only those checked will be affected.</b>\nFor Regular Expressions, <b>Match pattern</b> will be substituted with <b>New value</b>,\nmuch like Perl's: <b>s/Match pattern/New value/g</b>";
 	my $groups	= shift // 0;
 	my $cipher	= shift // 0;
 	
