@@ -1863,7 +1863,8 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'confirm chains'}					//= 1;
 	$$cfg{'defaults'}{'skip first chain expect'}		//= 1;
 	$$cfg{'defaults'}{'enable tree lines'}				//= 0;
-	$$cfg{'defaults'}{'check versions at start'}		//= 1;
+	#DevNote: option currently disabled
+	$$cfg{'defaults'}{'check versions at start'}		//= 0;
 	$$cfg{'defaults'}{'show statistics'}				//= 1;
 	$$cfg{'defaults'}{'protected color'}				//= '#FFB022'; #orange
 	$$cfg{'defaults'}{'protected set'}					//= 'background';

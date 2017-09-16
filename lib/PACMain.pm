@@ -125,9 +125,10 @@ sub new {
 	
 	# Setup some signal handling
 	$SIG{'USR1'}	= sub {
-		_showUpdate( &_checkREADME );
-		$$self{_UPDATING} = 0;
-		defined $$self{_CONFIG} and _( $$self{_CONFIG}, 'btnCheckVersion' ) -> set_sensitive( 1 );
+		#DevNote: option currently disabled
+		#_showUpdate( &_checkREADME );
+		#$$self{_UPDATING} = 0;
+		#defined $$self{_CONFIG} and _( $$self{_CONFIG}, 'btnCheckVersion' ) -> set_sensitive( 1 );
 	};
 	$SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
 		print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
@@ -256,7 +257,8 @@ sub new {
 	}
 	
 	# Check for updates in a child process
-	$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME( $$ );
+	#DevNote: option currently disabled
+	#$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME( $$ );
 
 	# Setup known connection methods
 	%{ $$self{_METHODS} } = _getMethods( $self );

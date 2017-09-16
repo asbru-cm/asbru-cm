@@ -157,8 +157,9 @@ sub _initGUI {
 	_( $self, 'btnResetDefaults' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-undo', 'button' ) );
 	_( $self, 'btnResetDefaults' )	-> set_label( '_Reset to DEFAULT values' );
 	
-	_( $self, 'btnCheckVersion' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
-	_( $self, 'btnCheckVersion' )	-> set_label( 'Check _now' );
+	# Option currently disabled
+	#_( $self, 'btnCheckVersion' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
+	#_( $self, 'btnCheckVersion' )	-> set_label( 'Check _now' );
 	
 	_( $self, 'rbCfgStartTreeConn' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-treelist', 'button' ) );
 	_( $self, 'rbCfgStartTreeFavs' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-favourite-on', 'button' ) );
@@ -179,8 +180,6 @@ sub _initGUI {
 	_( $self, 'alignCmdLocal' )		-> add( ( $$self{_CMD_LOCAL}	= PACExecEntry		-> new ) -> {container} );
 	_( $self, 'alignKeePass' )		-> add( ( $$self{_KEEPASS}		= PACKeePass		-> new ) -> {container} );
 	_( $self, 'nbPreferences' )		-> show_all;
-	
-	_( $self, 'btnCheckVersion' ) -> set_label( 'Check _now' );
 	
 	$$self{cbShowHidden} = Gtk2::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
 	_( $self, 'btnCfgSaveSessionLogs' ) -> set_extra_widget( $$self{cbShowHidden} );
@@ -234,13 +233,14 @@ sub _setupCallbacks {
 	_( $self, 'cbCfgBWTrayIcon' )		-> signal_connect( 'toggled' => sub { _( $self, 'imgTrayIcon' ) -> set_from_stock( _( $self, 'cbCfgBWTrayIcon' ) -> get_active ? 'pac-tray-bw' : 'pac-tray', 'menu' ); } );
 	_( $self, 'cbCfgShowSudoPassword' )	-> signal_connect( 'toggled' => sub { _( $self, 'entryCfgSudoPassword' ) -> set_visibility( _( $self, 'cbCfgShowSudoPassword' ) -> get_active ); } );
 	
-	_( $self, 'btnCheckVersion' ) -> signal_connect( 'clicked' => sub {
-		$PACMain::FUNCS{_MAIN}{_UPDATING} = 1;
-		$self -> _updateGUIPreferences;
-		PACUtils::_getREADME( $$ );
-		
-		return 1;
-	} );
+	#DevNote: option currently disabled
+	#_( $self, 'btnCheckVersion' ) -> signal_connect( 'clicked' => sub {
+	#	$PACMain::FUNCS{_MAIN}{_UPDATING} = 1;
+	#	$self -> _updateGUIPreferences;
+	#	PACUtils::_getREADME( $$ );
+	#	
+	#	return 1;
+	#} );
 	
 	# Capture 'export' button clicked
 	_( $self, 'btnExportYAML' ) -> signal_connect( 'button_press_event' => sub {
@@ -515,8 +515,6 @@ sub _updateGUIPreferences {
 	$proxy_ip		and $proxy_string = "$proxy_ip:$proxy_port";
 	$proxy_user		and $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
 	
-	_( $self, 'btnCheckVersion' ) -> set_sensitive( ! $PACMain::FUNCS{_MAIN}{_UPDATING} );
-	
 	# Main options
 	#_( $self, 'btnCfgLocation' )			-> set_uri( 'file://' . $$self{_CFG}{'defaults'}{'config location'} );
 	_( $self, 'cbCfgAutoAcceptKeys' )		-> set_active( $$cfg{'defaults'}{'auto accept key'} );
@@ -553,7 +551,9 @@ sub _updateGUIPreferences {
 	_( $self, 'entryCfgSelectByWordChars' )	-> set_text( $$cfg{'defaults'}{'word characters'} );
 	_( $self, 'cbCfgShowTrayIcon' )			-> set_active( $$cfg{'defaults'}{'show tray icon'} );
 	_( $self, 'cbCfgAutoStart' )			-> set_active( -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop" );
-	_( $self, 'cbCfgCheckVersions' )		-> set_active( $$cfg{'defaults'}{'check versions at start'} );
+	#DevNote: option currently disabled
+	#_( $self, 'cbCfgCheckVersions' )		-> set_active( $$cfg{'defaults'}{'check versions at start'} );
+	#_( $self, 'btnCheckVersion' ) -> set_sensitive( ! $PACMain::FUNCS{_MAIN}{_UPDATING} );
 	_( $self, 'cbCfgShowStatistics' )		-> set_active( $$cfg{'defaults'}{'show statistics'} );
 	_( $self, 'rbCfgForeground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'foreground' );
 	_( $self, 'rbCfgBackground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'background' );
@@ -775,7 +775,8 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'confirm chains'}					= _( $self, 'cbCfgConfirmChains' )			-> get_active;
 	$$self{_CFG}{'defaults'}{'skip first chain expect'}			= _( $self, 'cbCfgSkip1stChainExpect' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'enable tree lines'}				= _( $self, 'cbCfgEnableTreeLines' )		-> get_active;
-	$$self{_CFG}{'defaults'}{'check versions at start'}			= _( $self, 'cbCfgCheckVersions' 	)		-> get_active;
+	#DevNote: option currently disabled
+	#$$self{_CFG}{'defaults'}{'check versions at start'}			= _( $self, 'cbCfgCheckVersions' 	)		-> get_active;
 	$$self{_CFG}{'defaults'}{'show statistics'}					= _( $self, 'cbCfgShowStatistics' 	)		-> get_active;
 	$$self{_CFG}{'defaults'}{'protected set'}					= _( $self, 'rbCfgForeground' 	)			-> get_active ? 'foreground' : 'background' ;
 	$$self{_CFG}{'defaults'}{'protected color'}					= _( $self, 'colorCfgProtected' )			-> get_color -> to_string;

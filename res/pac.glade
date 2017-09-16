@@ -449,6 +449,8 @@
                         <property name="position">2</property>
                       </packing>
                     </child>
+                    <!-- Option currently disabled -->
+                    <!--
                     <child>
                       <widget class="GtkHBox" id="hbox1">
                         <property name="visible">True</property>
@@ -491,6 +493,7 @@
                         <property name="position">3</property>
                       </packing>
                     </child>
+                    -->
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgHideOnConnect">
                         <property name="label" translatable="yes">Hide on connection</property>
