@@ -1,29 +1,24 @@
 [Desktop Entry]
-Name=PAC
-Comment=Perl Auto Connector (auto start)
+Name=Ásbrú Connection Manager
+Comment=Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 Terminal=false
 Icon=pac
 Type=Application
-Exec=/usr/bin/pac
+Exec=/opt/asbru/asbru
 StartupNotify=true
-Name[en_US]=PAC
-Comment[en_US]=Perl Auto Connector
 Categories=Applications;Network;
 X-GNOME-Autostart-enabled=false
 Actions=Shell;Quick;ReadOnly;
 
 [Desktop Action Shell]
 Name=Start local shell
-Exec=pac --start-shell
-#OnlyShowIn=Unity;
+Exec=asbru --start-shell
 
 [Desktop Action Quick]
 Name=Quick connect...
-Exec=pac --quick-conn
-#OnlyShowIn=Unity;
+Exec=asbru --quick-conn
 
 [Desktop Action ReadOnly]
 Name=Start Read-Only instance
-Exec=pac --readonly --no-backup
-#OnlyShowIn=Unity;
+Exec=asbru --readonly --no-backup
 
