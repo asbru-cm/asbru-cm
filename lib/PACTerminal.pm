@@ -1003,6 +1003,9 @@ sub _setupCallbacks {
 		defined $$self{_SEND_STRING}		and eval { Glib::Source -> remove( $$self{_SEND_STRING} );  };
 		defined $$self{_EMBED_KIDNAP}		and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
 		
+		# _SOCKET_CLIENT is close so no more watch to expect
+		undef $$self{_SOCKET_CLIENT_WATCH};
+		
 		$self -> _setTabColour;
 		$self -> _updateStatus;
 		

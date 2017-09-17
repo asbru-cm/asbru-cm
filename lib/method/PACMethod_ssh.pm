@@ -241,7 +241,8 @@ sub _parseCfgToOptions
 	my @opts = split( /\s+-(?=([^\"]*\"[^\"]*\")*[^\"]*$)/, $cmd_line );
 	foreach my $opt ( @opts )
 	{
-		next unless $opt ne '';
+		next unless defined($opt) and $opt ne '';
+		
 		$opt =~ s/\s+$//go;
 		
 		$opt =~ /^([1|2]$)/go	and	$hash{sshVersion}				= $1;
