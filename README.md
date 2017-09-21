@@ -31,13 +31,13 @@
 
 We recommend installing Ásbrú Connection Manager using one of the [pre-built package](https://github.com/asbru-cm/asbru-cm/releases).
 
-Once installed on your system, find the application under "Applications" -> "Ásbrú Connection Manager", or type "acm" in your terminal.
+Once installed on your system, find the application under "Applications" -> "Ásbrú Connection Manager", or type "asbru" in your terminal.
 
 ### Frequenty Asked Questions
 
 - Why did you call that project "Ásbrú" ?
 
-In Norse mythology, [Ásbrú](https://en.wikipedia.org/wiki/Bifr%C3%B6st) refers to a burning rainbow bridge that connects Midgard (Earth) and Asgard, the realm of the gods.
+  In Norse mythology, [Ásbrú](https://en.wikipedia.org/wiki/Bifr%C3%B6st) refers to a burning rainbow bridge that connects Midgard (Earth) and Asgard, the realm of the gods.
 
 ### Contributing
 

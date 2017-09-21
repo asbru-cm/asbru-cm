@@ -46,8 +46,8 @@ use PACUtils;
 
 my $APPNAME			= $PACUtils::APPNAME;
 my $APPVERSION		= $PACUtils::APPVERSION;
-my $APPICON			= $RealBin . '/res/pac64x64.png';
-my $TRAYICON		= $RealBin . '/res/pac_tray.png';
+my $APPICON			= $RealBin . '/res/asbru-logo-64.png';
+my $TRAYICON		= $RealBin . '/res/asbru-logo-tray.png';
 my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -64,7 +64,9 @@ sub new {
 	
 	$self -> {_TRAY}	= undef;
 	
-	$TRAYICON = $$self{_MAIN}{_CFG}{'defaults'}{'use bw icon'} ? 'pac_tray_bw' : 'pac';
+	if ( $$self{_MAIN}{_CFG}{defaults}{'use bw icon'} ) {
+		$TRAYICON = $RealBin . '/res/pac_tray_bw.png';
+	}
 
 	# Build the GUI
 	_initGUI( $self ) or return 0;

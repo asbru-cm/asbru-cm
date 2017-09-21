@@ -1936,7 +1936,7 @@ sudo -p sudo_prompt_string ...</property>
                   <widget class="GtkImage" id="image1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="pixbuf">pac24x24.png</property>
+                    <property name="pixbuf">asbru-logo-24.png</property>
                   </widget>
                   <packing>
                     <property name="expand">True</property>

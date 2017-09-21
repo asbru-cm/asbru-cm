@@ -91,7 +91,7 @@ my $CFG_FILE_DUMPER		= $CFG_DIR . '/pac.dumper';
 my $PAC_START_PROGRESS	= 0;
 my $PAC_START_TOTAL		= 6;
 
-my $APPICON			= $RES_DIR . '/pac64x64.png';
+my $APPICON			= $RES_DIR . '/asbru-logo-64.png';
 my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/pac_cluster_auto.png' );
 my $CLUSTERICON		= _pixBufFromFile( $RealBin . '/res/pac_cluster_manager.png' );
 my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
@@ -105,8 +105,6 @@ my $NEW_CHANGES		= '';
 our $_NO_SPLASH		= 0;
 
 my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
-
-my $KC				= 'UpUpDownDownLeftRightLeftRightba';
 
 our %RUNNING;
 our %FUNCS;
@@ -173,7 +171,7 @@ sub new {
 	$self	-> {_PING} -> tcp_service_check( 1 );
 	
 	# Read the config/connections file...
-	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+	PACUtils::_splash( 1, "Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	_readConfiguration( $self );
 	
 	map( { if ( /^--dump-uuid=(.+)$/ ) { require Data::Dumper; print Data::Dumper::Dumper( $$self{_CFG}{environments}{$1 } ); exit 0; } } @{ $$self{_OPTS} } );
@@ -203,7 +201,7 @@ sub new {
 		my $pass;
 		grep( { if ( /^--password=(.+)$/ ) { $pass = $1; } } @{ $$self{_OPTS} } );
 		if ( ! defined $pass ) {
-			PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL );
+			PACUtils::_splash( 1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL );
 			$pass = _wEnterValue( $self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected' );
 		}
 		exit 0 unless defined $pass;
@@ -282,16 +280,16 @@ sub start {
 	#_makeDesktopFile( $$self{_CFG} );
 	
 	# Build the GUI
-	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+	PACUtils::_splash( 1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	$self -> _initGUI or return 0;
 	
 	# Build the Tree with the connections list
-	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+	PACUtils::_splash( 1, "Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	$self -> _loadTreeConfiguration( '__PAC__ROOT__' );
 	
 	$UNITY and $FUNCS{_TRAY} -> _setTrayMenu;
 	
-	PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
+	PACUtils::_splash( 1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	
 	# Setup callbacks
 	$self -> _setupCallbacks;
@@ -793,7 +791,7 @@ sub _initGUI {
 						$$self{_GUI}{quitBtn} -> set_tooltip_text( 'Exit' );
 	
 	# Setup some window properties.
-	$$self{_GUI}{main} -> set_title( "$APPNAME (v$APPVERSION)" . ( $$self{_READONLY} ? ' - READ ONLY MODE' : '' ) );
+	$$self{_GUI}{main} -> set_title( "$APPNAME" . ( $$self{_READONLY} ? ' - READ ONLY MODE' : '' ) );
 	$$self{_GUI}{main} -> set_default_icon_from_file( $APPICON );
 	$$self{_GUI}{main} -> set_default_size( $$self{_GUI}{sw} // 600, $$self{_GUI}{sh} // 480 );
 	$$self{_GUI}{main} -> set_resizable( 1 );
@@ -2666,16 +2664,16 @@ sub _showAboutWindow {
 	
 	my $dialog = Gtk2::AboutDialog -> new;
 	$dialog -> signal_connect( 'response' => sub { $_[0] -> destroy; } );
-	$dialog -> set_program_name( $APPNAME );
-	$dialog -> set_version( $APPVERSION );
-	$dialog -> set_logo( _pixBufFromFile( $RES_DIR . '/pac256x256.jpg' ) );
-	$dialog -> set_copyright( "Copyright 2017 Asbru Connection Manager Project\nCopyright 2010-2016 David Torrejon Vaquerizas" );
+	$dialog -> set_program_name( '' );  # name is shown in the logo
+	$dialog -> set_version( "v$APPVERSION" );
+	$dialog -> set_logo( _pixBufFromFile( $RES_DIR . '/asbru-logo-400.png' ) );
+	$dialog -> set_copyright( decode( 'UTF-8', "Copyright 2017 Ásbrú Connection Manager Project\nCopyright 2010-2016 David Torrejon Vaquerizas" ) );
 	$dialog -> set_website( 'https://asbru-cm.net/' );
-	$dialog -> set_authors( "David Torrejon Vaquerizas <david.tv\@gmail.com>\nDonations accepted at:\nhttp://sourceforge.net/project/project_donations.php?group_id=299598\n\nDONATORS LIST:\n" . join( "\n", @PACUtils::DONATORS_LIST ) );
-	$dialog -> set_license( "
-PAC( Perl Auto Connector): Your connections manager!
+	$dialog -> set_license( decode( 'UTF-8', "
+Ásbrú Connection Manager
 
-Copyright (C) 2010-2014  David Torrejon Vaquerizas
+Copyright 2017 Ásbrú Connection Manager project
+Copyright 2010-2016 David Torrejon Vaquerizas
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -2689,40 +2687,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-" );
+") );
 
-	my $keys = '';
-	$dialog -> get_content_area -> signal_connect( 'key_press_event', sub {
-		my ( $widget, $event ) = @_;
-		
-		my $keyval	= Gtk2::Gdk -> keyval_name( $event -> keyval );
-		my $unicode	= Gtk2::Gdk -> keyval_to_unicode( $event -> keyval); # 0 if not a character
-		my $state	= $event -> get_state;
-		my $shift	= $state * ['shift-mask'];
-		my $ctrl	= $state * ['control-mask'];
-		my $alt		= $state * ['mod1-mask'];
-		my $alt2	= $state * ['mod2-mask'];
-		my $alt5	= $state * ['mod5-mask'];
-		
-		if ( $KC =~ /^${keys}${keyval}/ ) {
-			$keys .= $keyval;
-			return 0 unless $keys eq $KC;
-			
-			$dialog -> get_content_area -> foreach( sub {
-				my $vbox = shift;
-				return 1 unless ref( $vbox ) eq 'Gtk2::VBox';
-				$vbox -> foreach( sub {
-					my $image = shift;
-					return 1 unless ref( $image ) eq 'Gtk2::Image';
-					$image -> set_from_file( $RES_DIR . '/pac_dumb_guy.svg' );
-					$dialog -> set_website( 'http://www.linkedin.com/in/davidtv/en' );
-				} );
-			} );
-		} else {
-			$keys = '';
-		}
-		return 0;
-	} );
 	$dialog -> run;
 	$dialog -> destroy;
 

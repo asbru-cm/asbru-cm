@@ -2,9 +2,9 @@
 Name=Ásbrú Connection Manager
 Comment=Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 Terminal=false
-Icon=pac
+Icon=asbru-logo
 Type=Application
-Exec=/opt/asbru/asbru
+Exec=asbru
 StartupNotify=true
 Categories=Applications;Network;
 X-GNOME-Autostart-enabled=false

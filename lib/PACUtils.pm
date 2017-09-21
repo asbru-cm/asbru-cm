@@ -117,7 +117,7 @@ elsif	( $ARCH_TMP =~ /armv7l/gio )	{ $ARCH = 'ARMV7L'; }
 elsif	( $ARCH_TMP =~ /arm/gio )		{ $ARCH = 'ARM'; }
 else									{ $ARCH = 32; }
 my $RES_DIR			= $RealBin . '/res';
-my $SPLASH_IMG		= $RES_DIR . '/pac256x256.jpg';
+my $SPLASH_IMG		= $RES_DIR . '/asbru-logo-400.png';
 my $CFG_DIR			= $ENV{'HOME'} . '/.config/pac';
 my $CFG_FILE		= $CFG_DIR . '/pac.yml';
 my $R_CFG_FILE		= $PACMain::R_CFG_FILE;
@@ -1111,8 +1111,7 @@ sub _getMethods {
 
 sub _registerPACIcons {
 	my %icons = (
-		'pac-splash'						=> $RES_DIR . '/pac256x256.jpg',
-		'pac-app-big'						=> $RES_DIR . '/pac64x64.png',
+		'pac-app-big'						=> $RES_DIR . '/asbru-logo-64.png',
 		'pac-group-add'						=> $RES_DIR . '/pac_group_add_16x16.png',
 		'pac-node-add'						=> $RES_DIR . '/pac_node_add_16x16.png',
 		'pac-node-del'						=> $RES_DIR . '/pac_node_del_16x16.png',
@@ -1151,9 +1150,8 @@ sub _registerPACIcons {
 		'pac-terminal-ok-big'				=> $RES_DIR . '/pac_terminal64x64.png',
 		'pac-terminal-ko-small'				=> $RES_DIR . '/pac_terminal_x16x16.png',
 		'pac-terminal-ko-big'				=> $RES_DIR . '/pac_terminal_x64x64.png',
-		'pac-tray-blue'						=> $RES_DIR . '/pac_tray_blue.png',
 		'pac-tray-bw'						=> $RES_DIR . '/pac_tray_bw.png',
-		'pac-tray'							=> $RES_DIR . '/pac_tray.png',
+		'pac-tray'							=> $RES_DIR . '/asbru-logo-tray.png',
 		'pac-treelist'						=> $RES_DIR . '/pac_treelist.png',
 		'pac-wol'							=> $RES_DIR . '/pac_wol.png',
 		'pac-prompt'						=> $RES_DIR . '/pac_prompt.png',

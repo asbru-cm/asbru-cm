@@ -46,7 +46,7 @@ use PACUtils;
 
 my $APPNAME			= $PACUtils::APPNAME;
 my $APPVERSION		= $PACUtils::APPVERSION;
-my $APPICON			= $RealBin . '/res/pac64x64.png';
+my $APPICON			= $RealBin . '/res/asbru-logo-64.png';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
