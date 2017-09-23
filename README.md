@@ -29,9 +29,16 @@
 
 ### Installation
 
-We recommend installing Ásbrú Connection Manager using one of the [pre-built package](https://github.com/asbru-cm/asbru-cm/releases).
+We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [packagecould.io](https://packagecloud.io/).
 
-Once installed on your system, find the application under "Applications" -> "Ásbrú Connection Manager", or type "asbru" in your terminal.
+To do so, execute the following commands:
+
+````
+$ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+$ sudo apt-get install asbru-cm
+````
+
+Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
 ### Frequenty Asked Questions
 
@@ -44,7 +51,6 @@ Once installed on your system, find the application under "Applications" -> "Ás
 If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
 
 Before contributing, please review our [contributing doc](https://github.com/asbru-cm/asbru-cm/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/asbru-cm/blob/master/CODE_OF_CONDUCT.md).
-
 
 ### License
 
