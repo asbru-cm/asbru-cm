@@ -689,7 +689,7 @@ sub _updateGUIPreferences {
 		return 0;
 	}
 	
-	if ( $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
+	if ( defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
 		_( $self, 'lblRestartRequired' ) -> set_text( "(*) Requires restarting PAC for the change(s) to take effect\n\n" . ( _( $self, 'cbCfgStartIconified' ) -> get_tooltip_text // '' ) );
 	}
 	return 1;

@@ -888,15 +888,15 @@ sub _initGUI {
 	$$self{_GUI}{_vboxSearch} -> hide;
 	
 	$self -> _updateGUIPreferences;
-	if ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'connections' ) {
+	if ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'connections' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 0 );
 	}
-	elsif ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'favourites' ) {
+	elsif ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'favourites' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 1 );
 		$self -> _updateFavouritesList;
 		$self -> _updateGUIFavourites;
 	}
-	elsif ( $$self{_CFG}{'defaults'}{'start tree on'} eq 'history' ) {
+	elsif ( $$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history' ) {
 		$$self{_GUI}{nbTree} -> set_current_page( 2 );
 		$self -> _updateGUIClusters;
 	}
@@ -2991,8 +2991,8 @@ sub _readConfiguration {
 		$continue = 0;
 	}
 	
-	if ( $R_CFG_FILE ) { $continue and print STDERR "ERROR: unable to load *any* config file from remote '$CFG_DIR'... Now starting from scratch..."; }
-	$continue and print STDERR "ERROR: unable to load *any* config file from '$CFG_DIR'... Now starting from scratch...";
+	if ( $R_CFG_FILE ) { $continue and print STDERR "No configuration file in (remote) '$CFG_DIR', creating a new one...\n"; }
+	$continue and print STDERR "No configuration file found in '$CFG_DIR', creating a new one...\n";
 	
 	# Make some sanity checks
 	$splash and PACUtils::_splash( 1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5 );
