@@ -873,7 +873,9 @@ sub _setupCallbacks {
 			elsif ( lc $keyval eq 'd' ) { $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] ); }
 			# f --> Find in history
 			elsif ( lc $keyval eq 'f' ) { $self -> _wHistory if $$self{_CFG}{'defaults'}{'record command history'}; }
-			
+			# r --> Disconnect and Restart session
+			elsif ( lc $keyval eq 'r' ) { $self -> _disconnectAndRestartTerminal(); }
+
 			return 1;
 		}
 		# <Ctrl>
@@ -1808,8 +1810,9 @@ sub _vteMenu {
 			{
 				label		=> 'Disconnect and Restart session',
 				stockicon	=> 'gtk-refresh',
+				shortcut	=> '<control><shift>r',
 				sensitive	=> $$self{CONNECTED} && $$self{_PID},
-				code		=> sub { kill( 15, $$self{_PID} ) and Glib::Timeout -> add_seconds( 1, sub { $self -> start; return 0; } ) }
+				code		=> sub { $self -> _disconnectAndRestartTerminal(); }
 			},
 			# Close Terminal
 			{
@@ -3780,6 +3783,12 @@ sub _checkSendKeystrokes {
 	}
 	
 	return $data;
+}
+
+sub _disconnectAndRestartTerminal {
+	my $self = shift;
+
+	kill( 15, $$self{_PID} ) and Glib::Timeout -> add_seconds( 1, sub { $self -> start; return 0; } )
 }
 
 # END: Private functions definitions

@@ -847,7 +847,7 @@ sub _initGUI {
 			$$self{_GUI}{main} -> maximize;
 		} else {
 			$$self{_GUI}{main} -> move( $$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0 );
-			$$self{_GUI}{main} -> resize( $$self{_GUI}{sw} // 600, $$self{_GUI}{sh} // 480 );
+			$$self{_GUI}{main} -> resize( $$self{_GUI}{sw} // 1024, $$self{_GUI}{sh} // 768 );
 		}
 	}
 	
@@ -1987,7 +1987,7 @@ sub _setupCallbacks {
 		
 		return 0;
 	} );
-	$$self{_GUI}{main} -> signal_connect( 'window_state_event' => sub { $$self{_GUI}{maximized} = $_[1] -> new_window_state eq 'maximized'; return 0; } );
+	$$self{_SIGNALS}{_WINDOWSTATEVENT} = $$self{_GUI}{main} -> signal_connect( 'window_state_event' => sub { $$self{_GUI}{maximized} = $_[1] -> new_window_state eq 'maximized'; return 0; } );
 	
 	return 1;	
 }
@@ -2838,7 +2838,10 @@ sub _quitProgram {
 	}
 	
 	print "Finishing ($Script) with pid $$\n";
-	
+
+	# Disconnect some events (to avoid side effects when closing/hiding)
+	$$self{_GUI}{main} -> signal_handler_disconnect($$self{_SIGNALS}{_WINDOWSTATEVENT}) if $$self{_SIGNALS}{_WINDOWSTATEVENT};
+
 	# Hide every GUI component has already finished
 	if ( $UNITY ) {
 		$$self{_TRAY}{_TRAY} -> set_passive;
@@ -3195,7 +3198,7 @@ sub _updateGUIWithUUID {
    2- 'click' on the second most left icon over the connections tree (or right-click over selected GROUP)
    3- Follow instructions
 
- - For the latest news, check the project website <a href="https://asbru-cm.net">https://asbru-cm.net/</a>.
+ - For the latest news, check the project website (https://asbru-cm.net/).
 
 __PAC__ROOT__DESCRIPTION__
 	} else {
