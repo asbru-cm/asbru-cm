@@ -46,6 +46,12 @@ Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
   In Norse mythology, [Ásbrú](https://en.wikipedia.org/wiki/Bifr%C3%B6st) refers to a burning rainbow bridge that connects Midgard (Earth) and Asgard, the realm of the gods.
 
+- Is this a fork of PAC (Perl Auto Connector) Manager ?
+
+  Yes.
+
+  As [David Torrejon Vaquerizas](https://github.com/perseo22), the author of PAC Manager, could not find time, for some reasons that we respect, to continue the work on his project and was not open for external contributions [see this](https://github.com/perseo22/pacmanager/issues/57), a fork was needed to ensure the future and give the opportunity to the community to take over.
+
 ### Contributing
 
 If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
