@@ -1,6 +1,6 @@
 # Ásbrú Connection Manager
 
-<img alt="Ásbrú Connection Manager" src="https://www.asbru-cm.net/assets/img/asbru-logo.svg" style="float: right; width: 200px;">
+<img alt="Ásbrú Connection Manager" src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" style="float: right; width: 200px;">
 
 ## A free and open-source connection manager
 
