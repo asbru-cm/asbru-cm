@@ -1948,7 +1948,7 @@ sub _cfgSanityCheck {
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'_protected'}			= 0;
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'parent'}				= '__PAC__ROOT__';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'name'}					= "PACShell";
-	$$cfg{'environments'}{'__PAC_SHELL__'}{'description'}			= "A shell on the location machine";
+	$$cfg{'environments'}{'__PAC_SHELL__'}{'description'}			= "A shell on the local machine";
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'title'}					= 'Local';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'ip'}					= 'bash';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'port'}					= 22;
