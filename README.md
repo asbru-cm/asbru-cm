@@ -1,5 +1,7 @@
 # Ásbrú Connection Manager
 
+<img alt="Ásbrú Connection Manager" src="https://www.asbru-cm.net/assets/img/asbru-logo.svg" style="float: right; width: 200px;">
+
 ## A free and open-source connection manager
 
 Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
@@ -50,7 +52,7 @@ Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
   Yes.
 
-  As [David Torrejon Vaquerizas](https://github.com/perseo22), the author of PAC Manager, could not find time, for some reasons that we respect, to continue the work on his project and was not open for external contributions [see this](https://github.com/perseo22/pacmanager/issues/57), a fork was needed to ensure the future and give the opportunity to the community to take over.
+  As [David Torrejon Vaquerizas](https://github.com/perseo22), the author of PAC Manager, could not find time, for some reasons that we respect, to continue the work on his project and was not open for external contributions ([see this](https://github.com/perseo22/pacmanager/issues/57)), a fork was needed to ensure the future and give the opportunity to the community to take over.
 
 ### Contributing
 
