@@ -1836,7 +1836,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'auto save'}						//= 0;
 	$$cfg{'defaults'}{'save on exit'}					//= 0;
 	$$cfg{'defaults'}{'start iconified'}				//= 0;
-	$$cfg{'defaults'}{'start maximized'}				//= 1;
+	$$cfg{'defaults'}{'start maximized'}				//= 0;
 	$$cfg{'defaults'}{'start main maximized'}			//= 0;
 	$$cfg{'defaults'}{'start at session startup'}		//= 0;
 	$$cfg{'defaults'}{'remember main size'}				//= 1;
