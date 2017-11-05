@@ -779,6 +779,26 @@ sub findKP {
 # END OF : Procedures definition
 ########################################################
 
+# User wants to use a proxy, check that Net::Proxy is available
+if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && $proxy_ip && $proxy_port ) {
+
+	# https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available/32608860#32608860
+	my $rc =  eval{ require Net::Proxy };
+	if (! $rc) {
+		$rc = do {
+			no strict;
+			*stash = *{"Net::Proxy::"};
+			scalar keys %stash;
+		}
+	}
+
+	if ( ! $rc ) {
+		msg( "ERROR: To use proxied connection, Ásbrú requires perl module Net::Proxy (see https://metacpan.org/pod/Net::Proxy).\n" );
+		msg( "Please install this module on your system or disable proxy settings for this connection.\n" );
+		exit 1;
+	}
+}
+
 # Prepare the threaded proxy tunnel
 if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && $proxy_ip && $proxy_port ) {
 	require IO::Socket;
@@ -833,7 +853,7 @@ if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && 
 					proxy_port	=> $proxy_port,
 					proxy_user	=> $proxy_user,
 					proxy_pass	=> $proxy_pass,
-					proxy_agent	=> "PAC Manager (http://sourceforge.net/projects/pacmanager)"
+					proxy_agent	=> "Ásbrú Connection Manager (https://www.asbru-cm.net/)"
 				}
 			} );
 		} until $proxy;
