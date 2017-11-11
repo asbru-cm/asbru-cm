@@ -131,6 +131,7 @@ sub new {
 	$SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
 		print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
 		_quitProgram( $self, 'force' );
+		exit 0;
 	};
 
 	$self	-> {_CFG}			= {};
@@ -2857,7 +2858,7 @@ sub _quitProgram {
 	if ( $$self{_READONLY} ) {
 		Gtk2::Gdk::Threads -> leave;
 		Gtk2 -> main_quit;
-		exit 0;
+		return 1;
 	}
 	
 	# Force the stop of every opened terminal
