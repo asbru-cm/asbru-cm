@@ -2884,7 +2884,6 @@ sub _quitProgram {
 	
 	# And finish every GUI
 	Gtk2 -> main_quit;
-	exit 0;
 	
 	return 1;
 }
