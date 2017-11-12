@@ -32,6 +32,7 @@ use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 use PACUtils;
 
+use Getopt::Long qw(GetOptionsFromString);
 #use Data::Dumper;
 
 # GTK2
@@ -139,8 +140,8 @@ sub update
 	$$self{gui}{lblRemote} -> set_markup( 'Remote Port Forwarding (<b>' . ( scalar( @{ $$self{listRemote} } ) ) . '</b>)' );
 	
 	# Now, add the -new?- dynamic socks widgets
-	if		( $$self{gui}{rbOrderLI3} -> get_active )	{ foreach my $hash ( sort { $$a{localIP} cmp $$b{localIP} } @{ $$options{dynamicForward} } ) { $self -> _buildDynamic( $hash ); } }
-	elsif	( $$self{gui}{rbOrderLP3} -> get_active )	{ foreach my $hash ( sort { $$a{localPort} <=> $$b{localPort} } @{ $$options{dynamicForward} } ) { $self -> _buildDynamic( $hash ); } }
+	if		( $$self{gui}{rbOrderLI3} -> get_active )	{ foreach my $hash ( sort { $$a{dynamicIP} cmp $$b{dynamicIP} } @{ $$options{dynamicForward} } ) { $self -> _buildDynamic( $hash ); } }
+	elsif	( $$self{gui}{rbOrderLP3} -> get_active )	{ foreach my $hash ( sort { $$a{dynamicPort} <=> $$b{dynamicPort} } @{ $$options{dynamicForward} } ) { $self -> _buildDynamic( $hash ); } }
 	$$self{gui}{lblDynamic} -> set_markup( 'Dynamic Socks Proxy (<b>' . ( scalar( @{ $$self{listDynamic} } ) ) . '</b>)' );
 	
 	# Now, add the -new?- dynamic socks widgets
@@ -220,73 +221,79 @@ sub get_cfg
 
 ###################################################################
 # START: Private functions definitions
-
 sub _parseCfgToOptions
 {
 	my $cmd_line = shift;
-	
-	my %hash;
-	$hash{sshVersion}				= 'any';
-	$hash{ipVersion}				= 'any';
-	$hash{noRemoteCmd}				= 0;
-	$hash{forwardX}					= 1;
-	$hash{useCompression}			= 0;
-	$hash{allowRemoteConnection}	= 0;
-	$hash{forwardAgent}				= 0;
-	@{ $hash{dynamicForward} }		= ();
-	@{ $hash{forwardPort} }			= ();
-	@{ $hash{remotePort} }			= ();
-	@{ $hash{advancedOption} }		= ();
-	
-	my @opts = split( /\s+-(?=([^\"]*\"[^\"]*\")*[^\"]*$)/, $cmd_line );
-	foreach my $opt ( @opts )
-	{
-		next unless defined($opt) and $opt ne '';
-		
-		$opt =~ s/\s+$//go;
-		
-		$opt =~ /^([1|2]$)/go	and	$hash{sshVersion}				= $1;
-		$opt =~ /^([4|6]$)/go	and	$hash{ipVersion}				= $1;
-		$opt =~ /^([X|x]$)/go	and	$hash{forwardX}					= $1 eq 'X' ? 1 : 0;
-		$opt eq 'N'				and	$hash{noRemoteCmd}				= 1;
-		$opt eq 'C'				and	$hash{useCompression}			= 1;
-		$opt eq 'g'				and	$hash{allowRemoteConnection}	= 1;
-		$opt eq 'A'				and	$hash{forwardAgent}				= 1;
-		
-		while ( $opt =~ /^o\s+\"?(.+?)\"?$/go ) {
-			my %opts;
-			my $tmpopt = $1;
-			$tmpopt =~ /\s*(.+?)\s*=\s*(.+)\s*/go;
-			( $opts{option}, $opts{value} ) = ( $1, $2 );
-			push( @{ $hash{advancedOption} }, \%opts );
-		}
-		while ( $opt =~ /^D\s+([^\s]*(?:\/|:))*(\d+)$/go ) {
-			my %dynamic;
-			( $dynamic{dynamicIP}, $dynamic{dynamicPort} ) = ( $1 // '', $2 );
-			$dynamic{dynamicIP} =~ s/[\/:]+//go;
-			push( @{ $hash{dynamicForward} }, \%dynamic );
-		}
-		while ( $opt =~ /^L\s+(.+)$/go ) {
-			my @fields = split( /[\/:]/, $1 );
-			my %forward;
-			$forward{remotePort}	= pop( @fields );
-			$forward{remoteIP}		= pop( @fields );
-			$forward{localPort}		= pop( @fields );
-			$forward{localIP}		= pop( @fields ) // '';
-			push( @{ $hash{forwardPort} }, \%forward );
-		}
-		while ( $opt =~ /^R\s+(.+)$/go ) {
-			my @fields = split( /[\/:]/, $1 );
-			my %remote;
-			$remote{remotePort}	= pop( @fields );
-			$remote{remoteIP}	= pop( @fields );
-			$remote{localPort}	= pop( @fields );
-			$remote{localIP}	= pop( @fields ) // '';
-			push( @{ $hash{remotePort} }, \%remote );
-		}
-	}
-	
-	return \%hash;
+
+	my %options;
+#	$options{sshVersion}				= 'any';
+#	$options{ipVersion}					= 'any';
+	$options{noRemoteCmd}				= 0;
+#	$options{forwardX}					= 1;
+	$options{useCompression}			= 0;
+	$options{allowRemoteConnection}		= 0;
+	$options{forwardAgent}				= 0;
+	@{ $options{forwardPort}	}		= ();
+	@{ $options{remotePort} 	}		= ();
+	@{ $options{dynamicForward}	}		= ();
+	@{ $options{advancedOption}	}		= ();
+
+
+	$options{_optionL} =
+	$options{_optionR} =
+		sub{
+			my ($optionName,$forwardSpec)		=	@_;
+			my (undef,$bind_address,$port,$host,$hostport) =
+				#			[-L [bind_address:]port:host:hostport]
+				$forwardSpec=~m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
+
+			push @{ $options{($optionName eq "_optionL" ? "forwardPort" : "remotePort")} },
+				{
+					'localIP'	=>	$bind_address	//	'',
+					'localPort'	=>	$port,
+					'remoteIP'=>	$host,
+					'remotePort'	=>	$hostport
+				};
+		};
+	$options{_optionD} =
+		sub{
+			my (undef,$forwardSpec)			=	@_;
+			my (undef,$bind_address,$port)	=
+				#			[-D [bind_address:]port]
+				$forwardSpec=~m/((.+)(?:\/|:))*(\d+)/;
+			push @{ $options{dynamicForward} },
+				{
+					'dynamicIP'	=>	$bind_address	//	'',
+			 		'dynamicPort'	=>	$port
+				};
+		};
+	$options{_optionO} =
+		sub{
+			my (undef,$option,$value)	=	@_;
+			push @{ $options{advancedOption} },
+				{
+					'option'		=>	$option,
+					'value'			=>	$value
+				};
+		};
+	Getopt::Long::Configure("bundling");
+	GetOptionsFromString($cmd_line, \%options,
+		"sshVersion1|1",	"sshVersion2|2",
+		"ipVersion4|4",		"ipVersion6|6",
+		"optionenableX|X",
+		"optiondisablex|x",
+		"noRemoteCmd|N",
+		"useCompression|C",
+		"allowRemoteConnection|g",
+		"forwardAgent|A",
+		"_optionO|o=s%",
+		"_optionD|D=s@",
+		"_optionL|L=s@",
+		"_optionR|R=s@");
+	$options{sshVersion}	= $options{sshVersion2} ? "2" 	: $options{sshVersion1} ? "1"		: "any";
+	$options{ipVersion}		= $options{ipVersion6}  ? "6" 	: $options{ipVersion4}  ? "4"		: "any";
+	$options{forwardX}		= $options{optionenableX}	?  1: $options{optiondisablex} 	 ?  0	: 1;
+	return \%options;
 }
 
 sub _parseOptionsToCfg
