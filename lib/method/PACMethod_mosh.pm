@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -148,31 +148,31 @@ sub _buildGUI {
 	
 	$w{vbox} = $container;
 		
-		$w{frPredict} = Gtk2::Frame -> new( ' Select speculative local echo (predictions) model: ' );
+		$w{frPredict} = Gtk3::Frame -> new( ' Select speculative local echo (predictions) model: ' );
 		$w{frPredict} -> set_tooltip_text( '[-(a|n)] : Controls use of speculative local echo (defaults to "adaptive")' );
 		$w{vbox} -> pack_start( $w{frPredict}, 0, 1, 0 );
 			
-			$w{hboxPredict} = Gtk2::HBox -> new( 0, 0 );
+			$w{hboxPredict} = Gtk3::HBox -> new( 0, 0 );
 			$w{frPredict} -> add( $w{hboxPredict} );
 				
-				$w{rbPredictAdaptive} = Gtk2::RadioButton -> new_with_label( undef, 'Adaptive' );
+				$w{rbPredictAdaptive} = Gtk3::RadioButton -> new_with_label( undef, 'Adaptive' );
 				$w{hboxPredict} -> pack_start( $w{'rbPredictAdaptive'}, 0, 1, 0 );
 				
-				$w{rbPredictAlways} = Gtk2::RadioButton -> new_with_label( $w{rbPredictAdaptive}, 'Always' );
+				$w{rbPredictAlways} = Gtk3::RadioButton -> new_with_label( $w{rbPredictAdaptive}, 'Always' );
 				$w{hboxPredict} -> pack_start( $w{rbPredictAlways}, 0, 1, 0 );
 				
-				$w{rbPredictNever} = Gtk2::RadioButton -> new_with_label( $w{rbPredictAdaptive}, 'Never' );
+				$w{rbPredictNever} = Gtk3::RadioButton -> new_with_label( $w{rbPredictAdaptive}, 'Never' );
 				$w{hboxPredict} -> pack_start( $w{rbPredictNever}, 0, 1, 0 );
 				
 				$w{rbPredictAdaptive} -> set_active( 1 );
 		
-		$w{vbox} -> pack_start( Gtk2::HSeparator -> new, 0, 1, 5 );
+		$w{vbox} -> pack_start( Gtk3::HSeparator -> new, 0, 1, 5 );
 		
-		$w{hbUDPPort} = Gtk2::HBox -> new( 0, 0 );
+		$w{hbUDPPort} = Gtk3::HBox -> new( 0, 0 );
 		$w{vbox} -> pack_start( $w{hbUDPPort}, 0, 1, 0 );
 			
-			$w{hbUDPPort} -> pack_start( Gtk2::Label -> new( 'Server-side UDP Port: ' ), 0, 1, 0 );
-			$w{sbUDPPort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 60000, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{hbUDPPort} -> pack_start( Gtk3::Label -> new( 'Server-side UDP Port: ' ), 0, 1, 0 );
+			$w{sbUDPPort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 60000, 1, 65535, 1, 10, 0 ), 1, 0 );
 			
 			$w{hbUDPPort} -> pack_start( $w{sbUDPPort}, 0, 1, 0 );
 	

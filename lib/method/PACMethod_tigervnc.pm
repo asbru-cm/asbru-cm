@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -181,55 +181,55 @@ sub _buildGUI
 	
 	$w{vbox} = $container;
 		
-		$w{hbox1} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox1}, 0, 1, 5 );
 			
-			$w{frCompressLevel} = Gtk2::Frame -> new( 'Compression level (1: min, 10: max) :' );
+			$w{frCompressLevel} = Gtk3::Frame -> new( 'Compression level (1: min, 10: max) :' );
 			$w{hbox1} -> pack_start( $w{frCompressLevel}, 1, 1, 0 );
 			$w{frCompressLevel} -> set_tooltip_text( '[-g] : Percentage of the whole screen to use' );
 				
-				$w{spCompressLevel} = Gtk2::HScale -> new( Gtk2::Adjustment -> new( 8, 1, 11, 1.0, 1.0, 1.0 ) );
+				$w{spCompressLevel} = Gtk3::HScale -> new( Gtk3::Adjustment -> new( 8, 1, 11, 1.0, 1.0, 1.0 ) );
 				$w{frCompressLevel} -> add( $w{spCompressLevel} );
 			
-			$w{frQuality} = Gtk2::Frame -> new( 'Picture quality (1: min, 10: max) :' );
+			$w{frQuality} = Gtk3::Frame -> new( 'Picture quality (1: min, 10: max) :' );
 			$w{hbox1} -> pack_start( $w{frQuality}, 1, 1, 0 );
 			$w{frQuality} -> set_tooltip_text( '[-g] : Percentage of the whole screen to use' );
 				
-				$w{spQuality} = Gtk2::HScale -> new( Gtk2::Adjustment -> new( 5, 1, 11, 1.0, 1.0, 1.0 ) );
+				$w{spQuality} = Gtk3::HScale -> new( Gtk3::Adjustment -> new( 5, 1, 11, 1.0, 1.0, 1.0 ) );
 				$w{frQuality} -> add( $w{spQuality} );
 			
-			$w{frColour} = Gtk2::Frame -> new( 'Colour Level:' );
+			$w{frColour} = Gtk3::Frame -> new( 'Colour Level:' );
 			$w{hbox1} -> pack_start( $w{frColour}, 1, 1, 0 );
 			$w{frColour} -> set_tooltip_text( 'Select the reduced colour level, or leave as automatic' );
 				
-				$w{cbColours} = Gtk2::ComboBox -> new_text;
+				$w{cbColours} = Gtk3::ComboBox -> new_text;
 				$w{frColour} -> add( $w{cbColours} );
 				foreach my $depth ( 8, 64, 256, 'AutoSelect' ) { $w{cbColours} -> append_text( $depth ); };
 		
-		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox2} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox2}, 0, 1, 5 );
 			
-			$w{chFullScreen} = Gtk2::CheckButton -> new_with_label( 'Fullscreen' );
+			$w{chFullScreen} = Gtk3::CheckButton -> new_with_label( 'Fullscreen' );
 			$w{hbox2} -> pack_start( $w{chFullScreen}, 0, 1, 0 );
 			$w{chFullScreen} -> set_tooltip_text( '[-FullScreen] : Fullscreen window' );
 			
-			$w{chListen} = Gtk2::CheckButton -> new_with_label( 'Listen' );
+			$w{chListen} = Gtk3::CheckButton -> new_with_label( 'Listen' );
 			$w{hbox2} -> pack_start( $w{chListen}, 0, 1, 0 );
 			$w{chListen} -> set_tooltip_text( '[-listen] : Listen for incoming connections' );
 			
-			$w{chViewOnly} = Gtk2::CheckButton -> new_with_label( 'View Only' );
+			$w{chViewOnly} = Gtk3::CheckButton -> new_with_label( 'View Only' );
 			$w{hbox2} -> pack_start( $w{chViewOnly}, 0, 1, 0 );
 			$w{chViewOnly} -> set_tooltip_text( '[-ViewOnly] : View only mode' );
 			
-			$w{chEmbed} = Gtk2::CheckButton -> new_with_label( 'Embed in TAB' );
+			$w{chEmbed} = Gtk3::CheckButton -> new_with_label( 'Embed in TAB' );
 			$w{hbox2} -> pack_start( $w{chEmbed}, 0, 1, 0 );
 			$w{chEmbed} -> set_tooltip_text( '[-Parent=XID] : Embed VNC window in PAC TAB' );
 			
-			$w{lblVia} = Gtk2::Label -> new( 'Via:' );
+			$w{lblVia} = Gtk3::Label -> new( 'Via:' );
 			$w{hbox2} -> pack_start( $w{lblVia}, 0, 0, 0 );
 			$w{lblVia} -> set_tooltip_text( '[-via gateway] : Starts an SSH to tunnel the connection' );
 			
-			$w{entryVia} = Gtk2::Entry -> new;
+			$w{entryVia} = Gtk3::Entry -> new;
 			$w{hbox2} -> pack_start( $w{entryVia}, 0, 1, 0 );
 			$w{entryVia} -> set_tooltip_text( '[-via gateway] : Starts an SSH to tunnel the connection' );
 	

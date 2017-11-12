@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl-ex/Gtk2-Ex/Simple/Tree/lib/Gtk2/Ex/Simple/TiedTree.pm,v 1.1.1.1 2004/10/21 00:00:58 rwmcfa1 Exp $
+# $Header: /cvsroot/gtk2-perl-ex/Gtk3-Ex/Simple/Tree/lib/Gtk3/Ex/Simple/TiedTree.pm,v 1.1.1.1 2004/10/21 00:00:58 rwmcfa1 Exp $
 #
 
 # nomenclature:
@@ -7,16 +7,16 @@
 #		whole tree
 #	iter - iter of the node('s values) we're working with
 #	citer - child iter
-#	prow - parent row, Gtk2::TreeRowReference (a persistent version of an
+#	prow - parent row, Gtk3::TreeRowReference (a persistent version of an
 #	iter)
 
 package TiedTree;
 
 use strict;
-use Gtk2;
+use Gtk3;
 use Carp;
 
-use Gtk2::Ex::Simple::TiedCommon;
+use Gtk3::Ex::Simple::TiedCommon;
 
 our $VERSION = '0.1';
 
@@ -32,11 +32,11 @@ sub TIEARRAY {
 	my $iter = shift;
 
 	croak "usage tie (\@ary, 'class', model, iter=undef)"
-		if (!$model || !UNIVERSAL::isa ($model, 'Gtk2::TreeModel') ||
-		    ($iter  && !UNIVERSAL::isa ($iter, 'Gtk2::TreeIter')));
+		if (!$model || !UNIVERSAL::isa ($model, 'Gtk3::TreeModel') ||
+		    ($iter  && !UNIVERSAL::isa ($iter, 'Gtk3::TreeIter')));
 
 	my $path = $model->get_path ($iter) if ($iter);
-	my $rowref = Gtk2::TreeRowReference->new ($model, $path) if ($path);
+	my $rowref = Gtk3::TreeRowReference->new ($model, $path) if ($path);
 
 	return bless {
 		model      => $model,
@@ -60,7 +60,7 @@ sub FETCH { # this, index
 
 	# tie this row's values
 	my @values;
-	tie @values, 'Gtk2::Ex::Simple::TiedRow', $model, $iter;
+	tie @values, 'Gtk3::Ex::Simple::TiedRow', $model, $iter;
 
 	# this this row's children
 	my @children;
@@ -84,7 +84,7 @@ sub _do_node
 
 	# tie this row's values
 	my @row;
-	tie @row, 'Gtk2::Ex::Simple::TiedRow', $model, $iter;
+	tie @row, 'Gtk3::Ex::Simple::TiedRow', $model, $iter;
 	if ('ARRAY' eq ref $store->{value}) {
 		@row = @{$store->{value}};
 	} else {

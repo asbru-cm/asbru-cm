@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -255,157 +255,157 @@ sub _buildGUI {
 	
 	$w{vbox} = $container;
 		
-		$w{hbox1} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox1}, 0, 1, 5 );
 			
-			$w{frRDPVersion} = Gtk2::Frame -> new( 'RDP Version:' );
+			$w{frRDPVersion} = Gtk3::Frame -> new( 'RDP Version:' );
 			$w{hbox1} -> pack_start( $w{frRDPVersion}, 1, 1, 0 );
 			$w{frRDPVersion} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			$w{frRDPVersion} -> set_tooltip_text( '-(4|5) : Use RDP v4 or v5 (default)' );
 				
-				$w{cbRDPVersion} = Gtk2::ComboBox -> new_text;
+				$w{cbRDPVersion} = Gtk3::ComboBoxText -> new;
 				$w{frRDPVersion} -> add( $w{cbRDPVersion} );
 				foreach my $rdp_version ( 4, 5 ) { $w{cbRDPVersion} -> append_text( $rdp_version ); };
 			
-			$w{frBPP} = Gtk2::Frame -> new( 'BPP:' );
+			$w{frBPP} = Gtk3::Frame -> new( 'BPP:' );
 			$w{hbox1} -> pack_start( $w{frBPP}, 1, 1, 0 );
 			$w{frBPP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			$w{frBPP} -> set_tooltip_text( '[-a] : Sets the colour depth for the connection (8, 15, 16 or 24)' );
 				
-				$w{cbBPP} = Gtk2::ComboBox -> new_text;
+				$w{cbBPP} = Gtk3::ComboBoxText -> new;
 				$w{frBPP} -> add( $w{cbBPP} );
 				foreach my $bpp ( 8, 15, 16, 24 ) { $w{cbBPP} -> append_text( $bpp ); };
 			
-			$w{vboxup} = Gtk2::VBox -> new( 0, 0 );
+			$w{vboxup} = Gtk3::VBox -> new( 0, 0 );
 			$w{hbox1} -> pack_start( $w{vboxup}, 0, 1, 5 );
 					
-				$w{hboxup} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxup} = Gtk3::HBox -> new( 0, 0 );
 				$w{vboxup} -> pack_start( $w{hboxup}, 1, 1, 0 );
 				
-					$w{chAttachToConsole} = Gtk2::CheckButton -> new_with_label( 'Attach to console' );
+					$w{chAttachToConsole} = Gtk3::CheckButton -> new_with_label( 'Attach to console' );
 					$w{hboxup} -> pack_start( $w{chAttachToConsole}, 1, 1, 0 );
 					$w{chAttachToConsole} -> set_tooltip_text( '[-0] : Attach to console of server (requires Windows Server 2003 or newer)' );
 					
-					$w{chBitmapCaching} = Gtk2::CheckButton -> new_with_label( 'Bitmap Cache' );
+					$w{chBitmapCaching} = Gtk3::CheckButton -> new_with_label( 'Bitmap Cache' );
 					$w{hboxup} -> pack_start( $w{chBitmapCaching}, 1, 1, 0 );
 					$w{chBitmapCaching} -> set_tooltip_text( '[-P] : Enable  caching  of  bitmaps to disk (persistent bitmap caching)' );
 					
-					$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Compression' );
+					$w{chUseCompression} = Gtk3::CheckButton -> new_with_label( 'Compression' );
 					$w{hboxup} -> pack_start( $w{chUseCompression}, 1, 1, 0 );
 					$w{chUseCompression} -> set_tooltip_text( '[-z] : Enable compression of the RDP datastream' );
 					
-					$w{cbScard} = Gtk2::CheckButton -> new_with_label( 'Use SmartCard' );
+					$w{cbScard} = Gtk3::CheckButton -> new_with_label( 'Use SmartCard' );
 					$w{hboxup} -> pack_start( $w{cbScard}, 0, 1, 0 );
 					$w{cbScard} -> set_tooltip_text( '[-r scard] : Enable SmartCard usage' );
 		
-				$w{hboxdown} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxdown} = Gtk3::HBox -> new( 0, 0 );
 				$w{vboxup} -> pack_start( $w{hboxdown}, 1, 1, 0 );
 					
-					$w{chClipboard} = Gtk2::CheckButton -> new_with_label( 'Clipboard forwarding ' );
+					$w{chClipboard} = Gtk3::CheckButton -> new_with_label( 'Clipboard forwarding ' );
 					$w{chClipboard} -> set_tooltip_text( '[-r clipboard:PRIMARYCLIPBOARD] : Enable clipboard forwarding' );
 					$w{hboxdown} -> pack_start( $w{chClipboard}, 0, 1, 0 );
 					
-					$w{cbEnableSeamless} = Gtk2::CheckButton -> new_with_label( 'Enable SeamlessRDP ' );
+					$w{cbEnableSeamless} = Gtk3::CheckButton -> new_with_label( 'Enable SeamlessRDP ' );
 					$w{cbEnableSeamless} -> set_tooltip_text( '[-A] : Enable SeamlessRDP' );
 					$w{hboxdown} -> pack_start( $w{cbEnableSeamless}, 0, 1, 0 );
 					
-					$w{lblStartupShell} = Gtk2::Label -> new( ' Startup shell:' );
+					$w{lblStartupShell} = Gtk3::Label -> new( ' Startup shell:' );
 					$w{hboxdown} -> pack_start( $w{lblStartupShell}, 0, 1, 0 );
 				
-					$w{entryStartupShell} = Gtk2::Entry -> new;
+					$w{entryStartupShell} = Gtk3::Entry -> new;
 					$w{entryStartupShell} -> set_tooltip_text( "[-s 'startupshell command'] : start given startupshell/command instead of explorer" );
 					$w{hboxdown} -> pack_start( $w{entryStartupShell}, 1, 1, 0 );
 				
-		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox2} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox2}, 0, 1, 5 );
 			
-			$w{frGeometry} = Gtk2::Frame -> new( ' RDP Window size: ' );
+			$w{frGeometry} = Gtk3::Frame -> new( ' RDP Window size: ' );
 			$w{hbox2} -> pack_start( $w{frGeometry}, 1, 1, 0 );
 			$w{frGeometry} -> set_tooltip_text( '[-g] : Amount of screen to use' );
 				
-				$w{hboxsize} = Gtk2::VBox -> new( 0, 5 );
+				$w{hboxsize} = Gtk3::VBox -> new( 0, 5 );
 				$w{frGeometry} -> add( $w{hboxsize} );
 					
-					$w{hboxfsebpc} = Gtk2::HBox -> new( 0, 5 );
+					$w{hboxfsebpc} = Gtk3::HBox -> new( 0, 5 );
 					$w{hboxsize} -> pack_start( $w{hboxfsebpc}, 1, 1, 0 );
 					
-					$w{chFullscreen} = Gtk2::RadioButton -> new_with_label( undef, 'Fullscreen' );
+					$w{chFullscreen} = Gtk3::RadioButton -> new_with_label( undef, 'Fullscreen' );
 					$w{hboxfsebpc} -> pack_start( $w{chFullscreen}, 1, 1, 0 );
 					$w{chFullscreen} -> set_tooltip_text( '[-f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)' );
 					
-					$w{chEmbed} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Embed in TAB' );
+					$w{chEmbed} = Gtk3::RadioButton -> new_with_label( $w{chFullscreen}, 'Embed in TAB' );
 					$w{hboxfsebpc} -> pack_start( $w{chEmbed}, 1, 1, 0 );
 					$w{chEmbed} -> set_tooltip_text( 'Embed terminal window in PAC TAB, using PAC\'s GUI size' );
 					
-					$w{hbox69} = Gtk2::HBox -> new( 0, 5 );
+					$w{hbox69} = Gtk3::HBox -> new( 0, 5 );
 					$w{hboxfsebpc} -> pack_start( $w{hbox69}, 1, 1, 0 );
 						
-						$w{chWidthHeight} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Width x Height:' );
+						$w{chWidthHeight} = Gtk3::RadioButton -> new_with_label( $w{chFullscreen}, 'Width x Height:' );
 						$w{chWidthHeight} -> set_tooltip_text( '[-g WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window' );
 						$w{hbox69} -> pack_start( $w{chWidthHeight}, 0, 1, 0 );
 						
-						$w{hboxWidthHeight} = Gtk2::HBox -> new( 0, 5 );
+						$w{hboxWidthHeight} = Gtk3::HBox -> new( 0, 5 );
 						$w{hbox69} -> pack_start( $w{hboxWidthHeight}, 0, 1, 0 );
 							
-							$w{spWidth} = Gtk2::SpinButton -> new_with_range( 1, 4096, 10 );
+							$w{spWidth} = Gtk3::SpinButton -> new_with_range( 1, 4096, 10 );
 							$w{hboxWidthHeight} -> pack_start( $w{spWidth}, 0, 1, 0 );
-							$w{spHeight} = Gtk2::SpinButton -> new_with_range( 1, 4096, 10 );
+							$w{spHeight} = Gtk3::SpinButton -> new_with_range( 1, 4096, 10 );
 							$w{hboxWidthHeight} -> pack_start( $w{spHeight}, 0, 1, 0 );
 							$w{hboxWidthHeight} -> set_sensitive( 0 );
 					
-					$w{hboxPercentage} = Gtk2::HBox -> new( 0, 5 );
+					$w{hboxPercentage} = Gtk3::HBox -> new( 0, 5 );
 					$w{hboxsize} -> pack_start( $w{hboxPercentage}, 0, 1, 0 );
 						
-						$w{chPercentage} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Screen percentage:' );
+						$w{chPercentage} = Gtk3::RadioButton -> new_with_label( $w{chFullscreen}, 'Screen percentage:' );
 						$w{chPercentage} -> set_tooltip_text( '[-g percentage%] : Amount of screen to use' );
 						$w{chPercentage} -> set_active( 1 );
 						$w{hboxPercentage} -> pack_start( $w{chPercentage}, 0, 1, 0 );
 						
-						$w{spGeometry} = Gtk2::HScale -> new( Gtk2::Adjustment -> new( 90, 10, 100, 1.0, 1.0, 1.0 ) );
+						$w{spGeometry} = Gtk3::HScale -> new( Gtk3::Adjustment -> new( 90, 10, 100, 1.0, 1.0, 1.0 ) );
 						$w{hboxPercentage} -> pack_start( $w{spGeometry}, 1, 1, 0 );
 			
-			$w{frKeyboard} = Gtk2::Frame -> new( 'Keyboard layout:' );
+			$w{frKeyboard} = Gtk3::Frame -> new( 'Keyboard layout:' );
 			$w{hbox2} -> pack_start( $w{frKeyboard}, 0, 1, 0 );
 			$w{frKeyboard} -> set_tooltip_text( '[-k] : Keyboard layout' );
 				
-				$w{entryKeyboard} = Gtk2::Entry -> new;
+				$w{entryKeyboard} = Gtk3::Entry -> new;
 				$w{frKeyboard} -> add( $w{entryKeyboard} );
 		
-		$w{hboxDomain} = Gtk2::HBox -> new( 0, 5 );
+		$w{hboxDomain} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hboxDomain}, 0, 1, 5 );
 			
-			$w{hboxDomain} -> pack_start( Gtk2::Label -> new( 'Windows Domain: ' ), 0, 1, 0 );
-			$w{entryDomain} = Gtk2::Entry -> new;
+			$w{hboxDomain} -> pack_start( Gtk3::Label -> new( 'Windows Domain: ' ), 0, 1, 0 );
+			$w{entryDomain} = Gtk3::Entry -> new;
 			$w{hboxDomain} -> pack_start( $w{entryDomain}, 1, 1, 0 );
 			
-			$w{hboxDomain} -> pack_start( Gtk2::Label -> new( 'Sound redirect: ' ), 0, 1, 0 );
-			$w{cbRedirSound} = Gtk2::ComboBox -> new_text;
+			$w{hboxDomain} -> pack_start( Gtk3::Label -> new( 'Sound redirect: ' ), 0, 1, 0 );
+			$w{cbRedirSound} = Gtk3::ComboBoxText -> new;
 			$w{hboxDomain} -> pack_start( $w{cbRedirSound}, 1, 1, 0 );
 			foreach my $sound ( 'local', 'off', 'remote' ) { $w{cbRedirSound} -> append_text( $sound ); };
 		
-		$w{frameRedirDisk} = Gtk2::Frame -> new( ' Disk redirects: ' );
+		$w{frameRedirDisk} = Gtk3::Frame -> new( ' Disk redirects: ' );
 		$w{vbox} -> pack_start( $w{frameRedirDisk}, 1, 1, 0 );
 		$w{frameRedirDisk} -> set_tooltip_text( '[-r disk:<8_chars_sharename>=<path>] : Redirects a <path> to the share \\tsclient\<8_chars_sharename> on the server' );
 			
-			$w{vbox_enesimo} = Gtk2::VBox -> new( 0, 0);
+			$w{vbox_enesimo} = Gtk3::VBox -> new( 0, 0);
 			$w{frameRedirDisk} -> add( $w{vbox_enesimo}, );
 				
 				# Build 'add' button
-				$w{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vbox_enesimo} -> pack_start( $w{btnadd}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{sw} = Gtk2::ScrolledWindow -> new();
+				$w{sw} = Gtk3::ScrolledWindow -> new();
 				$w{vbox_enesimo} -> pack_start( $w{sw}, 1, 1, 0 );
 				$w{sw} -> set_policy( 'automatic', 'automatic' );
 				$w{sw} -> set_shadow_type( 'none' );
 					
-					$w{vp} = Gtk2::Viewport -> new();
+					$w{vp} = Gtk3::Viewport -> new();
 					$w{sw} -> add( $w{vp} );
 					$w{vp} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the redirect widgets
-						$w{vbRedirect} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbRedirect} = Gtk3::VBox -> new( 0, 0 );
 						$w{vp} -> add( $w{vbRedirect} );
 	
 	# Capture 'Full Screen' checkbox toggled state
@@ -443,20 +443,20 @@ sub _buildRedir {
 	$w{position} = scalar @{ $$self{listRedir} };
 	
 	# Make an HBox to contain local address, local port, remote address, remote port and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{hbox} -> pack_start( Gtk2::Label -> new( 'Share Name (8 chars max.!):' ), 0, 1, 0 );
-		$w{entryRedirShare} = Gtk2::Entry -> new;
+		$w{hbox} -> pack_start( Gtk3::Label -> new( 'Share Name (8 chars max.!):' ), 0, 1, 0 );
+		$w{entryRedirShare} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{entryRedirShare}, 0, 1, 0 );
 		$w{entryRedirShare} -> set_text( $redirDiskShare );
 		
-		$w{fcForwardPath} = Gtk2::FileChooserButton -> new( 'Select a path to share', 'GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER' );
+		$w{fcForwardPath} = Gtk3::FileChooserButton -> new( 'Select a path to share', 'GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER' );
 		$redirDiskPath =~ s/(.+)/file:\/\/$1/g;
 		$w{fcForwardPath} -> set_uri( $redirDiskPath );
 		$w{hbox} -> pack_start( $w{fcForwardPath}, 1, 1, 0 );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container

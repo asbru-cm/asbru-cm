@@ -38,10 +38,9 @@ use Storable qw ( dclone nstore nstore_fd fd_retrieve );
 use Encode;
 use Gnome2::GConf;
 
-# GTK2
-use Gtk2 '-init';
-use Gtk2::GladeXML;
-use Gtk2::Ex::Simple::List;
+# GTK
+use Gtk3 '-init';
+#~ use Gtk3::Ex::Simple::List;
 
 # PAC modules
 use PACUtils;
@@ -63,7 +62,7 @@ my $APPVERSION		= $PACUtils::APPVERSION;
 my $RES_DIR			= $RealBin . '/res';
 my $AUTOSTART_FILE	= $RES_DIR . '/pac_start.desktop';
 
-my $GLADE_FILE		= $RES_DIR . '/pac.glade';
+my $GLADE_FILE		= $RES_DIR . '/asbru.glade';
 my $INIT_CFG_FILE	= $RES_DIR . '/pac.yml';
 my $CFG_DIR			= $ENV{'HOME'} . '/.config/pac';
 my $CFG_FILE		= $CFG_DIR . '/pac.yml';
@@ -129,15 +128,15 @@ sub show {
 	my $title;
 	if ( $$self{_IS_NEW} eq 'quick' ) {
 		_( $self, 'btnSaveEdit' ) -> set_label( '_Start Connection' );
-		_( $self, 'btnSaveEdit' ) -> set_image( Gtk2::Image -> new_from_stock( 'pac-quick-connect', 'button' ) );
+		_( $self, 'btnSaveEdit' ) -> set_image( Gtk3::Image -> new_from_stock( 'pac-quick-connect', 'button' ) );
 		_( $self, 'btnCloseEdit' ) -> set_label( '_Cancel Quick connect' );
-		_( $self, 'btnCloseEdit' ) -> set_image( Gtk2::Image -> new_from_stock( 'gtk-close', 'button' ) );
+		_( $self, 'btnCloseEdit' ) -> set_image( Gtk3::Image -> new_from_stock( 'gtk-close', 'button' ) );
 		$title = "Quick Connect : $APPNAME (v$APPVERSION)";
 	} else {
 		_( $self, 'btnSaveEdit' ) -> set_label( '_Save and Close' );
-		_( $self, 'btnSaveEdit' ) -> set_image( Gtk2::Image -> new_from_stock( 'gtk-save', 'button' ) );
+		_( $self, 'btnSaveEdit' ) -> set_image( Gtk3::Image -> new_from_stock( 'gtk-save', 'button' ) );
 		_( $self, 'btnCloseEdit' ) -> set_label( '_Close without saving' );
-		_( $self, 'btnCloseEdit' ) -> set_image( Gtk2::Image -> new_from_stock( 'gtk-close', 'button' ) );
+		_( $self, 'btnCloseEdit' ) -> set_image( Gtk3::Image -> new_from_stock( 'gtk-close', 'button' ) );
 		$title = "Editing '$PACMain::FUNCS{_MAIN}{_CFG}{'environments'}{ $$self{_UUID} }{'name'}' : $APPNAME (v$APPVERSION)";
 	}
 	
@@ -162,10 +161,11 @@ sub _initGUI {
 	my $self = shift;
 	
 	# Load XML Glade file
-	defined $$self{_GLADE} or $$self{_GLADE} = Gtk2::GladeXML -> new( $GLADE_FILE ) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
+	defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder -> new();
+	$$self{_GLADE} -> add_from_file ($GLADE_FILE ) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
 	
 	# Save main, about and add windows
-	$$self{_WINDOWEDIT}	= $$self{_GLADE} -> get_widget ('windowEdit');
+	$$self{_WINDOWEDIT}	= $$self{_GLADE} -> get_object ('windowEdit');
 	$$self{_WINDOWEDIT} -> set_size_request( -1, 550 );
 	
 	_( $self, 'imgBannerEdit' ) -> set_from_file( $RES_DIR . '/pac_banner_edit.png' );
@@ -195,13 +195,13 @@ sub _initGUI {
 	$$self{_WINDOWEDIT} -> set_icon_name( 'pac-app-big' );
 	$$self{_WINDOWEDIT} -> set_position( 'center' );
 	
-	$$self{cbShowHidden} = Gtk2::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
+	$$self{cbShowHidden} = Gtk3::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
 	_( $self, 'fileCfgPublicKey' ) -> set_extra_widget( $$self{cbShowHidden} );
 	
-	$$self{cbLogsShowHidden} = Gtk2::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
+	$$self{cbLogsShowHidden} = Gtk3::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
 	_( $self, 'btnEditSaveSessionLogs' ) -> set_extra_widget( $$self{cbLogsShowHidden} );
 	
-	_( $self, 'btnCheckKPX' ) -> set_image( Gtk2::Image -> new_from_stock( 'pac-keepass', 'button' ) );
+	_( $self, 'btnCheckKPX' ) -> set_image( Gtk3::Image -> new_from_stock( 'pac-keepass', 'button' ) );
 	
 	_( $self, 'btnSaveEdit' ) -> set_use_underline( 1 );
 	_( $self, 'btnCloseEdit' ) -> set_use_underline( 1 );

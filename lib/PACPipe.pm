@@ -32,8 +32,8 @@ use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 use Encode qw ( encode );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -87,7 +87,7 @@ sub show {
 	$$self{_WINDOWPIPE}{data} -> present;
 	
 	$self -> _updateGUI;
-	$$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> select_all;
+	#~ $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> select_all;
 	
 	return 1;
 }
@@ -102,7 +102,7 @@ sub _initGUI {
 	my $self = shift;
 	
 	# Create the 'windowFind' dialog window,
-	$$self{_WINDOWPIPE}{data} = Gtk2::Window -> new;
+	$$self{_WINDOWPIPE}{data} = Gtk3::Window -> new;
 	
 	# and setup some dialog properties.
 	$$self{_WINDOWPIPE}{data} -> set_title( "$APPNAME : Pipe output" );
@@ -113,97 +113,97 @@ sub _initGUI {
 	#$$self{_WINDOWPIPE}{data} -> set_modal( 1 );
 	$$self{_WINDOWPIPE}{data} -> maximize;
 		
-		$$self{_WINDOWPIPE}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$$self{_WINDOWPIPE}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$$self{_WINDOWPIPE}{data} -> add( $$self{_WINDOWPIPE}{gui}{vbox} );
 			
 			# Create an hpane
-			$$self{_WINDOWPIPE}{gui}{hpane} = Gtk2::HPaned -> new;
+			$$self{_WINDOWPIPE}{gui}{hpane} = Gtk3::HPaned -> new;
 			$$self{_WINDOWPIPE}{gui}{vbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{hpane}, 1, 1, 0 );
 				
-				$$self{_WINDOWPIPE}{gui}{frame1} = Gtk2::Frame -> new;
+				$$self{_WINDOWPIPE}{gui}{frame1} = Gtk3::Frame -> new;
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_size_request( 200, 200 );
 				$$self{_WINDOWPIPE}{gui}{hpane} -> pack1( $$self{_WINDOWPIPE}{gui}{frame1}, 0, 0 );
-				( my $lbl1 = Gtk2::Label -> new ) -> set_markup( ' <b>Terminals:</b> ' );
+				( my $lbl1 = Gtk3::Label -> new ) -> set_markup( ' <b>Terminals:</b> ' );
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_label_widget( $lbl1 );
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_border_width( 5 );
 					
 					# Terminals list
-					$$self{_WINDOWPIPE}{gui}{scroll2} = Gtk2::ScrolledWindow -> new;
+					$$self{_WINDOWPIPE}{gui}{scroll2} = Gtk3::ScrolledWindow -> new;
 					$$self{_WINDOWPIPE}{gui}{frame1} -> add( $$self{_WINDOWPIPE}{gui}{scroll2} );
 					$$self{_WINDOWPIPE}{gui}{scroll2} -> set_policy( 'automatic', 'automatic' );
 					$$self{_WINDOWPIPE}{gui}{frame1} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{treeTerminals} = Gtk2::Ex::Simple::List -> new_from_treeview (
-							Gtk2::TreeView -> new,
-							'UUID_TMP'	=> 'hidden',
-							'NAME'		=> 'text',
-							'TITLE'		=> 'text'
-						);
+						#~ $$self{_WINDOWPIPE}{treeTerminals} = Gtk3::Ex::Simple::List -> new_from_treeview (
+							#~ Gtk3::TreeView -> new,
+							#~ 'UUID_TMP'	=> 'hidden',
+							#~ 'NAME'		=> 'text',
+							#~ 'TITLE'		=> 'text'
+						#~ );
 						
-						$$self{_WINDOWPIPE}{gui}{scroll2} -> add( $$self{_WINDOWPIPE}{treeTerminals} );
-						$$self{_WINDOWPIPE}{treeTerminals} -> set_tooltip_text( 'List of Terminals where the locally PIPEd command was executed' );
-						$$self{_WINDOWPIPE}{treeTerminals} -> set_headers_visible( 1 );
-						$$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> set_mode( 'GTK_SELECTION_MULTIPLE' );
-						my @col_terminals = $$self{_WINDOWPIPE}{treeTerminals} -> get_columns;
-						$col_terminals[0] -> set_expand( 0 );
-						$col_terminals[1] -> set_expand( 0 );
-						$col_terminals[1] -> set_expand( 0 );
+						#~ $$self{_WINDOWPIPE}{gui}{scroll2} -> add( $$self{_WINDOWPIPE}{treeTerminals} );
+						#~ $$self{_WINDOWPIPE}{treeTerminals} -> set_tooltip_text( 'List of Terminals where the locally PIPEd command was executed' );
+						#~ $$self{_WINDOWPIPE}{treeTerminals} -> set_headers_visible( 1 );
+						#~ $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> set_mode( 'GTK_SELECTION_MULTIPLE' );
+						#~ my @col_terminals = $$self{_WINDOWPIPE}{treeTerminals} -> get_columns;
+						#~ $col_terminals[0] -> set_expand( 0 );
+						#~ $col_terminals[1] -> set_expand( 0 );
+						#~ $col_terminals[1] -> set_expand( 0 );
 				
 				# Create a vpane
-				$$self{_WINDOWPIPE}{gui}{vpane} = Gtk2::VPaned -> new;
+				$$self{_WINDOWPIPE}{gui}{vpane} = Gtk3::VPaned -> new;
 				$$self{_WINDOWPIPE}{gui}{hpane} -> pack2( $$self{_WINDOWPIPE}{gui}{vpane}, 1, 0 );
 					
 					# Create frame 2
-					$$self{_WINDOWPIPE}{gui}{frame2} = Gtk2::Frame -> new;
+					$$self{_WINDOWPIPE}{gui}{frame2} = Gtk3::Frame -> new;
 					$$self{_WINDOWPIPE}{gui}{vpane} -> pack1( $$self{_WINDOWPIPE}{gui}{frame2}, 1, 0 );
-					( my $lbl2 = Gtk2::Label -> new ) -> set_markup( ' <b>Expanded command:</b> ' );
+					( my $lbl2 = Gtk3::Label -> new ) -> set_markup( ' <b>Expanded command:</b> ' );
 					$$self{_WINDOWPIPE}{gui}{frame2} -> set_label_widget( $lbl2 );
 					$$self{_WINDOWPIPE}{gui}{frame2} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{gui}{scroll1} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWPIPE}{gui}{scroll1} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWPIPE}{gui}{frame2} -> add( $$self{_WINDOWPIPE}{gui}{scroll1} );
 						$$self{_WINDOWPIPE}{gui}{scroll1} -> set_policy( 'automatic', 'automatic' );
 						$$self{_WINDOWPIPE}{gui}{scroll1} -> set_border_width( 5 );
 							
-							$$self{_WINDOWPIPE}{bufferCmd} = Gtk2::TextBuffer -> new;
-							$$self{_WINDOWPIPE}{gui}{text1} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferCmd} );
+							$$self{_WINDOWPIPE}{bufferCmd} = Gtk3::TextBuffer -> new;
+							$$self{_WINDOWPIPE}{gui}{text1} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferCmd} );
 							
 							$$self{_WINDOWPIPE}{gui}{text1} -> set_editable( 0 );
-							$$self{_WINDOWPIPE}{gui}{text1} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+							$$self{_WINDOWPIPE}{gui}{text1} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 							$$self{_WINDOWPIPE}{gui}{scroll1} -> add( $$self{_WINDOWPIPE}{gui}{text1} );
 					
 					# Create frame 3
-					$$self{_WINDOWPIPE}{gui}{frame3} = Gtk2::Frame -> new;
+					$$self{_WINDOWPIPE}{gui}{frame3} = Gtk3::Frame -> new;
 					$$self{_WINDOWPIPE}{gui}{vpane} -> pack2( $$self{_WINDOWPIPE}{gui}{frame3}, 1, 0 );
-					( my $lbl3 = Gtk2::Label -> new ) -> set_markup( ' <b>Final output (locally piped):</b> ' );
+					( my $lbl3 = Gtk3::Label -> new ) -> set_markup( ' <b>Final output (locally piped):</b> ' );
 					$$self{_WINDOWPIPE}{gui}{frame3} -> set_label_widget( $lbl3 );
 					$$self{_WINDOWPIPE}{gui}{frame3} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{gui}{scroll} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWPIPE}{gui}{scroll} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWPIPE}{gui}{frame3} -> add( $$self{_WINDOWPIPE}{gui}{scroll} );
 						$$self{_WINDOWPIPE}{gui}{scroll} -> set_policy( 'automatic', 'automatic' );
 						$$self{_WINDOWPIPE}{gui}{scroll} -> set_border_width( 5 );
 							
-							$$self{_WINDOWPIPE}{bufferOut} = Gtk2::TextBuffer -> new;
-							$$self{_WINDOWPIPE}{gui}{text} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferOut} );
+							$$self{_WINDOWPIPE}{bufferOut} = Gtk3::TextBuffer -> new;
+							$$self{_WINDOWPIPE}{gui}{text} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferOut} );
 							
 							$$self{_WINDOWPIPE}{gui}{text} -> set_editable( 0 );
-							$$self{_WINDOWPIPE}{gui}{text} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+							$$self{_WINDOWPIPE}{gui}{text} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 							$$self{_WINDOWPIPE}{gui}{scroll} -> add( $$self{_WINDOWPIPE}{gui}{text} );
 			
-			$$self{_WINDOWPIPE}{gui}{btnbox} = Gtk2::HBox -> new( 0, 0 );
+			$$self{_WINDOWPIPE}{gui}{btnbox} = Gtk3::HBox -> new( 0, 0 );
 			$$self{_WINDOWPIPE}{gui}{vbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnbox}, 0, 1, 0 );
 				
 				# Put a 'always on top' checkbutton
-				$$self{_WINDOWPIPE}{gui}{cbaot} = Gtk2::CheckButton -> new_with_label( 'Always On Top' );
+				$$self{_WINDOWPIPE}{gui}{cbaot} = Gtk3::CheckButton -> new_with_label( 'Always On Top' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{cbaot}, 0, 1, 0 );
 				
 				# Put a 'refresh' button
-				$$self{_WINDOWPIPE}{gui}{btnrefresh} = Gtk2::Button -> new_from_stock( 'gtk-refresh' );
+				$$self{_WINDOWPIPE}{gui}{btnrefresh} = Gtk3::Button -> new_from_stock( 'gtk-refresh' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnrefresh}, 1, 1, 0 );
 				
 				# Put a 'close' button
-				$$self{_WINDOWPIPE}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-close' );
+				$$self{_WINDOWPIPE}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-close' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnclose}, 1, 1, 0 );
 	
 	$$self{_WINDOWPIPE}{gui}{vpane} -> set_position( ( $$self{_WINDOWPIPE}{data} -> get_size ) / 2 );
@@ -222,49 +222,49 @@ sub _setupCallbacks {
 		return 1;
 	} );	
 	
-	$$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> signal_connect( 'changed' => sub {
-		# Populate both command an piped output text entries with data depending on selected terminals
-		my $full_cmd = '';
-		my $full_out = '';
-		$$self{_WINDOWPIPE}{bufferCmd} -> set_text( '' );
-		$$self{_WINDOWPIPE}{bufferOut} -> set_text( '' );
+	#~ $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> signal_connect( 'changed' => sub {
+		#~ # Populate both command an piped output text entries with data depending on selected terminals
+		#~ my $full_cmd = '';
+		#~ my $full_out = '';
+		#~ $$self{_WINDOWPIPE}{bufferCmd} -> set_text( '' );
+		#~ $$self{_WINDOWPIPE}{bufferOut} -> set_text( '' );
 		
-		my $model = $$self{_WINDOWPIPE}{treeTerminals} -> get_model;
-		foreach my $path ( $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> get_selected_rows ) {
-			my $uuid_tmp	= $model -> get_value( $model -> get_iter( $path ), 0 );
-			my $t			= $PACMain::RUNNING{$uuid_tmp}{'terminal'};
-			my $name		= $$t{_NAME};
-			my $title		= $$t{_TITLE};
-			my $exec		= $$t{_EXEC};
-			next unless defined $$exec{FULL_CMD} and defined $$exec{RECEIVED};
+		#~ my $model = $$self{_WINDOWPIPE}{treeTerminals} -> get_model;
+		#~ foreach my $path ( $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> get_selected_rows ) {
+			#~ my $uuid_tmp	= $model -> get_value( $model -> get_iter( $path ), 0 );
+			#~ my $t			= $PACMain::RUNNING{$uuid_tmp}{'terminal'};
+			#~ my $name		= $$t{_NAME};
+			#~ my $title		= $$t{_TITLE};
+			#~ my $exec		= $$t{_EXEC};
+			#~ next unless defined $$exec{FULL_CMD} and defined $$exec{RECEIVED};
 			
-			$full_cmd .= "=======================================================\n";
-			$full_cmd .= "* CONNECTION: NAME '$name' TITLE '$title'\n";
-			$full_cmd .= "------------------------------------------------------\n";
-			$full_cmd .= "* ORIGINAL COMMAND:\n";
-			$full_cmd .= $$exec{FULL_CMD} . "\n";
-			$full_cmd .= "------------------------------------------------------\n";
-			$full_cmd .= "* EXPANDED COMMAND:\n";
-			$full_cmd .=  $$exec{RECEIVED} . ' | ' . join( ' | ', @{ $$exec{PIPE} } ) . "\n";
-			$full_cmd .= "------------------------------------------------------\n" if defined $$exec{PROMPT};
-			$full_cmd .= "* EXPECTED PROMPT: '$$exec{PROMPT}' \n" if defined $$exec{PROMPT};
-			$full_cmd .= "=======================================================\n\n";
+			#~ $full_cmd .= "=======================================================\n";
+			#~ $full_cmd .= "* CONNECTION: NAME '$name' TITLE '$title'\n";
+			#~ $full_cmd .= "------------------------------------------------------\n";
+			#~ $full_cmd .= "* ORIGINAL COMMAND:\n";
+			#~ $full_cmd .= $$exec{FULL_CMD} . "\n";
+			#~ $full_cmd .= "------------------------------------------------------\n";
+			#~ $full_cmd .= "* EXPANDED COMMAND:\n";
+			#~ $full_cmd .=  $$exec{RECEIVED} . ' | ' . join( ' | ', @{ $$exec{PIPE} } ) . "\n";
+			#~ $full_cmd .= "------------------------------------------------------\n" if defined $$exec{PROMPT};
+			#~ $full_cmd .= "* EXPECTED PROMPT: '$$exec{PROMPT}' \n" if defined $$exec{PROMPT};
+			#~ $full_cmd .= "=======================================================\n\n";
 			
-			$full_out .= "=======================================================\n";
-			$full_out .= "* CONNECTION: NAME '$name' TITLE '$title' OUTPUT:\n";
-			$full_out .= $$exec{OUT} // '';
-			$full_out .= "=======================================================\n\n";
-		}
+			#~ $full_out .= "=======================================================\n";
+			#~ $full_out .= "* CONNECTION: NAME '$name' TITLE '$title' OUTPUT:\n";
+			#~ $full_out .= $$exec{OUT} // '';
+			#~ $full_out .= "=======================================================\n\n";
+		#~ }
 		
-		$$self{_WINDOWPIPE}{bufferCmd} -> set_text( encode( 'iso-8859-1', _removeEscapeSeqs( $full_cmd ) ) );
-		$$self{_WINDOWPIPE}{bufferOut} -> set_text( encode( 'iso-8859-1', _removeEscapeSeqs( $full_out ) ) );
+		#~ $$self{_WINDOWPIPE}{bufferCmd} -> set_text( encode( 'iso-8859-1', _removeEscapeSeqs( $full_cmd ) ) );
+		#~ $$self{_WINDOWPIPE}{bufferOut} -> set_text( encode( 'iso-8859-1', _removeEscapeSeqs( $full_out ) ) );
 		
-		return 1;
-	} );
+		#~ return 1;
+	#~ } );
 	
 	$$self{_WINDOWPIPE}{data} -> signal_connect( 'delete_event' => sub { $$self{_WINDOWPIPE}{gui}{btnclose} -> activate; return 1; } );
 	$$self{_WINDOWPIPE}{gui}{cbaot} -> signal_connect( 'toggled' => sub { $$self{_WINDOWPIPE}{data} -> set_keep_above( $$self{_WINDOWPIPE}{gui}{cbaot} -> get_active ); } );
-	$$self{_WINDOWPIPE}{gui}{btnrefresh} -> signal_connect( 'clicked' => sub { $self -> _updateGUI; $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> select_all; return 1; } );
+	#~ $$self{_WINDOWPIPE}{gui}{btnrefresh} -> signal_connect( 'clicked' => sub { $self -> _updateGUI; $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> select_all; return 1; } );
 	$$self{_WINDOWPIPE}{gui}{btnclose} -> signal_connect( 'clicked' => sub { $$self{_WINDOWPIPE}{data} -> hide; return 1; } );
 	
 	return 1;	
@@ -274,10 +274,10 @@ sub _updateGUI {
 	my $self = shift;
 	
 	# Delete and re-populate the connections list
-	@{ $$self{_WINDOWPIPE}{treeTerminals}{data} } = ();
-	foreach my $uuid_tmp ( sort { lc( $PACMain::RUNNING{$a}{terminal}{_NAME} ) cmp lc( $PACMain::RUNNING{$b}{terminal}{_NAME} ) } keys %PACMain::RUNNING ) {
-		push( @{ $$self{_WINDOWPIPE}{treeTerminals}{data} }, [ $uuid_tmp, $PACMain::RUNNING{$uuid_tmp}{terminal}{_NAME}, $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} ] );
-	}
+	#~ @{ $$self{_WINDOWPIPE}{treeTerminals}{data} } = ();
+	#~ foreach my $uuid_tmp ( sort { lc( $PACMain::RUNNING{$a}{terminal}{_NAME} ) cmp lc( $PACMain::RUNNING{$b}{terminal}{_NAME} ) } keys %PACMain::RUNNING ) {
+		#~ push( @{ $$self{_WINDOWPIPE}{treeTerminals}{data} }, [ $uuid_tmp, $PACMain::RUNNING{$uuid_tmp}{terminal}{_NAME}, $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} ] );
+	#~ }
 	
 	return 1;
 }

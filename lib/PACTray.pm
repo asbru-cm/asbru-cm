@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -48,6 +48,7 @@ my $APPVERSION		= $PACUtils::APPVERSION;
 my $APPICON			= $RealBin . '/res/asbru-logo-64.png';
 my $TRAYICON		= $RealBin . '/res/asbru-logo-tray.png';
 my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -93,7 +94,7 @@ sub DESTROY {
 sub _initGUI {
 	my $self = shift;
 	
-	$$self{_TRAY} = Gtk2::StatusIcon -> new_from_file( $TRAYICON ) or die "ERROR: Could not create tray icon: $!";
+	$$self{_TRAY} = Gtk3::StatusIcon -> new_from_file( $TRAYICON ) or die "ERROR: Could not create tray icon: $!";
 	# Tray available (not Gnome-shell)?
 	$$self{_TRAY} -> set_property( 'tooltip-markup', "<b>$APPNAME</b> (v.$APPVERSION)" );
 	$$self{_TRAY} -> set_visible( $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} );

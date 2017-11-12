@@ -43,10 +43,10 @@ use YAML;
 use OSSP::uuid;
 use Encode;
 use KeePass;
-use DynaLoader; # Required for PACTerminal and PACShell modules
+#~ use DynaLoader; # Required for PACTerminal and PACShell modules
 
-# GTK2
-use Gtk2 '-init';
+# GTK3
+use Gtk3;
 
 # Module's functions/variables to export
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
@@ -96,6 +96,7 @@ require Exporter;
 	_getEncodings
 	_findKP
 	_makeDesktopFile
+	_updateWidgetColor
 ); # Functions/varibles to export
 
 @EXPORT_OK  = qw();
@@ -107,7 +108,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME		= decode( 'UTF-8', 'Ásbrú Connection Manager' );
-our $APPVERSION		= '5.0.0';
+our $APPVERSION		= '6.0';
 our $DEBUG_LEVEL	= 1;
 our $ARCH			= '';
 my $ARCH_TMP		= `/bin/uname -m 2>&1`;
@@ -127,82 +128,15 @@ my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
 
-our @DONATORS_LIST	= (
-	'Angelo Maria Lambiasi',
-	'TWEB Inc',
-	'Jeff Bakst',
-	'Sebastian Treu',
-	"Brian's Consultant Services",
-	'Cheah CH',
-	'Joseph Whipple',
-	'Felix Brack',
-	'Kalmykov Alexander',
-	'Paul Verreth',
-	'Iftimie Catalin Panaite',
-	'Andre Geißler',
-	'Arend de Boer',
-	'Taylor Finklea',
-	'Egbert Gerber',
-	'Гусаров Андрей',
-	'Carlos Bragatto',
-	'Nicklas Börjesson',
-	'Peter Taylor',
-	'Javier Martin Garcia-Asenjo',
-	'Helmut Kleinhans',
-	'Richard Kozel',
-	'Timo Büttner',
-	'Max Maskevich',
-	'1one - 18mind',
-	'von Karman Institute',
-	'Julian Thomas Bourne',
-	'iPERFEX',
-	'Joaquín Ferrero San Pedro',
-	'Yan Lebedev ',
-	'Florian Jerusalem',
-	'Brendan Bell',
-	'Microflow Software SA De CB',
-	'Giuseppe Massimiani',
-	'Рукавков Никита',
-	'Miguel Rodriguez Vazquez',
-	'Voronkov Vladislav',
-	'Murathan Bostanci',
-	'Adrian King',
-	'Sebastian Treu',
-	'Voronkov Vladislav',
-	'Dejan Korent',
-	'Diego Vasquez',
-	'Christoph Korn',
-	'Victor Demonchy',
-	'Ilir Pruthi',
-	'Robson Ramaldes',
-	'justine cattiaux',
-	'Ralph Hübner',
-	'Kalin Ivanov',
-	'Nikolay Penev',
-	'panagiotis palias',
-	'Lomakova Anastasia',
-	'Andre M Saunite',
-	'Jason Cyr',
-	'Andreas Diesner',
-	'Liam Ward',
-	'Andrei Padshyvalau',
-	'Gaston Martini',
-	'Host Revenda Ltda',
-	'Otto Schakenbos',
-	'Fernando Moreira',
-	'Don Jacobs'
-);
 our @PACDESKTOP		= (
 '[Desktop Entry]',
-'Name=PAC',
-'Comment=Perl Auto Connector (auto start)',
+'Name=Ásbrú CM',
+'Comment=Ásbrú Connection Manager',
 'Terminal=false',
-'Icon=pac',
+'Icon=asbru',
 'Type=Application',
-'Exec=/usr/bin/asbru --no-splash',
+'Exec=/usr/bin/asbru',
 'StartupNotify=false',
-'Name[en_US]=PAC',
-'Comment[en_US]=Perl Auto Connector (auto start)',
 'Categories=Applications;Network;',
 'X-GNOME-Autostart-enabled=true',
 );
@@ -232,7 +166,7 @@ die "ERROR: Could not load Gnome2::Vte Perl module from $RealBin/lib/ex/vte${PAC
 ######################################################
 # START: Private functions definitions
 
-sub _ { return shift -> {_GLADE} -> get_widget( shift ); };
+sub _ { return shift -> {_GLADE} -> get_object( shift ); };
 
 sub __ {
 	my $str = shift // '';
@@ -276,18 +210,19 @@ sub _splash {
 	return 1 if $PACMain::_NO_SPLASH;
 	
 	if ( ! defined $WINDOWSPLASH{_GUI} ) {
-		$WINDOWSPLASH{_GUI} = Gtk2::Window -> new;
+		$WINDOWSPLASH{_GUI} = Gtk3::Window -> new;
 		$WINDOWSPLASH{_GUI} -> set_type_hint( 'splashscreen' );
 		$WINDOWSPLASH{_GUI} -> set_position('center');
 		$WINDOWSPLASH{_GUI} -> set_keep_above( 1 );
 
-		$WINDOWSPLASH{_VBOX} = Gtk2::VBox -> new( 0, 0 );
+		$WINDOWSPLASH{_VBOX} = Gtk3::VBox -> new( 0, 0 );
 		$WINDOWSPLASH{_GUI} -> add( $WINDOWSPLASH{_VBOX} );
 
-		$WINDOWSPLASH{_IMG} = Gtk2::Image -> new_from_file( $SPLASH_IMG );
+		$WINDOWSPLASH{_IMG} = Gtk3::Image -> new_from_file( $SPLASH_IMG );
 		$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_IMG}, 1, 1, 0 );
 
-		$WINDOWSPLASH{_LBL} = Gtk2::ProgressBar -> new;
+		$WINDOWSPLASH{_LBL} = Gtk3::ProgressBar -> new;
+		$WINDOWSPLASH{_LBL} -> set_show_text ( 1 );
 		$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_LBL}, 1, 1, 5 );
 	}
 	
@@ -297,9 +232,9 @@ sub _splash {
 	if ( $show ) {
 		$WINDOWSPLASH{_GUI} -> show_all;
 		$WINDOWSPLASH{_GUI} -> present;
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3::main_iteration() while Gtk3::events_pending();
 	} else {
-		$WINDOWSPLASH{_GUI} -> hide_all;
+		$WINDOWSPLASH{_GUI} -> hide;
 		$WINDOWSPLASH{_GUI} -> destroy;
 	}
 	
@@ -310,38 +245,38 @@ sub _screenshot {
 	my $widget	= shift;
 	my $file	= shift;
 	
-	my $gdkpixbuf = Gtk2::Gdk::Pixbuf -> new( 'rgb', 0, 8, $widget -> allocation -> width, $widget -> allocation -> height );
+	my $gdkpixbuf = Gtk3::Gdk::Pixbuf -> new( 'rgb', 0, 8, $widget -> allocation -> width, $widget -> allocation -> height );
 	$gdkpixbuf -> get_from_drawable( $widget -> window, undef, $widget -> allocation -> x, $widget -> allocation -> y, 0, 0, $widget -> allocation -> width, $widget -> allocation -> height );
 	
 	return defined $file ? $gdkpixbuf -> save( $file, 'jpeg' ) : $gdkpixbuf;
 }
 
-sub _scale {
-	my $file	= shift;
-	my $w		= shift;
-	my $h		= shift;
-	my $ratio	= shift // '';
+#~ sub _scale {
+	#~ my $file	= shift;
+	#~ my $w		= shift;
+	#~ my $h		= shift;
+	#~ my $ratio	= shift // '';
 	
-	my $gdkpixbuf;
-	eval { $gdkpixbuf = ref( $file ) ? $file : Gtk2::Gdk::Pixbuf -> new_from_file( $file ) };
-	return 0 if $@;
+	#~ my $gdkpixbuf;
+	#~ eval { $gdkpixbuf = ref( $file ) ? $file : Gtk3::Gdk::Pixbuf -> new_from_file( $file ) };
+	#~ return 0 if $@;
 	
-	if ( $ratio && ( ( $gdkpixbuf -> get_width > $w ) || ( $gdkpixbuf -> get_height > $h ) ) ) {
-		if ( $gdkpixbuf -> get_width > $gdkpixbuf -> get_height ) {
-			$h = int( ( $w * $gdkpixbuf -> get_height ) / $gdkpixbuf -> get_width );
-		} elsif ( $gdkpixbuf -> get_height >= $gdkpixbuf -> get_width) {
-			$w = int( ( $h * $gdkpixbuf -> get_width ) / $gdkpixbuf -> get_height );
-		}
-	}
+	#~ if ( $ratio && ( ( $gdkpixbuf -> get_width > $w ) || ( $gdkpixbuf -> get_height > $h ) ) ) {
+		#~ if ( $gdkpixbuf -> get_width > $gdkpixbuf -> get_height ) {
+			#~ $h = int( ( $w * $gdkpixbuf -> get_height ) / $gdkpixbuf -> get_width );
+		#~ } elsif ( $gdkpixbuf -> get_height >= $gdkpixbuf -> get_width) {
+			#~ $w = int( ( $h * $gdkpixbuf -> get_width ) / $gdkpixbuf -> get_height );
+		#~ }
+	#~ }
 	
-	return $gdkpixbuf -> scale_simple( $w, $h, 'GDK_INTERP_HYPER' );
-}
+	#~ return $gdkpixbuf -> scale_simple( $w, $h, 'GDK_INTERP_HYPER' );
+#~ }
 
 sub _pixBufFromFile {
 	my $file = shift;
 	
 	my $gdkpixbuf;
-	eval { $gdkpixbuf = Gtk2::Gdk::Pixbuf -> new_from_file( $file ) };
+	eval { $gdkpixbuf = Gtk3::Gdk::Pixbuf -> new_from_file( $file ) };
 	
 	return 0 if $@;
 	return $gdkpixbuf;
@@ -410,7 +345,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -472,7 +407,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -533,7 +468,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_vncviewer.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_vncviewer.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -583,7 +518,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cu.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cu.jpg', 16, 16, 0 ),
 		'escape' => [ '~.' ]
 	};
 	
@@ -644,7 +579,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_remote-tty.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_remote-tty.jpg', 16, 16, 0 )
 	};
 	
 	`which c3270 1>/dev/null 2>&1`; my $c3270 = $?;
@@ -694,7 +629,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_3270.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_3270.jpg', 16, 16, 0 )
 	};
 	
 	`which autossh 1>/dev/null 2>&1`; my $autossh = ! $?;
@@ -756,7 +691,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( $autossh );
 			_( $self, 'cbAutossh' )				-> set_active( $$cfg{'autossh'} );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ssh.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ssh.jpg', 16, 16, 0 ),
 		'escape' => [ '~.' ]
 	};
 	
@@ -816,7 +751,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_mosh.png', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_mosh.png', 16, 16, 0 ),
 		'escape' => [ "\c^x." ]
 	};
 	
@@ -876,7 +811,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cadaver.png', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cadaver.png', 16, 16, 0 ),
 		'escape' => [ "\cc", "quit\n" ]
 	};
 	
@@ -936,7 +871,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_telnet.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_telnet.jpg', 16, 16, 0 ),
 		'escape' => [ "\c]", "quit\n" ]
 	};
 	
@@ -997,7 +932,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_sftp.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_sftp.jpg', 16, 16, 0 )
 	};
 	
 	$methods{ 'FTP' } = {
@@ -1055,7 +990,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ftp.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ftp.jpg', 16, 16, 0 )
 	};
 	
 	$methods{ 'Generic Command' } = {
@@ -1103,7 +1038,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_generic.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_generic.jpg', 16, 16, 0 )
 	};
 	
 	return %methods;
@@ -1159,13 +1094,13 @@ sub _registerPACIcons {
 		'pac-unprotected'					=> $RES_DIR . '/pac_unprotected.png',
 	);
 	
-	my $icon_factory = Gtk2::IconFactory -> new;
+	my $icon_factory = Gtk3::IconFactory -> new;
    
 	foreach my $icon ( keys %icons ) {
-		my $icon_source = Gtk2::IconSource -> new;
+		my $icon_source = Gtk3::IconSource -> new;
 		$icon_source -> set_filename( $icons{$icon} );
 		
-		my $icon_set = Gtk2::IconSet -> new;
+		my $icon_set = Gtk3::IconSet -> new;
 		$icon_set -> add_source( $icon_source );
 		
 		$icon_factory -> add( $icon, $icon_set);
@@ -1334,7 +1269,7 @@ sub _wEnterValue {
 	my %w;
 	
 	# Create the dialog window,
-	$w{window}{data} = Gtk2::Dialog -> new_with_buttons(
+	$w{window}{data} = Gtk3::Dialog -> new_with_buttons(
 		"$APPNAME (v$APPVERSION) : Enter data",
 		undef,
 		'modal',
@@ -1350,34 +1285,34 @@ sub _wEnterValue {
 	$w{window}{data} -> set_border_width( 5 );
 		
 		# Create an HBox to contain a picture and a label
-		$w{window}{gui}{hbox} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hbox}, 1, 1, 5 );
 		$w{window}{gui}{hbox} -> set_border_width( 5 );
 			
 			# Create image
-			$w{window}{gui}{img} = Gtk2::Image -> new_from_stock( $stock_icon, 'dialog' );
+			$w{window}{gui}{img} = Gtk3::Image -> new_from_stock( $stock_icon, 'dialog' );
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{img}, 0, 1, 5 );
 			
 			# Create 1st label
-			$w{window}{gui}{lblup} = Gtk2::Label -> new;
+			$w{window}{gui}{lblup} = Gtk3::Label -> new;
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{lblup}, 1, 1, 5 );
 			$w{window}{gui}{lblup} -> set_markup( $lblup );
 		
 		# Create 2nd label
-		$w{window}{gui}{lbldwn} = Gtk2::Label -> new;
+		$w{window}{gui}{lbldwn} = Gtk3::Label -> new;
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{lbldwn}, 1, 1, 5 );
 		$w{window}{gui}{lbldwn} -> set_text( $lbldown );
 		
 		if ( @list ) {
 			# Create combobox widget
-			$w{window}{gui}{comboList} = Gtk2::ComboBox -> new_text;
+			$w{window}{gui}{comboList} = Gtk3::ComboBox -> new_text;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{comboList}, 0, 1, 0 );
 			$w{window}{gui}{comboList} -> set_property( 'can_focus', 0 );
 			foreach my $text ( @list ) { $w{window}{gui}{comboList} -> append_text( $text ) };
 			$w{window}{gui}{comboList} -> set_active( 0 );
 		} else {
 			# Create the entry widget
-			$w{window}{gui}{entry} = Gtk2::Entry -> new;
+			$w{window}{gui}{entry} = Gtk3::Entry -> new;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{entry}, 0, 1, 5 );
 			$w{window}{gui}{entry} -> set_text( $default );
 			$w{window}{gui}{entry} -> set_activates_default( 1 );
@@ -1397,7 +1332,7 @@ sub _wEnterValue {
 	}
 	
 	$w{window}{data} -> destroy;
-	Gtk2 -> main_iteration while Gtk2 -> events_pending;
+	Gtk3 -> main_iteration while Gtk3 -> events_pending;
 	
 	return wantarray ? ( $val, $pos ) : $val;
 }
@@ -1426,7 +1361,7 @@ sub _wAddRenameNode {
 	my $new_title;
 	
 	# Create the dialog window,
-	$w{window}{data} = Gtk2::Dialog -> new_with_buttons(
+	$w{window}{data} = Gtk3::Dialog -> new_with_buttons(
 		"$APPNAME (v$APPVERSION) : Enter data",
 		undef,
 		'modal',
@@ -1442,31 +1377,31 @@ sub _wAddRenameNode {
 	$w{window}{data} -> set_border_width( 5 );
 		
 		# Create an HBox to contain a picture and a label
-		$w{window}{gui}{hbox} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hbox}, 0, 1, 0 );
 		$w{window}{gui}{hbox} -> set_border_width( 5 );
 			
 			# Create image
-			$w{window}{gui}{img} = Gtk2::Image -> new_from_stock( 'gtk-edit', 'dialog' );
+			$w{window}{gui}{img} = Gtk3::Image -> new_from_stock( 'gtk-edit', 'dialog' );
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{img}, 0, 1, 0 );
 			
 			# Create 1st label
-			$w{window}{gui}{lblup} = Gtk2::Label -> new;
+			$w{window}{gui}{lblup} = Gtk3::Label -> new;
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{lblup}, 1, 1, 0 );
 			$w{window}{gui}{lblup} -> set_markup( $lblup );
 		
 		# Create an HBox to contain a label and an entry
-		$w{window}{gui}{hbox1} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox1} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hbox1}, 0, 1, 0 );
 		$w{window}{gui}{hbox1} -> set_border_width( 5 );
 			
 			# Create label
-			$w{window}{gui}{lbl1} = Gtk2::Label -> new;
+			$w{window}{gui}{lbl1} = Gtk3::Label -> new;
 			$w{window}{gui}{hbox1} -> pack_start( $w{window}{gui}{lbl1}, 0, 1, 0 );
 			$w{window}{gui}{lbl1} -> set_text( 'Enter new NAME: ' );
 			
 			# Create the entry widget
-			$w{window}{gui}{entry1} = Gtk2::Entry -> new;
+			$w{window}{gui}{entry1} = Gtk3::Entry -> new;
 			$w{window}{gui}{hbox1} -> pack_start( $w{window}{gui}{entry1}, 1, 1, 0 );
 			$w{window}{gui}{entry1} -> set_text( $name );
 			$w{window}{gui}{entry1} -> set_activates_default( 1 );
@@ -1475,17 +1410,17 @@ sub _wAddRenameNode {
 			} );
 		
 		# Create an HBox to contain a label and an entry
-		$w{window}{gui}{hbox2} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox2} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hbox2}, 0, 1, 0 );
 		$w{window}{gui}{hbox2} -> set_border_width( 5 );
 			
 			# Create label
-			$w{window}{gui}{lbl2} = Gtk2::Label -> new;
+			$w{window}{gui}{lbl2} = Gtk3::Label -> new;
 			$w{window}{gui}{hbox2} -> pack_start( $w{window}{gui}{lbl2}, 0, 1, 0 );
 			$w{window}{gui}{lbl2} -> set_text( 'Enter new TITLE: ' );
 			
 			# Create the entry widget
-			$w{window}{gui}{entry2} = Gtk2::Entry -> new;
+			$w{window}{gui}{entry2} = Gtk3::Entry -> new;
 			$w{window}{gui}{hbox2} -> pack_start( $w{window}{gui}{entry2}, 1, 1, 0 );
 			$w{window}{gui}{entry2} -> set_text( $title );
 			$w{window}{gui}{entry2} -> set_activates_default( 1 );
@@ -1498,7 +1433,7 @@ sub _wAddRenameNode {
 	$new_title	= $w{window}{gui}{entry2} -> get_chars( 0, -1 ) if ( $ok eq 'ok' );
 	
 	$w{window}{data} -> destroy;
-	Gtk2 -> main_iteration while Gtk2 -> events_pending;
+	Gtk3 -> main_iteration while Gtk3 -> events_pending;
 	
 	return ( $new_name, $new_title );
 }
@@ -1519,10 +1454,10 @@ sub _wPopUpMenu {
 	$xml .= _buildMenuData( \@array, $mref, \%props );
 	$xml .= "</popup>\n</ui>";
 	
-	my $actions = Gtk2::ActionGroup -> new( 'Actions' );
+	my $actions = Gtk3::ActionGroup -> new( 'Actions' );
 	$actions -> add_actions( \@array, undef );
 	
-	my $ui = Gtk2::UIManager -> new;
+	my $ui = Gtk3::UIManager -> new;
 	$ui -> set_add_tearoffs( 1 );
 	$ui -> insert_action_group( $actions, 0 );
 	
@@ -1618,7 +1553,7 @@ sub _wMessage {
 	my $msg		= shift;
 	my $modal	= shift // 1;
 	
-	my $windowConfirm = Gtk2::MessageDialog -> new_with_markup( 
+	my $windowConfirm = Gtk3::MessageDialog -> new_with_markup( 
 		$window,
 		'GTK_DIALOG_DESTROY_WITH_PARENT',
 		'GTK_MESSAGE_INFO',
@@ -1635,7 +1570,7 @@ sub _wMessage {
 		$windowConfirm -> destroy;
 	} else {
 		$windowConfirm -> show_all;
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3 -> main_iteration while Gtk3 -> events_pending;
 	}
 	
 	return $windowConfirm;
@@ -1650,7 +1585,7 @@ sub _wProgress {
 	$WINDOWPROGRESS{_RET} = 1;
 	
 	if ( ! defined $WINDOWPROGRESS{_GUI} ) {
-		$WINDOWPROGRESS{_GUI} = Gtk2::Window -> new;
+		$WINDOWPROGRESS{_GUI} = Gtk3::Window -> new;
 			
 			$WINDOWPROGRESS{_GUI} -> set_position( 'center' );
 			$WINDOWPROGRESS{_GUI} -> set_icon_name( 'pac-app-big' );
@@ -1659,19 +1594,19 @@ sub _wProgress {
 			$WINDOWPROGRESS{_GUI} -> set_transient_for( $window ) if defined $window;
 			$WINDOWPROGRESS{_GUI} -> set_modal( 1 );
 			
-			$WINDOWPROGRESS{vbox} = Gtk2::VBox -> new( 0, 0 );
+			$WINDOWPROGRESS{vbox} = Gtk3::VBox -> new( 0, 0 );
 			$WINDOWPROGRESS{_GUI} -> add( $WINDOWPROGRESS{vbox} );
 				
-				$WINDOWPROGRESS{lbl1} = Gtk2::Label -> new;
+				$WINDOWPROGRESS{lbl1} = Gtk3::Label -> new;
 				$WINDOWPROGRESS{vbox} -> pack_start( $WINDOWPROGRESS{lbl1}, 0, 1, 5 );
 				
-				$WINDOWPROGRESS{pb} = Gtk2::ProgressBar -> new;
+				$WINDOWPROGRESS{pb} = Gtk3::ProgressBar -> new;
 				$WINDOWPROGRESS{vbox} -> pack_start( $WINDOWPROGRESS{pb}, 1, 1, 5 );
 				
-				$WINDOWPROGRESS{sep} = Gtk2::HSeparator -> new;
+				$WINDOWPROGRESS{sep} = Gtk3::HSeparator -> new;
 				$WINDOWPROGRESS{vbox} -> pack_start( $WINDOWPROGRESS{sep}, 0, 1, 5 );
 				
-				$WINDOWPROGRESS{btnCancel} = Gtk2::Button -> new_from_stock( 'gtk-cancel' );
+				$WINDOWPROGRESS{btnCancel} = Gtk3::Button -> new_from_stock( 'gtk-cancel' );
 				$WINDOWPROGRESS{vbox} -> pack_start( $WINDOWPROGRESS{btnCancel}, 0, 1, 5 );
 			
 			$WINDOWPROGRESS{_GUI} -> signal_connect( 'delete_event' => sub { return 1; } );
@@ -1693,7 +1628,7 @@ sub _wProgress {
 		$WINDOWPROGRESS{pb} -> set_fraction( $partial / $total );
 		
 		$WINDOWPROGRESS{_GUI} -> show_all;
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3 -> main_iteration while Gtk3 -> events_pending;
 	} else {
 		$WINDOWPROGRESS{_GUI} -> hide;
 	}
@@ -1705,13 +1640,13 @@ sub _wConfirm {
 	my $window	= shift;
 	my $msg		= shift;
 	
-	my $windowConfirm = Gtk2::MessageDialog -> new_with_markup( 
+	my $windowConfirm = Gtk3::MessageDialog -> new( 
 		$window,
 		'GTK_DIALOG_DESTROY_WITH_PARENT',
 		'GTK_MESSAGE_QUESTION',
-		'none',
-		$msg
-	);   
+		'none'
+	);
+	$windowConfirm -> set_markup ( $msg );
 	$windowConfirm -> add_buttons( 'gtk-ok' => 'yes', 'gtk-cancel'=> 'no');
 	$windowConfirm -> set_icon_name( 'pac-app-big' );
 	$windowConfirm -> set_title( "Confirm action : $APPNAME (v$APPVERSION)" );
@@ -1727,7 +1662,7 @@ sub _wYesNoCancel {
 	my $window	= shift;
 	my $msg		= shift;
 	
-	my $windowConfirm = Gtk2::MessageDialog -> new_with_markup( 
+	my $windowConfirm = Gtk3::MessageDialog -> new_with_markup( 
 		$window,
 		'GTK_DIALOG_DESTROY_WITH_PARENT',
 		'GTK_MESSAGE_QUESTION',
@@ -2721,7 +2656,7 @@ sub _wakeOnLan {
 	my %w;
 	
 	# Create the dialog window,
-	$w{window}{data} = Gtk2::Dialog -> new_with_buttons(
+	$w{window}{data} = Gtk3::Dialog -> new_with_buttons(
 		"$APPNAME (v$APPVERSION) : Wake On LAN",
 		undef,
 		'modal',
@@ -2735,79 +2670,79 @@ sub _wakeOnLan {
 	$w{window}{data} -> set_size_request( -1, -1 );
 	$w{window}{data} -> set_resizable( 0 );
 		
-		$w{window}{data} -> vbox -> pack_start( Gtk2::Image -> new_from_file( $RES_DIR . '/pac_banner_wol.png' ), 0, 1, 0 );
+		$w{window}{data} -> vbox -> pack_start( Gtk3::Image -> new_from_file( $RES_DIR . '/pac_banner_wol.png' ), 0, 1, 0 );
 		
 		# Create an HBox to contain a picture and a label
-		$w{window}{gui}{hbox} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hbox}, 1, 1, 0 );
 			
 			# Create image
-			$w{window}{gui}{img} = Gtk2::Image -> new_from_icon_name( 'computer', 'dialog' );
+			$w{window}{gui}{img} = Gtk3::Image -> new_from_icon_name( 'computer', 'dialog' );
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{img}, 0, 1, 0 );
 			
 			# Create 1st label
-			$w{window}{gui}{lblup} = Gtk2::Label -> new;
+			$w{window}{gui}{lblup} = Gtk3::Label -> new;
 			$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{lblup}, 1, 1, 0 );
 			$w{window}{gui}{lblup} -> set_markup( "<b>Enter the following data\nand press 'Ok' to send Magic Packet:</b>" );
 		
-		$w{window}{gui}{table} = Gtk2::Table -> new( 3, 3, 0 );
+		$w{window}{gui}{table} = Gtk3::Table -> new( 3, 3, 0 );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{table}, 1, 1, 0 );
 			
 			# Create MAC label
-			$w{window}{gui}{lblmac} = Gtk2::Label -> new;
+			$w{window}{gui}{lblmac} = Gtk3::Label -> new;
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{lblmac}, 0, 1, 0, 1 );
 			$w{window}{gui}{lblmac} -> set_text( 'MAC Address: ' );
 			
 			# Create MAC entry widget
-			$w{window}{gui}{entrymac} = Gtk2::Entry -> new;
+			$w{window}{gui}{entrymac} = Gtk3::Entry -> new;
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{entrymac}, 1, 2, 0, 1 );
 			$w{window}{gui}{entrymac} -> set_text( $mac );
 			$w{window}{gui}{entrymac} -> set_activates_default( 1 );
 			$w{window}{gui}{entrymac} -> grab_focus;
 			
 			# Create MAC icon widget
-			$w{window}{gui}{iconmac} = Gtk2::Image -> new_from_stock( 'gtk-no', 'menu' );
+			$w{window}{gui}{iconmac} = Gtk3::Image -> new_from_stock( 'gtk-no', 'menu' );
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{iconmac}, 2, 3, 0, 1 );
 			
 			# Create HOST label
-			$w{window}{gui}{lblip} = Gtk2::Label -> new;
+			$w{window}{gui}{lblip} = Gtk3::Label -> new;
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{lblip}, 0, 1, 1, 2 );
 			$w{window}{gui}{lblip} -> set_text( 'Host: ' );
 			
 			# Create HOST entry widget
-			$w{window}{gui}{entryip} = Gtk2::Entry -> new;
+			$w{window}{gui}{entryip} = Gtk3::Entry -> new;
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{entryip}, 1, 2, 1, 2 );
 			$w{window}{gui}{entryip} -> set_text( $ip );
 			$w{window}{gui}{entryip} -> set_sensitive( 0 );
 			$w{window}{gui}{entryip} -> set_activates_default( 0 );
 			
 			# Create IP icon widget
-			$w{window}{gui}{iconip} = Gtk2::Image -> new_from_stock( 'gtk-yes', 'menu' );
+			$w{window}{gui}{iconip} = Gtk3::Image -> new_from_stock( 'gtk-yes', 'menu' );
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{iconip}, 2, 3, 1, 2 );
 			
 			# Create PORT label
-			$w{window}{gui}{lblport} = Gtk2::Label -> new;
+			$w{window}{gui}{lblport} = Gtk3::Label -> new;
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{lblport}, 0, 1, 2, 3 );
 			$w{window}{gui}{lblport} -> set_text( 'Port Number: ' );
 			
 			# Create PORT entry widget
-			$w{window}{gui}{entryport} = Gtk2::SpinButton -> new_with_range( 1, 65535, 1 );
+			$w{window}{gui}{entryport} = Gtk3::SpinButton -> new_with_range( 1, 65535, 1 );
 			$w{window}{gui}{table} -> attach_defaults( $w{window}{gui}{entryport}, 1, 2, 2, 3 );
 			$w{window}{gui}{entryport} -> set_value( $port );
 			$w{window}{gui}{entryport} -> set_activates_default( 1 );
 		
-		$w{window}{gui}{separator} = Gtk2::HSeparator -> new;
+		$w{window}{gui}{separator} = Gtk3::HSeparator -> new;
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{separator}, 0, 1, 0 );
 		
-		$w{window}{gui}{cbbroadcast} = Gtk2::CheckButton -> new_with_label( 'Send to broadcast' );
+		$w{window}{gui}{cbbroadcast} = Gtk3::CheckButton -> new_with_label( 'Send to broadcast' );
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{cbbroadcast}, 0, 1, 0 );
 		$w{window}{gui}{cbbroadcast} -> set_active( 1 );
 		$w{window}{gui}{cbbroadcast} -> set_sensitive( $ip );
 		
-		$w{window}{gui}{separator} = Gtk2::HSeparator -> new;
+		$w{window}{gui}{separator} = Gtk3::HSeparator -> new;
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{separator}, 0, 1, 0 );
 		
-		$w{window}{gui}{lblstatus} = Gtk2::Label -> new;
+		$w{window}{gui}{lblstatus} = Gtk3::Label -> new;
 		$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{lblstatus}, 0, 1, 0 );
 		$w{window}{gui}{lblstatus} -> set_text( "Checking MAC for '$ip' ..." );
 	
@@ -2830,7 +2765,7 @@ sub _wakeOnLan {
 	# Try some net movement to resolve remote host's MAC address
 	if ( $ip && ( $mac eq '00:00:00:00:00:00' ) ) {
 		$w{window}{gui}{table} -> set_sensitive( 0 );
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3 -> main_iteration while Gtk3 -> events_pending;
 		my $PING = Net::Ping -> new( 'tcp' );
 		$PING -> tcp_service_check( 1 );
 		$PING -> port_number( $ping_port );
@@ -2851,7 +2786,7 @@ sub _wakeOnLan {
 			return 1 unless $_[0] -> get_label eq 'gtk-ok';
 			$_[0] -> set_sensitive( $w{window}{gui}{entrymac} -> get_chars( 0, -1 ) =~ /^[\da-fA-F]{2}[:-][\da-fA-F]{2}[:-][\da-fA-F]{2}[:-][\da-fA-F]{2}[:-][\da-fA-F]{2}[:-][\da-fA-F]{2}$/go ? 1 : 0 );
 		} );
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3 -> main_iteration while Gtk3 -> events_pending;
 	}
 	elsif ( ! $ip ) {
 		$w{window}{gui}{entrymac} -> set_text( $mac );
@@ -3030,134 +2965,134 @@ sub _purgeUnusedOrMissingScreenshots {
 	return 1;
 }
 
-sub _getXWindowsList {
-	my %list;
+#~ sub _getXWindowsList {
+	#~ my %list;
 	
-	my $s = Gtk2::Gdk::Screen -> get_default or die print $!;
-	my $display = $s -> get_display;
+	#~ my $s = Gtk3::Gdk::Screen -> get_default or die print $!;
+	#~ my $display = $s -> get_display;
 	
-	foreach my $w ( $s -> get_window_stack ) {
-		my $xid = $w -> get_xid or next;
+	#~ foreach my $w ( $s -> get_window_stack ) {
+		#~ my $xid = $w -> get_xid or next;
 		
-		my $win = Gtk2::Gdk::Window -> foreign_new_for_display( $display, $xid );
-		my ( $type_atom_name, $format_name, $data_name )			= $win -> property_get ( Gtk2::Gdk::Atom -> intern('WM_NAME'), Gtk2::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
-		my ( $type_atom_pid, $format_pid, $data_pid )				= $win -> property_get ( Gtk2::Gdk::Atom -> intern('_NET_WM_PID'), Gtk2::Gdk::Atom -> intern('CARDINAL'), 0, 9999, 0 );
-		my ( $type_atom_command, $format_command, $data_command )	= $win -> property_get ( Gtk2::Gdk::Atom -> intern('WM_COMMAND'), Gtk2::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
+		#~ my $win = Gtk3::Gdk::Window -> foreign_new_for_display( $display, $xid );
+		#~ my ( $type_atom_name, $format_name, $data_name )			= $win -> property_get ( Gtk3::Gdk::Atom -> intern('WM_NAME'), Gtk3::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
+		#~ my ( $type_atom_pid, $format_pid, $data_pid )				= $win -> property_get ( Gtk3::Gdk::Atom -> intern('_NET_WM_PID'), Gtk3::Gdk::Atom -> intern('CARDINAL'), 0, 9999, 0 );
+		#~ my ( $type_atom_command, $format_command, $data_command )	= $win -> property_get ( Gtk3::Gdk::Atom -> intern('WM_COMMAND'), Gtk3::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
 		
-		$list{'by_xid'}{$xid}{'title'}			= $data_name;
-		$list{'by_xid'}{$xid}{'window'}			= $w;
-		$list{'by_xid'}{$xid}{'pid'}			= $data_pid;
-		$list{'by_xid'}{$xid}{'command'}		= $data_command;
+		#~ $list{'by_xid'}{$xid}{'title'}			= $data_name;
+		#~ $list{'by_xid'}{$xid}{'window'}			= $w;
+		#~ $list{'by_xid'}{$xid}{'pid'}			= $data_pid;
+		#~ $list{'by_xid'}{$xid}{'command'}		= $data_command;
 		
-		if ( defined $data_name ) {
-			$list{'by_name'}{$data_name}{'xid'}		= $xid;
-			$list{'by_name'}{$data_name}{'window'}	= $w;
-			$list{'by_name'}{$data_name}{'pid'}		= $data_pid;
-			$list{'by_name'}{$data_name}{'command'}	= $data_command;
-		}
+		#~ if ( defined $data_name ) {
+			#~ $list{'by_name'}{$data_name}{'xid'}		= $xid;
+			#~ $list{'by_name'}{$data_name}{'window'}	= $w;
+			#~ $list{'by_name'}{$data_name}{'pid'}		= $data_pid;
+			#~ $list{'by_name'}{$data_name}{'command'}	= $data_command;
+		#~ }
 		
-		if ( defined $data_pid ) {
-			$list{'by_pid'}{$data_pid}{'title'}		= $data_name;
-			$list{'by_pid'}{$data_pid}{'window'}	= $w;
-			$list{'by_pid'}{$data_pid}{'xid'}		= $xid;
-			$list{'by_pid'}{$data_pid}{'command'}	= $data_command;
-		}
-	}
+		#~ if ( defined $data_pid ) {
+			#~ $list{'by_pid'}{$data_pid}{'title'}		= $data_name;
+			#~ $list{'by_pid'}{$data_pid}{'window'}	= $w;
+			#~ $list{'by_pid'}{$data_pid}{'xid'}		= $xid;
+			#~ $list{'by_pid'}{$data_pid}{'command'}	= $data_command;
+		#~ }
+	#~ }
 	
-	#my $tw = Gtk2::Window -> new;
-	#my $vb = Gtk2::VBox -> new( 0, 0 );
-	#$tw -> add( $vb );
-	#$tw -> show_all;
-	#
-	##$list{'by_xid'}{102760451}{'window'} -> reparent( $vb -> window, 0, 0 );
-	#
-	## ...or better:
-	#
-	#my $sock = Gtk2::Socket -> new;
-	#$vb -> add( $sock );
-	#$tw -> show_all;
-	#$sock -> add_id( $list{'by_name'}{'Calculator'}{'xid'} );
+	#~ #my $tw = Gtk3::Window -> new;
+	#~ #my $vb = Gtk3::VBox -> new( 0, 0 );
+	#~ #$tw -> add( $vb );
+	#~ #$tw -> show_all;
+	#~ #
+	#~ ##$list{'by_xid'}{102760451}{'window'} -> reparent( $vb -> window, 0, 0 );
+	#~ #
+	#~ ## ...or better:
+	#~ #
+	#~ #my $sock = Gtk3::Socket -> new;
+	#~ #$vb -> add( $sock );
+	#~ #$tw -> show_all;
+	#~ #$sock -> add_id( $list{'by_name'}{'Calculator'}{'xid'} );
 
-	return \%list;
-}
+	#~ return \%list;
+#~ }
 
-sub _getREADME {
-	my $pid	= shift // 0;
+#~ sub _getREADME {
+	#~ my $pid	= shift // 0;
 	
-	my $readme_file = "$CFG_DIR/tmp/latest_README";
-	system( "( /usr/bin/wget http://sourceforge.net/projects/pacmanager/files/README -O $readme_file 1>&2 2>/dev/null; kill -10 $pid ) &" );
-	return 1;
-}
+	#~ my $readme_file = "$CFG_DIR/tmp/latest_README";
+	#~ system( "( /usr/bin/wget http://sourceforge.net/projects/pacmanager/files/README -O $readme_file 1>&2 2>/dev/null; kill -10 $pid ) &" );
+	#~ return 1;
+#~ }
 
-sub _checkREADME {
-	my $readme_file = "$CFG_DIR/tmp/latest_README";
-	open F, $readme_file or return 0;
-	my @readme;
-	while( my $line = <F> ) { chomp $line; push( @readme, $line ); }
-	close F;
+#~ sub _checkREADME {
+	#~ my $readme_file = "$CFG_DIR/tmp/latest_README";
+	#~ open F, $readme_file or return 0;
+	#~ my @readme;
+	#~ while( my $line = <F> ) { chomp $line; push( @readme, $line ); }
+	#~ close F;
 	
-	my $version = $readme[56] // 0;
-	$version =~ s/^\s+-\s+(.+):/$1/go;
-	$version or return 0;
+	#~ my $version = $readme[56] // 0;
+	#~ $version =~ s/^\s+-\s+(.+):/$1/go;
+	#~ $version or return 0;
 	
-	my $i = 54;
-	my @changes = splice( @readme, 54 );
-	unlink $readme_file;
+	#~ my $i = 54;
+	#~ my @changes = splice( @readme, 54 );
+	#~ unlink $readme_file;
 	
-	return $version, \@changes;
-}
+	#~ return $version, \@changes;
+#~ }
 
-sub _showUpdate {
-	my $NEW_VERSION			= shift;
-	my $NEW_CHANGES			= shift;
-	my $notify_no_updates	= shift // 0;
+#~ sub _showUpdate {
+	#~ my $NEW_VERSION			= shift;
+	#~ my $NEW_CHANGES			= shift;
+	#~ my $notify_no_updates	= shift // 0;
 	
-	return 0 if ( ( ( ! $NEW_VERSION ) || ( $APPVERSION ge $NEW_VERSION ) ) && ( ! $notify_no_updates ) );
-	my $windowConfirm = Gtk2::Dialog -> new_with_buttons(
-		"$APPNAME (v$APPVERSION) : Check new version availability",
-		undef,
-		'modal',
-		'gtk-ok' => 'ok',
-	);
+	#~ return 0 if ( ( ( ! $NEW_VERSION ) || ( $APPVERSION ge $NEW_VERSION ) ) && ( ! $notify_no_updates ) );
+	#~ my $windowConfirm = Gtk3::Dialog -> new_with_buttons(
+		#~ "$APPNAME (v$APPVERSION) : Check new version availability",
+		#~ undef,
+		#~ 'modal',
+		#~ 'gtk-ok' => 'ok',
+	#~ );
 	
-	my $lbl = Gtk2::Label -> new;
-	$windowConfirm -> vbox -> pack_start( $lbl, 0, 0, 5 );
+	#~ my $lbl = Gtk3::Label -> new;
+	#~ $windowConfirm -> vbox -> pack_start( $lbl, 0, 0, 5 );
 	
-	my $lbl2 = Gtk2::LinkButton -> new_with_label( 'http://sourceforge.net/projects/pacmanager' );
-	$windowConfirm -> vbox -> pack_start( $lbl2, 0, 0, 5 );
-	$lbl2 -> set( 'relief', 'none' );
+	#~ my $lbl2 = Gtk3::LinkButton -> new_with_label( 'http://sourceforge.net/projects/pacmanager' );
+	#~ $windowConfirm -> vbox -> pack_start( $lbl2, 0, 0, 5 );
+	#~ $lbl2 -> set( 'relief', 'none' );
 	
-	if ( ( ! $NEW_VERSION ) || ( $APPVERSION ge $NEW_VERSION ) ) {
-		$lbl -> set_markup( "There is <b>NO</b> new version available" );
-		$windowConfirm -> signal_connect( 'response', sub { $windowConfirm -> destroy; } );
-	} else {
-		$lbl -> set_markup( "There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>" );
+	#~ if ( ( ! $NEW_VERSION ) || ( $APPVERSION ge $NEW_VERSION ) ) {
+		#~ $lbl -> set_markup( "There is <b>NO</b> new version available" );
+		#~ $windowConfirm -> signal_connect( 'response', sub { $windowConfirm -> destroy; } );
+	#~ } else {
+		#~ $lbl -> set_markup( "There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>" );
 		
-		# Create a scrolled window to contain the textview
-		my $scrollDescription = Gtk2::ScrolledWindow -> new;
-		$windowConfirm -> vbox -> pack_start( $scrollDescription, 1, 1, 0 );
-		$scrollDescription -> set_policy( 'automatic', 'automatic' );
-		my $tb = Gtk2::TextBuffer -> new;
-		$tb -> set_text( join( "\n", @{ $NEW_CHANGES } ) );
-		my $tv = Gtk2::TextView -> new_with_buffer( $tb );
-		$tv -> set_editable( 0 );
-		$scrollDescription -> add( $tv );
-		my $cb = Gtk2::CheckButton -> new( 'Do not check for updates anymore (also configurable under "Preferences")' );
-		$cb -> set_active( ! $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'check versions at start'} );
-		$windowConfirm -> vbox -> pack_start( $cb, 0, 0, 5 );
+		#~ # Create a scrolled window to contain the textview
+		#~ my $scrollDescription = Gtk3::ScrolledWindow -> new;
+		#~ $windowConfirm -> vbox -> pack_start( $scrollDescription, 1, 1, 0 );
+		#~ $scrollDescription -> set_policy( 'automatic', 'automatic' );
+		#~ my $tb = Gtk3::TextBuffer -> new;
+		#~ $tb -> set_text( join( "\n", @{ $NEW_CHANGES } ) );
+		#~ my $tv = Gtk3::TextView -> new_with_buffer( $tb );
+		#~ $tv -> set_editable( 0 );
+		#~ $scrollDescription -> add( $tv );
+		#~ my $cb = Gtk3::CheckButton -> new( 'Do not check for updates anymore (also configurable under "Preferences")' );
+		#~ $cb -> set_active( ! $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'check versions at start'} );
+		#~ $windowConfirm -> vbox -> pack_start( $cb, 0, 0, 5 );
 		
-		$windowConfirm -> signal_connect( 'response', sub { $PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb -> get_active; $PACMain::FUNCS{_MAIN} -> _saveConfiguration; $windowConfirm -> destroy; } );
-		$windowConfirm -> set_size_request( 640, 480 );
-		$windowConfirm -> set_resizable( 1 );
-	}
+		#~ $windowConfirm -> signal_connect( 'response', sub { $PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb -> get_active; $PACMain::FUNCS{_MAIN} -> _saveConfiguration; $windowConfirm -> destroy; } );
+		#~ $windowConfirm -> set_size_request( 640, 480 );
+		#~ $windowConfirm -> set_resizable( 1 );
+	#~ }
 	
-	$windowConfirm -> set_position( 'center_always' );
-	$windowConfirm -> set_icon_name( 'pac-app-big' );
-	$windowConfirm -> set_border_width( 5 );
-	$windowConfirm -> show_all;
+	#~ $windowConfirm -> set_position( 'center_always' );
+	#~ $windowConfirm -> set_icon_name( 'pac-app-big' );
+	#~ $windowConfirm -> set_border_width( 5 );
+	#~ $windowConfirm -> show_all;
 	
-	return 1;
-}
+	#~ return 1;
+#~ }
 
 sub _getEncodings {
 	return {
@@ -3420,50 +3355,64 @@ sub _getEncodings {
 	};
 }
 
-sub _makeDesktopFile {
-	my $cfg = shift;
+#~ sub _makeDesktopFile {
+	#~ my $cfg = shift;
 	
-	if ( ! $$cfg{'defaults'}{'show favourites in unity'} ) {
-		unlink "$ENV{HOME}/.local/share/applications/pac.desktop";
-		system( '/usr/bin/xdg-desktop-menu forceupdate &' );
-		return 1;
-	}
+	#~ if ( ! $$cfg{'defaults'}{'show favourites in unity'} ) {
+		#~ unlink "$ENV{HOME}/.local/share/applications/pac.desktop";
+		#~ system( '/usr/bin/xdg-desktop-menu forceupdate &' );
+		#~ return 1;
+	#~ }
 	
-	my $d	= "[Desktop Entry]\n";
-	$d		.= "Name=PAC\n";
-	$d		.= "Comment=Perl Auto Connector (auto start)\n";
-	$d		.= "Terminal=false\n";
-	$d		.= "Icon=pac\n";
-	$d		.= "Type=Application\n";
-	$d		.= "Exec=/usr/bin/pac\n";
-	$d		.= "StartupNotify=true\n";
-	$d		.= "Name[en_US]=PAC\n";
-	$d		.= "Comment[en_US]=Perl Auto Connector\n";
-	$d		.= "Categories=Applications;Network;\n";
-	$d		.= "X-GNOME-Autostart-enabled=false\n";
-	my $dal	= 'Actions=Shell;Quick;';
-	my $da	= "\n[Desktop Action Shell]\n";
-	$da		.= "Name=<Start local shell>\n";
-	$da		.= "Exec=asbru --start-shell\n";
-	$da		.= "\n[Desktop Action Quick]\n";
-	$da		.= "Name=<Quick connect...>\n";
-	$da		.= "Exec=asbru --quick-conn\n";
-	my $action = 0;
-	foreach my $uuid ( keys %{ $$cfg{environments} } ) {
-		next if ( ( $uuid eq '__PAC__ROOT__' ) || ( ! $$cfg{'environments'}{$uuid}{'favourite'} ) );
+	#~ my $d	= "[Desktop Entry]\n";
+	#~ $d		.= "Name=PAC\n";
+	#~ $d		.= "Comment=Perl Auto Connector (auto start)\n";
+	#~ $d		.= "Terminal=false\n";
+	#~ $d		.= "Icon=pac\n";
+	#~ $d		.= "Type=Application\n";
+	#~ $d		.= "Exec=/usr/bin/pac\n";
+	#~ $d		.= "StartupNotify=true\n";
+	#~ $d		.= "Name[en_US]=PAC\n";
+	#~ $d		.= "Comment[en_US]=Perl Auto Connector\n";
+	#~ $d		.= "Categories=Applications;Network;\n";
+	#~ $d		.= "X-GNOME-Autostart-enabled=false\n";
+	#~ my $dal	= 'Actions=Shell;Quick;';
+	#~ my $da	= "\n[Desktop Action Shell]\n";
+	#~ $da		.= "Name=<Start local shell>\n";
+	#~ $da		.= "Exec=asbru --start-shell\n";
+	#~ $da		.= "\n[Desktop Action Quick]\n";
+	#~ $da		.= "Name=<Quick connect...>\n";
+	#~ $da		.= "Exec=asbru --quick-conn\n";
+	#~ my $action = 0;
+	#~ foreach my $uuid ( keys %{ $$cfg{environments} } ) {
+		#~ next if ( ( $uuid eq '__PAC__ROOT__' ) || ( ! $$cfg{'environments'}{$uuid}{'favourite'} ) );
 		
-		$dal .= $action . ';';
-		$da .= "\n" . '[Desktop Action ' . $action++ . "]\n";
-		$da .= "Name=" . ( $$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go ) . "\n";
-		$da .= "Exec=asbru --start-uuid=$uuid\n";
+		#~ $dal .= $action . ';';
+		#~ $da .= "\n" . '[Desktop Action ' . $action++ . "]\n";
+		#~ $da .= "Name=" . ( $$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go ) . "\n";
+		#~ $da .= "Exec=asbru --start-uuid=$uuid\n";
+	#~ }
+	
+	#~ open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
+	#~ print F "$d\n$dal\n$da\n";
+	#~ close F;
+	#~ system( '/usr/bin/xdg-desktop-menu forceupdate &' );
+	
+	#~ return 1;
+#~ }
+
+sub _updateWidgetColor {
+	my $self = shift;
+	my $cfg = shift;
+	my $widget = shift;
+	my $cfgName = shift;
+	my $defaultColor = shift;
+	# If we don't have an object yet, get it from self
+	if (ref($widget) eq '') {
+		$widget = _( $self, $widget );
 	}
-	
-	open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
-	print F "$d\n$dal\n$da\n";
-	close F;
-	system( '/usr/bin/xdg-desktop-menu forceupdate &' );
-	
-	return 1;
+	my $tmpColor = Gtk3::Gdk::Color::parse( $$cfg{'defaults'}{$cfgName} // $defaultColor );
+	$widget -> set_color( $tmpColor );
 }
 
 1;

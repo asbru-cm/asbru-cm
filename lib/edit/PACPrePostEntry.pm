@@ -33,8 +33,8 @@ use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 #use Data::Dumper;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -122,34 +122,34 @@ sub _buildPrePostGUI {
 	my %w;
 	
 	# Build a vbox for:buttons, separator and expect widgets
-	$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+	$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 		
 		# Build a hbuttonbox for widgets actions (add, etc.)
-		$w{bbox} = Gtk2::HButtonBox -> new();
+		$w{bbox} = Gtk3::HButtonBox -> new();
 		$w{vbox} -> pack_start( $w{bbox}, 0, 1, 0 );
 		$w{bbox} -> set_layout( 'GTK_BUTTONBOX_START' );
 			
 			# Build 'add' button
-			$w{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+			$w{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 			$w{bbox} -> add( $w{btnadd} );
 		
 		# Build a separator
-		$w{sep} = Gtk2::HSeparator -> new();
+		$w{sep} = Gtk3::HSeparator -> new();
 		$w{vbox} -> pack_start( $w{sep}, 0, 1, 5 );
 		
 		# Build a scrolled window
-		$w{sw} = Gtk2::ScrolledWindow -> new();
+		$w{sw} = Gtk3::ScrolledWindow -> new();
 		$w{vbox} -> pack_start( $w{sw}, 1, 1, 0 );
 		$w{sw} -> set_policy( 'automatic', 'automatic' );
 		$w{sw} -> set_shadow_type( 'none' );
 			
-			$w{vp} = Gtk2::Viewport -> new();
+			$w{vp} = Gtk3::Viewport -> new();
 			$w{sw} -> add( $w{vp} );
 			$w{vp} -> set_property( 'border-width', 5 );
 			$w{vp} -> set_shadow_type( 'none' );
 				
 				# Build and add the vbox that will contain the expect widgets
-				$w{vbexec} = Gtk2::VBox -> new( 0, 0 );
+				$w{vbexec} = Gtk3::VBox -> new( 0, 0 );
 				$w{vp} -> add( $w{vbexec} );
 	
 	$$self{container} = $w{vbox};
@@ -188,27 +188,27 @@ sub _buildPrePost {
 	$w{position} = scalar @{ $$self{list} };
 	
 	# Make an HBox to contain checkbox and entry
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
 		# Build checkbox
-		$w{ask} = Gtk2::CheckButton -> new_with_label( 'Ask: ' . ( $ask ? 'YES' : 'NO' ) );
+		$w{ask} = Gtk3::CheckButton -> new_with_label( 'Ask: ' . ( $ask ? 'YES' : 'NO' ) );
 		$w{hbox} -> pack_start( $w{ask}, 0, 1, 0 );
 		$w{ask} -> set_active( $ask );
 		
 		# Build checkbox
-		$w{default} = Gtk2::CheckButton -> new_with_label( 'Default: ' . ( $def ? 'YES' : 'NO' ) );
+		$w{default} = Gtk3::CheckButton -> new_with_label( 'Default: ' . ( $def ? 'YES' : 'NO' ) );
 		$w{hbox} -> pack_start( $w{default}, 0, 1, 0 );
 		$w{default} -> set_active( $def );
 		
 		# Build entry
-		$w{command} = Gtk2::Entry -> new;
+		$w{command} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{command}, 1, 1, 0 );
 		$w{command} -> set_icon_from_stock( 'primary', 'gtk-execute' );
 		$w{command} -> set_text( $command );
 		$w{default} -> set_sensitive( $command ne '' );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container

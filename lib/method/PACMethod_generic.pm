@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -128,7 +128,7 @@ sub _buildGUI
 	
 	$w{vbox} = $container;
 		
-		$w{vbox} -> pack_start( Gtk2::Label -> new( 'No option to configure here.' ), 1, 1, 0 );
+		$w{vbox} -> pack_start( Gtk3::Label -> new( 'No option to configure here.' ), 1, 1, 0 );
 	
 	$$self{gui} = \%w;
 	

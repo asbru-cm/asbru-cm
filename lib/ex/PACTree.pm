@@ -2,17 +2,17 @@ package PACTree;
 
 use strict;
 use Carp;
-use Gtk2;
+use Gtk3;
 
-use TiedTree;
+#use TiedTree;
 
-our @ISA = 'Gtk2::TreeView';
+our @ISA = 'Gtk3::TreeView';
 
 our $VERSION = '0.50';
 
 our %column_types;
-*column_types = \%Gtk2::Ex::Simple::TiedCommon::column_types;
-*add_column_type = \&Gtk2::Ex::Simple::TiedCommon::add_column_type;
+*column_types = \%Gtk3::Ex::Simple::TiedCommon::column_types;
+*add_column_type = \&Gtk3::Ex::Simple::TiedCommon::add_column_type;
 
 # Start PAC specific methods
 sub _getSelectedUUIDs {
@@ -93,7 +93,7 @@ sub _getPath {
 		return 1;
 	} );
 	
-	return ( defined $ret_path ) ? Gtk2::TreePath -> new_from_string( $ret_path ) : undef;
+	return ( defined $ret_path ) ? Gtk3::TreePath -> new_from_string( $ret_path ) : undef;
 }
 
 sub _addNode {
@@ -173,7 +173,7 @@ sub _setTreeFocus {
 
 sub text_cell_edited {
 	my ($cell_renderer, $text_path, $new_text, $model) = @_;
-	my $path = Gtk2::TreePath->new_from_string ($text_path);
+	my $path = Gtk3::TreePath->new_from_string ($text_path);
 	my $iter = $model->get_iter ($path);
 	$model->set ($iter, $cell_renderer->{column}, $new_text);
 }
@@ -183,15 +183,15 @@ sub new {
 	    . " expecting a list of column title and type name pairs.\n"
 	    . " can't create a SimpleTree with no columns"
 		unless @_ >= 3; # class, key1, val1
-	return shift->new_from_treeview (Gtk2::TreeView->new (), @_);
+	return shift->new_from_treeview (Gtk3::TreeView->new (), @_);
 }
 
 sub new_from_treeview {
 	my $class = shift;
 	my $view = shift;
-	croak "treeview is not a Gtk2::TreeView"
+	croak "treeview is not a Gtk3::TreeView"
 		unless defined ($view)
-		   and UNIVERSAL::isa ($view, 'Gtk2::TreeView');
+		   and UNIVERSAL::isa ($view, 'Gtk3::TreeView');
 	croak "Usage: $class\->new_from_treeview (treeview, title => type, ...)\n"
 	    . " expecting a treeview reference and list of column title and type name pairs.\n"
 	    . " can't create a SimpleTree with no columns"
@@ -218,7 +218,7 @@ sub new_from_treeview {
 			attr => $column_types{$_[$i+1]}{attr},
 		};
 	}
-	my $model = Gtk2::TreeStore->new (map { $_->{type} } @column_info);
+	my $model = Gtk3::TreeStore->new (map { $_->{type} } @column_info);
 	# just in case, 'cause i'm paranoid like that.
 	map { $view->remove_column ($_) } $view->get_columns;
 	$view->set_model ($model);
@@ -236,7 +236,7 @@ sub new_from_treeview {
 		}
 		else
 		{
-			my $column = Gtk2::TreeViewColumn->new_with_attributes (
+			my $column = Gtk3::TreeViewColumn->new_with_attributes (
 				$column_info[$i]{title},
 				$column_info[$i]{rtype}->new,
 				$column_info[$i]{attr} => $i,
@@ -249,7 +249,7 @@ sub new_from_treeview {
 				$r->set (activatable => 1);
 				$r->signal_connect (toggled => sub {
 					my ($renderer, $row, $col) = @_;
-					my $path = Gtk2::TreePath->new_from_string ($row);
+					my $path = Gtk3::TreePath->new_from_string ($row);
 					my $iter = $model->get_iter ($path);
 					my $val = $model->get ($iter, $col);
 					$model->set ($iter, $col, !$val);
@@ -301,12 +301,12 @@ __END__
 
 =head1 NAME
 
-Tree - A simple interface to Gtk2's complex MVC tree widget
+Tree - A simple interface to Gtk3's complex MVC tree widget
 
 =head1 SYNOPSIS
 
   use Glib qw(TRUE FALSE);
-  use Gtk2 '-init';
+  use Gtk3 '-init';
   use Tree;
 
   my $stree = Tree->new (
@@ -331,13 +331,13 @@ Tree - A simple interface to Gtk2's complex MVC tree widget
 
 =head1 ABSTRACT
 
-Simple::Tree is a simple interface to the powerful but complex Gtk2::TreeView
-and Gtk2::TreeStore combination, implementing using tied arrays to make
+Simple::Tree is a simple interface to the powerful but complex Gtk3::TreeView
+and Gtk3::TreeStore combination, implementing using tied arrays to make
 thing simple and easy.
 
 =head1 DESCRIPTION
 
-Gtk2 has a powerful, but complex MVC (Model, View, Controller) system used to
+Gtk3 has a powerful, but complex MVC (Model, View, Controller) system used to
 implement list and tree widgets.  Tree automates the complex
 setup work and allows you to treat the tree model as a more natural list of
 hash refs.
@@ -359,9 +359,9 @@ arbitrary new column types before calling the new function.
 =head1 OBJECT HIERARCHY
 
  Glib::Object
- +--- Gtk2::Object
-      +--- Gtk2::Widget
-           +--- Gtk2::TreeView
+ +--- Gtk3::Object
+      +--- Gtk3::Widget
+           +--- Gtk3::TreeView
 	        +--- Tree
 
 =head1 METHODS
@@ -393,7 +393,7 @@ column, one of:
  double  double-precision floating point values
  bool    boolean values, displayed as toggle-able checkboxes
  scalar  a perl scalar, displayed as a text string by default
- pixbuf  a Gtk2::Gdk::Pixbuf
+ pixbuf  a Gtk3::Gdk::Pixbuf
 
 or the name of a custom type you add with C<add_column_type>.  These should be
 provided in pairs according to the desired columns for your tree.
@@ -404,7 +404,7 @@ provided in pairs according to the desired columns for your tree.
 
 =over
 
-=item * $treeview (Gtk2::TreeView)
+=item * $treeview (Gtk3::TreeView)
 
 =item * $cname (string)
 
@@ -414,7 +414,7 @@ provided in pairs according to the desired columns for your tree.
 
 =back
 
-Like C<< Tree->new() >>, but turns an existing Gtk2::TreeView
+Like C<< Tree->new() >>, but turns an existing Gtk3::TreeView
 into a Tree.  This is intended mostly for use with stuff like
 Glade, where the widget is created for you.  This will create and attach a new
 model and remove any existing columns from I<treeview>.  Returns I<treeview>,
@@ -463,7 +463,7 @@ data.
 
 =back
 
-This is a very simple interface to Gtk2::TreeView's editable text column cells.
+This is a very simple interface to Gtk3::TreeView's editable text column cells.
 All columns which use the attr "text" (basically, any text or number column,
 see C<add_column_type>) automatically have callbacks installed to update data
 when cells are edited.  With C<set_column_editable>, you can enable the
@@ -499,8 +499,8 @@ stored in the underlying model representation; this is a package name, e.g.
 Glib::String, Glib::Int, Glib::Boolean, but in general if you want an
 arbitrary Perl data structure you will want to use 'Glib::Scalar'. The
 renderer key should hold the class name of the cell renderer to create for this
-column type; this may be any of Gtk2::CellRendererText,
-Gtk2::CellRendererToggle, Gtk2::CellRendererPixbuf, or some other, possibly
+column type; this may be any of Gtk3::CellRendererText,
+Gtk3::CellRendererToggle, Gtk3::CellRendererPixbuf, or some other, possibly
 custom, cell renderer class.  The attr key is magical; it may be either a
 string, in which case it specifies the attribute which will be set from the
 specified column (e.g. 'text' for a text renderer, 'active' for a toggle
@@ -518,7 +518,7 @@ you have to do to render the cell the way you want.  Here are some examples:
   # Perl would convert it to a string
   Tree->add_column_type( 'a_scalar', 
           type     => 'Glib::Scalar',
-	  renderer => 'Gtk2::CellRendererText',
+	  renderer => 'Gtk3::CellRendererText',
           attr     => sub {
                my ($treecol, $cell, $model, $iter, $col_num) = @_;
                my $info = $model->get ($iter, $col_num);
@@ -530,7 +530,7 @@ you have to do to render the cell the way you want.  Here are some examples:
   # that in a text renderer
   Tree->add_column_type( 'sum_of_array', 
           type     => 'Glib::Scalar',
-	  renderer => 'Gtk2::CellRendererText',
+	  renderer => 'Gtk3::CellRendererText',
           attr     => sub {
                my ($treecol, $cell, $model, $iter, $col_num) = @_;
                my $sum = 0;
@@ -569,8 +569,8 @@ Examples only, possibilities are too numerous to list here (see examples.)
 
 =head1 SEE ALSO
 
-Perl(1), Glib(3pm), Gtk2(3pm), Gtk2::TreeView(3pm), Gtk2::TreeModel(3pm),
-Gtk2::TreeStore(3pm).
+Perl(1), Glib(3pm), Gtk3(3pm), Gtk3::TreeView(3pm), Gtk3::TreeModel(3pm),
+Gtk3::TreeStore(3pm).
 
 =head1 AUTHORS
 
@@ -579,7 +579,7 @@ Gtk2::TreeStore(3pm).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 by the Gtk2-Perl team.
+Copyright 2004 by the Gtk3-Perl team.
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

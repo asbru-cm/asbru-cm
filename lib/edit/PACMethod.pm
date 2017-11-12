@@ -31,10 +31,9 @@ use strict;
 use warnings;
 
 use FindBin qw ( $RealBin $Bin $Script );
-#use Data::Dumper;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 use PACUtils;
 
@@ -44,7 +43,7 @@ use PACUtils;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-our $CONTAINER = Gtk2::VBox -> new( 0, 0 );
+our $CONTAINER = Gtk3::VBox -> new( 0, 0 );
 my %METHODS;
 
 no strict 'refs'; # Trick or treat!! ;)

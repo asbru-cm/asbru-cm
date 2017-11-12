@@ -40,10 +40,9 @@ use IO::Socket::INET;
 use Time::HiRes qw ( gettimeofday );
 use KeePass;
 
-# GTK2
-use Gtk2 '-init';
-use Gtk2::Ex::Simple::List;
-eval { require Gtk2::SourceView2; };
+# GTK
+use Gtk3 '-init';
+eval { require Gtk3::SourceView2; };
 my $SOURCEVIEW = ! $@;
 
 # PAC modules
@@ -347,7 +346,7 @@ sub start {
 	foreach my $exp ( @{ $$self{_CFG}{'environments'}{ $$self{_UUID} }{'expect'} } ) { next unless ( $$exp{'active'} // 0 ); ++$$self{_TOTAL}; }
 	
 	# Create a progressbar and add it to GUI's bottombox
-	$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+	$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 	$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 	$$self{_GUI}{pb} -> show;
 	
@@ -487,42 +486,42 @@ sub _initGUI {
 	my $tabs	= $$self{_NOTEBOOK};
 
 	# Create a GtkVBox and its child widgets:
-	$$self{_GUI}{_VBOX} = Gtk2::VBox -> new( 0, 0 );
+	$$self{_GUI}{_VBOX} = Gtk3::VBox -> new( 0, 0 );
 		
-		$$self{_GUI}{_HBOX} = Gtk2::HPaned -> new;	
+		$$self{_GUI}{_HBOX} = Gtk3::HPaned -> new;	
 		
 		#### $vbox 1st row: this will contain an HBOX with Gnome's VTE and keypresses list
 		
 		# Create a GtkScrolledWindow,
-		my $sc = Gtk2::ScrolledWindow -> new;
+		my $sc = Gtk3::ScrolledWindow -> new;
 		$sc -> set_shadow_type( 'none' );
 		$sc -> set_policy( 'automatic', 'automatic' );
 		
 		# , build a Gnome VTE Terminal,
-		$$self{_GUI}{_VTE} = Gnome2::Vte::Terminal -> new;
-		$$self{_GUI}{_VTE} -> set_size_request( 200, 100 );
+		#~ $$self{_GUI}{_VTE} = Gnome2::Vte::Terminal -> new;
+		#~ $$self{_GUI}{_VTE} -> set_size_request( 200, 100 );
 		
 		# , add VTE to the scrolled window and...
-		$sc -> add( $$self{_GUI}{_VTE} );
+		#~ $sc -> add( $$self{_GUI}{_VTE} );
 		
-		$$self{_GUI}{hbHist} = Gtk2::VBox -> new( 0, 0 );
+		$$self{_GUI}{hbHist} = Gtk3::VBox -> new( 0, 0 );
 			
 			# Create a scrolled window for the keypress list
-			$$self{_GUI}{sk} = Gtk2::ScrolledWindow -> new;
+			$$self{_GUI}{sk} = Gtk3::ScrolledWindow -> new;
 			$$self{_GUI}{hbHist} -> pack_start( $$self{_GUI}{sk}, 1, 1, 0 );
 			$$self{_GUI}{sk} -> set_policy( 'automatic', 'automatic' );
 			$$self{_GUI}{sk} -> set_size_request( 120, 100 );
-			$$self{_GUI}{treeKeys} = Gtk2::Ex::Simple::List -> new( ' HISTORY' => 'text', 'TIME' => 'hidden' );
-			$$self{_GUI}{treeKeys} -> get_selection -> set_mode( 'single' );
-			$$self{_GUI}{sk} -> add( $$self{_GUI}{treeKeys} );
-			$$self{_GUI}{treeKeys} -> set_headers_visible( 1 );
-			$$self{_GUI}{treeKeys} -> set_enable_search( 0 );
-			eval { $$self{_GUI}{treeKeys} -> set_can_focus( 0 ); };
+			#~ $$self{_GUI}{treeKeys} = Gtk3::Ex::Simple::List -> new( ' HISTORY' => 'text', 'TIME' => 'hidden' );
+			#~ $$self{_GUI}{treeKeys} -> get_selection -> set_mode( 'single' );
+			#~ $$self{_GUI}{sk} -> add( $$self{_GUI}{treeKeys} );
+			#~ $$self{_GUI}{treeKeys} -> set_headers_visible( 1 );
+			#~ $$self{_GUI}{treeKeys} -> set_enable_search( 0 );
+			#~ eval { $$self{_GUI}{treeKeys} -> set_can_focus( 0 ); };
 			
 			# Create a button to remove history
-			$$self{_GUI}{btnDelHist} = Gtk2::Button -> new( 'Forget history' );
+			$$self{_GUI}{btnDelHist} = Gtk3::Button -> new( 'Forget history' );
 			$$self{_GUI}{hbHist} -> pack_start( $$self{_GUI}{btnDelHist}, 0, 0, 0 );
-			$$self{_GUI}{btnDelHist} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-delete', 'button' ) );
+			$$self{_GUI}{btnDelHist} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-delete', 'button' ) );
 			eval { $$self{_GUI}{btnDelHist} -> set_can_focus( 0 ); };
 		
 		if ( ! $$self{'EMBED'} ) {
@@ -533,18 +532,18 @@ sub _initGUI {
 			$$self{_GUI}{_HBOX} -> pack2( $$self{_GUI}{hbHist}, 1, 0 );
 			$$self{_GUI}{_HBOX} -> set_position( 3000 );
 			
-			$$self{FOCUS} = $$self{_GUI}{_VTE};
+			#~ $$self{FOCUS} = $$self{_GUI}{_VTE};
 		} else {
-			my $sc2 = Gtk2::ScrolledWindow -> new;
+			my $sc2 = Gtk3::ScrolledWindow -> new;
 			$sc2 -> set_shadow_type( 'none' );
 			$sc2 -> set_policy( 'automatic', 'automatic' );
 			$$self{_GUI}{_VBOX} -> pack_start( $sc2, 1, 1, 0 );
 				
-				$$self{_GUI}{_SOCKET} = Gtk2::Socket -> new;
+				$$self{_GUI}{_SOCKET} = Gtk3::Socket -> new;
 				$sc2 -> add_with_viewport( $$self{_GUI}{_SOCKET} );
 			
-			$$self{_GUI}{_BTNFOCUS} = Gtk2::Button -> new_with_mnemonic( 'Set _keyboard focus' );
-			$$self{_GUI}{_BTNFOCUS} -> set_image( Gtk2::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
+			$$self{_GUI}{_BTNFOCUS} = Gtk3::Button -> new_with_mnemonic( 'Set _keyboard focus' );
+			$$self{_GUI}{_BTNFOCUS} -> set_image( Gtk3::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
 			$$self{_GUI}{_BTNFOCUS} -> set( 'can_focus', 0 );
 			$$self{_GUI}{_VBOX} -> pack_start( $$self{_GUI}{_BTNFOCUS}, 0, 1, 0 );
 			
@@ -555,20 +554,20 @@ sub _initGUI {
 		
 		# MACROS Combobox??
 		if ( $$self{_CFG}{'defaults'}{'show commands box'} == 1 ) {
-			$$self{_GUI}{_MACROSBOX} = Gtk2::HBox -> new( 0, 0 );
+			$$self{_GUI}{_MACROSBOX} = Gtk3::HBox -> new( 0, 0 );
 			$$self{_GUI}{_VBOX} -> pack_start( $$self{_GUI}{_MACROSBOX}, 0, 1, 0 );
 			
 			# Create a GtkButton and add it to $macrosbox
-			$$self{_GUI}{_BTNLOCALTERMINALEXEC} = Gtk2::Button -> new_with_mnemonic( '_Local' );
+			$$self{_GUI}{_BTNLOCALTERMINALEXEC} = Gtk3::Button -> new_with_mnemonic( '_Local' );
 			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set_sensitive( 0 );
-			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-execute', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
+			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-execute', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
 			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set_size_request( 60, 25 );
 			$$self{_GUI}{_BTNLOCALTERMINALEXEC} -> set( 'can_focus', 0 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_BTNLOCALTERMINALEXEC}, 0, 1, 0 );
 			
 			# Create a GtkComboBox and add it to $macrosbox
-			$$self{_GUI}{_CBLOCALEXECTERMINAL} = Gtk2::ComboBox -> new_text;
+			$$self{_GUI}{_CBLOCALEXECTERMINAL} = Gtk3::ComboBox -> new_text;
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_size_request( 200, -1 ); # Limit combobox hsize!!
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_sensitive( 0 );
@@ -577,13 +576,13 @@ sub _initGUI {
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_CBLOCALEXECTERMINAL}, 1, 1, 0 );
 			
 			# Checkbutton to send or not to all terminals in cluster
-			$$self{_GUI}{_MACROSCLUSTER} = Gtk2::CheckButton -> new_with_label( 'Sending THIS: ' );
+			$$self{_GUI}{_MACROSCLUSTER} = Gtk3::CheckButton -> new_with_label( 'Sending THIS: ' );
 			$$self{_GUI}{_MACROSCLUSTER} -> set( 'can-focus', 0 );
 			$$self{_GUI}{_MACROSCLUSTER} -> signal_connect( 'toggled', sub { $$self{_GUI}{_MACROSCLUSTER} -> set_label( $$self{_GUI}{_MACROSCLUSTER} -> get_active ? 'Sending CLUSTER: ' : 'Sending THIS: ' ); } );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0 );
 			
 			# Create a GtkComboBox and add it to $macrosbox
-			$$self{_GUI}{_CBMACROSTERMINAL} = Gtk2::ComboBox -> new_text;
+			$$self{_GUI}{_CBMACROSTERMINAL} = Gtk3::ComboBox -> new_text;
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_size_request( 200, -1 ); # Limit combobox hsize!!
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_sensitive( 0 );
@@ -592,10 +591,10 @@ sub _initGUI {
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_CBMACROSTERMINAL}, 1, 1, 0 );
 			
 			# Create a GtkButton and add it to $macrosbox
-			$$self{_GUI}{_BTNMACROSTERMINALEXEC} = Gtk2::Button -> new_with_mnemonic( '_Remote' );
+			$$self{_GUI}{_BTNMACROSTERMINALEXEC} = Gtk3::Button -> new_with_mnemonic( '_Remote' );
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_sensitive( 0 );
-			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-execute', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
+			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-execute', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_size_request( 70, 25 );
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set( 'can_focus', 0 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_BTNMACROSTERMINALEXEC}, 0, 1, 0 );
@@ -603,9 +602,9 @@ sub _initGUI {
 		# MACROS Buttonbox??
 		elsif ( $$self{_CFG}{'defaults'}{'show commands box'} == 2 )
 		{
-			$$self{_GUI}{_SCROLLMACROS} = Gtk2::ScrolledWindow -> new;
+			$$self{_GUI}{_SCROLLMACROS} = Gtk3::ScrolledWindow -> new;
 			$$self{_GUI}{_SCROLLMACROS} -> set_policy( 'automatic', 'never' );
-			$$self{_GUI}{_MACROSBOX} = Gtk2::HBox -> new( 0, 0 );
+			$$self{_GUI}{_MACROSBOX} = Gtk3::HBox -> new( 0, 0 );
 			$$self{_GUI}{_SCROLLMACROS} -> add_with_viewport( $$self{_GUI}{_MACROSBOX} );
 			
 			$$self{_GUI}{_VBOX} -> pack_start( $$self{_GUI}{_SCROLLMACROS}, 0, 1, 0 );
@@ -614,36 +613,36 @@ sub _initGUI {
 		$$self{_GUI}{_MACROSBOX} -> hide_all if defined $$self{_GUI}{_MACROSBOX};
 		
 		# bottombox will contain both progress and status bar
-		$$self{_GUI}{bottombox} = Gtk2::HBox -> new( 0, 0 );
+		$$self{_GUI}{bottombox} = Gtk3::HBox -> new( 0, 0 );
 		$$self{_GUI}{_VBOX} -> pack_end( $$self{_GUI}{bottombox}, 0, 1, 0 ) if $$self{_CFG}{defaults}{'terminal show status bar'};
 			
 			# Create a checkbox to show or not commands history tree
-			$$self{_GUI}{cbShowHist} = Gtk2::CheckButton -> new( 'Show command history' );
+			$$self{_GUI}{cbShowHist} = Gtk3::CheckButton -> new( 'Show command history' );
 			eval { $$self{_GUI}{cbShowHist} -> set_can_focus( 0 ); };
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{cbShowHist}, 0, 1, 0 );
 			
 			# Create gtkstatusbar
-			$$self{_GUI}{status} = Gtk2::Statusbar -> new;
+			$$self{_GUI}{status} = Gtk3::Statusbar -> new;
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{status}, 1, 1, 0 );
-			$$self{_GUI}{status} -> set_has_resize_grip( ! $$self{_CFG}{defaults}{'tabs in main window'} );
+			#~ $$self{_GUI}{status} -> set_has_resize_grip( ! $$self{_CFG}{defaults}{'tabs in main window'} );
 			
 			# Create a status icon
-			$$self{_GUI}{statusIcon} = Gtk2::Image -> new_from_stock( 'pac-terminal-ko-small', 'button' );
+			$$self{_GUI}{statusIcon} = Gtk3::Image -> new_from_stock( 'pac-terminal-ko-small', 'button' );
 			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'DISCONNECTED' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusIcon}, 0, 0, 0 );
 			
 			# Create an Expect execute icon
-			$$self{_GUI}{statusExpect} = Gtk2::Image -> new_from_stock( 'none', 'button' );
+			$$self{_GUI}{statusExpect} = Gtk3::Image -> new_from_stock( 'none', 'button' );
 			$$self{_GUI}{statusExpect} -> set_tooltip_text( 'DISCONNECTED' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusExpect}, 0, 0, 0 );
 			
 			# Create a cluster icon
-			$$self{_GUI}{statusCluster} = Gtk2::Image -> new_from_stock( 'pac-cluster-manager-off', 'button' );
+			$$self{_GUI}{statusCluster} = Gtk3::Image -> new_from_stock( 'pac-cluster-manager-off', 'button' );
 			$$self{_GUI}{statusCluster} -> set_tooltip_text( 'Unclustered' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusCluster}, 0, 0, 0 );
 	
 	# Set the number of scrollback lines
-	$$self{_GUI}{_VTE} -> set_scrollback_lines( $$self{_CFG}{'defaults'}{'terminal scrollback lines'} );
+	#~ $$self{_GUI}{_VTE} -> set_scrollback_lines( $$self{_CFG}{'defaults'}{'terminal scrollback lines'} );
 	
 	############################################################################
 	# Check if this terminal should start in a new window or in a new tab/window
@@ -652,13 +651,13 @@ sub _initGUI {
 	# New TAB:
 	if ( $$self{_TABBED} ) {
 		# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
-		$$self{_GUI}{_TABLBL} = Gtk2::HBox -> new( 0, 0 );
-			$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk2::EventBox -> new;
-				$$self{_GUI}{_TABLBL}{_LABEL} = Gtk2::Label -> new( $$self{_TITLE} );
+		$$self{_GUI}{_TABLBL} = Gtk3::HBox -> new( 0, 0 );
+			$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk3::EventBox -> new;
+				$$self{_GUI}{_TABLBL}{_LABEL} = Gtk3::Label -> new( $$self{_TITLE} );
 				$$self{_GUI}{_TABLBL}{_EBLBL} -> add( $$self{_GUI}{_TABLBL}{_LABEL} );
 				$$self{_GUI}{_TABLBL} -> pack_start( $$self{_GUI}{_TABLBL}{_EBLBL}, 1, 1, 0 );
-			my $eblbl1 = Gtk2::EventBox -> new;
-				$eblbl1 -> add( Gtk2::Image -> new_from_stock( 'gtk-close', 'menu' ) );
+			my $eblbl1 = Gtk3::EventBox -> new;
+				$eblbl1 -> add( Gtk3::Image -> new_from_stock( 'gtk-close', 'menu' ) );
 				$eblbl1 -> signal_connect( 'button_release_event' => sub { $_[1] -> button != 1 and return 0; $self -> stop( undef, 1 ); } );
 			$$self{_GUI}{_TABLBL} -> pack_start( $eblbl1, 0, 1, 0 );
 		
@@ -688,7 +687,7 @@ sub _initGUI {
 	else
 	{
 		# Build a new window,
-		$$self{_WINDOWTERMINAL} = Gtk2::Window -> new;
+		$$self{_WINDOWTERMINAL} = Gtk3::Window -> new;
 		$$self{_WINDOWTERMINAL} -> set_title( $$self{_TITLE} . " : $APPNAME (v$APPVERSION)" );
 		$$self{_WINDOWTERMINAL} -> set_position( 'center' );
 		$$self{_WINDOWTERMINAL} -> set_size_request( 200, 100 );
@@ -710,262 +709,263 @@ sub _initGUI {
 sub _setupCallbacks {
 	my $self	= shift;
 	
-	$$self{_GUI}{btnDelHist} -> signal_connect( 'clicked', sub {
-		@{ $$self{_GUI}{treeKeys}{data} } = () if _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?" );
-	} );
+	#~ $$self{_GUI}{btnDelHist} -> signal_connect( 'clicked', sub {
+		#~ @{ $$self{_GUI}{treeKeys}{data} } = () if _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?" );
+	#~ } );
 	
-	$$self{_GUI}{treeKeys} -> signal_connect( 'row_activated' => sub {
-		my $tree			= shift;
-		my ( $selected )	= $tree -> get_selected_indices;
-		return 1 unless ( defined $selected && $$self{CONNECTED} );
-		my $cmd = $$tree{data}[$selected][0];
+	#~ $$self{_GUI}{treeKeys} -> signal_connect( 'row_activated' => sub {
+		#~ my $tree			= shift;
+		#~ my ( $selected )	= $tree -> get_selected_indices;
+		#~ return 1 unless ( defined $selected && $$self{CONNECTED} );
+		#~ my $cmd = $$tree{data}[$selected][0];
 		
-		$$self{_SAVE_KEYS} = 0;
-		$self -> _execute( 'remote', $cmd, 0 );
-		$$self{_SAVE_KEYS} = 1;
-	} );
+		#~ $$self{_SAVE_KEYS} = 0;
+		#~ $self -> _execute( 'remote', $cmd, 0 );
+		#~ $$self{_SAVE_KEYS} = 1;
+	#~ } );
 	
 	$$self{_GUI}{cbShowHist} -> signal_connect( 'toggled', sub {
 		if ( $$self{_GUI}{cbShowHist} -> get_active )	{ $$self{_GUI}{hbHist} -> show_all; }
 		else											{ $$self{_GUI}{hbHist} -> hide; }
 	} );
 	
-	$$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE} -> signal_connect( 'motion_notify_event', sub {
-		return 0 if $$self{_CFG}{'defaults'}{'prevent mouse over show tree'};
-		return 0 unless $$self{'_CFG'}{'defaults'}{'auto hide connections list'} && $$self{_TABBED};
-		my @geo = $$self{_GUI}{_VTE} -> window -> get_geometry;
-		if ( $$self{_CFG}{defaults}{'tree on right side'} ) {
-			return 0 if ( $$self{_SPLIT_VPANE} && ( ( $$self{_SPLIT_VPANE} -> get_child1 ) eq $$self{_GUI}{_VBOX} ) && ! $$self{_SPLIT_VERTICAL} );
-			$PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn} -> set_active( $_[1] -> x >= ( $geo[2] - 30 ) );
-		} else {
-			return 0 if ( $$self{_SPLIT_VPANE} && ( ( $$self{_SPLIT_VPANE} -> get_child2 ) eq $$self{_GUI}{_VBOX} ) && ! $$self{_SPLIT_VERTICAL} );
-			$PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn} -> set_active( $_[1] -> x <= 10 );
-		}
-		return 0;
-	} );
+	#~ $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE} -> signal_connect( 'motion_notify_event', sub {
+		#~ return 0 if $$self{_CFG}{'defaults'}{'prevent mouse over show tree'};
+		#~ return 0 unless $$self{'_CFG'}{'defaults'}{'auto hide connections list'} && $$self{_TABBED};
+		#~ my @geo = $$self{_GUI}{_VTE} -> window -> get_geometry;
+		#~ if ( $$self{_CFG}{defaults}{'tree on right side'} ) {
+			#~ return 0 if ( $$self{_SPLIT_VPANE} && ( ( $$self{_SPLIT_VPANE} -> get_child1 ) eq $$self{_GUI}{_VBOX} ) && ! $$self{_SPLIT_VERTICAL} );
+			#~ $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn} -> set_active( $_[1] -> x >= ( $geo[2] - 30 ) );
+		#~ } else {
+			#~ return 0 if ( $$self{_SPLIT_VPANE} && ( ( $$self{_SPLIT_VPANE} -> get_child2 ) eq $$self{_GUI}{_VBOX} ) && ! $$self{_SPLIT_VERTICAL} );
+			#~ $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn} -> set_active( $_[1] -> x <= 10 );
+		#~ }
+		#~ return 0;
+	#~ } );
 	
 	# Capture focus-out of VTE when it shouldn't get out!!!
-	$$self{_GUI}{_VTE} -> signal_connect( 'focus_out_event' => sub {
-		if ( ( $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} // '' ) eq $$self{_GUI}{_VTE} ) {
-			$$self{_GUI}{_VTE} -> grab_focus;
-			$PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
-			1;
-		}
-	} );
-	# Capture keypresses on VTE
-	$$self{_GUI}{_VTE} -> signal_connect( 'key_press_event' => sub {
-		my ( $widget, $event ) = @_;
-		
-		my $keyval	= Gtk2::Gdk -> keyval_name( $event -> keyval );
-		my $unicode	= Gtk2::Gdk -> keyval_to_unicode( $event -> keyval); # 0 if not a character
-		my $state	= $event -> get_state;
-		my $shift	= $state * ['shift-mask'];
-		my $ctrl	= $state * ['control-mask'];
-		my $alt		= $state * ['mod1-mask'];
-		my $alt2	= $state * ['mod2-mask'];
-		my $alt5	= $state * ['mod5-mask'];
-		
-		#print "TERMINAL KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
-		#print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-		
-		return 1 if defined $$self{_KEYS_RECEIVE};
-		
-		# ENTER --> reconnect if disconnected
-		if ( ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) && ( ! $$self{CONNECTED} && ! $$self{CONNECTING} ) ) {
-			$self -> start;
-			return 1;
-		} elsif ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) {
-			$$self{_INTRO_PRESS} = 1;
-		}
-		
-		# F11 --> [un]fullscreen window
-		if ( ( $keyval eq 'F11' ) && ( ! $$self{_CFG}{defaults}{'prevent F11'} ) ) {
-			if ( $$self{_FULLSCREEN} ) {
-				$$self{_FSTOTAB} and $self -> _winToTab;
-				$$self{_GUI}{_VBOX} -> window -> unfullscreen;
-				$$self{_FULLSCREEN} = 0;
-			} else {
-				$$self{_FSTOTAB} = $$self{_TABBED};
-				$$self{_TABBED} and $self -> _tabToWin;
-				$$self{_GUI}{_VBOX} -> window -> fullscreen;
-				$$self{_FULLSCREEN} = 1;
-			}
-			return 1;
-		}
-		
-		# Capture only keypresses with modifiers (ctrl, alt, etc.)
-		
-		############################################
-		# Generic VTE keystrokes
-		
-		# <Shift><Ctrl><Alt>
-		if ( ( $ctrl && $alt && $shift ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) ) {
-			# d --> FULL uplicate connection
-			if ( lc $keyval eq 'd' ) { $self -> _wSelectKeypress; }
-			# X --> Reset terminal
-			elsif 	( lc $keyval eq 'x' )	{ $$self{_GUI}{_VTE} -> reset( 1, 1 ); }   
-			
-			return 1;
-		}
-		# <Ctrl><Alt>
-		elsif ( ( $ctrl && $alt ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) ) {
-			# r --> remove from cluster
-			if ( lc $keyval eq 'r' ) { $PACMain::FUNCS{_CLUSTER} -> delFromCluster( $$self{_UUID_TMP}, $$self{_CLUSTER} ); }
-			if ( lc $keyval eq 'h' ) { $$self{_GUI}{cbShowHist} -> set_active( ! $$self{_GUI}{cbShowHist} -> get_active ); }
-			
-			return 1;
-		}
-		# <Ctrl><Shift>
-		if ( ( $ctrl && $shift ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) ) {
-			# C --> COPY
-			if		( lc $keyval eq 'c' )	{ $$self{_GUI}{_VTE} -> copy_clipboard; }   
-			# V --> PASTE
-			elsif	( lc $keyval eq 'v' )
-			{
-				my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
-				$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
-			}
-			# B --> PASTE AND DELETE
-			elsif	( lc $keyval eq 'b' )
-			{
-				my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
-				my $delete = _wEnterValue(
-					$$self{_GUI},
-					"Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
-					'Use string or Perl RegExps (ex: \n means "carriage return")',
-					'\n|\f|\r'
-				) or return 1;
-				$text =~ s/$delete//g;
-				$self -> _pasteToVte( $text, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} || 1 );
-			}
-			# X --> Reset terminal
-			elsif 	( lc $keyval eq 'x' )	{ $$self{_GUI}{_VTE} -> reset( 1, 0 ); }   
-			# g --> Guess hostname and set as title
-			elsif 	( lc $keyval eq 'g' )	{ ( $$self{CONNECTED} && ! $$self{CONNECTING} ) and $self -> _execute( 'remote', '<CTRL_TITLE:hostname>', undef, undef, undef ); }   
-			# w --> Close terminal
-			elsif 	( lc $keyval eq 'w' )	{ $self -> stop( undef, 1 ); }   
-			# q --> Close PAC
-			elsif 	( lc $keyval eq 'q' )	{ $PACMain::FUNCS{_MAIN} -> _quitProgram; }   
-			# f --> FIND in treeView
-			elsif	( lc $keyval eq 'f' )
-			{
-				$PACMain::FUNCS{_MAIN} -> _showConnectionsList;
-				$PACMain::FUNCS{_MAIN}{_GUI}{_vboxSearch} -> show;
-				$PACMain::FUNCS{_MAIN}{_GUI}{_entrySearch} -> grab_focus;
-			}
-			# 6 --> Send a Cisco interrupt keypress
-			elsif	( $unicode eq 38 )
-			{
-				$$self{_GUI}{_VTE} -> feed_child_binary( "\c^x" );
-				#$$self{_GUI}{_VTE} -> feed_child_binary( "\c^" );
-				#$$self{_GUI}{_VTE} -> feed_child_binary( "\c]" );
-				$$self{_GUI}{_VTE} -> feed_child_binary( chr( 30 ) . 'x' );
-			}
-			# F4 --> CLOSE *ALL* opened tabs
-			elsif ( ( $self -> {_TABBED} ) and ( $keyval eq 'F4' ) )
-			{
-				my @list = keys %PACMain::RUNNING;
-				return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>ALL</b> open terminals?" );
-				foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }
-				return 1;
-			}
-			# d --> duplicate connection
-			elsif ( lc $keyval eq 'd' ) { $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] ); }
-			# f --> Find in history
-			elsif ( lc $keyval eq 'f' ) { $self -> _wHistory if $$self{_CFG}{'defaults'}{'record command history'}; }
-			# r --> Disconnect and Restart session
-			elsif ( lc $keyval eq 'r' ) { $self -> _disconnectAndRestartTerminal(); }
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'focus_out_event' => sub {
+		#~ if ( ( $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} // '' ) eq $$self{_GUI}{_VTE} ) {
+			#~ $$self{_GUI}{_VTE} -> grab_focus;
+			#~ $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
+			#~ 1;
+		#~ }
+	#~ } );
 
-			return 1;
-		}
-		# <Ctrl>
-		elsif ( $ctrl && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} ) )
-		{
-			# F4 --> CLOSE current tab
-			if ( ( $self -> {_TABBED} ) and ( $keyval eq 'F4' ) ) { $self -> stop( undef, 1 ); return 1; }
-			
-			# F3 --> FIND in text buffer
-			if ( $keyval eq 'F3' ) { _wFindInTerminal( $self ); return 1; }
-			
-			# <ins> --> COPY
-			if ( $keyval eq 'Insert' )	{ $$self{_GUI}{_VTE} -> copy_clipboard; return 1; }
-			
-		}
-		# <Shift>
-		elsif ( $shift && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) )
-		{
-			# <ins> --> PASTE
-			if ( $keyval eq 'Insert' )	{ $$self{_GUI}{_VTE} -> paste_clipboard; return 1; }   
-		}
-		# <Alt>
-		elsif ( $alt && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) )
-		{
-			# c | n --> Show main connections window
-			if ( ( lc $keyval eq 'c' ) || ( lc $keyval eq 'n' ) ) {
-				if ( ! $$self{_TABBED} || ! $$self{_CFG}{defaults}{'tabs in main window'} )	{ $PACMain::FUNCS{_MAIN} -> _showConnectionsList; }
-				else																		{ $PACMain::FUNCS{_MAIN} -> _toggleConnectionsList; }
-				return 1;
-			}
-			# e --> Show main edit connection window
-			if ( lc $keyval eq 'e' ) {
-				$PACMain::FUNCS{_EDIT} -> show( $$self{_UUID} ) unless $$self{_UUID} eq '__PAC_SHELL__';
-				return 1;
-			}
-			# h --> Show command history window
-			if ( lc $keyval eq 'h' ) {
-				$self -> _wHistory if $$self{_CFG}{'defaults'}{'record command history'};
-				return 1;
-			}
-			return 0;
-		}
+	# Capture keypresses on VTE
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'key_press_event' => sub {
+		#~ my ( $widget, $event ) = @_;
 		
-		return 0;
-	} );
+		#~ my $keyval	= Gtk3::Gdk -> keyval_name( $event -> keyval );
+		#~ my $unicode	= Gtk3::Gdk -> keyval_to_unicode( $event -> keyval); # 0 if not a character
+		#~ my $state	= $event -> get_state;
+		#~ my $shift	= $state * ['shift-mask'];
+		#~ my $ctrl	= $state * ['control-mask'];
+		#~ my $alt		= $state * ['mod1-mask'];
+		#~ my $alt2	= $state * ['mod2-mask'];
+		#~ my $alt5	= $state * ['mod5-mask'];
+		
+		#~ #print "TERMINAL KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
+		#~ #print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+		
+		#~ return 1 if defined $$self{_KEYS_RECEIVE};
+		
+		#~ # ENTER --> reconnect if disconnected
+		#~ if ( ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) && ( ! $$self{CONNECTED} && ! $$self{CONNECTING} ) ) {
+			#~ $self -> start;
+			#~ return 1;
+		#~ } elsif ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) {
+			#~ $$self{_INTRO_PRESS} = 1;
+		#~ }
+		
+		#~ # F11 --> [un]fullscreen window
+		#~ if ( ( $keyval eq 'F11' ) && ( ! $$self{_CFG}{defaults}{'prevent F11'} ) ) {
+			#~ if ( $$self{_FULLSCREEN} ) {
+				#~ $$self{_FSTOTAB} and $self -> _winToTab;
+				#~ $$self{_GUI}{_VBOX} -> window -> unfullscreen;
+				#~ $$self{_FULLSCREEN} = 0;
+			#~ } else {
+				#~ $$self{_FSTOTAB} = $$self{_TABBED};
+				#~ $$self{_TABBED} and $self -> _tabToWin;
+				#~ $$self{_GUI}{_VBOX} -> window -> fullscreen;
+				#~ $$self{_FULLSCREEN} = 1;
+			#~ }
+			#~ return 1;
+		#~ }
+		
+		#~ # Capture only keypresses with modifiers (ctrl, alt, etc.)
+		
+		#~ ############################################
+		#~ # Generic VTE keystrokes
+		
+		#~ # <Shift><Ctrl><Alt>
+		#~ if ( ( $ctrl && $alt && $shift ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) ) {
+			#~ # d --> FULL uplicate connection
+			#~ if ( lc $keyval eq 'd' ) { $self -> _wSelectKeypress; }
+			#~ # X --> Reset terminal
+			#~ elsif 	( lc $keyval eq 'x' )	{ $$self{_GUI}{_VTE} -> reset( 1, 1 ); }   
+			
+			#~ return 1;
+		#~ }
+		#~ # <Ctrl><Alt>
+		#~ elsif ( ( $ctrl && $alt ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) ) {
+			#~ # r --> remove from cluster
+			#~ if ( lc $keyval eq 'r' ) { $PACMain::FUNCS{_CLUSTER} -> delFromCluster( $$self{_UUID_TMP}, $$self{_CLUSTER} ); }
+			#~ if ( lc $keyval eq 'h' ) { $$self{_GUI}{cbShowHist} -> set_active( ! $$self{_GUI}{cbShowHist} -> get_active ); }
+			
+			#~ return 1;
+		#~ }
+		#~ # <Ctrl><Shift>
+		#~ if ( ( $ctrl && $shift ) && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} )  && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) ) {
+			#~ # C --> COPY
+			#~ if		( lc $keyval eq 'c' )	{ $$self{_GUI}{_VTE} -> copy_clipboard; }   
+			#~ # V --> PASTE
+			#~ elsif	( lc $keyval eq 'v' )
+			#~ {
+				#~ my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+				#~ $self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
+			#~ }
+			#~ # B --> PASTE AND DELETE
+			#~ elsif	( lc $keyval eq 'b' )
+			#~ {
+				#~ my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+				#~ my $delete = _wEnterValue(
+					#~ $$self{_GUI},
+					#~ "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
+					#~ 'Use string or Perl RegExps (ex: \n means "carriage return")',
+					#~ '\n|\f|\r'
+				#~ ) or return 1;
+				#~ $text =~ s/$delete//g;
+				#~ $self -> _pasteToVte( $text, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} || 1 );
+			#~ }
+			#~ # X --> Reset terminal
+			#~ elsif 	( lc $keyval eq 'x' )	{ $$self{_GUI}{_VTE} -> reset( 1, 0 ); }   
+			#~ # g --> Guess hostname and set as title
+			#~ elsif 	( lc $keyval eq 'g' )	{ ( $$self{CONNECTED} && ! $$self{CONNECTING} ) and $self -> _execute( 'remote', '<CTRL_TITLE:hostname>', undef, undef, undef ); }   
+			#~ # w --> Close terminal
+			#~ elsif 	( lc $keyval eq 'w' )	{ $self -> stop( undef, 1 ); }   
+			#~ # q --> Close PAC
+			#~ elsif 	( lc $keyval eq 'q' )	{ $PACMain::FUNCS{_MAIN} -> _quitProgram; }   
+			#~ # f --> FIND in treeView
+			#~ elsif	( lc $keyval eq 'f' )
+			#~ {
+				#~ $PACMain::FUNCS{_MAIN} -> _showConnectionsList;
+				#~ $PACMain::FUNCS{_MAIN}{_GUI}{_vboxSearch} -> show;
+				#~ $PACMain::FUNCS{_MAIN}{_GUI}{_entrySearch} -> grab_focus;
+			#~ }
+			#~ # 6 --> Send a Cisco interrupt keypress
+			#~ elsif	( $unicode eq 38 )
+			#~ {
+				#~ $$self{_GUI}{_VTE} -> feed_child_binary( "\c^x" );
+				#~ #$$self{_GUI}{_VTE} -> feed_child_binary( "\c^" );
+				#~ #$$self{_GUI}{_VTE} -> feed_child_binary( "\c]" );
+				#~ $$self{_GUI}{_VTE} -> feed_child_binary( chr( 30 ) . 'x' );
+			#~ }
+			#~ # F4 --> CLOSE *ALL* opened tabs
+			#~ elsif ( ( $self -> {_TABBED} ) and ( $keyval eq 'F4' ) )
+			#~ {
+				#~ my @list = keys %PACMain::RUNNING;
+				#~ return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>ALL</b> open terminals?" );
+				#~ foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }
+				#~ return 1;
+			#~ }
+			#~ # d --> duplicate connection
+			#~ elsif ( lc $keyval eq 'd' ) { $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] ); }
+			#~ # f --> Find in history
+			#~ elsif ( lc $keyval eq 'f' ) { $self -> _wHistory if $$self{_CFG}{'defaults'}{'record command history'}; }
+			#~ # r --> Disconnect and Restart session
+			#~ elsif ( lc $keyval eq 'r' ) { $self -> _disconnectAndRestartTerminal(); }
+
+			#~ return 1;
+		#~ }
+		#~ # <Ctrl>
+		#~ elsif ( $ctrl && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable CTRL key bindings'} ) )
+		#~ {
+			#~ # F4 --> CLOSE current tab
+			#~ if ( ( $self -> {_TABBED} ) and ( $keyval eq 'F4' ) ) { $self -> stop( undef, 1 ); return 1; }
+			
+			#~ # F3 --> FIND in text buffer
+			#~ if ( $keyval eq 'F3' ) { _wFindInTerminal( $self ); return 1; }
+			
+			#~ # <ins> --> COPY
+			#~ if ( $keyval eq 'Insert' )	{ $$self{_GUI}{_VTE} -> copy_clipboard; return 1; }
+			
+		#~ }
+		#~ # <Shift>
+		#~ elsif ( $shift && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable SHIFT key bindings'} ) )
+		#~ {
+			#~ # <ins> --> PASTE
+			#~ if ( $keyval eq 'Insert' )	{ $$self{_GUI}{_VTE} -> paste_clipboard; return 1; }   
+		#~ }
+		#~ # <Alt>
+		#~ elsif ( $alt && ( ! $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'disable ALT key bindings'} ) )
+		#~ {
+			#~ # c | n --> Show main connections window
+			#~ if ( ( lc $keyval eq 'c' ) || ( lc $keyval eq 'n' ) ) {
+				#~ if ( ! $$self{_TABBED} || ! $$self{_CFG}{defaults}{'tabs in main window'} )	{ $PACMain::FUNCS{_MAIN} -> _showConnectionsList; }
+				#~ else																		{ $PACMain::FUNCS{_MAIN} -> _toggleConnectionsList; }
+				#~ return 1;
+			#~ }
+			#~ # e --> Show main edit connection window
+			#~ if ( lc $keyval eq 'e' ) {
+				#~ $PACMain::FUNCS{_EDIT} -> show( $$self{_UUID} ) unless $$self{_UUID} eq '__PAC_SHELL__';
+				#~ return 1;
+			#~ }
+			#~ # h --> Show command history window
+			#~ if ( lc $keyval eq 'h' ) {
+				#~ $self -> _wHistory if $$self{_CFG}{'defaults'}{'record command history'};
+				#~ return 1;
+			#~ }
+			#~ return 0;
+		#~ }
+		
+		#~ return 0;
+	#~ } );
 	
 	# Right mouse mouse on VTE
-	$$self{_GUI}{_VTE} -> signal_connect( 'button_press_event' => sub {
-		my ( $widget, $event ) = @_;
-		if ( $event -> button eq 2 ) {
-			return 0 unless $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'};
-			my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_PRIMARY ) -> wait_for_text;
-			$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
-			$$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' );
-			return 1;
-		} elsif ( $event -> button eq 3 ) {
-			$self -> _vteMenu( $event );
-			return 1;
-		}
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'button_press_event' => sub {
+		#~ my ( $widget, $event ) = @_;
+		#~ if ( $event -> button eq 2 ) {
+			#~ return 0 unless $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'};
+			#~ my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_PRIMARY ) -> wait_for_text;
+			#~ $self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
+			#~ $$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' );
+			#~ return 1;
+		#~ } elsif ( $event -> button eq 3 ) {
+			#~ $self -> _vteMenu( $event );
+			#~ return 1;
+		#~ }
 		
-		return 0;
-	} );
+		#~ return 0;
+	#~ } );
 	
 	# Capture mouse selection on VTE
-	$$self{_GUI}{_VTE} -> signal_connect( 'selection_changed' => sub { $$self{_GUI}{_VTE} -> copy_clipboard if $$self{_CFG}{defaults}{'selection to clipboard'}; return 0; } );
-	$$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); $self -> _clusterCommit( @_ ); } );
-	$$self{_GUI}{_VTE} -> signal_connect( 'cursor_moved' => sub { $$self{_NEW_DATA} = 1; $self -> _setTabColour; } );
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'selection_changed' => sub { $$self{_GUI}{_VTE} -> copy_clipboard if $$self{_CFG}{defaults}{'selection to clipboard'}; return 0; } );
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); $self -> _clusterCommit( @_ ); } );
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'cursor_moved' => sub { $$self{_NEW_DATA} = 1; $self -> _setTabColour; } );
 	
 	# Capture Drag and Drop events
-	$$self{_GUI}{_VTE} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'move' ], { 'target' => 'PAC Connect', 'flags' => [], 'info' => 0 } );
-	$$self{_GUI}{_VTE} -> signal_connect( 'drag_drop' => sub {
-		if ( ! $$self{CONNECTED} ) {
-			_wMessage( $$self{GUI}{_VBOX}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1 );
-			return 0;
-		} elsif ( $$self{CONNECTING} ) {
-			_wMessage( $$self{GUI}{_VBOX}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1 );
-			return 0;
-		} elsif ( $$self{CONNECTED} && ( scalar @{ $PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'} } == 1 ) ) {
-			my $sel = shift @{ $PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'} };
-			my $name = $$self{_CFG}{environments}{$sel}{name};
-			my $title = $$self{_CFG}{environments}{$sel}{title};
-			$self -> _wSelectChain( $sel ) or _wMessage( undef, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>" );
-			$$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' ) if $$self{_FOCUSED};
-			return 1;
-		} else {
-			$$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' ) if $$self{_FOCUSED};
-			return 0;
-		}
-	} );
-	$$self{_GUI}{_VTE} -> signal_connect( 'drag_motion' => sub { $_[0] -> get_parent_window -> raise; return 1; } );
+	#~ $$self{_GUI}{_VTE} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'move' ], { 'target' => 'PAC Connect', 'flags' => [], 'info' => 0 } );
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'drag_drop' => sub {
+		#~ if ( ! $$self{CONNECTED} ) {
+			#~ _wMessage( $$self{GUI}{_VBOX}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1 );
+			#~ return 0;
+		#~ } elsif ( $$self{CONNECTING} ) {
+			#~ _wMessage( $$self{GUI}{_VBOX}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1 );
+			#~ return 0;
+		#~ } elsif ( $$self{CONNECTED} && ( scalar @{ $PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'} } == 1 ) ) {
+			#~ my $sel = shift @{ $PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'} };
+			#~ my $name = $$self{_CFG}{environments}{$sel}{name};
+			#~ my $title = $$self{_CFG}{environments}{$sel}{title};
+			#~ $self -> _wSelectChain( $sel ) or _wMessage( undef, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>" );
+			#~ $$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' ) if $$self{_FOCUSED};
+			#~ return 1;
+		#~ } else {
+			#~ $$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' ) if $$self{_FOCUSED};
+			#~ return 0;
+		#~ }
+	#~ } );
+	#~ $$self{_GUI}{_VTE} -> signal_connect( 'drag_motion' => sub { $_[0] -> get_parent_window -> raise; return 1; } );
 	
 	# Depending on terminal creation (window/tab), process connection closing differently
 	if ( ! $$self{_TABBED} ) {
@@ -984,54 +984,54 @@ sub _setupCallbacks {
 	$$self{_GUI}{hbHist} -> signal_connect( 'map' => sub { $self -> _updateCFG unless $$self{_NO_UPDATE_CFG}; } );
 	
 	# Append VTE's connection finalization with CLOSE event
-	$$self{_GUI}{_VTE} -> signal_connect ( 'child_exited' => sub {
-		defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_from_stock( 'pac-terminal-ko-small', 'button' );
-		defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_tooltip_text( 'DISCONNECTED' );
-		defined $$self{_GUI}{pb}			and $$self{_GUI}{pb} -> destroy;
+	#~ $$self{_GUI}{_VTE} -> signal_connect ( 'child_exited' => sub {
+		#~ defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_from_stock( 'pac-terminal-ko-small', 'button' );
+		#~ defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_tooltip_text( 'DISCONNECTED' );
+		#~ defined $$self{_GUI}{pb}			and $$self{_GUI}{pb} -> destroy;
 		
-		$PACMain::RUNNING{ $$self{'_UUID_TMP'} }{'stop_time'} = time();
-		$PACMain::FUNCS{_STATS} -> stop( $$self{_UUID} );
+		#~ $PACMain::RUNNING{ $$self{'_UUID_TMP'} }{'stop_time'} = time();
+		#~ $PACMain::FUNCS{_STATS} -> stop( $$self{_UUID} );
 		
-		# Update 'CONNECTED' status
-		$$self{_LAST_STATUS}	= 'DISCONNECTED';
-		$$self{CONNECTED}		= 0;
-		$$self{CONNECTING}		= 0;
+		#~ # Update 'CONNECTED' status
+		#~ $$self{_LAST_STATUS}	= 'DISCONNECTED';
+		#~ $$self{CONNECTED}		= 0;
+		#~ $$self{CONNECTING}		= 0;
 		
-		my $string = $$self{_CFG}{'environments'}{ $$self{_UUID} }{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
-		$$self{_GUI}{_VTE} -> feed( "\e[1;31m\r\n <-= $string (" . ( localtime( time ) ) . ")\e[0m\r\n\n" ) if defined $$self{_GUI}{_VTE};
+		#~ my $string = $$self{_CFG}{'environments'}{ $$self{_UUID} }{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+		#~ $$self{_GUI}{_VTE} -> feed( "\e[1;31m\r\n <-= $string (" . ( localtime( time ) ) . ")\e[0m\r\n\n" ) if defined $$self{_GUI}{_VTE};
 		
-		defined $$self{_SOCKET_CLIENT}		and $$self{_SOCKET_CLIENT}		-> close;
-		defined $$self{_SOCKET_CLIENT_EXEC}	and $$self{_SOCKET_CLIENT_EXEC} -> close;
-		defined $$self{_SEND_STRING}		and eval { Glib::Source -> remove( $$self{_SEND_STRING} );  };
-		defined $$self{_EMBED_KIDNAP}		and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
+		#~ defined $$self{_SOCKET_CLIENT}		and $$self{_SOCKET_CLIENT}		-> close;
+		#~ defined $$self{_SOCKET_CLIENT_EXEC}	and $$self{_SOCKET_CLIENT_EXEC} -> close;
+		#~ defined $$self{_SEND_STRING}		and eval { Glib::Source -> remove( $$self{_SEND_STRING} );  };
+		#~ defined $$self{_EMBED_KIDNAP}		and eval { Glib::Source -> remove( $$self{_EMBED_KIDNAP} ); };
 		
-		# _SOCKET_CLIENT is close so no more watch to expect
-		undef $$self{_SOCKET_CLIENT_WATCH};
+		#~ # _SOCKET_CLIENT is close so no more watch to expect
+		#~ undef $$self{_SOCKET_CLIENT_WATCH};
 		
-		$self -> _setTabColour;
-		$self -> _updateStatus;
+		#~ $self -> _setTabColour;
+		#~ $self -> _updateStatus;
 		
-		# Update Cluster GUI
-		$PACMain::FUNCS{_CLUSTER} -> _updateGUI;
+		#~ # Update Cluster GUI
+		#~ $PACMain::FUNCS{_CLUSTER} -> _updateGUI;
 		
-		$self -> _unsplit if ( $$self{_SPLIT} && $$self{_CFG}{'defaults'}{'unsplit disconnected terminals'} );
+		#~ $self -> _unsplit if ( $$self{_SPLIT} && $$self{_CFG}{'defaults'}{'unsplit disconnected terminals'} );
 		
-		$$self{_PID} = 0;
+		#~ $$self{_PID} = 0;
 		
-		if ( $$self{_RESTART} ) {
-			$self -> start;
-		} else {
-			# Check for post-connection commands execution
-			$self -> _wPrePostExec( 'local after' );
+		#~ if ( $$self{_RESTART} ) {
+			#~ $self -> start;
+		#~ } else {
+			#~ # Check for post-connection commands execution
+			#~ $self -> _wPrePostExec( 'local after' );
 			
-			# And close if so is configured
-			$self -> stop( undef, 1 ) if $$self{_CFG}{'defaults'}{'close terminal on disconnect'} && ! $$self{_BADEXIT};
-		}
+			#~ # And close if so is configured
+			#~ $self -> stop( undef, 1 ) if $$self{_CFG}{'defaults'}{'close terminal on disconnect'} && ! $$self{_BADEXIT};
+		#~ }
 		
-		$self -> _updateCFG;
+		#~ $self -> _updateCFG;
 		
-		return 1;
-	} );
+		#~ return 1;
+	#~ } );
 	
 	return 1;
 }
@@ -1081,7 +1081,7 @@ sub _watchConnectionData {
 			my $prompt	= $2;
 			
 			if ( ! defined $$self{_GUI}{pb} ) {
-				$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+				$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 				$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 				$$self{_GUI}{pb} -> show;
 			}
@@ -1098,7 +1098,7 @@ sub _watchConnectionData {
 			
 			if ( $$self{CONNECTING} = $status eq 'START' ) {
 				if ( ! defined $$self{_GUI}{pb} ) {
-					$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+					$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 					$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 					$$self{_GUI}{pb} -> show;
 				}
@@ -1134,7 +1134,7 @@ sub _watchConnectionData {
 			$$self{_GUI}{statusExpect} -> set_tooltip_text( "Expect / Execute: $1 / $2" );
 			$$self{_PULSE} = 0;
 			if ( ! defined $$self{_GUI}{pb} ) {
-				$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+				$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 				$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 				$$self{_GUI}{pb} -> show;
 			}
@@ -1154,7 +1154,7 @@ sub _watchConnectionData {
 			my $txt = $1;
 			$$self{_PULSE} = 1;
 			if ( ! defined $$self{_GUI}{pb} ) {
-				$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+				$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 				$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 				$$self{_GUI}{pb} -> show;
 			}
@@ -1626,9 +1626,9 @@ sub _vteMenu {
 		label		=> 'Paste',
 		stockicon	=> 'gtk-paste',
 		shortcut	=> '<control><shift>v',
-		sensitive	=> $$self{CONNECTED} && $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_is_text_available,
+		sensitive	=> $$self{CONNECTED} && $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_is_text_available,
 		code		=> sub {
-			my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+			my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
 			$self -> _pasteToVte( $txt, $$self{_CFG}{environments}{ $$self{_UUID} }{'send slow'} );
 		}
 	} );
@@ -1639,9 +1639,9 @@ sub _vteMenu {
 		stockicon	=> 'gtk-paste',
 		shortcut	=> '<control><shift>b',
 		tooltip		=> 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
-		sensitive	=> $$self{CONNECTED} && $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_is_text_available,
+		sensitive	=> $$self{CONNECTED} && $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_is_text_available,
 		code		=> sub {
-			my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+			my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
 			my $delete = _wEnterValue(
 				$$self{_GUI},
 				"Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -1852,7 +1852,7 @@ sub _pasteToVte {
 	} else {
 		foreach my $char ( split( '', $txt ) ) {
 			$$self{_GUI}{_VTE} -> feed_child( $char );
-			Gtk2 -> main_iteration while Gtk2 -> events_pending;
+			Gtk3 -> main_iteration while Gtk3 -> events_pending;
 			select( undef, undef, undef, $slow / 1000 );
 		}
 	}
@@ -1976,9 +1976,9 @@ sub _saveHistory {
 		}
 		$$self{_HAVE_PROMPT} = 0;
 		$$self{_INTRO_PRESS} = 0;
-		push( @{ $$self{_GUI}{treeKeys}{'data'} }, [ $txt, time ] );
-		my $last = $#{ $$self{_GUI}{treeKeys}{'data'} };
-		$$self{_GUI}{treeKeys} -> set_cursor( Gtk2::TreePath -> new_from_string( $last ) );
+		#~ push( @{ $$self{_GUI}{treeKeys}{'data'} }, [ $txt, time ] );
+		#~ my $last = $#{ $$self{_GUI}{treeKeys}{'data'} };
+		#~ $$self{_GUI}{treeKeys} -> set_cursor( Gtk3::TreePath -> new_from_string( $last ) );
 	}
 }
 
@@ -1990,25 +1990,25 @@ sub _tabToWin {
 	
 	my $i = $$self{_SPLIT} ? $$self{_GUI}{_SPLIT_VPANE} : $$self{_NOTEBOOK} -> page_num( $$self{_GUI}{_VBOX} );
 	
-	$self -> {_WINDOWTERMINAL} = Gtk2::Window -> new;
+	$self -> {_WINDOWTERMINAL} = Gtk3::Window -> new;
 	if ( $$self{_SPLIT_VPANE} ) {
 		$$self{_SPLIT_VPANE} -> reparent( $self -> {_WINDOWTERMINAL} );
 		$PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_TABBED} = 0;
 	} else {
 		if ( $$self{EMBED} ) {
-			my $vbox = Gtk2::VBox-> new( 0, 0 );
+			my $vbox = Gtk3::VBox-> new( 0, 0 );
 			$$self{_WINDOWTERMINAL} -> add( $vbox);
 				
-				my $sc2 = Gtk2::ScrolledWindow -> new();
+				my $sc2 = Gtk3::ScrolledWindow -> new();
 				$sc2 -> set_shadow_type( 'none' );
 				$sc2 -> set_policy( 'automatic', 'automatic' );
 				$vbox -> pack_start( $sc2, 1, 1, 0 );
 					
-					my $vp = Gtk2::Viewport -> new;
+					my $vp = Gtk3::Viewport -> new;
 					$sc2 -> add( $vp );
 				
-				my $btnfocus = Gtk2::Button -> new_with_mnemonic( 'Set _keyboard focus' );
-				$btnfocus -> set_image( Gtk2::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
+				my $btnfocus = Gtk3::Button -> new_with_mnemonic( 'Set _keyboard focus' );
+				$btnfocus -> set_image( Gtk3::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
 				$btnfocus -> set( 'can_focus', 0 );
 				$btnfocus -> signal_connect ( 'clicked' => sub { $$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' ); } );
 				$vbox -> pack_start( $btnfocus, 0, 1, 0 );
@@ -2055,15 +2055,15 @@ sub _winToTab {
 	my $tabs = $$self{_NOTEBOOK};
 	
 	# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
-	$$self{_GUI}{_TABLBL} = Gtk2::HBox -> new( 0, 0 );
+	$$self{_GUI}{_TABLBL} = Gtk3::HBox -> new( 0, 0 );
 		
-		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk2::EventBox -> new;
+		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk3::EventBox -> new;
 			$$self{_GUI}{_TABLBL} -> pack_start( $$self{_GUI}{_TABLBL}{_EBLBL}, 1, 1, 0 );
-			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk2::Label -> new( $$self{_TITLE} );
+			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk3::Label -> new( $$self{_TITLE} );
 			$$self{_GUI}{_TABLBL}{_EBLBL} -> add( $$self{_GUI}{_TABLBL}{_LABEL} );
 		
-		my $eblbl1 = Gtk2::EventBox -> new;
-			$eblbl1 -> add( Gtk2::Image -> new_from_stock( 'gtk-close', 'menu' ) );
+		my $eblbl1 = Gtk3::EventBox -> new;
+			$eblbl1 -> add( Gtk3::Image -> new_from_stock( 'gtk-close', 'menu' ) );
 			$eblbl1 -> signal_connect( 'button_release_event' => sub { $_[1] -> button != 1 and return 0; $self -> stop( undef, 1 ); } );
 			$$self{_GUI}{_TABLBL} -> pack_start( $eblbl1, 0, 1, 0 );
 	
@@ -2317,7 +2317,7 @@ sub _split {
 	my $tabs = $self -> {_NOTEBOOK};
 	$$self{_SPLIT_VERTICAL} = $vertical;
 	
-	my $new_vpane = $vertical ? Gtk2::VPaned -> new : Gtk2::HPaned -> new;
+	my $new_vpane = $vertical ? Gtk3::VPaned -> new : Gtk3::HPaned -> new;
 	
 	$$self{_SPLIT_VPANE}									= $new_vpane; # Assign new parent pane to both terminals
 	$PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT_VPANE}	= $new_vpane; # Assign new parent pane to both terminals
@@ -2326,15 +2326,15 @@ sub _split {
 	$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VBOX}	-> reparent( $new_vpane ); # Move THE OTHER TERMINAL into new created PANE
 	
 	# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
-	$$self{_GUI}{_TABLBL} = Gtk2::HBox -> new( 0, 0 );
+	$$self{_GUI}{_TABLBL} = Gtk3::HBox -> new( 0, 0 );
 		
-		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk2::EventBox -> new;
+		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk3::EventBox -> new;
 			$$self{_GUI}{_TABLBL} -> pack_start( $$self{_GUI}{_TABLBL}{_EBLBL}, 1, 1, 0 );
-			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk2::Label -> new( $$self{_TITLE} . ' + ' . $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} );
+			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk3::Label -> new( $$self{_TITLE} . ' + ' . $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} );
 			$$self{_GUI}{_TABLBL}{_EBLBL} -> add( $$self{_GUI}{_TABLBL}{_LABEL} );
 		
-		my $eblbl1 = Gtk2::EventBox -> new;
-			$eblbl1 -> add( Gtk2::Image -> new_from_stock( 'gtk-close', 'menu' ) );
+		my $eblbl1 = Gtk3::EventBox -> new;
+			$eblbl1 -> add( Gtk3::Image -> new_from_stock( 'gtk-close', 'menu' ) );
 			$eblbl1 -> signal_connect( 'button_release_event' => sub { $_[1] -> button != 1 and return 0; $self -> stop( undef, 1 ); } );
 			$$self{_GUI}{_TABLBL} -> pack_start( $eblbl1, 0, 1, 0 );
 		
@@ -2379,8 +2379,8 @@ sub _unsplit {
 	my $tabs		= $$self{_NOTEBOOK};
 	my $page		= $$self{_NOTEBOOK} -> page_num( $$self{_SPLIT_VPANE} );
 	
-	my $new_vbox_1 = Gtk2::VBox -> new( 0, 0 );
-	my $new_vbox_2 = Gtk2::VBox -> new( 0, 0 );
+	my $new_vbox_1 = Gtk3::VBox -> new( 0, 0 );
+	my $new_vbox_2 = Gtk3::VBox -> new( 0, 0 );
 	
 	$$self{_GUI}{_VBOX} -> reparent( $new_vbox_1 );
 	$$self{_GUI}{_VBOX} = $new_vbox_1;
@@ -2390,15 +2390,15 @@ sub _unsplit {
 	$PACMain::RUNNING{$uuid_tmp}{terminal}{_TABBED} = 1;
 	
 	# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
-	$$self{_GUI}{_TABLBL} = Gtk2::HBox -> new( 0, 0 );
+	$$self{_GUI}{_TABLBL} = Gtk3::HBox -> new( 0, 0 );
 		
-		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk2::EventBox -> new();
+		$$self{_GUI}{_TABLBL}{_EBLBL} = Gtk3::EventBox -> new();
 			$$self{_GUI}{_TABLBL} -> pack_start( $$self{_GUI}{_TABLBL}{_EBLBL}, 1, 1, 0 );
-			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk2::Label -> new( $$self{_TITLE} );
+			$$self{_GUI}{_TABLBL}{_LABEL} = Gtk3::Label -> new( $$self{_TITLE} );
 			$$self{_GUI}{_TABLBL}{_EBLBL} -> add( $$self{_GUI}{_TABLBL}{_LABEL} );
 		
-		my $eblbl1 = Gtk2::EventBox -> new();
-			$eblbl1 -> add( Gtk2::Image -> new_from_stock( 'gtk-close', 'menu' ) );
+		my $eblbl1 = Gtk3::EventBox -> new();
+			$eblbl1 -> add( Gtk3::Image -> new_from_stock( 'gtk-close', 'menu' ) );
 			$eblbl1 -> signal_connect( 'button_release_event' => sub { $_[1] -> button != 1 and return 0; $self -> stop( undef, 1 ); } );
 			$$self{_GUI}{_TABLBL} -> pack_start( $eblbl1, 0, 1, 0 );
 		
@@ -2421,15 +2421,15 @@ sub _unsplit {
 	$self -> _setupTabDND;
 	
 	# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
-	$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL} = Gtk2::HBox -> new( 0, 0 );
+	$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL} = Gtk3::HBox -> new( 0, 0 );
 		
-		$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_EBLBL} = Gtk2::EventBox -> new();
+		$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_EBLBL} = Gtk3::EventBox -> new();
 			$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL} -> pack_start( $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_EBLBL}, 1, 1, 0 );
-			$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_LABEL} = Gtk2::Label -> new( $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} );
+			$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_LABEL} = Gtk3::Label -> new( $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} );
 			$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_EBLBL} -> add( $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_LABEL} );
 		
-		my $eblbl3 = Gtk2::EventBox -> new();
-			$eblbl3 -> add( Gtk2::Image -> new_from_stock( 'gtk-close', 'menu' ) );
+		my $eblbl3 = Gtk3::EventBox -> new();
+			$eblbl3 -> add( Gtk3::Image -> new_from_stock( 'gtk-close', 'menu' ) );
 			$eblbl3 -> signal_connect( 'button_release_event' => sub { $_[1] -> button != 1 and return 0; $self -> stop( undef, 1 ); } );
 			$PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL} -> pack_start( $eblbl3, 0, 1, 0 );
 		
@@ -2498,7 +2498,7 @@ sub _saveSessionLog {
 	my $new_file = $$self{_LOGFILE};
 	$new_file =~ s/\s/_/go;
 	
-	my $dialog = Gtk2::FileChooserDialog -> new (
+	my $dialog = Gtk3::FileChooserDialog -> new (
 		'Select file to save session log',
 		undef,
 		'select-folder',
@@ -2640,7 +2640,7 @@ sub _wPrePostExec {
 	return 1 unless $total;
 
 	# Change mouse cursor (to busy) in VTE window
-	$$self{_GUI}{_VBOX} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
+	$$self{_GUI}{_VBOX} -> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'watch' ) );
 
 	# Now, prepare the local executions window, show it, AND stop until something clicked
 	$ppe{window}{data} -> show_all;
@@ -2660,7 +2660,7 @@ sub _wPrePostExec {
 		foreach my $line ( @{ $ppe{window}{gui}{treeview}{data} } ) { my ( $def, $cmd ) = @{ $line }; $t += $def; }
 		
 		# Change mouse cursor (to busy)
-		$ppe{window}{data} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
+		$ppe{window}{data} -> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'watch' ) );
 		$ppe{window}{data} -> set_sensitive( 0 );
 		
 		my $i = 0;
@@ -2676,14 +2676,14 @@ sub _wPrePostExec {
 			# Make some update to progress bar
 			$ppe{window}{gui}{pb} -> set_text( 'Executing: ' . $cmd );
 			$ppe{window}{gui}{pb} -> set_fraction( ++$i / $t );
-			Gtk2 -> main_iteration while Gtk2 -> events_pending;
+			Gtk3 -> main_iteration while Gtk3 -> events_pending;
 			
 			# Launch the local command
 			system( $cmd );
 		}
 		
 		# Change mouse cursor (to normal)
-		$ppe{window}{data} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
+		$ppe{window}{data} -> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'left-ptr' ) );
 		$ppe{window}{data} -> set_sensitive( 1 );
 		
 		return 1;
@@ -2695,7 +2695,7 @@ sub _wPrePostExec {
 		my %w;
 		
 		# Create the dialog window,
-		$w{window}{data} = Gtk2::Dialog -> new_with_buttons(
+		$w{window}{data} = Gtk3::Dialog -> new_with_buttons(
 			$self -> {_NAME} . " : $APPNAME : Local execution",
 			undef,
 			'modal',
@@ -2710,35 +2710,35 @@ sub _wPrePostExec {
 		$w{window}{btnCancel} = $w{window}{data} -> add_button( '_Cancel' , 0 );
 			
 			# Create frame
-			$w{window}{gui}{frame} = Gtk2::Frame -> new;
+			$w{window}{gui}{frame} = Gtk3::Frame -> new;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{frame}, 1, 1, 0 );
 			$w{window}{gui}{frame} -> set_label( 'Select local command(s) to execute:' );
 			$w{window}{gui}{frame} -> set_border_width( 5 );
 				
 				# Create a GtkScrolledWindow,
-				my $sct = Gtk2::ScrolledWindow -> new;
+				my $sct = Gtk3::ScrolledWindow -> new;
 				$w{window}{gui}{frame} -> add( $sct );
 				
 				$sct -> set_shadow_type( 'none' );
 				$sct -> set_policy( 'automatic', 'automatic' );
 				
 				# Create treeview
-				$w{window}{gui}{treeview} = Gtk2::Ex::Simple::List -> new_from_treeview (
-					Gtk2::TreeView -> new,
+				$w{window}{gui}{treeview} = Gtk3::Ex::Simple::List -> new_from_treeview (
+					Gtk3::TreeView -> new,
 					' EXECUTE?'			=> 'bool',
 					' LOCAL COMMAND'	=> 'text'
 				);
 				$sct -> add( $w{window}{gui}{treeview} );
 				
 			# Create progress bar
-			$w{window}{gui}{pb} = Gtk2::ProgressBar -> new;
+			$w{window}{gui}{pb} = Gtk3::ProgressBar -> new;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{pb}, 0, 1, 5 );
 		
 		$w{window}{data} -> signal_connect( 'response' => sub {
 			my ( $me, $response ) = @_;
 			$response eq '1' and _execLocalPPE( $self, \%w );
 			$w{window}{data} -> destroy;
-			$$self{_GUI}{_VBOX} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
+			$$self{_GUI}{_VBOX} -> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'left-ptr' ) );
 			undef %w;
 		} );
 		
@@ -2874,7 +2874,7 @@ sub _wSelectChain {
 		my %w;
 		
 		# Create the dialog window,
-		$w{window}{data} = Gtk2::Dialog -> new_with_buttons(
+		$w{window}{data} = Gtk3::Dialog -> new_with_buttons(
 			$self -> {_NAME} . " : $APPNAME : Chain connections",
 			$PACMain::FUNCS{_MAIN}{_GUI}{main},
 			'modal',
@@ -2889,21 +2889,21 @@ sub _wSelectChain {
 		$w{window}{data} -> set_resizable( 1 );
 			
 			# Create frame
-			$w{window}{gui}{frame} = Gtk2::Frame -> new;
+			$w{window}{gui}{frame} = Gtk3::Frame -> new;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{frame}, 1, 1, 0 );
 			$w{window}{gui}{frame} -> set_label( " Select 'expect/command' pairs from '$$self{_CFG}{'environments'}{$drop_uuid}{'name'}' to be executed into '$$self{_CFG}{'environments'}{$$self{_UUID}}{'name'}': " );
 			$w{window}{gui}{frame} -> set_border_width( 5 );
 				
 				# Create a GtkScrolledWindow,
-				my $sct = Gtk2::ScrolledWindow -> new;
+				my $sct = Gtk3::ScrolledWindow -> new;
 				$w{window}{gui}{frame} -> add( $sct );
 				
 				$sct -> set_shadow_type( 'none' );
 				$sct -> set_policy( 'automatic', 'automatic' );
 				
 				# Create treeview
-				$w{window}{gui}{treeview} = Gtk2::Ex::Simple::List -> new_from_treeview (
-					Gtk2::TreeView -> new,
+				$w{window}{gui}{treeview} = Gtk3::Ex::Simple::List -> new_from_treeview (
+					Gtk3::TreeView -> new,
 					' # '			=> 'int',
 					' ACTIVE '		=> 'bool',
 					' PATTERN '		=> 'text',
@@ -2915,25 +2915,25 @@ sub _wSelectChain {
 				);
 				$sct -> add( $w{window}{gui}{treeview}  );
 			
-			$w{window}{gui}{hboxtitle} = Gtk2::HBox -> new( 0, 0 ),
+			$w{window}{gui}{hboxtitle} = Gtk3::HBox -> new( 0, 0 ),
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{hboxtitle}, 0, 1, 0 );
 				
-				$w{window}{gui}{btnSelectAll} = Gtk2::Button -> new( "Select All/None" );
+				$w{window}{gui}{btnSelectAll} = Gtk3::Button -> new( "Select All/None" );
 				$w{window}{gui}{hboxtitle} -> pack_start( $w{window}{gui}{btnSelectAll}, 0, 1, 5 );
 				$w{window}{gui}{btnSelectAll} -> signal_connect( 'clicked' => sub {
 					$$_[0] = $select_all foreach ( @{ $w{window}{gui}{treeview}{data} } );
 					$select_all = ! $select_all;
 				} );
 				
-				$w{window}{gui}{cbChangeTitle} = Gtk2::CheckButton -> new_with_label( "Change TAB/Window title to: " );
+				$w{window}{gui}{cbChangeTitle} = Gtk3::CheckButton -> new_with_label( "Change TAB/Window title to: " );
 				$w{window}{gui}{cbChangeTitle} -> set_active( 1 );
 				$w{window}{gui}{hboxtitle} -> pack_start( $w{window}{gui}{cbChangeTitle}, 0, 1, 0 );
 				
-				$w{window}{gui}{entrytitle} = Gtk2::Entry -> new;
+				$w{window}{gui}{entrytitle} = Gtk3::Entry -> new;
 				$w{window}{gui}{hboxtitle} -> pack_start( $w{window}{gui}{entrytitle}, 1, 1, 0 );
 				$w{window}{gui}{entrytitle} -> set_text(  $$self{_CFG}{'environments'}{ $drop_uuid }{'title'} );
 		
-			$w{window}{gui}{cbExecInCluster} = Gtk2::CheckButton -> new_with_label( 'Send Chain to all connections in cluster' . ( $$self{_CLUSTER} ne '' ? " '$$self{_CLUSTER}'" : '' ) );
+			$w{window}{gui}{cbExecInCluster} = Gtk3::CheckButton -> new_with_label( 'Send Chain to all connections in cluster' . ( $$self{_CLUSTER} ne '' ? " '$$self{_CLUSTER}'" : '' ) );
 			$w{window}{data} -> vbox  -> pack_start( $w{window}{gui}{cbExecInCluster}, 0, 1, 0 );
 			$w{window}{gui}{cbExecInCluster} -> set_active( 0 );
 			$w{window}{gui}{cbExecInCluster} -> set_sensitive( $$self{_CLUSTER} ne '' );
@@ -2951,7 +2951,7 @@ sub _wSelectKeypress {
 	defined $w{window} and return $w{window}{data} -> present;
 	
 	# Create the dialog window,
-	$w{window}{data} = Gtk2::Window -> new;
+	$w{window}{data} = Gtk3::Window -> new;
 	
 	$w{window}{data} -> signal_connect( 'delete_event' => sub {
 		$w{window}{data} -> destroy;
@@ -2977,30 +2977,30 @@ sub _wSelectKeypress {
 	$w{window}{data} -> set_transient_for( $PACMain::FUNCS{_MAIN}{_GUI}{main} );
 		
 		# Create a vbox
-		$w{window}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$w{window}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$w{window}{data} -> add( $w{window}{gui}{vbox} );
 			
-			$w{window}{gui}{label0} = Gtk2::Label -> new;
+			$w{window}{gui}{label0} = Gtk3::Label -> new;
 			$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{label0}, 0, 1, 0 );
 			$w{window}{gui}{label0} -> set_justify( 'center' );
 			$w{window}{gui}{label0} -> set_markup( "<big><b><span foreground=\"#FF0000\">***************** ATTENTION *****************</span></b></big>\nAre you sure you want to duplicate this connection, including <b>every kestroke</b> registered until now?\nThat can be *very dangerous*, specially if you do not remember your keyboard activity in this terminal.\nIf unsure, click 'Cancel' and take a look at this terminals's history" );
 			
 			# Create frame 1
-			$w{window}{gui}{frame1} = Gtk2::Frame -> new;
+			$w{window}{gui}{frame1} = Gtk3::Frame -> new;
 			$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{frame1}, 1, 1, 0 );
 			$w{window}{gui}{frame1} -> set_label( ' Command History: ' );
 			$w{window}{gui}{frame1} -> set_border_width( 5 );
 				
 				# Create a GtkScrolledWindow,
-				my $sctxt = Gtk2::ScrolledWindow -> new;
+				my $sctxt = Gtk3::ScrolledWindow -> new;
 				$w{window}{gui}{frame1} -> add( $sctxt );
 				$sctxt -> set_shadow_type( 'none' );
 				$sctxt -> set_policy( 'automatic', 'automatic' );
 				$sctxt -> set_border_width( 5 );
 				
 				# Create treefound
-				$w{window}{gui}{treefound} = Gtk2::Ex::Simple::List -> new_from_treeview (
-					Gtk2::TreeView -> new,
+				$w{window}{gui}{treefound} = Gtk3::Ex::Simple::List -> new_from_treeview (
+					Gtk3::TreeView -> new,
 					' Execute '			=> 'bool',
 					' Last Execution '	=> 'text',
 					' Command '			=> 'text',
@@ -3009,59 +3009,59 @@ sub _wSelectKeypress {
 				$w{window}{gui}{treefound} -> set_headers_visible( 1 );
 				$w{window}{gui}{treefound} -> set_grid_lines( 'both' );
 				$w{window}{gui}{treefound} -> get_selection -> set_mode( 'single' );
-				foreach my $array ( @{ $$self{_GUI}{treeKeys}{data} } ) {
-					my $cmd		= $$array[0];
-					my $cmdt	= $$array[1];
+				#~ foreach my $array ( @{ $$self{_GUI}{treeKeys}{data} } ) {
+					#~ my $cmd		= $$array[0];
+					#~ my $cmdt	= $$array[1];
 					
-					push( @{ $w{window}{gui}{treefound}{data} },
-					[
-						1,
-						strftime( "%Y-%m-%d %H:%M:%S", localtime( $cmdt ) ),
-						_replaceBadChars( $cmd ),
-						$cmd
-					] );
-				}
+					#~ push( @{ $w{window}{gui}{treefound}{data} },
+					#~ [
+						#~ 1,
+						#~ strftime( "%Y-%m-%d %H:%M:%S", localtime( $cmdt ) ),
+						#~ _replaceBadChars( $cmd ),
+						#~ $cmd
+					#~ ] );
+				#~ }
 				
 				# Put treefound into scrolledwindow
 				$sctxt -> add( $w{window}{gui}{treefound} );
 		
 		# Put a separator
-		$w{window}{gui}{sep} = Gtk2::HSeparator -> new;
+		$w{window}{gui}{sep} = Gtk3::HSeparator -> new;
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{sep}, 0, 1, 5 );
 		
-		$w{window}{gui}{hbox1} = Gtk2::HBox -> new( 0, 0 );
+		$w{window}{gui}{hbox1} = Gtk3::HBox -> new( 0, 0 );
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{hbox1}, 0, 1, 0 );
 			
-			$w{window}{gui}{lblSleep} = Gtk2::Label -> new( 'Time between commands to replicate: ' );
+			$w{window}{gui}{lblSleep} = Gtk3::Label -> new( 'Time between commands to replicate: ' );
 			$w{window}{gui}{hbox1} -> pack_start( $w{window}{gui}{lblSleep}, 0, 1, 0 );
 			
-			$w{window}{gui}{spSleep} = Gtk2::SpinButton -> new_with_range( 0, 86400, 1/2 );
+			$w{window}{gui}{spSleep} = Gtk3::SpinButton -> new_with_range( 0, 86400, 1/2 );
 			$w{window}{gui}{hbox1} -> pack_start( $w{window}{gui}{spSleep}, 0, 1, 0 );
 			$w{window}{gui}{spSleep} -> set_value( 1/2 );
 		
 		# Put a separator
-		$w{window}{gui}{sep2} = Gtk2::HSeparator -> new;
+		$w{window}{gui}{sep2} = Gtk3::HSeparator -> new;
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{sep2}, 0, 1, 5 );
 		
 		# Put a hbox to add exec/close buttons
-		$w{window}{gui}{hbtnbox} = Gtk2::HBox -> new;
+		$w{window}{gui}{hbtnbox} = Gtk3::HBox -> new;
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{hbtnbox}, 0, 1, 0 );
 		$w{window}{gui}{hbtnbox} -> set_border_width( 5 );
 			
 			# Put a 'select all' button
-			$w{window}{gui}{btnselectall} = Gtk2::Button -> new_from_stock( 'gtk-yes' );
+			$w{window}{gui}{btnselectall} = Gtk3::Button -> new_from_stock( 'gtk-yes' );
 			$w{window}{gui}{btnselectall} -> set_label( 'Select all' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnselectall}, 0, 1, 0 );
 			$w{window}{gui}{btnselectall} -> signal_connect( 'clicked' => sub { foreach my $line ( @{ $w{window}{gui}{treefound}{data} } ) { $$line[0] = 1; }; } );
 			
 			# Put a 'select all' button
-			$w{window}{gui}{btnselectnone} = Gtk2::Button -> new_from_stock( 'gtk-no' );
+			$w{window}{gui}{btnselectnone} = Gtk3::Button -> new_from_stock( 'gtk-no' );
 			$w{window}{gui}{btnselectnone} -> set_label( 'Select none' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnselectnone}, 0, 1, 0 );
 			$w{window}{gui}{btnselectnone} -> signal_connect( 'clicked' => sub { foreach my $line ( @{ $w{window}{gui}{treefound}{data} } ) { $$line[0] = 0; }; } );
 			
 			# Put a button to execute
-			$w{window}{gui}{btnExec} = Gtk2::Button -> new_from_stock( 'gtk-execute' );
+			$w{window}{gui}{btnExec} = Gtk3::Button -> new_from_stock( 'gtk-execute' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnExec}, 1, 1, 0 );
 			$w{window}{gui}{btnExec} -> set_label( 'Go _FULL Duplicate' );
 			$w{window}{gui}{btnExec} -> signal_connect( 'clicked' => sub {
@@ -3076,7 +3076,7 @@ sub _wSelectKeypress {
 			} );
 			
 			# Put a 'close' button
-			$w{window}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-cancel' );
+			$w{window}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-cancel' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnclose}, 0, 1, 0 );
 			$w{window}{gui}{btnclose} -> signal_connect( 'clicked' => sub { $w{window}{data} -> destroy; undef %w; return 1; } );
 
@@ -3224,7 +3224,7 @@ sub _updateCFG {
 	{
 		$$self{_GUI}{_MACROSBOX} -> set_sensitive( $$self{CONNECTED} );
 		$$self{_GUI}{_MACROSBOX} -> foreach( sub { $_[0] -> destroy; } );
-		$$self{_GUI}{_MACROSCLUSTER} = Gtk2::CheckButton -> new_with_label( 'Sending THIS: ' );
+		$$self{_GUI}{_MACROSCLUSTER} = Gtk3::CheckButton -> new_with_label( 'Sending THIS: ' );
 		$$self{_GUI}{_MACROSCLUSTER} -> set( 'can-focus', 0 );
 		$$self{_GUI}{_MACROSCLUSTER} -> signal_connect( 'toggled', sub { $$self{_GUI}{_MACROSCLUSTER} -> set_label( $$self{_GUI}{_MACROSCLUSTER} -> get_active ? 'Sending CLUSTER: ' : 'Sending THIS: ' ); } );
 		$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0 );
@@ -3239,10 +3239,10 @@ sub _updateCFG {
 			my $intro	= $$hash{intro};
 			next unless $cmd ne '';
 			
-			$$self{_GUI}{"_BTNMACRO_$i"} = Gtk2::Button -> new;
+			$$self{_GUI}{"_BTNMACRO_$i"} = Gtk3::Button -> new;
 			$$self{_GUI}{"_BTNMACRO_$i"} -> set( 'can-focus', 0 );
 			$$self{_GUI}{"_BTNMACRO_$i"} -> set_tooltip_text( $cmd );
-			my $btn1 = Gtk2::Label -> new( $desc ? $desc : $cmd );
+			my $btn1 = Gtk3::Label -> new( $desc ? $desc : $cmd );
 			$btn1 -> set_ellipsize( 'PANGO_ELLIPSIZE_END' );
 			$$self{_GUI}{"_BTNMACRO_$i"} -> add( $btn1 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{"_BTNMACRO_$i"}, 1, 1, 0 );
@@ -3263,10 +3263,10 @@ sub _updateCFG {
 				my $intro	= ref( $hash ) ? $$hash{intro} : 0;
 				next unless $cmd ne '';
 				
-				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} = Gtk2::Button -> new;
+				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} = Gtk3::Button -> new;
 				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} -> set( 'can-focus', 0 );
 				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} -> set_tooltip_text( $cmd );
-				my $btn2 = Gtk2::Label -> new( $desc ? $desc : $cmd );
+				my $btn2 = Gtk3::Label -> new( $desc ? $desc : $cmd );
 				$btn2 -> set_ellipsize( 'PANGO_ELLIPSIZE_END' );
 				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} -> add( $btn2 );
 				$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{"_BTNMACRO_GLOB_$i"}, 1, 1, 0 );
@@ -3281,30 +3281,30 @@ sub _updateCFG {
 	
 	_setTabColour( $self );
 	
-	my $colors = [Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'color black'} // '#000000000000' ),		# black
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color red'}),				# red
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color green'}),				# green
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color yellow'}),				# yellow (=brown)
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color blue'}),				# blue
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color magenta'}),				# magenta
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color cyan'}),				# cyan
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color white'}),				# white (=light grey)
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright black'}),			# light black (=dark grey)
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright red'}),			# light red
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright green'}),			# light green
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright yellow'}),			# light yellow
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright blue'}),			# light blue
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright magenta'}),			# light magenta
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright cyan'}),			# light cyan
-	Gtk2::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright white'})];			# light white
+	my $colors = [Gtk3::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'color black'} // '#000000000000' ),		# black
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color red'}),				# red
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color green'}),				# green
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color yellow'}),				# yellow (=brown)
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color blue'}),				# blue
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color magenta'}),				# magenta
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color cyan'}),				# cyan
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color white'}),				# white (=light grey)
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright black'}),			# light black (=dark grey)
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright red'}),			# light red
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright green'}),			# light green
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright yellow'}),			# light yellow
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright blue'}),			# light blue
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright magenta'}),			# light magenta
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright cyan'}),			# light cyan
+	Gtk3::Gdk::Color -> parse($$self{_CFG}{'defaults'}{'color bright white'})];			# light white
 	# Update some VTE options
 	if ( ( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ) && ( defined $$self{_GUI}{_VTE} ) ) {
 		$$self{_GUI}{_VTE} -> set_background_transparent( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal transparency'} > 0 );
 		$$self{_GUI}{_VTE} -> set_background_saturation( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal transparency'} );
-		$$self{_GUI}{_VTE} -> set_colors( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
-		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ) );
-		$$self{_GUI}{_VTE} -> set_color_background( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ) );
-		$$self{_GUI}{_VTE} -> set_color_bold( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} : $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color'} ) );
+		$$self{_GUI}{_VTE} -> set_colors( Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
+		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ) );
+		$$self{_GUI}{_VTE} -> set_color_background( Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ) );
+		$$self{_GUI}{_VTE} -> set_color_bold( Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} : $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'bold color'} ) );
 		$$self{_GUI}{_VTE} -> set_font_from_string( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal font'} );
 		$$self{_GUI}{_VTE} -> set_property( 'cursor-shape', $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'cursor shape'} );
 		$$self{_GUI}{_VTE} -> set_encoding( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal character encoding'} // 'UTF-8' );
@@ -3316,10 +3316,10 @@ sub _updateCFG {
 	} elsif ( defined $$self{_GUI}{_VTE} ) {
 		$$self{_GUI}{_VTE} -> set_background_transparent( $$self{_CFG}{'defaults'}{'terminal transparency'} > 0 );
 		$$self{_GUI}{_VTE} -> set_background_saturation( $$self{_CFG}{'defaults'}{'terminal transparency'} );
-		$$self{_GUI}{_VTE} -> set_colors( Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk2::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
-		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'text color'} ) );
-		$$self{_GUI}{_VTE} -> set_color_background( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'back color'} ) );
-		$$self{_GUI}{_VTE} -> set_color_bold( Gtk2::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'} ) );
+		$$self{_GUI}{_VTE} -> set_colors( Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'text color'} ), Gtk3::Gdk::Color -> parse( $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'back color'} ), $colors);
+		$$self{_GUI}{_VTE} -> set_color_foreground( Gtk3::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'text color'} ) );
+		$$self{_GUI}{_VTE} -> set_color_background( Gtk3::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'back color'} ) );
+		$$self{_GUI}{_VTE} -> set_color_bold( Gtk3::Gdk::Color -> parse( $$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'} ) );
 		$$self{_GUI}{_VTE} -> set_font_from_string( $$self{_CFG}{'defaults'}{'terminal font'} );
 		$$self{_GUI}{_VTE} -> set_property( 'cursor-shape', $$self{_CFG}{'defaults'}{'cursor shape'} );
 		$$self{_GUI}{_VTE} -> set_encoding( $$self{_CFG}{'defaults'}{'terminal character encoding'} // 'UTF-8' );
@@ -3357,7 +3357,7 @@ sub _wFindInTerminal {
 	}
 	
 	# Create the 'windowFind' dialog window,
-	$w{window}{data} = Gtk2::Window -> new;
+	$w{window}{data} = Gtk3::Window -> new;
 	
 	$w{window}{data} -> signal_connect( 'delete_event' => sub {
 		$searching = 0;
@@ -3384,41 +3384,41 @@ sub _wFindInTerminal {
 	$w{window}{data} -> set_resizable( 1 );
 		
 		# Create an hbox
-		$w{window}{gui}{hboxmain} = Gtk2::HPaned -> new;
+		$w{window}{gui}{hboxmain} = Gtk3::HPaned -> new;
 		$w{window}{data} -> add( $w{window}{gui}{hboxmain} );
 			
 			# Create a vbox
-			$w{window}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+			$w{window}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 			$w{window}{gui}{vbox} -> set_size_request( 300, 200 );
 			$w{window}{gui}{hboxmain} -> pack1( $w{window}{gui}{vbox}, 1, 0 );
 				
 				# Create frame 1
-				$w{window}{gui}{frame1} = Gtk2::Frame -> new;
+				$w{window}{gui}{frame1} = Gtk3::Frame -> new;
 				$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{frame1}, 0, 1, 0 );
 				$w{window}{gui}{frame1} -> set_label( ' Enter Regular Expression to look for: ' );
 				$w{window}{gui}{frame1} -> set_border_width( 5 );
 					
-					$w{window}{gui}{hbox} = Gtk2::HBox -> new( 0, 0 );
+					$w{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
 					$w{window}{gui}{frame1} -> add( $w{window}{gui}{hbox} );
 					$w{window}{gui}{hbox} -> set_border_width( 5 );
 						
 						# Create 'find' image
-						$w{window}{gui}{img} = Gtk2::Image -> new_from_stock( 'gtk-find', 'dialog' );
+						$w{window}{gui}{img} = Gtk3::Image -> new_from_stock( 'gtk-find', 'dialog' );
 						$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{img}, 0, 1, 5 );
 						
 						# Create search entry
-						$w{window}{gui}{entry} = Gtk2::Entry -> new;
+						$w{window}{gui}{entry} = Gtk3::Entry -> new;
 						$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{entry}, 1, 1, 0 );
 						$w{window}{gui}{entry} -> set_activates_default( 1 );
 						$w{window}{gui}{entry} -> has_focus( 1 );
 						
 						# Create 'case sensitive search' checkbutton
-						$w{window}{gui}{cbCaseSensitive} = Gtk2::CheckButton -> new_with_label( 'Case sensitive' );
+						$w{window}{gui}{cbCaseSensitive} = Gtk3::CheckButton -> new_with_label( 'Case sensitive' );
 						$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{cbCaseSensitive}, 0, 1, 0 );
 						$w{window}{gui}{cbCaseSensitive} -> set_active( 0 );
 						
 						# Create "Search" button
-						$w{window}{gui}{btnfind} = Gtk2::Button -> new_from_stock( 'gtk-find' );
+						$w{window}{gui}{btnfind} = Gtk3::Button -> new_from_stock( 'gtk-find' );
 						$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{btnfind}, 0, 1, 0 );
 						$w{window}{gui}{btnfind} -> signal_connect( 'clicked' => sub {
 							if ( ! $searching ) {
@@ -3433,21 +3433,21 @@ sub _wFindInTerminal {
 						$w{window}{gui}{btnfind} -> grab_default;
 				
 				# Create frame 2
-				$w{window}{gui}{frame2} = Gtk2::Frame -> new;
+				$w{window}{gui}{frame2} = Gtk3::Frame -> new;
 				$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{frame2}, 1, 1, 0 );
 				$w{window}{gui}{frame2} -> set_label( ' Lines matching string: ' );
 				$w{window}{gui}{frame2} -> set_border_width( 5 );
 					
 					# Create a GtkScrolledWindow,
-					my $sctxt = Gtk2::ScrolledWindow -> new;
+					my $sctxt = Gtk3::ScrolledWindow -> new;
 					$w{window}{gui}{frame2} -> add( $sctxt );
 					$sctxt -> set_shadow_type( 'none' );
 					$sctxt -> set_policy( 'automatic', 'automatic' );
 					$sctxt -> set_border_width( 5 );
 					
 					# Create treefound
-					$w{window}{gui}{treefound} = Gtk2::Ex::Simple::List -> new_from_treeview (
-						Gtk2::TreeView -> new,
+					$w{window}{gui}{treefound} = Gtk3::Ex::Simple::List -> new_from_treeview (
+						Gtk3::TreeView -> new,
 						' Line # '			=> 'text',
 						' Line contents '	=> 'text'
 					);
@@ -3467,19 +3467,19 @@ sub _wFindInTerminal {
 					$sctxt -> add( $w{window}{gui}{treefound} );
 				
 				# Put a separator
-				$w{window}{gui}{sep} = Gtk2::HSeparator -> new;
+				$w{window}{gui}{sep} = Gtk3::HSeparator -> new;
 				$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{sep}, 0, 1, 5 );
 				
 				# Put a hbox to add copy/close buttons
-				$w{window}{gui}{hbtnbox} = Gtk2::HBox -> new;
+				$w{window}{gui}{hbtnbox} = Gtk3::HBox -> new;
 				$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{hbtnbox}, 0, 1, 0 );
 				$w{window}{gui}{hbtnbox} -> set_border_width( 5 );
 					
 					# Put a button to copy selected rows to clipboard
-					$w{window}{gui}{btnCopy} = Gtk2::Button -> new_from_stock( 'gtk-copy' );
+					$w{window}{gui}{btnCopy} = Gtk3::Button -> new_from_stock( 'gtk-copy' );
 					$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnCopy}, 1, 1, 0 );
 					$w{window}{gui}{btnCopy} -> signal_connect( 'clicked' => sub {
-						$$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk-> SELECTION_CLIPBOARD ) -> set_text (
+						$$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk-> SELECTION_CLIPBOARD ) -> set_text (
 							join(
 								"\n",
 								map $w{window}{gui}{treefound}{data}[$_][1],
@@ -3489,30 +3489,30 @@ sub _wFindInTerminal {
 					} );
 					
 					# Put a 'close' button
-					$w{window}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-close' );
+					$w{window}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-close' );
 					$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnclose}, 0, 1, 0 );
 					$w{window}{gui}{btnclose} -> signal_connect( 'clicked' => sub { $w{window}{data} -> destroy; undef %w; return 1; } );
 			
 			# Create frame 3
-			$w{window}{gui}{frame3} = Gtk2::Frame -> new;
+			$w{window}{gui}{frame3} = Gtk3::Frame -> new;
 			$w{window}{gui}{frame3} -> set_size_request( 200, 200 );
 			$w{window}{gui}{hboxmain} -> pack2( $w{window}{gui}{frame3}, 1, 0 );
 			$w{window}{gui}{frame3} -> set_label( ' Contents of current log: ' );
 			$w{window}{gui}{frame3} -> set_border_width( 5 );
 				
-				$w{window}{gui}{scroll} = Gtk2::ScrolledWindow -> new;
+				$w{window}{gui}{scroll} = Gtk3::ScrolledWindow -> new;
 				$w{window}{gui}{frame3} -> add( $w{window}{gui}{scroll} );
 				$w{window}{gui}{scroll} -> set_policy( 'automatic', 'automatic' );
 				$w{window}{gui}{scroll} -> set_border_width( 5 );
 					
 					if ( $SOURCEVIEW ) {
-						$w{window}{buffer} = Gtk2::SourceView2::Buffer -> new( undef );
-						$w{window}{gui}{text} = Gtk2::SourceView2::View -> new_with_buffer( $w{window}{buffer} );
+						$w{window}{buffer} = Gtk3::SourceView2::Buffer -> new( undef );
+						$w{window}{gui}{text} = Gtk3::SourceView2::View -> new_with_buffer( $w{window}{buffer} );
 						$w{window}{gui}{text} ->set_show_line_numbers( 1 );
 						$w{window}{gui}{text} ->set_highlight_current_line( 1 );
 					} else {
-						$w{window}{buffer} = Gtk2::TextBuffer -> new;
-						$w{window}{gui}{text} = Gtk2::TextView -> new_with_buffer( $w{window}{buffer} );
+						$w{window}{buffer} = Gtk3::TextBuffer -> new;
+						$w{window}{gui}{text} = Gtk3::TextView -> new_with_buffer( $w{window}{buffer} );
 					}
 					
 					$w{window}{gui}{text} -> set_editable( 0 );
@@ -3551,16 +3551,16 @@ sub _wFindInTerminal {
 		
 		my $val = $w{window}{gui}{entry} -> get_chars( 0, -1 );
 		
-		$w{window}{gui}{vbox}		-> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
+		$w{window}{gui}{vbox}		-> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'watch' ) );
 		$w{window}{gui}{hbtnbox}	-> set_sensitive( 0 );
 		$w{window}{gui}{frame2}		-> set_label( ' PLEASE, WAIT. SEARCHING... ' );
 		$w{window}{gui}{btnfind}	-> set_label( 'STOP SEARCH' );
-		$w{window}{gui}{btnfind}	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-close', 'GTK_ICON_SIZE_BUTTON' ) );
+		$w{window}{gui}{btnfind}	-> set_image( Gtk3::Image -> new_from_stock( 'gtk-close', 'GTK_ICON_SIZE_BUTTON' ) );
 		
 		# Empty previous found lines
 		@{ $w{window}{gui}{'treefound'}{data} } = ();
 		
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3 -> main_iteration while Gtk3 -> events_pending;
 		
 		my %found;
 		my $i = 0;
@@ -3572,7 +3572,7 @@ sub _wFindInTerminal {
 			if ( ++$i >= 1000 ) {
 				$i = 0;
 				$w{window}{gui}{frame2} -> set_label( ' PLEASE, WAIT. Searching... (' . scalar( keys %found ) . " lines matching '$val' so far in $l processed lines) " );
-				Gtk2 -> main_iteration;
+				Gtk3 -> main_iteration;
 			}
 			chomp $line;
 			next unless $line =~ /$regexp/g;
@@ -3584,21 +3584,21 @@ sub _wFindInTerminal {
 		if ( $stop ) {
 			# Update label text to announce that search was stopped
 			$w{window}{gui}{frame2} -> set_label( ' SEARCH WAS STOPPED WITH ' . scalar( keys %found ) . " LINES MATCHING '$val' SO FAR!! " );
-			Gtk2 -> main_iteration;
+			Gtk3 -> main_iteration;
 			$stop = 0;
 		} else {
 			# Update label text with number of matches found
 			$w{window}{gui}{frame2} -> set_label( ' PLEASE, WAIT. Updating... (' . scalar( keys %found ) . " lines matching '$val') " );
-			Gtk2 -> main_iteration while Gtk2 -> events_pending;
+			Gtk3 -> main_iteration while Gtk3 -> events_pending;
 			# Update tree with the list of found lines
 			foreach my $line_num ( sort { $a <=> $b } keys %found ) { push( @{ $w{window}{gui}{treefound}{data} }, [ $line_num, $found{$line_num} ] ); }
 		}
 		
-		$w{window}{gui}{vbox}		-> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
+		$w{window}{gui}{vbox}		-> window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'left-ptr' ) );
 		$w{window}{gui}{hbtnbox}	-> set_sensitive( 1 );
 		$w{window}{gui}{frame2}		-> set_label( ' ' . scalar( keys %found ) . " lines matching '$val': " );
 		$w{window}{gui}{btnfind}	-> set_label( 'Find' );
-		$w{window}{gui}{btnfind}	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-find', 'GTK_ICON_SIZE_BUTTON' ) );
+		$w{window}{gui}{btnfind}	-> set_image( Gtk3::Image -> new_from_stock( 'gtk-find', 'GTK_ICON_SIZE_BUTTON' ) );
 		
 		$w{window}{gui}{entry} -> has_focus( 1 );
 		$w{window}{gui}{entry} -> grab_focus;
@@ -3617,7 +3617,7 @@ sub _wHistory {
 	defined $w{window} and return $w{window}{data} -> present;
 	
 	# Create the 'windowFind' dialog window,
-	$w{window}{data} = Gtk2::Window -> new;
+	$w{window}{data} = Gtk3::Window -> new;
 	
 	$w{window}{data} -> signal_connect( 'delete_event' => sub {
 		$w{window}{data} -> destroy;
@@ -3643,25 +3643,25 @@ sub _wHistory {
 	$w{window}{data} -> set_transient_for( $PACMain::FUNCS{_MAIN}{_GUI}{main} );
 		
 		# Create a vbox
-		$w{window}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$w{window}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$w{window}{data} -> add( $w{window}{gui}{vbox} );
 			
 			# Create frame 1
-			$w{window}{gui}{frame1} = Gtk2::Frame -> new;
+			$w{window}{gui}{frame1} = Gtk3::Frame -> new;
 			$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{frame1}, 1, 1, 0 );
 			$w{window}{gui}{frame1} -> set_label( ' Command History: ' );
 			$w{window}{gui}{frame1} -> set_border_width( 5 );
 				
 				# Create a GtkScrolledWindow,
-				my $sctxt = Gtk2::ScrolledWindow -> new;
+				my $sctxt = Gtk3::ScrolledWindow -> new;
 				$w{window}{gui}{frame1} -> add( $sctxt );
 				$sctxt -> set_shadow_type( 'none' );
 				$sctxt -> set_policy( 'automatic', 'automatic' );
 				$sctxt -> set_border_width( 5 );
 				
 				# Create treefound
-				$w{window}{gui}{treefound} = Gtk2::Ex::Simple::List -> new_from_treeview (
-					Gtk2::TreeView -> new(),
+				$w{window}{gui}{treefound} = Gtk3::Ex::Simple::List -> new_from_treeview (
+					Gtk3::TreeView -> new(),
 					' Execution time '	=> 'text',
 					' Command '			=> 'text',
 					'cmd'				=> 'hidden'
@@ -3669,18 +3669,18 @@ sub _wHistory {
 				$w{window}{gui}{treefound} -> set_headers_visible( 1 );
 				$w{window}{gui}{treefound} -> set_grid_lines( 'both' );
 				$w{window}{gui}{treefound} -> get_selection -> set_mode( 'single' );
-				foreach my $array ( @{ $$self{_GUI}{treeKeys}{data} } ) {
-					my $cmd = $$array[0];
-					my $cmdt = $$array[1];
-					my $pretty_cmd = _replaceBadChars( $cmd );
+				#~ foreach my $array ( @{ $$self{_GUI}{treeKeys}{data} } ) {
+					#~ my $cmd = $$array[0];
+					#~ my $cmdt = $$array[1];
+					#~ my $pretty_cmd = _replaceBadChars( $cmd );
 					
-					push( @{ $w{window}{gui}{treefound}{data} },
-					[
-						strftime( "%Y-%m-%d %H:%M:%S", localtime( $cmdt ) ),
-						$pretty_cmd,
-						$cmd
-					] );
-				}
+					#~ push( @{ $w{window}{gui}{treefound}{data} },
+					#~ [
+						#~ strftime( "%Y-%m-%d %H:%M:%S", localtime( $cmdt ) ),
+						#~ $pretty_cmd,
+						#~ $cmd
+					#~ ] );
+				#~ }
 				
 				$w{window}{gui}{treefound} -> signal_connect( 'row_activated' => sub { $w{window}{gui}{btnExec} -> clicked } );
 				
@@ -3688,16 +3688,16 @@ sub _wHistory {
 				$sctxt -> add( $w{window}{gui}{treefound} );
 				
 		# Put a separator
-		$w{window}{gui}{sep} = Gtk2::HSeparator -> new;
+		$w{window}{gui}{sep} = Gtk3::HSeparator -> new;
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{sep}, 0, 1, 5 );
 		
 		# Put a hbox to add exec/close buttons
-		$w{window}{gui}{hbtnbox} = Gtk2::HBox -> new;
+		$w{window}{gui}{hbtnbox} = Gtk3::HBox -> new;
 		$w{window}{gui}{vbox} -> pack_start( $w{window}{gui}{hbtnbox}, 0, 1, 0 );
 		$w{window}{gui}{hbtnbox} -> set_border_width( 5 );
 			
 			# Put a button to execute selected row
-			$w{window}{gui}{btnExec} = Gtk2::Button -> new_from_stock( 'gtk-execute' );
+			$w{window}{gui}{btnExec} = Gtk3::Button -> new_from_stock( 'gtk-execute' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnExec}, 1, 1, 0 );
 			$w{window}{gui}{btnExec} -> signal_connect( 'clicked' => sub {
 				my ( $selected ) = $w{window}{gui}{treefound} -> get_selected_indices;
@@ -3710,26 +3710,26 @@ sub _wHistory {
 			} );
 			
 			# Put a button to copy selected rows to clipboard
-			$w{window}{gui}{btnCopy} = Gtk2::Button -> new_from_stock( 'gtk-copy' );
+			$w{window}{gui}{btnCopy} = Gtk3::Button -> new_from_stock( 'gtk-copy' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnCopy}, 1, 1, 0 );
 			$w{window}{gui}{btnCopy} -> signal_connect( 'clicked' => sub {
-				$$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk-> SELECTION_CLIPBOARD ) -> set_text (
+				$$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk-> SELECTION_CLIPBOARD ) -> set_text (
 					join( "\n", map $w{window}{gui}{treefound}{data}[$_][2], $w{window}{gui}{treefound} -> get_selected_indices )
 				);
 			} );
 			
 			# Put a button to empty the history
-			$w{window}{gui}{btnEmpty} = Gtk2::Button -> new( 'Forget history' );
+			$w{window}{gui}{btnEmpty} = Gtk3::Button -> new( 'Forget history' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnEmpty}, 1, 1, 0 );
-			$w{window}{gui}{btnEmpty} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-delete', 'button' ) );
+			$w{window}{gui}{btnEmpty} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-delete', 'button' ) );
 			$w{window}{gui}{btnEmpty} -> signal_connect( 'clicked' => sub {
 				return 1 unless _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?" );
 				@{ $w{window}{gui}{treefound}{data} } = ();
-				@{ $$self{_GUI}{treeKeys}{data} } = ();
+				#~ @{ $$self{_GUI}{treeKeys}{data} } = ();
 			} );
 			
 			# Put a 'close' button
-			$w{window}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-close' );
+			$w{window}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-close' );
 			$w{window}{gui}{hbtnbox} -> pack_start( $w{window}{gui}{btnclose}, 0, 1, 0 );
 			$w{window}{gui}{btnclose} -> signal_connect( 'clicked' => sub { $w{window}{data} -> destroy; undef %w; return 1; } );
 
@@ -3756,7 +3756,7 @@ sub _checkSendKeystrokes {
 	$$self{_PULSE}	= 0;
 	
 	if ( ! defined $$self{_GUI}{pb} ) {
-		$$self{_GUI}{pb} = Gtk2::ProgressBar -> new;
+		$$self{_GUI}{pb} = Gtk3::ProgressBar -> new;
 		$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{pb}, 0, 1, 0 );
 		$$self{_GUI}{pb} -> show;
 	}
