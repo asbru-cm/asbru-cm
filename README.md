@@ -35,10 +35,19 @@ We recommend installing Ásbrú Connection Manager using our latest pre-built pa
 
 To do so, execute the following commands:
 
-````
-$ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
-$ sudo apt-get install asbru-cm
-````
+- Debian / Ubuntu
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+  $ sudo apt-get install asbru-cm
+  ````
+
+- Fedora
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
+  $ sudo dnf install asbru-cm
+  ````
 
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
