@@ -2,6 +2,8 @@ language: perl
 perl:
         - "5.24.1"
 before_install:
+  - apt-get update
+  - apt-get install build-essential
   - git clone git://github.com/haarg/perl-travis-helper
   - source perl-travis-helper/init
   - build-perl
