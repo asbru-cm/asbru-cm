@@ -49,6 +49,12 @@ To do so, execute the following commands:
   $ sudo dnf install asbru-cm
   ````
 
+- Arch / Manjaro
+
+````
+yaourt -S asbru-cm-git
+````
+
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
 ### Frequenty Asked Questions
