@@ -382,7 +382,7 @@ sub subst {
 	while ( $string =~ /<V:(\d+?)>/go ) {
 		my $var = $1;
 		if ( defined $$CFG{'environments'}{$UUID}{'variables'}[ $var ] ) {
-			my $val = $$CFG{'environments'}{$UUID}{'variables'}[ $var ] // '';
+			my $val = $$CFG{'environments'}{$UUID}{'variables'}[ $var ]{txt} // '';
 			$string =~ s/<V:$var>/$val/g;
 		}
 	}

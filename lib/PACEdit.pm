@@ -353,7 +353,7 @@ sub _setupCallbacks {
 		# Populate with user defined variables
 		my @variables_menu;
 		my $i = 0;
-		foreach my $value ( @{ $$self{variables} } ) {
+		foreach my $value ( map{ $_->{txt} // '' } @{ $self->{_VARIABLES}->{cfg} } ) {
 			my $j = $i;
 			push( @variables_menu, {
 				label => "<V:$j> ($value)",
@@ -363,7 +363,7 @@ sub _setupCallbacks {
 		}
 		push( @menu_items, {
 			label => 'User variables...',
-			sensitive => scalar @{ $$self{variables} },
+			sensitive => scalar @{ $self->{_VARIABLES}->{cfg} },
 			submenu => \@variables_menu
 		} );
 		
@@ -476,7 +476,7 @@ sub _setupCallbacks {
 			# Populate with user defined variables
 			my @variables_menu;
 			my $i = 0;
-			foreach my $value ( @{ $$self{variables} } ) {
+			foreach my $value ( map{ $_->{txt} // '' } @{ $self->{_VARIABLES}->{cfg} } ) {
 				my $j = $i;
 				push( @variables_menu, {
 					label => "<V:$j> ($value)",
@@ -486,7 +486,7 @@ sub _setupCallbacks {
 			}
 			push( @menu_items, {
 				label => 'User variables...',
-				sensitive => scalar @{ $$self{variables} },
+				sensitive => scalar @{ $self->{_VARIABLES}->{cfg} },
 				submenu => \@variables_menu
 			} );
 			
