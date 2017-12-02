@@ -80,3 +80,11 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 ### License
 
 Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
+
+### packagecloud
+
+The repositories for our RPM and DEB builds are thankfully sponsored by packagecloud. A great thanks to them.
+
+```html
+<a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
+```
