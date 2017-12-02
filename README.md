@@ -85,6 +85,4 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 
 The repositories for our RPM and DEB builds are thankfully sponsored by packagecloud. A great thanks to them.
 
-```html
 <a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
-```
