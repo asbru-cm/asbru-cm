@@ -11,7 +11,7 @@ env:
     - OS=ubuntu DIST=xenial PACKAGE=deb
     - OS=fedora DIST=26 PACKAGE=rpm
     - OS=fedora DIST=25 PACKAGE=rpm
-    - OS=linuxmint DIST=sonya PACKAGE=deb SCRIPT=make_debian.sh
+    - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
 install:
         - sudo apt-get update
         - sudo apt-get install git devscripts debhelper quilt
