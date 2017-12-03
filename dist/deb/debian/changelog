@@ -1,0 +1,44 @@
+asbru-cm (5.0.0~rc4-1) unstable; urgency=medium
+
+  * Upstream RC4 release
+
+ -- Klaas Tammling <klaas@tammling.hamburg>  Sun, 19 Nov 2017 19:10:29 +0100
+
+asbru-cm (5.0.0~rc3-3) unstable; urgency=medium
+
+  * Installing the .desktop file now
+  * Installing a symlink to /usr/bin/asbru
+
+ -- Klaas Tammling <klaas@tammling.hamburg>  Sat, 18 Nov 2017 11:44:00 +0100
+
+asbru-cm (5.0.0~rc3-2) unstable; urgency=medium
+
+  * Added dependency for libcanberra-gtk-module
+
+ -- Klaas Tammling <klaas@tammling.hamburg>  Wed, 01 Nov 2017 18:27:13 +0100
+
+asbru-cm (5.0.0~rc3-1) unstable; urgency=medium
+
+  * Upstream release 5.0.0-RC3
+
+ -- Klaas Tammling <klaas@tammling.hamburg>  Tue, 31 Oct 2017 09:50:05 +0100
+
+asbru-cm (5.0.0~rc2-2) unstable; urgency=medium
+
+  * New dependency for libgnome2-vte-perl added
+
+ -- Klaas Tammling <ktammling@localhost.localdomain>  Sun, 01 Oct 2017 10:11:33 +0200
+
+asbru-cm (5.0.0~rc2-1) unstable; urgency=medium
+
+  * New icon
+  * Correcting some scripts and versioning.
+  * Added dependencies needed to run Asbru
+
+ -- Klaas Tammling <ktammling@localhost.localdomain>  Thu, 28 Sep 2017 17:58:42 +0200
+
+asbru-cm (5.0.0-rc1-1) unstable; urgency=medium
+
+  * Initial release
+
+ -- Klaas Tammling <klaas@tammling.hamburg>  Sun, 17 Sep 2017 12:19:30 +0200

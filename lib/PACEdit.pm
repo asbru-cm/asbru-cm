@@ -211,10 +211,21 @@ sub _initGUI {
 
 sub __checkRBAuth {
 	my $self = shift;
-	
+
 	if ( _( $self, 'comboMethod' ) -> get_active_text !~ /RDP|VNC|Generic|3270/go ) {
-		_( $self, 'frameExpect' )	-> set_sensitive( ! _( $self, 'rbCfgAuthManual' ) -> get_active );
-		_( $self, 'labelExpect' )	-> set_sensitive( ! _( $self, 'rbCfgAuthManual' ) -> get_active );
+		if( _( $self, 'rbCfgAuthManual' ) -> get_active ) {
+			_( $self, 'frameExpect' )->set_sensitive( 0 );
+			_( $self, 'labelExpect' )->set_sensitive( 0 );
+			_( $self, 'labelExpect' )->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
+			_( $self, 'alignExpect' )->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
+		}
+		else{
+			_( $self, 'frameExpect' )->set_sensitive( 1 );
+			_( $self, 'labelExpect' )->set_sensitive( 1 );
+			_( $self, 'labelExpect' )->set_tooltip_text("EXPECT remote patterns AND-THEN-EXECUTE remote commands");
+			_( $self, 'alignExpect' )->set_has_tooltip( 0 );
+
+		}
 	}
 	
 	_( $self, 'alignUserPass' )		-> set_sensitive( _( $self, 'rbCfgAuthUserPass' ) -> get_active );
@@ -342,7 +353,7 @@ sub _setupCallbacks {
 		# Populate with user defined variables
 		my @variables_menu;
 		my $i = 0;
-		foreach my $value ( @{ $$self{variables} } ) {
+		foreach my $value ( map{ $_->{txt} // '' } @{ $self->{_VARIABLES}->{cfg} } ) {
 			my $j = $i;
 			push( @variables_menu, {
 				label => "<V:$j> ($value)",
@@ -352,7 +363,7 @@ sub _setupCallbacks {
 		}
 		push( @menu_items, {
 			label => 'User variables...',
-			sensitive => scalar @{ $$self{variables} },
+			sensitive => scalar @{ $self->{_VARIABLES}->{cfg} },
 			submenu => \@variables_menu
 		} );
 		
@@ -465,7 +476,7 @@ sub _setupCallbacks {
 			# Populate with user defined variables
 			my @variables_menu;
 			my $i = 0;
-			foreach my $value ( @{ $$self{variables} } ) {
+			foreach my $value ( map{ $_->{txt} // '' } @{ $self->{_VARIABLES}->{cfg} } ) {
 				my $j = $i;
 				push( @variables_menu, {
 					label => "<V:$j> ($value)",
@@ -475,7 +486,7 @@ sub _setupCallbacks {
 			}
 			push( @menu_items, {
 				label => 'User variables...',
-				sensitive => scalar @{ $$self{variables} },
+				sensitive => scalar @{ $self->{_VARIABLES}->{cfg} },
 				submenu => \@variables_menu
 			} );
 			

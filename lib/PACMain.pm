@@ -2196,7 +2196,7 @@ sub _treeConnections_menu_lite {
 	# Quick Edit variables
 	my @var_submenu;
 	my $i = 0;
-	foreach my $var ( @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} } ) {
+	foreach my $var ( map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} } ) {
 
 		my $j = $i;
 		
@@ -2212,7 +2212,7 @@ sub _treeConnections_menu_lite {
 					$var
 				);
 				! defined $new_var and return 1;
-				$$self{_CFG}{'environments'}{$sel[0]}{'variables'}[$j] = $new_var;
+				$$self{_CFG}{'environments'}{$sel[0]}{'variables'}[$j]{txt} = $new_var;
 			}
 		} );
 		
@@ -2416,7 +2416,7 @@ sub _treeConnections_menu {
 	# Quick Edit variables
 	my @var_submenu;
 	my $i = 0;
-	foreach my $var ( @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} } ) {
+	foreach my $var ( map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} } ) {
 
 		my $j = $i;
 		
@@ -2432,7 +2432,7 @@ sub _treeConnections_menu {
 					$var
 				);
 				! defined $new_var and return 1;
-				$$self{_CFG}{'environments'}{$sel[0]}{'variables'}[$j] = $new_var;
+				$$self{_CFG}{'environments'}{$sel[0]}{'variables'}[$j]{txt} = $new_var;
 			}
 		} );
 		

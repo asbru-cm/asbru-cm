@@ -255,7 +255,7 @@ sub _buildPrePost {
 		# Populate with user defined variables
 		my @variables_menu;
 		my $i = 0;
-		foreach my $value ( @{ $$self{variables} } ) {
+		foreach my $value ( map{ $_->{txt} // '' } @{ $$self{variables} } ) {
 			my $j = $i;
 			push( @variables_menu, {
 				label => "<V:$j> ($value)",
