@@ -4,13 +4,13 @@ services:
         - docker
 env:
   matrix:
-          #    - OS=debian DIST=jessie PACKAGE=deb
-          #    - OS=debian DIST=stretch PACKAGE=deb
-          #    - OS=ubuntu DIST=trusty PACKAGE=deb
-          #    - OS=ubuntu DIST=artful PACKAGE=deb
-          #    - OS=ubuntu DIST=xenial PACKAGE=deb
-          #    - OS=fedora DIST=26 PACKAGE=rpm
-          #    - OS=fedora DIST=25 PACKAGE=rpm
+    - OS=debian DIST=jessie PACKAGE=deb
+    - OS=debian DIST=stretch PACKAGE=deb
+    - OS=ubuntu DIST=trusty PACKAGE=deb
+    - OS=ubuntu DIST=artful PACKAGE=deb
+    - OS=ubuntu DIST=xenial PACKAGE=deb
+    - OS=fedora DIST=26 PACKAGE=rpm
+    - OS=fedora DIST=25 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
 install:
         - sudo apt-get update
@@ -26,7 +26,7 @@ deploy:
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
-      branch: auto-build
+      branch: master
   - provider: packagecloud
     skip_cleanup: true
     repository: asbru-cm
