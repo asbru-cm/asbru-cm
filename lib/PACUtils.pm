@@ -1305,7 +1305,7 @@ sub _wEnterValue {
 		
 		if ( @list ) {
 			# Create combobox widget
-			$w{window}{gui}{comboList} = Gtk3::ComboBox -> new_text;
+			$w{window}{gui}{comboList} = Gtk3::ComboBoxText -> new;
 			$w{window}{data} -> vbox -> pack_start( $w{window}{gui}{comboList}, 0, 1, 0 );
 			$w{window}{gui}{comboList} -> set_property( 'can_focus', 0 );
 			foreach my $text ( @list ) { $w{window}{gui}{comboList} -> append_text( $text ) };

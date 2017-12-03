@@ -569,7 +569,7 @@ sub _initGUI {
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_BTNLOCALTERMINALEXEC}, 0, 1, 0 );
 			
 			# Create a GtkComboBox and add it to $macrosbox
-			$$self{_GUI}{_CBLOCALEXECTERMINAL} = Gtk3::ComboBox -> new_text;
+			$$self{_GUI}{_CBLOCALEXECTERMINAL} = Gtk3::ComboBoxText -> new;
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_size_request( 200, -1 ); # Limit combobox hsize!!
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_sensitive( 0 );
@@ -584,7 +584,7 @@ sub _initGUI {
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0 );
 			
 			# Create a GtkComboBox and add it to $macrosbox
-			$$self{_GUI}{_CBMACROSTERMINAL} = Gtk3::ComboBox -> new_text;
+			$$self{_GUI}{_CBMACROSTERMINAL} = Gtk3::ComboBoxText -> new;
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_property( 'can_focus', 0 );
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_size_request( 200, -1 ); # Limit combobox hsize!!
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_sensitive( 0 );

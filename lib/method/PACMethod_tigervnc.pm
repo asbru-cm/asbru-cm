@@ -202,7 +202,7 @@ sub _buildGUI
 			$w{hbox1} -> pack_start( $w{frColour}, 1, 1, 0 );
 			$w{frColour} -> set_tooltip_text( 'Select the reduced colour level, or leave as automatic' );
 				
-				$w{cbColours} = Gtk3::ComboBox -> new_text;
+				$w{cbColours} = Gtk3::ComboBoxText -> new;
 				$w{frColour} -> add( $w{cbColours} );
 				foreach my $depth ( 8, 64, 256, 'AutoSelect' ) { $w{cbColours} -> append_text( $depth ); };
 		

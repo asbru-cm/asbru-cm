@@ -220,7 +220,7 @@ sub _buildGUI {
 			$w{frDepth} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			$w{frDepth} -> set_tooltip_text( '[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits per pixel)' );
 				
-				$w{cbDepth} = Gtk3::ComboBox -> new_text;
+				$w{cbDepth} = Gtk3::ComboBoxText -> new;
 				$w{frDepth}  -> add( $w{cbDepth} );
 				foreach my $depth ( 8, 15, 16, 24, 32, 'default' ) { $w{cbDepth} -> append_text( $depth ); };
 			
