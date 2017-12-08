@@ -99,7 +99,7 @@ mkdir -p %{buildroot}/%{_datadir}/{%{name}/{lib,res},applications}
 mkdir -p %{buildroot}/%{_bashcompletiondir}
 mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/{24x24,64x64,256x256,scalable}/apps
 
-install -m 755 asbru %{buildroot}/%{_bindir}/%{name}
+install -m 755 asbru-cm %{buildroot}/%{_bindir}/%{name}
 install -m 755 utils/pac_from_mcm.pl %{buildroot}/%{_bindir}/%{name}_from_mcm
 install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putty
 
