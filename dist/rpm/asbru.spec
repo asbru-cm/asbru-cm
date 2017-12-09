@@ -95,7 +95,7 @@ install -m 755 utils/pac_from_mcm.pl %{buildroot}/%{_bindir}/%{name}_from_mcm
 install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putty
 
 cp -a res/asbru.desktop %{buildroot}/%{_datadir}/applications/%{name}.desktop
-cp -a res/pac.1 %{buildroot}/%{_mandir}/man1/%{name}.1
+cp -a res/asbru-cm.1 %{buildroot}/%{_mandir}/man1/%{name}.1
 cp -a res/asbru_bash_completion %{buildroot}/%{_bashcompletiondir}/%{name}
 
 # Copy the icons over to /usr/share/icons/

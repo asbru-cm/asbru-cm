@@ -1,10 +1,15 @@
 # Ásbrú Connection Manager
 
-<img alt="Ásbrú Connection Manager" src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" style="float: right; width: 200px;">
+[![Travis][travis-badge]][travis-url]
+[![License][license-badge]][license-url]
+[![RPM Packages][rpm-badge]][rpm-url]
+[![Debian Packages][deb-badge]][deb-url]
+
+[<img alt="Ásbrú Connection Manager" src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" aligh="right" width="200" height="200">][Ásbrú Connection Manager]
 
 ## A free and open-source connection manager
 
-Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
+**Ásbrú Connection Manager** is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 
 ### Features
 
@@ -86,3 +91,12 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 The repositories for our RPM and DEB builds are thankfully sponsored by packagecloud. A great thanks to them.
 
 <a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
+
+[travis-badge]: https://travis-ci.org/asbru-cm/asbru-cm.svg?branch=master
+[travis-url]: https://travis-ci.org/asbru-cm/asbru-cm
+[license-badge]: https://img.shields.io/badge/License-GPL--3-orange.svg?style=flat
+[license-url]: LICENSE
+[deb-badge]: https://img.shields.io/badge/Packages-Debian-red.svg?style=flat
+[deb-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=debs
+[rpm-badge]: https://img.shields.io/badge/Packages-RPM-blue.svg?style=flat
+[rpm-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=rpms
