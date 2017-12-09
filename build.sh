@@ -5,7 +5,6 @@ if [ -z "$TRAVIS_TAG" ]; then
 	export VERSION=$APPVERSION~$(date +"%s");
 	echo "No Travis Tag set. We are using a timestamp in seconds: ${VERSION}"
 fi
-exit
 
 cp -r dist/${PACKAGE}/* .
 
