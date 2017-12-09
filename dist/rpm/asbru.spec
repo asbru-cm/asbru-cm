@@ -74,16 +74,7 @@ find . -type f -exec sed -i \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
   -e 's|/\.\.\(/\)|\1|' \
   '{}' \+
-sed -ri -e '/^(Exec|Icon)=/{s|pac|%{name}|}' \
-        -e 's|(^Categories=).*|\1GTK;Network;|' \
-        -e 's|(^Actions=.*;)|\1Tray;|' res/asbru.desktop
-sed -ri 's|([\t_ ]*)pac([ ]*)|\1%{name}\2|g' res/pac_bash_completion
-cat <<EOF >> res/asbru.desktop
-[Desktop Action Tray]
-Name=Start %{name} in system tray
-Exec=%{name} --iconified
-EOF
-cat res/asbru.desktop
+
 
 %build
 
@@ -105,7 +96,7 @@ install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putt
 
 cp -a res/asbru.desktop %{buildroot}/%{_datadir}/applications/%{name}.desktop
 cp -a res/pac.1 %{buildroot}/%{_mandir}/man1/%{name}.1
-cp -a res/pac_bash_completion %{buildroot}/%{_bashcompletiondir}/%{name}
+cp -a res/asbru_bash_completion %{buildroot}/%{_bashcompletiondir}/%{name}
 
 # Copy the icons over to /usr/share/icons/
 cp -a res/asbru-logo-24.png %{buildroot}/%{_datadir}/icons/hicolor/24x24/apps/%{name}.png

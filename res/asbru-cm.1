@@ -1,0 +1,137 @@
+.\" Preview this file with
+.\" groff -man -Tascii asbru-cm.1
+.\" Copy to /usr/share/man/man1
+.\"
+.TH asbru-cm 1 "MARCH 2013" Linux "User Manuals"
+.SH "NAME"
+asbru-cm \- Ásbrú Connection Manager
+.SH SYNOPSIS
+.B asbru-cm [options]
+.SH "DESCRIPTION"
+.B asbru-cm
+is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
+.br
+.SH "FEATURES"
+- Simple GUI to manage/launch connections to remote machines
+.br
+- Scripting possibilities, 'ala' SecureCRT
+.br
+- Configurable [Pre|Post]-connection local commands execution
+.br
+- Configurable list of macros (commands) to execute locally when connected or to send to connected client
+.br
+- Configurable list of conditional executions on connected machine via 'Expect':
+.br
+	. forget about SSH certificates
+.br
+	. chain multiple ssh connections
+.br
+	. automate tunnels creation
+.br
+	. with line-send delay capabilities
+.br
+- KeePassX integration
+.br
+- Ability to connect to machines through a Proxy server
+.br
+- Cluster connections
+.br
+- Tabbed/Windowed terminals
+.br
+- Wake On LAN capabilities
+.br
+- Local and global variables, eg.: write down a password once, use it everywhere, centralizing its modification for faster changes! use them for: 
+.br
+	. password vault
+.br
+	. reusing connection strings
+.br
+- Seamless Gnome/Gtk integration
+.br
+- Tray icon for quick launching connections
+.br
+- Statistics on connection use
+.br
+- Connection screenshots.
+.br
+- DEB, RPM and .TAR.GZ packages available
+.br
+.SH "LICENSE"
+Ásbrú Connection Manager is licensed under the GNU General Public License version 3 http://www.gnu.org/licenses/gpl-3.0.html. A full copy of the license can be found in the LICENSE file.
+.br
+.SH "OPTIONS"
+.IP --help
+ this help
+.IP --no-backup
+ do no create alternative config files as a backup (faster shutdown)
+.IP --start-shell
+ start a local terminal
+.IP --start-uuid=<uuid>[:<cluster]
+ start connection in cluster (if given)
+.IP --edit-uuid=<uuid>
+ edit connection
+.IP --start-script=<script>
+ start given script
+.IP --password=<pwd>
+ automatically logon with given password without prompting user
+.IP --dump-uuid=<uuid>
+ dump given UUID's data
+.IP --scripts
+ open scripts window
+.IP --preferences
+ open global preferences dialog
+.IP --quick-conn
+ open the Quick Connect dialog on startup
+.IP --list-uuids
+ list existing connections/groups and their UUIDs
+.IP --no-splash
+ no splash screen on startup
+.IP --iconified
+ go to tray once started
+.IP --readonly
+ start in read only mode (no config changes allowed)
+.SH FILES
+.I ~/.config/pac/
+.RS
+Per user configuration directory.
+.SH "ENVIRONMENT"
+Uses next Gnome's configuration paths:
+.IP
+/system/http_proxy/host
+or
+/system/proxy/http/host
+ - Takes this proxy path
+.IP
+/system/http_proxy/port
+or
+/system/proxy/http/port
+ - Takes this proxy port
+.IP
+/system/http_proxy/authentication_user
+or
+/system/proxy/http/host/authentication-user
+ - Takes this proxy user name
+.IP
+/system/http_proxy/authentication_password
+or
+/system/proxy/http/host/authentication-password
+ - Takes this proxy password
+.SH "CONTRIBUTING"
+If you want to contribute to Ásbrú Connection Manager, first check out the issues published on https://github.com/asbru-cm/asbru-cm/issues and see if your request is not listed yet. Issues and pull requests will be triaged and responded to as quickly as possible.
+.SH "HOME PAGE"
+https://asbru-cm.net
+.br
+.SH "COPYRIGHT"
+(C) 2017 Ásbrú Connection Manager team <contact@asbru-cm.net>
+.br
+(C) 2010-2016 David Torrejon Vaquerizas
+.br
+.SH "SEE ALSO"
+.BR ssh (1),
+.BR sftp (1),
+.BR telnet (1)
+.BR rdesktop (1)
+.BR vncviewer (1)
+.BR remote-tty (1)
+.BR cu (1)
+
