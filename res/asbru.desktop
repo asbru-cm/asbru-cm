@@ -2,13 +2,13 @@
 Name=Ásbrú Connection Manager
 Comment=Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 Terminal=false
-Icon=asbru
+Icon=asbru-cm
 Type=Application
 Exec=asbru-cm
 StartupNotify=true
-Categories=Applications;Network;
+Categories=Utility;TerminalEmulator;GTK;
 X-GNOME-Autostart-enabled=false
-Actions=Shell;Quick;ReadOnly;
+Actions=Shell;Quick;ReadOnly;Tray;
 
 [Desktop Action Shell]
 Name=Start local shell
@@ -21,3 +21,7 @@ Exec=asbru-cm --quick-conn
 [Desktop Action ReadOnly]
 Name=Start Read-Only instance
 Exec=asbru-cm --readonly --no-backup
+
+[Desktop Action Tray]
+Name=Start in system tray
+Exec=asbru-cm --iconified

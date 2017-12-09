@@ -1,0 +1,22 @@
+_asbru_commands()
+{
+	asbru-cm --help | sed -e '1,/^Options:/d' -e '/^See /Q' -e 's/^[\t]\+\(--[^=]\+\)\(=.\+\)* : .*/\1/g' -e 's/^\(.\+\)=.\+/\1=/g' | uniq
+}
+
+have asbru-cm &&
+_asbru()
+{
+	cur=${COMP_WORDS[COMP_CWORD]}
+	prev=${COMP_WORDS[COMP_CWORD-1]}
+	COMPREPLY=()
+	if [[ "$cur" == "" ]] ; then
+		options=$(_asbru_commands)
+	elif [[ "$cur" == -* ]] ; then
+		options=$(_asbru_commands)
+	fi
+
+	COMPREPLY=( $( compgen -W "$options" -- ${cur} ) )
+}
+
+[ "$have" ] && complete -F _asbru asbru-cm
+
