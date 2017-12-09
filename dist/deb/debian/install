@@ -2,7 +2,6 @@ asbru-cm /opt/asbru/
 lib /opt/asbru/
 res /opt/asbru/
 utils /opt/asbru/
-res/asbru.desktop /usr/share/applications/
+res/asbru-cm.desktop /usr/share/applications/
 res/asbru-cm.1 /usr/share/man/man1/
 res/asbru_bash_completion /etc/bash_completion.d/
-res/asbru-logo.svg /usr/share/icons/hicolor/scalable/apps/asbru-cm.svg
