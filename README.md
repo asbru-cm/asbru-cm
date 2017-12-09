@@ -86,17 +86,17 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 
 Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
 
-### packagecloud
+### Packages
 
-The repositories for our RPM and DEB builds are thankfully sponsored by packagecloud. A great thanks to them.
+The repositories for our RPM and DEB builds are thankfully sponsored by [packagecloud](https://packagecloud.io/). A great thanks to them.
 
-<a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository | packagecloud" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
+<a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
 
 [travis-badge]: https://travis-ci.org/asbru-cm/asbru-cm.svg?branch=master
 [travis-url]: https://travis-ci.org/asbru-cm/asbru-cm
-[license-badge]: https://img.shields.io/badge/License-GPL--3-orange.svg?style=flat
+[license-badge]: https://img.shields.io/badge/License-GPL--3-blue.svg?style=flat
 [license-url]: LICENSE
-[deb-badge]: https://img.shields.io/badge/Packages-Debian-red.svg?style=flat
+[deb-badge]: https://img.shields.io/badge/Packages-Debian-blue.svg?style=flat
 [deb-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=debs
 [rpm-badge]: https://img.shields.io/badge/Packages-RPM-blue.svg?style=flat
 [rpm-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=rpms
