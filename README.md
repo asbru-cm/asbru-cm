@@ -5,7 +5,7 @@
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
 
-[<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" aligh="right" width="200px" height="200px" />][Ásbrú Connection Manager]
+[<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
 
 ## A free and open-source connection manager
 
