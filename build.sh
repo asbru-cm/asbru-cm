@@ -2,9 +2,10 @@
 
 if [ -z "$TRAVIS_TAG" ]; then
 	eval "$(egrep -o 'APPVERSION.*=.*' lib/PACUtils.pm | tr -d '[:space:]')"
-	export VERSION=$APPVERSION~$(git log -1 | grep -i "^commit" | awk '{print $2}');
-	echo "No Travis Tag set. We are guessing a version number from the git log: ${VERSION}"
+	export VERSION=$APPVERSION~$(date +"%s");
+	echo "No Travis Tag set. We are using a timestamp in seconds: ${VERSION}"
 fi
+exit
 
 cp -r dist/${PACKAGE}/* .
 
