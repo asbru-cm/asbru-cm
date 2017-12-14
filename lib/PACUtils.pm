@@ -1417,7 +1417,7 @@ sub _wAddRenameNode {
 	} elsif ( $action eq 'add' ) {
 		$name			= '';
 		$parent_name	= $$cfg{'environments'}{ $uuid }{'name'};
-		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : "$parent_name - ";
+		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ");
 		$lblup			= "<b>Adding new node into '" . ( $uuid eq '__PAC__ROOT__' ? 'ROOT' : "$parent_name" ) . "'</b>";
 	}
 	
@@ -1471,7 +1471,7 @@ sub _wAddRenameNode {
 			$w{window}{gui}{entry1} -> set_text( $name );
 			$w{window}{gui}{entry1} -> set_activates_default( 1 );
 			$w{window}{gui}{entry1} -> signal_connect( 'changed', sub {
-				$w{window}{gui}{entry2} -> set_text( ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : "$parent_name - " ) . $w{window}{gui}{entry1} -> get_chars( 0, -1 ) );
+				$w{window}{gui}{entry2} -> set_text( ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ") ) . $w{window}{gui}{entry1} -> get_chars( 0, -1 ) );
 			} );
 		
 		# Create an HBox to contain a label and an entry
