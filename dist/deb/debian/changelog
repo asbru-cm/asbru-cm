@@ -1,3 +1,9 @@
+asbru-cm (5.0.0-1) stable; urgency=medium
+
+  * Upstream 5.0.0 release
+
+ -- Klaas tammling <klaas@tammling.hamburg> Fri, 29 Dec 2017 10:55:29 +0100
+
 asbru-cm (5.0.0~rc4-1) unstable; urgency=medium
 
   * Upstream RC4 release
