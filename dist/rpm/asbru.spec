@@ -136,7 +136,7 @@ fi
 
 
 %changelog
-* Fri Dec 29 2017 Asbru Project Team <info@asbru-cm.net> 5.0.0
+* Fri Dec 29 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0
 - Final 5.0.0 release
-* Sat Nov 4 2017 Asbru Project Team <info@asbru-cm.net> 5.0.0
+* Sat Nov 4 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0
 - Initial packaging of Ásbrú Connection Manager RPM
