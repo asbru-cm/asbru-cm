@@ -4,6 +4,9 @@ if [ -z "$TRAVIS_TAG" ]; then
 	eval "$(egrep -o 'APPVERSION.*=.*' lib/PACUtils.pm | tr -d '[:space:]')"
 	export VERSION=$APPVERSION~$(date +"%s");
 	echo "No Travis Tag set. We are using a timestamp in seconds: ${VERSION}"
+else
+	export VERSION=$TRAVIS_TAG
+	echo "Our version will be the tag ${VERSION}"
 fi
 
 cp -r dist/${PACKAGE}/* .
