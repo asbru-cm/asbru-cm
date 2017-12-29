@@ -5,7 +5,7 @@ services:
 env:
   global:
     - CHANGELOG_NAME=Asbru-CM Team
-    - CHANGELOG_EMAIL=info@asbru-cm.net
+    - CHANGELOG_EMAIL=contact@asbru-cm.net
     - PRODUCT=asbru-cm
   matrix:
     - OS=debian DIST=jessie PACKAGE=deb
