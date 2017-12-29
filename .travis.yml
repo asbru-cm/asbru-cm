@@ -3,6 +3,10 @@ language: perl
 services:
         - docker
 env:
+  global:
+    - CHANGELOG_NAME=Asbru-CM Team
+    - CHANGELOG_EMAIL=info@asbru-cm.net
+    - PRODUCT=asbru-cm
   matrix:
     - OS=debian DIST=jessie PACKAGE=deb
     - OS=debian DIST=stretch PACKAGE=deb
