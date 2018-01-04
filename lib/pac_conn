@@ -1545,7 +1545,13 @@ elsif ( ! $MANUAL ) {
 				
 				$command = subst( $command );
 				
-				# ... and launch command
+				# Disconnect if an error occured during command substitution (eg: when user cancelled data entry)
+				if ( not defined($command) ) {
+					$CONNECTED = 0;
+					last;
+				}
+
+				# otherwise launch command
 				if ( $hide ) {
 					ctrl( "EXPECT:SENDING:<<HIDDEN STRING>>" . ( $return ? '\n' : '' ) );
 					$EXP -> log_stdout( 0 );
