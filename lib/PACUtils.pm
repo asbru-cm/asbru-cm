@@ -1896,7 +1896,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'prevent F11'}					//= 0;
 	$$cfg{'defaults'}{'autostart shell upon start'}	//= 0;
 	$$cfg{'defaults'}{'tree on right side'}				//= 0;
-	$$cfg{'defaults'}{'prevent mouse over show tree'}	//= 0;
+	$$cfg{'defaults'}{'prevent mouse over show tree'}	//= 1;
 	$$cfg{'defaults'}{'start PAC tree on'}				//= 'connections';
 	$$cfg{'defaults'}{'show connections tooltips'}		//= 0;
 	$$cfg{'defaults'}{'hide connections submenu'}		//= 0;

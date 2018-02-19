@@ -567,7 +567,7 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgAutoStartShell' )		-> set_active( $$cfg{'defaults'}{'autostart shell upon PAC start'} );
 	_( $self, 'cbCfgTreeOnRight' )			-> set_active( $$cfg{'defaults'}{'tree on right side'} );
 	_( $self, 'cbCfgTreeOnLeft' )			-> set_active( ! $$cfg{'defaults'}{'tree on right side'} );
-	_( $self, 'cbCfgPreventMOShowTree' )	-> set_active( $$cfg{'defaults'}{'prevent mouse over show tree'} );
+	_( $self, 'cbCfgPreventMOShowTree' )	-> set_active( ! $$cfg{'defaults'}{'prevent mouse over show tree'} );
 	_( $self, 'rbCfgStartTreeConn' )		-> set_active( $$cfg{'defaults'}{'start PAC tree on'} eq 'connections' );
 	_( $self, 'rbCfgStartTreeFavs' )		-> set_active( $$cfg{'defaults'}{'start PAC tree on'} eq 'favourites' );
 	_( $self, 'rbCfgStartTreeHist' )		-> set_active( $$cfg{'defaults'}{'start PAC tree on'} eq 'history' );
@@ -788,7 +788,7 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'prevent F11'}						= _( $self, 'cbCfgPreventF11' )				-> get_active;
 	$$self{_CFG}{'defaults'}{'autostart shell upon PAC start'}	= _( $self, 'cbCfgAutoStartShell' )			-> get_active;
 	$$self{_CFG}{'defaults'}{'tree on right side'}				= _( $self, 'cbCfgTreeOnRight' )			-> get_active;
-	$$self{_CFG}{'defaults'}{'prevent mouse over show tree'}	= _( $self, 'cbCfgPreventMOShowTree' )		-> get_active;
+	$$self{_CFG}{'defaults'}{'prevent mouse over show tree'}	= ! _( $self, 'cbCfgPreventMOShowTree' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'show connections tooltips'}		= _( $self, 'cbCfgShowTreeTooltips' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'hide connections submenu'}		= _( $self, 'cbCfgHideConnSubMenu' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'tree font'}						= _( $self, 'fontTree' )					-> get_font_name;
