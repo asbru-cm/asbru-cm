@@ -734,7 +734,6 @@ sub _setupCallbacks {
 	
 	$$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE} -> signal_connect( 'motion_notify_event', sub {
 		return 0 if $$self{_CFG}{'defaults'}{'prevent mouse over show tree'};
-		return 0 unless $$self{'_CFG'}{'defaults'}{'auto hide connections list'} && $$self{_TABBED};
 		my @geo = $$self{_GUI}{_VTE} -> window -> get_geometry;
 		if ( $$self{_CFG}{defaults}{'tree on right side'} ) {
 			return 0 if ( $$self{_SPLIT_VPANE} && ( ( $$self{_SPLIT_VPANE} -> get_child1 ) eq $$self{_GUI}{_VBOX} ) && ! $$self{_SPLIT_VERTICAL} );

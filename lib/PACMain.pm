@@ -1901,9 +1901,6 @@ sub _setupCallbacks {
 	$$self{_GUI}{nb} -> signal_connect( 'switch_page' => sub {
 		my ( $nb, $p, $pnum ) = @_;
 		
-		#if ( $pnum == 0 && $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 1 ); }
-		#elsif ( $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 0 ); }
-		
 		$$self{_PREVTAB}=$nb->get_current_page;
 
 		my $tab_page = $nb -> get_nth_page( $pnum );
@@ -1932,8 +1929,6 @@ sub _setupCallbacks {
 			$$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
 			last;
 		}
-		
-		$$self{_GUI}{showConnBtn} -> set_active( ( $pnum == 0 ) || ( $pnum && $$self{_CFG}{defaults}{'tabs in main window'} && ! $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) );
 		
 		return 1;
 	} );
@@ -3264,8 +3259,6 @@ sub _updateGUIPreferences {
 	$$self{_GUI}{nb}				-> set_tab_pos( $$self{_CFG}{'defaults'}{'tabs position'} );
 	$$self{_GUI}{treeConnections}	-> set_enable_tree_lines( $$self{_CFG}{'defaults'}{'enable tree lines'} );
 	$$self{_GUI}{descView}			-> modify_font( Pango::FontDescription -> from_string( $$self{_CFG}{'defaults'}{'info font'} ) );
-	
-	$$self{_GUI}{showConnBtn} -> set_active( ! ( ( $$self{_CFG}{'defaults'}{'auto hide connections list'} && $$self{_GUI}{nb} -> get( 'page') ) ) );
 	
 	if ( $UNITY ) {
 		( ! $$self{_GUI}{main} -> visible || $$self{_CFG}{defaults}{'show tray icon'} ) ? $$self{_TRAY}{_TRAY} -> set_active : $$self{_TRAY}{_TRAY} -> set_passive;

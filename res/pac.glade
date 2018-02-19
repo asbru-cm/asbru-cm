@@ -928,12 +928,12 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <child>
                                   <widget class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
-                                    <property name="label" translatable="yes">Auto hide connections list on Terminal Open</property>
+                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">If checked, this option will make the Connections Tree to be hidden (increasing the space usable for the tabbed terminals</property>
+                                    <property name="tooltip" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="draw_indicator">True</property>
                                   </widget>
@@ -945,10 +945,12 @@ connecting (timeout is in seconds)</property>
                                 </child>
                                 <child>
                                   <widget class="GtkCheckButton" id="cbCfgPreventMOShowTree">
-                                    <property name="label" translatable="yes">Prevent connections from appearing on mouse over</property>
+                                    <property name="label" translatable="yes">Auto show/hide when entering/leaving connections list</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip" translatable="yes">If checked, the connections list will be shown/hidden when the mouse enters/leaves the connections list area.</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="draw_indicator">True</property>
                                   </widget>
