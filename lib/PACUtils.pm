@@ -1833,7 +1833,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'shell options'}					//= '-login';
 	$$cfg{'defaults'}{'shell directory'}				//= $ENV{'HOME'};
 	$$cfg{'defaults'}{'tabs position'}					//= 'top';
-	$$cfg{'defaults'}{'auto save'}						//= 0;
+	$$cfg{'defaults'}{'auto save'}						//= 1;
 	$$cfg{'defaults'}{'save on exit'}					//= 0;
 	$$cfg{'defaults'}{'start iconified'}				//= 0;
 	$$cfg{'defaults'}{'start maximized'}				//= 0;

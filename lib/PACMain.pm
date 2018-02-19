@@ -307,6 +307,9 @@ sub start {
 	Gtk2::Gdk -> notify_startup_complete;
 	Glib::Idle -> add( sub {_splash( 0 ); return 0; } );
 	
+	# Show main interface
+	$$self{_GUI}{main} -> show_all;
+	
 	# Autostart selected connections
 	my @idx;
 	grep( { $$self{_CFG}{'environments'}{$_}{'startup launch'} and push( @idx, [ $_ ] ); }	keys %{ $$self{_CFG}{'environments'} } );
@@ -330,7 +333,6 @@ sub start {
 		}
 	}
 	
-	$$self{_GUI}{main} -> show_all;
 	if ( ! $$self{_CFG}{defaults}{'start iconified'} && ! $$self{_CMDLINETRAY} )	{ $$self{_GUI}{main} -> present; }
 	else												{ $self -> _hideConnectionsList; }
 	
@@ -767,7 +769,6 @@ sub _initGUI {
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{saveBtn}, 1, 1, 0 );
 						$$self{_GUI}{saveBtn} -> set( 'can-focus' => 0 );
 						$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
-						$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Save current configuration' );
 						
 						# Create [un]lockBtn button
 						$$self{_GUI}{lockPACBtn} = Gtk2::ToggleButton -> new;
@@ -1622,7 +1623,9 @@ sub _setupCallbacks {
 		return 1;
 	} );
 	
+  print("reg toggle...\n");
 	$$self{_GUI}{showConnBtn} -> signal_connect( 'toggled' => sub {
+  print("do toggle [" . ($$self{_GUI}{showConnBtn} -> get_active()) . "]...\n");
 		$$self{_GUI}{showConnBtn} -> get_active ? $$self{_GUI}{vbox3} -> show : $$self{_GUI}{vbox3} -> hide;
 		$$self{_GUI}{treeConnections} -> grab_focus if $$self{_GUI}{showConnBtn} -> get_active;
 		return 1;
@@ -2737,11 +2740,18 @@ sub _launchTerminals {
 		$$self{_GUI}{main} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
 		$$self{_GUI}{main} -> set_sensitive( 0 );
 	}
+
+  print $$self{_GUI}{showConnBtn} -> get_active() . "\n";
+
 	
 	# Check if user wants main window to be close when a terminal comes up
 	( $$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'} ) and $self -> _hideConnectionsList;
 	( $$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'} ) and $$self{_GUI}{showConnBtn} -> set_active( 0 );
 	
+  print $$self{_CFG}{'defaults'}{'tabs in main window'} . "\n";
+  print $$self{_CFG}{'defaults'}{'auto hide connections list'} . "\n";
+  print $$self{_GUI}{showConnBtn} -> get_active() . "\n";
+  
 	my $wtmp;
 	scalar( @{ $terminals } ) > 1 and $wtmp = _wMessage( $$self{_GUI}{main}, "Starting '<b><big>". ( scalar( @{ $terminals } ) ) . "</big></b>' terminals...", 0 );
 	
@@ -3268,13 +3278,9 @@ sub _updateGUIPreferences {
 	
 	$$self{_GUI}{lockPACBtn} -> set_sensitive( $$self{_CFG}{'defaults'}{'use gui password'} );
 	
-	$$self{_CFG}{defaults}{'auto save'} and $$self{_GUI}{saveBtn} -> set_label( 'Auto saving ACTIVE' );
 	$self -> _updateGUIWithUUID( $sel_uuids[0] ) if $total == 1;
 	
-	if ( $$self{_READONLY} ) {
-		$$self{_GUI}{saveBtn} -> set_label( 'READ ONLY INSTANCE' );
-		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
-	}
+	$self -> _setCFGChanged( 1 );
 	
 	return 1;
 }
@@ -4152,11 +4158,14 @@ sub _setCFGChanged {
 		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
 	} elsif ( $$self{_CFG}{defaults}{'auto save'} ) {
 		$$self{_GUI}{saveBtn} -> set_label( 'Auto saving ACTIVE' );
+		$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Every configuration change will be saved automatically.  You can disable this feature in Preferences > Main Options.' );
+		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
 		$self -> _saveConfiguration( undef, 0 );
 	} else {
 		$$self{_CFG}{tmp}{changed} = $stat;
 		$$self{_GUI}{saveBtn} -> set_sensitive( $stat );
 		$$self{_GUI}{saveBtn} -> set_label( '_Save' );
+		$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Save your configuration' );
 	}
 	return 1;
 }
