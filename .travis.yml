@@ -16,6 +16,7 @@ env:
     - OS=fedora DIST=27 PACKAGE=rpm DOCKER_IMAGE=fedora-rawhide
     - OS=fedora DIST=26 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
+    - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
 install:
         - sudo apt-get update
         - sudo apt-get install git devscripts debhelper quilt
