@@ -3,7 +3,6 @@ _asbru_commands()
 	asbru-cm --help | sed -e '1,/^Options:/d' -e '/^See /Q' -e 's/^[\t]\+\(--[^=]\+\)\(=.\+\)* : .*/\1/g' -e 's/^\(.\+\)=.\+/\1=/g' | uniq
 }
 
-have asbru-cm &&
 _asbru()
 {
 	cur=${COMP_WORDS[COMP_CWORD]}
@@ -18,5 +17,4 @@ _asbru()
 	COMPREPLY=( $( compgen -W "$options" -- ${cur} ) )
 }
 
-[ "$have" ] && complete -F _asbru asbru-cm
-
+complete -F _asbru asbru-cm
