@@ -15,8 +15,6 @@ env:
     - OS=ubuntu DIST=xenial PACKAGE=deb
     - OS=fedora DIST=27 PACKAGE=rpm DOCKER_IMAGE=fedora-rawhide
     - OS=fedora DIST=26 PACKAGE=rpm
-    - OS=centos DIST=6 PACKAGE=rpm
-    - OS=centos DIST=7 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
 install:
         - sudo apt-get update
