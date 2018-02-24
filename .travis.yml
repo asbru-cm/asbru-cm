@@ -10,6 +10,7 @@ env:
   matrix:
     - OS=debian DIST=jessie PACKAGE=deb
     - OS=debian DIST=stretch PACKAGE=deb
+    - OS=debian DIST=stretch PACKAGE=deb ARCH=armhf
     - OS=ubuntu DIST=trusty PACKAGE=deb
     - OS=ubuntu DIST=artful PACKAGE=deb
     - OS=ubuntu DIST=xenial PACKAGE=deb
