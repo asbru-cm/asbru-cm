@@ -1,4 +1,4 @@
-%define _bashcompletiondir %(pkg-config --variable=completionsdir bash-completion)
+%define _bashcompletiondir /usr/share/bash-completion/completions
 
 Name:       asbru-cm
 Version:    %{_version}
