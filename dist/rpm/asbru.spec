@@ -58,7 +58,7 @@ Requires:   vte
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
-BuildRequires: pkg-config
+BuildRequires: pkgconfig
 BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %description
