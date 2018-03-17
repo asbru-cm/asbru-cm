@@ -2330,7 +2330,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="has_tooltip">True</property>
-                    <property name="tooltip_text" translatable="yes">EXPECT remote patterns AND-THEN-EXECUTE remote commands</property>
                     <property name="label" translatable="yes">Expect</property>
                   </object>
                   <packing>
@@ -3751,13 +3750,13 @@ connecting (timeout is in seconds)</property>
                                 <property name="orientation">vertical</property>
                                 <child>
                                   <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
-                                    <property name="label" translatable="yes">Auto hide connections list on Terminal Open</property>
+                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, this option will make the Connections Tree to be hidden (increasing the space usable for the tabbed terminals</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
@@ -3769,11 +3768,13 @@ connecting (timeout is in seconds)</property>
                                 </child>
                                 <child>
                                   <object class="GtkCheckButton" id="cbCfgPreventMOShowTree">
-                                    <property name="label" translatable="yes">Prevent connections from appearing on mouse over</property>
+                                    <property name="label" translatable="yes">Auto show/hide when entering/leaving connections list</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be shown/hidden when the mouse enters/leaves the connections list area.</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>

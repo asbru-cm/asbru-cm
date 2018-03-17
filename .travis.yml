@@ -3,15 +3,20 @@ language: perl
 services:
         - docker
 env:
+  global:
+    - CHANGELOG_NAME=Asbru-CM Team
+    - CHANGELOG_EMAIL=contact@asbru-cm.net
+    - PRODUCT=asbru-cm
   matrix:
     - OS=debian DIST=jessie PACKAGE=deb
     - OS=debian DIST=stretch PACKAGE=deb
     - OS=ubuntu DIST=trusty PACKAGE=deb
     - OS=ubuntu DIST=artful PACKAGE=deb
     - OS=ubuntu DIST=xenial PACKAGE=deb
+    - OS=fedora DIST=27 PACKAGE=rpm DOCKER_IMAGE=fedora-rawhide
     - OS=fedora DIST=26 PACKAGE=rpm
-    - OS=fedora DIST=25 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
+    - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
 install:
         - sudo apt-get update
         - sudo apt-get install git devscripts debhelper quilt
@@ -20,9 +25,8 @@ deploy:
   - provider: packagecloud
     skip_cleanup: true
     repository: snapshots
-    username: asbru-cm
-    token:
-      secure: ZkwM5okisd28XRj8QSiKLMVKf0kKJVnRiWYAlmtwLo46KueWl4C/sEm4LvZA2qJ7E5FMU7eUEkCmsIPsfYWgyKivSBtLlMT64wwt44d33FXcQ6oMeLFb4MiaH9nbnRseaxI3Zq6ux+Rg5zAq3H9WmWQbKPadoYQM328KLlEQCGnzysCb52Uwh+k0VlZG93k7lzyo5Y9Jl/Arsb2Y0VimRcC9ZIUFzQl08xQoaz5Nb3AY6uSn/J1d7iuTDAL3pkenlF63YnjoN0xf1ywZ61HYnfVxBVP4l5UiqYoLw2nIODBjSITTIttFVh2rQdgffFsdDCsSesoqGnf68HpY5LRVeYfhb29AEId0v6SGUdeD8axKQbXpHxkgMWFMzdtIkrmg8njKjplZgIPV2bE6dg6HHrXdlUZuG/HHCeQlCr75/luBo4dhXOLEzOJmeR6cezmxd4UEI8IxrNqT+jjPLn0jr8TaK/tDA+wGD3aSScAaInBkWdgXBz+koXLEpAi7JBkw88d4Bcrxu1aBQ55834afaDgU1UH8sSg/HGlXdKZBzr3B9wt4NId//fcGqzKfAm3xQMSou0o6yxbj2Qy9TujE2Z0ejStSyMYRZYUoqPSXKVvK1K9bytkV3gftWekZRZ2y9Zjec7c6sUt2a20xAWsT1gHYyaHemayFtuqIpl2bLI4=
+    username: ${PACKAGECLOUD_USER}
+    token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
@@ -30,10 +34,15 @@ deploy:
   - provider: packagecloud
     skip_cleanup: true
     repository: asbru-cm
-    username: asbru-cm
-    token:
-      secure: ZkwM5okisd28XRj8QSiKLMVKf0kKJVnRiWYAlmtwLo46KueWl4C/sEm4LvZA2qJ7E5FMU7eUEkCmsIPsfYWgyKivSBtLlMT64wwt44d33FXcQ6oMeLFb4MiaH9nbnRseaxI3Zq6ux+Rg5zAq3H9WmWQbKPadoYQM328KLlEQCGnzysCb52Uwh+k0VlZG93k7lzyo5Y9Jl/Arsb2Y0VimRcC9ZIUFzQl08xQoaz5Nb3AY6uSn/J1d7iuTDAL3pkenlF63YnjoN0xf1ywZ61HYnfVxBVP4l5UiqYoLw2nIODBjSITTIttFVh2rQdgffFsdDCsSesoqGnf68HpY5LRVeYfhb29AEId0v6SGUdeD8axKQbXpHxkgMWFMzdtIkrmg8njKjplZgIPV2bE6dg6HHrXdlUZuG/HHCeQlCr75/luBo4dhXOLEzOJmeR6cezmxd4UEI8IxrNqT+jjPLn0jr8TaK/tDA+wGD3aSScAaInBkWdgXBz+koXLEpAi7JBkw88d4Bcrxu1aBQ55834afaDgU1UH8sSg/HGlXdKZBzr3B9wt4NId//fcGqzKfAm3xQMSou0o6yxbj2Qy9TujE2Z0ejStSyMYRZYUoqPSXKVvK1K9bytkV3gftWekZRZ2y9Zjec7c6sUt2a20xAWsT1gHYyaHemayFtuqIpl2bLI4=
+    username: ${PACKAGECLOUD_USER}
+    token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       tags: true
+
+after_deploy:
+        # Prune old packages from packagecloud. The last 5 should be enough.
+        - pip install -r ./packpack/tools/requirements.txt
+        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
+        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5

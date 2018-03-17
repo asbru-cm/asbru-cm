@@ -3,7 +3,7 @@ package PACUtils;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2018 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -1352,7 +1352,7 @@ sub _wAddRenameNode {
 	} elsif ( $action eq 'add' ) {
 		$name			= '';
 		$parent_name	= $$cfg{'environments'}{ $uuid }{'name'};
-		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : "$parent_name - ";
+		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ");
 		$lblup			= "<b>Adding new node into '" . ( $uuid eq '__PAC__ROOT__' ? 'ROOT' : "$parent_name" ) . "'</b>";
 	}
 	
@@ -1406,7 +1406,7 @@ sub _wAddRenameNode {
 			$w{window}{gui}{entry1} -> set_text( $name );
 			$w{window}{gui}{entry1} -> set_activates_default( 1 );
 			$w{window}{gui}{entry1} -> signal_connect( 'changed', sub {
-				$w{window}{gui}{entry2} -> set_text( ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : "$parent_name - " ) . $w{window}{gui}{entry1} -> get_chars( 0, -1 ) );
+				$w{window}{gui}{entry2} -> set_text( ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ") ) . $w{window}{gui}{entry1} -> get_chars( 0, -1 ) );
 			} );
 		
 		# Create an HBox to contain a label and an entry
@@ -1768,7 +1768,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'shell options'}					//= '-login';
 	$$cfg{'defaults'}{'shell directory'}				//= $ENV{'HOME'};
 	$$cfg{'defaults'}{'tabs position'}					//= 'top';
-	$$cfg{'defaults'}{'auto save'}						//= 0;
+	$$cfg{'defaults'}{'auto save'}						//= 1;
 	$$cfg{'defaults'}{'save on exit'}					//= 0;
 	$$cfg{'defaults'}{'start iconified'}				//= 0;
 	$$cfg{'defaults'}{'start maximized'}				//= 0;
@@ -1831,7 +1831,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'prevent F11'}					//= 0;
 	$$cfg{'defaults'}{'autostart shell upon start'}	//= 0;
 	$$cfg{'defaults'}{'tree on right side'}				//= 0;
-	$$cfg{'defaults'}{'prevent mouse over show tree'}	//= 0;
+	$$cfg{'defaults'}{'prevent mouse over show tree'}	//= 1;
 	$$cfg{'defaults'}{'start PAC tree on'}				//= 'connections';
 	$$cfg{'defaults'}{'show connections tooltips'}		//= 0;
 	$$cfg{'defaults'}{'hide connections submenu'}		//= 0;

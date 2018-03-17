@@ -1,0 +1,45 @@
+#    asbru-cm.yaml - ansible playbook for installing asbru-cm on ubuntu/debian
+#    Copyright (C) 2017  nomike at nomike dot com
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: install curl
+    apt: name=curl state=present
+  - name: install gnupg
+    apt: name=gnupg state=present
+  - name: install debian-archive-keyring
+    apt: name=debian-archive-keyring state=present
+    when: ansible_os_family == "Debian"
+  - name: install apt-transport-https
+    apt: name=apt-transport-https state=present
+  - name: Setup apt repository
+    get_url:
+      dest: "/etc/apt/sources.list.d/asbru-cm_asbru-cm.list"
+      url: "https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/config_file.list?os={{ ansible_distribution }}&dist={{ ansible_distribution_release }}&source=script"
+      owner: root
+      group: root
+      mode: 0644
+  - name: install asbru-cm gpg key
+    apt_key:
+      url: https://packagecloud.io/asbru-cm/asbru-cm/gpgkey
+      state: present
+  - name: install asbru-cm
+    apt:
+      name: asbru-cm
+      update_cache: true
+      state: present
+

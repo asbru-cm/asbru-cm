@@ -3,7 +3,7 @@ package PACMain;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2018 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -295,6 +295,9 @@ sub start {
 	Gtk3::Gdk::notify_startup_complete();
 	Glib::Idle -> add( sub {_splash( 0 ); return 0; } );
 	
+	# Show main interface
+	$$self{_GUI}{main} -> show_all;
+	
 	# Autostart selected connections
 	my @idx;
 	grep( { $$self{_CFG}{'environments'}{$_}{'startup launch'} and push( @idx, [ $_ ] ); }	keys %{ $$self{_CFG}{'environments'} } );
@@ -318,7 +321,6 @@ sub start {
 		}
 	}
 	
-	$$self{_GUI}{main} -> show_all;
 	if ( ! $$self{_CFG}{defaults}{'start iconified'} && ! $$self{_CMDLINETRAY} )	{ $$self{_GUI}{main} -> present; }
 	else												{ $self -> _hideConnectionsList; }
 	
@@ -753,7 +755,6 @@ sub _initGUI {
 						$$self{_GUI}{hbuttonbox1} -> pack_start( $$self{_GUI}{saveBtn}, 1, 1, 0 );
 						$$self{_GUI}{saveBtn} -> set( 'can-focus' => 0 );
 						$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
-						$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Save current configuration' );
 						
 						# Create [un]lockBtn button
 						$$self{_GUI}{lockPACBtn} = Gtk3::ToggleButton -> new;
@@ -1887,9 +1888,6 @@ sub _setupCallbacks {
 	$$self{_GUI}{nb} -> signal_connect( 'switch_page' => sub {
 		my ( $nb, $p, $pnum ) = @_;
 		
-		#if ( $pnum == 0 && $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 1 ); }
-		#elsif ( $$self{_CFG}{defaults}{'tabs in main window'} && $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) { $$self{_GUI}{showConnBtn} -> set_active( 0 ); }
-		
 		$$self{_PREVTAB}=$nb->get_current_page;
 
 		my $tab_page = $nb -> get_nth_page( $pnum );
@@ -1918,8 +1916,6 @@ sub _setupCallbacks {
 			$$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
 			last;
 		}
-		
-		$$self{_GUI}{showConnBtn} -> set_active( ( $pnum == 0 ) || ( $pnum && $$self{_CFG}{defaults}{'tabs in main window'} && ! $$self{'_CFG'}{'defaults'}{'auto hide connections list'} ) );
 		
 		return 1;
 	} );
@@ -2654,12 +2650,12 @@ sub _showAboutWindow {
 	$dialog -> set_program_name( '' );  # name is shown in the logo
 	$dialog -> set_version( "v$APPVERSION" );
 	$dialog -> set_logo( _pixBufFromFile( $RES_DIR . '/asbru-logo-400.png' ) );
-	$dialog -> set_copyright( decode( 'UTF-8', "Copyright 2017 Ásbrú Connection Manager Project\nCopyright 2010-2016 David Torrejon Vaquerizas" ) );
+	$dialog -> set_copyright( decode( 'UTF-8', "Copyright 2017-2018 Ásbrú Connection Manager Project\nCopyright 2010-2016 David Torrejon Vaquerizas" ) );
 	$dialog -> set_website( 'https://asbru-cm.net/' );
 	$dialog -> set_license( decode( 'UTF-8', "
 Ásbrú Connection Manager
 
-Copyright 2017 Ásbrú Connection Manager project
+Copyright 2017-2018 Ásbrú Connection Manager project
 Copyright 2010-2016 David Torrejon Vaquerizas
 
 This program is free software: you can redistribute it and/or modify
@@ -3251,8 +3247,6 @@ sub _updateGUIPreferences {
 	#~ $$self{_GUI}{treeConnections}	-> set_enable_tree_lines( $$self{_CFG}{'defaults'}{'enable tree lines'} );
 	$$self{_GUI}{descView}			-> modify_font( Pango::FontDescription::from_string( $$self{_CFG}{'defaults'}{'info font'} ) );
 	
-	$$self{_GUI}{showConnBtn} -> set_active( ! ( ( $$self{_CFG}{'defaults'}{'auto hide connections list'} && $$self{_GUI}{nb} -> get( 'page') ) ) );
-	
 	if ( $UNITY ) {
 		( ! $$self{_GUI}{main} -> get_visible || $$self{_CFG}{defaults}{'show tray icon'} ) ? $$self{_TRAY}{_TRAY} -> set_active : $$self{_TRAY}{_TRAY} -> set_passive;
 	} else {
@@ -3261,13 +3255,9 @@ sub _updateGUIPreferences {
 	
 	$$self{_GUI}{lockPACBtn} -> set_sensitive( $$self{_CFG}{'defaults'}{'use gui password'} );
 	
-	$$self{_CFG}{defaults}{'auto save'} and $$self{_GUI}{saveBtn} -> set_label( 'Auto saving ACTIVE' );
 	$self -> _updateGUIWithUUID( $sel_uuids[0] ) if $total == 1;
 	
-	if ( $$self{_READONLY} ) {
-		$$self{_GUI}{saveBtn} -> set_label( 'READ ONLY INSTANCE' );
-		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
-	}
+	$self -> _setCFGChanged( 1 );
 	
 	return 1;
 }
@@ -4145,11 +4135,14 @@ sub _setCFGChanged {
 		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
 	} elsif ( $$self{_CFG}{defaults}{'auto save'} ) {
 		$$self{_GUI}{saveBtn} -> set_label( 'Auto saving ACTIVE' );
+		$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Every configuration change will be saved automatically.  You can disable this feature in Preferences > Main Options.' );
+		$$self{_GUI}{saveBtn} -> set_sensitive( 0 );
 		$self -> _saveConfiguration( undef, 0 );
 	} else {
 		$$self{_CFG}{tmp}{changed} = $stat;
 		$$self{_GUI}{saveBtn} -> set_sensitive( $stat );
 		$$self{_GUI}{saveBtn} -> set_label( '_Save' );
+		$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Save your configuration' );
 	}
 	return 1;
 }
