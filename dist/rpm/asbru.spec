@@ -1,5 +1,3 @@
-%define _bashcompletiondir /usr/share/bash-completion/completions
-
 Name:       asbru-cm
 Version:    %{_version}
 Release:    %{_release}%{?dist}
@@ -60,6 +58,7 @@ Requires:   vte
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
+BuildRequires: pkg-config
 BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %description
@@ -74,6 +73,7 @@ find . -type f -exec sed -i \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
   -e 's|/\.\.\(/\)|\1|' \
   '{}' \+
+%define _bashcompletiondir %(pkg-config --variable=completionsdir bash-completion)
 
 
 %build
