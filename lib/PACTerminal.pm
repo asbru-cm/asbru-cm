@@ -891,9 +891,12 @@ sub _setupCallbacks {
 			# F4 --> CLOSE *ALL* opened tabs
 			elsif ( ( $self -> {_TABBED} ) and ( $keyval eq 'F4' ) )
 			{
-				my @list = keys %PACMain::RUNNING;
-				return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>ALL</b> open terminals?" );
-				foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }
+				$self -> _closeAllTerminals();
+				return 1;
+			}
+			# n --> Close disconnected sessions
+			elsif ( lc $keyval eq 'n' ) {
+				$self -> _closeDisconnectedTerminals();
 				return 1;
 			}
 			# d --> duplicate connection
@@ -1857,24 +1860,28 @@ sub _vteMenu {
 				sensitive	=> $$self{CONNECTED} && $$self{_PID},
 				code		=> sub { $self -> _disconnectAndRestartTerminal(); }
 			},
-			# Close Terminal
+			# Close terminal
 			{
 				label		=> 'Close Terminal',
 				shortcut	=> '<control>F4',
 				stockicon	=> 'gtk-close',
 				code		=> sub { $self -> stop( 0, 1 ); }
 			},
-			# Close ALL Terminals
+			# Close all terminals
 			{
-				label		=> 'Close ALL Terminals',
+				label		=> 'Close All Terminals',
 				shortcut	=> '<control><shift>F4',
 				stockicon	=> 'gtk-close',
-				code		=> sub {
-					my @list = keys %PACMain::RUNNING;
-					return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal?" );
-					foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }
-					return 1;
-				}
+				sensitive	=> $self -> _hasOtherTerminals(),
+				code		=> sub { $self -> _closeAllTerminals(); }
+			},
+			# Close disconnected terminals
+			{
+				label		=> 'Close Disconnected Terminals',
+				shortcut	=> '<control><shift>n',
+				stockicon	=> 'gtk-close',
+				sensitive	=> $self -> _hasDisconnectedTerminals(),
+				code		=> sub { $self -> _closeDisconnectedTerminals(); }
 			}
 		]
 	} );
@@ -3832,6 +3839,46 @@ sub _disconnectAndRestartTerminal {
 	my $self = shift;
 
 	kill( 15, $$self{_PID} ) and Glib::Timeout -> add_seconds( 1, sub { $self -> start; return 0; } )
+}
+
+sub _closeAllTerminals {
+	my $self = shift;
+	my @list = keys %PACMain::RUNNING;
+
+	return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to close <b>all</b> terminals?" );
+	foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }
+	return 1;
+}
+
+sub _hasOtherTerminals {
+	my $self = shift;
+	my $list_count = keys %PACMain::RUNNING;
+
+	return $list_count > 1;
+}
+
+sub _closeDisconnectedTerminals {
+	my $self = shift;
+	my @list = keys %PACMain::RUNNING;
+
+	foreach my $uuid ( @list ) {
+		if ($PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED') {
+			$PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' );
+		}
+	}
+	return 1;
+}
+
+sub _hasDisconnectedTerminals {
+	my $self = shift;
+	my @list = keys %PACMain::RUNNING;
+
+	foreach my $uuid ( @list ) {
+		if ($PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED') {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 # END: Private functions definitions
