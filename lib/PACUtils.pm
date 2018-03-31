@@ -121,7 +121,7 @@ my $SPLASH_IMG		= $RES_DIR . '/asbru-logo-400.png';
 my $CFG_DIR			= $ENV{'HOME'} . '/.config/pac';
 my $CFG_FILE		= $CFG_DIR . '/pac.yml';
 my $R_CFG_FILE		= $PACMain::R_CFG_FILE;
-my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
+my $CIPHER			= Crypt::CBC -> new( -key => 'Àsbrù Connection Manager (https://www.asbru-cm.net/)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;

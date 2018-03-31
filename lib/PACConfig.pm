@@ -65,7 +65,8 @@ my $RES_DIR			= $RealBin . '/res';
 # Connect to Gnome's GConf
 my $GCONF			= Gnome2::GConf::Client -> get_default;
 
-my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
+my $CIPHER			= Crypt::CBC -> new( -key => 'Àsbrù Connection Manager (https://www.asbru-cm.net/)', -cipher => 
+'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -690,7 +691,8 @@ sub _updateGUIPreferences {
 	}
 	
 	if ( defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
-		_( $self, 'lblRestartRequired' ) -> set_text( "(*) Requires restarting PAC for the change(s) to take effect\n\n" . ( _( $self, 'cbCfgStartIconified' ) -> get_tooltip_text // '' ) );
+		_( $self, 'lblRestartRequired' ) -> set_text( "(*) Requires restarting Àsbrù for the change(s) to take effect\n\n" . ( _( 
+$self, 'cbCfgStartIconified' ) -> get_tooltip_text // '' ) );
 	}
 	return 1;
 }
