@@ -391,7 +391,7 @@ sub stop {
 	# May be user wants to close without confirmation...
 	if ( ( ! $force ) && ( $self -> {CONNECTED} ) ) {
 		# Ask for confirmation
-		return 1 unless _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE '" . ( $$self{_SPLIT} ? 'this Splitted TAB' : $$self{_TITLE} ) . "'?" );
+		return 1 unless _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE '" . ( $$self{_SPLIT} ? 'this split tab' : $$self{_TITLE} ) . "'?" );
 		
 		# Check for post-connection commands execution
 		$$self{CONNECTED} and $self -> _wPrePostExec( 'local after');
@@ -1340,44 +1340,44 @@ sub _vteMenu {
 	
 	# Show a popup with the opened tabs (if tabbed!!)
 	if ( $$self{_TABBED} ) {
-		my @submenu_split_h;
 		my @submenu_split_v;
+		my @submenu_split_h;
 		foreach my $uuid_tmp ( keys %PACMain::RUNNING ) {
 			next unless defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT};
 			my $i = $$self{_NOTEBOOK} -> page_num( $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT} ? $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT_VPANE} : $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VBOX} );
 			next if ( $uuid_tmp eq $$self{_UUID_TMP} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} eq 'Info ' || $i < 0 );
 			next if ( $$self{_SPLIT} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT} ) || ( ! $PACMain::RUNNING{$uuid_tmp}{terminal}{_TABBED} );
-			push( @submenu_split_h,
-			{
-				label	=> "$i: $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}",
-				tooltip	=> "Put horizontally separated in the same window, both connections: actual($$self{_TITLE}) and this one ($PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE})",
-				code	=> sub { $self -> _split( $uuid_tmp ); }
-			} );
 			push( @submenu_split_v,
 			{
 				label	=> "$i: $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}",
-				tooltip	=> "Put vertically separated in the same window, both connections: actual($$self{_TITLE}) and this one ($PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE})",
+				tooltip	=> "Arrange both connections ($$self{_TITLE}) and ($PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}) into the same vertically split window.",
+				code	=> sub { $self -> _split( $uuid_tmp ); }
+			} );
+			push( @submenu_split_h,
+			{
+				label	=> "$i: $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}",
+				tooltip	=> "Arrange both connections ($$self{_TITLE}) and ($PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}) into the same horizontally split window .",
 				code	=> sub { $self -> _split( $uuid_tmp, 1 ); }
 			} );
 		}
-		@submenu_split_h = sort { $$a{label} cmp $$b{label} } @submenu_split_h;
 		@submenu_split_v = sort { $$a{label} cmp $$b{label} } @submenu_split_v;
+		@submenu_split_h = sort { $$a{label} cmp $$b{label} } @submenu_split_h;
 		
 		push( @vte_menu_items,
 		{
 			sensitive	=> 1,
-			label		=> 'Detach TAB to a new Window',
+			label		=> 'Detach tab to a new Window',
 			stockicon	=> 'gtk-fullscreen',
-			tooltip		=> 'Separate this connection window from the TABbed view, and put it in a separate window',
+			tooltip		=> 'Separate this connection window from the tabbed view, and put it in a separate window',
 			code		=> sub { $self -> _tabToWin; }
 		} );
 		
 		if ( $$self{_SPLIT} ) {
 			push( @vte_menu_items,
 			{
-				label		=> 'Unsplit to new TAB',
+				label		=> 'Unsplit',
 				stockicon	=> 'gtk-zoom-fit',
-				tooltip		=> "Remove this connection from the splitted view and put it into it's own TAB",
+				tooltip		=> "Remove the split view and put each connection into its own tab",
 				code		=> sub { $self -> _unsplit; }
 			} );
 		} else {
@@ -1385,20 +1385,20 @@ sub _vteMenu {
 			{
 				label		=> 'Split',
 				stockicon	=> 'gtk-zoom-fit',
-				sensitive	=> scalar( @submenu_split_h ) && scalar( @submenu_split_v ),
+				sensitive	=> scalar( @submenu_split_v ) && scalar( @submenu_split_h ),
 				submenu		=> 
 				[
 					{
-						label		=> 'Horizontally with TAB',
-						stockicon	=> 'gtk-zoom-fit',
-						submenu		=> \@submenu_split_h,
-						sensitive	=> scalar( @submenu_split_h )
-					},
-					{
-						label		=> 'Vertically with TAB',
+						label		=> 'Vertically',
 						stockicon	=> 'gtk-zoom-fit',
 						submenu		=> \@submenu_split_v,
 						sensitive	=> scalar( @submenu_split_v )
+					},
+					{
+						label		=> 'Horizontally',
+						stockicon	=> 'gtk-zoom-fit',
+						submenu		=> \@submenu_split_h,
+						sensitive	=> scalar( @submenu_split_h )
 					}
 				]
 			} );
@@ -2199,25 +2199,25 @@ sub _tabMenu {
 	# Show a popup with the opened tabs (if tabbed!!)
 	if ( ! $$self{EMBED} ) {
 		if ( $$self{_TABBED} ) {
-			my @submenu_split_h;
 			my @submenu_split_v;
+			my @submenu_split_h;
 			foreach my $uuid_tmp ( keys %PACMain::RUNNING ) {
 				my $i = $$self{_NOTEBOOK} -> page_num( $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT} ? $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT_VPANE} : $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VBOX} );
 				next if ( $uuid_tmp eq $$self{_UUID_TMP} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} eq 'Info ' || $i < 0 );
 				next if ( $$self{_SPLIT} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT} ) || ( ! $PACMain::RUNNING{$uuid_tmp}{terminal}{_TABBED} );
-				push( @submenu_split_h,
+				push( @submenu_split_v,
 				{
 					label	=> "$i: $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}",
 					code	=> sub { $self -> _split( $uuid_tmp ); }
 				} );
-				push( @submenu_split_v,
+				push( @submenu_split_h,
 				{
 					label	=> "$i: $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE}",
 					code	=> sub { $self -> _split( $uuid_tmp, 1 ); }
 				} );
 			}
-			@submenu_split_h = sort { $$a{label} cmp $$b{label} } @submenu_split_h;
 			@submenu_split_v = sort { $$a{label} cmp $$b{label} } @submenu_split_v;
+			@submenu_split_h = sort { $$a{label} cmp $$b{label} } @submenu_split_h;
 			
 			push( @vte_menu_items, { label => 'Detach TAB to a new Window', stockicon => 'gtk-fullscreen', code => sub { _tabToWin( $self ); return 1; } } );
 			
@@ -2233,20 +2233,20 @@ sub _tabMenu {
 				{
 					label		=> 'Split',
 					stockicon	=> 'gtk-zoom-fit',
-					sensitive	=> scalar( @submenu_split_h ) && scalar( @submenu_split_v ),
+					sensitive	=> scalar( @submenu_split_v ) && scalar( @submenu_split_h ),
 					submenu		=> 
 					[
 						{
 							label		=> 'Horizontally with TAB',
 							stockicon	=> 'gtk-zoom-fit',
-							submenu		=> \@submenu_split_h,
-							sensitive	=> scalar( @submenu_split_h )
+							submenu		=> \@submenu_split_v,
+							sensitive	=> scalar( @submenu_split_v )
 						},
 						{
 							label		=> 'Vertically with TAB',
 							stockicon	=> 'gtk-zoom-fit',
-							submenu		=> \@submenu_split_v,
-							sensitive	=> scalar( @submenu_split_v )
+							submenu		=> \@submenu_split_h,
+							sensitive	=> scalar( @submenu_split_h )
 						}
 					]
 				} );
