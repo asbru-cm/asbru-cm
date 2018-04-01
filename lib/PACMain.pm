@@ -104,7 +104,7 @@ my $NEW_VERSION		= 0;
 my $NEW_CHANGES		= '';
 our $_NO_SPLASH		= 0;
 
-my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
+my $CIPHER			= Crypt::CBC -> new( -key => 'Àsbrù Connection Manager (https://www.asbru-cm.net/)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
 
 our %RUNNING;
 our %FUNCS;
