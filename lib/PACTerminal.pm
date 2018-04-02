@@ -2364,6 +2364,9 @@ sub _split {
 	my $uuid_tmp	= shift;
 	my $vertical	= shift // '0';
 	
+	# NOTE: For some reason the vertical flag is negated
+	$vertical = ! $vertical;
+
 	my $tabs = $self -> {_NOTEBOOK};
 	$$self{_SPLIT_VERTICAL} = $vertical;
 	
