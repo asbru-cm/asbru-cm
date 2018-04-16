@@ -807,7 +807,7 @@ sub _setupCallbacks {
 				return 1;
 			}
 			# X --> Reset terminal
-			elsif 	( lc $keyval eq 'x' )	{
+			elsif ( lc $keyval eq 'x' )	{
 				$$self{_GUI}{_VTE} -> reset( 1, 1 );
 				return 1;
 			}   
@@ -2224,7 +2224,7 @@ sub _tabMenu {
 			if ( $$self{_SPLIT} ) {
 				push( @vte_menu_items,
 				{
-					label		=> 'Unsplit to new TAB',
+					label		=> 'Unsplit',
 					stockicon	=> 'gtk-zoom-fit',
 					code		=> sub { $self -> _unsplit; }
 				} );
@@ -2237,13 +2237,13 @@ sub _tabMenu {
 					submenu		=> 
 					[
 						{
-							label		=> 'Horizontally with TAB',
+							label		=> 'Vertically ',
 							stockicon	=> 'gtk-zoom-fit',
 							submenu		=> \@submenu_split_v,
 							sensitive	=> scalar( @submenu_split_v )
 						},
 						{
-							label		=> 'Vertically with TAB',
+							label		=> 'Horizontally',
 							stockicon	=> 'gtk-zoom-fit',
 							submenu		=> \@submenu_split_h,
 							sensitive	=> scalar( @submenu_split_h )
@@ -2820,7 +2820,7 @@ sub _wSelectChain {
 		my $on_fail		= $$hash{'on_fail'}		// -1;
 		my $time_out	= $$hash{'time_out'}	// -1;
 		
-  		push( @{ $ppe{window}{gui}{treeview}{data} },
+			push( @{ $ppe{window}{gui}{treeview}{data} },
 		[
 			$total,
 			$active,
