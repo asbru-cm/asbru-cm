@@ -953,8 +953,8 @@ if ( defined $METHOD ) {
 		} elsif ( defined $$CFG{'tmp'}{'xid'} ) {
 			$$CFG{'tmp'}{'width'}-=5;
 			$$CFG{'tmp'}{'height'}-=5;
-			$connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER /p:$PASS" ) . " /v:$IP:$PORT";
-			$connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER /p:$PASS" ) . " /v:$IP:$PORT";
+			$connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
+			$connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
 		} elsif ( $METHOD eq 'rdesktop' ) {
 			$connection_cmd = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " -T \"$TITLE\" $IP:$PORT";
 			$connection_txt = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " -T \"$TITLE\" $IP:$PORT";
