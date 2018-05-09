@@ -391,7 +391,7 @@ sub stop {
 	# May be user wants to close without confirmation...
 	if ( ( ! $force ) && ( $self -> {CONNECTED} ) ) {
 		# Ask for confirmation
-		return 1 unless _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE '" . ( $$self{_SPLIT} ? 'this split tab' : $$self{_TITLE} ) . "'?" );
+		return 1 unless _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to close '" . ( $$self{_SPLIT} ? 'this split tab' : $$self{_TITLE} ) . "'?" );
 		
 		# Check for post-connection commands execution
 		$$self{CONNECTED} and $self -> _wPrePostExec( 'local after');
@@ -1407,9 +1407,9 @@ sub _vteMenu {
 	} else {
 		push( @vte_menu_items,
 		{
-			label		=> 'Attach Window to main TAB bar',
+			label		=> 'Attach Window to main tab bar',
 			stockicon	=> 'gtk-leave-fullscreen',
-			tooltip		=> 'Put this connection window into main TABbed window',
+			tooltip		=> 'Put this connection window into main tabbed window',
 			code		=> sub { _winToTab( $self ); }
 		} );
 		push( @vte_menu_items, { separator => 1 } );
@@ -2088,7 +2088,7 @@ sub _tabToWin {
 	# Capture window close
 	$$self{_WINDOWTERMINAL} -> signal_connect( 'delete_event' => sub {
 		$self -> stop( undef, 1 ) unless $$self{_GUILOCKED};
-		return 1;
+		return Gtk2::EVENT_STOP; # stop propagation
 	} );
 	
 	$self -> _updateCFG;
