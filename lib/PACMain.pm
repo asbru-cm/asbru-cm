@@ -3271,8 +3271,6 @@ sub _updateGUIPreferences {
 	
 	$self -> _updateGUIWithUUID( $sel_uuids[0] ) if $total == 1;
 	
-	$self -> _setCFGChanged( 1 );
-	
 	return 1;
 }
 
