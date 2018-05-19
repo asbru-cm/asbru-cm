@@ -222,7 +222,7 @@ sub _setupCallbacks {
 	_( $self, 'rbCfgInternalViewer' )	-> signal_connect( 'toggled' => sub { _( $self, 'entryCfgExternalViewer' ) -> set_sensitive( ! _( $self, 'rbCfgInternalViewer' ) -> get_active ); } );
 	_( $self, 'btnSaveConfig' )			-> signal_connect( 'clicked' => sub { $self -> _saveConfiguration; _( $self, 'btnCloseConfig' ) -> activate } );
 	_( $self, 'cbBoldAsText' )			-> signal_connect( 'toggled' => sub { _( $self, 'colorBold' ) -> set_sensitive( ! _( $self, 'cbBoldAsText' ) -> get_active ); } );
-	_( $self, 'cbCfgTabsInMain' )		-> signal_connect( 'toggled' => sub { _( $self, 'cbCfgConnectionsAutoHide' ) -> set_sensitive( _( $self, 'cbCfgTabsInMain' ) -> get_active ); } );
+	_( $self, 'cbCfgTabsInMain' )		-> signal_connect( 'toggled' => sub { _( $self, 'cbCfgConnectionsAutoHide' ) -> set_sensitive( _( $self, 'cbCfgTabsInMain' ) -> get_active ); _( $self, 'cbCfgButtonBarAutoHide' ) -> set_sensitive( _( $self, 'cbCfgTabsInMain' ) -> get_active ); } );
 	_( $self, 'cbCfgNewInTab' )			-> signal_connect( 'toggled' => sub { _( $self, 'vboxCfgTabsOptions' ) -> set_sensitive( _( $self, 'cbCfgNewInTab' ) -> get_active ); } );
 	_( $self, 'cbCfgNewInWindow' )		-> signal_connect( 'toggled' => sub { _( $self, 'hboxWidthHeight' ) -> set_sensitive( _( $self, 'cbCfgNewInWindow' ) -> get_active ); } );
 	_( $self, 'btnCfgOpenSessionLogs' ) -> signal_connect( 'clicked' => sub { system( '/usr/bin/xdg-open ' . ( _( $self, 'btnCfgSaveSessionLogs' ) -> get_current_folder ) ); } );
@@ -538,6 +538,8 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgTabsInMain' )			-> set_active( $$cfg{'defaults'}{'tabs in main window'} );
 	_( $self, 'cbCfgConnectionsAutoHide' )	-> set_active( $$cfg{'defaults'}{'auto hide connections list'} );
 	_( $self, 'cbCfgConnectionsAutoHide' )	-> set_sensitive( _( $self, 'cbCfgTabsInMain' ) -> get_active );
+	_( $self, 'cbCfgButtonBarAutoHide' )	-> set_active( $$cfg{'defaults'}{'auto hide button bar'} );
+	_( $self, 'cbCfgButtonBarAutoHide' )	-> set_sensitive( _( $self, 'cbCfgTabsInMain' ) -> get_active );
 	_( $self, 'entryCfgPrompt' )			-> set_text( $$cfg{'defaults'}{'command prompt'} );
 	_( $self, 'entryCfgUserPrompt' )		-> set_text( $$cfg{'defaults'}{'username prompt'} );
 	_( $self, 'entryCfgPasswordPrompt' )	-> set_text( $$cfg{'defaults'}{'password prompt'} );
@@ -724,6 +726,7 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'show screenshots'}				= _( $self, 'cbCfgSaveShowScreenshots' )	-> get_active;
 	$$self{_CFG}{'defaults'}{'tabs in main window'}				= _( $self, 'cbCfgTabsInMain' )				-> get_active;
 	$$self{_CFG}{'defaults'}{'auto hide connections list'}		= _( $self, 'cbCfgConnectionsAutoHide' )	-> get_active;
+	$$self{_CFG}{'defaults'}{'auto hide button bar'}			= _( $self, 'cbCfgButtonBarAutoHide' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'hide on connect'}					= _( $self, 'cbCfgHideOnConnect' ) 			-> get_active;
 	$$self{_CFG}{'defaults'}{'ping port before connect'}		= _( $self, 'cbCfgPreConnPingPort' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'ping port timeout'}				= _( $self, 'spCfgPingTimeout' )			-> get_chars( 0, -1 );

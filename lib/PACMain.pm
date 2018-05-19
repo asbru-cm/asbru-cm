@@ -1931,6 +1931,8 @@ sub _setupCallbacks {
 			last;
 		}
 		
+		$$self{_GUI}{hbuttonbox1} -> set_visible( ( $pnum == 0 ) || ( $pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'} ) );
+		
 		return 1;
 	} );
 
@@ -2742,6 +2744,7 @@ sub _launchTerminals {
 	# Check if user wants main window to be close when a terminal comes up
 	( $$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'} ) and $self -> _hideConnectionsList;
 	( $$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'} ) and $$self{_GUI}{showConnBtn} -> set_active( 0 );
+	( $$self{_CFG}{'defaults'}{'auto hide button bar'} ) and $$self{_GUI}{hbuttonbox1} -> hide;
 	
 	my $wtmp;
 	scalar( @{ $terminals } ) > 1 and $wtmp = _wMessage( $$self{_GUI}{main}, "Starting '<b><big>". ( scalar( @{ $terminals } ) ) . "</big></b>' terminals...", 0 );
