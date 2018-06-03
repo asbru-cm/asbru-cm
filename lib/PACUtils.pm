@@ -1822,6 +1822,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'debug'}							//= 0;
 	$$cfg{'defaults'}{'tabs in main window'}			//= 1;
 	$$cfg{'defaults'}{'auto hide connections list'}		//= 0;
+	$$cfg{'defaults'}{'auto hide button bar'}		    //= 0;
 	$$cfg{'defaults'}{'hide on connect'}				//= 0;
 	$$cfg{'defaults'}{'ping port before connect'}		//= 0;
 	$$cfg{'defaults'}{'ping port timeout'}				//= 1;

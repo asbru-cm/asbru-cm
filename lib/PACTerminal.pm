@@ -3295,6 +3295,7 @@ sub _updateCFG {
 			my $btn1 = Gtk2::Label -> new( $desc ? $desc : $cmd );
 			$btn1 -> set_ellipsize( 'PANGO_ELLIPSIZE_END' );
 			$$self{_GUI}{"_BTNMACRO_$i"} -> add( $btn1 );
+			$$self{_GUI}{"_BTNMACRO_$i"} -> set_size_request( 60, 20 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{"_BTNMACRO_$i"}, 1, 1, 0 );
 			$$self{_GUI}{_MACROSBOX} -> show_all;
 			
@@ -3319,6 +3320,7 @@ sub _updateCFG {
 				my $btn2 = Gtk2::Label -> new( $desc ? $desc : $cmd );
 				$btn2 -> set_ellipsize( 'PANGO_ELLIPSIZE_END' );
 				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} -> add( $btn2 );
+				$$self{_GUI}{"_BTNMACRO_GLOB_$i"} -> set_size_request( 60, 20 );
 				$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{"_BTNMACRO_GLOB_$i"}, 1, 1, 0 );
 				$$self{_GUI}{_MACROSBOX} -> show_all;
 				
