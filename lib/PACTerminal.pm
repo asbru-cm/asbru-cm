@@ -1960,7 +1960,7 @@ sub _setTabColour {
 			);
 		}
 	} else {
-		defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL} -> set_icon_from_file( $$self{CONNECTED} ? $RealBin . '/res/pac_terminal64x64.png' : $RealBin . '/res/pac_terminal_x64x64.png' );
+		defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL} -> set_icon_from_file( $$self{CONNECTED} ? $RealBin . '/res/asbru_terminal64x64.png' : $RealBin . '/res/asbru_terminal_x64x64.png' );
 	}
 	
 	# Once checked the availability of new data, reset its value
