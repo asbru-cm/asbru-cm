@@ -4302,7 +4302,7 @@ tty</property>
                   <widget class="GtkImage" id="image2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="pixbuf">pac_terminal16x16.png</property>
+                    <property name="pixbuf">asbru_terminal16x16.png</property>
                     <property name="icon-size">3</property>
                   </widget>
                   <packing>
