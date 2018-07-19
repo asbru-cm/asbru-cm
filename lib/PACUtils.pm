@@ -1157,6 +1157,8 @@ sub _registerPACIcons {
 		'pac-prompt'						=> $RES_DIR . '/asbru_prompt.png',
 		'pac-protected'						=> $RES_DIR . '/asbru_protected.png',
 		'pac-unprotected'					=> $RES_DIR . '/asbru_unprotected.png',
+		'pac-buttonbar-show'					=> $RES_DIR . '/asbru_buttonbar_show.png',
+		'pac-buttonbar-hide'					=> $RES_DIR . '/asbru_buttonbar_hide.png',
 	);
 	
 	my $icon_factory = Gtk2::IconFactory -> new;
