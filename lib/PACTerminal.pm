@@ -614,35 +614,47 @@ sub _initGUI {
 		}
 		
 		$$self{_GUI}{_MACROSBOX} -> hide_all if defined $$self{_GUI}{_MACROSBOX};
-		
+
 		# bottombox will contain both progress and status bar
 		$$self{_GUI}{bottombox} = Gtk2::HBox -> new( 0, 0 );
 		$$self{_GUI}{_VBOX} -> pack_end( $$self{_GUI}{bottombox}, 0, 1, 0 ) if $$self{_CFG}{defaults}{'terminal show status bar'};
-			
+
 			# Create a checkbox to show or not commands history tree
-			$$self{_GUI}{cbShowHist} = Gtk2::CheckButton -> new( 'Show command history' );
+			$$self{_GUI}{cbShowHist} = Gtk2::ToggleButton -> new;
+			$$self{_GUI}{cbShowHist} -> set_tooltip_text( 'Show/Hide command history' );
+			$$self{_GUI}{cbShowHist} -> set_image( Gtk2::Image -> new_from_stock( 'pac-history', 'GTK_ICON_SIZE_BUTTON' ));
 			eval { $$self{_GUI}{cbShowHist} -> set_can_focus( 0 ); };
-			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{cbShowHist}, 0, 1, 0 );
-			
+			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{cbShowHist}, 0, 1, 4 );
+
+			# Create a checkbox to show/hide the button bar
+			$$self{_GUI}{btnShowButtonBar} = Gtk2::ToggleButton -> new;
+			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk2::Image -> new_from_stock( $$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'pac-buttonbar-show' : 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON' ));
+			$$self{_GUI}{btnShowButtonBar} -> set( 'can-focus' => 0 );
+			$$self{_GUI}{btnShowButtonBar} -> set_tooltip_text( 'Show/Hide button bar' );
+			$$self{_GUI}{btnShowButtonBar} -> set_active( $$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1 );
+			print($$self{_GUI}{btnShowButtonBar} -> get_active() . "\n");
+			$$self{_GUI}{btnShowButtonBar} -> set_inconsistent( 0 );
+			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowButtonBar}, 0, 1, 4 );
+
 			# Create gtkstatusbar
 			$$self{_GUI}{status} = Gtk2::Statusbar -> new;
-			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{status}, 1, 1, 0 );
+			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{status}, 1, 1, 4 );
 			$$self{_GUI}{status} -> set_has_resize_grip( ! $$self{_CFG}{defaults}{'tabs in main window'} );
 			
 			# Create a status icon
 			$$self{_GUI}{statusIcon} = Gtk2::Image -> new_from_stock( 'pac-terminal-ko-small', 'button' );
-			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'DISCONNECTED' );
-			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusIcon}, 0, 0, 0 );
+			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'Disconnected' );
+			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusIcon}, 0, 0, 4 );
 			
 			# Create an Expect execute icon
 			$$self{_GUI}{statusExpect} = Gtk2::Image -> new_from_stock( 'none', 'button' );
-			$$self{_GUI}{statusExpect} -> set_tooltip_text( 'DISCONNECTED' );
-			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusExpect}, 0, 0, 0 );
+			$$self{_GUI}{statusExpect} -> set_tooltip_text( 'Disconnected' );
+			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusExpect}, 0, 0, 4 );
 			
 			# Create a cluster icon
 			$$self{_GUI}{statusCluster} = Gtk2::Image -> new_from_stock( 'pac-cluster-manager-off', 'button' );
 			$$self{_GUI}{statusCluster} -> set_tooltip_text( 'Unclustered' );
-			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusCluster}, 0, 0, 0 );
+			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusCluster}, 0, 0, 4 );
 	
 	# Set the number of scrollback lines
 	$$self{_GUI}{_VTE} -> set_scrollback_lines( $$self{_CFG}{'defaults'}{'terminal scrollback lines'} );
@@ -728,10 +740,20 @@ sub _setupCallbacks {
 	} );
 	
 	$$self{_GUI}{cbShowHist} -> signal_connect( 'toggled', sub {
-		if ( $$self{_GUI}{cbShowHist} -> get_active )	{ $$self{_GUI}{hbHist} -> show_all; }
-		else											{ $$self{_GUI}{hbHist} -> hide; }
+		if ( $$self{_GUI}{cbShowHist} -> get_active ) { $$self{_GUI}{hbHist} -> show_all; }
+		else { $$self{_GUI}{hbHist} -> hide; }
 	} );
-	
+
+	$$self{_GUI}{btnShowButtonBar} -> signal_connect( 'toggled', sub {
+		if ($$self{_GUI}{btnShowButtonBar} -> get_active()) {
+			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk2::Image -> new_from_stock( 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON' ));
+			$PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1} -> show();
+		} else {
+			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk2::Image -> new_from_stock( 'pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON' ));
+			$PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1} -> hide();
+		};
+	} );
+
 	$$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE} -> signal_connect( 'motion_notify_event', sub {
 		return 0 if $$self{_CFG}{'defaults'}{'prevent mouse over show tree'};
 		my @geo = $$self{_GUI}{_VTE} -> window -> get_geometry;
@@ -1032,7 +1054,7 @@ sub _setupCallbacks {
 	# Append VTE's connection finalization with CLOSE event
 	$$self{_GUI}{_VTE} -> signal_connect ( 'child_exited' => sub {
 		defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_from_stock( 'pac-terminal-ko-small', 'button' );
-		defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_tooltip_text( 'DISCONNECTED' );
+		defined $$self{_GUI}{statusIcon}	and $$self{_GUI}{statusIcon} -> set_tooltip_text( 'Disconnected' );
 		defined $$self{_GUI}{pb}			and $$self{_GUI}{pb} -> destroy;
 		
 		$PACMain::RUNNING{ $$self{'_UUID_TMP'} }{'stop_time'} = time();
@@ -1095,7 +1117,7 @@ sub _watchConnectionData {
 		
 		if ( $data eq 'CONNECTED' ) {
 			$$self{_GUI}{statusIcon} -> set_from_stock( 'pac-terminal-ok-small', 'button' );
-			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'CONNECTED' );
+			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'Connected' );
 			$$self{_GUI}{statusExpect} -> clear;
 			$$self{CONNECTED}		= 1;
 			$$self{CONNECTING}		= 0;
@@ -1975,14 +1997,14 @@ sub _updateStatus {
 	return 1 unless defined $$self{_GUI}{status};
 	splice( @{ $$self{_HISTORY} }, 0, 2, ( '(... older status skipped...)' ) ) unless $$self{_STATUS_COUNT}++ < 15;
 	push( @{ $$self{_HISTORY} }, $$self{_LAST_STATUS} );
-	
+
 	# Control CLUSTER status
 	if ( $$self{_CLUSTER} ne '' ) {
-		$$self{_GUI}{status} -> push( 0, "[ IN CLUSTER: $$self{_CLUSTER} ]" . ' - Status: ' . $$self{_LAST_STATUS} );
+		$$self{_GUI}{status} -> push( 0, "[ IN CLUSTER: $$self{_CLUSTER} ] - Status: " . $$self{_LAST_STATUS} );
 	} else {
-		$$self{_GUI}{status} -> push( 0, ' - Status: ' . $$self{_LAST_STATUS} );
+		$$self{_GUI}{status} -> push( 0, 'Status: ' . $$self{_LAST_STATUS} );
 	}
-	
+
 	defined $$self{_GUI}{status} and $$self{_GUI}{status}	-> set_property( 'tooltip-text', join( "\n", @{ $$self{_HISTORY} } ) );
 	defined $$self{_GUI}{pb} and $$self{_GUI}{pb}			-> set_property( 'tooltip-text', join( "\n", @{ $$self{_HISTORY} } ) );
 	
