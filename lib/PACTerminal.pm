@@ -632,7 +632,6 @@ sub _initGUI {
 			$$self{_GUI}{btnShowButtonBar} -> set( 'can-focus' => 0 );
 			$$self{_GUI}{btnShowButtonBar} -> set_tooltip_text( 'Show/Hide button bar' );
 			$$self{_GUI}{btnShowButtonBar} -> set_active( $$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1 );
-			print($$self{_GUI}{btnShowButtonBar} -> get_active() . "\n");
 			$$self{_GUI}{btnShowButtonBar} -> set_inconsistent( 0 );
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowButtonBar}, 0, 1, 4 );
 
