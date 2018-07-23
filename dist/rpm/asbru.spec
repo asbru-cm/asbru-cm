@@ -140,6 +140,8 @@ fi
 
 
 %changelog
+* Mon Jul 23 2018 Ásbrú Project Team <contact@asbru-cm.net> 5.1.0
+- 5.1.0 release
 * Fri Dec 29 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0
 - Final 5.0.0 release
 * Sat Nov 4 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0
