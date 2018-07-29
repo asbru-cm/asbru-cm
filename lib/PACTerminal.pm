@@ -577,13 +577,13 @@ sub _initGUI {
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set_size_request( 30, 25 );
 			$$self{_GUI}{_CBLOCALEXECTERMINAL} -> set( 'can_focus', 0 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_CBLOCALEXECTERMINAL}, 1, 1, 0 );
-			
+
 			# Checkbutton to send or not to all terminals in cluster
 			$$self{_GUI}{_MACROSCLUSTER} = Gtk2::CheckButton -> new_with_label( 'Sending THIS: ' );
 			$$self{_GUI}{_MACROSCLUSTER} -> set( 'can-focus', 0 );
 			$$self{_GUI}{_MACROSCLUSTER} -> signal_connect( 'toggled', sub { $$self{_GUI}{_MACROSCLUSTER} -> set_label( $$self{_GUI}{_MACROSCLUSTER} -> get_active ? 'Sending CLUSTER: ' : 'Sending THIS: ' ); } );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0 );
-			
+
 			# Create a GtkComboBox and add it to $macrosbox
 			$$self{_GUI}{_CBMACROSTERMINAL} = Gtk2::ComboBox -> new_text;
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_property( 'can_focus', 0 );
@@ -592,7 +592,7 @@ sub _initGUI {
 			$$self{_GUI}{_CBMACROSTERMINAL} -> set_size_request( 60, 25 );
 			$$self{_GUI}{_CBMACROSTERMINAL}	-> set( 'can_focus', 0 );
 			$$self{_GUI}{_MACROSBOX} -> pack_start( $$self{_GUI}{_CBMACROSTERMINAL}, 1, 1, 0 );
-			
+
 			# Create a GtkButton and add it to $macrosbox
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} = Gtk2::Button -> new_with_mnemonic( '_Remote' );
 			$$self{_GUI}{_BTNMACROSTERMINALEXEC} -> set_property( 'can_focus', 0 );
@@ -609,10 +609,10 @@ sub _initGUI {
 			$$self{_GUI}{_SCROLLMACROS} -> set_policy( 'automatic', 'never' );
 			$$self{_GUI}{_MACROSBOX} = Gtk2::HBox -> new( 0, 0 );
 			$$self{_GUI}{_SCROLLMACROS} -> add_with_viewport( $$self{_GUI}{_MACROSBOX} );
-			
+
 			$$self{_GUI}{_VBOX} -> pack_start( $$self{_GUI}{_SCROLLMACROS}, 0, 1, 0 );
 		}
-		
+
 		$$self{_GUI}{_MACROSBOX} -> hide_all if defined $$self{_GUI}{_MACROSBOX};
 
 		# bottombox will contain both progress and status bar
@@ -635,33 +635,39 @@ sub _initGUI {
 			$$self{_GUI}{btnShowButtonBar} -> set_inconsistent( 0 );
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowButtonBar}, 0, 1, 4 );
 
+			# Create a button to show the info tab
+			$$self{_GUI}{btnShowInfoTab} = Gtk2::Button -> new;
+			$$self{_GUI}{btnShowInfoTab} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-info', 'GTK_ICON_SIZE_BUTTON' ));
+			$$self{_GUI}{btnShowInfoTab} -> set_tooltip_text( 'Show information tab (Shift+Ctrl+I)' );
+			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowInfoTab}, 0, 1, 4 );
+
 			# Create gtkstatusbar
 			$$self{_GUI}{status} = Gtk2::Statusbar -> new;
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{status}, 1, 1, 4 );
 			$$self{_GUI}{status} -> set_has_resize_grip( ! $$self{_CFG}{defaults}{'tabs in main window'} );
-			
+
 			# Create a status icon
 			$$self{_GUI}{statusIcon} = Gtk2::Image -> new_from_stock( 'pac-terminal-ko-small', 'button' );
 			$$self{_GUI}{statusIcon} -> set_tooltip_text( 'Disconnected' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusIcon}, 0, 0, 4 );
-			
+
 			# Create an Expect execute icon
 			$$self{_GUI}{statusExpect} = Gtk2::Image -> new_from_stock( 'none', 'button' );
 			$$self{_GUI}{statusExpect} -> set_tooltip_text( 'Disconnected' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusExpect}, 0, 0, 4 );
-			
+
 			# Create a cluster icon
 			$$self{_GUI}{statusCluster} = Gtk2::Image -> new_from_stock( 'pac-cluster-manager-off', 'button' );
 			$$self{_GUI}{statusCluster} -> set_tooltip_text( 'Unclustered' );
 			$$self{_GUI}{bottombox} -> pack_start( $$self{_GUI}{statusCluster}, 0, 0, 4 );
-	
+
 	# Set the number of scrollback lines
 	$$self{_GUI}{_VTE} -> set_scrollback_lines( $$self{_CFG}{'defaults'}{'terminal scrollback lines'} );
-	
+
 	############################################################################
 	# Check if this terminal should start in a new window or in a new tab/window
 	############################################################################
-	
+
 	# New TAB:
 	if ( $$self{_TABBED} ) {
 		# Append this GUI to a new TAB (with an associated label && event_box -> image(close) button)
@@ -753,6 +759,10 @@ sub _setupCallbacks {
 		};
 	} );
 
+	$$self{_GUI}{btnShowInfoTab} -> signal_connect( 'clicked', sub {
+		$self -> _showInfoTab ();
+	} );
+
 	$$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE} -> signal_connect( 'motion_notify_event', sub {
 		return 0 if $$self{_CFG}{'defaults'}{'prevent mouse over show tree'};
 		my @geo = $$self{_GUI}{_VTE} -> window -> get_geometry;
@@ -765,7 +775,7 @@ sub _setupCallbacks {
 		}
 		return 0;
 	} );
-	
+
 	# Capture focus-out of VTE when it shouldn't get out!!!
 	$$self{_GUI}{_VTE} -> signal_connect( 'focus_out_event' => sub {
 		if ( ( $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} // '' ) eq $$self{_GUI}{_VTE} ) {
@@ -774,6 +784,7 @@ sub _setupCallbacks {
 			1;
 		}
 	} );
+
 	# Capture keypresses on VTE
 	$$self{_GUI}{_VTE} -> signal_connect( 'key_press_event' => sub {
 		my ( $widget, $event ) = @_;
@@ -786,12 +797,9 @@ sub _setupCallbacks {
 		my $alt		= $state * ['mod1-mask'];
 		my $alt2	= $state * ['mod2-mask'];
 		my $alt5	= $state * ['mod5-mask'];
-		
-		#print "TERMINAL KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
-		#print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-		
+
 		return 1 if defined $$self{_KEYS_RECEIVE};
-		
+
 		# ENTER --> reconnect if disconnected
 		if ( ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) && ( ! $$self{CONNECTED} && ! $$self{CONNECTING} ) ) {
 			$self -> start;
@@ -799,7 +807,7 @@ sub _setupCallbacks {
 		} elsif ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) {
 			$$self{_INTRO_PRESS} = 1;
 		}
-		
+
 		# F11 --> [un]fullscreen window
 		if ( ( $keyval eq 'F11' ) && ( ! $$self{_CFG}{defaults}{'prevent F11'} ) ) {
 			if ( $$self{_FULLSCREEN} ) {
@@ -933,6 +941,11 @@ sub _setupCallbacks {
 			# r --> Disconnect and Restart session
 			elsif ( lc $keyval eq 'r' ) {
 				$self -> _disconnectAndRestartTerminal();
+				return 1;
+			}
+			# i --> Show the information tab
+			elsif ( lc $keyval eq 'i' ) {
+				$self -> _showInfoTab();
 				return 1;
 			}
 		}
@@ -3902,6 +3915,12 @@ sub _hasDisconnectedTerminals {
 		}
 	}
 	return 0;
+}
+
+sub _showInfoTab {
+	my $self = shift;
+
+	$PACMain::FUNCS{_MAIN}{_GUI}{nb} -> set_current_page( 0 );
 }
 
 # END: Private functions definitions
