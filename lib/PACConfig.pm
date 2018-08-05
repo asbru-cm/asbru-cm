@@ -5,17 +5,17 @@ package PACConfig;
 #
 # Copyright (C) 2017-2018 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
-# 
+#
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License version 3
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -76,24 +76,24 @@ my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaqueriza
 sub new {
 	my $class	= shift;
 	my $self	= {};
-	
+
 	$self	-> {_CFG}			= shift;
-	
+
 	$self	-> {_WINDOWCONFIG}	= undef;
 	$self	-> {_TXTOPTSBUFFER}	= undef;
 	$self	-> { _GLADE}		= undef;
-	
+
 	%{ $self	-> {_CURSOR} } = (
 		'block'		=> 0,
 		'ibeam'		=> 1,
 		'underline'	=> 2
 	);
-	
+
 	$self	-> {_ENCODINGS_HASH}	= _getEncodings;
 	$self	-> {_ENCODINGS_ARRAY}	= [];
 	$self	-> {_ENCODINGS_MAP}		= {};
 	$self	-> {_CFGTOGGLEPASS}		= 1;
-	
+
 	%{ $self	-> {_BACKSPACE_BINDING}	} = (
 		'auto'				=> 0,
 		'ascii-backspace'	=> 1,
@@ -101,13 +101,13 @@ sub new {
 		'delete-sequence'	=> 3,
 		'tty'				=> 4
 	);
-	
+
 	# Build the GUI
 	_initGUI( $self ) or return 0;
 
 	# Setup callbacks
 	_setupCallbacks( $self );
-	
+
 	bless( $self, $class );
 	return $self;
 }
@@ -138,52 +138,52 @@ sub show {
 sub _initGUI {
 	my $self = shift;
 	my $opt = shift;
-	
+
 	# Load XML Glade file
 	defined $$self{_GLADE} or $$self{_GLADE} = Gtk2::GladeXML -> new( $GLADE_FILE ) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
-	
+
 	# Save main, about and add windows
 	$$self{_WINDOWCONFIG} = $$self{_GLADE} -> get_widget ('windowConfig');
 	$$self{_WINDOWCONFIG} -> set_size_request( -1, -1 );
 
 	_( $self, 'imgBannerPref' ) -> set_from_file( $RES_DIR . '/asbru_banner_preferences.png' );
-	
+
 	# Setup the check-button that defined whether PAC is auto-started on session init
 	_( $self, 'cbCfgAutoStart' ) -> set_active( -f $ENV{'HOME'} . '/.config/autostart/pac_start.desktop' );
-	
+
 	# Initialize main window
 	$$self{_WINDOWCONFIG} -> set_icon_name( 'pac-app-big' );
 
 	_( $self, 'btnResetDefaults' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-undo', 'button' ) );
 	_( $self, 'btnResetDefaults' )	-> set_label( '_Reset to DEFAULT values' );
-	
+
 	# Option currently disabled
 	#_( $self, 'btnCheckVersion' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
 	#_( $self, 'btnCheckVersion' )	-> set_label( 'Check _now' );
-	
+
 	_( $self, 'rbCfgStartTreeConn' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-treelist', 'button' ) );
 	_( $self, 'rbCfgStartTreeFavs' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-favourite-on', 'button' ) );
 	_( $self, 'rbCfgStartTreeHist' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-history', 'button' ) );
 	_( $self, 'rbCfgStartTreeCluster' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-cluster-manager', 'button' ) );
-	
+
 	_( $self, 'imgKeePassOpts' )	-> set_from_stock( 'pac-keepass', 'button' );
-	
+
 	_( $self, 'btnCfgSetGUIPassword' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-protected', 'button' ) );
 	_( $self, 'btnCfgSetGUIPassword' )	-> set_label( 'Set...' );
-	
+
 	_( $self, 'btnExportYAML' )		-> set_image( Gtk2::Image -> new_from_stock( 'gtk-save-as', 'button' ) );
 	_( $self, 'btnExportYAML' )		-> set_label( 'Export config...' );
-	
+
 	_( $self, 'alignShellOpts' )	-> add( ( $$self{_SHELL}		= PACTermOpts		-> new ) -> {container} );
 	_( $self, 'alignGlobalVar' )	-> add( ( $$self{_VARIABLES}	= PACGlobalVarEntry	-> new ) -> {container} );
 	_( $self, 'alignCmdRemote' )	-> add( ( $$self{_CMD_REMOTE}	= PACExecEntry		-> new ) -> {container} );
 	_( $self, 'alignCmdLocal' )		-> add( ( $$self{_CMD_LOCAL}	= PACExecEntry		-> new ) -> {container} );
 	_( $self, 'alignKeePass' )		-> add( ( $$self{_KEEPASS}		= PACKeePass		-> new ) -> {container} );
 	_( $self, 'nbPreferences' )		-> show_all;
-	
+
 	$$self{cbShowHidden} = Gtk2::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
 	_( $self, 'btnCfgSaveSessionLogs' ) -> set_extra_widget( $$self{cbShowHidden} );
-	
+
 	# Populate the Encodings combobox
 	my $i = -1;
 	$$self{_ENCODINGS_ARRAY} = _getEncodings;
@@ -192,15 +192,15 @@ sub _initGUI {
 		$$self{_SHELL}{gui}{'comboEncoding'} -> append_text( $enc );
 		$$self{_ENCODINGS_MAP}{ $enc } = ++$i;
 	}
-	
+
 	_updateGUIPreferences( $self );
-	
+
 	return 1;
 }
 
 sub _setupCallbacks {
 	my $self = shift;
-	
+
 	# Capture 'autostart' checkbox toggled state
 	_( $self, 'cbCfgAutoStart' ) -> signal_connect( 'toggled' => sub {
 		if ( ( _( $self, 'cbCfgAutoStart' ) -> get_active ) && ( ! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop" ) ) {
@@ -214,7 +214,7 @@ sub _setupCallbacks {
 
 	# Capture 'Show hidden files' checkbox for session log files
 	$$self{cbShowHidden} -> signal_connect( 'toggled' => sub { _( $self, 'btnCfgSaveSessionLogs' ) -> set_show_hidden( $$self{cbShowHidden} -> get_active ); } );
-	
+
 	_( $self, 'cbCfgProxyToggle' )		-> signal_connect( 'toggled' => sub { _( $self, 'aCfgProxy' ) -> set_sensitive( _( $self, 'cbCfgProxyToggle' ) -> get_active ); } );
 	_( $self, 'cbConnShowPass' )		-> signal_connect( 'toggled' => sub { _( $self, 'entryPassword' ) -> set_visibility( _( $self, 'cbConnShowPass' ) -> get_active ); } );
 	_( $self, 'cbCfgPreConnPingPort' )	-> signal_connect( 'toggled' => sub { _( $self, 'spCfgPingTimeout' ) -> set_sensitive( _( $self, 'cbCfgPreConnPingPort' ) -> get_active ); } );
@@ -232,16 +232,16 @@ sub _setupCallbacks {
 	_( $self, 'cfgComboCharEncode' )	-> signal_connect( 'changed' => sub { _( $self, 'cfgLblCharEncode' ) -> set_text( $self -> {_ENCODINGS_HASH}{ _( $self, 'cfgComboCharEncode' ) -> get_active_text } // '' ); } );
 	_( $self, 'cbCfgBWTrayIcon' )		-> signal_connect( 'toggled' => sub { _( $self, 'imgTrayIcon' ) -> set_from_stock( _( $self, 'cbCfgBWTrayIcon' ) -> get_active ? 'pac-tray-bw' : 'pac-tray', 'menu' ); } );
 	_( $self, 'cbCfgShowSudoPassword' )	-> signal_connect( 'toggled' => sub { _( $self, 'entryCfgSudoPassword' ) -> set_visibility( _( $self, 'cbCfgShowSudoPassword' ) -> get_active ); } );
-	
+
 	#DevNote: option currently disabled
 	#_( $self, 'btnCheckVersion' ) -> signal_connect( 'clicked' => sub {
 	#	$PACMain::FUNCS{_MAIN}{_UPDATING} = 1;
 	#	$self -> _updateGUIPreferences;
 	#	PACUtils::_getREADME( $$ );
-	#	
+	#
 	#	return 1;
 	#} );
-	
+
 	# Capture 'export' button clicked
 	_( $self, 'btnExportYAML' ) -> signal_connect( 'button_press_event' => sub {
 		my ( $widget, $event ) = @_;
@@ -252,11 +252,11 @@ sub _setupCallbacks {
 		_wPopUpMenu( \@type, $event, 1 );
 		return 1;
 	} );
-	
+
 	# Capture the "Protect PAC with startup password" checkbutton
 	_( $self, 'cbCfgUseGUIPassword' ) -> signal_connect( 'toggled' => sub {
 		$$self{_CFGTOGGLEPASS} or return $$self{_CFGTOGGLEPASS} = 1;
-		
+
 		if ( _( $self, 'cbCfgUseGUIPassword' ) -> get_active ) {
 			my $pass_ok = _wSetPACPassword( $self, 0 );
 			! $pass_ok and $$self{_CFGTOGGLEPASS} = 0;
@@ -272,28 +272,28 @@ sub _setupCallbacks {
 				_wMessage( $$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!' );
 				return 1;
 			}
-			
+
 			$$self{_CFG}{'defaults'}{'gui password'} = $CIPHER -> encrypt_hex( '' );
 			_( $self, 'hboxCfgPACPassword' ) -> set_sensitive( 0 );
 			$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 		}
-		
+
 		return 0;
 	} );
-	
+
 	_( $self, 'entryCfgSudoPassword' ) -> signal_connect( 'button_press_event' => sub {
 			my ( $widget, $event ) = @_;
-			
+
 			return 0 unless $event -> button eq 3;
-			
+
 			my @menu_items;
-			
+
 			# Populate with <<ASK_PASS>> special string
 			push( @menu_items, {
 				label => 'Interactive Password input',
 				code => sub { _( $self, 'entryCfgSudoPassword' ) -> delete_text( 0, -1 ); _( $self, 'entryCfgSudoPassword' ) -> insert_text( '<<ASK_PASS>>', -1, 0 ); }
 			} );
-			
+
 			# Populate with user defined variables
 			my @variables_menu;
 			my $i = 0;
@@ -310,7 +310,7 @@ sub _setupCallbacks {
 				sensitive => scalar @{ $$self{variables} },
 				submenu => \@variables_menu
 			} );
-			
+
 			# Populate with global defined variables
 			my @global_variables_menu;
 			foreach my $var ( sort { $a cmp $b } keys %{ $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'} } ) {
@@ -325,7 +325,7 @@ sub _setupCallbacks {
 				sensitive => scalar( @global_variables_menu ),
 				submenu => \@global_variables_menu
 			} );
-			
+
 			# Populate with environment variables
 			my @environment_menu;
 			foreach my $key ( sort { $a cmp $b } keys %ENV ) {
@@ -336,12 +336,12 @@ sub _setupCallbacks {
 					code => sub { _( $self, 'entryCfgSudoPassword' ) -> insert_text( "<ENV:$key>", -1, _( $self, 'entryCfgSudoPassword' ) -> get_position ); }
 				} );
 			}
-			
+
 			push( @menu_items, {
 				label => 'Environment variables...',
 				submenu => \@environment_menu
 			} );
-			
+
 			# Populate with <ASK:#> special string
 			push( @menu_items, {
 				label => 'Interactive user input',
@@ -352,7 +352,7 @@ sub _setupCallbacks {
 					_( $self, 'entryCfgSudoPassword' ) -> select_region( $pos + 5, $pos + 11 );
 				}
 			} );
-			
+
 			# Populate with <ASK:*|> special string
 			push( @menu_items, {
 				label => 'Interactive user choose from list',
@@ -363,7 +363,7 @@ sub _setupCallbacks {
 					_( $self, 'entryCfgSudoPassword' ) -> select_region( $pos + 5, $pos + 40 );
 				}
 			} );
-			
+
 			# Populate with <CMD:*> special string
 			push( @menu_items, {
 				label => 'Use a command output as value',
@@ -374,7 +374,7 @@ sub _setupCallbacks {
 					_( $self, 'entryCfgSudoPassword' ) -> select_region( $pos + 5, $pos + 22 );
 				}
 			} );
-			
+
 			# Populate with KeePass special strings
 			if ( $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'} ) {
 				my ( @titles, @usernames, @urls, @query );
@@ -395,7 +395,7 @@ sub _setupCallbacks {
 						code => sub { _( $self, 'entryCfgSudoPassword' ) -> set_text( "<KPX_url:$$hash{url}>" ); }
 					} );
 				}
-				
+
 				push( @menu_items, {
 					label => 'KeePassX',
 					stockicon => 'pac-keepass',
@@ -417,26 +417,26 @@ sub _setupCallbacks {
 					]
 				} );
 			}
-			
+
 			_wPopUpMenu( \@menu_items, $event );
-			
+
 			return 1;
 	} );
-	
+
 	$$self{_WINDOWCONFIG} -> signal_connect( 'delete_event' => sub { _( $self, 'btnCloseConfig' ) -> clicked; return 1; } );
 	$$self{_WINDOWCONFIG} -> signal_connect( 'key_press_event' => sub { my ( $widget, $event ) = @_; $event -> keyval == 65307 and $$self{_WINDOWCONFIG} -> hide; return 0; } );
-	
-	return 1;	
+
+	return 1;
 }
 
 sub _exporter {
 	my $self	= shift;
 	my $format	= shift // 'dumper';
 	my $file	= shift // '';
-	
+
 	my $suffix	= '';
 	my $func	= '';
-	
+
 	if ( $format eq 'yaml' ) {
 		$suffix = '.yml';
 		$func = 'require YAML; YAML::DumpFile( $file, $$self{_CFG} ) or die "ERROR: Could not save file \'$file\' ($!)";';
@@ -445,7 +445,7 @@ sub _exporter {
 		$suffix = '.dumper';
 		$func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open F, ">$file" or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper( $$self{_CFG} ); close F;';
 	}
-	
+
 	my $w;
 	if ( ! $file ) {
 		my $choose = Gtk2::FileChooserDialog -> new(
@@ -458,20 +458,20 @@ sub _exporter {
 		$choose -> set_do_overwrite_confirmation( 1 );
 		$choose -> set_current_folder( $ENV{'HOME'} // '/tmp' );
 		$choose -> set_current_name( 'pac' . $suffix );
-		
+
 		my $out = $choose -> run;
 		$file = $choose -> get_filename;
 		$choose -> destroy;
 		return 1 unless $out eq 'accept';
-		
+
 		$$self{_WINDOWCONFIG} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
 		$w = _wMessage( $$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0 );
 		Gtk2 -> main_iteration while Gtk2 -> events_pending;
 	}
-	
+
 	_cfgSanityCheck( $$self{_CFG} );
 	_cipherCFG( $$self{_CFG} );
-	
+
 	$$self{_CFG}{'__PAC__EXPORTED__FULL__'} = 1;
 	eval "$func";
 	if ( ( ! $@ ) && ( defined $w ) ) {
@@ -483,29 +483,29 @@ sub _exporter {
 	}
 	delete $$self{_CFG}{'__PAC__EXPORTED__'};
 	delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-	
+
 	_decipherCFG( $$self{_CFG} );
 	defined $$self{_WINDOWCONFIG} -> window and $$self{_WINDOWCONFIG} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
-	
+
 	return $file;
 }
 
 sub _resetDefaults {
 	my $self = shift;
-	
+
 	my %default_cfg;
 	defined $default_cfg{'defaults'}{1} or 1;
-	
+
 	PACUtils::_cfgSanityCheck( \%default_cfg );
 	$self -> _updateGUIPreferences( \%default_cfg );
-	
+
 	return 1;
 }
 
 sub _updateGUIPreferences {
 	my $self = shift;
 	my $cfg = shift // $$self{_CFG};
-	
+
 	# Get PROXY from environment
 	my $proxy_ip		= $GCONF -> get_string( '/system/http_proxy/host' ) || $GCONF -> get_string( '/system/proxy/http/host' );
 	my $proxy_port		= $GCONF -> get_int( '/system/http_proxy/port' ) || $GCONF -> get_string( '/system/proxy/http/port' );
@@ -514,7 +514,7 @@ sub _updateGUIPreferences {
 	my $proxy_string	= 'no proxy configured';
 	$proxy_ip		and $proxy_string = "$proxy_ip:$proxy_port";
 	$proxy_user		and $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
-	
+
 	# Main options
 	#_( $self, 'btnCfgLocation' )			-> set_uri( 'file://' . $$self{_CFG}{'defaults'}{'config location'} );
 	_( $self, 'cbCfgAutoAcceptKeys' )		-> set_active( $$cfg{'defaults'}{'auto accept key'} );
@@ -587,7 +587,7 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgRemoveCtrlCharsConf' )	-> set_active( $$cfg{'defaults'}{'remove control chars'} );
 	_( $self, 'cbCfgAllowMoreInstances' )	-> set_active( $$cfg{'defaults'}{'allow more instances'} );
 	_( $self, 'cbCfgShowFavOnUnity' )		-> set_active( $$cfg{'defaults'}{'show favourites in unity'} );
-	
+
 	# Terminal Options
 	_( $self, 'spCfgTmoutConnect' )			-> set_value( $$cfg{'defaults'}{'timeout connect'} );
 	_( $self, 'spCfgTmoutCommand' )			-> set_value( $$cfg{'defaults'}{'timeout command'} );
@@ -643,6 +643,7 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgAudibleBell' )			-> set_active( $$cfg{'defaults'}{'audible bell'} );
 	_( $self, 'cbCfgVisibleBell' )			-> set_active( $$cfg{'defaults'}{'visible bell'} );
 	_( $self, 'cbCfgShowTerminalStatus' )	-> set_active( $$cfg{'defaults'}{'terminal show status bar'} );
+	_( $self, 'cbCfgChangeMainTitle' )	-> set_active( $$cfg{'defaults'}{'change main title'} );
 	_( $self, 'rbCfgSwitchTabsCtrl' )		-> set_active( ! $$cfg{'defaults'}{'how to switch tabs'} );
 	_( $self, 'rbCfgSwitchTabsAlt' )		-> set_active( $$cfg{'defaults'}{'how to switch tabs'} );
 
@@ -668,7 +669,7 @@ sub _updateGUIPreferences {
 	_( $self, 'entryCfgShellBinary' )		-> set_text( $$cfg{'defaults'}{'shell binary'} || '/bin/bash' );
 	_( $self, 'entryCfgShellOptions' )		-> set_text( $$cfg{'defaults'}{'shell options'} );
 	_( $self, 'entryCfgShellDirectory' )	-> set_text( $$cfg{'defaults'}{'shell directory'} );
-	
+
 	# Proxy Configuration
 	_( $self, 'cbCfgProxyToggle' )		-> set_active( $$cfg{'defaults'}{'use proxy'} );
 	_( $self, 'aCfgProxy' )				-> set_sensitive( _( $self, 'cbCfgProxyToggle' ) -> get_active );
@@ -679,7 +680,7 @@ sub _updateGUIPreferences {
 	_( $self, 'entryCfgProxyPort' )		-> set_value( ( $$cfg{'defaults'}{'proxy port'} // 0 ) || 8080 );
 	_( $self, 'entryCfgProxyUser' )		-> set_text( $$cfg{'defaults'}{'proxy user'} );
 	_( $self, 'entryCfgProxyPassword' )	-> set_text( $$cfg{'defaults'}{'proxy pass'} );
-	
+
 	# Global TABS
 	$$self{_SHELL}			-> update( $$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'} );
 	$$self{_VARIABLES}		-> update( $$self{_CFG}{'defaults'}{'global variables'} );
@@ -690,7 +691,7 @@ sub _updateGUIPreferences {
 		_( $self, 'nbPreferences' ) -> set_current_page( -1 );
 		return 0;
 	}
-	
+
 	if ( defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
 		_( $self, 'lblRestartRequired' ) -> set_text( "(*) Requires restarting PAC for the change(s) to take effect\n\n" . ( _( $self, 'cbCfgStartIconified' ) -> get_tooltip_text // '' ) );
 	}
@@ -699,7 +700,7 @@ sub _updateGUIPreferences {
 
 sub _saveConfiguration {
 	my $self = shift;
-	
+
 	$$self{_CFG}{'defaults'}{'command prompt'}					= _( $self, 'entryCfgPrompt' ) 				-> get_chars( 0, -1 );
 	$$self{_CFG}{'defaults'}{'username prompt'}					= _( $self, 'entryCfgUserPrompt' ) 			-> get_chars( 0, -1 );
 	$$self{_CFG}{'defaults'}{'password prompt'}					= _( $self, 'entryCfgPasswordPrompt' ) 		-> get_chars( 0, -1 );
@@ -802,13 +803,14 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'ctrl tab'}						= _( $self, 'rbCfgCtrlTabLast' )			-> get_active ? 'last' : 'next';
 	$$self{_CFG}{'defaults'}{'terminal show status bar'}		= _( $self, 'cbCfgShowTerminalStatus' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'append group name'}				= _( $self, 'cbCfgAutoAppendGroupName' )	-> get_active;
+	$$self{_CFG}{'defaults'}{'change main title'}		= _( $self, 'cbCfgChangeMainTitle' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'when no more tabs'}				= _( $self, 'rbOnNoTabsNothing' )			-> get_active ? 'last' : 'next';
 	$$self{_CFG}{'defaults'}{'selection to clipboard'}			= _( $self, 'cbCfgSelectionToClipboard' )	-> get_active;
 	$$self{_CFG}{'defaults'}{'how to switch tabs'}				= _( $self, 'rbCfgSwitchTabsAlt' )			-> get_active;
 	$$self{_CFG}{'defaults'}{'remove control chars'}			= _( $self, 'cbCfgRemoveCtrlCharsConf' )	-> get_active;
 	$$self{_CFG}{'defaults'}{'allow more instances'}			= _( $self, 'cbCfgAllowMoreInstances' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'show favourites in unity'}		= _( $self, 'cbCfgShowFavOnUnity' )			-> get_active;
-	
+
 	# Terminal colors
 	$$self{_CFG}{'defaults'}{'color black'}						= _( $self, 'colorBlack' )					-> get_color -> to_string;
 	$$self{_CFG}{'defaults'}{'color red'}						= _( $self, 'colorRed' )					-> get_color -> to_string;
@@ -826,11 +828,11 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'color bright magenta'}				= _( $self, 'colorBrightMagenta' )				-> get_color -> to_string;
 	$$self{_CFG}{'defaults'}{'color bright cyan'}					= _( $self, 'colorBrightCyan' )					-> get_color -> to_string;
 	$$self{_CFG}{'defaults'}{'color bright white'}					= _( $self, 'colorBrightWhite' )				-> get_color -> to_string;
-	
+
 	if		( _( $self, 'rbOnNoTabsNothing' ) -> get_active )	{ $$self{_CFG}{'defaults'}{'when no more tabs'} = 0; }
 	elsif	( _( $self, 'rbOnNoTabsClose' ) -> get_active )		{ $$self{_CFG}{'defaults'}{'when no more tabs'} = 1; }
 	else														{ $$self{_CFG}{'defaults'}{'when no more tabs'} = 2; }
-	
+
 	#my $new_cfg_location										= _( $self, 'btnCfgLocation' ) 				-> get_uri // "$ENV{HOME}/.config/pac";
 	#$new_cfg_location											=~ s/^file:\/\///go;
 	#if ( $new_cfg_location ne $$self{_CFG}{'defaults'}{'config location'} ) {
@@ -841,12 +843,12 @@ sub _saveConfiguration {
 	#	}
 	#}
 	#$$self{_CFG}{'defaults'}{'config location'} = $new_cfg_location;
-	
+
 	_( $self, 'rbCfgStartTreeConn' ) 	-> get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'connections';
 	_( $self, 'rbCfgStartTreeFavs' ) 	-> get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'favourites';
 	_( $self, 'rbCfgStartTreeHist' ) 	-> get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'history';
 	_( $self, 'rbCfgStartTreeCluster' ) -> get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
-	
+
 	unlink( $ENV{'HOME'} . '/.config/autostart/pac_start.desktop' );
 	$$self{_CFG}{'defaults'}{'start at session startup'} = 0;
 	if ( _( $self, 'cbCfgAutoStart' ) -> get_active ) {
@@ -854,21 +856,21 @@ sub _saveConfiguration {
 		open F, ">$ENV{HOME}/.config/autostart/pac_start.desktop"; print F join( "\n", @PACUtils::PACDESKTOP ); close F;
 		$$self{_CFG}{'defaults'}{'start at session startup'} = 1;
 	}
-	
+
 	$$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'}	= $$self{_SHELL}		-> get_cfg;	# Save the global variables tab options
 	$$self{_CFG}{'defaults'}{'global variables'}						= $$self{_VARIABLES}	-> get_cfg;	# Save the global variables tab options
 	$$self{_CFG}{'defaults'}{'local commands'}							= $$self{_CMD_LOCAL}	-> get_cfg;	# Save the global local commands tab options
 	$$self{_CFG}{'defaults'}{'remote commands'}							= $$self{_CMD_REMOTE}	-> get_cfg;	# Save the global remote commands tab options
 	$$self{_CFG}{'defaults'}{'keepass'}									= $$self{_KEEPASS}		-> get_cfg;	# Save KeePass options
-	
+
 	$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 	$self -> _updateGUIPreferences;
-	
+
 	$PACMain::FUNCS{_MAIN} -> _updateGUIPreferences;
-	
+
 	# Send a signal to every started terminal for this $uuid to realize the new global CFG
 	map { eval { $$_{'terminal'} -> _updateCFG; }; } ( values %PACMain::RUNNING );
-	
+
 	return 1;
 }
 
