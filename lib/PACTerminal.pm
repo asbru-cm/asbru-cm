@@ -777,9 +777,9 @@ sub _setupCallbacks {
 	} );
 
 	$$self{_GUI}{_VTE} -> signal_connect( 'focus_in_event' => sub {
-	  if ( $$self{_CFG}{defaults}{'change main title'} ) {
-	    $PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title($$self{_TITLE});
-	  }
+		if ( $$self{_CFG}{defaults}{'change main title'} ) {
+		$PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title($$self{_TITLE} . ' - ' . $APPNAME);
+		}
 	} );
 
 	# Capture focus-out of VTE when it shouldn't get out!!!
