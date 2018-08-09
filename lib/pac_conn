@@ -636,7 +636,6 @@ sub _execScript {
 	
 	$TERMINAL{exp}		= $EXP;
 	$TERMINAL{name}		= $NAME;
-	$TERMINAL{method}	= $METHOD;
 	$TERMINAL{uuid}		= $UUID;
 	$TERMINAL{tmp_uuid}	= $TMP_UUID;
 	$TERMINAL{error}	= '';
