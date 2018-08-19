@@ -1813,7 +1813,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'color yellow'}					//=  '#c4c4a0a00000';
 	$$cfg{'defaults'}{'command prompt'}					//= '[#%\$>]|\:\/\s*$';
 	$$cfg{'defaults'}{'username prompt'}				//= '([l|L]ogin|[u|U]suario|([u|U]ser-?)*[n|N]ame.*|[u|U]ser)\s*:\s*$';
-	$$cfg{'defaults'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+)*|[c|C]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+	$$cfg{'defaults'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 	$$cfg{'defaults'}{'hostkey changed prompt'}			//= '^.+ontinue connecting \((.+)\/(.+)\)\?\s*$';
 	$$cfg{'defaults'}{'press any key prompt'}			//= '.*(any key to continue|tecla para continuar).*';
 	$$cfg{'defaults'}{'remote host changed prompt'}		//= '.*ffending .*key in (.+?)\:(\d+).*';
@@ -2002,7 +2002,7 @@ sub _cfgSanityCheck {
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'back color'}					//= '#000000000000'; # Black
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'}				//= '(\]\#|\$\s)+';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'}				//= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'}					//= 'block';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'}					//= 1;
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'}					//= 'Monospace 9';
@@ -2269,7 +2269,7 @@ sub _cfgSanityCheck {
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'back color'}					= '#000000000000'; # Black
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'}				= '[#%\$>]|\:\/\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'}				= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'} 				= 'block';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'}					= 1;
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'}				= 'Monospace 9';
@@ -2296,7 +2296,7 @@ sub _cfgSanityCheck {
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'back color'}					//= '#000000000000'; # Black
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'}				//= '(\]\#|\$\s)+';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'}				//= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}				//= 'block';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'}					//= 1;
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'}				//= 'Monospace 9';
