@@ -19,6 +19,7 @@ env:
     - OS=fedora DIST=28 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
+    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic DOCKER_REPO=asbru/asbru-cm
 install:
       - sudo apt-get update
       - sudo apt-get install git devscripts debhelper quilt
