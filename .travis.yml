@@ -21,8 +21,8 @@ env:
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic DOCKER_REPO=asbru/asbru-cm
 install:
-      - sudo apt-get update
-      - sudo apt-get install git devscripts debhelper quilt
+    - sudo apt-get update
+    - sudo apt-get install git devscripts debhelper quilt
 script: ./build.sh
 deploy:
   - provider: packagecloud
@@ -45,7 +45,7 @@ deploy:
       tags: true
 
 after_deploy:
-        # Prune old packages from packagecloud. The last 5 should be enough.
-        - pip install -r ./packpack/tools/requirements.txt
-        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
-        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
+  # Prune old packages from packagecloud. The last 5 should be enough.
+  - pip install -r ./packpack/tools/requirements.txt
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
