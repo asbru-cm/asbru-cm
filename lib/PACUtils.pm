@@ -345,7 +345,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_rdesktop.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -407,7 +407,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_rdesktop.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_rdesktop.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -468,7 +468,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_vncviewer.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_vncviewer.jpg', 16, 16, 0 ),
 		'escape' => [ "\cc" ]
 	};
 	
@@ -518,7 +518,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cu.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_cu.jpg', 16, 16, 0 ),
 		'escape' => [ '~.' ]
 	};
 	
@@ -579,7 +579,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_remote-tty.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_remote-tty.jpg', 16, 16, 0 )
 	};
 	
 	`which c3270 1>/dev/null 2>&1`; my $c3270 = $?;
@@ -629,7 +629,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_3270.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_3270.jpg', 16, 16, 0 )
 	};
 	
 	`which autossh 1>/dev/null 2>&1`; my $autossh = ! $?;
@@ -691,7 +691,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( $autossh );
 			_( $self, 'cbAutossh' )				-> set_active( $$cfg{'autossh'} );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ssh.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_ssh.jpg', 16, 16, 0 ),
 		'escape' => [ '~.' ]
 	};
 	
@@ -751,7 +751,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_mosh.png', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_mosh.png', 16, 16, 0 ),
 		'escape' => [ "\c^x." ]
 	};
 	
@@ -811,7 +811,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_cadaver.png', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_cadaver.png', 16, 16, 0 ),
 		'escape' => [ "\cc", "quit\n" ]
 	};
 	
@@ -871,7 +871,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_telnet.jpg', 16, 16, 0 ),
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_telnet.jpg', 16, 16, 0 ),
 		'escape' => [ "\c]", "quit\n" ]
 	};
 	
@@ -932,7 +932,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_sftp.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_sftp.jpg', 16, 16, 0 )
 	};
 	
 	$methods{ 'FTP' } = {
@@ -990,7 +990,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_ftp.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_ftp.jpg', 16, 16, 0 )
 	};
 	
 	$methods{ 'Generic Command' } = {
@@ -1038,7 +1038,7 @@ sub _getMethods {
 			_( $self, 'cbAutossh' )				-> set_sensitive( 0 );
 			_( $self, 'cbAutossh' )				-> set_active( 0 );
 		},
-		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_method_generic.jpg', 16, 16, 0 )
+		'icon' => Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_method_generic.jpg', 16, 16, 0 )
 	};
 	
 	return %methods;
@@ -1047,51 +1047,53 @@ sub _getMethods {
 sub _registerPACIcons {
 	my %icons = (
 		'pac-app-big'						=> $RES_DIR . '/asbru-logo-64.png',
-		'pac-group-add'						=> $RES_DIR . '/pac_group_add_16x16.png',
-		'pac-node-add'						=> $RES_DIR . '/pac_node_add_16x16.png',
-		'pac-node-del'						=> $RES_DIR . '/pac_node_del_16x16.png',
-		'pac-chain'							=> $RES_DIR . '/pac_chain.png',
-		'pac-cluster-auto'					=> $RES_DIR . '/pac_cluster_auto.png',
-		'pac-cluster-manager2'				=> $RES_DIR . '/pac_cluster_manager2.png',
-		'pac-cluster-manager'				=> $RES_DIR . '/pac_cluster_manager.png',
-		'pac-cluster-manager-off'			=> $RES_DIR . '/pac_cluster_manager_off.png',
-		'pac-favourite-on'					=> $RES_DIR . '/pac_favourite_on.png',
-		'pac-favourite-off'					=> $RES_DIR . '/pac_favourite_off.png',
-		'pac-group-closed'					=> $RES_DIR . '/pac_group_closed_16x16.png',
-		'pac-group-closed'					=> $RES_DIR . '/pac_group_closed_16x16.png',
-		'pac-group-open'					=> $RES_DIR . '/pac_group_open_16x16.png',
-		'pac-group'							=> $RES_DIR . '/pac_group.png',
-		'pac-history'						=> $RES_DIR . '/pac_history.png',
-		'pac-keepass'						=> $RES_DIR . '/pac_keepass.png',
-		'pac-method-WebDAV'					=> $RES_DIR . '/pac_method_cadaver.png',
-		'pac-method-MOSH'					=> $RES_DIR . '/pac_method_mosh.png',
-		'pac-method-IBM 3270/5250'			=> $RES_DIR . '/pac_method_3270.jpg',
-		'pac-method-Serial (cu)'			=> $RES_DIR . '/pac_method_cu.jpg',
-		'pac-method-FTP'					=> $RES_DIR . '/pac_method_ftp.jpg',
-		'pac-method-Generic Command'		=> $RES_DIR . '/pac_method_generic.jpg',
-		'pac-method-RDP (Windows)'			=> $RES_DIR . '/pac_method_rdesktop.jpg',
-		'pac-method-RDP (rdesktop)'			=> $RES_DIR . '/pac_method_rdesktop.jpg',
-		'pac-method-RDP (xfreerdp)'			=> $RES_DIR . '/pac_method_rdesktop.jpg',
-		'pac-method-Serial (remote-tty)'	=> $RES_DIR . '/pac_method_remote-tty.jpg',
-		'pac-method-SFTP'					=> $RES_DIR . '/pac_method_sftp.jpg',
-		'pac-method-SSH'					=> $RES_DIR . '/pac_method_ssh.jpg',
-		'pac-method-Telnet'					=> $RES_DIR . '/pac_method_telnet.jpg',
-		'pac-method-VNC'					=> $RES_DIR . '/pac_method_vncviewer.jpg',
-		'pac-quick-connect'					=> $RES_DIR . '/pac_quick_connect.png',
-		'pac-script'						=> $RES_DIR . '/pac_script.png',
-		'pac-shell'							=> $RES_DIR . '/pac_shell.png',
-		'pac-tab'							=> $RES_DIR . '/pac_tab.png',
-		'pac-terminal-ok-small'				=> $RES_DIR . '/pac_terminal16x16.png',
-		'pac-terminal-ok-big'				=> $RES_DIR . '/pac_terminal64x64.png',
-		'pac-terminal-ko-small'				=> $RES_DIR . '/pac_terminal_x16x16.png',
-		'pac-terminal-ko-big'				=> $RES_DIR . '/pac_terminal_x64x64.png',
-		'pac-tray-bw'						=> $RES_DIR . '/pac_tray_bw.png',
+		'pac-group-add'						=> $RES_DIR . '/asbru_group_add_16x16.png',
+		'pac-node-add'						=> $RES_DIR . '/asbru_node_add_16x16.png',
+		'pac-node-del'						=> $RES_DIR . '/asbru_node_del_16x16.png',
+		'pac-chain'							=> $RES_DIR . '/asbru_chain.png',
+		'pac-cluster-auto'					=> $RES_DIR . '/asbru_cluster_auto.png',
+		'pac-cluster-manager2'				=> $RES_DIR . '/asbru_cluster_manager2.png',
+		'pac-cluster-manager'				=> $RES_DIR . '/asbru_cluster_manager.png',
+		'pac-cluster-manager-off'			=> $RES_DIR . '/asbru_cluster_manager_off.png',
+		'pac-favourite-on'					=> $RES_DIR . '/asbru_favourite_on.png',
+		'pac-favourite-off'					=> $RES_DIR . '/asbru_favourite_off.png',
+		'pac-group-closed'					=> $RES_DIR . '/asbru_group_closed_16x16.png',
+		'pac-group-closed'					=> $RES_DIR . '/asbru_group_closed_16x16.png',
+		'pac-group-open'					=> $RES_DIR . '/asbru_group_open_16x16.png',
+		'pac-group'							=> $RES_DIR . '/asbru_group.png',
+		'pac-history'						=> $RES_DIR . '/asbru_history.png',
+		'pac-keepass'						=> $RES_DIR . '/asbru_keepass.png',
+		'pac-method-WebDAV'					=> $RES_DIR . '/asbru_method_cadaver.png',
+		'pac-method-MOSH'					=> $RES_DIR . '/asbru_method_mosh.png',
+		'pac-method-IBM 3270/5250'			=> $RES_DIR . '/asbru_method_3270.jpg',
+		'pac-method-Serial (cu)'			=> $RES_DIR . '/asbru_method_cu.jpg',
+		'pac-method-FTP'					=> $RES_DIR . '/asbru_method_ftp.jpg',
+		'pac-method-Generic Command'		=> $RES_DIR . '/asbru_method_generic.jpg',
+		'pac-method-RDP (Windows)'			=> $RES_DIR . '/asbru_method_rdesktop.jpg',
+		'pac-method-RDP (rdesktop)'			=> $RES_DIR . '/asbru_method_rdesktop.jpg',
+		'pac-method-RDP (xfreerdp)'			=> $RES_DIR . '/asbru_method_rdesktop.jpg',
+		'pac-method-Serial (remote-tty)'	=> $RES_DIR . '/asbru_method_remote-tty.jpg',
+		'pac-method-SFTP'					=> $RES_DIR . '/asbru_method_sftp.jpg',
+		'pac-method-SSH'					=> $RES_DIR . '/asbru_method_ssh.jpg',
+		'pac-method-Telnet'					=> $RES_DIR . '/asbru_method_telnet.jpg',
+		'pac-method-VNC'					=> $RES_DIR . '/asbru_method_vncviewer.jpg',
+		'pac-quick-connect'					=> $RES_DIR . '/asbru_quick_connect.png',
+		'pac-script'						=> $RES_DIR . '/asbru_script.png',
+		'pac-shell'							=> $RES_DIR . '/asbru_shell.png',
+		'pac-tab'							=> $RES_DIR . '/asbru_tab.png',
+		'pac-terminal-ok-small'				=> $RES_DIR . '/asbru_terminal16x16.png',
+		'pac-terminal-ok-big'				=> $RES_DIR . '/asbru_terminal64x64.png',
+		'pac-terminal-ko-small'				=> $RES_DIR . '/asbru_terminal_x16x16.png',
+		'pac-terminal-ko-big'				=> $RES_DIR . '/asbru_terminal_x64x64.png',
+		'pac-tray-bw'						=> $RES_DIR . '/asbru_tray_bw.png',
 		'pac-tray'							=> $RES_DIR . '/asbru-logo-tray.png',
-		'pac-treelist'						=> $RES_DIR . '/pac_treelist.png',
-		'pac-wol'							=> $RES_DIR . '/pac_wol.png',
-		'pac-prompt'						=> $RES_DIR . '/pac_prompt.png',
-		'pac-protected'						=> $RES_DIR . '/pac_protected.png',
-		'pac-unprotected'					=> $RES_DIR . '/pac_unprotected.png',
+		'pac-treelist'						=> $RES_DIR . '/asbru_treelist.png',
+		'pac-wol'							=> $RES_DIR . '/asbru_wol.png',
+		'pac-prompt'						=> $RES_DIR . '/asbru_prompt.png',
+		'pac-protected'						=> $RES_DIR . '/asbru_protected.png',
+		'pac-unprotected'					=> $RES_DIR . '/asbru_unprotected.png',
+		'pac-buttonbar-show'					=> $RES_DIR . '/asbru_buttonbar_show.png',
+		'pac-buttonbar-hide'					=> $RES_DIR . '/asbru_buttonbar_hide.png',
 	);
 	
 	my $icon_factory = Gtk3::IconFactory -> new;
@@ -1352,7 +1354,7 @@ sub _wAddRenameNode {
 	} elsif ( $action eq 'add' ) {
 		$name			= '';
 		$parent_name	= $$cfg{'environments'}{ $uuid }{'name'};
-		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ");
+		$title			= $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : " - $parent_name");
 		$lblup			= "<b>Adding new node into '" . ( $uuid eq '__PAC__ROOT__' ? 'ROOT' : "$parent_name" ) . "'</b>";
 	}
 	
@@ -1406,7 +1408,8 @@ sub _wAddRenameNode {
 			$w{window}{gui}{entry1} -> set_text( $name );
 			$w{window}{gui}{entry1} -> set_activates_default( 1 );
 			$w{window}{gui}{entry1} -> signal_connect( 'changed', sub {
-				$w{window}{gui}{entry2} -> set_text( ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : "$parent_name - ") ) . $w{window}{gui}{entry1} -> get_chars( 0, -1 ) );
+				$w{window}{gui}{entry2} -> set_text( $w{window}{gui}{entry1} -> get_chars( 0, -1 ) . ( $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' :  " - $parent_name" ) ) );
+
 			} );
 		
 		# Create an HBox to contain a label and an entry
@@ -1745,7 +1748,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'color yellow'}					//=  '#c4c4a0a00000';
 	$$cfg{'defaults'}{'command prompt'}					//= '[#%\$>]|\:\/\s*$';
 	$$cfg{'defaults'}{'username prompt'}				//= '([l|L]ogin|[u|U]suario|([u|U]ser-?)*[n|N]ame.*|[u|U]ser)\s*:\s*$';
-	$$cfg{'defaults'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+)*|[c|C]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+	$$cfg{'defaults'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 	$$cfg{'defaults'}{'hostkey changed prompt'}			//= '^.+ontinue connecting \((.+)\/(.+)\)\?\s*$';
 	$$cfg{'defaults'}{'press any key prompt'}			//= '.*(any key to continue|tecla para continuar).*';
 	$$cfg{'defaults'}{'remote host changed prompt'}		//= '.*ffending .*key in (.+?)\:(\d+).*';
@@ -1756,6 +1759,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'debug'}							//= 0;
 	$$cfg{'defaults'}{'tabs in main window'}			//= 1;
 	$$cfg{'defaults'}{'auto hide connections list'}		//= 0;
+	$$cfg{'defaults'}{'auto hide button bar'}		    //= 0;
 	$$cfg{'defaults'}{'hide on connect'}				//= 0;
 	$$cfg{'defaults'}{'ping port before connect'}		//= 0;
 	$$cfg{'defaults'}{'ping port timeout'}				//= 1;
@@ -1933,7 +1937,7 @@ sub _cfgSanityCheck {
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'back color'}					//= '#000000000000'; # Black
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'}				//= '(\]\#|\$\s)+';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'}				//= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'}					//= 'block';
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'}					//= 1;
 	$$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'}					//= 'Monospace 9';
@@ -2200,7 +2204,7 @@ sub _cfgSanityCheck {
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'back color'}					= '#000000000000'; # Black
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'}				= '[#%\$>]|\:\/\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'}				= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'} 				= 'block';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'}					= 1;
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'}				= 'Monospace 9';
@@ -2227,7 +2231,7 @@ sub _cfgSanityCheck {
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'back color'}					//= '#000000000000'; # Black
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'}				//= '(\]\#|\$\s)+';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'}				//= '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$';
-			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$';
+			$$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}				//= 'block';
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'}					//= 1;
 			$$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'}				//= 'Monospace 9';
@@ -2670,7 +2674,7 @@ sub _wakeOnLan {
 	$w{window}{data} -> set_size_request( -1, -1 );
 	$w{window}{data} -> set_resizable( 0 );
 		
-		$w{window}{data} -> vbox -> pack_start( Gtk3::Image -> new_from_file( $RES_DIR . '/pac_banner_wol.png' ), 0, 1, 0 );
+		$w{window}{data} -> vbox -> pack_start( Gtk3::Image -> new_from_file( $RES_DIR . '/asbru_banner_wol.png' ), 0, 1, 0 );
 		
 		# Create an HBox to contain a picture and a label
 		$w{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );

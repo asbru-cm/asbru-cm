@@ -1,3 +1,9 @@
+asbru-cm (5.1.0-1) stable; urgency=medium
+
+  * Upstream 5.1.0 release
+
+ -- Ásbrú Project Team <contact@asbru-cm.net> Mon, 23 Jul 2018 20:56:29 +0100
+
 asbru-cm (5.0.0-1) stable; urgency=medium
 
   * Upstream 5.0.0 release

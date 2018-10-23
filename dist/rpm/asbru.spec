@@ -60,6 +60,8 @@ Requires:   vte
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
+BuildRequires: pkgconfig
+BuildRequires: bash-completion
 BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %description
@@ -93,6 +95,8 @@ mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/{24x24,64x64,256x256,scalable}/a
 install -m 755 asbru-cm %{buildroot}/%{_bindir}/%{name}
 install -m 755 utils/pac_from_mcm.pl %{buildroot}/%{_bindir}/%{name}_from_mcm
 install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putty
+
+echo Bashcompletion Directory %{_bashcompletiondir}
 
 cp -a res/asbru-cm.desktop %{buildroot}/%{_datadir}/applications/%{name}.desktop
 cp -a res/asbru-cm.1 %{buildroot}/%{_mandir}/man1/%{name}.1
@@ -136,6 +140,8 @@ fi
 
 
 %changelog
+* Mon Jul 23 2018 Ásbrú Project Team <contact@asbru-cm.net> 5.1.0
+- 5.1.0 release
 * Fri Dec 29 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0
 - Final 5.0.0 release
 * Sat Nov 4 2017 Asbru Project Team <contact@asbru-cm.net> 5.0.0

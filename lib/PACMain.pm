@@ -91,12 +91,12 @@ my $PAC_START_PROGRESS	= 0;
 my $PAC_START_TOTAL		= 6;
 
 my $APPICON			= $RES_DIR . '/asbru-logo-64.png';
-my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/pac_cluster_auto.png' );
-my $CLUSTERICON		= _pixBufFromFile( $RealBin . '/res/pac_cluster_manager.png' );
-my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
-my $GROUPICON		= _pixBufFromFile( $RealBin . '/res/pac_group_open_16x16.png' );
-my $GROUPICONOPEN	= _pixBufFromFile( $RealBin . '/res/pac_group_open_16x16.png' );
-my $GROUPICONCLOSED	= _pixBufFromFile( $RealBin . '/res/pac_group_closed_16x16.png' );
+my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/asbru_cluster_auto.png' );
+my $CLUSTERICON		= _pixBufFromFile( $RealBin . '/res/asbru_cluster_manager.png' );
+my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/asbru_group.png' );
+my $GROUPICON		= _pixBufFromFile( $RealBin . '/res/asbru_group_open_16x16.png' );
+my $GROUPICONOPEN	= _pixBufFromFile( $RealBin . '/res/asbru_group_open_16x16.png' );
+my $GROUPICONCLOSED	= _pixBufFromFile( $RealBin . '/res/asbru_group_closed_16x16.png' );
 
 my $CHECK_VERSION	= 0;
 my $NEW_VERSION		= 0;
@@ -1917,6 +1917,8 @@ sub _setupCallbacks {
 			last;
 		}
 		
+		$$self{_GUI}{hbuttonbox1} -> set_visible( ( $pnum == 0 ) || ( $pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'} ) );
+		
 		return 1;
 	} );
 
@@ -2728,6 +2730,7 @@ sub _launchTerminals {
 	# Check if user wants main window to be close when a terminal comes up
 	( $$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'} ) and $self -> _hideConnectionsList;
 	( $$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'} ) and $$self{_GUI}{showConnBtn} -> set_active( 0 );
+	( $$self{_CFG}{'defaults'}{'auto hide button bar'} ) and $$self{_GUI}{hbuttonbox1} -> hide;
 	
 	my $wtmp;
 	scalar( @{ $terminals } ) > 1 and $wtmp = _wMessage( $$self{_GUI}{main}, "Starting '<b><big>". ( scalar( @{ $terminals } ) ) . "</big></b>' terminals...", 0 );
@@ -2775,7 +2778,7 @@ sub _launchTerminals {
 		
 		$$t{_GUI}{_VTE} -> grab_focus;
 		my $uuid	= $$t{_UUID};
-		my $icon	= $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/pac_shell.png', 16, 16, 0 ) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
+		my $icon	= $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_shell.png', 16, 16, 0 ) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
 		my $name	= $$self{_CFG}{'environments'}{$uuid}{'name'};
 		unshift( @{ $$self{_GUI}{treeHistory}{data} }, ( { value => [ $icon, $name, $uuid, 	strftime( "%H:%M:%S %d-%m-%Y", localtime( $FUNCS{_STATS}{statistics}{$uuid}{start} ) ) ] } ) );
 	}
@@ -3256,8 +3259,6 @@ sub _updateGUIPreferences {
 	$$self{_GUI}{lockPACBtn} -> set_sensitive( $$self{_CFG}{'defaults'}{'use gui password'} );
 	
 	$self -> _updateGUIWithUUID( $sel_uuids[0] ) if $total == 1;
-	
-	$self -> _setCFGChanged( 1 );
 	
 	return 1;
 }

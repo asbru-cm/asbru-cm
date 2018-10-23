@@ -54,12 +54,12 @@ my $APPVERSION		= $PACUtils::APPVERSION;
 
 my $CFG_DIR			= $ENV{'HOME'} . '/.config/pac';
 my $CLUSTERS_FILE	= $CFG_DIR . '/pac_clusters.nfreeze';
-my $GROUPICONCLOSED	= _pixBufFromFile( $RealBin . '/res/pac_group_closed_16x16.png' );
-my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/pac_group.png' );
-my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/pac_cluster_auto.png' );
-my $ICON_ON			= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/pac_terminal16x16.png', 16, 16, 0 );
-my $ICON_OFF		= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/pac_terminal_x16x16.png', 16, 16, 0 );
-my $BANNER			= Gtk3::Image -> new_from_file( $RealBin . '/res/pac_banner_cluster.png' );
+my $GROUPICONCLOSED	= _pixBufFromFile( $RealBin . '/res/asbru_group_closed_16x16.png' );
+my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/asbru_group.png' );
+my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/asbru_cluster_auto.png' );
+my $ICON_ON			= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal16x16.png', 16, 16, 0 );
+my $ICON_OFF		= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal_x16x16.png', 16, 16, 0 );
+my $BANNER			= Gtk3::Image -> new_from_file( $RealBin . '/res/asbru_banner_cluster.png' );
 # END: Define GLOBAL CLASS variables
 ###################################################################
 

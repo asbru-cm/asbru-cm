@@ -11,15 +11,18 @@ env:
     - OS=debian DIST=jessie PACKAGE=deb
     - OS=debian DIST=stretch PACKAGE=deb
     - OS=ubuntu DIST=trusty PACKAGE=deb
-    - OS=ubuntu DIST=artful PACKAGE=deb
     - OS=ubuntu DIST=xenial PACKAGE=deb
-    - OS=fedora DIST=27 PACKAGE=rpm DOCKER_IMAGE=fedora-rawhide
+    - OS=ubuntu DIST=artful PACKAGE=deb
+    - OS=ubuntu DIST=bionic PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
     - OS=fedora DIST=26 PACKAGE=rpm
+    - OS=fedora DIST=27 PACKAGE=rpm
+    - OS=fedora DIST=28 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
+    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic DOCKER_REPO=asbru/asbru-cm
 install:
-        - sudo apt-get update
-        - sudo apt-get install git devscripts debhelper quilt
+    - sudo apt-get update
+    - sudo apt-get install git devscripts debhelper quilt
 script: ./build.sh
 deploy:
   - provider: packagecloud
@@ -42,7 +45,7 @@ deploy:
       tags: true
 
 after_deploy:
-        # Prune old packages from packagecloud. The last 5 should be enough.
-        - pip install -r ./packpack/tools/requirements.txt
-        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
-        - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
+  # Prune old packages from packagecloud. The last 5 should be enough.
+  - pip install -r ./packpack/tools/requirements.txt
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5

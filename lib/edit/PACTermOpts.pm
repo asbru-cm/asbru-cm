@@ -100,7 +100,7 @@ sub update {
 	
 	$$self{gui}{entryCfgPrompt}				-> set_text( $$cfg{'command prompt'} // '[#%\$>]|\:\/\s*$' );
 	$$self{gui}{entryCfgUserPrompt}			-> set_text( $$cfg{'username prompt'} // '([l|L]ogin|[u|u]suario|[u|U]ser-?[n|N]ame|[u|U]ser):\s*$' );
-	$$self{gui}{entryCfgPasswordPrompt}		-> set_text( $$cfg{'password prompt'} // '([p|P]ass|[p|P]ass[w|W]or[d|t]|ontrase.a|Enter passphrase for key \'.+\'):\s*$' );
+	$$self{gui}{entryCfgPasswordPrompt}		-> set_text( $$cfg{'password prompt'} // '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$' );
 	
 	$$self{gui}{cbTabBackColor}				-> set_active( $$cfg{'use tab back color'} // 0 );
 	_updateWidgetColor( $self, $cfg, $$self{gui}{colorTabBack}, 'tab back black', '#000000000000' );

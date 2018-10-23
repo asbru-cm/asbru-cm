@@ -1,3 +1,5 @@
 # Eclipse files
 .project
 .includepath
+# Vim temporary files
+*.sw?
