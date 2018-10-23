@@ -2127,7 +2127,7 @@ sub _tabToWin {
 	# Capture window close
 	$$self{_WINDOWTERMINAL} -> signal_connect( 'delete_event' => sub {
 		$self -> stop( undef, 1 ) unless $$self{_GUILOCKED};
-		return Gtk2::EVENT_STOP; # stop propagation
+		return Gtk3::EVENT_STOP; # stop propagation
 	} );
 
 	$self -> _updateCFG;
