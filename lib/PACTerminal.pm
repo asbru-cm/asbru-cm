@@ -636,7 +636,7 @@ sub _initGUI {
 
 			# Create a button to show the info tab
 			$$self{_GUI}{btnShowInfoTab} = Gtk3::Button -> new;
-			$$self{_GUI}{btnShowInfoTab} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-info', 'GTK_ICON_SIZE_BUTTON' ));
+			$$self{_GUI}{btnShowInfoTab} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-info', 'GTK_ICON_SIZE_BUTTON' ));
 			$$self{_GUI}{btnShowInfoTab} -> set_tooltip_text( 'Show information tab (Shift+Ctrl+I)' );
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowInfoTab}, 0, 1, 4 );
 
@@ -750,10 +750,10 @@ sub _setupCallbacks {
 
 	$$self{_GUI}{btnShowButtonBar} -> signal_connect( 'toggled', sub {
 		if ($$self{_GUI}{btnShowButtonBar} -> get_active()) {
-			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk2::Image -> new_from_stock( 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON' ));
+			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk3::Image -> new_from_stock( 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON' ));
 			$PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1} -> show();
 		} else {
-			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk2::Image -> new_from_stock( 'pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON' ));
+			$$self{_GUI}{btnShowButtonBar} -> set_image( Gtk3::Image -> new_from_stock( 'pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON' ));
 			$PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1} -> hide();
 		};
 	} );
@@ -867,14 +867,14 @@ sub _setupCallbacks {
 			}
 			# V --> PASTE
 			elsif ( lc $keyval eq 'v' )	{
-				my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+				my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
 				$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
 				return 1;
 			}
 			# B --> PASTE AND DELETE
 			elsif ( lc $keyval eq 'b' )
 			{
-				my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk2::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
+				my $text = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk -> SELECTION_CLIPBOARD ) -> wait_for_text;
 				my $delete = _wEnterValue(
 					$$self{_GUI},
 					"Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
