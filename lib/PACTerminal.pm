@@ -1420,6 +1420,13 @@ sub _vteMenu {
 				tooltip		=> "Remove the split view and put each connection into its own tab",
 				code		=> sub { $self -> _unsplit; }
 			} );
+			push( @vte_menu_items,
+			{
+				label		=> 'Equally resize terminals',
+				stockicon	=> 'gtk-zoom-fit',
+				tooltip		=> "Resize terminals equally",
+				code		=> sub { $self -> _equalresize; }
+			} );
 		} else {
 			push( @vte_menu_items,
 			{
@@ -2268,6 +2275,12 @@ sub _tabMenu {
 					stockicon	=> 'gtk-zoom-fit',
 					code		=> sub { $self -> _unsplit; }
 				} );
+				push( @vte_menu_items,
+				{
+					label		=> 'Equally resize terminals',
+					stockicon	=> 'gtk-zoom-fit',
+					code		=> sub { $self -> _equalresize; }
+				} );
 			} else {
 				push( @vte_menu_items,
 				{
@@ -2455,9 +2468,25 @@ sub _split {
 	$self -> _setTabColour;
 	$PACMain::RUNNING{$uuid_tmp}{terminal} -> _updateCFG;
 
-	my $req = $$self{_GUI}{_VBOX} -> get_parent -> size_request;
+	my $req = $$self{_SPLIT_VPANE} -> get_parent -> allocation;
 	my ( $x, $y ) = ( $req -> width, $req -> height );
-	$$self{_SPLIT_VPANE} -> set_position( ( $vertical ? $y : $x ) / 1.3 );
+	$$self{_SPLIT_VPANE} -> set_position( ( ( $vertical ? $y : $x ) / 2 ) - 7 );
+
+	if ( $$self{_CFG}{'defaults'}{'force split tabs to 50%'} ) {
+		$$self{_SPLIT_VPANE} -> signal_connect( 'size-allocate', sub {
+			$self -> _equalresize ();
+		} );
+	}
+
+	return 1;
+}
+
+sub _equalresize {
+	my $self = shift;
+
+	my $req = $$self{_SPLIT_VPANE} -> get_parent -> allocation;
+	my ( $x, $y ) = ( $req -> width, $req -> height );
+	$$self{_SPLIT_VPANE} -> set_position( ( ( $$self{_SPLIT_VERTICAL} ? $y : $x ) / 2 ) - 7 );
 
 	return 1;
 }
