@@ -519,6 +519,7 @@ sub _updateGUIPreferences {
 	#_( $self, 'btnCfgLocation' )			-> set_uri( 'file://' . $$self{_CFG}{'defaults'}{'config location'} );
 	_( $self, 'cbCfgAutoAcceptKeys' )		-> set_active( $$cfg{'defaults'}{'auto accept key'} );
 	_( $self, 'cbCfgHideOnConnect' )		-> set_active( $$cfg{'defaults'}{'hide on connect'} );
+	_( $self, 'cbCfgForceSpitSize' )		-> set_active( $$cfg{'defaults'}{'force split tabs to 50%'} );
 	_( $self, 'cbCfgCloseToTray' )			-> set_active( $$cfg{'defaults'}{'close to tray'} );
 	_( $self, 'cbCfgStartMainMaximized' )	-> set_active( $$cfg{'defaults'}{'start main maximized'} );
 	_( $self, 'cbCfgRememberSize' )			-> set_active( $$cfg{'defaults'}{'remember main size'} );
@@ -729,6 +730,7 @@ sub _saveConfiguration {
 	$$self{_CFG}{'defaults'}{'auto hide connections list'}		= _( $self, 'cbCfgConnectionsAutoHide' )	-> get_active;
 	$$self{_CFG}{'defaults'}{'auto hide button bar'}			= _( $self, 'cbCfgButtonBarAutoHide' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'hide on connect'}					= _( $self, 'cbCfgHideOnConnect' ) 			-> get_active;
+	$$self{_CFG}{'defaults'}{'force split tabs to 50%'}					= _( $self, 'cbCfgForceSpitSize' ) 			-> get_active;
 	$$self{_CFG}{'defaults'}{'ping port before connect'}		= _( $self, 'cbCfgPreConnPingPort' )		-> get_active;
 	$$self{_CFG}{'defaults'}{'ping port timeout'}				= _( $self, 'spCfgPingTimeout' )			-> get_chars( 0, -1 );
 	$$self{_CFG}{'defaults'}{'start iconified'}					= _( $self, 'cbCfgStartIconified' )			-> get_active;

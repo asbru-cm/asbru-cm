@@ -12,6 +12,7 @@ defaults:
   disconnected color: '#ffff00000000'
   global variables: {}
   hide on connect: ''
+  force split tabs to 50%: 0
   intro reconnects: ''
   minimize to tray: ''
   new data color: '#00008888ffff'
