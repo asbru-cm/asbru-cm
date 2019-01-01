@@ -4,6 +4,7 @@
 [![License][license-badge]][license-url]
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/KlaasT)
 
 [<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
 
