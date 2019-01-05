@@ -13,13 +13,15 @@ env:
     - OS=ubuntu DIST=trusty PACKAGE=deb
     - OS=ubuntu DIST=xenial PACKAGE=deb
     - OS=ubuntu DIST=artful PACKAGE=deb
-    - OS=ubuntu DIST=bionic PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
+    - OS=ubuntu DIST=bionic PACKAGE=deb
+    - OS=ubuntu DIST=cosmic PACKAGE=deb
     - OS=fedora DIST=26 PACKAGE=rpm
     - OS=fedora DIST=27 PACKAGE=rpm
-    - OS=fedora DIST=28 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm
+    - OS=fedora DIST=28 PACKAGE=rpm
+    - OS=fedora DIST=29 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
-    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic DOCKER_REPO=asbru/asbru-cm
+    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
