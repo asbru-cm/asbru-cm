@@ -10,6 +10,6 @@ Vcs-Browser: https://github.com/asbru-cm/asbru-cm.git
 
 Package: asbru-cm
 Architecture: all
-Depends: perl, gtk2-engines-pixbuf, libvte9, libcairo-perl, libgtk2-perl, libglib-perl, libpango-perl, libgnome2-gconf-perl, libsocket6-perl, libexpect-perl, libnet-proxy-perl, libyaml-perl, libcrypt-cbc-perl, libcrypt-blowfish-perl, libgtk2-perl, libgtk2-gladexml-perl, libgtk2-ex-simple-list-perl, libnet-arp-perl, libossp-uuid-perl, openssh-client, telnet, ftp, libcrypt-rijndael-perl, libxml-parser-perl, libgtk2-unique-perl, libgnome2-vte-perl, libcanberra-gtk-module
+Depends: perl, gtk2-engines-pixbuf, libvte9, libcairo-perl, libgtk2-perl, libglib-perl, libpango-perl, libgnome2-gconf-perl, libsocket6-perl, libexpect-perl, libnet-proxy-perl, libyaml-perl, libcrypt-cbc-perl, libcrypt-blowfish-perl, libgtk2-perl, libgtk2-gladexml-perl, libgtk2-ex-simple-list-perl, libnet-arp-perl, libossp-uuid-perl, openssh-client, telnet, ftp, libcrypt-rijndael-perl, libxml-parser-perl, libgtk2-unique-perl, libgnome2-vte-perl, libcanberra-gtk-module, dbus-x11
 Description: A free and open-source connection manager
  Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
