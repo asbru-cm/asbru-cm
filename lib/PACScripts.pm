@@ -1647,11 +1647,11 @@ sub _execScript {
 		}
 		
 		Glib::Timeout -> add( 500, sub {
-			# Skip if this tmp_uuid has disappeared for any reason
+			# Skip if this tmp_uuid has disappeared (for any reason)
 			return 0 unless defined $PACMain::RUNNING{$tmp_uuid};
-			# Continue waiting if this tmp_uuid is not yet in "CONNECTING" state
+			# Continue waiting if this tmp_uuid is still in "CONNECTING" state
 			return 1 if $PACMain::RUNNING{$tmp_uuid}{terminal}{CONNECTING};
-			# Skip if this tmp_uuid was not properly connected for some reason
+			# Skip if this tmp_uuid was not properly connected (for some reason)
 			return 0 unless $PACMain::RUNNING{$tmp_uuid}{terminal}{CONNECTED};
 			
 			# Advise pac_conn to receive script name
