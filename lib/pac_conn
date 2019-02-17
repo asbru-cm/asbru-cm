@@ -1008,8 +1008,6 @@ if ( defined $METHOD ) {
 	##############################################
 	else {
 		my $string = "Unsupported connection method '$METHOD'.";
-		$string .= 'Report this problem to perseo22@users.sourceforge.net';
-		$string .= 'Sorry for the inconvenience!! :(';
 		msg( $string );
 		ctrl( "ERROR:$string" );
 		ctrl( "DISCONNECTED" );
@@ -1781,7 +1779,7 @@ $SIG{'USR1'} = sub {
 	
 	_execAndCapture( $tmp );
 	
-	ctrl( $CONNECTED ? 'CONNECTED' : 'DISCONNECTED' );
+	ctrl( $CONNECTED ? "CONNECTED" : "DISCONNECTED" );
 	$INT = 0;
 	return 1;
 };
@@ -1804,7 +1802,7 @@ $SIG{'USR2'} = sub {
 	}
 	
 	_execScript( $tmp );
-	ctrl( $CONNECTED ? 'CONNECTED' : 'DISCONNECTED' );
+	ctrl( $CONNECTED ? "CONNECTED" : "DISCONNECTED" );
 	
 	$INT = 0;
 	return 1;
