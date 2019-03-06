@@ -48,6 +48,15 @@ To do so, execute the following commands:
   $ sudo apt-get install asbru-cm
   ````
 
+- Mint 19 (tara), 19.1 (tessa)
+
+  ````
+  wget https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh
+  chmod +x script.deb.sh
+  sudo bash -c "os=ubuntu dist=bionic ./script.deb.sh"
+  sudo apt-get install asbru-cm
+  ````
+  
 - Fedora
 
   ````
