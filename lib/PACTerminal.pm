@@ -40,6 +40,8 @@ use IO::Socket::INET;
 use Time::HiRes qw ( gettimeofday );
 use KeePass;
 
+use Data::Dumper;
+
 # GTK2
 use Gtk2 '-init';
 use Gtk2::Ex::Simple::List;
@@ -1154,8 +1156,9 @@ sub _watchConnectionData {
 					"FreeRDP: $$self{_CFG}{environments}{$$self{_UUID}}{ip}" . ( $$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}" ) :
 					"TightVNC: $$self{_CFG}{environments}{$$self{_UUID}}{user}";
 				my $list = _getXWindowsList;
-				return 1 unless grep( { $_ =~ /$title/ and $title = $_; } keys %{ $$list{'by_name'} } );
-				$$self{_GUI}{_SOCKET} -> add_id( $$list{'by_name'}{$title}{'xid'} );
+				if (grep( { $_ =~ /$title/ and $title = $_; } keys %{ $$list{'by_name'} } )) {
+					$$self{_GUI}{_SOCKET} -> add_id( $$list{'by_name'}{$title}{'xid'} );
+				}
 				return 0;
 			} ) if $$self{EMBED} && $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' || $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'VNC';
 		}
