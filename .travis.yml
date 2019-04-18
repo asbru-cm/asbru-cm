@@ -15,6 +15,7 @@ env:
     - OS=ubuntu DIST=artful PACKAGE=deb
     - OS=ubuntu DIST=bionic PACKAGE=deb
     - OS=ubuntu DIST=cosmic PACKAGE=deb
+    - OS=ubuntu DIST=disco PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
     - OS=fedora DIST=26 PACKAGE=rpm
     - OS=fedora DIST=27 PACKAGE=rpm
     - OS=fedora DIST=28 PACKAGE=rpm
