@@ -3,7 +3,7 @@ package PACUtils;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2018 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 # 
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -107,7 +107,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME		= decode( 'UTF-8', 'Ásbrú Connection Manager' );
-our $APPVERSION		= '5.1.0';
+our $APPVERSION		= '5.2.0';
 our $DEBUG_LEVEL	= 1;
 our $ARCH			= '';
 my $ARCH_TMP		= `/bin/uname -m 2>&1`;
