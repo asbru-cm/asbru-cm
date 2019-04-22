@@ -2790,7 +2790,6 @@ sub _launchTerminals {
 			next;
 		}
 		
-		$$t{_GUI}{_VTE} -> grab_focus;
 		my $uuid	= $$t{_UUID};
 		my $icon	= $uuid eq '__PAC_SHELL__' ? Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RES_DIR . '/asbru_shell.png', 16, 16, 0 ) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
 		my $name	= $$self{_CFG}{'environments'}{$uuid}{'name'};
@@ -2803,11 +2802,16 @@ sub _launchTerminals {
 		$$self{_GUI}{main} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
 		$$self{_GUI}{main} -> set_sensitive( 1 );
 	}
-	
-	#$self -> _showConnectionsList if $$self{_CFG}{'defaults'}{'tabs in main window'};
+
 	$self -> _showConnectionsList( 0 ) if ( $$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'} );
-	@new_terminals and $new_terminals[ $#new_terminals ]{_NOTEBOOK} -> show;
-	
+	if (@new_terminals) {
+		$new_terminals[ $#new_terminals ]{_NOTEBOOK} -> show;
+		# Force focus on the last shown terminal
+		$new_terminals[ $#new_terminals ]{_GUI}{_VTE} -> grab_focus;
+		# Makes sure the focus is reset on that terminal if lost during startup process
+		$$self{_HAS_FOCUS} = $new_terminals[ $#new_terminals ]{_GUI}{_VTE};
+	}
+
 	return \@new_terminals;
 }
 
