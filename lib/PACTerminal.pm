@@ -787,6 +787,7 @@ sub _setupCallbacks {
 	# Capture focus-out of VTE when it shouldn't get out!!!
 	$$self{_GUI}{_VTE} -> signal_connect( 'focus_out_event' => sub {
 		if ( ( $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} // '' ) eq $$self{_GUI}{_VTE} ) {
+			$$self{_WINDOWTERMINAL} -> present ;
 			$$self{_GUI}{_VTE} -> grab_focus;
 			$PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
 			1;
