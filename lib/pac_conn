@@ -574,7 +574,7 @@ sub _execAndCapture {
 			$EXP -> hard_close;
 		}],
 		
-		[ ( ( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) ? '##__PAC__PIPE__##' : $pattern ) => sub { $ok = 1; } ]
+		[ ( ( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) ? '##__PAC__PIPE__##' : (defined $pattern ? $pattern : '') ) => sub { $ok = 1; } ]
 	);
 	
 	if ( $ok && ( $pipe || $tee || $capture || defined $ctrl ) ) {
