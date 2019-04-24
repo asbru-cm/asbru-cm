@@ -4152,7 +4152,7 @@ tty</property>
                     </child>
                     <child>
                       <widget class="GtkCheckButton" id="cbCfgExpectDebug">
-                        <property name="label" translatable="yes">Expect DEBUG: make Expect object show information on waht's going on, in order to aid in debugging</property>
+                        <property name="label" translatable="yes">Expect DEBUG: make Expect object show information on what's going on, in order to aid in debugging</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
