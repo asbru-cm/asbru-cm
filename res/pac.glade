@@ -548,7 +548,7 @@
                           <widget class="GtkLabel" id="label85">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">  (see &lt;b&gt;Host-key&lt;/b&gt; and &lt;b&gt;Remote kost key&lt;/b&gt; on TAB '&lt;i&gt;Advanced&lt;/i&gt;')</property>
+                            <property name="label" translatable="yes">  (see &lt;b&gt;Host-key&lt;/b&gt; and &lt;b&gt;Remote host key&lt;/b&gt; on TAB '&lt;i&gt;Advanced&lt;/i&gt;')</property>
                             <property name="use_markup">True</property>
                             <property name="justify">right</property>
                           </widget>
