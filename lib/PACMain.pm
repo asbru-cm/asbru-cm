@@ -2826,8 +2826,8 @@ sub _quitProgram {
 	
 	# Check for user confirmation for close/save
 	if ( ! $force ) {
-		my $string = "Are you sure you want to <b>EXIT $APPNAME</b> ?";
-		$rc and $string .= "\n\n( there are $rc open Terminals)";
+		my $string = "Are you sure you want to <b>exit</b> $APPNAME ?";
+		$rc and $string .= "\n\n(" . ($rc > 1 ? "there are $rc open terminals" : "there is $rc open terminal")  . ")";
 		if ( $$self{_CFG}{'defaults'}{'confirm exit'} || $rc ) { return 1 unless _wConfirm( $$self{_GUI}{main}, $string ); };
 		
 		if ( $changed && ( ! $$self{_CFG}{defaults}{'save on exit'} ) ) {
