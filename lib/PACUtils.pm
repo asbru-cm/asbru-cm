@@ -1814,7 +1814,7 @@ sub _cfgSanityCheck {
 	$$cfg{'defaults'}{'command prompt'}					//= '[#%\$>]|\:\/\s*$';
 	$$cfg{'defaults'}{'username prompt'}				//= '([l|L]ogin|[u|U]suario|([u|U]ser-?)*[n|N]ame.*|[u|U]ser)\s*:\s*$';
 	$$cfg{'defaults'}{'password prompt'}				//= '([p|P]ass|[p|P]ass[w|W]or[d|t](\s+for\s+|\w+@\w+)*|[c|C]ontrase.a|Enter passphrase for key '.+')\s*:\s*$';
-	$$cfg{'defaults'}{'hostkey changed prompt'}			//= '^.+ontinue connecting \((.+)\/(.+)\)\?\s*$';
+	$$cfg{'defaults'}{'hostkey changed prompt'}			//= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
 	$$cfg{'defaults'}{'press any key prompt'}			//= '.*(any key to continue|tecla para continuar).*';
 	$$cfg{'defaults'}{'remote host changed prompt'}		//= '.*ffending .*key in (.+?)\:(\d+).*';
 	$$cfg{'defaults'}{'sudo prompt'}					//= '[__PAC__SUDO__PROMPT__]';

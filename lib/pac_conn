@@ -39,6 +39,7 @@ use Encode qw ( encode decode );
 use IO::Socket::INET;
 use Encode;
 use KeePass;
+use PACUtils;
 
 use Gtk2 '-init';
 
@@ -47,7 +48,7 @@ use Gtk2 '-init';
 
 ########################################################
 # START : Variables declaration/initialization
-my $APPNAME     = 'PAC';
+my $APPNAME		= $PACUtils::APPNAME;
 my $APPICON		= $RealBin . '/../res/asbru-logo-64.png';
 my $CFG_DIR		= $ENV{'HOME'} . '/.config/pac';
 my $SCRIPTS_DIR	= $CFG_DIR . '/scripts';
@@ -247,16 +248,6 @@ my $INT = 0;
 
 ########################################################
 # START : Procedures definition
-
-sub _removeEscapeSeqs {
-	my $string = shift // '';
-	
-	$string =~ s/(\x1B\[\d+(;\d+)?m)|(\cM)//go;
-	$string =~ s/(\x1B|\x08)\[.//go;
-	$string =~ s/\x1B|\x08//go;
-	
-	return $string;
-}
 
 sub msg {
 	my $msg = shift or die $COLOR{'err'} . "ERROR: You must provide a message to 'msg'!!" . $COLOR{'norm'};
@@ -1369,9 +1360,10 @@ elsif ( ! $MANUAL ) {
 				ctrl( "HOSTKEY:accepted by configuration (sent '$yes')" );
 				exp_continue;
 			} else {
-				$CONNECTED = 0;
-				send_slow( $EXP, $no . "\n" );
-				ctrl( "CLOSE:HOSTKEY:rejected by configuration (sent '$no')" );
+				my $val = wEnterValue( undef, $match, undef) // return undef;
+				send_slow( $EXP, $val . "\n" );
+				ctrl( "HOSTKEY:user value sent '$val')" );
+				exp_continue;
 			}
 		}],
 		
@@ -1504,11 +1496,9 @@ elsif ( ! $MANUAL ) {
 					}],
 					
 					# Found Host-Key verification string
-					#[ '^.+continue connecting \((.+)\/(.+)\)\?\s*$', sub {
 					[ $HOSTCHANGE_PROMPT, sub {
 						
 						my $match = $EXP -> match;
-						#$match =~ /^.+continue connecting \((.+)\/(.+)\)\?\s*$/go;
 						$match =~ /$HOSTCHANGE_PROMPT/g;
 						my ( $yes, $no ) = ( $1, $2 );
 						if ( $ACCEPT_KEY ) {
@@ -1699,10 +1689,10 @@ $SIG{'HUP'} = sub {
 			}],
 			
 			# Found Host-Key verification string
-			[ '^.+continue connecting \((.+)\/(.+)\)\?\s*$', sub {
+			[ $HOSTCHANGE_PROMPT, sub {
 				
 				my $match = $EXP -> match;
-				$match =~ /^.+continue connecting \((.+)\/(.+)\)\?\s*$/go;
+				$match =~ /$HOSTCHANGE_PROMPT/go;
 				my ( $yes, $no ) = ( $1, $2 );
 				if ( $ACCEPT_KEY ) {
 					send_slow( $EXP, $yes . ( ( $METHOD =~ /^.*3270.*$/ ) || ( $METHOD eq 'IBM 3270/5250' ) ) ? "\r\f" : "\n" );
