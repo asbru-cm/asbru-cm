@@ -60,6 +60,7 @@ my $UUID;
 my $GETCMD				= 0;
 my $CONNECTED			= 0;
 my $PASSWORD_COUNT		= 0;
+my $WAS_ASK_PASS		= 0;
 my $SUDO_PASSWORD_COUNT	= 0;
 my $USER_COUNT			= 0;
 my %PROXY;
@@ -1413,12 +1414,18 @@ elsif ( ! $MANUAL ) {
 		# Found password/passphrase string
 		[ $PASSWORD_PROMPT, sub {
 			
-			# First password attempt...
-			if ( ! $PASSWORD_COUNT ) {
+			# A few attempts...
+			if ( $PASSWORD_COUNT < 6 ) {
 				$PASSWORD_COUNT++;
-				if ( defined $PASS && $PASS eq '<<ASK_PASS>>' ) {
+				$WAS_ASK_PASS = 0;
+				if ( defined $PASS && $PASS eq '<<ASK_PASS>>' || $AUTH eq 'publickey' ) {
+					my @before = split /\n/, $EXP -> before;
+					# Extract the last line and use it is as prompt for the request password dialog
+					my $real_prompt = $before[-1] . $EXP -> match;
+					
+					$WAS_ASK_PASS = 1;
 					ctrl( "PASSWORD:Asking user for password..." );
-					$PASS = wEnterValue( undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0 );
+					$PASS = wEnterValue( undef, '<b>Manual Password requested</b>', $real_prompt, '', 0 );
 				}
 				if ( defined $PASS ) {
 					$EXP -> log_stdout( 0 );
@@ -1426,13 +1433,15 @@ elsif ( ! $MANUAL ) {
 					send_slow( $EXP, "$PASS\n", 'hide' );
 					$EXP -> log_stdout( 1 );
 					ctrl( "PASSWORD:Sent (not shown)" );
+					# Next time we will ask the password since the automatic one did not work
+					$PASS = '<<ASK_PASS>>';
 					exp_continue;
 				} else {
 					ctrl( "CLOSE:PASSWORD:Password input cancelled by user" );
 					$EXP -> hard_close;
 				}
 			}
-			# ... second password attempt: provided password is no longer valid!!
+			# ... too many password attempts: provided password is no longer valid!!
 			else {
 				ctrl( "CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected" );
 				$EXP -> hard_close;
