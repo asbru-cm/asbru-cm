@@ -4,6 +4,7 @@
 [![License][license-badge]][license-url]
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
+[![Liberapay][liberapay-badge]][liberapay-badge]
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/KlaasT)
 
 [<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
@@ -101,3 +102,4 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 [deb-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=debs
 [rpm-badge]: https://img.shields.io/badge/Packages-RPM-blue.svg?style=flat
 [rpm-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=rpms
+[liberapay-badge]: http://img.shields.io/liberapay/patrons/asbru-cm.svg?logo=liberapay
