@@ -875,6 +875,11 @@ sub _setupCallbacks {
 				$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
 				return 1;
 			}
+			# P --> PASTE CONNECTION PASSWORD
+			elsif ( $$self{_CFG}{environments}{ $$self{_UUID} }{'pass'} ne '' && lc $keyval eq 'p' )	{
+				$self -> _pasteToVte( $$self{_CFG}{environments}{ $$self{_UUID} }{'pass'}, 1 );
+				return 1;
+			}
 			# B --> PASTE AND DELETE
 			elsif ( lc $keyval eq 'b' )
 			{
@@ -1729,6 +1734,19 @@ sub _vteMenu {
 			$self -> _pasteToVte( $txt, $$self{_CFG}{environments}{ $$self{_UUID} }{'send slow'} );
 		}
 	} );
+	# Paste Current Connection Password
+	if ($$self{_CFG}{environments}{ $$self{_UUID} }{'pass'} ne '') {
+		push( @vte_menu_items,
+		{
+			label		=> 'Paste Connection Password',
+			stockicon	=> 'gtk-paste',
+			sensitive	=> $$self{CONNECTED},
+			shortcut	=> '<control><shift>p',
+			code		=> sub {
+				$self -> _pasteToVte( $$self{_CFG}{environments}{ $$self{_UUID} }{'pass'}, 1 );
+			}
+		} );
+	};
 	# Paste Special
 	push( @vte_menu_items,
 	{
