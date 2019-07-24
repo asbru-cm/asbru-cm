@@ -769,6 +769,18 @@ sub findKP {
 	return wantarray ? @found : scalar( @found );
 }
 
+# If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
+# We should eval in BEGIN or perl warns "Too late to run INIT block"
+my $module_guitest;
+BEGIN{ 
+	eval("use X11::GUITest qw ( GetWindowPos GetRootWindow )");
+
+	if ($@) {
+		$module_guitest="N";
+	} else {
+		$module_guitest="Y";
+	}
+}
 # END OF : Procedures definition
 ########################################################
 
@@ -941,11 +953,22 @@ if ( defined $METHOD ) {
 	elsif	( $METHOD =~ /^.*RDP \((.+)\).*$/ ) {
 		$METHOD = $1;
 		if ( ( defined $$CFG{'tmp'}{'xid'} ) && ( $METHOD eq 'rdesktop' ) ) {
+			if ( $module_guitest eq 'Y' ) {
+				my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
+				$$CFG{'tmp'}{'width'}  = $Xwidth;
+				$$CFG{'tmp'}{'height'} = $Xheight;
+			}
 			$connection_cmd = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " $IP:$PORT";
 			$connection_txt = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " $IP:$PORT";
+		} elsif ( ( defined $$CFG{'tmp'}{'xid'} ) && ( $METHOD =~ /^.*freerdp$/ ) ) {
+			if ( $module_guitest eq 'Y' ) {
+				my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
+				$$CFG{'tmp'}{'width'}  = $Xwidth;
+				$$CFG{'tmp'}{'height'} = $Xheight;
+			}
+			$connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
+			$connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
 		} elsif ( defined $$CFG{'tmp'}{'xid'} ) {
-			$$CFG{'tmp'}{'width'}-=5;
-			$$CFG{'tmp'}{'height'}-=5;
 			$connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
 			$connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:'$USER' /p:'$PASS'" ) . " /v:$IP:$PORT";
 		} elsif ( $METHOD eq 'rdesktop' ) {
