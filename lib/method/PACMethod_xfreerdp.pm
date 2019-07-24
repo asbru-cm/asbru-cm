@@ -96,6 +96,7 @@ sub update {
 	$$self{gui}{chNoFastPath}			-> set_active( $$options{nofastPath} // 0 );
 	$$self{gui}{chRFX}					-> set_active( $$options{rfx} // 0 );
 	$$self{gui}{chNSCodec}				-> set_active( $$options{nsCodec} // 0 );
+	$$self{gui}{chDynamicResolution}		-> set_active( $$options{dynamicResolution} // 0 );
 	$$self{gui}{chNoRDP}				-> set_active( $$options{noRDP} // 0 );
 	$$self{gui}{chNoTLS}				-> set_active( $$options{noTLS} // 0 );
 	$$self{gui}{chNoNLA}				-> set_active( $$options{noNLA} // 0 );
@@ -139,6 +140,7 @@ sub get_cfg {
 	$options{nofastPath}        = $$self{gui}{chNoFastPath}			-> get_active;
 	$options{rfx}               = $$self{gui}{chRFX}				-> get_active;
 	$options{nsCodec}           = $$self{gui}{chNSCodec}			-> get_active;
+	$options{dynamicResolution}           = $$self{gui}{chDynamicResolution}			-> get_active;
 	$options{noRDP}             = $$self{gui}{chNoRDP}				-> get_active;
 	$options{noTLS}             = $$self{gui}{chNoTLS}				-> get_active;
 	$options{noNLA}             = $$self{gui}{chNoNLA}				-> get_active;
@@ -189,6 +191,7 @@ sub _parseCfgToOptions {
 	$hash{nofastPath}       = 0;
 	$hash{rfx}              = 0;
 	$hash{nsCodec}          = 0;
+	$hash{dynamicResolution}          = 0;
 	$hash{noRDP}            = 0;
 	$hash{noTLS}            = 0;
 	$hash{noNLA}            = 0;
@@ -217,6 +220,7 @@ sub _parseCfgToOptions {
 		$opt =~ /^-fast-path$/go	and	$hash{nofastPath}	= 1;
 		$opt =~ /^rfx$/go		and	$hash{rfx}		= 1;
 		$opt =~ /^nsc$/go		and	$hash{nsCodec}		= 1;
+		$opt =~ /^dynamic-resolution$/go		and	$hash{dynamicResolution}		= 1;
 		$opt =~ /^-sec-rdp$/go		and	$hash{noRDP}		= 1;
 		$opt =~ /^-sec-tls$/go		and	$hash{noTLS}		= 1;
 		$opt =~ /^-sec-nla$/go		and	$hash{noNLA}		= 1;
@@ -262,6 +266,7 @@ sub _parseOptionsToCfg {
 	$txt .= ' -fast-path' if $$hash{nofastPath};
 	$txt .= ' /rfx' if $$hash{rfx};
 	$txt .= ' /nsc' if $$hash{nsCodec};
+	$txt .= ' /dynamic-resolution' if $$hash{dynamicResolution};
 	$txt .= ' -sec-rdp' if $$hash{noRDP};
 	$txt .= ' -sec-tls' if $$hash{noTLS};
 	$txt .= ' -sec-nla' if $$hash{noNLA};
@@ -339,6 +344,10 @@ sub _buildGUI {
 			$w{hbox3} -> pack_start( $w{chNSCodec}, 0, 1, 0 );
 			$w{chNSCodec} -> set_tooltip_text( "/nsc: enable NSCodec (experimental)" );
 			
+			$w{chDynamicResolution} = Gtk2::CheckButton -> new_with_label( 'Enable dynamic resolution' );
+			$w{hbox3} -> pack_start( $w{chDynamicResolution}, 0, 1, 0 );
+			$w{chDynamicResolution} -> set_tooltip_text( "/dynamic-resolution: Send resolution updates when the window is resized)" );
+			
 		$w{hbox4} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox4}, 0, 1, 5 );
 			
@@ -386,7 +395,7 @@ sub _buildGUI {
 					$w{chEmbed} -> set_tooltip_text( "[-X:xid] : Embed RDP window in a PAC TAB\n*WARNING*: this may not work on your system with 'xfreerdp'.\nTry to select another option if your connections does not work correctly" );
 					$w{chEmbed} -> set_sensitive( 1 );
 					$w{chEmbed} -> set_active( 0 );
-					
+				
 					$w{hbox69} = Gtk2::HBox -> new( 0, 5 );
 					$w{hboxfsebpc} -> pack_start( $w{hbox69}, 1, 1, 0 );
 						
