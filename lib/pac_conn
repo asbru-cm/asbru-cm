@@ -974,6 +974,9 @@ if ( defined $METHOD ) {
 		} elsif ( $METHOD eq 'rdesktop' ) {
 			$connection_cmd = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " -T \"$TITLE\" $IP:$PORT";
 			$connection_txt = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " -T \"$TITLE\" $IP:$PORT";
+		} elsif (( $METHOD =~ /^.*freerdp$/ ) && ( defined $PASS )) {
+			$connection_cmd = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER /p:'$PASS'" ) . " /t:\"$TITLE\" /v:$IP:$PORT";
+			$connection_txt = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER /p:'$PASS'" ) . " /t:\"$TITLE\" /v:$IP:$PORT";
 		} elsif ( $METHOD =~ /^.*freerdp$/ ) {
 			$connection_cmd = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER" ) . " /t:\"$TITLE\" /v:$IP:$PORT";
 			$connection_txt = "$METHOD $CONNECT_OPTS" . ( $MANUAL ? '' : " /u:$USER" ) . " /t:\"$TITLE\" /v:$IP:$PORT";
