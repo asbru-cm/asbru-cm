@@ -392,7 +392,7 @@ sub _buildGUI {
 					
 					$w{chEmbed} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Embed in TAB(*)' );
 					$w{hboxfsebpc} -> pack_start( $w{chEmbed}, 1, 1, 0 );
-					$w{chEmbed} -> set_tooltip_text( "[-X:xid] : Embed RDP window in a PAC TAB\n*WARNING*: this may not work on your system with 'xfreerdp'.\nTry to select another option if your connections does not work correctly" );
+					$w{chEmbed} -> set_tooltip_text( "[-X:xid] : Embed RDP window in an Asbru TAB\n*WARNING*: if embedded windows doesn't fit perfect install Perl module X11::GUITest" );
 					$w{chEmbed} -> set_sensitive( 1 );
 					$w{chEmbed} -> set_active( 0 );
 				
