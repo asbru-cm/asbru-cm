@@ -207,7 +207,7 @@ sub _parseCfgToOptions {
 		$opt =~ /^bpp:(8|15|16|24)$/go	  and	$hash{bpp}				= $1;
 		$opt eq 'admin'	                  and	$hash{attachToConsole}	= 1;
 		$opt eq '+compression'		  and	$hash{useCompression}	= 1;
-		if ( $opt =~ /^shell\s+'(.+?)'$/go )  {	$hash{startupshell} = $1; }
+		if ( $opt =~ /^shell:(.+)$/go )  {	$hash{startupshell} = $1; }
 		if ( $opt eq 'f' )                    {	$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
 		if ( $opt =~ /^size:(\d+)\%$/go )     {	$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
 		if ( $opt =~ /^size:(\d+)x(\d+)$/go ) {	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
