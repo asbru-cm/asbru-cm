@@ -257,7 +257,7 @@ sub _parseOptionsToCfg {
 		$txt .= ' /size:' . $$hash{width} . 'x' . $$hash{height};
 	}
 	$txt .= ' /kbd:' . $$hash{keyboardLocale} if $$hash{keyboardLocale} ne '';
-	$txt .= ' /shell ' . $$hash{startupshell} if $$hash{startupshell} ne '';
+	$txt .= ' /shell:' . $$hash{startupshell} if $$hash{startupshell} ne '';
 	$txt .= ' /d:' . $$hash{domain} if $$hash{domain} ne '';
 	$txt .= ' +clipboard' if $$hash{redirClipboard};
         $txt .= ' /sound:sys:alsa' if $$hash{redirSound};
@@ -370,7 +370,7 @@ sub _buildGUI {
 			$w{hboxss} -> pack_start( $w{lblStartupShell}, 0, 1, 0 );
 			
 			$w{entryStartupShell} = Gtk2::Entry -> new;
-			$w{entryStartupShell} -> set_tooltip_text( "[/shell 'startupshell command'] : start given startupshell/command instead of explorer" );
+			$w{entryStartupShell} -> set_tooltip_text( "[/shell:'startupshell command'] : start given startupshell/command instead of explorer" );
 			$w{hboxss} -> pack_start( $w{entryStartupShell}, 1, 1, 5 );
 		
 		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
