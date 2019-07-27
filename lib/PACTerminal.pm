@@ -3231,8 +3231,10 @@ sub _updateCFG {
 
 	$$self{_NO_UPDATE_CFG} = 1;
 
-	if ( ( $$self{_GUI}{cbShowHist} -> get_active ) && ( $$self{_CFG}{'defaults'}{'record command history'} ) )	{ $$self{_GUI}{hbHist} -> show_all; }
-	else																										{ $$self{_GUI}{hbHist} -> hide_all; }
+	if ($$self{_GUI}{hbHist}) {
+		if ( ( $$self{_GUI}{cbShowHist} -> get_active ) && ( $$self{_CFG}{'defaults'}{'record command history'} ) )	{ $$self{_GUI}{hbHist} -> show_all; }
+		else																										{ $$self{_GUI}{hbHist} -> hide_all; }
+	}
 
 	if ( defined $$self{_GUI}{_MACROSBOX} ) {
 		$$self{_GUI}{_MACROSBOX} -> hide_all;
