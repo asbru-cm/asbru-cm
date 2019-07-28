@@ -20,6 +20,7 @@ env:
     - OS=fedora DIST=27 PACKAGE=rpm
     - OS=fedora DIST=28 PACKAGE=rpm
     - OS=fedora DIST=29 PACKAGE=rpm
+    - OS=fedora DIST=30 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
