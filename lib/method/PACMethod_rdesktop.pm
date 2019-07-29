@@ -41,7 +41,7 @@ use Gtk2 '-init';
 # Define GLOBAL CLASS variables
 
 my %RDP_VERSION = ( 4 => 0, 5 => 1 );
-my %BPP 		= ( 8 => 0, 15 => 1, 16 => 2, 24 => 3 );
+my %BPP 		= ( 8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4 );
 my %SOUND		= ( 'local' => 0, 'off' => 1, 'remote' => 2 );
 
 my $RES_DIR = $RealBin . '/res';
@@ -77,7 +77,7 @@ sub update {
 	my $options = _parseCfgToOptions( $$self{cfg});
 	
 	$$self{gui}{cbRDPVersion}			-> set_active( $RDP_VERSION{ $$options{RDPVersion} // 5 } );
-	$$self{gui}{cbBPP}					-> set_active( $BPP{ $$options{bpp} // 8 } );
+	$$self{gui}{cbBPP}					-> set_active( $BPP{ $$options{bpp} // 24 } );
 	$$self{gui}{chClipboard}			-> set_active( $$options{clipboard} // 1 );
 	$$self{gui}{chAttachToConsole}		-> set_active( $$options{attachToConsole} );
 	$$self{gui}{chBitmapCaching}		-> set_active( $$options{bitmapCaching} );
@@ -158,7 +158,7 @@ sub _parseCfgToOptions {
 	
 	my %hash;
 	$hash{RDPVersion}		= 5;
-	$hash{bpp}				= 8;
+	$hash{bpp}				= 24;
 	$hash{clipboard}		= 1;
 	$hash{attachToConsole}	= 0;
 	$hash{bitmapCaching}	= 0;
@@ -185,7 +185,7 @@ sub _parseCfgToOptions {
 		$opt =~ s/\s+$//go;
 		
 		$opt =~ /^(4|5)$/go					and	$hash{RDPVersion}		= $1;
-		$opt =~ /^a\s+(8|15|16|24)$/go		and	$hash{bpp}				= $1;
+		$opt =~ /^a\s+(8|15|16|24|32)$/go		and	$hash{bpp}				= $1;
 		$opt eq '0'							and	$hash{attachToConsole}	= 1;
 		$opt eq 'P'							and	$hash{bitmapCaching}	= 1;
 		$opt eq 'z'							and	$hash{useCompression}	= 1;
@@ -270,11 +270,11 @@ sub _buildGUI {
 			$w{frBPP} = Gtk2::Frame -> new( 'BPP:' );
 			$w{hbox1} -> pack_start( $w{frBPP}, 1, 1, 0 );
 			$w{frBPP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
-			$w{frBPP} -> set_tooltip_text( '[-a] : Sets the colour depth for the connection (8, 15, 16 or 24)' );
+			$w{frBPP} -> set_tooltip_text( '[-a] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)' );
 				
 				$w{cbBPP} = Gtk2::ComboBox -> new_text;
 				$w{frBPP} -> add( $w{cbBPP} );
-				foreach my $bpp ( 8, 15, 16, 24 ) { $w{cbBPP} -> append_text( $bpp ); };
+				foreach my $bpp ( 8, 15, 16, 24, 32 ) { $w{cbBPP} -> append_text( $bpp ); };
 			
 			$w{vboxup} = Gtk2::VBox -> new( 0, 0 );
 			$w{hbox1} -> pack_start( $w{vboxup}, 0, 1, 5 );
