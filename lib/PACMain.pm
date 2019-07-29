@@ -317,8 +317,8 @@ sub start {
 	$self -> _launchTerminals( \@idx ) if scalar( @idx );
 	
 	# Autostart Shell if so is configured
-	$$self{_GUI}{shellBtn} -> clicked if $$self{_CFG}{'defaults'}{'autostart shell upon start'};
-	
+	$$self{_GUI}{shellBtn} -> clicked if $$self{_CFG}{'defaults'}{'autostart shell upon PAC start'};
+
 	$$self{_GUI}{statistics} -> update( '__PAC__ROOT__', $$self{_CFG} );
 	
 	# Is tray available (Gnome2 OR Unity)?

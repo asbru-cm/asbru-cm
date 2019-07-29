@@ -56,6 +56,7 @@ Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
 Requires:   perl-Gnome2-Vte
+Requires:   perl-X11-GUITest
 Requires:   vte
 Requires:   ftp
 Requires:   telnet
