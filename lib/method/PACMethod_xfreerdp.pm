@@ -40,7 +40,7 @@ use Gtk2 '-init';
 ###################################################################
 # Define GLOBAL CLASS variables
 
-my %BPP 		= ( 8 => 0, 15 => 1, 16 => 2, 24 => 3 );
+my %BPP 		= ( 8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4 );
 
 my $RES_DIR = $RealBin . '/res';
 
@@ -75,7 +75,7 @@ sub update {
 	
 	my $options = _parseCfgToOptions( $$self{cfg});
 	
-	$$self{gui}{cbBPP}					-> set_active( $BPP{ $$options{bpp} // 8 } );
+	$$self{gui}{cbBPP}					-> set_active( $BPP{ $$options{bpp} // 24 } );
 	$$self{gui}{chAttachToConsole}		-> set_active( $$options{attachToConsole} );
 	$$self{gui}{chUseCompression}		-> set_active( $$options{useCompression} );
 	$$self{gui}{chFullscreen}			-> set_active( $$options{fullScreen} );
@@ -170,7 +170,7 @@ sub _parseCfgToOptions {
 	my $cmd_line = shift;
 	
 	my %hash;
-	$hash{bpp}				= 8;
+	$hash{bpp}				= 24;
 	$hash{attachToConsole}	= 0;
 	$hash{useCompression}	= 0;
 	$hash{fullScreen}		= 0;
@@ -207,7 +207,7 @@ sub _parseCfgToOptions {
 		$opt =~ /^bpp:(8|15|16|24)$/go	  and	$hash{bpp}				= $1;
 		$opt eq 'admin'	                  and	$hash{attachToConsole}	= 1;
 		$opt eq '+compression'		  and	$hash{useCompression}	= 1;
-		if ( $opt =~ /^shell\s+'(.+?)'$/go )  {	$hash{startupshell} = $1; }
+		if ( $opt =~ /^shell:(.+)$/go )  {	$hash{startupshell} = $1; }
 		if ( $opt eq 'f' )                    {	$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
 		if ( $opt =~ /^size:(\d+)\%$/go )     {	$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
 		if ( $opt =~ /^size:(\d+)x(\d+)$/go ) {	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
@@ -299,11 +299,11 @@ sub _buildGUI {
 			$w{frBPP} = Gtk2::Frame -> new( 'BPP:' );
 			$w{hbox1} -> pack_start( $w{frBPP}, 0, 1, 0 );
 			$w{frBPP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
-			$w{frBPP} -> set_tooltip_text( '[/bpp:] : Sets the colour depth for the connection (8, 15, 16 or 24)' );
+			$w{frBPP} -> set_tooltip_text( '[/bpp:] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)' );
 				
 				$w{cbBPP} = Gtk2::ComboBox -> new_text;
 				$w{frBPP} -> add( $w{cbBPP} );
-				foreach my $bpp ( 8, 15, 16, 24 ) { $w{cbBPP} -> append_text( $bpp ); };
+				foreach my $bpp ( 8, 15, 16, 24, 32 ) { $w{cbBPP} -> append_text( $bpp ); };
 			
 			$w{chAttachToConsole} = Gtk2::CheckButton -> new_with_label( 'Attach to console' );
 			$w{hbox1} -> pack_start( $w{chAttachToConsole}, 0, 1, 0 );
