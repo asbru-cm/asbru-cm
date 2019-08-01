@@ -955,7 +955,7 @@ if ( defined $METHOD ) {
 		if ( ( defined $$CFG{'tmp'}{'xid'} ) && ( $METHOD eq 'rdesktop' ) ) {
 			if ( $module_guitest eq 'Y' ) {
 				my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
-				$$CFG{'tmp'}{'width'}  = $Xwidth;
+				$$CFG{'tmp'}{'width'}  = $Xwidth -2;
 				$$CFG{'tmp'}{'height'} = $Xheight;
 			}
 			$connection_cmd = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ( $MANUAL ? '' : " -u $USER -p -" ) . " $IP:$PORT";
