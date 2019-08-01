@@ -288,7 +288,7 @@ sub _buildGUI {
 					
 					$w{chBitmapCaching} = Gtk2::CheckButton -> new_with_label( 'Bitmap Cache' );
 					$w{hboxup} -> pack_start( $w{chBitmapCaching}, 1, 1, 0 );
-					$w{chBitmapCaching} -> set_tooltip_text( '[-P] : Enable  caching  of  bitmaps to disk (persistent bitmap caching)' );
+					$w{chBitmapCaching} -> set_tooltip_text( '[-P] : Enable caching of bitmaps to disk (persistent bitmap caching)' );
 					
 					$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Compression' );
 					$w{hboxup} -> pack_start( $w{chUseCompression}, 1, 1, 0 );
