@@ -546,13 +546,6 @@ sub _initGUI {
 
 				$$self{_GUI}{_SOCKET} = Gtk2::Socket -> new;
 				$sc2 -> add_with_viewport( $$self{_GUI}{_SOCKET} );
-
-			$$self{_GUI}{_BTNFOCUS} = Gtk2::Button -> new_with_mnemonic( 'Set _keyboard focus' );
-			$$self{_GUI}{_BTNFOCUS} -> set_image( Gtk2::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_SMALL_TOOLBAR' ) );
-			$$self{_GUI}{_BTNFOCUS} -> set( 'can_focus', 0 );
-			$$self{_GUI}{_VBOX} -> pack_start( $$self{_GUI}{_BTNFOCUS}, 0, 1, 0 );
-
-			$$self{FOCUS} = $$self{_GUI}{_SOCKET};
 		}
 
 		#### $vbox 2nd row: this will contain local/remote macros
@@ -642,6 +635,15 @@ sub _initGUI {
 			$$self{_GUI}{btnShowInfoTab} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-info', 'GTK_ICON_SIZE_BUTTON' ));
 			$$self{_GUI}{btnShowInfoTab} -> set_tooltip_text( 'Show information tab (Shift+Ctrl+I)' );
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{btnShowInfoTab}, 0, 1, 4 );
+
+		if ( $$self{'EMBED'} ) {
+			$$self{_GUI}{_BTNFOCUS} = Gtk2::Button -> new_with_mnemonic( 'Set _keyboard focus' );
+			$$self{_GUI}{_BTNFOCUS} -> set_image( Gtk2::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_BUTTON' ) );
+			$$self{_GUI}{_BTNFOCUS} -> set( 'can_focus', 0 );
+			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{_BTNFOCUS}, 0, 1, 4 );
+				
+			$$self{FOCUS} = $$self{_GUI}{_SOCKET};
+		}
 
 			# Create gtkstatusbar
 			$$self{_GUI}{status} = Gtk2::Statusbar -> new;
