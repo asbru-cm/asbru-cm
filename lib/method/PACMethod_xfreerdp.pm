@@ -443,6 +443,7 @@ sub _buildGUI {
 			$w{frKeyboard} -> set_tooltip_text( '[/kbd] : Keyboard layout' );
 				
 				$w{entryKeyboard} = Gtk2::Entry -> new;
+				$w{entryKeyboard} -> set_tooltip_text( "List keyboard layouts launching 'xfreerdp /kbd-list' (0x00000...)" );
 				$w{frKeyboard} -> add( $w{entryKeyboard} );
 		
 		$w{hboxDomain} = Gtk2::HBox -> new( 0, 5 );
