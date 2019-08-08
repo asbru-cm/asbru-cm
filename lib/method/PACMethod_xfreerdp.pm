@@ -212,7 +212,7 @@ sub _parseCfgToOptions {
 		elsif ( $opt eq '+compression' )	{ $hash{useCompression}	= 1; }
 		elsif ( $opt =~ /^\/shell:(.+)$/go )	{ $hash{startupshell} = $1; }
 		elsif ( $opt eq '/f' )		{ $hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
-		elsif ( $opt =~ /^\/size:(\d+)\%$/go )	{ $hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
+		elsif ( $opt =~ /^\/size:(\d+(\.\d+)?)%$/go )	{ $hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
 		elsif ( $opt =~ /^\/size:(\d+)x(\d+)$/go )	{ $hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
 		elsif ( $opt =~ /^\/kbd:(.+)$/go )	{ $hash{keyboardLocale}	= $1; }
 		elsif ( $opt =~ /^\/sound:sys:alsa$/go )	{ $hash{redirSound}	= 1; }
