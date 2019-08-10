@@ -42,7 +42,7 @@ use Gtk2 '-init';
 
 my %RDP_VERSION = ( 4 => 0, 5 => 1 );
 my %BPP 		= ( 8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4 );
-my %SOUND		= ( 'local' => 0, 'off' => 1, 'remote' => 2 );
+my %SOUND		= ( 'local' => 0, 'off' => 1, 'remote' => 2, 'local:alsa' => 3, 'local:pulseaudio' =>4 );
 
 my $RES_DIR = $RealBin . '/res';
 
@@ -82,21 +82,20 @@ sub update {
 	$$self{gui}{chAttachToConsole}		-> set_active( $$options{attachToConsole} );
 	$$self{gui}{chBitmapCaching}		-> set_active( $$options{bitmapCaching} );
 	$$self{gui}{chUseCompression}		-> set_active( $$options{useCompression} );
+	$$self{gui}{chNoGrabKbd}            -> set_active( $$options{noGrabKbd} // 0 );
 	$$self{gui}{chFullscreen}			-> set_active( $$options{fullScreen} );
 	$$self{gui}{chEmbed}				-> set_active( $$options{embed} );
-	$$self{gui}{chPercentage}			-> set_active( $$options{percent} );
 	$$self{gui}{chWidthHeight}			-> set_active( $$options{wh} );
-	$$self{gui}{spGeometry}				-> set_value( $$options{geometry} ) if $$options{percent};
 	$$self{gui}{spWidth}				-> set_value( $$options{width} // 640 );
 	$$self{gui}{spHeight}				-> set_value( $$options{height} // 480 );
-	$$self{gui}{spGeometry}				-> set_sensitive( $$options{percent} );
 	$$self{gui}{hboxWidthHeight}		-> set_sensitive( $$options{wh} );
 	$$self{gui}{entryKeyboard}			-> set_text( $$options{keyboardLocale} );
-	$$self{gui}{cbRedirSound}			-> set_active( $SOUND{ $$options{redirSound} // 'local' } );
+	$$self{gui}{cbRedirSound}			-> set_active( $SOUND{ $$options{redirSound} // 'off' } );
 	$$self{gui}{entryDomain}			-> set_text( $$options{domain} // '' );
 	$$self{gui}{cbScard}				-> set_active( $$options{scard} // 0 );
 	$$self{gui}{cbEnableSeamless}		-> set_active( $$options{seamless} // 0 );
 	$$self{gui}{entryStartupShell}		-> set_text( $$options{startupshell} // '' );
+	$$self{gui}{entryOtherOptions}		-> set_text( $$options{otherOptions} // '' );
 
 	# Destroy previuos widgets
 	$$self{gui}{vbRedirect} -> foreach( sub { $_[0] -> destroy(); } );
@@ -121,19 +120,19 @@ sub get_cfg {
 	$options{attachToConsole}	= $$self{gui}{chAttachToConsole}	-> get_active;
 	$options{bitmapCaching}		= $$self{gui}{chBitmapCaching}		-> get_active;
 	$options{useCompression}	= $$self{gui}{chUseCompression}		-> get_active;
+	$options{noGrabKbd}         = $$self{gui}{chNoGrabKbd}          -> get_active;
 	$options{fullScreen}		= $$self{gui}{chFullscreen}			-> get_active;
-	$options{geometry}			= $$self{gui}{spGeometry}			-> get_value;
-	$options{percent}			= $$self{gui}{chPercentage}			-> get_active;
 	$options{width}				= $$self{gui}{spWidth}				-> get_chars( 0, -1 );
 	$options{height}			= $$self{gui}{spHeight}				-> get_chars( 0, -1 );
 	$options{wh}				= $$self{gui}{chWidthHeight}		-> get_active;
-	$options{embed}				= ! ( $$self{gui}{chFullscreen} -> get_active || $$self{gui}{chPercentage} -> get_active || $$self{gui}{chWidthHeight} -> get_active );
+	$options{embed}				= ! ( $$self{gui}{chFullscreen} -> get_active || $$self{gui}{chWidthHeight} -> get_active );
 	$options{keyboardLocale}	= $$self{gui}{entryKeyboard}		-> get_chars( 0, -1 );
 	$options{redirSound}		= $$self{gui}{cbRedirSound}			-> get_active_text;
 	$options{domain}			= $$self{gui}{entryDomain}			-> get_chars( 0, -1 );
 	$options{scard}				= $$self{gui}{cbScard}				-> get_active;
 	$options{seamless}			= $$self{gui}{cbEnableSeamless}		-> get_active;
 	$options{startupshell}		= $$self{gui}{entryStartupShell}	-> get_chars( 0, -1 );
+	$options{otherOptions}		= $$self{gui}{entryOtherOptions}	-> get_chars( 0, -1 );
 	
 	foreach my $w ( @{ $$self{listRedir} } ) {
 		my %hash;
@@ -163,51 +162,51 @@ sub _parseCfgToOptions {
 	$hash{attachToConsole}	= 0;
 	$hash{bitmapCaching}	= 0;
 	$hash{useCompression}	= 0;
+	$hash{noGrabKbd}        = 0;
 	$hash{fullScreen}		= 0;
 	$hash{scard}			= 0;
 	$hash{embed}			= 1;
-	$hash{percent}			= 0;
-	$hash{geometry}			= 90;
 	$hash{wh}				= 0;
 	$hash{width}			= 640;
 	$hash{height}			= 480;
 	$hash{keyboardLocale}	= '';
 	$hash{redirDiskShare}	= '';
 	$hash{redirDiskPath}	= $ENV{'HOME'};
-	$hash{redirSound}		= 'local';
+	$hash{redirSound}		= 'off';
 	$hash{domain}			= '';
 	$hash{seamless}			= 0;
 	$hash{startupshell}		= '';
+	$hash{otherOptions}		= '';
 	
-	my @opts = split( /\s+-/, $cmd_line );
-	foreach my $opt ( @opts ) {
-		next unless $opt ne '';
-		$opt =~ s/\s+$//go;
-		
-		$opt =~ /^(4|5)$/go					and	$hash{RDPVersion}		= $1;
-		$opt =~ /^a\s+(8|15|16|24|32)$/go		and	$hash{bpp}				= $1;
-		$opt eq '0'							and	$hash{attachToConsole}	= 1;
-		$opt eq 'P'							and	$hash{bitmapCaching}	= 1;
-		$opt eq 'z'							and	$hash{useCompression}	= 1;
-		$opt eq 'A'							and	$hash{seamless}			= 1;
-		if ( $opt =~ /^s\s+'(.+?)'$/go )	 {	$hash{startupshell} = $1; }
-		if ( $opt eq 'f' ) {					$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^g\s+(\d+)\%$/go ) {		$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^g\s+(\d+)x(\d+)$/go ){	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
-		$opt =~ /^k\s+(.+)$/go				and	$hash{keyboardLocale}	= $1;
-		$opt =~ /^r\s+sound:(.+)$/go		and	$hash{redirSound}		= $1;
-		$opt =~ /^r\s+scard$/go				and	$hash{scard}			= 1;
-		$opt =~ /^r\s+clipboard:(.+)$/go	and	$hash{clipboard}		= 1;
-		$opt =~ /^d\s+(.+)$/go				and	$hash{domain}			= $1;
-		
-		while ( $opt =~ /^r\s+disk:(.+)=\"(.+)\"/go )
-		{
-			my %redir;
-			$redir{redirDiskShare}	= $1;
-			$redir{redirDiskPath}	= $2;
-			push( @{ $hash{redirDisk} }, \%redir );
-		}
-	}
+	my @opts = ( $cmd_line =~ /-\w?\s?[^-]+/g );
+    foreach my $opt ( @opts ) {
+        next unless $opt ne '';
+        $opt =~ s/\s+$//go;
+
+        if ( $opt =~ /^-(4|5)$/go )                     { $hash{RDPVersion}         = $1; }
+        elsif ( $opt =~ /^-a\s+(8|15|16|24|32)$/go )        { $hash{bpp}                = $1; }
+        elsif ( $opt eq '-0' )                      { $hash{attachToConsole}    = 1; }
+        elsif ( $opt eq '-P' )                      { $hash{bitmapCaching}      = 1; }
+        elsif ( $opt eq '-z' )                      { $hash{useCompression}     = 1; }
+        elsif ( $opt eq '-A' )                      { $hash{seamless}           = 1; }
+		elsif ( $opt eq '-K' )      				{ $hash{noGrabKbd}      	= 1; }
+        elsif ( $opt =~ /^-s\s+(.+)$/go )               { $hash{startupshell}       = $1; }
+        elsif ( $opt eq '-f' )                      { $hash{fullScreen} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
+        elsif ( $opt =~ /^-g\s+(\d+)x(\d+)$/go )            { $hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{'embed'} = 0; }
+        elsif ( $opt =~ /^-k\s+(.+)$/go )               { $hash{keyboardLocale}     = $1; }
+        elsif ( $opt =~ /^-r\s+sound:(.+)$/go )         { $hash{redirSound}         = $1; }
+        elsif ( $opt =~ /^-r\s+scard$/go )              { $hash{scard}              = 1; }
+        elsif ( $opt =~ /^-r\s+clipboard:(.+)$/go )     { $hash{clipboard}          = 1; }
+        elsif ( $opt =~ /^-d\s+(.+)$/go )               { $hash{domain}             = $1; }
+        elsif ( $opt =~ /^-r\s+disk:(.+)=\"(.+)\"$/go )
+        {
+            my %redir;
+            $redir{redirDiskShare}  = $1;
+            $redir{redirDiskPath}   = $2;
+            push( @{ $hash{redirDisk} }, \%redir );
+        }
+        else { $hash{otherOptions} .= ' ' . $opt . ' '; }
+    }
 	
 	return \%hash;
 }
@@ -224,10 +223,9 @@ sub _parseOptionsToCfg {
 	$txt .= ' -z' if $$hash{useCompression};
 	$txt .= ' -f' if $$hash{fullScreen};
 	$txt .= ' -A' if $$hash{seamless};
-	$txt .= " -s '$$hash{startupshell}'" if $$hash{startupshell} ne '';
-	if ( $$hash{percent} ) {
-		$txt .= ' -g ' . $$hash{geometry} . '%';
-	} elsif ( $$hash{wh} ) {
+	$txt .= ' -K' if $$hash{noGrabKbd};
+	$txt .= ' -s ' . $$hash{startupshell} if $$hash{startupshell} ne '';
+	if ( $$hash{wh} ) {
 		$txt .= ' -g ' . $$hash{width} . 'x' . $$hash{height};
 	}
 	$txt .= ' -k ' . $$hash{keyboardLocale} if $$hash{keyboardLocale} ne '';
@@ -237,12 +235,14 @@ sub _parseOptionsToCfg {
 	$txt .= " -d $$hash{domain}" if $$hash{domain} ne '';
 	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " -r disk:$$redir{redirDiskShare}=\"$$redir{redirDiskPath}\""; }
 	
+	$txt .= ' ' . $$hash{otherOptions} if $$hash{otherOptions} ne '';
+
 	return $txt;
 }
 
 sub embed {
 	my $self = shift;
-	return ! ( $$self{gui}{chFullscreen} -> get_active || $$self{gui}{chPercentage} -> get_active || $$self{gui}{chWidthHeight} -> get_active );
+	return ! ( $$self{gui}{chFullscreen} -> get_active || $$self{gui}{chWidthHeight} -> get_active );
 }
 
 sub _buildGUI {
@@ -288,7 +288,7 @@ sub _buildGUI {
 					
 					$w{chBitmapCaching} = Gtk2::CheckButton -> new_with_label( 'Bitmap Cache' );
 					$w{hboxup} -> pack_start( $w{chBitmapCaching}, 1, 1, 0 );
-					$w{chBitmapCaching} -> set_tooltip_text( '[-P] : Enable  caching  of  bitmaps to disk (persistent bitmap caching)' );
+					$w{chBitmapCaching} -> set_tooltip_text( '[-P] : Enable caching of bitmaps to disk (persistent bitmap caching)' );
 					
 					$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Compression' );
 					$w{hboxup} -> pack_start( $w{chUseCompression}, 1, 1, 0 );
@@ -301,7 +301,7 @@ sub _buildGUI {
 				$w{hboxdown} = Gtk2::HBox -> new( 0, 0 );
 				$w{vboxup} -> pack_start( $w{hboxdown}, 1, 1, 0 );
 					
-					$w{chClipboard} = Gtk2::CheckButton -> new_with_label( 'Clipboard forwarding ' );
+					$w{chClipboard} = Gtk2::CheckButton -> new_with_label( 'Clipboard forwarding' );
 					$w{chClipboard} -> set_tooltip_text( '[-r clipboard:PRIMARYCLIPBOARD] : Enable clipboard forwarding' );
 					$w{hboxdown} -> pack_start( $w{chClipboard}, 0, 1, 0 );
 					
@@ -309,13 +309,32 @@ sub _buildGUI {
 					$w{cbEnableSeamless} -> set_tooltip_text( '[-A] : Enable SeamlessRDP' );
 					$w{hboxdown} -> pack_start( $w{cbEnableSeamless}, 0, 1, 0 );
 					
-					$w{lblStartupShell} = Gtk2::Label -> new( ' Startup shell:' );
-					$w{hboxdown} -> pack_start( $w{lblStartupShell}, 0, 1, 0 );
-				
-					$w{entryStartupShell} = Gtk2::Entry -> new;
-					$w{entryStartupShell} -> set_tooltip_text( "[-s 'startupshell command'] : start given startupshell/command instead of explorer" );
-					$w{hboxdown} -> pack_start( $w{entryStartupShell}, 1, 1, 0 );
-				
+					$w{chNoGrabKbd} = Gtk2::CheckButton -> new_with_label( 'Keep WM key bindings' );
+					$w{chNoGrabKbd} -> set_tooltip_text( "[-K] : keep window manager key bindings" );
+					$w{hboxdown} -> pack_start( $w{chNoGrabKbd}, 0, 1, 0 );
+
+		
+		
+		$w{hboxss} = Gtk2::HBox -> new( 0, 5 );
+		$w{vbox} -> pack_start( $w{hboxss}, 0, 1, 5 );
+			
+			$w{lblStartupShell} = Gtk2::Label -> new( 'Startup shell: ' );
+			$w{hboxss} -> pack_start( $w{lblStartupShell}, 0, 1, 0 );
+			
+			$w{entryStartupShell} = Gtk2::Entry -> new;
+			$w{entryStartupShell} -> set_tooltip_text( "[-s 'startupshell command'] : start given startupshell/command instead of explorer" );
+			$w{hboxss} -> pack_start( $w{entryStartupShell}, 1, 1, 5 );
+
+		$w{hboxoo} = Gtk2::HBox -> new( 0, 5 );
+		$w{vbox} -> pack_start( $w{hboxoo}, 0, 1, 5 );
+			
+			$w{lblOtherOptions} = Gtk2::Label -> new( 'Other options: ' );
+			$w{hboxoo} -> pack_start( $w{lblOtherOptions}, 0, 1, 0 );
+			
+			$w{entryOtherOptions} = Gtk2::Entry -> new;
+			$w{entryOtherOptions} -> set_tooltip_text( "Insert other options not implemented in Asbru (launch 'rdesktop --help' to see them all)" );
+			$w{hboxoo} -> pack_start( $w{entryOtherOptions}, 1, 1, 5 );
+		
 		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox2}, 0, 1, 5 );
 			
@@ -335,7 +354,7 @@ sub _buildGUI {
 					
 					$w{chEmbed} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Embed in TAB' );
 					$w{hboxfsebpc} -> pack_start( $w{chEmbed}, 1, 1, 0 );
-					$w{chEmbed} -> set_tooltip_text( 'Embed terminal window in PAC TAB, using PAC\'s GUI size' );
+					$w{chEmbed} -> set_tooltip_text( 'Embed terminal window in Asbru TAB, using Asbru\'s GUI size' );
 					
 					$w{hbox69} = Gtk2::HBox -> new( 0, 5 );
 					$w{hboxfsebpc} -> pack_start( $w{hbox69}, 1, 1, 0 );
@@ -353,17 +372,6 @@ sub _buildGUI {
 							$w{hboxWidthHeight} -> pack_start( $w{spHeight}, 0, 1, 0 );
 							$w{hboxWidthHeight} -> set_sensitive( 0 );
 					
-					$w{hboxPercentage} = Gtk2::HBox -> new( 0, 5 );
-					$w{hboxsize} -> pack_start( $w{hboxPercentage}, 0, 1, 0 );
-						
-						$w{chPercentage} = Gtk2::RadioButton -> new_with_label( $w{chFullscreen}, 'Screen percentage:' );
-						$w{chPercentage} -> set_tooltip_text( '[-g percentage%] : Amount of screen to use' );
-						$w{chPercentage} -> set_active( 1 );
-						$w{hboxPercentage} -> pack_start( $w{chPercentage}, 0, 1, 0 );
-						
-						$w{spGeometry} = Gtk2::HScale -> new( Gtk2::Adjustment -> new( 90, 10, 100, 1.0, 1.0, 1.0 ) );
-						$w{hboxPercentage} -> pack_start( $w{spGeometry}, 1, 1, 0 );
-			
 			$w{frKeyboard} = Gtk2::Frame -> new( 'Keyboard layout:' );
 			$w{hbox2} -> pack_start( $w{frKeyboard}, 0, 1, 0 );
 			$w{frKeyboard} -> set_tooltip_text( '[-k] : Keyboard layout' );
@@ -381,7 +389,7 @@ sub _buildGUI {
 			$w{hboxDomain} -> pack_start( Gtk2::Label -> new( 'Sound redirect: ' ), 0, 1, 0 );
 			$w{cbRedirSound} = Gtk2::ComboBox -> new_text;
 			$w{hboxDomain} -> pack_start( $w{cbRedirSound}, 1, 1, 0 );
-			foreach my $sound ( 'local', 'off', 'remote' ) { $w{cbRedirSound} -> append_text( $sound ); };
+			foreach my $sound ( 'local', 'off', 'remote', 'local:alsa', 'local:pulseaudio' ) { $w{cbRedirSound} -> append_text( $sound ); };
 		
 		$w{frameRedirDisk} = Gtk2::Frame -> new( ' Disk redirects: ' );
 		$w{vbox} -> pack_start( $w{frameRedirDisk}, 1, 1, 0 );
@@ -409,10 +417,9 @@ sub _buildGUI {
 						$w{vp} -> add( $w{vbRedirect} );
 	
 	# Capture 'Full Screen' checkbox toggled state
-	$w{chFullscreen}	-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); $w{spGeometry} -> set_sensitive( ! $w{chFullscreen} -> get_active && ! $w{chEmbed} -> get_active ); } );
-	$w{chEmbed}			-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); $w{spGeometry} -> set_sensitive( ! $w{chFullscreen} -> get_active && ! $w{chEmbed} -> get_active ); } );
-	$w{chPercentage}	-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); $w{spGeometry} -> set_sensitive( ! $w{chFullscreen} -> get_active && ! $w{chEmbed} -> get_active ); } );
-	$w{chWidthHeight}	-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); $w{spGeometry} -> set_sensitive( ! $w{chFullscreen} -> get_active && ! $w{chEmbed} -> get_active ); } );
+	$w{chFullscreen}	-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); } );
+	$w{chEmbed}			-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); } );
+	$w{chWidthHeight}	-> signal_connect( 'toggled' => sub { $w{hboxWidthHeight} -> set_sensitive( $w{chWidthHeight} -> get_active ); } );
 	
 	$$self{gui} = \%w;
 	
