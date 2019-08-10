@@ -103,6 +103,7 @@ sub update {
 	$$self{gui}{chFontSmooth}			-> set_active( $$options{fontSmooth} // 0 );
 	$$self{gui}{chNoGrabKbd}			-> set_active( $$options{noGrabKbd} // 0 );
 	$$self{gui}{entryStartupShell}		-> set_text( $$options{startupshell} // '' );
+	$$self{gui}{entryOtherOptions}		-> set_text( $$options{otherOptions} // '' );
 
 	# Destroy previuos widgets
 	$$self{gui}{vbRedirect} -> foreach( sub { $_[0] -> destroy(); } );
@@ -147,6 +148,7 @@ sub get_cfg {
 	$options{fontSmooth}		= $$self{gui}{chFontSmooth}			-> get_active;
 	$options{noGrabKbd}		= $$self{gui}{chNoGrabKbd}			-> get_active;
 	$options{startupshell}		= $$self{gui}{entryStartupShell}	-> get_chars( 0, -1 );
+	$options{otherOptions}		= $$self{gui}{entryOtherOptions}	-> get_chars( 0, -1 );
 
 	foreach my $w ( @{ $$self{listRedir} } ) {
 		my %hash;
@@ -186,54 +188,55 @@ sub _parseCfgToOptions {
 	$hash{redirSound}		= 0;
 	$hash{redirClipboard}	= 0;
 	$hash{domain}			= '';
-	$hash{ignoreCert}       = 0;
-	$hash{noAuth}           = 0;
-	$hash{nofastPath}       = 0;
-	$hash{rfx}              = 0;
-	$hash{nsCodec}          = 0;
-	$hash{dynamicResolution}          = 0;
-	$hash{noRDP}            = 0;
-	$hash{noTLS}            = 0;
-	$hash{noNLA}            = 0;
+	$hash{ignoreCert}	= 0;
+	$hash{noAuth}		= 0;
+	$hash{nofastPath}	= 0;
+	$hash{rfx}		= 0;
+	$hash{nsCodec}		= 0;
+	$hash{dynamicResolution}	= 0;
+	$hash{noRDP}		= 0;
+	$hash{noTLS}		= 0;
+	$hash{noNLA}		= 0;
 	$hash{fontSmooth}		= 0;
-        $hash{noGrabKbd}                = 0;
+        $hash{noGrabKbd}		= 0;
 	$hash{startupshell}		= '';
+	$hash{otherOptions}		= '';
 	
-	my @opts = split( /\s+\/?/, $cmd_line );
+	my @opts = split( / /, $cmd_line );
 	foreach my $opt ( @opts ) {
 		next unless $opt ne '';
 		$opt =~ s/\s+$//go;
 		
-		$opt =~ /^bpp:(8|15|16|24)$/go	  and	$hash{bpp}				= $1;
-		$opt eq 'admin'	                  and	$hash{attachToConsole}	= 1;
-		$opt eq '+compression'		  and	$hash{useCompression}	= 1;
-		if ( $opt =~ /^shell:(.+)$/go )  {	$hash{startupshell} = $1; }
-		if ( $opt eq 'f' )                    {	$hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^size:(\d+)\%$/go )     {	$hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
-		if ( $opt =~ /^size:(\d+)x(\d+)$/go ) {	$hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
-		$opt =~ /^kbd:(.+)$/go		and	$hash{keyboardLocale}	= $1;
-		$opt =~ /^sound:sys:alsa$/go	and	$hash{redirSound}	= 1;
-		$opt =~ /^\+clipboard$/go	and	$hash{redirClipboard}	= 1;
-		$opt =~ /^d:(.+)$/go		and	$hash{domain}		= $1;
-		$opt =~ /^cert-ignore$/go	and	$hash{ignoreCert}	= 1;
-		$opt =~ /^-authentication$/go	and	$hash{noAuth}		= 1;
-		$opt =~ /^-fast-path$/go	and	$hash{nofastPath}	= 1;
-		$opt =~ /^rfx$/go		and	$hash{rfx}		= 1;
-		$opt =~ /^nsc$/go		and	$hash{nsCodec}		= 1;
-		$opt =~ /^dynamic-resolution$/go		and	$hash{dynamicResolution}		= 1;
-		$opt =~ /^-sec-rdp$/go		and	$hash{noRDP}		= 1;
-		$opt =~ /^-sec-tls$/go		and	$hash{noTLS}		= 1;
-		$opt =~ /^-sec-nla$/go		and	$hash{noNLA}		= 1;
-		$opt =~ /^\+fonts$/go		and	$hash{fontSmooth}	= 1;
-		$opt =~ /^-grab-keyboard$/go	and	$hash{noGrabKbd}	= 1;
-		
-		while ( $opt =~ /^drive:(.+),(.+)/go )
+		if ( $opt =~ /^\/bpp:(8|15|16|24|32)$/go )	{ $hash{bpp}	= $1; }
+		elsif ( $opt eq '/admin' )	{ $hash{attachToConsole}	= 1; }
+		elsif ( $opt eq '+compression' )	{ $hash{useCompression}	= 1; }
+		elsif ( $opt =~ /^\/shell:(.+)$/go )	{ $hash{startupshell} = $1; }
+		elsif ( $opt eq '/f' )		{ $hash{fullScreen} = 1; $hash{percent} = 0; $hash{wh} = 0; $hash{'embed'} = 0; }
+		elsif ( $opt =~ /^\/size:(\d+(\.\d+)?)%$/go )	{ $hash{geometry} = $1; $hash{percent} = 1; $hash{wh} = 0; $hash{'embed'} = 0; }
+		elsif ( $opt =~ /^\/size:(\d+)x(\d+)$/go )	{ $hash{width} = $1; $hash{height} = $2; $hash{wh} = 1; $hash{percent} = 0; $hash{'embed'} = 0; }
+		elsif ( $opt =~ /^\/kbd:(.+)$/go )	{ $hash{keyboardLocale}	= $1; }
+		elsif ( $opt =~ /^\/sound:sys:alsa$/go )	{ $hash{redirSound}	= 1; }
+		elsif ( $opt eq '+clipboard' )	{ $hash{redirClipboard}	= 1; }
+		elsif ( $opt =~ /^\/d:(.+)$/go )		{ $hash{domain}		= $1; }
+		elsif ( $opt eq '/cert-ignore' )	{ $hash{ignoreCert}	= 1; }
+		elsif ( $opt =~ /^-authentication$/go )	{ $hash{noAuth}		= 1; } 
+		elsif ( $opt eq '-fast-path' )	{ $hash{nofastPath}	= 1; }
+		elsif ( $opt eq '/rfx' )	{ $hash{rfx}		= 1; }
+		elsif ( $opt eq '/nsc' )	{ $hash{nsCodec}		= 1; }
+		elsif ( $opt eq '/dynamic-resolution' )	{ $hash{dynamicResolution}		= 1; }
+		elsif ( $opt eq '-sec-rdp' )	{ $hash{noRDP}		= 1; }
+		elsif ( $opt eq '-sec-tls' )	{ $hash{noTLS}		= 1; }
+		elsif ( $opt eq '-sec-nla' )	{ $hash{noNLA}		= 1; }
+		elsif ( $opt eq '+fonts' )	{ $hash{fontSmooth}	= 1; }
+		elsif ( $opt eq '-grab-keyboard' )	{ $hash{noGrabKbd}	= 1; }
+		elsif ( $opt =~ /^\/drive:(.+),(.+)$/g )
 		{
 			my %redir;
-			$redir{redirDiskShare}	= $1;
-			$redir{redirDiskPath}	= $2;
+			$redir{redirDiskShare} = $1;
+			$redir{redirDiskPath} = $2;
 			push( @{ $hash{redirDisk} }, \%redir );
 		}
+		else { $hash{otherOptions}	.= ' ' . $opt; }
 	}
 	
 	return \%hash;
@@ -274,6 +277,8 @@ sub _parseOptionsToCfg {
 	$txt .= ' -grab-keyboard' if $$hash{noGrabKbd};
 	
 	foreach my $redir ( @{ $$hash{redirDisk} } ) { $txt .= " /drive:$$redir{redirDiskShare},$$redir{redirDiskPath}"; }
+	
+	$txt .= ' ' . $$hash{otherOptions} if $$hash{otherOptions} ne '';
 	
 	return $txt;
 }
@@ -373,6 +378,16 @@ sub _buildGUI {
 			$w{entryStartupShell} -> set_tooltip_text( "[/shell:'startupshell command'] : start given startupshell/command instead of explorer" );
 			$w{hboxss} -> pack_start( $w{entryStartupShell}, 1, 1, 5 );
 		
+		$w{hboxoo} = Gtk2::HBox -> new( 0, 5 );
+		$w{vbox} -> pack_start( $w{hboxoo}, 0, 1, 5 );
+			
+			$w{lblOtherOptions} = Gtk2::Label -> new( 'Other options: ' );
+			$w{hboxoo} -> pack_start( $w{lblOtherOptions}, 0, 1, 0 );
+			
+			$w{entryOtherOptions} = Gtk2::Entry -> new;
+			$w{entryOtherOptions} -> set_tooltip_text( "Insert other options not implemented in Asbru (launch 'xfreerdp --help' to see them all)" );
+			$w{hboxoo} -> pack_start( $w{entryOtherOptions}, 1, 1, 5 );
+		
 		$w{hbox2} = Gtk2::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox2}, 0, 1, 5 );
 			
@@ -428,6 +443,7 @@ sub _buildGUI {
 			$w{frKeyboard} -> set_tooltip_text( '[/kbd] : Keyboard layout' );
 				
 				$w{entryKeyboard} = Gtk2::Entry -> new;
+				$w{entryKeyboard} -> set_tooltip_text( "List keyboard layouts launching 'xfreerdp /kbd-list' (0x00000...)" );
 				$w{frKeyboard} -> add( $w{entryKeyboard} );
 		
 		$w{hboxDomain} = Gtk2::HBox -> new( 0, 5 );
