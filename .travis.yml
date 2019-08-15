@@ -25,6 +25,7 @@ env:
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
     - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
+    - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
