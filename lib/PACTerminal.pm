@@ -946,7 +946,8 @@ sub _setupCallbacks {
 			}
 			# d --> duplicate connection
 			elsif ( lc $keyval eq 'd' ) {
-				$PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] );
+				my $terminals = $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] );
+				$$self{_NOTEBOOK}->reorder_child ($$terminals[0] -> {_GUI}{_VBOX}, $$self{_NOTEBOOK}->page_num($$self{_GUI}{_VBOX}) + 1);
 				return 1;
 			}
 			# f --> Find in history
