@@ -903,7 +903,16 @@ if ( defined $METHOD ) {
 	} elsif ( ( $METHOD =~ /^.*mosh.*$/ ) || ( $METHOD eq 'MOSH' ) ) {
 		$METHOD = 'mosh';
 		$PORT != 22 and $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
-		$connection_cmd = "$METHOD $CONNECT_OPTS $USER\@$IP";
+		my $key = '';
+        if ( $AUTH eq 'publickey' ) {
+            $key = "-i \"$PUBKEY\"" . ( $AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"' );
+            $USER = $PASSPHRASE_USER;
+            $PASS = $PASSPHRASE;
+			$CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
+        } elsif ( ! $AUTHFALLBACK ) {
+            $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
+        }
+		$connection_cmd = "$METHOD $CONNECT_OPTS " . "$USER" . "@" . "$IP";
 		$connection_txt = $connection_cmd;
 		print "*$connection_cmd*\n";
 	} elsif ( ( $METHOD =~ /^.*sftp.*$/ ) || ( $METHOD eq 'SFTP' ) ) {
