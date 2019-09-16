@@ -801,7 +801,7 @@ sub _getMethods {
 			_( $self, 'entryUser' )				-> set_sensitive( 1 );
 			_( $self, 'alignUserPass' )			-> set_sensitive( 1 );
 			_( $self, 'rbCfgAuthUserPass' )		-> set_active( $$cfg{'auth type'} eq 'userpass' );
-			_( $self, 'framePublicKey' )		-> set_sensitive( 0 );
+			_( $self, 'framePublicKey' )		-> set_sensitive( 1 );
 			_( $self, 'entryPassphrase' )		-> set_text( $$cfg{passphrase} // '' );
 			_( $self, 'fileCfgPublicKey' )		-> set_filename( $$cfg{'public key'} // '' );
 			_( $self, 'rbCfgAuthPublicKey' )	-> set_active( $$cfg{'auth type'} eq 'publickey' );
