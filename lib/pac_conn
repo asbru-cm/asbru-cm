@@ -904,14 +904,14 @@ if ( defined $METHOD ) {
 		$METHOD = 'mosh';
 		$PORT != 22 and $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
 		my $key = '';
-        if ( $AUTH eq 'publickey' ) {
-            $key = "-i \"$PUBKEY\"" . ( $AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"' );
-            $USER = $PASSPHRASE_USER;
-            $PASS = $PASSPHRASE;
+		if ( $AUTH eq 'publickey' ) {
+			$key = "-i \"$PUBKEY\"" . ( $AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"' );
+			$USER = $PASSPHRASE_USER;
+			$PASS = $PASSPHRASE;
 			$CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
-        } elsif ( ! $AUTHFALLBACK ) {
-            $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
-        }
+		} elsif ( ! $AUTHFALLBACK ) {
+			$key = '-o "PreferredAuthentications=password,keyboard-interactive"';
+		}
 		$connection_cmd = "$METHOD $CONNECT_OPTS " . "$USER" . "@" . "$IP";
 		$connection_txt = $connection_cmd;
 		print "*$connection_cmd*\n";
