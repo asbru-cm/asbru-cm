@@ -495,8 +495,8 @@
                     </child>
                     -->
                     <child>
-                      <widget class="GtkCheckButton" id="cbCfgForceSpitSize">
-                        <property name="label" translatable="yes">Force slit tabs to 50%</property>
+                      <widget class="GtkCheckButton" id="cbCfgForceSplitSize">
+                        <property name="label" translatable="yes">Force split tabs to 50%</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
