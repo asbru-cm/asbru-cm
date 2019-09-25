@@ -32,8 +32,8 @@ use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 use Encode qw ( encode );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -102,7 +102,7 @@ sub _initGUI {
 	my $self = shift;
 	
 	# Create the 'windowFind' dialog window,
-	$$self{_WINDOWPIPE}{data} = Gtk2::Window -> new;
+	$$self{_WINDOWPIPE}{data} = Gtk3::Window -> new;
 	
 	# and setup some dialog properties.
 	$$self{_WINDOWPIPE}{data} -> set_title( "$APPNAME : Pipe output" );
@@ -113,28 +113,28 @@ sub _initGUI {
 	#$$self{_WINDOWPIPE}{data} -> set_modal( 1 );
 	$$self{_WINDOWPIPE}{data} -> maximize;
 		
-		$$self{_WINDOWPIPE}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$$self{_WINDOWPIPE}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$$self{_WINDOWPIPE}{data} -> add( $$self{_WINDOWPIPE}{gui}{vbox} );
 			
 			# Create an hpane
-			$$self{_WINDOWPIPE}{gui}{hpane} = Gtk2::HPaned -> new;
+			$$self{_WINDOWPIPE}{gui}{hpane} = Gtk3::HPaned -> new;
 			$$self{_WINDOWPIPE}{gui}{vbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{hpane}, 1, 1, 0 );
 				
-				$$self{_WINDOWPIPE}{gui}{frame1} = Gtk2::Frame -> new;
+				$$self{_WINDOWPIPE}{gui}{frame1} = Gtk3::Frame -> new;
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_size_request( 200, 200 );
 				$$self{_WINDOWPIPE}{gui}{hpane} -> pack1( $$self{_WINDOWPIPE}{gui}{frame1}, 0, 0 );
-				( my $lbl1 = Gtk2::Label -> new ) -> set_markup( ' <b>Terminals:</b> ' );
+				( my $lbl1 = Gtk3::Label -> new ) -> set_markup( ' <b>Terminals:</b> ' );
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_label_widget( $lbl1 );
 				$$self{_WINDOWPIPE}{gui}{frame1} -> set_border_width( 5 );
 					
 					# Terminals list
-					$$self{_WINDOWPIPE}{gui}{scroll2} = Gtk2::ScrolledWindow -> new;
+					$$self{_WINDOWPIPE}{gui}{scroll2} = Gtk3::ScrolledWindow -> new;
 					$$self{_WINDOWPIPE}{gui}{frame1} -> add( $$self{_WINDOWPIPE}{gui}{scroll2} );
 					$$self{_WINDOWPIPE}{gui}{scroll2} -> set_policy( 'automatic', 'automatic' );
 					$$self{_WINDOWPIPE}{gui}{frame1} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{treeTerminals} = Gtk2::Ex::Simple::List -> new_from_treeview (
-							Gtk2::TreeView -> new,
+						$$self{_WINDOWPIPE}{treeTerminals} = Gtk3::SimpleList -> new_from_treeview (
+							Gtk3::TreeView -> new,
 							'UUID_TMP'	=> 'hidden',
 							'NAME'		=> 'text',
 							'TITLE'		=> 'text'
@@ -150,60 +150,60 @@ sub _initGUI {
 						$col_terminals[1] -> set_expand( 0 );
 				
 				# Create a vpane
-				$$self{_WINDOWPIPE}{gui}{vpane} = Gtk2::VPaned -> new;
+				$$self{_WINDOWPIPE}{gui}{vpane} = Gtk3::VPaned -> new;
 				$$self{_WINDOWPIPE}{gui}{hpane} -> pack2( $$self{_WINDOWPIPE}{gui}{vpane}, 1, 0 );
 					
 					# Create frame 2
-					$$self{_WINDOWPIPE}{gui}{frame2} = Gtk2::Frame -> new;
+					$$self{_WINDOWPIPE}{gui}{frame2} = Gtk3::Frame -> new;
 					$$self{_WINDOWPIPE}{gui}{vpane} -> pack1( $$self{_WINDOWPIPE}{gui}{frame2}, 1, 0 );
-					( my $lbl2 = Gtk2::Label -> new ) -> set_markup( ' <b>Expanded command:</b> ' );
+					( my $lbl2 = Gtk3::Label -> new ) -> set_markup( ' <b>Expanded command:</b> ' );
 					$$self{_WINDOWPIPE}{gui}{frame2} -> set_label_widget( $lbl2 );
 					$$self{_WINDOWPIPE}{gui}{frame2} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{gui}{scroll1} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWPIPE}{gui}{scroll1} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWPIPE}{gui}{frame2} -> add( $$self{_WINDOWPIPE}{gui}{scroll1} );
 						$$self{_WINDOWPIPE}{gui}{scroll1} -> set_policy( 'automatic', 'automatic' );
 						$$self{_WINDOWPIPE}{gui}{scroll1} -> set_border_width( 5 );
 							
-							$$self{_WINDOWPIPE}{bufferCmd} = Gtk2::TextBuffer -> new;
-							$$self{_WINDOWPIPE}{gui}{text1} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferCmd} );
+							$$self{_WINDOWPIPE}{bufferCmd} = Gtk3::TextBuffer -> new;
+							$$self{_WINDOWPIPE}{gui}{text1} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferCmd} );
 							
 							$$self{_WINDOWPIPE}{gui}{text1} -> set_editable( 0 );
-							$$self{_WINDOWPIPE}{gui}{text1} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+							$$self{_WINDOWPIPE}{gui}{text1} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 							$$self{_WINDOWPIPE}{gui}{scroll1} -> add( $$self{_WINDOWPIPE}{gui}{text1} );
 					
 					# Create frame 3
-					$$self{_WINDOWPIPE}{gui}{frame3} = Gtk2::Frame -> new;
+					$$self{_WINDOWPIPE}{gui}{frame3} = Gtk3::Frame -> new;
 					$$self{_WINDOWPIPE}{gui}{vpane} -> pack2( $$self{_WINDOWPIPE}{gui}{frame3}, 1, 0 );
-					( my $lbl3 = Gtk2::Label -> new ) -> set_markup( ' <b>Final output (locally piped):</b> ' );
+					( my $lbl3 = Gtk3::Label -> new ) -> set_markup( ' <b>Final output (locally piped):</b> ' );
 					$$self{_WINDOWPIPE}{gui}{frame3} -> set_label_widget( $lbl3 );
 					$$self{_WINDOWPIPE}{gui}{frame3} -> set_border_width( 5 );
 						
-						$$self{_WINDOWPIPE}{gui}{scroll} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWPIPE}{gui}{scroll} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWPIPE}{gui}{frame3} -> add( $$self{_WINDOWPIPE}{gui}{scroll} );
 						$$self{_WINDOWPIPE}{gui}{scroll} -> set_policy( 'automatic', 'automatic' );
 						$$self{_WINDOWPIPE}{gui}{scroll} -> set_border_width( 5 );
 							
-							$$self{_WINDOWPIPE}{bufferOut} = Gtk2::TextBuffer -> new;
-							$$self{_WINDOWPIPE}{gui}{text} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferOut} );
+							$$self{_WINDOWPIPE}{bufferOut} = Gtk3::TextBuffer -> new;
+							$$self{_WINDOWPIPE}{gui}{text} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWPIPE}{bufferOut} );
 							
 							$$self{_WINDOWPIPE}{gui}{text} -> set_editable( 0 );
-							$$self{_WINDOWPIPE}{gui}{text} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+							$$self{_WINDOWPIPE}{gui}{text} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 							$$self{_WINDOWPIPE}{gui}{scroll} -> add( $$self{_WINDOWPIPE}{gui}{text} );
 			
-			$$self{_WINDOWPIPE}{gui}{btnbox} = Gtk2::HBox -> new( 0, 0 );
+			$$self{_WINDOWPIPE}{gui}{btnbox} = Gtk3::HBox -> new( 0, 0 );
 			$$self{_WINDOWPIPE}{gui}{vbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnbox}, 0, 1, 0 );
 				
 				# Put a 'always on top' checkbutton
-				$$self{_WINDOWPIPE}{gui}{cbaot} = Gtk2::CheckButton -> new_with_label( 'Always On Top' );
+				$$self{_WINDOWPIPE}{gui}{cbaot} = Gtk3::CheckButton -> new_with_label( 'Always On Top' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{cbaot}, 0, 1, 0 );
 				
 				# Put a 'refresh' button
-				$$self{_WINDOWPIPE}{gui}{btnrefresh} = Gtk2::Button -> new_from_stock( 'gtk-refresh' );
+				$$self{_WINDOWPIPE}{gui}{btnrefresh} = Gtk3::Button -> new_from_stock( 'gtk-refresh' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnrefresh}, 1, 1, 0 );
 				
 				# Put a 'close' button
-				$$self{_WINDOWPIPE}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-close' );
+				$$self{_WINDOWPIPE}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-close' );
 				$$self{_WINDOWPIPE}{gui}{btnbox} -> pack_start( $$self{_WINDOWPIPE}{gui}{btnclose}, 1, 1, 0 );
 	
 	$$self{_WINDOWPIPE}{gui}{vpane} -> set_position( ( $$self{_WINDOWPIPE}{data} -> get_size ) / 2 );
@@ -230,7 +230,7 @@ sub _setupCallbacks {
 		$$self{_WINDOWPIPE}{bufferOut} -> set_text( '' );
 		
 		my $model = $$self{_WINDOWPIPE}{treeTerminals} -> get_model;
-		foreach my $path ( $$self{_WINDOWPIPE}{treeTerminals} -> get_selection -> get_selected_rows ) {
+		foreach my $path ( _getSelectedRows( $$self{_WINDOWPIPE}{treeTerminals} -> get_selection ) ) {
 			my $uuid_tmp	= $model -> get_value( $model -> get_iter( $path ), 0 );
 			my $t			= $PACMain::RUNNING{$uuid_tmp}{'terminal'};
 			my $name		= $$t{_NAME};

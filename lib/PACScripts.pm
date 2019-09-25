@@ -35,13 +35,13 @@ use File::Copy;
 use File::Basename;
 use Storable qw ( dclone nstore_fd );
 
-eval { require Gtk2::SourceView2; };
+eval { require Gtk3::SourceView2; };
 my $SOURCEVIEW = ! $@;
 
 my $PERL = `which perl 2>&1`;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -338,7 +338,7 @@ sub show {
 	$$self{_WINDOWSCRIPTS}{main} -> show_all;
 	$$self{_WINDOWSCRIPTS}{main} -> present;
 	
-	$self -> _reloadDir unless $$self{_WINDOWSCRIPTS}{main} -> window -> is_visible;
+	$self -> _reloadDir unless $$self{_WINDOWSCRIPTS}{main} -> get_window -> is_visible;
 	$self -> _updateGUI;
 	
 	# Setup a timer to check syntax of selected script
@@ -348,7 +348,7 @@ sub show {
 		my $selection	= $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection;
 		my $model		= $$self{_WINDOWSCRIPTS}{treeScripts} -> get_model;
 		
-		my @sel = $selection -> get_selected_rows;
+		my @sel = _getSelectedRows( $selection );
 		if ( scalar @sel != 1 ) {
 			$$self{_WINDOWSCRIPTS}{gui}{status} -> set_markup( '' );
 			$$self{_WINDOWSCRIPTS}{gui}{status} -> set_tooltip_text( '' );
@@ -388,7 +388,7 @@ sub _initGUI {
 	my $self = shift;
 	
 	# Create the 'windowFind' dialog window,
-	$$self{_WINDOWSCRIPTS}{main} = Gtk2::Window -> new;
+	$$self{_WINDOWSCRIPTS}{main} = Gtk3::Window -> new;
 	
 	# and setup some dialog properties.
 	$$self{_WINDOWSCRIPTS}{main} -> set_title( "$APPNAME : Scripts" );
@@ -398,24 +398,24 @@ sub _initGUI {
 	$$self{_WINDOWSCRIPTS}{main} -> set_resizable( 1 );
 	$$self{_WINDOWSCRIPTS}{main} -> maximize;
 		
-		$$self{_WINDOWSCRIPTS}{gui}{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$$self{_WINDOWSCRIPTS}{gui}{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$$self{_WINDOWSCRIPTS}{main} -> add( $$self{_WINDOWSCRIPTS}{gui}{vbox} );
 			
-			my $hboxaux = Gtk2::HBox -> new( 0, 0 );
+			my $hboxaux = Gtk3::HBox -> new( 0, 0 );
 			$$self{_WINDOWSCRIPTS}{gui}{vbox} -> pack_start( $hboxaux, 0, 1, 0 );
-			$hboxaux -> pack_start( Gtk2::Image -> new_from_file( $BANNER ), 0, 1, 0 );
+			$hboxaux -> pack_start( Gtk3::Image -> new_from_file( $BANNER ), 0, 1, 0 );
 			
 			# Create an hpane
-			$$self{_WINDOWSCRIPTS}{gui}{hpane} = Gtk2::HPaned -> new;
+			$$self{_WINDOWSCRIPTS}{gui}{hpane} = Gtk3::HPaned -> new;
 			$$self{_WINDOWSCRIPTS}{gui}{vbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{hpane}, 1, 1, 0 );
 				
 				# Terminals list
-				$$self{_WINDOWSCRIPTS}{gui}{scroll2} = Gtk2::ScrolledWindow -> new;
+				$$self{_WINDOWSCRIPTS}{gui}{scroll2} = Gtk3::ScrolledWindow -> new;
 				$$self{_WINDOWSCRIPTS}{gui}{hpane} -> pack1( $$self{_WINDOWSCRIPTS}{gui}{scroll2}, 0, 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{scroll2} -> set_policy( 'automatic', 'automatic' );
 					
-					$$self{_WINDOWSCRIPTS}{treeScripts} = Gtk2::Ex::Simple::List -> new_from_treeview (
-						Gtk2::TreeView -> new,
+					$$self{_WINDOWSCRIPTS}{treeScripts} = Gtk3::SimpleList -> new_from_treeview (
+						Gtk3::TreeView -> new,
 						'FILE'		=> 'hidden',
 						'SCRIPT'	=> 'text'
 					);
@@ -426,32 +426,32 @@ sub _initGUI {
 					$$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection -> set_mode( 'GTK_SELECTION_MULTIPLE' );
 				
 				# Create a notebook
-				$$self{_WINDOWSCRIPTS}{nb} = Gtk2::Notebook -> new;
+				$$self{_WINDOWSCRIPTS}{nb} = Gtk3::Notebook -> new;
 				$$self{_WINDOWSCRIPTS}{gui}{hpane} -> pack2( $$self{_WINDOWSCRIPTS}{nb}, 1, 0 );
 					
 					# PAC Script Editor
 					
-					my $tablbl = Gtk2::HBox -> new( 0, 0 );
-					$tablbl -> pack_start( Gtk2::Label -> new( ' Script Editor ' ), 1, 1, 0 );
-					$tablbl -> pack_start( Gtk2::Image -> new_from_stock( 'pac-script', 'menu' ), 0, 1, 0 );
+					my $tablbl = Gtk3::HBox -> new( 0, 0 );
+					$tablbl -> pack_start( Gtk3::Label -> new( ' Script Editor ' ), 1, 1, 0 );
+					$tablbl -> pack_start( Gtk3::Image -> new_from_stock( 'pac-script', 'menu' ), 0, 1, 0 );
 					$tablbl -> show_all;
 					
-					$$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} = Gtk2::HPaned -> new;
+					$$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} = Gtk3::HPaned -> new;
 					$$self{_WINDOWSCRIPTS}{nb} -> append_page( $$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc}, $tablbl );
 					$$self{_WINDOWSCRIPTS}{nb} -> set_tab_reorderable( $$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc}, 0 );
 					$$self{_WINDOWSCRIPTS}{nb} -> set_tab_detachable( $$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc}, 0 );
 						
-						$$self{_WINDOWSCRIPTS}{gui}{vboxedit} = Gtk2::VBox -> new( 0, 0 );
+						$$self{_WINDOWSCRIPTS}{gui}{vboxedit} = Gtk3::VBox -> new( 0, 0 );
 						$$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} -> pack1( $$self{_WINDOWSCRIPTS}{gui}{vboxedit}, 0, 0 );
 							
-							$$self{_WINDOWSCRIPTS}{gui}{scrollMultiText} = Gtk2::ScrolledWindow -> new;
+							$$self{_WINDOWSCRIPTS}{gui}{scrollMultiText} = Gtk3::ScrolledWindow -> new;
 							$$self{_WINDOWSCRIPTS}{gui}{vboxedit} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{scrollMultiText}, 1, 1, 0 );
 							$$self{_WINDOWSCRIPTS}{gui}{scrollMultiText} -> set_policy( 'automatic', 'automatic' );
 							$$self{_WINDOWSCRIPTS}{gui}{scrollMultiText} -> set_border_width( 5 );
 								
 								if ( $SOURCEVIEW ) {
-									$$self{_WINDOWSCRIPTS}{multiTextBuffer} = Gtk2::SourceView2::Buffer -> new( undef );
-									$$self{_WINDOWSCRIPTS}{gui}{textScript} = Gtk2::SourceView2::View -> new_with_buffer( $$self{_WINDOWSCRIPTS}{multiTextBuffer} );
+									$$self{_WINDOWSCRIPTS}{multiTextBuffer} = Gtk3::SourceView2::Buffer -> new( undef );
+									$$self{_WINDOWSCRIPTS}{gui}{textScript} = Gtk3::SourceView2::View -> new_with_buffer( $$self{_WINDOWSCRIPTS}{multiTextBuffer} );
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set_smart_home_end( 'before' );
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set_show_line_numbers( 1 );
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set_tab_width( 4 );
@@ -459,10 +459,10 @@ sub _initGUI {
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set_auto_indent( 1 );
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set( 'auto-indent', 1 );
 									$$self{_WINDOWSCRIPTS}{gui}{textScript} ->set_highlight_current_line( 1 );
-									$$self{_WINDOWSCRIPTS}{gui}{textScript} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+									$$self{_WINDOWSCRIPTS}{gui}{textScript} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 								} else {
-									$$self{_WINDOWSCRIPTS}{multiTextBuffer} = Gtk2::TextBuffer -> new;
-									$$self{_WINDOWSCRIPTS}{gui}{textScript} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWSCRIPTS}{multiTextBuffer} );
+									$$self{_WINDOWSCRIPTS}{multiTextBuffer} = Gtk3::TextBuffer -> new;
+									$$self{_WINDOWSCRIPTS}{gui}{textScript} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWSCRIPTS}{multiTextBuffer} );
 								}
 								
 								$$self{_WINDOWSCRIPTS}{gui}{textScript} -> set_border_width( 5 );
@@ -473,22 +473,22 @@ sub _initGUI {
 								$$self{_WINDOWSCRIPTS}{gui}{textScript} -> set( 'can_focus', 1 );
 							
 							if ( ! $SOURCEVIEW ) {
-								$$self{_WINDOWSCRIPTS}{gui}{statusLib} = Gtk2::Statusbar -> new;
+								$$self{_WINDOWSCRIPTS}{gui}{statusLib} = Gtk3::Statusbar -> new;
 								$$self{_WINDOWSCRIPTS}{gui}{vboxedit} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{statusLib}, 0, 1, 0 );
 								$$self{_WINDOWSCRIPTS}{gui}{statusLib} -> push( 1, "Install 'libgtk2-sourceview2-perl' to enjoy Syntax Highlight" );
 							}
 							
-							$$self{_WINDOWSCRIPTS}{gui}{status} = Gtk2::Label -> new;
+							$$self{_WINDOWSCRIPTS}{gui}{status} = Gtk3::Label -> new;
 							$$self{_WINDOWSCRIPTS}{gui}{status} -> set_justify( 'center' );
 							$$self{_WINDOWSCRIPTS}{gui}{vboxedit} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{status}, 0, 1, 0 );
 					
 						# API functions list
-						$$self{_WINDOWSCRIPTS}{gui}{scrollfunc} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWSCRIPTS}{gui}{scrollfunc} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} -> pack2( $$self{_WINDOWSCRIPTS}{gui}{scrollfunc}, 0, 0 );
 						$$self{_WINDOWSCRIPTS}{gui}{scrollfunc} -> set_policy( 'automatic', 'automatic' );
 							
-							$$self{_WINDOWSCRIPTS}{treeFuncs} = Gtk2::Ex::Simple::List -> new_from_treeview (
-								Gtk2::TreeView -> new,
+							$$self{_WINDOWSCRIPTS}{treeFuncs} = Gtk3::SimpleList -> new_from_treeview (
+								Gtk3::TreeView -> new,
 								'API NAME'	=> 'hidden',
 								'API CALL'	=> 'markup',
 							);
@@ -532,41 +532,41 @@ sub _initGUI {
 					
 					# PAC Script Help
 					
-					my $tablbl2 = Gtk2::HBox -> new( 0, 0 );
-					$tablbl2 -> pack_start( Gtk2::Label -> new( ' PAC Script Help ' ), 1, 1, 0 );
-					$tablbl2 -> pack_start( Gtk2::Image -> new_from_stock( 'gtk-help', 'menu' ), 0, 1, 0 );
+					my $tablbl2 = Gtk3::HBox -> new( 0, 0 );
+					$tablbl2 -> pack_start( Gtk3::Label -> new( ' PAC Script Help ' ), 1, 1, 0 );
+					$tablbl2 -> pack_start( Gtk3::Image -> new_from_stock( 'gtk-help', 'menu' ), 0, 1, 0 );
 					$tablbl2 -> show_all;
 					
-					$$self{_WINDOWSCRIPTS}{gui}{vboxhelp} = Gtk2::VBox -> new( 0, 0 );
+					$$self{_WINDOWSCRIPTS}{gui}{vboxhelp} = Gtk3::VBox -> new( 0, 0 );
 					$$self{_WINDOWSCRIPTS}{nb} -> append_page( $$self{_WINDOWSCRIPTS}{gui}{vboxhelp}, $tablbl2 );
 					$$self{_WINDOWSCRIPTS}{nb} -> set_tab_reorderable( $$self{_WINDOWSCRIPTS}{gui}{vboxhelp}, 0 );
 					$$self{_WINDOWSCRIPTS}{nb} -> set_tab_detachable( $$self{_WINDOWSCRIPTS}{gui}{vboxhelp}, 0 );
 						
-						$$self{_WINDOWSCRIPTS}{gui}{scrollHelp} = Gtk2::ScrolledWindow -> new;
+						$$self{_WINDOWSCRIPTS}{gui}{scrollHelp} = Gtk3::ScrolledWindow -> new;
 						$$self{_WINDOWSCRIPTS}{gui}{vboxhelp} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{scrollHelp}, 1, 1, 0 );
 						$$self{_WINDOWSCRIPTS}{gui}{scrollHelp} -> set_policy( 'automatic', 'automatic' );
 						$$self{_WINDOWSCRIPTS}{gui}{scrollHelp} -> set_border_width( 5 );
 							
 							if ( $SOURCEVIEW ) {
-								$$self{_WINDOWSCRIPTS}{helpBuffer} = Gtk2::SourceView2::Buffer -> new( undef );
-								$$self{_WINDOWSCRIPTS}{gui}{helpScript} = Gtk2::SourceView2::View -> new_with_buffer( $$self{_WINDOWSCRIPTS}{helpBuffer} );
+								$$self{_WINDOWSCRIPTS}{helpBuffer} = Gtk3::SourceView2::Buffer -> new( undef );
+								$$self{_WINDOWSCRIPTS}{gui}{helpScript} = Gtk3::SourceView2::View -> new_with_buffer( $$self{_WINDOWSCRIPTS}{helpBuffer} );
 								$$self{_WINDOWSCRIPTS}{gui}{helpScript} ->set_show_line_numbers( 0 );
 								$$self{_WINDOWSCRIPTS}{gui}{helpScript} ->set_tab_width( 4 );
 								$$self{_WINDOWSCRIPTS}{gui}{helpScript} ->set_indent_on_tab( 1 );
 								$$self{_WINDOWSCRIPTS}{gui}{helpScript} ->set_highlight_current_line( 1 );
-								$$self{_WINDOWSCRIPTS}{gui}{helpScript} -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+								$$self{_WINDOWSCRIPTS}{gui}{helpScript} -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 							
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> begin_not_undoable_action;
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> set_text( encode( 'iso-8859-1', $PAC_SCRIPTS_HELP ) );
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> end_not_undoable_action;
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> place_cursor( $$self{_WINDOWSCRIPTS}{helpBuffer} -> get_start_iter );
 								
-								my $manager = Gtk2::SourceView2::LanguageManager -> get_default;
+								my $manager = Gtk3::SourceView2::LanguageManager -> get_default;
 								my $language = $manager -> get_language( 'perl' );
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> set_language( $language );
 							} else {
-								$$self{_WINDOWSCRIPTS}{helpBuffer} = Gtk2::TextBuffer -> new;
-								$$self{_WINDOWSCRIPTS}{gui}{helpScript} = Gtk2::TextView -> new_with_buffer( $$self{_WINDOWSCRIPTS}{helpBuffer} );
+								$$self{_WINDOWSCRIPTS}{helpBuffer} = Gtk3::TextBuffer -> new;
+								$$self{_WINDOWSCRIPTS}{gui}{helpScript} = Gtk3::TextView -> new_with_buffer( $$self{_WINDOWSCRIPTS}{helpBuffer} );
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> set_text( encode( 'iso-8859-1', $PAC_SCRIPTS_HELP ) );
 								$$self{_WINDOWSCRIPTS}{helpBuffer} -> place_cursor( $$self{_WINDOWSCRIPTS}{helpBuffer} -> get_start_iter );
 							}
@@ -580,47 +580,47 @@ sub _initGUI {
 			# Set notebook properties
 			$$self{_WINDOWSCRIPTS}{nb} -> set_scrollable( 1 );
 			$$self{_WINDOWSCRIPTS}{nb} -> set_tab_pos( 'top' );
-			$$self{_WINDOWSCRIPTS}{nb} -> set( 'homogeneous', 1 );
+# FIXME-HOMOGENEOUS			$$self{_WINDOWSCRIPTS}{nb} -> set( 'homogeneous', 1 );
 			$$self{_WINDOWSCRIPTS}{nb} -> set_current_page( 0 );
 			
 			# Action buttons
-			$$self{_WINDOWSCRIPTS}{gui}{btnbox} = Gtk2::HBox -> new( 0, 0 );
+			$$self{_WINDOWSCRIPTS}{gui}{btnbox} = Gtk3::HBox -> new( 0, 0 );
 			$$self{_WINDOWSCRIPTS}{gui}{vbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnbox}, 0, 1, 0 );
 				
 				# Put a 'execute' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnexec} = Gtk2::Button -> new( 'E_xecute' );
-				$$self{_WINDOWSCRIPTS}{gui}{btnexec} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-media-play', 'button' ) );
+				$$self{_WINDOWSCRIPTS}{gui}{btnexec} = Gtk3::Button -> new( 'E_xecute' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnexec} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-media-play', 'button' ) );
 				$$self{_WINDOWSCRIPTS}{gui}{btnexec} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnexec}, 1, 1, 0 );
 				
 				# Put a 'add' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-new' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-new' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnadd} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnadd}, 1, 1, 0 );
 				
 				# Put a 'import' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnimport} = Gtk2::Button -> new( 'Import...' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnimport} = Gtk3::Button -> new( 'Import...' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnimport} -> set( 'can_focus', 0 );
-				$$self{_WINDOWSCRIPTS}{gui}{btnimport} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-open', 'button' ) );
+				$$self{_WINDOWSCRIPTS}{gui}{btnimport} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-open', 'button' ) );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnimport}, 1, 1, 0 );
 				
 				# Put a 'remove' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnremove} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnremove} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnremove} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnremove}, 1, 1, 0 );
 				
 				# Put a 'reload' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnreload} = Gtk2::Button -> new_from_stock( 'gtk-refresh' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnreload} = Gtk3::Button -> new_from_stock( 'gtk-refresh' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnreload} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnreload}, 1, 1, 0 );
 				
 				# Put a 'save' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnsave} = Gtk2::Button -> new_from_stock( 'gtk-save' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnsave} = Gtk3::Button -> new_from_stock( 'gtk-save' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnsave} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnsave}, 1, 1, 0 );
 				
 				# Put a 'close' button
-				$$self{_WINDOWSCRIPTS}{gui}{btnclose} = Gtk2::Button -> new_from_stock( 'gtk-close' );
+				$$self{_WINDOWSCRIPTS}{gui}{btnclose} = Gtk3::Button -> new_from_stock( 'gtk-close' );
 				$$self{_WINDOWSCRIPTS}{gui}{btnclose} -> set( 'can_focus', 0 );
 				$$self{_WINDOWSCRIPTS}{gui}{btnbox} -> pack_start( $$self{_WINDOWSCRIPTS}{gui}{btnclose}, 1, 1, 0 );
 	
@@ -1006,8 +1006,8 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 	$$self{_WINDOWSCRIPTS}{gui}{textScript} -> signal_connect( 'key_press_event' => sub {
 		my ( $widget, $event ) = @_; 
 		
-		my $keyval	= Gtk2::Gdk -> keyval_name( $event -> keyval );
-		my $unicode	= Gtk2::Gdk -> keyval_to_unicode( $event -> keyval); # 0 if not a character
+		my $keyval	= Gtk3::Gdk::keyval_name( $event -> keyval );
+		my $unicode	= Gtk3::Gdk::keyval_to_unicode( $event -> keyval); # 0 if not a character
 		my $state	= $event -> get_state;
 		my $ctrl	= $state * ['control-mask'];
 		my $shift	= $state * ['shift-mask'];
@@ -1044,12 +1044,12 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 	$$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection -> signal_connect( 'changed' => sub { $self -> _updateGUI; return 1; } );
 	$$self{_WINDOWSCRIPTS}{treeFuncs} -> signal_connect( 'row_activated' => sub {
 		
-		return 1 unless ( scalar( $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection -> get_selected_rows ) && $$self{_WINDOWSCRIPTS}{gui}{textScript} -> get_sensitive );
+		return 1 unless ( scalar( _getSelectedRows( $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection ) ) && $$self{_WINDOWSCRIPTS}{gui}{textScript} -> get_sensitive );
 		
 		my $selection	= $$self{_WINDOWSCRIPTS}{treeFuncs} -> get_selection;
 		my $model		= $$self{_WINDOWSCRIPTS}{treeFuncs} -> get_model;
 		
-		my @sel = $selection -> get_selected_rows;
+		my @sel = _getSelectedRows( $selection );
 		return 1 unless scalar @sel == 1;
 		
 		my $apicall						= $model -> get_value( $model -> get_iter( $sel[0] ), 0 );
@@ -1060,7 +1060,8 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 	} );
 	
 	# Setup Drag 'n Drop
-	$$self{_WINDOWSCRIPTS}{treeScripts} -> drag_dest_set( 'all', ['copy', 'move'], {'target' => "STRING", 'flags' => [], 'info' => 0} );
+	my @targets = ( Gtk3::TargetEntry->new( 'STRING', [], 0 ) );
+	$$self{_WINDOWSCRIPTS}{treeScripts} -> drag_dest_set( 'all', \@targets, ['copy', 'move'] );
 	$$self{_WINDOWSCRIPTS}{treeScripts} -> signal_connect( 'drag_data_received' => sub {
 		my ( $me, $context, $x, $y, $data, $info, $time ) = @_;
 		
@@ -1100,7 +1101,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 		my $selection	= $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection;
 		my $model		= $$self{_WINDOWSCRIPTS}{treeScripts} -> get_model;
 		
-		my @sel = $selection -> get_selected_rows;
+		my @sel = _getSelectedRows( $selection );
 		return 1 unless scalar @sel == 1;
 		
 		my $name = $model -> get_value( $model -> get_iter( $sel[0] ), 1 );
@@ -1127,7 +1128,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 		return 1;
 	} );
 	$$self{_WINDOWSCRIPTS}{gui}{btnimport} -> signal_connect( 'clicked' => sub {
-		my $choose = Gtk2::FileChooserDialog -> new(
+		my $choose = Gtk3::FileChooserDialog -> new(
 			"$APPNAME (v.$APPVERSION) Choose a text file to Import",
 			$$self{_WINDOWSCRIPTS}{main},
 			'GTK_FILE_CHOOSER_ACTION_OPEN',
@@ -1137,7 +1138,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 		$choose -> set_current_folder( $ENV{'HOME'} // '/tmp' );
 		$choose -> set_select_multiple( 1 );
 		
-		my $filter = Gtk2::FileFilter -> new;
+		my $filter = Gtk3::FileFilter -> new;
 		$filter -> set_name( 'Perl files (.pl)' );
 		$filter -> add_pattern( '*.pl' );
 		$choose -> add_filter( $filter );
@@ -1179,7 +1180,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 			$self -> _saveFile( $$self{_SELECTED} ) if _wConfirm( $$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?" );
 		}
 		
-		my @sel = $selection -> get_selected_rows;
+		my @sel = _getSelectedRows( $selection );
 		return 1 unless scalar( @sel );
 		return 1 unless _wConfirm( $$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". ( scalar( @sel ) ) . " PAC Scripts?" );
 		
@@ -1197,7 +1198,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 	} );
 	
 	$$self{_WINDOWSCRIPTS}{gui}{btnsave} -> signal_connect( 'clicked' => sub {
-		my ( $path ) = $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection -> get_selected_rows;
+		my ( $path ) = _getSelectedRows( $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection );
 		defined $path or return 1;
 		my $file = $$self{_WINDOWSCRIPTS}{treeScripts} -> get_model -> get_value( $$self{_WINDOWSCRIPTS}{treeScripts} -> get_model -> get_iter( $path ), 0 );
 		
@@ -1272,7 +1273,7 @@ sub _loadFile {
 		$$self{_WINDOWSCRIPTS}{multiTextBuffer} -> end_not_undoable_action;
 		$$self{_WINDOWSCRIPTS}{multiTextBuffer} -> place_cursor( $$self{_WINDOWSCRIPTS}{multiTextBuffer} -> get_start_iter );
 		
-		my $manager = Gtk2::SourceView2::LanguageManager -> get_default;
+		my $manager = Gtk3::SourceView2::LanguageManager -> get_default;
 		my $language = $manager -> guess_language( $file );
 		$$self{_WINDOWSCRIPTS}{multiTextBuffer} -> set_language( $language );
 	} else {
@@ -1343,7 +1344,7 @@ sub _updateGUI {
 	
 	return 1 if $$self{_PREVENT_UPDATES};
 	
-	my @sel = $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection -> get_selected_rows;
+	my @sel = _getSelectedRows( $$self{_WINDOWSCRIPTS}{treeScripts} -> get_selection );
 	
 	my $default = "* PAC Scripts *\n
 - Take a look at PAC example scripts to see how they work\n

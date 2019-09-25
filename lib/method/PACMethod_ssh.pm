@@ -35,8 +35,8 @@ use PACUtils;
 use Getopt::Long qw(GetOptionsFromString);
 #use Data::Dumper;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -343,231 +343,231 @@ sub _buildGUI
 	$w{vbox} = $container;
 	$w{vbox} -> set_border_width( 5 );
 		
-		$w{hbox1} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox1}, 0, 1, 0 );
 		$w{hbox1} -> set_border_width( 5 );
 			
-			$w{vboxipv} = Gtk2::VBox -> new( 0, 5 );
+			$w{vboxipv} = Gtk3::VBox -> new( 0, 5 );
 			$w{hbox1} -> pack_start( $w{vboxipv}, 0, 1, 0 );
 				
-				my $hb123 = Gtk2::HBox -> new( 0, 5 );
+				my $hb123 = Gtk3::HBox -> new( 0, 5 );
 				$w{vboxipv} -> pack_start( $hb123, 1, 1, 0 );
 					
-					my $lblsshv = Gtk2::Label -> new( 'SSH Version: ' );
+					my $lblsshv = Gtk3::Label -> new( 'SSH Version: ' );
 					$lblsshv -> set_alignment( 1, 0.5 );
 					$hb123 -> pack_start( $lblsshv, 1, 1, 0 );
 					$hb123 -> set_tooltip_text( '-(1|2|any) : Use SSH v1, v2 or any  of them' );
 					
-					$w{cbSSHVersion} = Gtk2::ComboBox -> new_text;
+					$w{cbSSHVersion} = Gtk3::ComboBoxText -> new;
 					$hb123 -> pack_start( $w{cbSSHVersion}, 0, 1, 0 );
 					foreach my $ssh_version ( sort { $a cmp $b } keys %SSH_VERSION ) { $w{cbSSHVersion} -> append_text( $ssh_version ); };
 					
-				my $hb456 = Gtk2::HBox -> new( 0, 5 );
+				my $hb456 = Gtk3::HBox -> new( 0, 5 );
 				$w{vboxipv} -> pack_start( $hb456, 1, 1, 0 );
 					
-					my $lblipv = Gtk2::Label -> new( 'IP Protocol: ' );
+					my $lblipv = Gtk3::Label -> new( 'IP Protocol: ' );
 					$lblipv -> set_alignment( 1, 0.5 );
 					$hb456 -> pack_start( $lblipv, 1, 1, 0 );
 					$hb456 -> set_tooltip_text( '-(4|6) : Uses IPv4, IPv6 or no specification (ip based)' );
 					
-					$w{cbSSHProtocol} = Gtk2::ComboBox -> new_text;
+					$w{cbSSHProtocol} = Gtk3::ComboBoxText -> new;
 					$hb456 -> pack_start( $w{cbSSHProtocol}, 0, 1, 0 );
 					foreach my $ip_protocol ( sort { $a cmp $b } keys %IP_PROTOCOL ) { $w{cbSSHProtocol} -> append_text( $ip_protocol ); };
 			
-			$w{frSSHOther} = Gtk2::Frame -> new( ' Other Options: ' );
+			$w{frSSHOther} = Gtk3::Frame -> new( ' Other Options: ' );
 			$w{hbox1} -> pack_start( $w{frSSHOther}, 1, 1, 0 );
 				
-				my $vboxother = Gtk2::VBox -> new( 0, 0 );
+				my $vboxother = Gtk3::VBox -> new( 0, 0 );
 				$w{frSSHOther} -> add( $vboxother );
 					
-					my $hbox1 = Gtk2::HBox -> new( 0, 0 );
+					my $hbox1 = Gtk3::HBox -> new( 0, 0 );
 					#$w{frSSHOther} -> add( $hbox1 );
 					$vboxother -> add( $hbox1 );
 					$hbox1 -> set_border_width( 5 );
 						
-						$w{chForwardX} = Gtk2::CheckButton -> new_with_label( 'Forward X' );
+						$w{chForwardX} = Gtk3::CheckButton -> new_with_label( 'Forward X' );
 						$hbox1 -> pack_start( $w{chForwardX}, 1, 1, 0 );
 						$w{chForwardX} -> set_tooltip_text( '-(X|x) : Forwards or not the X' );
 						
-						$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Use Compression' );
+						$w{chUseCompression} = Gtk3::CheckButton -> new_with_label( 'Use Compression' );
 						$hbox1 -> pack_start( $w{chUseCompression}, 1, 1, 0 );
 						$w{chUseCompression} -> set_tooltip_text( '[-C] : Use or not compression' );
 						
-						$w{chAllowPortConnect} = Gtk2::CheckButton -> new_with_label( 'Allow Remote Port Connect' );
+						$w{chAllowPortConnect} = Gtk3::CheckButton -> new_with_label( 'Allow Remote Port Connect' );
 						$hbox1 -> pack_start( $w{chAllowPortConnect}, 1, 1, 0 );
 						$w{chAllowPortConnect} -> set_tooltip_text( '[-g] : Allow or not Remote Port Connections' );
 						
-						$w{chForwardAgent} = Gtk2::CheckButton -> new_with_label( 'Forward Agent' );
+						$w{chForwardAgent} = Gtk3::CheckButton -> new_with_label( 'Forward Agent' );
 						$hbox1 -> pack_start( $w{chForwardAgent}, 1, 1, 0 );
 						$w{chForwardAgent} -> set_tooltip_text( '[-A] : Forward or not the SSH authentication agent' );
 		
-					my $hbox2 = Gtk2::HBox -> new( 0, 0 );
+					my $hbox2 = Gtk3::HBox -> new( 0, 0 );
 					$vboxother -> add( $hbox2 );
 					$hbox2 -> set_border_width( 5 );
 						
-						$w{chNoRemoteCmd} = Gtk2::CheckButton -> new_with_label( 'Do NOT execute remote command' );
+						$w{chNoRemoteCmd} = Gtk3::CheckButton -> new_with_label( 'Do NOT execute remote command' );
 						$hbox2 -> pack_start( $w{chNoRemoteCmd}, 1, 1, 0 );
 						$w{chNoRemoteCmd} -> set_tooltip_text( '[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)' );
 		
-		$w{hbox4} = Gtk2::HBox -> new( 0, 0 );
+		$w{hbox4} = Gtk3::HBox -> new( 0, 0 );
 		$w{vbox} -> pack_start( $w{hbox4}, 1, 1, 0 );
 		
-		$w{nb} = Gtk2::Notebook -> new;
+		$w{nb} = Gtk3::Notebook -> new;
 		$w{hbox4} -> pack_start( $w{nb}, 1, 1, 0 );
 			
-			$w{vbox2} = Gtk2::VBox -> new( 0, 0 );
-			$w{lblLocal} = Gtk2::Label -> new( 'Local Port Forwarding' );
+			$w{vbox2} = Gtk3::VBox -> new( 0, 0 );
+			$w{lblLocal} = Gtk3::Label -> new( 'Local Port Forwarding' );
 			$w{nb} -> append_page( $w{vbox2}, $w{lblLocal} );
 			$w{vbox2} -> set_tooltip_text( '[-L [bind_address:]local_port:remote_address:remote_port] : Forward local_port to remote_address -> remote_port' );
 			$w{vbox2} -> set_border_width( 5 );
 				
-				$w{hboxorder} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxorder} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox2} -> pack_start( $w{hboxorder}, 0, 1, 0 );
 					
-					$w{lblOrder} = Gtk2::Label -> new( 'Show ordered by: ' );
+					$w{lblOrder} = Gtk3::Label -> new( 'Show ordered by: ' );
 					$w{hboxorder} -> pack_start( $w{lblOrder}, 0, 1, 0 );
 					
 					# Build the "order" radiobuttons
-					$w{rbOrderLI} = Gtk2::RadioButton -> new_with_label( undef, 'Local IP, ' );
+					$w{rbOrderLI} = Gtk3::RadioButton -> new_with_label( undef, 'Local IP, ' );
 					$w{hboxorder} -> pack_start( $w{rbOrderLI}, 0, 1, 0 );
 					$w{rbOrderLI} ->set( 'can_focus', 0 );
 					
-					$w{rbOrderLP} = Gtk2::RadioButton -> new_with_label( $w{rbOrderLI}, 'Local Port, ' );
+					$w{rbOrderLP} = Gtk3::RadioButton -> new_with_label( $w{rbOrderLI}, 'Local Port, ' );
 					$w{hboxorder} -> pack_start( $w{rbOrderLP}, 0, 1, 0 );
 					$w{rbOrderLP} ->set( 'can_focus', 0 );
 					
-					$w{rbOrderRI} = Gtk2::RadioButton -> new_with_label( $w{rbOrderLI}, 'Remote IP' );
+					$w{rbOrderRI} = Gtk3::RadioButton -> new_with_label( $w{rbOrderLI}, 'Remote IP' );
 					$w{hboxorder} -> pack_start( $w{rbOrderRI}, 0, 1, 0 );
 					$w{rbOrderRI} ->set( 'can_focus', 0 );
 					
 					$w{rbOrderLP} -> set_active( 1 );
 				
 				# Build 'add' button
-				$w{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vbox2} -> pack_start( $w{btnadd}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{sw} = Gtk2::ScrolledWindow -> new;
+				$w{sw} = Gtk3::ScrolledWindow -> new;
 				$w{vbox2} -> pack_start( $w{sw}, 1, 1, 0 );
 				$w{sw} -> set_policy( 'automatic', 'automatic' );
 				$w{sw} -> set_shadow_type( 'none' );
 					
-					$w{vp} = Gtk2::Viewport -> new;
+					$w{vp} = Gtk3::Viewport -> new;
 					$w{sw} -> add( $w{vp} );
 					$w{vp} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the forward widgets
-						$w{vbForward} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbForward} = Gtk3::VBox -> new( 0, 0 );
 						$w{vp} -> add( $w{vbForward} );
 			
-			$w{vbox3} = Gtk2::VBox -> new( 0, 0 );
-			$w{lblRemote} = Gtk2::Label -> new( 'Remote Port Forwarding' );
+			$w{vbox3} = Gtk3::VBox -> new( 0, 0 );
+			$w{lblRemote} = Gtk3::Label -> new( 'Remote Port Forwarding' );
 			$w{nb} -> append_page( $w{vbox3}, $w{lblRemote} );
 			$w{vbox3} -> set_tooltip_text( '[-R [bind_address:]port:address:remote_port] :Bring remote_port to local_address -> local_port' );
 			$w{vbox3} -> set_border_width( 5 );
 				
-				$w{hboxorder2} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxorder2} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox3} -> pack_start( $w{hboxorder2}, 0, 1, 0 );
 					
-					$w{lblOrder2} = Gtk2::Label -> new( 'Show ordered by: ' );
+					$w{lblOrder2} = Gtk3::Label -> new( 'Show ordered by: ' );
 					$w{hboxorder2} -> pack_start( $w{lblOrder2}, 0, 1, 0 );
 					
 					# Build the "order" radiobuttons
-					$w{rbOrderLI2} = Gtk2::RadioButton -> new_with_label( undef, 'Local IP, ' );
+					$w{rbOrderLI2} = Gtk3::RadioButton -> new_with_label( undef, 'Local IP, ' );
 					$w{hboxorder2} -> pack_start( $w{rbOrderLI2}, 0, 1, 0 );
 					$w{rbOrderLI2} ->set( 'can_focus', 0 );
 					
-					$w{rbOrderLP2} = Gtk2::RadioButton -> new_with_label( $w{rbOrderLI2}, 'Local Port, ' );
+					$w{rbOrderLP2} = Gtk3::RadioButton -> new_with_label( $w{rbOrderLI2}, 'Local Port, ' );
 					$w{hboxorder2} -> pack_start( $w{rbOrderLP2}, 0, 1, 0 );
 					$w{rbOrderLP2} ->set( 'can_focus', 0 );
 					
-					$w{rbOrderRI2} = Gtk2::RadioButton -> new_with_label( $w{rbOrderLI2}, 'Remote IP' );
+					$w{rbOrderRI2} = Gtk3::RadioButton -> new_with_label( $w{rbOrderLI2}, 'Remote IP' );
 					$w{hboxorder2} -> pack_start( $w{rbOrderRI2}, 0, 1, 0 );
 					$w{rbOrderRI2} ->set( 'can_focus', 0 );
 					
 					$w{rbOrderLP2} -> set_active( 1 );
 				
 				# Build 'add' button
-				$w{btnaddRemote} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnaddRemote} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vbox3} -> pack_start( $w{btnaddRemote}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{swRemote} = Gtk2::ScrolledWindow -> new;
+				$w{swRemote} = Gtk3::ScrolledWindow -> new;
 				$w{vbox3} -> pack_start( $w{swRemote}, 1, 1, 0 );
 				$w{swRemote} -> set_policy( 'automatic', 'automatic' );
 				$w{swRemote} -> set_shadow_type( 'none' );
 					
-					$w{vpRemote} = Gtk2::Viewport -> new;
+					$w{vpRemote} = Gtk3::Viewport -> new;
 					$w{swRemote} -> add( $w{vpRemote} );
 					$w{vpRemote} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the remote widgets
-						$w{vbRemote} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbRemote} = Gtk3::VBox -> new( 0, 0 );
 						$w{vpRemote} -> add( $w{vbRemote} );
 			
-			$w{vbox33} = Gtk2::VBox -> new( 0, 0 );
-			$w{lblDynamic} = Gtk2::Label -> new( 'Dynamic Socks Proxy' );
+			$w{vbox33} = Gtk3::VBox -> new( 0, 0 );
+			$w{lblDynamic} = Gtk3::Label -> new( 'Dynamic Socks Proxy' );
 			$w{nb} -> append_page( $w{vbox33}, $w{lblDynamic} );
 			$w{vbox33} -> set_tooltip_text( '[-D [bind_address:]local_port] : Create a Dynamic Socks proxy at local_port' );
 			$w{vbox33} -> set_border_width( 5 );
 				
-				$w{hboxorder3} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxorder3} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox33} -> pack_start( $w{hboxorder3}, 0, 1, 0 );
 					
-					$w{lblOrder3} = Gtk2::Label -> new( 'Show ordered by: ' );
+					$w{lblOrder3} = Gtk3::Label -> new( 'Show ordered by: ' );
 					$w{hboxorder3} -> pack_start( $w{lblOrder3}, 0, 1, 0 );
 					
 					# Build the "order" radiobuttons
-					$w{rbOrderLI3} = Gtk2::RadioButton -> new_with_label( undef, 'Local IP, ' );
+					$w{rbOrderLI3} = Gtk3::RadioButton -> new_with_label( undef, 'Local IP, ' );
 					$w{hboxorder3} -> pack_start( $w{rbOrderLI3}, 0, 1, 0 );
 					$w{rbOrderLI3} ->set( 'can_focus', 0 );
 					
-					$w{rbOrderLP3} = Gtk2::RadioButton -> new_with_label( $w{rbOrderLI3}, 'Local Port' );
+					$w{rbOrderLP3} = Gtk3::RadioButton -> new_with_label( $w{rbOrderLI3}, 'Local Port' );
 					$w{hboxorder3} -> pack_start( $w{rbOrderLP3}, 0, 1, 0 );
 					$w{rbOrderLP3} ->set( 'can_focus', 0 );
 					
 					$w{rbOrderLP3} -> set_active( 1 );
 				
 				# Build 'add' button
-				$w{btnaddDynamic} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnaddDynamic} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vbox33} -> pack_start( $w{btnaddDynamic}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{swDynamic} = Gtk2::ScrolledWindow -> new;
+				$w{swDynamic} = Gtk3::ScrolledWindow -> new;
 				$w{vbox33} -> pack_start( $w{swDynamic}, 1, 1, 0 );
 				$w{swDynamic} -> set_policy( 'automatic', 'automatic' );
 				$w{swDynamic} -> set_shadow_type( 'none' );
 					
-					$w{vpDynamic} = Gtk2::Viewport -> new;
+					$w{vpDynamic} = Gtk3::Viewport -> new;
 					$w{swDynamic} -> add( $w{vpDynamic} );
 					$w{vpDynamic} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the remote widgets
-						$w{vbDynamic} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbDynamic} = Gtk3::VBox -> new( 0, 0 );
 						$w{vpDynamic} -> add( $w{vbDynamic} );
 		
-			$w{vboxAdvOpt} = Gtk2::VBox -> new( 0, 0 );
-			$w{lblAdvOpt} = Gtk2::Label -> new( 'Advanced Options' );
+			$w{vboxAdvOpt} = Gtk3::VBox -> new( 0, 0 );
+			$w{lblAdvOpt} = Gtk3::Label -> new( 'Advanced Options' );
 			$w{nb} -> append_page( $w{vboxAdvOpt}, $w{lblAdvOpt} );
 			$w{vboxAdvOpt} -> set_tooltip_text( '[-o "ssh_option=value"]' );
 			$w{vboxAdvOpt} -> set_border_width( 5 );
 				
 				# Build 'add' button
-				$w{btnaddAdvOpt} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnaddAdvOpt} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vboxAdvOpt} -> pack_start( $w{btnaddAdvOpt}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{swAdvOpt} = Gtk2::ScrolledWindow -> new;
+				$w{swAdvOpt} = Gtk3::ScrolledWindow -> new;
 				$w{vboxAdvOpt} -> pack_start( $w{swAdvOpt}, 1, 1, 0 );
 				$w{swAdvOpt} -> set_policy( 'automatic', 'automatic' );
 				$w{swAdvOpt} -> set_shadow_type( 'none' );
 					
-					$w{vpAdvOpt} = Gtk2::Viewport -> new;
+					$w{vpAdvOpt} = Gtk3::Viewport -> new;
 					$w{swAdvOpt} -> add( $w{vpAdvOpt} );
 					$w{vpAdvOpt} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the advanced options widgets
-						$w{vbAdvOpt} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbAdvOpt} = Gtk3::VBox -> new( 0, 0 );
 						$w{vpAdvOpt} -> add( $w{vbAdvOpt} );
 			
 		$w{nb} -> set_current_page( 0 );
@@ -637,47 +637,47 @@ sub _buildForward
 	$w{position} = scalar @{ $$self{list} };
 	
 	# Make an HBox to contain local address, local port, remote address, remote port and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{frPFLocalIP} = Gtk2::Frame -> new( 'Bind Address:' );
+		$w{frPFLocalIP} = Gtk3::Frame -> new( 'Bind Address:' );
 		$w{hbox} -> pack_start( $w{frPFLocalIP}, 1, 1, 0 );
 		$w{frPFLocalIP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryPFLocalIP} = Gtk2::Entry -> new;
+			$w{entryPFLocalIP} = Gtk3::Entry -> new;
 			$w{frPFLocalIP} -> add( $w{entryPFLocalIP} );
 			$w{entryPFLocalIP} -> set_size_request( 30, 20 );
 			$w{entryPFLocalIP} -> set_text( $localIP );
 			$w{entryPFLocalIP} -> set_tooltip_text( 'Bind incoming connection to given ip (leave blank to bind to any interface)' );
 		
-		$w{frPFLocalPort} = Gtk2::Frame -> new( 'Local Port:' );
+		$w{frPFLocalPort} = Gtk3::Frame -> new( 'Local Port:' );
 		$w{hbox} -> pack_start( $w{frPFLocalPort}, 0, 1, 0 );
 		$w{frPFLocalPort} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{spinPFLocalPort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{spinPFLocalPort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
 			$w{frPFLocalPort} -> add( $w{spinPFLocalPort} );
 			$w{spinPFLocalPort} -> set_size_request( 30, 20 );
 			$w{spinPFLocalPort} -> set_value( $localPort );
 		
-		$w{frPFRemoteIP} = Gtk2::Frame -> new( 'Remote Address:' );
+		$w{frPFRemoteIP} = Gtk3::Frame -> new( 'Remote Address:' );
 		$w{hbox} -> pack_start( $w{frPFRemoteIP}, 1, 1, 0 );
 		$w{frPFRemoteIP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryPFRemoteIP} = Gtk2::Entry -> new;
+			$w{entryPFRemoteIP} = Gtk3::Entry -> new;
 			$w{frPFRemoteIP} -> add( $w{entryPFRemoteIP} );
 			$w{entryPFRemoteIP} -> set_size_request( 30, 20 );
 			$w{entryPFRemoteIP} -> set_text( $remoteIP );
 		
-		$w{frPFRemotePort} = Gtk2::Frame -> new( 'Remote Port:' );
+		$w{frPFRemotePort} = Gtk3::Frame -> new( 'Remote Port:' );
 		$w{hbox} -> pack_start( $w{frPFRemotePort}, 0, 1, 0 );
 		$w{frPFRemotePort} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{spinPFRemotePort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{spinPFRemotePort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
 			$w{frPFRemotePort} -> add( $w{spinPFRemotePort} );
 			$w{spinPFRemotePort} -> set_size_request( 30, 20 );
 			$w{spinPFRemotePort} -> set_value( $remotePort );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container
@@ -758,47 +758,47 @@ sub _buildRemote
 	$w{position} = scalar @{ $$self{listRemote} };
 	
 	# Make an HBox to contain local address, local port, remote address, remote port and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{frPFLocalIP} = Gtk2::Frame -> new( 'Bind Address:' );
+		$w{frPFLocalIP} = Gtk3::Frame -> new( 'Bind Address:' );
 		$w{hbox} -> pack_start( $w{frPFLocalIP}, 1, 1, 0 );
 		$w{frPFLocalIP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryPFLocalIP} = Gtk2::Entry -> new;
+			$w{entryPFLocalIP} = Gtk3::Entry -> new;
 			$w{frPFLocalIP} -> add( $w{entryPFLocalIP} );
 			$w{entryPFLocalIP} -> set_size_request( 30, 20 );
 			$w{entryPFLocalIP} -> set_text( $localIP );
 			$w{entryPFLocalIP} -> set_tooltip_text( 'Bind outgoing connection to given ip (leave blank to bind to any interface)' );
 		
-		$w{frPFLocalPort} = Gtk2::Frame -> new( 'Local Port:' );
+		$w{frPFLocalPort} = Gtk3::Frame -> new( 'Local Port:' );
 		$w{hbox} -> pack_start( $w{frPFLocalPort}, 0, 1, 0 );
 		$w{frPFLocalPort} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{spinPFLocalPort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{spinPFLocalPort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
 			$w{frPFLocalPort} -> add( $w{spinPFLocalPort} );
 			$w{spinPFLocalPort} -> set_size_request( 30, 20 );
 			$w{spinPFLocalPort} -> set_value( $localPort );
 		
-		$w{frPFRemoteIP} = Gtk2::Frame -> new( 'Remote Address:' );
+		$w{frPFRemoteIP} = Gtk3::Frame -> new( 'Remote Address:' );
 		$w{hbox} -> pack_start( $w{frPFRemoteIP}, 1, 1, 0 );
 		$w{frPFRemoteIP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryPFRemoteIP} = Gtk2::Entry -> new;
+			$w{entryPFRemoteIP} = Gtk3::Entry -> new;
 			$w{frPFRemoteIP} -> add( $w{entryPFRemoteIP} );
 			$w{entryPFRemoteIP} -> set_size_request( 30, 20 );
 			$w{entryPFRemoteIP} -> set_text( $remoteIP );
 		
-		$w{frPFRemotePort} = Gtk2::Frame -> new( 'Remote Port:' );
+		$w{frPFRemotePort} = Gtk3::Frame -> new( 'Remote Port:' );
 		$w{hbox} -> pack_start( $w{frPFRemotePort}, 0, 1, 0 );
 		$w{frPFRemotePort} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{spinPFRemotePort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{spinPFRemotePort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
 			$w{frPFRemotePort} -> add( $w{spinPFRemotePort} );
 			$w{spinPFRemotePort} -> set_size_request( 30, 20 );
 			$w{spinPFRemotePort} -> set_value( $remotePort );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container
@@ -880,29 +880,29 @@ sub _buildDynamic
 	$w{position} = scalar @{ $$self{listDynamic} };
 	
 	# Make an HBox to contain local address, local port, remote address, remote port and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{frPFLocalIP} = Gtk2::Frame -> new( 'Bind Address:' );
+		$w{frPFLocalIP} = Gtk3::Frame -> new( 'Bind Address:' );
 		$w{hbox} -> pack_start( $w{frPFLocalIP}, 1, 1, 0 );
 		$w{frPFLocalIP} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryPFLocalIP} = Gtk2::Entry -> new;
+			$w{entryPFLocalIP} = Gtk3::Entry -> new;
 			$w{frPFLocalIP} -> add( $w{entryPFLocalIP} );
 			$w{entryPFLocalIP} -> set_size_request( 30, 20 );
 			$w{entryPFLocalIP} -> set_text( $localIP );
 			$w{entryPFLocalIP} -> set_tooltip_text( 'Leave blank to bind to any interface' );
 		
-		$w{frPFLocalPort} = Gtk2::Frame -> new( 'Local Port:' );
+		$w{frPFLocalPort} = Gtk3::Frame -> new( 'Local Port:' );
 		$w{hbox} -> pack_start( $w{frPFLocalPort}, 0, 1, 0 );
 		$w{frPFLocalPort} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{spinPFLocalPort} = Gtk2::SpinButton -> new( Gtk2::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
+			$w{spinPFLocalPort} = Gtk3::SpinButton -> new( Gtk3::Adjustment -> new( 1, 1, 65535, 1, 10, 0 ), 1, 0 );
 			$w{frPFLocalPort} -> add( $w{spinPFLocalPort} );
 			$w{spinPFLocalPort} -> set_size_request( 30, 20 );
 			$w{spinPFLocalPort} -> set_value( $localPort );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container
@@ -963,28 +963,28 @@ sub _buildAdvOpt
 	$w{position} = scalar @{ $$self{listAdvOpt} };
 	
 	# Make an HBox to contain option, value and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{frAdvOptOption} = Gtk2::Frame -> new( 'Option:' );
+		$w{frAdvOptOption} = Gtk3::Frame -> new( 'Option:' );
 		$w{hbox} -> pack_start( $w{frAdvOptOption}, 1, 1, 0 );
 		$w{frAdvOptOption} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryAdvOptOption} = Gtk2::Entry -> new;
+			$w{entryAdvOptOption} = Gtk3::Entry -> new;
 			$w{frAdvOptOption} -> add( $w{entryAdvOptOption} );
 			$w{entryAdvOptOption} -> set_size_request( 30, 20 );
 			$w{entryAdvOptOption} -> set_text( $option );
 		
-		$w{frAdvOptValue} = Gtk2::Frame -> new( 'Value:' );
+		$w{frAdvOptValue} = Gtk3::Frame -> new( 'Value:' );
 		$w{hbox} -> pack_start( $w{frAdvOptValue}, 1, 1, 0 );
 		$w{frAdvOptValue} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryAdvOptValue} = Gtk2::Entry -> new;
+			$w{entryAdvOptValue} = Gtk3::Entry -> new;
 			$w{frAdvOptValue} -> add( $w{entryAdvOptValue} );
 			$w{entryAdvOptValue} -> set_size_request( 30, 20 );
 			$w{entryAdvOptValue} -> set_text( $value );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container

@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -93,7 +93,7 @@ sub DESTROY {
 sub _initGUI {
 	my $self = shift;
 	
-	$$self{_TRAY} = Gtk2::StatusIcon -> new_from_file( $TRAYICON ) or die "ERROR: Could not create tray icon: $!";
+	$$self{_TRAY} = Gtk3::StatusIcon -> new_from_file( $TRAYICON ) or die "ERROR: Could not create tray icon: $!";
 	# Tray available (not Gnome-shell)?
 	$$self{_TRAY} -> set_property( 'tooltip-markup', "<b>$APPNAME</b> (v.$APPVERSION)" );
 	$$self{_TRAY} -> set_visible( $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} );
@@ -113,7 +113,7 @@ sub _setupCallbacks {
 		# Left click: show/hide main window
 		return 1 unless $event -> button eq 1;
 		
-		if ( $$self{_MAIN}{_GUI}{main} -> visible ) {
+		if ( $$self{_MAIN}{_GUI}{main} -> get_visible ) {
 			# Trigger the "lock" procedure
 			$$self{_MAIN}{_GUI}{lockPACBtn} -> set_active( 1 ) if ( $$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'} );
 			$$self{_MAIN} -> _hideConnectionsList;

@@ -33,7 +33,7 @@ use FindBin qw ( $RealBin $Bin $Script );
 use lib $RealBin, $RealBin . '/ex', $RealBin . '/edit';
 use Storable qw ( dclone thaw retrieve fd_retrieve nstore_fd );
 use Expect;
-use Gnome2::GConf;
+use Glib::IO; # GSettings
 use POSIX qw ( strftime );
 use Encode qw ( encode decode );
 use IO::Socket::INET;
@@ -41,7 +41,7 @@ use Encode;
 use KeePass;
 use PACUtils;
 
-use Gtk2 '-init';
+use Gtk3 '-init';
 
 # END OF : Modules import
 ########################################################
@@ -85,8 +85,8 @@ $Expect::Multiline_Matching = 1;
 my $EXP = new Expect;
 eval { $EXP -> slave -> clone_winsize_from( \*STDIN ); };
 
-# Connect to Gnome's GConf
-my $GCONF = Gnome2::GConf::Client -> get_default;
+# Connect to Gnome's GSettings
+my $GSETTINGS = Glib::IO::Settings -> new( 'org.gnome.system.proxy.http' );
 
 # END OF : Variables declaration/initialization
 ########################################################
@@ -116,10 +116,10 @@ $UUID		= shift or die $COLOR{'err'} . "ERROR: You must provide a profile to conn
 $GETCMD		= shift // 0;
 
 # Get PROXY from environment
-$PROXY{'env'}{'ip'}		= $GCONF -> get_string( '/system/http_proxy/host' ) || $GCONF -> get_string( '/system/proxy/http/host' );
-$PROXY{'env'}{'port'}	= $GCONF -> get_int( '/system/http_proxy/port' ) || $GCONF -> get_string( '/system/proxy/http/port' );
-$PROXY{'env'}{'user'}	= $GCONF -> get_string( '/system/http_proxy/authentication_user' ) || $GCONF -> get_string( '/system/proxy/http/host/authentication-user' );
-$PROXY{'env'}{'pass'}	= $GCONF -> get_string( '/system/http_proxy/authentication_password' ) || $GCONF -> get_string( '/system/proxy/http/host/authentication-password' );
+$PROXY{'env'}{'ip'}	= $GSETTINGS -> get_string( 'host' );
+$PROXY{'env'}{'port'}	= $GSETTINGS -> get_int( 'port' );
+$PROXY{'env'}{'user'}	= $GSETTINGS -> get_string( 'authentication-user' );
+$PROXY{'env'}{'pass'}	= $GSETTINGS -> get_string( 'authentication-password' );
 
 # Load the 'freezed' configuration
 $CFG = retrieve( $CFG_FILE ) or die "ERROR: Could not load config file '$CFG_FILE': $!";
@@ -438,7 +438,7 @@ sub wEnterValue {
 	elsif ( ref( $default ) ) { @list = @{ $default }; }
 	
 	# Create the dialog window,
-	$_W{window}{data} = Gtk2::Dialog -> new_with_buttons(
+	$_W{window}{data} = Gtk3::Dialog -> new_with_buttons(
 		"$APPNAME : Enter data",
 		undef,
 		'modal',
@@ -454,35 +454,35 @@ sub wEnterValue {
 	$_W{window}{data} -> set_border_width( 5 );
 		
 		# Create an HBox to contain a picture and a label
-		$_W{window}{gui}{hbox} = Gtk2::HBox -> new( 0, 0 );
-		$_W{window}{data} -> vbox -> pack_start( $_W{window}{gui}{hbox}, 1, 1, 5 );
+		$_W{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
+		$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{hbox}, 1, 1, 5 );
 		$_W{window}{gui}{hbox} -> set_border_width( 5 );
 			
 			# Create image
-			$_W{window}{gui}{img} = Gtk2::Image -> new_from_stock( 'gtk-edit', 'dialog' );
+			$_W{window}{gui}{img} = Gtk3::Image -> new_from_stock( 'gtk-edit', 'dialog' );
 			$_W{window}{gui}{hbox} -> pack_start( $_W{window}{gui}{img}, 0, 1, 5 );
 			
 			# Create 1st label
-			$_W{window}{gui}{lblup} = Gtk2::Label -> new;
+			$_W{window}{gui}{lblup} = Gtk3::Label -> new;
 			$_W{window}{gui}{hbox} -> pack_start( $_W{window}{gui}{lblup}, 1, 1, 5 );
 			$_W{window}{gui}{lblup} -> set_markup( $lblup );
 		
 		# Create 2nd label
-		$_W{window}{gui}{lbldwn} = Gtk2::Label -> new;
-		$_W{window}{data} -> vbox -> pack_start( $_W{window}{gui}{lbldwn}, 1, 1, 5 );
+		$_W{window}{gui}{lbldwn} = Gtk3::Label -> new;
+		$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{lbldwn}, 1, 1, 5 );
 		$_W{window}{gui}{lbldwn} -> set_text( $lbldown );
 		
 		if ( @list ) {
 			# Create combobox widget
-			$_W{window}{gui}{comboList} = Gtk2::ComboBox -> new_text;
-			$_W{window}{data} -> vbox -> pack_start( $_W{window}{gui}{comboList}, 0, 1, 0 );
+			$_W{window}{gui}{comboList} = Gtk3::ComboBoxText -> new;
+			$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{comboList}, 0, 1, 0 );
 			$_W{window}{gui}{comboList} -> set_property( 'can_focus', 0 );
 			foreach my $text ( @list ) { $_W{window}{gui}{comboList} -> append_text( $text ) };
 			$_W{window}{gui}{comboList} -> set_active( 0 );
 		} else {
 			# Create the entry widget
-			$_W{window}{gui}{entry} = Gtk2::Entry -> new;
-			$_W{window}{data} -> vbox -> pack_start( $_W{window}{gui}{entry}, 0, 1, 5 );
+			$_W{window}{gui}{entry} = Gtk3::Entry -> new;
+			$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{entry}, 0, 1, 5 );
 			$_W{window}{gui}{entry} -> set_text( $default );
 			$_W{window}{gui}{entry} -> set_activates_default( 1 );
 			$_W{window}{gui}{entry} -> set_visibility( $visible );
@@ -497,7 +497,7 @@ sub wEnterValue {
 	else			{ $val = ( $ok eq 'ok' ) ? $_W{window}{gui}{entry} -> get_chars( 0, -1 ) : undef; }
 	
 	$_W{window}{data} -> destroy;
-	Gtk2 -> main_iteration while Gtk2 -> events_pending;
+	Gtk3::main_iteration while Gtk3::events_pending;
 	undef %_W;
 	
 	return wantarray ? ( $val, $pos ) : $val;
@@ -735,7 +735,7 @@ sub _execScript {
 			msg( "PAC Script '$name' terminated by user request (TERM(15) signal)" );
 			defined $_W{window}{data} and $_W{window}{data} -> destroy;
 			undef %_W;
-			Gtk2 -> main_iteration while Gtk2 -> events_pending;
+			Gtk3::main_iteration while Gtk3::events_pending;
 			die;
 		};
 		

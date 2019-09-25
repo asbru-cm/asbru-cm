@@ -31,8 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -143,7 +143,7 @@ sub _buildGUI
 	
 	$w{vbox} = $container;
 		
-		$w{chTolerant} = Gtk2::CheckButton -> new_with_label( 'Tolerant mode' );
+		$w{chTolerant} = Gtk3::CheckButton -> new_with_label( 'Tolerant mode' );
 		$w{vbox} -> pack_start( $w{chTolerant}, 0, 1, 0 );
 		$w{chTolerant} -> set_tooltip_text( '[-t] : Allow cd/open into non-WebDAV enabled collection; use if the server or proxy server has WebDAV compliance problems.' );
 	

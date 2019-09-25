@@ -31,9 +31,9 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
-eval { require Gtk2::AppIndicator; }; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
+# GTK
+use Gtk3 '-init';
+eval { require Gtk3::AppIndicator; }; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
 
 # PAC modules
 use PACUtils;
@@ -91,7 +91,7 @@ sub DESTROY {
 sub _initGUI {
 	my $self = shift;
 	
-	$$self{_TRAY} = Gtk2::AppIndicator -> new( 'pac', $TRAYICON );
+	$$self{_TRAY} = Gtk3::AppIndicator -> new( 'pac', $TRAYICON );
 	$$self{_TRAY} -> set_icon_theme_path( $RealBin . '/res' );
 	$$self{_TRAY} -> set_active;
 	$$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = ! $@;

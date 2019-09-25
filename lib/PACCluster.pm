@@ -35,9 +35,9 @@ use warnings;
 use Storable qw ( dclone );
 use Encode;
 
-# GTK2
-use Gtk2 '-init';
-use Gtk2::Ex::Simple::List;
+# GTK
+use Gtk3 '-init';
+use Gtk3::SimpleList;
 
 # PAC modules
 use PACUtils;
@@ -57,9 +57,9 @@ my $CLUSTERS_FILE	= $CFG_DIR . '/pac_clusters.nfreeze';
 my $GROUPICONCLOSED	= _pixBufFromFile( $RealBin . '/res/asbru_group_closed_16x16.png' );
 my $GROUPICON_ROOT	= _pixBufFromFile( $RealBin . '/res/asbru_group.png' );
 my $AUTOCLUSTERICON	= _pixBufFromFile( $RealBin . '/res/asbru_cluster_auto.png' );
-my $ICON_ON			= Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal16x16.png', 16, 16, 0 );
-my $ICON_OFF		= Gtk2::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal_x16x16.png', 16, 16, 0 );
-my $BANNER			= Gtk2::Image -> new_from_file( $RealBin . '/res/asbru_banner_cluster.png' );
+my $ICON_ON			= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal16x16.png', 16, 16, 0 );
+my $ICON_OFF		= Gtk3::Gdk::Pixbuf -> new_from_file_at_scale( $RealBin . '/res/asbru_terminal_x16x16.png', 16, 16, 0 );
+my $BANNER			= Gtk3::Image -> new_from_file( $RealBin . '/res/asbru_banner_cluster.png' );
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -136,7 +136,7 @@ sub _loadTreeConfiguration {
 	foreach my $child ( keys %{ $PACMain::{FUNCS}{_MAIN}{_CFG}{environments}{'__PAC__ROOT__'}{children} } ) { push( @{ $$tree{data} }, $self -> __recurLoadTree( $child ) );}
 	
 	# Select the root path
-	$tree -> set_cursor( Gtk2::TreePath -> new_from_string( '0' ) );
+	$tree -> set_cursor( Gtk3::TreePath -> new_from_string( '0' ), undef, 0 );
 	
 	return 1;
 }
@@ -197,7 +197,7 @@ sub __treeSort {
 sub _initGUI {
 	my $self = shift;
 	
-	$$self{_WINDOWCLUSTER}{main} = Gtk2::Window -> new;
+	$$self{_WINDOWCLUSTER}{main} = Gtk3::Window -> new;
 	$$self{_WINDOWCLUSTER}{main} -> set_position( 'center' );
 	$$self{_WINDOWCLUSTER}{main} -> set_icon_name( 'pac-app-big' );
 	$$self{_WINDOWCLUSTER}{main} -> set_size_request( 650, 500 );
@@ -206,44 +206,44 @@ sub _initGUI {
 	$$self{_WINDOWCLUSTER}{main} -> set_transient_for( $PACMain::FUNCS{_MAIN}{_GUI}{main} );
 	$$self{_WINDOWCLUSTER}{main} -> set_modal( 1 );
 		
-		my $vbox0 = Gtk2::VBox -> new( 0, 0 );
+		my $vbox0 = Gtk3::VBox -> new( 0, 0 );
 		$$self{_WINDOWCLUSTER}{main} -> add( $vbox0 );
 			
 			$vbox0 -> pack_start( $BANNER , 0, 1, 0 );
 			
 			# Create a notebook widget
-			$$self{_WINDOWCLUSTER}{nb} = Gtk2::Notebook -> new;
+			$$self{_WINDOWCLUSTER}{nb} = Gtk3::Notebook -> new;
 			$$self{_WINDOWCLUSTER}{nb} -> set_scrollable( 1 );
 			$$self{_WINDOWCLUSTER}{nb} -> set_tab_pos( 'right' );
-			$$self{_WINDOWCLUSTER}{nb} -> set( 'homogeneous', 1 );
+# FIXME-HOMOGENEOUS			$$self{_WINDOWCLUSTER}{nb} -> set( 'homogeneous', 1 );
 			$vbox0 -> pack_start( $$self{_WINDOWCLUSTER}{nb}, 1, 1, 0 );
 				
-				my $tablbl1 = Gtk2::HBox -> new( 0, 0 );
-					my $lbl1 = Gtk2::Label -> new;
+				my $tablbl1 = Gtk3::HBox -> new( 0, 0 );
+					my $lbl1 = Gtk3::Label -> new;
 					$lbl1 -> set_markup( '<b>RUNNING CLUSTERS </b>' );
 					$tablbl1 -> pack_start( $lbl1, 0, 1, 0 );
-					$tablbl1 -> pack_start( Gtk2::Image -> new_from_stock( 'pac-terminal-ok-small', 'menu' ), 0, 1, 0 );
+					$tablbl1 -> pack_start( Gtk3::Image -> new_from_stock( 'pac-terminal-ok-small', 'menu' ), 0, 1, 0 );
 				$tablbl1 -> show_all;
 				
-				my $vbox1 = Gtk2::VBox -> new( 0, 0 );
+				my $vbox1 = Gtk3::VBox -> new( 0, 0 );
 				$$self{_WINDOWCLUSTER}{nb} -> append_page( $vbox1, $tablbl1 );
 				
-				my $hbox1 = Gtk2::HBox -> new( 0, 0 );
+				my $hbox1 = Gtk3::HBox -> new( 0, 0 );
 				$vbox1 -> pack_start( $hbox1, 1, 1, 0 );
 					
-					my $frame0 = Gtk2::Frame -> new( ' UNCLUSTERED TERMINALS: ' );
+					my $frame0 = Gtk3::Frame -> new( ' UNCLUSTERED TERMINALS: ' );
 					$hbox1 -> pack_start( $frame0, 1, 1, 0 );
-					my $frame0lbl = Gtk2::Label -> new;
+					my $frame0lbl = Gtk3::Label -> new;
 					$frame0lbl -> set_markup( ' <b>UNCLUSTERED TERMINALS:</b> ' );
 					$frame0 -> set_label_widget( $frame0lbl );
 						
 						# Terminals list
-						my $scroll1 = Gtk2::ScrolledWindow -> new;
+						my $scroll1 = Gtk3::ScrolledWindow -> new;
 						$frame0 -> add( $scroll1 );
 						$scroll1 -> set_policy( 'automatic', 'automatic' );
 							
-							$$self{_WINDOWCLUSTER}{treeTerminals} = Gtk2::Ex::Simple::List -> new_from_treeview (
-								Gtk2::TreeView -> new,
+							$$self{_WINDOWCLUSTER}{treeTerminals} = Gtk3::SimpleList -> new_from_treeview (
+								Gtk3::TreeView -> new,
 								'Opened Terminal(s):'	=> 'text',
 								'UUID:'					=> 'hidden',
 								'Status'				=> 'pixbuf'
@@ -258,71 +258,71 @@ sub _initGUI {
 								$col_terminals[1] -> set_expand( 0 );
 					
 					# Buttons to Add/Del to/from Clusters
-					my $vbox2 = Gtk2::VBox -> new( 0, 0 );
+					my $vbox2 = Gtk3::VBox -> new( 0, 0 );
 					$hbox1 -> pack_start( $vbox2, 0, 1, 0 );
 						
-						$$self{_WINDOWCLUSTER}{btnadd} = Gtk2::Button -> new_with_label( "Add to\nCluster" );
+						$$self{_WINDOWCLUSTER}{btnadd} = Gtk3::Button -> new_with_label( "Add to\nCluster" );
 						$vbox2 -> pack_start( $$self{_WINDOWCLUSTER}{btnadd}, 1, 1, 0 );
-						$$self{_WINDOWCLUSTER}{btnadd} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-go-forward', 'GTK_ICON_SIZE_BUTTON' ) );
+						$$self{_WINDOWCLUSTER}{btnadd} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-go-forward', 'GTK_ICON_SIZE_BUTTON' ) );
 						$$self{_WINDOWCLUSTER}{btnadd} -> set_image_position( 'GTK_POS_BOTTOM' );
 						$$self{_WINDOWCLUSTER}{btnadd} -> set_relief( 'GTK_RELIEF_NONE' );
 						$$self{_WINDOWCLUSTER}{btnadd} -> set_sensitive( 0 );
 						
-						$$self{_WINDOWCLUSTER}{btndel} = Gtk2::Button -> new_with_label( "Del from\nCluster" );
+						$$self{_WINDOWCLUSTER}{btndel} = Gtk3::Button -> new_with_label( "Del from\nCluster" );
 						$vbox2 -> pack_start( $$self{_WINDOWCLUSTER}{btndel}, 1, 1, 0 );
-						$$self{_WINDOWCLUSTER}{btndel} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-go-back', 'GTK_ICON_SIZE_BUTTON' ) );
+						$$self{_WINDOWCLUSTER}{btndel} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-go-back', 'GTK_ICON_SIZE_BUTTON' ) );
 						$$self{_WINDOWCLUSTER}{btndel} -> set_image_position( 'GTK_POS_TOP' );
 						$$self{_WINDOWCLUSTER}{btndel} -> set_relief( 'GTK_RELIEF_NONE' );
 						$$self{_WINDOWCLUSTER}{btndel} -> set_sensitive( 0 );
 					
 					# Clusters list
-					my $vbox3 = Gtk2::VBox -> new( 0, 0 );
+					my $vbox3 = Gtk3::VBox -> new( 0, 0 );
 					$hbox1 -> pack_start( $vbox3, 1, 1, 0 );
 						
-						my $frame1 = Gtk2::Frame -> new( ' ACTIVE CLUSTERS: ' );
+						my $frame1 = Gtk3::Frame -> new( ' ACTIVE CLUSTERS: ' );
 						$vbox3 -> pack_start( $frame1, 0, 1, 0 );
-						my $frame1lbl = Gtk2::Label -> new();
+						my $frame1lbl = Gtk3::Label -> new();
 						$frame1lbl -> set_markup( ' <b>ACTIVE CLUSTERS:</b> ' );
 						$frame1 -> set_label_widget( $frame1lbl );
 							
-							my $vbox4 = Gtk2::VBox -> new( 0, 0 );
+							my $vbox4 = Gtk3::VBox -> new( 0, 0 );
 							$frame1 -> add( $vbox4 );
 								
-								$$self{_WINDOWCLUSTER}{comboClusters} = Gtk2::ComboBox -> new_text();
+								$$self{_WINDOWCLUSTER}{comboClusters} = Gtk3::ComboBoxText -> new();
 								$vbox4 -> pack_start( $$self{_WINDOWCLUSTER}{comboClusters}, 0, 1, 0 );
 								
-								my $sep1 = Gtk2::HSeparator -> new;
+								my $sep1 = Gtk3::HSeparator -> new;
 								$vbox4 -> pack_start( $sep1, 0, 1, 5 );
 								
-								my $hbuttonbox1 = Gtk2::HButtonBox -> new();
+								my $hbuttonbox1 = Gtk3::HButtonBox -> new();
 								$vbox4 -> pack_start( $hbuttonbox1, 0, 1, 0 );
 								$hbuttonbox1 -> set_layout( 'GTK_BUTTONBOX_EDGE' );
 								$hbuttonbox1 -> set_homogeneous( 1 );
 									
-									$$self{_WINDOWCLUSTER}{addCluster} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+									$$self{_WINDOWCLUSTER}{addCluster} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 									$hbuttonbox1 -> add( $$self{_WINDOWCLUSTER}{addCluster} );
 									$$self{_WINDOWCLUSTER}{addCluster} -> set( 'can-focus' => 0 );
 									
-									$$self{_WINDOWCLUSTER}{delCluster} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+									$$self{_WINDOWCLUSTER}{delCluster} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 									$hbuttonbox1 -> add( $$self{_WINDOWCLUSTER}{delCluster} );
 									$$self{_WINDOWCLUSTER}{delCluster} -> set( 'can-focus' => 0 );
 									$$self{_WINDOWCLUSTER}{delCluster} -> set_sensitive( 0 );
 									
-						my $frame2 = Gtk2::Frame -> new( ' TERMINALS: ' );
+						my $frame2 = Gtk3::Frame -> new( ' TERMINALS: ' );
 						$vbox3 -> pack_start( $frame2, 1, 1, 0 );
-						my $frame2lbl = Gtk2::Label -> new();
+						my $frame2lbl = Gtk3::Label -> new();
 						$frame2lbl -> set_markup( ' <b>TERMINALS IN SELECTED CLUSTER:</b> ' );
 						$frame2 -> set_label_widget( $frame2lbl );
 							
-							my $vbox5 = Gtk2::VBox -> new( 0, 0 );
+							my $vbox5 = Gtk3::VBox -> new( 0, 0 );
 							$frame2 -> add( $vbox5 );
 								
-								my $scroll2 = Gtk2::ScrolledWindow -> new;
+								my $scroll2 = Gtk3::ScrolledWindow -> new;
 								$vbox5 -> pack_start( $scroll2, 1, 1, 0 );
 								$scroll2 -> set_policy( 'automatic', 'automatic' );
 									
-									$$self{_WINDOWCLUSTER}{treeClustered} = Gtk2::Ex::Simple::List -> new_from_treeview (
-										Gtk2::TreeView -> new,
+									$$self{_WINDOWCLUSTER}{treeClustered} = Gtk3::SimpleList -> new_from_treeview (
+										Gtk3::TreeView -> new,
 										'Terminal(s) in cluster:'	=> 'text',
 										'UUID:'						=> 'hidden',
 										'Status'					=> 'pixbuf'
@@ -336,18 +336,18 @@ sub _initGUI {
 									$col_cluster[0] -> set_expand( 1 );
 									$col_cluster[1] -> set_expand( 0 );
 				
-				my $tablbl2 = Gtk2::HBox -> new( 0, 0 );
-					my $lbl2 = Gtk2::Label -> new;
+				my $tablbl2 = Gtk3::HBox -> new( 0, 0 );
+					my $lbl2 = Gtk3::Label -> new;
 					$lbl2 -> set_markup( '<b>SAVED CLUSTERS </b>' );
 					$tablbl2 -> pack_start( $lbl2, 0, 1, 0 );
-					$tablbl2 -> pack_start( Gtk2::Image -> new_from_stock( 'pac-cluster-manager', 'menu' ), 0, 1, 0 );
+					$tablbl2 -> pack_start( Gtk3::Image -> new_from_stock( 'pac-cluster-manager', 'menu' ), 0, 1, 0 );
 				$tablbl2 -> show_all;
 				
-				my $hboxclu = Gtk2::HBox -> new( 0, 0 );
+				my $hboxclu = Gtk3::HBox -> new( 0, 0 );
 				$$self{_WINDOWCLUSTER}{nb} -> append_page( $hboxclu, $tablbl2 );
 					
 					# Create a scrolled1 scrolled window to contain the connections tree
-					$$self{_WINDOWCLUSTER}{scrollclu} = Gtk2::ScrolledWindow -> new;
+					$$self{_WINDOWCLUSTER}{scrollclu} = Gtk3::ScrolledWindow -> new;
 					$$self{_WINDOWCLUSTER}{scrollclu} -> set_policy( 'automatic', 'automatic' );
 					$hboxclu -> pack_start( $$self{_WINDOWCLUSTER}{scrollclu}, 1, 1, 0 );
 					
@@ -362,7 +362,7 @@ sub _initGUI {
 					$$self{_WINDOWCLUSTER}{treeConnections} -> set_enable_search( 0 );
 						
 						# Implement a "TreeModelSort" to auto-sort the data
-						my $sort_model_conn = Gtk2::TreeModelSort -> new_with_model( $$self{_WINDOWCLUSTER}{treeConnections} -> get_model );
+						my $sort_model_conn = Gtk3::TreeModelSort -> new_with_model( $$self{_WINDOWCLUSTER}{treeConnections} -> get_model );
 						$$self{_WINDOWCLUSTER}{treeConnections} -> set_model( $sort_model_conn );
 						$sort_model_conn -> set_default_sort_func( \&__treeSort );
 						$$self{_WINDOWCLUSTER}{treeConnections} -> get_selection -> set_mode( 'GTK_SELECTION_MULTIPLE' );
@@ -374,76 +374,76 @@ sub _initGUI {
 					
 					
 					# Buttons to Add/Del to/from Clusters
-					my $vboxclu1 = Gtk2::VBox -> new( 0, 0 );
+					my $vboxclu1 = Gtk3::VBox -> new( 0, 0 );
 					$hboxclu -> pack_start( $vboxclu1, 0, 1, 0 );
 						
-						$$self{_WINDOWCLUSTER}{btnadd1} = Gtk2::Button -> new_with_label( "Add to\nCluster" );
+						$$self{_WINDOWCLUSTER}{btnadd1} = Gtk3::Button -> new_with_label( "Add to\nCluster" );
 						$vboxclu1 -> pack_start( $$self{_WINDOWCLUSTER}{btnadd1}, 1, 1, 0 );
-						$$self{_WINDOWCLUSTER}{btnadd1} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-go-forward', 'GTK_ICON_SIZE_BUTTON' ) );
+						$$self{_WINDOWCLUSTER}{btnadd1} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-go-forward', 'GTK_ICON_SIZE_BUTTON' ) );
 						$$self{_WINDOWCLUSTER}{btnadd1} -> set_image_position( 'GTK_POS_BOTTOM' );
 						$$self{_WINDOWCLUSTER}{btnadd1} -> set_relief( 'GTK_RELIEF_NONE' );
 						$$self{_WINDOWCLUSTER}{btnadd1} -> set_sensitive( 0 );
 						
-						$$self{_WINDOWCLUSTER}{btndel1} = Gtk2::Button -> new_with_label( "Del from\nCluster" );
+						$$self{_WINDOWCLUSTER}{btndel1} = Gtk3::Button -> new_with_label( "Del from\nCluster" );
 						$vboxclu1 -> pack_start( $$self{_WINDOWCLUSTER}{btndel1}, 1, 1, 0 );
-						$$self{_WINDOWCLUSTER}{btndel1} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-go-back', 'GTK_ICON_SIZE_BUTTON' ) );
+						$$self{_WINDOWCLUSTER}{btndel1} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-go-back', 'GTK_ICON_SIZE_BUTTON' ) );
 						$$self{_WINDOWCLUSTER}{btndel1} -> set_image_position( 'GTK_POS_TOP' );
 						$$self{_WINDOWCLUSTER}{btndel1} -> set_relief( 'GTK_RELIEF_NONE' );
 						$$self{_WINDOWCLUSTER}{btndel1} -> set_sensitive( 0 );
 					
 					# Clusters list
-					my $vbox3clu = Gtk2::VBox -> new( 0, 0 );
+					my $vbox3clu = Gtk3::VBox -> new( 0, 0 );
 					$hboxclu -> pack_start( $vbox3clu, 0, 1, 0 );
 						
-						my $frame1clu = Gtk2::Frame -> new( ' CONFIGURED CLUSTERS: ' );
+						my $frame1clu = Gtk3::Frame -> new( ' CONFIGURED CLUSTERS: ' );
 						$vbox3clu -> pack_start( $frame1clu, 0, 1, 0 );
-						my $frame1lblclu = Gtk2::Label -> new;
+						my $frame1lblclu = Gtk3::Label -> new;
 						$frame1lblclu -> set_markup( ' <b>CONFIGURED CLUSTERS:</b> ' );
 						$frame1clu -> set_label_widget( $frame1lblclu );
 							
-							my $vbox4clu = Gtk2::VBox -> new( 0, 0 );
+							my $vbox4clu = Gtk3::VBox -> new( 0, 0 );
 							$frame1clu -> add( $vbox4clu );
 								
-								$$self{_WINDOWCLUSTER}{comboClusters1} = Gtk2::ComboBox -> new_text;
+								$$self{_WINDOWCLUSTER}{comboClusters1} = Gtk3::ComboBoxText -> new;
 								$vbox4clu -> pack_start( $$self{_WINDOWCLUSTER}{comboClusters1}, 0, 1, 0 );
 								
-								$vbox4clu -> pack_start( Gtk2::HSeparator -> new, 0, 1, 5 );
+								$vbox4clu -> pack_start( Gtk3::HSeparator -> new, 0, 1, 5 );
 								
-								my $hbuttonbox1clu = Gtk2::HButtonBox -> new;
+								my $hbuttonbox1clu = Gtk3::HButtonBox -> new;
 								$vbox4clu -> pack_start( $hbuttonbox1clu, 0, 1, 0 );
 								$hbuttonbox1clu -> set_layout( 'GTK_BUTTONBOX_EDGE' );
 								$hbuttonbox1clu -> set_homogeneous( 1 );
 									
-									$$self{_WINDOWCLUSTER}{addCluster1} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+									$$self{_WINDOWCLUSTER}{addCluster1} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 									$hbuttonbox1clu -> add( $$self{_WINDOWCLUSTER}{addCluster1} );
 									$$self{_WINDOWCLUSTER}{addCluster1} -> set( 'can-focus' => 0 );
 									
-									$$self{_WINDOWCLUSTER}{renCluster1} = Gtk2::Button -> new;
+									$$self{_WINDOWCLUSTER}{renCluster1} = Gtk3::Button -> new;
 									$hbuttonbox1clu -> add( $$self{_WINDOWCLUSTER}{renCluster1} );
-									$$self{_WINDOWCLUSTER}{renCluster1} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-edit', 'button' ) );
+									$$self{_WINDOWCLUSTER}{renCluster1} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-edit', 'button' ) );
 									$$self{_WINDOWCLUSTER}{renCluster1} -> set_label( 'Rename' );
 									$$self{_WINDOWCLUSTER}{renCluster1} -> set( 'can-focus' => 0 );
 									
-									$$self{_WINDOWCLUSTER}{delCluster1} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+									$$self{_WINDOWCLUSTER}{delCluster1} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 									$hbuttonbox1clu -> add( $$self{_WINDOWCLUSTER}{delCluster1} );
 									$$self{_WINDOWCLUSTER}{delCluster1} -> set( 'can-focus' => 0 );
 									$$self{_WINDOWCLUSTER}{delCluster1} -> set_sensitive( 0 );
 						
-						my $frame2clu = Gtk2::Frame -> new( ' TERMINALS: ' );
+						my $frame2clu = Gtk3::Frame -> new( ' TERMINALS: ' );
 						$vbox3clu -> pack_start( $frame2clu, 1, 1, 0 );
-						my $frame2lblclu = Gtk2::Label -> new;
+						my $frame2lblclu = Gtk3::Label -> new;
 						$frame2lblclu -> set_markup( ' <b>TERMINALS IN SELECTED CLUSTER:</b> ' );
 						$frame2clu -> set_label_widget( $frame2lblclu );
 							
-							my $vbox5clu = Gtk2::VBox -> new( 0, 0 );
+							my $vbox5clu = Gtk3::VBox -> new( 0, 0 );
 							$frame2clu -> add( $vbox5clu );
 								
-								my $scroll2clu = Gtk2::ScrolledWindow -> new;
+								my $scroll2clu = Gtk3::ScrolledWindow -> new;
 								$vbox5clu -> pack_start( $scroll2clu, 1, 1, 0 );
 								$scroll2clu -> set_policy( 'automatic', 'automatic' );
 									
-									$$self{_WINDOWCLUSTER}{treeClustered1} = Gtk2::Ex::Simple::List -> new_from_treeview (
-										Gtk2::TreeView -> new,
+									$$self{_WINDOWCLUSTER}{treeClustered1} = Gtk3::SimpleList -> new_from_treeview (
+										Gtk3::TreeView -> new,
 										'Terminal(s) in cluster:'	=> 'text',
 										'UUID:'						=> 'hidden'
 									);
@@ -454,92 +454,92 @@ sub _initGUI {
 									$$self{_WINDOWCLUSTER}{treeClustered1} -> get_selection -> set_mode( 'GTK_SELECTION_MULTIPLE' );
 				
 				# Add an "autocluster" tab
-				my $tablbl3 = Gtk2::HBox -> new( 0, 0 );
-					my $lbl3 = Gtk2::Label -> new;
+				my $tablbl3 = Gtk3::HBox -> new( 0, 0 );
+					my $lbl3 = Gtk3::Label -> new;
 					$lbl3 -> set_markup( '<b>AUTO CLUSTERS </b>' );
 					$tablbl3 -> pack_start( $lbl3, 0, 1, 0 );
-					$tablbl3 -> pack_start( Gtk2::Image -> new_from_stock( 'pac-cluster-manager2', 'menu' ), 0, 1, 0 );
+					$tablbl3 -> pack_start( Gtk3::Image -> new_from_stock( 'pac-cluster-manager2', 'menu' ), 0, 1, 0 );
 				$tablbl3 -> show_all;
 				
-				my $hboxautoclu = Gtk2::HBox -> new( 0, 0 );
+				my $hboxautoclu = Gtk3::HBox -> new( 0, 0 );
 				$$self{_WINDOWCLUSTER}{nb} -> append_page( $hboxautoclu, $tablbl3 );
 					
-					my $vboxaclist = Gtk2::VBox -> new;
+					my $vboxaclist = Gtk3::VBox -> new;
 					$hboxautoclu -> pack_start( $vboxaclist, 1, 1, 0 );
 						
-						my $hboxaclistbtns = Gtk2::HBox -> new;
+						my $hboxaclistbtns = Gtk3::HBox -> new;
 						$vboxaclist -> pack_start( $hboxaclistbtns, 0, 1, 0 );
 							
-							$$self{_WINDOWCLUSTER}{addAC} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+							$$self{_WINDOWCLUSTER}{addAC} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 							$hboxaclistbtns -> add( $$self{_WINDOWCLUSTER}{addAC} );
 							$$self{_WINDOWCLUSTER}{addAC} -> set( 'can-focus' => 0 );
 							
-							$$self{_WINDOWCLUSTER}{renAC} = Gtk2::Button -> new;
+							$$self{_WINDOWCLUSTER}{renAC} = Gtk3::Button -> new;
 							$hboxaclistbtns -> add( $$self{_WINDOWCLUSTER}{renAC} );
-							$$self{_WINDOWCLUSTER}{renAC} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-edit', 'button' ) );
+							$$self{_WINDOWCLUSTER}{renAC} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-edit', 'button' ) );
 							$$self{_WINDOWCLUSTER}{renAC} -> set_label( 'Rename' );
 							$$self{_WINDOWCLUSTER}{renAC} -> set( 'can-focus' => 0 );
 							
-							$$self{_WINDOWCLUSTER}{delAC} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+							$$self{_WINDOWCLUSTER}{delAC} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 							$hboxaclistbtns -> add( $$self{_WINDOWCLUSTER}{delAC} );
 							$$self{_WINDOWCLUSTER}{delAC} -> set( 'can-focus' => 0 );
 						
 						# Create a scrollautoclu scrolled window to contain the connections tree
-						my $scrollaclist = Gtk2::ScrolledWindow -> new;
+						my $scrollaclist = Gtk3::ScrolledWindow -> new;
 						$scrollaclist -> set_policy( 'automatic', 'automatic' );
 						$vboxaclist -> pack_start( $scrollaclist, 1, 1, 0 );
-						$$self{_WINDOWCLUSTER}{treeAutocluster} = Gtk2::Ex::Simple::List -> new_from_treeview (
-							Gtk2::TreeView -> new,
+						$$self{_WINDOWCLUSTER}{treeAutocluster} = Gtk3::SimpleList -> new_from_treeview (
+							Gtk3::TreeView -> new,
 							'AUTOCLUSTER'	=> 'text',
 						);
 						$scrollaclist -> add( $$self{_WINDOWCLUSTER}{treeAutocluster} );
 						$$self{_WINDOWCLUSTER}{treeAutocluster} -> set_headers_visible( 1 );
 						$$self{_WINDOWCLUSTER}{treeAutocluster} -> get_selection -> set_mode( 'GTK_SELECTION_SINGLE' );
 					
-					$hboxautoclu -> pack_start( Gtk2::VSeparator -> new, 0, 1, 5 );
+					$hboxautoclu -> pack_start( Gtk3::VSeparator -> new, 0, 1, 5 );
 					
-					my $frameac = Gtk2::Frame -> new;
+					my $frameac = Gtk3::Frame -> new;
 					$hboxautoclu -> pack_start( $frameac, 1, 1, 0 );
-					my $frameaclbl = Gtk2::Label -> new;
+					my $frameaclbl = Gtk3::Label -> new;
 					$frameaclbl -> set_markup( ' <b>AUTOCLUSTER MATCHING PROPERTIES:</b> ' );
 					$frameac -> set_label_widget( $frameaclbl );
 					$frameac -> set_tooltip_text( "These entries accept Regular Expressions,like:\n^server\\d+\nor\nconn.*\\d{1,3}\$\nor any other Perl RegExp" );
 						
-						my $vboxacprops = Gtk2::VBox -> new;
+						my $vboxacprops = Gtk3::VBox -> new;
 						$frameac -> add( $vboxacprops );
 							
-							my $hboxacpname = Gtk2::HBox -> new; $vboxacprops -> pack_start( $hboxacpname, 0, 1, 0);
-							$hboxacpname -> pack_start( Gtk2::Label -> new( 'Name:' ) , 0, 1, 0 );
-							$hboxacpname -> pack_start( $$self{_WINDOWCLUSTER}{entryname} = Gtk2::Entry -> new, 1, 1, 0 );
+							my $hboxacpname = Gtk3::HBox -> new; $vboxacprops -> pack_start( $hboxacpname, 0, 1, 0);
+							$hboxacpname -> pack_start( Gtk3::Label -> new( 'Name:' ) , 0, 1, 0 );
+							$hboxacpname -> pack_start( $$self{_WINDOWCLUSTER}{entryname} = Gtk3::Entry -> new, 1, 1, 0 );
 							
-							my $hboxacptitle = Gtk2::HBox -> new; $vboxacprops -> pack_start( $hboxacptitle, 0, 1, 0);
-							$hboxacptitle -> pack_start( Gtk2::Label -> new( 'Title:' ) , 0, 1, 0 );
-							$hboxacptitle -> pack_start( $$self{_WINDOWCLUSTER}{entrytitle} = Gtk2::Entry -> new, 1, 1, 0 );
+							my $hboxacptitle = Gtk3::HBox -> new; $vboxacprops -> pack_start( $hboxacptitle, 0, 1, 0);
+							$hboxacptitle -> pack_start( Gtk3::Label -> new( 'Title:' ) , 0, 1, 0 );
+							$hboxacptitle -> pack_start( $$self{_WINDOWCLUSTER}{entrytitle} = Gtk3::Entry -> new, 1, 1, 0 );
 							
-							my $hboxacphost = Gtk2::HBox -> new; $vboxacprops -> pack_start( $hboxacphost, 0, 1, 0);
-							$hboxacphost -> pack_start( Gtk2::Label -> new( 'IP/Host:' ) , 0, 1, 0 );
-							$hboxacphost -> pack_start( $$self{_WINDOWCLUSTER}{entryhost} = Gtk2::Entry -> new, 1, 1, 0 );
+							my $hboxacphost = Gtk3::HBox -> new; $vboxacprops -> pack_start( $hboxacphost, 0, 1, 0);
+							$hboxacphost -> pack_start( Gtk3::Label -> new( 'IP/Host:' ) , 0, 1, 0 );
+							$hboxacphost -> pack_start( $$self{_WINDOWCLUSTER}{entryhost} = Gtk3::Entry -> new, 1, 1, 0 );
 							
-							my $hboxacpdesc = Gtk2::HBox -> new; $vboxacprops -> pack_start( $hboxacpdesc, 0, 1, 0);
-							$hboxacpdesc -> pack_start( Gtk2::Label -> new( 'Description:' ) , 0, 1, 0 );
-							$hboxacpdesc -> pack_start( $$self{_WINDOWCLUSTER}{entrydesc} = Gtk2::Entry -> new, 1, 1, 0 );
+							my $hboxacpdesc = Gtk3::HBox -> new; $vboxacprops -> pack_start( $hboxacpdesc, 0, 1, 0);
+							$hboxacpdesc -> pack_start( Gtk3::Label -> new( 'Description:' ) , 0, 1, 0 );
+							$hboxacpdesc -> pack_start( $$self{_WINDOWCLUSTER}{entrydesc} = Gtk3::Entry -> new, 1, 1, 0 );
 							
-							$$self{_WINDOWCLUSTER}{btnCheckAC} = Gtk2::Button -> new;
-							$$self{_WINDOWCLUSTER}{btnCheckAC} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-find', 'button' ) );
+							$$self{_WINDOWCLUSTER}{btnCheckAC} = Gtk3::Button -> new;
+							$$self{_WINDOWCLUSTER}{btnCheckAC} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-find', 'button' ) );
 							$$self{_WINDOWCLUSTER}{btnCheckAC} -> set_label( 'Check Auto Cluster conditions' );
 							$$self{_WINDOWCLUSTER}{btnCheckAC} -> set( 'can-focus', 0);
 							$vboxacprops -> pack_start( $$self{_WINDOWCLUSTER}{btnCheckAC} , 1, 1, 5 );
 			
-			$$self{_WINDOWCLUSTER}{buttonPCC} = Gtk2::Button -> new_with_mnemonic( '_Power Cluster Controller' );
-			$$self{_WINDOWCLUSTER}{buttonPCC} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-justify-fill', 'button' ) );
+			$$self{_WINDOWCLUSTER}{buttonPCC} = Gtk3::Button -> new_with_mnemonic( '_Power Cluster Controller' );
+			$$self{_WINDOWCLUSTER}{buttonPCC} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-justify-fill', 'button' ) );
 			$vbox0 -> pack_start( $$self{_WINDOWCLUSTER}{buttonPCC}, 0, 1, 5 );
 			
-			$vbox0 -> pack_start( Gtk2::HSeparator -> new, 0, 1, 0 );
+			$vbox0 -> pack_start( Gtk3::HSeparator -> new, 0, 1, 0 );
 			
-			my $hbbox1 = Gtk2::HButtonBox -> new;
+			my $hbbox1 = Gtk3::HButtonBox -> new;
 			$vbox0 -> pack_start( $hbbox1, 0, 1, 5 );
 				
-				$$self{_WINDOWCLUSTER}{btnOK} = Gtk2::Button -> new_from_stock( 'gtk-ok' );
+				$$self{_WINDOWCLUSTER}{btnOK} = Gtk3::Button -> new_from_stock( 'gtk-ok' );
 				$hbbox1 -> set_layout( 'GTK_BUTTONBOX_END' );
 				$hbbox1 -> add( $$self{_WINDOWCLUSTER}{btnOK} );
 	
@@ -553,7 +553,8 @@ sub _setupCallbacks {
 	# CLUSTERS RELATED CALLBACKS
 	###############################
 
-	$$self{_WINDOWCLUSTER}{treeClustered} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'copy', 'move' ], { target => 'PAC Connect', flags => [] } );
+	my @targets = ( Gtk3::TargetEntry->new( 'PAC Connect', [], 0 ) );
+	$$self{_WINDOWCLUSTER}{treeClustered} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', \@targets, [ 'copy', 'move' ] );
 	$$self{_WINDOWCLUSTER}{treeClustered} -> signal_connect( 'drag_motion' => sub { $_[0] -> get_parent_window -> raise; return 1; } );
 	$$self{_WINDOWCLUSTER}{treeClustered} -> signal_connect( 'drag_drop' => sub {
 		my ( $me, $context, $x, $y, $data, $info, $time ) = @_;
@@ -686,7 +687,7 @@ sub _setupCallbacks {
 		}
 		
 		# Empty the environments combobox
-		foreach my $cluster ( keys %{ $$self{_CLUSTERS} } ) { $$self{_WINDOWCLUSTER}{comboClusters} -> remove_text( 0 ); }
+		$$self{_WINDOWCLUSTER}{comboClusters} -> remove_all();
 		
 		$$self{_CLUSTERS}{$new_cluster}{1} = undef;
 		
@@ -714,7 +715,7 @@ sub _setupCallbacks {
 		if ( defined $PACMain::{FUNCS}{_MAIN}{_CFG}{defaults}{'auto cluster'}{$new_cluster} ) { _wMessage( $$self{_WINDOWCLUSTER}{main}, "Auto Cluster name '$new_cluster' already exists!!" ); return 1; }
 		
 		# Empty the environments combobox
-		foreach my $uuid ( keys %{ $$self{CLUSTERS} } ) { $$self{_WINDOWCLUSTER}{comboClusters1} -> remove_text( 0 ); }
+		$$self{_WINDOWCLUSTER}{comboClusters1} -> remove_all();
 		
 		$$self{CLUSTERS}{$new_cluster} = undef;
 		
@@ -780,7 +781,7 @@ sub _setupCallbacks {
 		}
 		
 		# Empty the clusters combobox
-		foreach my $del_cluster ( keys %{ $$self{_CLUSTERS} } ) { $$self{_WINDOWCLUSTER}{comboClusters} -> remove_text( 0 ); }
+		$$self{_WINDOWCLUSTER}{comboClusters} -> remove_all();
 		
 		# Delete selected cluster
 		delete $$self{_CLUSTERS}{$cluster};
@@ -866,7 +867,7 @@ sub _setupCallbacks {
 			}
 			
 			# Empty the environments combobox
-			foreach my $clt ( keys %{ $$self{_CLUSTERS} } ) { $$self{_WINDOWCLUSTER}{comboClusters} -> remove_text( 0 ); }
+			$$self{_WINDOWCLUSTER}{comboClusters} -> remove_all();
 			
 			$$self{_CLUSTERS}{$cluster}{1} = undef;
 			
@@ -927,7 +928,7 @@ sub _setupCallbacks {
 		
 		my $selection	= $tree -> get_selection;
 		my $model		= $tree -> get_model;
-		my @paths		= $selection -> get_selected_rows;
+		my @paths		= _getSelectedRows( $selection );
 		
 		my $uuid		= $model -> get_value( $model -> get_iter( $paths[0] ), 2 );
 		
@@ -969,7 +970,7 @@ sub _setupCallbacks {
 			
 			my $selection	= $tree -> get_selection;
 			my $model		= $tree -> get_model;
-			my @paths		= $selection -> get_selected_rows;
+			my @paths		= _getSelectedRows( $selection );
 			
 			my $uuid		= $model -> get_value( $model -> get_iter( $paths[0] ), 2 );
 			
@@ -979,10 +980,10 @@ sub _setupCallbacks {
 				{
 					$tree -> collapse_row( $$self{_WINDOWCLUSTER}{treeConnections} -> _getPath( $uuid ) );
 				} elsif ( $uuid ne '__PAC__ROOT__' ) {
-					$tree -> set_cursor( $$self{_WINDOWCLUSTER}{treeConnections} -> _getPath( $PACMain::{FUNCS}{_MAIN}{_CFG}{'environments'}{$uuid}{'parent'} ) );
+					$tree -> set_cursor( $$self{_WINDOWCLUSTER}{treeConnections} -> _getPath( $PACMain::{FUNCS}{_MAIN}{_CFG}{'environments'}{$uuid}{'parent'} ), undef, 0 );
 				}
 			} else {
-				$tree -> set_cursor( $$self{_WINDOWCLUSTER}{treeConnections} -> _getPath( $PACMain::{FUNCS}{_MAIN}{_CFG}{'environments'}{$uuid}{'parent'} ) );
+				$tree -> set_cursor( $$self{_WINDOWCLUSTER}{treeConnections} -> _getPath( $PACMain::{FUNCS}{_MAIN}{_CFG}{'environments'}{$uuid}{'parent'} ), undef, 0 );
 			}
 		}
 		# Capture 'right arrow' or 'intro' keypress to expand row
@@ -996,7 +997,7 @@ sub _setupCallbacks {
 			
 			my $selection	= $tree -> get_selection;
 			my $model		= $tree -> get_model;
-			my @paths		= $selection -> get_selected_rows;
+			my @paths		= _getSelectedRows( $selection );
 			
 			my $uuid		= $model -> get_value( $model -> get_iter( $paths[0] ), 2 );
 			
@@ -1125,27 +1126,28 @@ sub _setupCallbacks {
 		$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster}{title}	ne '' and $cond .= "\ntitle =~ /$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster}{title}/";
 		$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}	ne '' and $cond .= "\ndescription =~ /$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}/";
 		
-		my $windowConfirm = Gtk2::MessageDialog -> new_with_markup( 
+		# Why no Gtk3::MessageDialog -> new_with_markup() available??
+		my $windowConfirm = Gtk3::MessageDialog -> new(
 			$$self{_WINDOWCLUSTER}{main},
 			'GTK_DIALOG_DESTROY_WITH_PARENT',
 			'GTK_MESSAGE_INFO',
 			'none',
-			"Terminals matching Auto Cluster <b>$cluster</b> conditions:" . $cond
+			''
 		);
-		
+		$windowConfirm -> set_markup( "Terminals matching Auto Cluster <b>$cluster</b> conditions:" . $cond );
 		$windowConfirm -> set_icon_name( 'pac-app-big' );
 		$windowConfirm -> set_title( "$APPNAME (v$APPVERSION) : Auto Cluster matching" );
 		$windowConfirm -> add_buttons( 'gtk-ok' => 'ok' );
 		$windowConfirm -> set_size_request( 640, 400 );
 			
-			my $hboxjarl = Gtk2::HBox -> new( 0, 0 );
-			$windowConfirm -> vbox -> pack_start( $hboxjarl, 1, 1, 0 );
+			my $hboxjarl = Gtk3::HBox -> new( 0, 0 );
+			$windowConfirm -> get_content_area -> pack_start( $hboxjarl, 1, 1, 0 );
 				
-				my $scroll = Gtk2::ScrolledWindow -> new;
+				my $scroll = Gtk3::ScrolledWindow -> new;
 				$hboxjarl -> pack_start( $scroll, 0, 1, 0 );
 				$scroll -> set_policy( 'never', 'automatic' );
 				
-				my $tree = Gtk2::Ex::Simple::List -> new_from_treeview ( Gtk2::TreeView -> new, 'Icon' => 'pixbuf', 'Terminal(s) matching' => 'text', 'UUID' => 'hidden' );
+				my $tree = Gtk3::SimpleList -> new_from_treeview ( Gtk3::TreeView -> new, 'Icon' => 'pixbuf', 'Terminal(s) matching' => 'text', 'UUID' => 'hidden' );
 				$scroll -> add( $tree );
 				$tree -> set_headers_visible( 0 );
 				$tree -> get_selection -> set_mode( 'GTK_SELECTION_SINGLE' );
@@ -1164,19 +1166,19 @@ sub _setupCallbacks {
 				}
 				
 				# Create a scrolled2 scrolled window to contain the description textview
-				my $scrollDescription = Gtk2::ScrolledWindow -> new;
+				my $scrollDescription = Gtk3::ScrolledWindow -> new;
 				$hboxjarl -> pack_start( $scrollDescription, 1, 1, 0 );
 				$scrollDescription -> set_policy( 'automatic', 'automatic' );
 					
 					# Create descView as a gtktextview with descBuffer
-					my $descBuffer = Gtk2::TextBuffer -> new;
-					my $descView = Gtk2::TextView -> new_with_buffer( $descBuffer );
+					my $descBuffer = Gtk3::TextBuffer -> new;
+					my $descView = Gtk3::TextView -> new_with_buffer( $descBuffer );
 					$descView -> set_border_width( 5 );
 					$scrollDescription -> add( $descView );
 					$descView -> set_wrap_mode( 'GTK_WRAP_WORD' );
 					$descView -> set_sensitive( 0 );
 					$descView -> drag_dest_unset;
-					$descView -> modify_font( Pango::FontDescription -> from_string( 'monospace' ) );
+					$descView -> modify_font( Pango::FontDescription::from_string( 'monospace' ) );
 		
 		$tree -> get_selection -> signal_connect( 'changed' => sub {
 			my @selection = $tree -> get_selected_indices;
@@ -1187,9 +1189,9 @@ sub _setupCallbacks {
 			$descBuffer -> set_text( encode( 'unicode', $PACMain::FUNCS{_MAIN}{_CFG}{'environments'}{$uuid}{'description'} // '' ) );
 		} );
 		
-		my $lbltotal = Gtk2::Label -> new;
+		my $lbltotal = Gtk3::Label -> new;
 		$lbltotal -> set_markup( "Conditions for Auto Cluster <b>$cluster</b> match <b>" . ( scalar( @{ $$tree{data} } ) ) . '</b> connections' );
-		$windowConfirm -> vbox -> pack_start( $lbltotal, 0, 1, 0 );
+		$windowConfirm -> get_content_area -> pack_start( $lbltotal, 0, 1, 0 );
 		
 		$windowConfirm -> show_all;
 		my $close = $windowConfirm -> run;
@@ -1268,7 +1270,7 @@ sub _updateGUI {
 	$$self{_WINDOWCLUSTER}{btndel}		-> set_sensitive( 0 );
 	
 	# Empty the clusters combobox
-	foreach my $cluster ( keys %{ $$self{_CLUSTERS} } ) { $$self{_WINDOWCLUSTER}{comboClusters} -> remove_text( 0 ); }
+	$$self{_WINDOWCLUSTER}{comboClusters} -> remove_all();
 	# Empty the terminals tree
 	@{ $$self{_WINDOWCLUSTER}{treeTerminals} -> {data} } = ();
 	# Empty the clustered tree
@@ -1322,7 +1324,7 @@ sub _updateGUI1 {
 	$$self{CLUSTERS} = $self -> getCFGClusters;
 	
 	# Empty the clusters combobox
-	for( my $i = 0; $i < 1000; ++$i ) { $$self{_WINDOWCLUSTER}{comboClusters1} -> remove_text( 0 ); }
+	$$self{_WINDOWCLUSTER}{comboClusters1} -> remove_all();
 	
 	# Empty the clustered connections tree
 	@{ $$self{_WINDOWCLUSTER}{treeClustered1}{data} } = ();
@@ -1363,7 +1365,7 @@ sub _updateGUIAC {
 		++$i;
 		push( @{ $$self{_WINDOWCLUSTER}{treeAutocluster}{data} }, $ac );
 	}
-	$$self{_WINDOWCLUSTER}{treeAutocluster} -> set_cursor( Gtk2::TreePath -> new_from_string( $j ) );
+	$$self{_WINDOWCLUSTER}{treeAutocluster} -> set_cursor( Gtk3::TreePath -> new_from_string( $j ), undef, 0 );
 	
 	$self -> _updateButtonsAC;
 	
