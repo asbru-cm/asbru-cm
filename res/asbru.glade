@@ -3276,8 +3276,8 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgForceSpitSize">
-                        <property name="label" translatable="yes">Force slit tabs to 50%</property>
+                      <object class="GtkCheckButton" id="cbCfgForceSplitSize">
+                        <property name="label" translatable="yes">Force split tabs to 50%</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
