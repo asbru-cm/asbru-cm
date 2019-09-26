@@ -61,7 +61,7 @@ sub _getChildren {
 	$modelsort -> foreach( sub
 	{
 		my ( $store, $path, $iter, $tmp ) = @_;
-		my $node_uuid = $store -> get_value( $iter, 0 );
+		my $node_uuid = $store -> get_value( $iter, 2 );
 		my $node_name = $store -> get_value( $iter, 1 );
 		
 		( $node_uuid eq $uuid ) and $root = $path -> to_string;
@@ -88,7 +88,7 @@ sub _getPath {
 	$modelsort -> foreach( sub
 	{
 		my ( $store, $path, $iter, $tmp ) = @_;
-		my $node_uuid = $store -> get_value( $iter, 0 );
+		my $node_uuid = $store -> get_value( $iter, 2 );
 		
 		return 0 unless $node_uuid eq $uuid;
 		$ret_path = $path -> to_string;
@@ -140,7 +140,7 @@ sub _delNode {
 	$modelsort -> foreach( sub
 	{
 		my ( $store, $path, $iter, $tmp ) = @_;
-		my $node_uuid = $store -> get_value( $iter, 0 );
+		my $node_uuid = $store -> get_value( $iter, 2 );
 		return 0 unless $node_uuid eq $uuid;
 		$model -> remove( $modelsort -> convert_iter_to_child_iter( $modelsort -> get_iter( $path ) ) );
 		return 1;
