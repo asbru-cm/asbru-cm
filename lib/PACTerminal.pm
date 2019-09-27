@@ -1481,6 +1481,7 @@ sub _vteMenu {
 	{
 		label		=> 'New Cluster...',
 		stockicon	=> 'gtk-new',
+		shortcut => '',
 		tooltip		=> 'Create a new cluster and put this connection in it',
 		code		=> sub {
 			my $cluster = _wEnterValue( $self, 'Enter a name for the <b>New Cluster</b>' );
@@ -1779,7 +1780,7 @@ sub _vteMenu {
 	push( @vte_menu_items, { label => 'Command History...', shortcut => '<alt>h', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{ $self -> _wHistory; } } );
 
 	# Add save session log
-	push( @vte_menu_items, { label => 'Save session log...', stockicon => 'gtk-save', code => sub{ $self -> _saveSessionLog; } } );
+	push( @vte_menu_items, { label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{ $self -> _saveSessionLog; } } );
 
 	# Add edit session
 	push( @vte_menu_items, { label => 'Edit session...', stockicon => 'gtk-edit', shortcut => '<alt>e', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub{ $PACMain::FUNCS{_EDIT} -> show( $$self{_UUID} ); } } );
@@ -1802,7 +1803,7 @@ sub _vteMenu {
 	push( @vte_menu_items, { label => 'Set title with guessed hostname', sensitive => ( $$self{CONNECTED} && ! $$self{CONNECTING} ), shortcut => '<control><shift>g', code => sub { $self -> _execute( 'remote', '<CTRL_TITLE:hostname>', undef, undef, undef ); } } );
 
 	# Open file explorer on current directory (for PAC Shells only)
-	$$self{_UUID} eq '__PAC_SHELL__' and push( @vte_menu_items, { label => 'Open file manager on current dir', stockicon => 'gtk-open', sensitive => ( $$self{CONNECTED} && ! $$self{CONNECTING} ), code => sub { $self -> _execute( 'remote', 'xdg-open .', undef, undef, undef ); } } );
+	$$self{_UUID} eq '__PAC_SHELL__' and push( @vte_menu_items, { label => 'Open file manager on current dir', stockicon => 'gtk-open', shortcut => '', sensitive => ( $$self{CONNECTED} && ! $$self{CONNECTING} ), code => sub { $self -> _execute( 'remote', 'xdg-open .', undef, undef, undef ); } } );
 
 	# Add take screenshot
 	push( @vte_menu_items, { label => 'Take Screenshot', stockicon => 'gtk-media-record', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub {
@@ -2346,6 +2347,7 @@ sub _tabMenu {
 	{
 		label		=> 'New Cluster...',
 		stockicon	=> 'gtk-new',
+		shortcut => '',
 		code		=> sub {
 			my $cluster = _wEnterValue( $self, 'Enter a name for the <b>New Cluster</b>' );
 			( ( ! defined $cluster ) || ( $cluster =~ /^\s*$/go ) ) and return 1;
@@ -2391,13 +2393,13 @@ sub _tabMenu {
 	} );
 	push( @vte_menu_items, { separator => 1 } );
 
-	push( @vte_menu_items, { label => 'Find...', stockicon => 'gtk-find', code => sub { $self -> _wFindInTerminal; return 1; } } );
+	push( @vte_menu_items, { label => 'Find...', stockicon => 'gtk-find', shortcut => '', code => sub { $self -> _wFindInTerminal; return 1; } } );
 
 	# Add show command history
 	push( @vte_menu_items, { label => 'Command History...', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{ $self -> _wHistory; } } );
 
 	# Add save session log
-	push( @vte_menu_items, { label => 'Save session log...', stockicon => 'gtk-save', code => sub{ $self -> _saveSessionLog; } } );
+	push( @vte_menu_items, { label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{ $self -> _saveSessionLog; } } );
 
 	# Add edit session
 	push( @vte_menu_items, { label => 'Edit session...', stockicon => 'gtk-edit', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub{ $PACMain::FUNCS{_EDIT} -> show( $$self{_UUID} ); } } );
@@ -2421,7 +2423,7 @@ sub _tabMenu {
 	push( @vte_menu_items, { label => 'New connection', stockicon => 'gtk-connect', submenu => &_menuAvailableConnections( $PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data} ) } );
 
 	# Add a 'duplicate connection' button
-	push( @vte_menu_items, { label => 'Duplicate connection', stockicon => 'gtk-copy', sensitive => 1, code => sub{ $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] ); } } );
+	push( @vte_menu_items, { label => 'Duplicate connection', stockicon => 'gtk-copy', shortcut => '', sensitive => 1, code => sub{ $PACMain::FUNCS{_MAIN} -> _launchTerminals( [ [ $$self{_UUID} ] ] ); } } );
 
 	# Add close terminal
 	push( @vte_menu_items, { separator => 1 } );

@@ -2290,6 +2290,7 @@ sub _treeConnections_menu_lite {
 
 		label		=> 'Execute in New Cluster...',
 		stockicon	=> 'gtk-new',
+		shortcut => '',
 		sensitive	=> scalar @sel >= 1,
 		code		=> sub {
 
@@ -2415,6 +2416,7 @@ sub _treeConnections_menu {
 
 		label => 'Export ' . ( $sel[0] eq '__PAC__ROOT__' ? 'ALL' : 'SELECTED' ) . ' connection(s)...',
 		stockicon => 'gtk-save-as',
+		shortcut => '',
 		tooltip => 'Export connection(s) to a YAML file',
 		sensitive =>  scalar @sel >= 1,
 		code => sub {
