@@ -3503,7 +3503,7 @@ sub _wFindInTerminal {
 		$text =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
 		$text =~ s/\cM//go; # Delete any Ctrl-M ( ^M ) character
 		close F;
-		$w{window}{buffer} -> set_text( encode( 'iso-8859-1', $text ) );
+		$w{window}{buffer} -> set_text( encode( 'iso-8859-1', $text // '' ) );
 
 		return $w{window}{data} -> present;
 	}
@@ -3562,7 +3562,7 @@ sub _wFindInTerminal {
 						$w{window}{gui}{entry} = Gtk3::Entry -> new;
 						$w{window}{gui}{hbox} -> pack_start( $w{window}{gui}{entry}, 1, 1, 0 );
 						$w{window}{gui}{entry} -> set_activates_default( 1 );
-						$w{window}{gui}{entry} -> has_focus( 1 );
+						$w{window}{gui}{entry} -> has_focus();
 
 						# Create 'case sensitive search' checkbutton
 						$w{window}{gui}{cbCaseSensitive} = Gtk3::CheckButton -> new_with_label( 'Case sensitive' );
@@ -3581,7 +3581,7 @@ sub _wFindInTerminal {
 								$stop = 1;
 							}
 						} );
-						$w{window}{gui}{btnfind} -> can_default( 1 );
+						$w{window}{gui}{btnfind} -> set_can_default( 1 );
 						$w{window}{gui}{btnfind} -> grab_default;
 
 				# Create frame 2
@@ -3752,7 +3752,7 @@ sub _wFindInTerminal {
 		$w{window}{gui}{btnfind}	-> set_label( 'Find' );
 		$w{window}{gui}{btnfind}	-> set_image( Gtk3::Image -> new_from_stock( 'gtk-find', 'GTK_ICON_SIZE_BUTTON' ) );
 
-		$w{window}{gui}{entry} -> has_focus( 1 );
+		$w{window}{gui}{entry} -> has_focus();
 		$w{window}{gui}{entry} -> grab_focus;
 
 		return 1;
