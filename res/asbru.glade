@@ -4354,6 +4354,7 @@ the first parenthesis refers to "yes" and second to "no"</property>
                             <property name="caps_lock_warning">False</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="width_chars">70</property>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
