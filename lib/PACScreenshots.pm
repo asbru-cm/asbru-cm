@@ -420,20 +420,20 @@ sub _showImage {
 	$window -> set_resizable( 1 );
 	
 	my $sc = Gtk3::ScrolledWindow -> new;
-        my $pb = _pixBufFromFile( $file );
+	my $pb = _pixBufFromFile( $file );
 	my $image = Gtk3::Image -> new_from_pixbuf( $pb );
-        my $pw = $pb -> get_width       + 30;
+	my $pw = $pb -> get_width       + 30;
 	my $ph = $pb -> get_height      + 50;
 
 	$sc -> set_policy( 'automatic', 'automatic' );
 	$sc -> set_min_content_width( $pw );
 	$sc -> set_min_content_height( $ph );
 	$window -> get_content_area -> add( $sc );
-		
+	
 	$sc -> add_with_viewport( $image );
 	
-	my $pw = $pb -> get_width	+ 30;
-	my $ph = $pb -> get_height	+ 50;
+	$pw = $pb -> get_width	+ 30;
+	$ph = $pb -> get_height	+ 50;
 	
 	if ( $pw > $sw || $ph > $sh )	{ $window -> maximize; }
 	else							{ $window -> set_default_size( $pw, $ph ); }
