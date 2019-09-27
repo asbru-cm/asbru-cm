@@ -3497,7 +3497,7 @@ sub _vteFeedChild {
 	my $vte = shift;
 	my $str = shift;
 	my @arr = unpack ( 'C*', $str );
-	$vte -> feed_child( \@arr );
+	$vte -> feed_child( \@arr, length(\@arr));
 }
 
 sub _vteFeedChildBinary {
