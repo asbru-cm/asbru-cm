@@ -1681,7 +1681,7 @@ sub _vteMenu {
 		{
 			label => __( $key ),
 			tooltip => "$key=$value",
-			code => sub { my $t = _subst( "<ENV:$key>", $$self{_CFG}, $$self{_UUID} ); _vteFeedChlid( $$self{_GUI}{_VTE}, $t ); }
+			code => sub { my $t = _subst( "<ENV:$key>", $$self{_CFG}, $$self{_UUID} ); _vteFeedChild( $$self{_GUI}{_VTE}, $t ); }
 		} );
 	}
 	push( @insert_menu_items,
