@@ -2427,8 +2427,8 @@ sub _tabMenu {
 	push( @vte_menu_items, { separator => 1 } );
 	# Add a 'disconnect' button to disconnect without closing the terminal
 	push( @vte_menu_items, { label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub { kill( 15, $$self{_PID} ); } } );
-	push( @vte_menu_items, { label => 'Close terminal', stockicon => 'gtk-close', code => sub { $self -> stop( undef, 1 ); } } );
-	push( @vte_menu_items, { label => 'Close ALL terminals', stockicon => 'gtk-close', code => sub {
+	push( @vte_menu_items, { label => 'Close terminal', stockicon => 'gtk-close', shortcut	=> '<control>F4', code => sub { $self -> stop( undef, 1 ); } } );
+	push( @vte_menu_items, { label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut	=> '<control><shift>F4', code => sub {
 		my @list = keys %PACMain::RUNNING;
 		return 1 unless scalar( @list ) && _wConfirm( $$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal?" );
 		foreach my $uuid ( @list ) { $PACMain::RUNNING{$uuid}{'terminal'} -> stop( 'force', 'deep' ); }

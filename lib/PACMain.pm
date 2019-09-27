@@ -2434,6 +2434,7 @@ sub _treeConnections_menu {
 
 		label => 'Import connection(s)...',
 		stockicon => 'gtk-open',
+		shortcut => '',
 		tooltip => 'Import connection(s) from a file',
 		sensitive =>  ( scalar( @sel ) == 1 ) && ( $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__' ),
 		code => sub { $self -> __importNodes }
@@ -2596,6 +2597,7 @@ sub _treeConnections_menu {
 
 		label		=> 'Execute in New Cluster...',
 		stockicon	=> 'gtk-new',
+		shortcut => '',
 		sensitive	=> ( ( scalar @sel >= 1 ) && ( $sel[0] ne '__PAC__ROOT__' ) ),
 		code		=> sub {
 
