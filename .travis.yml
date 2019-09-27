@@ -49,6 +49,16 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       tags: true
+  - provider: packagecloud
+    skip_cleanup: true
+    repository: gtk3
+    username: ${PACKAGECLOUD_USER}
+    token: ${PACKAGECLOUD_TOKEN}
+    dist: ${OS}/${DIST}
+    package_glob: "build/*.{deb,rpm,dsc}"
+    on:
+      branch: gtk3
+
 
 after_deploy:
   # Prune old packages from packagecloud. The last 5 should be enough.
