@@ -298,7 +298,7 @@ sub _screenshot {
 	
 	my $gdkpixbuf = Gtk3::Gdk::pixbuf_get_from_window( $widget -> get_window, $widget -> get_allocation -> {'x'}, $widget -> get_allocation -> {'y'}, $widget -> get_allocation -> {'width'}, $widget -> get_allocation -> {'height'} );
 	
-	return defined $file ? $gdkpixbuf -> save( $file, 'jpeg' ) : $gdkpixbuf;
+	return defined $file ? $gdkpixbuf -> save( $file, 'png' ) : $gdkpixbuf;
 }
 
 sub _scale {

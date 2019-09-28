@@ -1808,8 +1808,8 @@ sub _vteMenu {
 	# Add take screenshot
 	push( @vte_menu_items, { label => 'Take Screenshot', stockicon => 'gtk-media-record', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub {
 		my $screenshot_file = '';
-		$screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.jpg';
-		while( -f $screenshot_file ) { $screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.jpg'; }
+		$screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.png';
+		while( -f $screenshot_file ) { $screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.png'; }
 		select( undef, undef, undef, 0.5 );
 		_screenshot( $$self{_GUI}{_VBOX}, $screenshot_file );
 		$PACMain::FUNCS{_MAIN}{_GUI}{screenshots} -> add( $screenshot_file, $self -> {_CFG}{'environments'}{ $$self{_UUID} } );
@@ -1990,8 +1990,8 @@ sub _setTabColour {
 		return 1 if ( ! $$self{CONNECTED} ) || ( ! $$self{_FOCUSED} );
 
 		my $screenshot_file = '';
-		$screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.jpg';
-		while( -f $screenshot_file ) { $screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.jpg'; }
+		$screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.png';
+		while( -f $screenshot_file ) { $screenshot_file = '/tmp/pac_screenshot_' . rand( 123456789 ). '.png'; }
 		_screenshot( $$self{EMBED} ? $$self{FOCUS} : $$self{_GUI}{_VBOX}, $screenshot_file );
 		$PACMain::FUNCS{_MAIN}{_GUI}{screenshots} -> add( $screenshot_file, $$self{_CFG}{'environments'}{ $$self{_UUID} } );
 		$PACMain::FUNCS{_MAIN} -> _updateGUIPreferences;

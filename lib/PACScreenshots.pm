@@ -107,14 +107,13 @@ sub add {
 	}
 	
 	my $screenshot_file = '';
-	$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.jpg';
-	while( -f $screenshot_file ) { $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.jpg'; }
+	$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.png';
+	while( -f $screenshot_file ) { $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.png'; }
 	
 	copy( $file, $screenshot_file );
 	
 	push( @{ $$new_cfg{screenshots} }, $screenshot_file );
 	$self -> update;
-	#$PACMain::FUNCS{_MAIN}{_CFG}{tmp}{changed} = 1;
 	$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 	
 	return 1;
@@ -196,12 +195,11 @@ sub _buildScreenshotsGUI {
 		my $file = $self -> _chooseScreenshot;
 		if ( $file ) {
 			my $screenshot_file = '';
-			$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.jpg';
-			while( -f $screenshot_file ) { $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.jpg'; }
-			_pixBufFromFile( $file ) -> save( $screenshot_file, 'jpeg' );
+			$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.png';
+			while( -f $screenshot_file ) { $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand( 123456789 ). '.png'; }
+			_pixBufFromFile( $file ) -> save( $screenshot_file, 'png' );
 			
 			push( @{ $$self{cfg}{screenshots} }, $screenshot_file ) and $self -> update();
-			#$PACMain::FUNCS{_MAIN}{_CFG}{tmp}{changed} = 1;
 			$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 		}
 		return 1;
@@ -246,7 +244,6 @@ sub _buildScreenshots {
 		$w{imageScreenshot} = Gtk3::Image -> new;
 		-f $file and $w{imageScreenshot} -> set_from_pixbuf( _scale( $file, 200, 200, 1 ) );
 		$w{ebScreenshot} -> add( $w{imageScreenshot} );
-		#$w{imageScreenshot} -> set_tooltip_markup( "<b>SCREENSHOT FOR:</b> $$self{cfg}{name} (UUID:$$self{uuid})\n<b>FILE:</b> $w{file}\n" );
 	
 	# Add built control to main container
 	$$self{frame}{hbscreenshots} -> pack_start( $w{ebScreenshot}, 0, 1, 5 );
@@ -260,7 +257,6 @@ sub _buildScreenshots {
 	$w{ebScreenshot} -> signal_connect( 'button_press_event' => sub {
 		my ( $widget, $event ) = @_;
 		
-		#if ( ( $event -> button eq 1 ) && ( $event -> type eq '2button-press' ) )
 		if ( $event -> button eq 1 ) {
 			$self -> _showImage( $w{file} );
 			return 1;
@@ -275,7 +271,6 @@ sub _buildScreenshots {
 						$w{file} = $file;
 						$w{imageScreenshot} -> set_from_pixbuf( _scale( $file, 200, 200, 'keep aspect ratio' ) );
 						splice( @{ $$self{cfg}{screenshots} }, $w{position}, 1, $w{file} );
-						#$PACMain::FUNCS{_MAIN}{_CFG}{tmp}{changed} = 1;
 						$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 					}
 					return 1;
@@ -286,7 +281,7 @@ sub _buildScreenshots {
 				sensitive => $w{imageScreenshot} -> get_storage_type ne 'stock',
 				stockicon => 'gtk-save',
 				code => sub {
-					my $new_file = $APPNAME . '-' . ( $self -> {cfg} -> {name} || 'SCREENSHOT' ) . '-' . ( $self -> {cfg} -> {uuid} || 'FILE' ) . '.jpg';
+					my $new_file = $APPNAME . '-' . ( $self -> {cfg} -> {name} || 'SCREENSHOT' ) . '-' . ( $self -> {cfg} -> {uuid} || 'FILE' ) . '.png';
 					$new_file =~ s/\s+/_/go;
 					
 					my $dialog = Gtk3::FileChooserDialog -> new (
@@ -321,7 +316,6 @@ sub _buildScreenshots {
 					
 					splice( @{ $$self{list} }, $w{position}, 1 );
 					splice( @{ $$self{cfg}{screenshots} }, $w{position}, 1 );
-					#$PACMain::FUNCS{_MAIN}{_CFG}{tmp}{changed} = 1;
 					$PACMain::FUNCS{_MAIN} -> _setCFGChanged( 1 );
 					$self -> update( $$self{cfg} );
 					return 1;
