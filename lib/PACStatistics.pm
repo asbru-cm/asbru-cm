@@ -38,7 +38,7 @@ use POSIX qw( strftime );
 # GTK
 use Gtk3 '-init';
 
-# PAC modules
+# Other application modules
 use PACUtils;
 
 # END: Import Modules
@@ -107,6 +107,8 @@ sub update {
 		my $total_time	= 0;
 		
 		foreach my $tmpuuid ( keys %{ $$cfg{'environments'} } ) {
+			next if $tmpuuid eq '__PAC__ROOT__';
+			next if $tmpuuid eq '__PAC_SHELL__';
 			if ( $$cfg{'environments'}{$tmpuuid}{_is_group} ) {
 				next if $tmpuuid eq '__PAC__ROOT__';
 				$groups++;
@@ -127,10 +129,10 @@ sub update {
 		
 		$$self{frame}{lblPR}	-> set_markup(
 			"<span $font>" .
-				"Total PAC Groups:              <b>$groups</b>"			. "\n" .
-				"Total PAC Nodes:               <b>$nodes</b>"			. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Total Time Connected:          <b>$str_total_time</b>" .
+				"Total groups:                  <b>$groups</b>"			. "\n" .
+				"Total nodes:                   <b>$nodes</b>"			. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Total time connected:          <b>$str_total_time</b>" .
 			"</span>"
 		);
 	} elsif ( $$cfg{environments}{$uuid}{_is_group} ) {
@@ -163,10 +165,10 @@ sub update {
 		
 		$$self{frame}{lblPG}	-> set_markup(
 			"<span $font>" .
-				"Total Sub-Groups:              <b>$groups</b>"			. "\n" .
-				"Total Contained Nodes:         <b>$nodes</b>"			. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Total Time Connected:          <b>$str_total_time</b>" .
+				"Total sub-groups:              <b>$groups</b>"			. "\n" .
+				"Total contained nodes:         <b>$nodes</b>"			. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Total time connected:          <b>$str_total_time</b>" .
 			"</span>"
 		);
 	} else {
@@ -205,16 +207,16 @@ sub update {
 		
 		$$self{frame}{lblPN}	-> set_markup(
 			"<span $font>" .
-				"Total Time Connected:          <b>$str_total_time</b>"	. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Last Connection:               <b>$str_start</b>" .
+				"Total time connected:          <b>$str_total_time</b>"	. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Last connection:               <b>$str_start</b>" .
 			"</span>"
 		);
 	}
 	
-	if ( $uuid eq '__PAC__ROOT__' )						{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'ALL PAC CONNECTIONS'..." ); }
-	elsif ( $$cfg{'environments'}{$uuid}{_is_group} )	{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for group\n'$name'..." ); }
-	else												{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'$name'..." ); }
+	if ( $uuid eq '__PAC__ROOT__' )						{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'all connections'..." ); }
+	elsif ( $$cfg{'environments'}{$uuid}{_is_group} )	{ $$self{frame}{btnReset} -> set_label( "Reset statistics for group\n'$name'..." ); }
+	else												{ $$self{frame}{btnReset} -> set_label( "Reset statistics for\n'$name'..." ); }
 	
 	return 1;
 }
