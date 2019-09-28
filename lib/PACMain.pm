@@ -240,7 +240,7 @@ sub new {
 		}
 		
 		if ( ! $getout ) {
-			if ( ( $$self{_CFG}{'defaults'}{'allow more instances'} ) || ( grep( /^--readonly$/, @{ $$self{_OPTS} } ) ) ) {
+			if ( $$self{_CFG}{'defaults'}{'allow more instances'} ) {
 				print "INFO: Starting '$0' in READ ONLY mode!\n";
 				$$self{_READONLY} = 1;
 			}
@@ -255,7 +255,12 @@ sub new {
 			return 0;
 		}
 	}
-	
+
+	if ( grep( /^--readonly$/, @{ $$self{_OPTS} } ) ) {
+		print "INFO: Starting '$0' in READ ONLY mode!\n";
+		$$self{_READONLY} = 1;
+	}
+
 	# Check for updates in a child process
 	#DevNote: option currently disabled
 	#$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME( $$ );
