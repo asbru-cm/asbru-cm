@@ -1334,7 +1334,6 @@ elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $M
 elsif ( $METHOD eq 'PACShell' ) {
 	$CONNECTED = 1;
 	ctrl( "CONNECTED" );
-	send_slow( $EXP, "cd $$CFG{'defaults'}{'shell directory'}\n" );
 }
 elsif ( ! $MANUAL ) {
 	my $end = 0;

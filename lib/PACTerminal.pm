@@ -338,7 +338,7 @@ sub start {
 	my @args;
 	if ( $$self{_CFG}{'defaults'}{'use login shell to connect'} ) { @args = [ $SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)" ]; }
 	else { @args = [ $PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID} ]; }
-	if ( ! $$self{_GUI}{_VTE} -> spawn_sync( [], undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef ) ) {
+	if ( ! $$self{_GUI}{_VTE} -> spawn_sync( [], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef ) ) {
 		$$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
 		$$self{CONNECTING} = 0;
 		return 0;
