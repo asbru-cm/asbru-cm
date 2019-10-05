@@ -151,21 +151,18 @@ sub new {
 	@{ $self -> {_UNDO} }		= ();
 	$$self{_GUILOCKED}			= 0;
 
-# FIXME-GTKAPPLICATION port as per https://developer.gnome.org/gtk3/stable/gtk-migrating-unique-GtkApplication.html
-#	$self	-> {_APP}			= Gtk3::UniqueApp -> new(
-#		'org.pacmanager.PAC', undef,
-#		'start-shell'	=> 1,
-#		'quick-conn'	=> 2,
-#		'start-uuid'	=> 3,
-#		'show-conn'		=> 4,
-#		'edit-uuid'		=> 5,
-#	);
-        $self   -> {_APP}   = Gtk3::Application -> new('org.pacmanager.PAC', []);
-	
+	# Create application & register it
+	# This will let us know if another Ásbrú instance is running
+	$self -> {_APP} = Gtk3::Application -> new('org.asbru-cm.main', 'flags-none');
+	if (!$self -> {_APP} -> register()) {
+		print("ERROR: Failed to register Gtk3 application.\n");
+		exit 0;
+	}
+
 	$_NO_SPLASH = grep( { /^(--no-splash)|(--list-uuids)|(--dump-uuid)/go } @{ $$self{_OPTS} } );
-# FIXME-GTKAPPLICATION	$_NO_SPLASH ||= $$self{_APP} -> get_is_remote;
-	
-	# Show the splash-screen!!
+	$_NO_SPLASH ||= $$self{_APP} -> get_is_remote;
+
+	# Show splash-screen while loading
 	PACUtils::_splash( 1, "Starting $PACUtils::APPNAME (v$PACUtils::APPVERSION)", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
 	
 	$self	-> {_PING} = Net::Ping -> new( 'tcp' );
@@ -213,9 +210,8 @@ sub new {
 	}
 	
 	# Check if only one instance is allowed
-# FIXME-GTKAPPLICATION	if ( $$self{_APP} -> get_is_remote ) {
-        if ( 0 ) {
-		print "INFO: Ásbrú already running\n";
+	if ( $$self{_APP} -> get_is_remote ) {
+		print "INFO: Ásbrú is already running.\n";
 		
 		my $getout = 0;
 		my $uuid;
@@ -246,11 +242,10 @@ sub new {
 			}
 			elsif ( ! $$self{_CFG}{'defaults'}{'allow more instances'} ) {
 				print "INFO: No more instances allowed!\n";
-				$$self{_APP} -> send_message( 4, text => '' );
 				Gtk3::Gdk::notify_startup_complete;
 				return 0;
 			}
-		} else {		
+		} else {
 			Gtk3::Gdk::notify_startup_complete;
 			return 0;
 		}
@@ -292,7 +287,10 @@ sub start {
 	
 	# Build the GUI
 	PACUtils::_splash( 1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
-	$self -> _initGUI or return 0;
+	if (!$self -> _initGUI) {
+		_splash( 0 );
+		return 0;
+	}
 	
 	# Build the Tree with the connections list
 	PACUtils::_splash( 1, "Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL );
@@ -331,7 +329,7 @@ sub start {
 
 	$$self{_GUI}{statistics} -> update( '__PAC__ROOT__', $$self{_CFG} );
 	
-	# Is tray available (Gnome2 OR Unity)?
+	# Is tray available (Gnome or Unity)?
 	if ( $$self{_CFG}{'tmp'}{'tray available'} eq 'warning' ) {
 		_( $$self{_CONFIG}, 'cbCfgStartIconified' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon." );
 		_( $$self{_CONFIG}, 'cbCfgCloseToTray' )	-> set_tooltip_text( "WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon." );
@@ -346,7 +344,7 @@ sub start {
 	if ( ! $$self{_CFG}{defaults}{'start iconified'} && ! $$self{_CMDLINETRAY} )	{ $$self{_GUI}{main} -> present; }
 	else												{ $self -> _hideConnectionsList; }
 	
-	print "INFO: Using '" . ( $UNITY ? 'Unity' : 'standard Gnome2' ) . "' tray icon\n";
+	print "INFO: Using " . ( $UNITY ? 'Unity' : 'Gnome' ) . " tray icon\n";
 	
 	# Auto open "Edit" dialog
 	foreach my $arg ( @{ $$self{_OPTS} } ) {
@@ -388,6 +386,11 @@ sub start {
 
 sub _initGUI {
 	my $self = shift;
+	
+	# Prevent from creating the main window a second time
+	if (defined $$self{_GUI}{main}) {
+		return 0;
+	}
 	
 	##############################################
 	# Create main window
@@ -2861,7 +2864,7 @@ sub _quitProgram {
 		}
 	}
 	
-	print "Finishing ($Script) with pid $$\n";
+	print "INFO: Finishing ($Script) with pid $$\n";
 
 	# Disconnect some events (to avoid side effects when closing/hiding)
 	$$self{_GUI}{main} -> signal_handler_disconnect($$self{_SIGNALS}{_WINDOWSTATEVENT}) if $$self{_SIGNALS}{_WINDOWSTATEVENT};
