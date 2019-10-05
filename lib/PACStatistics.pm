@@ -108,13 +108,11 @@ sub update {
 		
 		foreach my $tmpuuid ( keys %{ $$cfg{'environments'} } ) {
 			next if $tmpuuid eq '__PAC__ROOT__';
-			next if $tmpuuid eq '__PAC_SHELL__';
 			if ( $$cfg{'environments'}{$tmpuuid}{_is_group} ) {
-				next if $tmpuuid eq '__PAC__ROOT__';
 				$groups++;
 				$total_conn += ( $$self{statistics}{$tmpuuid}{total_connections} // 0 );
 			} else {
-				$nodes++;
+				$nodes++ unless $tmpuuid eq '__PAC_SHELL__';
 				$total_time += ( $$self{statistics}{$tmpuuid}{total_time} // 0 );
 				$total_conn += ( $$self{statistics}{$tmpuuid}{total_conn} // 0 );
 			}
@@ -256,7 +254,7 @@ sub purge {
 	my $self	= shift;
 	my $cfg		= shift // $PACMain::FUNCS{_MAIN}{_CFG};
 	
-	foreach my $uuid ( keys %{ $$self{statistics} } ) { delete $$self{statistics}{$uuid} unless defined $$cfg{environments}{$uuid}; }
+	foreach my $uuid ( keys %{ $$self{statistics} } ) { delete $$self{statistics}{$uuid} unless $uuid eq '__PAC_SHELL__' || defined $$cfg{environments}{$uuid}; }
 	
 	return 1;
 }
