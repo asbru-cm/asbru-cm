@@ -153,7 +153,7 @@ sub new {
 
 	# Create application & register it
 	# This will let us know if another Ásbrú instance is running
-	$self -> {_APP} = Gtk3::Application -> new('org.asbru-cm.main', 'flags-none');
+	$self -> {_APP} = Gtk3::Application -> new('org.asbru-cm.main', 'handles-open');
 	if (!$self -> {_APP} -> register()) {
 		print("ERROR: Failed to register Gtk3 application.\n");
 		exit 0;
@@ -216,19 +216,19 @@ sub new {
 		my $getout = 0;
 		my $uuid;
 		if ( grep { /--start-shell/; } @{ $$self{_OPTS} } ) {
-			$$self{_APP} -> send_message( 1, text => '' );
+			_sendAppMessage($$self{_APP}, 'start-shell');
 			$getout = 1;
 		}
 		elsif ( grep { /--quick-conn/; } @{ $$self{_OPTS} } ) {
-			$$self{_APP} -> send_message( 2, text => '' );
+			_sendAppMessage($$self{_APP}, 'quick-conn');
 			$getout = 1;
 		}
 		elsif ( grep { /--start-uuid=(.+)/ and $uuid = $1; } @{ $$self{_OPTS} } ) {
-			$$self{_APP} -> send_message( 3, text => $uuid );
+			_sendAppMessage($$self{_APP}, 'start-uuid', $uuid);
 			$getout = 1;
 		}
 		elsif ( grep { /--edit-uuid=(.+)/ and $uuid = $1; } @{ $$self{_OPTS} } ) {
-			$$self{_APP} -> send_message( 5, text => $uuid );
+			_sendAppMessage($$self{_APP}, 'edit-uuid', $uuid);
 			$getout = 1;
 		}
 		else {
@@ -242,6 +242,7 @@ sub new {
 			}
 			elsif ( ! $$self{_CFG}{'defaults'}{'allow more instances'} ) {
 				print "INFO: No more instances allowed!\n";
+				_sendAppMessage($$self{_APP}, 'show-conn');
 				Gtk3::Gdk::notify_startup_complete;
 				return 0;
 			}
@@ -925,13 +926,11 @@ sub _initGUI {
 
 sub _setupCallbacks {
 	my $self = shift;
-	
-# FIXME-GTKAPPLICATION	$$self{_APP} -> watch_window( $$self{_GUI}{main} );
-# FIXME-GTKAPPLICATION
-if ( 0 ) {
-	$$self{_APP} -> signal_connect( 'message-received' , sub {
-		my ( $app, $command, $message, $time ) = @_;
-		print "INFO: Received message( $command, " . ( $message -> get_text ) . ", " . ( localtime( $time ) ) . " )\n";
+
+	$$self{_APP} -> signal_connect( 'open' , sub {
+		my ( $app, $files, $nfile, $hint ) = @_;
+		my ( $command, $message ) = $hint =~ /([^\|]+)\|(.*)?/;
+		print "INFO: Received message : [$command]-[$message]\n";
 		if ( $command eq 'start-shell' ) {
 			$$self{_GUI}{shellBtn} -> clicked;
 		}
@@ -939,13 +938,13 @@ if ( 0 ) {
 			$$self{_GUI}{connQuickBtn} -> clicked;
 		}
 		elsif ( $command eq 'start-uuid' ) {
-			$self -> _launchTerminals( [ [ $message -> get_text ] ] );
+			$self -> _launchTerminals( [ [ $message ] ] );
 		}
 		elsif ( $command eq'show-conn' ) {
 			$self -> _showConnectionsList;
 		}
 		elsif ( $command eq 'edit-uuid' ) {
-			my $uuid = $message -> get_text;
+			my $uuid = $message;
 			my $path = $$self{_GUI}{treeConnections} -> _getPath( $uuid ) or next;
 			next unless ( $uuid ne '__PAC__ROOT__' );
 			$$self{_GUI}{treeConnections} -> expand_to_path( $path );
@@ -953,13 +952,12 @@ if ( 0 ) {
 			$$self{_GUI}{connEditBtn} -> clicked;
 		}
 		else {
-			print "INFO: Unknown command received ($command)\n";
+			print "WARN: Unknown command received ($command)\n";
 		}
 		
 		return 'ok';
 	} );
-}
-	
+
 	###################################
 	# TREECONNECTIONS RELATED CALLBACKS
 	###################################
@@ -4186,6 +4184,16 @@ sub _setCFGChanged {
 		$$self{_GUI}{saveBtn} -> set_tooltip_text( 'Save your configuration' );
 	}
 	return 1;
+}
+
+# Sends a message to the Ásbrú application that is already running
+sub _sendAppMessage {
+	my $app  = shift;
+	my $msg  = shift;
+	my $text = shift // '';
+
+	# Do not open any file but pass the message as 'hint'
+	$app -> open ([], $msg.'|'.$text);
 }
 
 # END: Define PRIVATE CLASS functions
