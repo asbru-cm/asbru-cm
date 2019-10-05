@@ -81,13 +81,13 @@ my $ASBRU;
 ###################################################################
 # START: MAIN program
 
-print "Ásbrú started ($Script) with PID $$\n";
+print "INFO: Ásbrú started ($Script) with PID $$\n";
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
 if ( ( $? eq 0 ) && ( ! grep( /'asbru'/, $wl ) ) ) {
-	print " - Adding 'asbru' to Unity's 'systray-whitelist'\n";
+	print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";
 	$wl =~ s/'\s*]/', 'asbru']/;
 	`gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
 }
@@ -112,12 +112,12 @@ if ( ( $? eq 0 ) && ( ! grep( /'asbru'/, $wl ) ) ) {
 
 # Start Àsbrú Connection Manager :)
 if ( ! ( $ASBRU = PACMain -> new( @ARGV ) ) ) {
-	print STDERR "Ásbrú not started. Is Ásbrú already running?\n";
+	print STDERR "WARN: Ásbrú aborted.\n";
 	exit 0
 }
 $ASBRU -> start;
 
-print "Finished $Script (PID:$$)...\n";
+print "INFO: Finished $Script (PID:$$)...\n";
 exit 0;
 
 # END: MAIN program
