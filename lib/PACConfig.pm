@@ -559,7 +559,7 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgShowStatistics' )		-> set_active( $$cfg{'defaults'}{'show statistics'} );
 	_( $self, 'rbCfgForeground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'foreground' );
 	_( $self, 'rbCfgBackground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'background' );
-	_updateWidgetColor( $self, $cfg, 'colorCfgProtected', 'protected color', _( $self, 'colorCfgProtected' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorCfgProtected', 'protected color', _( $self, 'colorCfgProtected' ) -> get_color -> to_string );
 	_( $self, 'cbCfgUseGUIPassword' )		-> set_active( $$cfg{'defaults'}{'use gui password'} );
 	_( $self, 'hboxCfgPACPassword' )		-> set_sensitive( $$cfg{'defaults'}{'use gui password'} );
 	_( $self, 'cbCfgUseGUIPasswordTray' )	-> set_active( $$cfg{'defaults'}{'use gui password tray'} );
@@ -612,14 +612,14 @@ sub _updateGUIPreferences {
 	_( $self, 'rbCfgComBoxCombo' )			-> set_active( $$cfg{'defaults'}{'show commands box'} == 1 );
 	_( $self, 'rbCfgComBoxButtons' )		-> set_active( $$cfg{'defaults'}{'show commands box'} == 2 );
 	_( $self, 'cbCfgShowGlobalComm' )		-> set_active( $$cfg{'defaults'}{'show global commands box'} );
-	_updateWidgetColor( $self, $cfg, 'colorText', 'text color', _( $self, 'colorText' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBack', 'back color', _( $self, 'colorBack' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBold', 'bold color', _( $self, 'colorBold' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorText', 'text color', _( $self, 'colorText' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBack', 'back color', _( $self, 'colorBack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBold', 'bold color', _( $self, 'colorBold' ) -> get_color -> to_string );
 	_( $self, 'colorBold' )					-> set_sensitive( ! _( $self, 'cbBoldAsText' ) -> get_active );
 	_( $self, 'cbBoldAsText' )				-> set_active( $$cfg{'defaults'}{'bold color like text'} // 1 );
-	_updateWidgetColor( $self, $cfg, 'colorConnected', 'connected color', _( $self, 'colorText' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorDisconnected', 'disconnected color', _( $self, 'colorBlack' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorNewData', 'new data color', _( $self, 'colorNewData' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorConnected', 'connected color', _( $self, 'colorText' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorDisconnected', 'disconnected color', _( $self, 'colorBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorNewData', 'new data color', _( $self, 'colorNewData' ) -> get_color -> to_string );
 	_( $self, 'fontTerminal' )				-> set_font_name( $$cfg{'defaults'}{'terminal font'} // _( $self, 'fontTerminal' ) -> get_font_name );
 	_( $self, 'comboCursorShape' )			-> set_active( $self -> {_CURSOR}{ $$cfg{'defaults'}{'cursor shape'} // 'block' } );
 	_( $self, 'cbCfgSaveSessionLogs' )		-> set_active( $$cfg{'defaults'}{'save session logs'} );
@@ -648,22 +648,22 @@ sub _updateGUIPreferences {
 	_( $self, 'rbCfgSwitchTabsAlt' )		-> set_active( $$cfg{'defaults'}{'how to switch tabs'} );
 
 	# Terminal Colors
-	_updateWidgetColor( $self, $cfg, 'colorBlack', 'color black', _( $self, 'colorBlack' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorRed', 'color red', _( $self, 'colorRed' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorGreen', 'color green', _( $self, 'colorGreen' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorYellow', 'color yellow', _( $self, 'colorYellow' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBlue', 'color blue', _( $self, 'colorBlue' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorMagenta', 'color magenta', _( $self, 'colorMagenta' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorCyan', 'color cyan', _( $self, 'colorCyan' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorWhite', 'color white', _( $self, 'colorWhite' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightBlack', 'color bright black', _( $self, 'colorBrightBlack' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightRed', 'color bright red', _( $self, 'colorBrightRed' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightGreen', 'color bright green', _( $self, 'colorBrightGreen' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightYellow', 'color bright yellow', _( $self, 'colorBrightYellow' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightBlue', 'color bright blue', _( $self, 'colorBrightBlue' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightMagenta', 'color bright magenta', _( $self, 'colorBrightMagenta' ) -> get_color -> to_string );
-	_updateWidgetColor( $self, $cfg, 'colorBrightCyan', 'color bright cyan', _( $self, 'colorBrightCyan' ) -> get_color -> to_string);
-	_updateWidgetColor( $self, $cfg, 'colorBrightWhite', 'color bright white', _( $self, 'colorBrightWhite' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBlack', 'color black', _( $self, 'colorBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorRed', 'color red', _( $self, 'colorRed' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorGreen', 'color green', _( $self, 'colorGreen' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorYellow', 'color yellow', _( $self, 'colorYellow' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBlue', 'color blue', _( $self, 'colorBlue' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorMagenta', 'color magenta', _( $self, 'colorMagenta' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorCyan', 'color cyan', _( $self, 'colorCyan' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorWhite', 'color white', _( $self, 'colorWhite' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightBlack', 'color bright black', _( $self, 'colorBrightBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightRed', 'color bright red', _( $self, 'colorBrightRed' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightGreen', 'color bright green', _( $self, 'colorBrightGreen' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightYellow', 'color bright yellow', _( $self, 'colorBrightYellow' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightBlue', 'color bright blue', _( $self, 'colorBrightBlue' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightMagenta', 'color bright magenta', _( $self, 'colorBrightMagenta' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightCyan', 'color bright cyan', _( $self, 'colorBrightCyan' ) -> get_color -> to_string);
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightWhite', 'color bright white', _( $self, 'colorBrightWhite' ) -> get_color -> to_string );
 
 	# Local Shell Options
 	_( $self, 'entryCfgShellBinary' )		-> set_text( $$cfg{'defaults'}{'shell binary'} || '/bin/bash' );

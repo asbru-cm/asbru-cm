@@ -31,7 +31,6 @@ use strict;
 use warnings;
 
 use FindBin qw ( $RealBin $Bin $Script );
-#use Data::Dumper;
 
 # GTK
 use Gtk3 '-init';
@@ -104,11 +103,11 @@ sub update {
 	$$self{gui}{entryCfgPasswordPrompt}		-> set_text( $$cfg{'password prompt'} // '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@\w+)*|[cC]ontrase.a|Enter passphrase for key '.+')\s*:\s*$' );
 	
 	$$self{gui}{cbTabBackColor}				-> set_active( $$cfg{'use tab back color'} // 0 );
-	_updateWidgetColor( $self, $cfg, $$self{gui}{colorTabBack}, 'tab back black', '#000000000000' );
+	_updateWidgetColor( $self, $cfg, $$self{gui}{colorTabBack}, 'tab back color', '#000000000000' );
 	$$self{gui}{colorTabBack}				-> set_sensitive( $$self{gui}{cbTabBackColor} -> get_active );
-	_updateWidgetColor( $self, $cfg, $$self{gui}{colorText}, 'text black', '#cc62cc62cc62' );
-	_updateWidgetColor( $self, $cfg, $$self{gui}{colorBack}, 'back black', '#000000000000' );
-	_updateWidgetColor( $self, $cfg, $$self{gui}{colorBold}, 'bold black', $$cfg{'text color'} // '#cc62cc62cc62' );
+	_updateWidgetColor( $self, $cfg, $$self{gui}{colorText}, 'text color', '#cc62cc62cc62' );
+	_updateWidgetColor( $self, $cfg, $$self{gui}{colorBack}, 'back color', '#000000000000' );
+	_updateWidgetColor( $self, $cfg, $$self{gui}{colorBold}, 'bold color', $$cfg{'text color'} // '#cc62cc62cc62' );
 	$$self{gui}{cbBoldAsText}				-> set_active( $$cfg{'bold color like text'} // 1 );
 	$$self{gui}{colorBold}					-> set_sensitive( ! $$self{gui}{cbBoldAsText} -> get_active );
 	$$self{gui}{fontTerminal}				-> set_font_name( $$cfg{'terminal font'} // 'Monospace 9' );

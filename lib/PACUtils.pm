@@ -3472,7 +3472,7 @@ sub _updateWidgetColor {
 	if (ref($widget) eq '') {
 		$widget = _( $self, $widget );
 	}
-	my $tmpColor = Gtk3::Gdk::RGBA::parse( $$cfg{'defaults'}{$cfgName} // $defaultColor );
+	my $tmpColor = Gtk3::Gdk::RGBA::parse( $$cfg{$cfgName} // $defaultColor );
 	$widget -> set_rgba( $tmpColor );
 }
 
