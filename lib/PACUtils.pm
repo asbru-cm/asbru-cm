@@ -3516,7 +3516,13 @@ sub _vteFeedChildBinary {
 	my $vte = shift;
 	my $str = shift;
 	my @arr = unpack ( 'C*', $str );
-	$vte -> feed_child_binary( \@arr );
+	if ( Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 46 ) {
+		# Newer version only requires 1 parameter
+		$vte -> feed_child_binary( \@arr );
+	} else {
+		# Elder versions requires 2 parameters
+		$vte -> feed_child_binary( \@arr, length(\@arr));
+	}
 }
 
 1;
