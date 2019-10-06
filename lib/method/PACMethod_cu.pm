@@ -31,8 +31,6 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-#use Data::Dumper;
-
 # GTK
 use Gtk3 '-init';
 

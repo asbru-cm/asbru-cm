@@ -40,8 +40,6 @@ use IO::Socket::INET;
 use Time::HiRes qw ( gettimeofday );
 use KeePass;
 
-use Data::Dumper;
-
 # GTK
 use Gtk3 '-init';
 use Gtk3::SimpleList;

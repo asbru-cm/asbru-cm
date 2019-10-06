@@ -33,7 +33,6 @@ use FindBin qw ( $RealBin $Bin $Script );
 use PACUtils;
 
 use Getopt::Long qw(GetOptionsFromString);
-#use Data::Dumper;
 
 # GTK
 use Gtk3 '-init';
