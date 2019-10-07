@@ -205,7 +205,7 @@ sub _buildGUI {
 			
 			$w{chEmbed} = Gtk3::RadioButton -> new_with_label( $w{chFullScreen}, 'Embed' );
 			$w{hbox2} -> pack_start( $w{chEmbed}, 0, 1, 0 );
-			$w{chEmbed} -> set_tooltip_text( "Embed VNC window into PAC tab\nWARNING: Highly experimental!\nIt may not work at all\nOn failure, please, chenge this setting." );
+			$w{chEmbed} -> set_tooltip_text( "Embed VNC window into Àsbrú Connection Manager tab\nWARNING: Highly experimental!\nIt may not work at all\nOn failure, please, change this setting." );
 			
 			$w{chListen} = Gtk3::CheckButton -> new_with_label( 'Listen' );
 			$w{hbox2} -> pack_start( $w{chListen}, 0, 1, 0 );

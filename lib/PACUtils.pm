@@ -464,7 +464,7 @@ sub _getMethods {
 	`which vncviewer 1>/dev/null 2>&1`;				my $xtightvncviewer = $?;
 	`vncviewer --help 2>&1 | /bin/grep TigerVNC`;	my $tigervnc = $?;
 	$methods{ 'VNC' } = {
-		'installed' => sub { return ! $xtightvncviewer || ! $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into PAC"; },
+		'installed' => sub { return ! $xtightvncviewer || ! $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager."; },
 		'checkCFG' => sub {
 			
 			my $cfg = shift;
