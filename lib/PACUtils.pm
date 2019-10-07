@@ -47,6 +47,8 @@ use DynaLoader; # Required for PACTerminal and PACShell modules
 
 # GTK
 use Gtk3 '-init';
+use Gtk3::Gdk;
+use Wnck; # for the windows list
 
 # Module's functions/variables to export
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
@@ -3029,50 +3031,21 @@ sub _purgeUnusedOrMissingScreenshots {
 sub _getXWindowsList {
 	my %list;
 	
-	my $s = Gtk3::Gdk::Screen::get_default or die print $!;
-	my $display = $s -> get_display;
+	my $s = Wnck::Screen::get_default() or die print $!;
+	$s->force_update;
 	
-	foreach my $w ( $s -> get_window_stack ) {
+	foreach my $w ( @{$s -> get_windows} ) {
 		my $xid = $w -> get_xid or next;
-		
-		my $win = Gtk3::Gdk::Window -> foreign_new_for_display( $display, $xid );
-		my ( $type_atom_name, $format_name, $data_name )			= $win -> property_get ( Gtk3::Gdk::Atom -> intern('WM_NAME'), Gtk3::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
-		my ( $type_atom_pid, $format_pid, $data_pid )				= $win -> property_get ( Gtk3::Gdk::Atom -> intern('_NET_WM_PID'), Gtk3::Gdk::Atom -> intern('CARDINAL'), 0, 9999, 0 );
-		my ( $type_atom_command, $format_command, $data_command )	= $win -> property_get ( Gtk3::Gdk::Atom -> intern('WM_COMMAND'), Gtk3::Gdk::Atom -> intern('STRING'), 0, 9999, 0 );
+		my $data_name = $w -> get_name;
 		
 		$list{'by_xid'}{$xid}{'title'}			= $data_name;
 		$list{'by_xid'}{$xid}{'window'}			= $w;
-		$list{'by_xid'}{$xid}{'pid'}			= $data_pid;
-		$list{'by_xid'}{$xid}{'command'}		= $data_command;
 		
 		if ( defined $data_name ) {
 			$list{'by_name'}{$data_name}{'xid'}		= $xid;
 			$list{'by_name'}{$data_name}{'window'}	= $w;
-			$list{'by_name'}{$data_name}{'pid'}		= $data_pid;
-			$list{'by_name'}{$data_name}{'command'}	= $data_command;
-		}
-		
-		if ( defined $data_pid ) {
-			$list{'by_pid'}{$data_pid}{'title'}		= $data_name;
-			$list{'by_pid'}{$data_pid}{'window'}	= $w;
-			$list{'by_pid'}{$data_pid}{'xid'}		= $xid;
-			$list{'by_pid'}{$data_pid}{'command'}	= $data_command;
 		}
 	}
-	
-	#my $tw = Gtk3::Window -> new;
-	#my $vb = Gtk3::VBox -> new( 0, 0 );
-	#$tw -> add( $vb );
-	#$tw -> show_all;
-	#
-	##$list{'by_xid'}{102760451}{'window'} -> reparent( $vb -> get_window, 0, 0 );
-	#
-	## ...or better:
-	#
-	#my $sock = Gtk3::Socket -> new;
-	#$vb -> add( $sock );
-	#$tw -> show_all;
-	#$sock -> add_id( $list{'by_name'}{'Calculator'}{'xid'} );
 
 	return \%list;
 }

@@ -43,12 +43,14 @@ use KeePass;
 # GTK
 use Gtk3 '-init';
 use Gtk3::SimpleList;
+use Gtk3::Gdk;
 eval { require Gtk3::SourceView2; };
 my $SOURCEVIEW = ! $@;
 
-# PAC modules
+# Ásbrú utilities
 use PACUtils;
 
+# VteTerminal (terminal widget)
 use Vte;
 
 # END: Import Modules
