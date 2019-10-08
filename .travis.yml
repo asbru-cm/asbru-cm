@@ -21,7 +21,8 @@ env:
     - OS=fedora DIST=28 PACKAGE=rpm
     - OS=fedora DIST=29 PACKAGE=rpm
     - OS=fedora DIST=30 PACKAGE=rpm
-    - OS=centos DIST=7 PACKAGE=rpm
+    - OS=el DIST=7 PACKAGE=rpm DOCKER_IMAGE=centos-7
+    - OS=el DIST=8 PACKAGE=rpm DOCKER_IMAGE=centos-8 DOCKER_REPO=asbru/asbru-cm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
