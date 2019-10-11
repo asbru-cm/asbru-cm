@@ -33,13 +33,12 @@ use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 use YAML qw ( LoadFile DumpFile );
 use Storable;
-use Gnome2::GConf;
+use Glib::IO; # GSettings
 use Crypt::CBC;
 
-# GTK2
-use Gtk2 '-init';
-use Gtk2::GladeXML;
-use Gtk2::Ex::Simple::List;
+# GTK
+use Gtk3 '-init';
+use Gtk3::SimpleList;
 
 # PAC modules
 use PACUtils;
@@ -58,12 +57,12 @@ my $APPNAME			= $PACUtils::APPNAME;
 my $APPVERSION		= $PACUtils::APPVERSION;
 my $AUTOSTART_FILE	= $RealBin . '/res/pac_start.desktop';
 
-my $GLADE_FILE		= $RealBin . '/res/pac.glade';
+my $GLADE_FILE		= $RealBin . '/res/asbru.glade';
 my $CFG_DIR			= $ENV{'HOME'} . '/.config/pac';
 my $RES_DIR			= $RealBin . '/res';
 
-# Connect to Gnome's GConf
-my $GCONF			= Gnome2::GConf::Client -> get_default;
+# Connect to Gnome's GSettings
+my $GSETTINGS			= Glib::IO::Settings -> new( 'org.gnome.system.proxy.http' );
 
 my $CIPHER			= Crypt::CBC -> new( -key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678' ) or die "ERROR: $!";
 
@@ -140,10 +139,10 @@ sub _initGUI {
 	my $opt = shift;
 
 	# Load XML Glade file
-	defined $$self{_GLADE} or $$self{_GLADE} = Gtk2::GladeXML -> new( $GLADE_FILE ) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
+	defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder -> new_from_file( $GLADE_FILE ) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
 
 	# Save main, about and add windows
-	$$self{_WINDOWCONFIG} = $$self{_GLADE} -> get_widget ('windowConfig');
+	$$self{_WINDOWCONFIG} = $$self{_GLADE} -> get_object ('windowConfig');
 	$$self{_WINDOWCONFIG} -> set_size_request( -1, -1 );
 
 	_( $self, 'imgBannerPref' ) -> set_from_file( $RES_DIR . '/asbru_banner_preferences.png' );
@@ -154,24 +153,24 @@ sub _initGUI {
 	# Initialize main window
 	$$self{_WINDOWCONFIG} -> set_icon_name( 'pac-app-big' );
 
-	_( $self, 'btnResetDefaults' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-undo', 'button' ) );
+	_( $self, 'btnResetDefaults' )	-> set_image( Gtk3::Image -> new_from_stock( 'gtk-undo', 'button' ) );
 	_( $self, 'btnResetDefaults' )	-> set_label( '_Reset to DEFAULT values' );
 
 	# Option currently disabled
-	#_( $self, 'btnCheckVersion' )	-> set_image( Gtk2::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
+	#_( $self, 'btnCheckVersion' )	-> set_image( Gtk3::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
 	#_( $self, 'btnCheckVersion' )	-> set_label( 'Check _now' );
 
-	_( $self, 'rbCfgStartTreeConn' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-treelist', 'button' ) );
-	_( $self, 'rbCfgStartTreeFavs' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-favourite-on', 'button' ) );
-	_( $self, 'rbCfgStartTreeHist' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-history', 'button' ) );
-	_( $self, 'rbCfgStartTreeCluster' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-cluster-manager', 'button' ) );
+	_( $self, 'rbCfgStartTreeConn' )	-> set_image( Gtk3::Image -> new_from_stock( 'pac-treelist', 'button' ) );
+	_( $self, 'rbCfgStartTreeFavs' )	-> set_image( Gtk3::Image -> new_from_stock( 'pac-favourite-on', 'button' ) );
+	_( $self, 'rbCfgStartTreeHist' )	-> set_image( Gtk3::Image -> new_from_stock( 'pac-history', 'button' ) );
+	_( $self, 'rbCfgStartTreeCluster' )	-> set_image( Gtk3::Image -> new_from_stock( 'pac-cluster-manager', 'button' ) );
 
 	_( $self, 'imgKeePassOpts' )	-> set_from_stock( 'pac-keepass', 'button' );
 
-	_( $self, 'btnCfgSetGUIPassword' )	-> set_image( Gtk2::Image -> new_from_stock( 'pac-protected', 'button' ) );
+	_( $self, 'btnCfgSetGUIPassword' )	-> set_image( Gtk3::Image -> new_from_stock( 'pac-protected', 'button' ) );
 	_( $self, 'btnCfgSetGUIPassword' )	-> set_label( 'Set...' );
 
-	_( $self, 'btnExportYAML' )		-> set_image( Gtk2::Image -> new_from_stock( 'gtk-save-as', 'button' ) );
+	_( $self, 'btnExportYAML' )		-> set_image( Gtk3::Image -> new_from_stock( 'gtk-save-as', 'button' ) );
 	_( $self, 'btnExportYAML' )		-> set_label( 'Export config...' );
 
 	_( $self, 'alignShellOpts' )	-> add( ( $$self{_SHELL}		= PACTermOpts		-> new ) -> {container} );
@@ -181,7 +180,7 @@ sub _initGUI {
 	_( $self, 'alignKeePass' )		-> add( ( $$self{_KEEPASS}		= PACKeePass		-> new ) -> {container} );
 	_( $self, 'nbPreferences' )		-> show_all;
 
-	$$self{cbShowHidden} = Gtk2::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
+	$$self{cbShowHidden} = Gtk3::CheckButton -> new_with_mnemonic( 'Show _hidden files' );
 	_( $self, 'btnCfgSaveSessionLogs' ) -> set_extra_widget( $$self{cbShowHidden} );
 
 	# Populate the Encodings combobox
@@ -448,7 +447,7 @@ sub _exporter {
 
 	my $w;
 	if ( ! $file ) {
-		my $choose = Gtk2::FileChooserDialog -> new(
+		my $choose = Gtk3::FileChooserDialog -> new(
 			"$APPNAME (v.$APPVERSION) Choose file to Export configuration as '$format'",
 			$$self{_WINDOWCONFIG},
 			'GTK_FILE_CHOOSER_ACTION_SAVE',
@@ -464,9 +463,9 @@ sub _exporter {
 		$choose -> destroy;
 		return 1 unless $out eq 'accept';
 
-		$$self{_WINDOWCONFIG} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'watch' ) );
+		$$self{_WINDOWCONFIG} -> get_window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'watch' ) );
 		$w = _wMessage( $$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0 );
-		Gtk2 -> main_iteration while Gtk2 -> events_pending;
+		Gtk3::main_iteration while Gtk3::events_pending;
 	}
 
 	_cfgSanityCheck( $$self{_CFG} );
@@ -485,7 +484,7 @@ sub _exporter {
 	delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
 
 	_decipherCFG( $$self{_CFG} );
-	defined $$self{_WINDOWCONFIG} -> window and $$self{_WINDOWCONFIG} -> window -> set_cursor( Gtk2::Gdk::Cursor -> new( 'left-ptr' ) );
+	defined $$self{_WINDOWCONFIG} -> get_window and $$self{_WINDOWCONFIG} -> get_window -> set_cursor( Gtk3::Gdk::Cursor -> new( 'left-ptr' ) );
 
 	return $file;
 }
@@ -507,10 +506,10 @@ sub _updateGUIPreferences {
 	my $cfg = shift // $$self{_CFG};
 
 	# Get PROXY from environment
-	my $proxy_ip		= $GCONF -> get_string( '/system/http_proxy/host' ) || $GCONF -> get_string( '/system/proxy/http/host' );
-	my $proxy_port		= $GCONF -> get_int( '/system/http_proxy/port' ) || $GCONF -> get_string( '/system/proxy/http/port' );
-	my $proxy_user		= $GCONF -> get_string( '/system/http_proxy/authentication_user' ) || $GCONF -> get_string( '/system/proxy/http/host/authentication-user' );
-	my $proxy_pass		= $GCONF -> get_string( '/system/http_proxy/authentication_password' ) || $GCONF -> get_string( '/system/proxy/http/host/authentication-password' );
+	my $proxy_ip		= $GSETTINGS -> get_string( 'host' );
+	my $proxy_port		= $GSETTINGS -> get_int( 'port' );
+	my $proxy_user		= $GSETTINGS -> get_string( 'authentication-user' );
+	my $proxy_pass		= $GSETTINGS -> get_string( 'authentication-password' );
 	my $proxy_string	= 'no proxy configured';
 	$proxy_ip		and $proxy_string = "$proxy_ip:$proxy_port";
 	$proxy_user		and $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
@@ -560,7 +559,7 @@ sub _updateGUIPreferences {
 	_( $self, 'cbCfgShowStatistics' )		-> set_active( $$cfg{'defaults'}{'show statistics'} );
 	_( $self, 'rbCfgForeground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'foreground' );
 	_( $self, 'rbCfgBackground' )			-> set_active( $$cfg{'defaults'}{'protected set'} eq 'background' );
-	_( $self, 'colorCfgProtected' )			-> set_color( _( $self, 'colorCfgProtected' ) -> get_color -> parse( $$cfg{'defaults'}{'protected color'} // _( $self, 'colorCfgProtected' ) -> get_color -> to_string ) );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorCfgProtected', 'protected color', _( $self, 'colorCfgProtected' ) -> get_color -> to_string );
 	_( $self, 'cbCfgUseGUIPassword' )		-> set_active( $$cfg{'defaults'}{'use gui password'} );
 	_( $self, 'hboxCfgPACPassword' )		-> set_sensitive( $$cfg{'defaults'}{'use gui password'} );
 	_( $self, 'cbCfgUseGUIPasswordTray' )	-> set_active( $$cfg{'defaults'}{'use gui password tray'} );
@@ -613,14 +612,14 @@ sub _updateGUIPreferences {
 	_( $self, 'rbCfgComBoxCombo' )			-> set_active( $$cfg{'defaults'}{'show commands box'} == 1 );
 	_( $self, 'rbCfgComBoxButtons' )		-> set_active( $$cfg{'defaults'}{'show commands box'} == 2 );
 	_( $self, 'cbCfgShowGlobalComm' )		-> set_active( $$cfg{'defaults'}{'show global commands box'} );
-	_( $self, 'colorText' )					-> set_color( _( $self, 'colorText' ) -> get_color -> parse( $$cfg{'defaults'}{'text color'} // _( $self, 'colorText' ) -> get_color -> to_string ) );
-	_( $self, 'colorBack' )					-> set_color( _( $self, 'colorBack' ) -> get_color -> parse( $$cfg{'defaults'}{'back color'} // _( $self, 'colorBack' ) -> get_color -> to_string ) );
-	_( $self, 'colorBold' )					-> set_color( _( $self, 'colorBold' ) -> get_color -> parse( $$cfg{'defaults'}{'bold color'} // _( $self, 'colorBold' ) -> get_color -> to_string ) );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorText', 'text color', _( $self, 'colorText' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBack', 'back color', _( $self, 'colorBack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBold', 'bold color', _( $self, 'colorBold' ) -> get_color -> to_string );
 	_( $self, 'colorBold' )					-> set_sensitive( ! _( $self, 'cbBoldAsText' ) -> get_active );
 	_( $self, 'cbBoldAsText' )				-> set_active( $$cfg{'defaults'}{'bold color like text'} // 1 );
-	_( $self, 'colorConnected' )			-> set_color( _( $self, 'colorConnected' ) -> get_color -> parse( $$cfg{'defaults'}{'connected color'} // _( $self, 'colorText' ) -> get_color -> to_string ) );
-	_( $self, 'colorDisconnected' )			-> set_color( _( $self, 'colorDisconnected' ) -> get_color -> parse( $$cfg{'defaults'}{'disconnected color'} // _( $self, 'colorBack' ) -> get_color -> to_string ) );
-	_( $self, 'colorNewData' )				-> set_color( _( $self, 'colorNewData' ) -> get_color -> parse( $$cfg{'defaults'}{'new data color'} // _( $self, 'colorNewData' ) -> get_color -> to_string ) );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorConnected', 'connected color', _( $self, 'colorText' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorDisconnected', 'disconnected color', _( $self, 'colorBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorNewData', 'new data color', _( $self, 'colorNewData' ) -> get_color -> to_string );
 	_( $self, 'fontTerminal' )				-> set_font_name( $$cfg{'defaults'}{'terminal font'} // _( $self, 'fontTerminal' ) -> get_font_name );
 	_( $self, 'comboCursorShape' )			-> set_active( $self -> {_CURSOR}{ $$cfg{'defaults'}{'cursor shape'} // 'block' } );
 	_( $self, 'cbCfgSaveSessionLogs' )		-> set_active( $$cfg{'defaults'}{'save session logs'} );
@@ -649,22 +648,22 @@ sub _updateGUIPreferences {
 	_( $self, 'rbCfgSwitchTabsAlt' )		-> set_active( $$cfg{'defaults'}{'how to switch tabs'} );
 
 	# Terminal Colors
-	_( $self, 'colorBlack' )                        -> set_color( _( $self, 'colorBlack' ) -> get_color -> parse( $$cfg{'defaults'}{'color black'} // _( $self, 'colorBlack' ) -> get_color -> to_string ) );
-	_( $self, 'colorRed' )                          -> set_color( _( $self, 'colorRed' ) -> get_color -> parse( $$cfg{'defaults'}{'color red'} // _( $self, 'colorRed' ) -> get_color -> to_string ) );
-	_( $self, 'colorGreen' )                        -> set_color( _( $self, 'colorGreen' ) -> get_color -> parse( $$cfg{'defaults'}{'color green'} // _( $self, 'colorGreen' ) -> get_color -> to_string ) );
-	_( $self, 'colorYellow' )                       -> set_color( _( $self, 'colorYellow' ) -> get_color -> parse( $$cfg{'defaults'}{'color yellow'} // _( $self, 'colorYellow' ) -> get_color -> to_string ) );
-	_( $self, 'colorBlue' )                         -> set_color( _( $self, 'colorBlue' ) -> get_color -> parse( $$cfg{'defaults'}{'color blue'} // _( $self, 'colorBlue' ) -> get_color -> to_string ) );
-	_( $self, 'colorMagenta' )                      -> set_color( _( $self, 'colorMagenta' ) -> get_color -> parse( $$cfg{'defaults'}{'color magenta'} // _( $self, 'colorMagenta' ) -> get_color -> to_string ) );
-	_( $self, 'colorCyan' )                         -> set_color( _( $self, 'colorCyan' ) -> get_color -> parse( $$cfg{'defaults'}{'color cyan'} // _( $self, 'colorCyan' ) -> get_color -> to_string ) );
-	_( $self, 'colorWhite' )                        -> set_color( _( $self, 'colorWhite' ) -> get_color -> parse( $$cfg{'defaults'}{'color white'} // _( $self, 'colorWhite' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightBlack' )                  -> set_color( _( $self, 'colorBrightBlack' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright black'} // _( $self, 'colorBrightBlack' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightRed' )                    -> set_color( _( $self, 'colorBrightRed' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright red'} // _( $self, 'colorBrightRed' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightGreen' )                  -> set_color( _( $self, 'colorBrightGreen' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright green'} // _( $self, 'colorBrightGreen' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightYellow' )                 -> set_color( _( $self, 'colorBrightYellow' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright yellow'} // _( $self, 'colorBrightYellow' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightBlue' )                   -> set_color( _( $self, 'colorBrightBlue' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright blue'} // _( $self, 'colorBrightBlue' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightMagenta' )                -> set_color( _( $self, 'colorBrightMagenta' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright magenta'} // _( $self, 'colorBrightMagenta' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightCyan' )                   -> set_color( _( $self, 'colorBrightCyan' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright cyan'} // _( $self, 'colorBrightCyan' ) -> get_color -> to_string ) );
-	_( $self, 'colorBrightWhite' )                  -> set_color( _( $self, 'colorBrightWhite' ) -> get_color -> parse( $$cfg{'defaults'}{'color bright white'} // _( $self, 'colorBrightWhite' ) -> get_color -> to_string ) );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBlack', 'color black', _( $self, 'colorBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorRed', 'color red', _( $self, 'colorRed' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorGreen', 'color green', _( $self, 'colorGreen' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorYellow', 'color yellow', _( $self, 'colorYellow' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBlue', 'color blue', _( $self, 'colorBlue' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorMagenta', 'color magenta', _( $self, 'colorMagenta' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorCyan', 'color cyan', _( $self, 'colorCyan' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorWhite', 'color white', _( $self, 'colorWhite' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightBlack', 'color bright black', _( $self, 'colorBrightBlack' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightRed', 'color bright red', _( $self, 'colorBrightRed' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightGreen', 'color bright green', _( $self, 'colorBrightGreen' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightYellow', 'color bright yellow', _( $self, 'colorBrightYellow' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightBlue', 'color bright blue', _( $self, 'colorBrightBlue' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightMagenta', 'color bright magenta', _( $self, 'colorBrightMagenta' ) -> get_color -> to_string );
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightCyan', 'color bright cyan', _( $self, 'colorBrightCyan' ) -> get_color -> to_string);
+	_updateWidgetColor( $self, $$cfg{'defaults'}, 'colorBrightWhite', 'color bright white', _( $self, 'colorBrightWhite' ) -> get_color -> to_string );
 
 	# Local Shell Options
 	_( $self, 'entryCfgShellBinary' )		-> set_text( $$cfg{'defaults'}{'shell binary'} || '/bin/bash' );

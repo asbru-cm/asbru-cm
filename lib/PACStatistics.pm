@@ -35,10 +35,10 @@ use File::Copy;
 use Storable qw ( nstore retrieve );
 use POSIX qw( strftime );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
-# PAC modules
+# Other application modules
 use PACUtils;
 
 # END: Import Modules
@@ -107,12 +107,12 @@ sub update {
 		my $total_time	= 0;
 		
 		foreach my $tmpuuid ( keys %{ $$cfg{'environments'} } ) {
+			next if $tmpuuid eq '__PAC__ROOT__';
 			if ( $$cfg{'environments'}{$tmpuuid}{_is_group} ) {
-				next if $tmpuuid eq '__PAC__ROOT__';
 				$groups++;
 				$total_conn += ( $$self{statistics}{$tmpuuid}{total_connections} // 0 );
 			} else {
-				$nodes++;
+				$nodes++ unless $tmpuuid eq '__PAC_SHELL__';
 				$total_time += ( $$self{statistics}{$tmpuuid}{total_time} // 0 );
 				$total_conn += ( $$self{statistics}{$tmpuuid}{total_conn} // 0 );
 			}
@@ -127,10 +127,10 @@ sub update {
 		
 		$$self{frame}{lblPR}	-> set_markup(
 			"<span $font>" .
-				"Total PAC Groups:              <b>$groups</b>"			. "\n" .
-				"Total PAC Nodes:               <b>$nodes</b>"			. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Total Time Connected:          <b>$str_total_time</b>" .
+				"Total groups:                  <b>$groups</b>"			. "\n" .
+				"Total nodes:                   <b>$nodes</b>"			. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Total time connected:          <b>$str_total_time</b>" .
 			"</span>"
 		);
 	} elsif ( $$cfg{environments}{$uuid}{_is_group} ) {
@@ -163,10 +163,10 @@ sub update {
 		
 		$$self{frame}{lblPG}	-> set_markup(
 			"<span $font>" .
-				"Total Sub-Groups:              <b>$groups</b>"			. "\n" .
-				"Total Contained Nodes:         <b>$nodes</b>"			. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Total Time Connected:          <b>$str_total_time</b>" .
+				"Total sub-groups:              <b>$groups</b>"			. "\n" .
+				"Total contained nodes:         <b>$nodes</b>"			. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Total time connected:          <b>$str_total_time</b>" .
 			"</span>"
 		);
 	} else {
@@ -205,16 +205,16 @@ sub update {
 		
 		$$self{frame}{lblPN}	-> set_markup(
 			"<span $font>" .
-				"Total Time Connected:          <b>$str_total_time</b>"	. "\n" .
-				"Total Connections Established: <b>$total_conn</b>"		. "\n" .
-				"Last Connection:               <b>$str_start</b>" .
+				"Total time connected:          <b>$str_total_time</b>"	. "\n" .
+				"Total connections established: <b>$total_conn</b>"		. "\n" .
+				"Last connection:               <b>$str_start</b>" .
 			"</span>"
 		);
 	}
 	
-	if ( $uuid eq '__PAC__ROOT__' )						{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'ALL PAC CONNECTIONS'..." ); }
-	elsif ( $$cfg{'environments'}{$uuid}{_is_group} )	{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for group\n'$name'..." ); }
-	else												{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'$name'..." ); }
+	if ( $uuid eq '__PAC__ROOT__' )						{ $$self{frame}{btnReset} -> set_label( "Reset Statistics for\n'all connections'..." ); }
+	elsif ( $$cfg{'environments'}{$uuid}{_is_group} )	{ $$self{frame}{btnReset} -> set_label( "Reset statistics for group\n'$name'..." ); }
+	else												{ $$self{frame}{btnReset} -> set_label( "Reset statistics for\n'$name'..." ); }
 	
 	return 1;
 }
@@ -254,7 +254,7 @@ sub purge {
 	my $self	= shift;
 	my $cfg		= shift // $PACMain::FUNCS{_MAIN}{_CFG};
 	
-	foreach my $uuid ( keys %{ $$self{statistics} } ) { delete $$self{statistics}{$uuid} unless defined $$cfg{environments}{$uuid}; }
+	foreach my $uuid ( keys %{ $$self{statistics} } ) { delete $$self{statistics}{$uuid} unless $uuid eq '__PAC_SHELL__' || defined $$cfg{environments}{$uuid}; }
 	
 	return 1;
 }
@@ -273,36 +273,36 @@ sub _buildStatisticsGUI {
 	my %w;
 	
 	# Build a vbox for:buttons, separator and image widgets
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{btnReset} = Gtk2::Button -> new_with_label( 'Reset Statistics...' );
-		$w{btnReset} -> set_image( Gtk2::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
+		$w{btnReset} = Gtk3::Button -> new_with_label( 'Reset Statistics...' );
+		$w{btnReset} -> set_image( Gtk3::Image -> new_from_stock( 'gtk-refresh', 'button' ) );
 		$w{btnReset} -> set( 'can-focus', 0 );
 		$w{hbox} -> pack_start( $w{btnReset}, 0, 1, 0 );
 		
-		$w{hbox} -> pack_start( Gtk2::VSeparator -> new, 0, 1, 5 );
+		$w{hbox} -> pack_start( Gtk3::VSeparator -> new, 0, 1, 5 );
 		
-		$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+		$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 		$w{hbox} -> pack_start( $w{vbox}, 1, 1, 0 );
 			
-			$w{hboxPACRoot} = Gtk2::HBox -> new( 0, 0 );
+			$w{hboxPACRoot} = Gtk3::HBox -> new( 0, 0 );
 			$w{vbox} -> pack_start( $w{hboxPACRoot}, 0, 1, 0 );
 				
-				$w{lblPR} = Gtk2::Label -> new;
+				$w{lblPR} = Gtk3::Label -> new;
 				$w{lblPR} -> set_justify( 'left' );
 				$w{hboxPACRoot} -> pack_start( $w{lblPR}, 0, 1, 0 );
 			
-			$w{hboxPACGroup} = Gtk2::HBox -> new( 0, 0 );
+			$w{hboxPACGroup} = Gtk3::HBox -> new( 0, 0 );
 			$w{vbox} -> pack_start( $w{hboxPACGroup}, 0, 1, 0 );
 				
-				$w{lblPG} = Gtk2::Label -> new;
+				$w{lblPG} = Gtk3::Label -> new;
 				$w{lblPG} -> set_justify( 'left' );
 				$w{hboxPACGroup} -> pack_start( $w{lblPG}, 0, 1, 0 );
 			
-			$w{hboxPACNode} = Gtk2::HBox -> new( 0, 0 );
+			$w{hboxPACNode} = Gtk3::HBox -> new( 0, 0 );
 			$w{vbox} -> pack_start( $w{hboxPACNode}, 0, 1, 0 );
 				
-				$w{lblPN} = Gtk2::Label -> new;
+				$w{lblPN} = Gtk3::Label -> new;
 				$w{lblPN} -> set_justify( 'left' );
 				$w{hboxPACNode} -> pack_start( $w{lblPN}, 0, 1, 0 );
 	

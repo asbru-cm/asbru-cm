@@ -188,7 +188,7 @@ elementTemplate = """{uuid}:
     terminal emulation: xterm
     terminal font: Monospace 9
     terminal scrollback lines: 5000
-    terminal select words: \.:_\/-A-Za-z0-9
+    terminal select words: '-.:_/'
     terminal transparency: 0
     terminal window hsize: 800
     terminal window vsize: 600

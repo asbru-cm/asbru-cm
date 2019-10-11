@@ -31,10 +31,9 @@ use strict;
 use warnings;
 
 use FindBin qw ( $RealBin $Bin $Script );
-#use Data::Dumper;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -138,34 +137,34 @@ sub _buildExpectGUI {
 	my %w;
 	
 	# Build a vbox for:buttons, separator and expect widgets
-	$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+	$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 		
 		# Build a hbuttonbox for widgets actions (add, etc.)
-		$w{bbox} = Gtk2::HButtonBox -> new();
+		$w{bbox} = Gtk3::HButtonBox -> new();
 		$w{vbox} -> pack_start( $w{bbox}, 0, 1, 0 );
 		$w{bbox} -> set_layout( 'GTK_BUTTONBOX_START' );
 			
 			# Build 'add' button
-			$w{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+			$w{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 			$w{bbox} -> add( $w{btnadd} );
 			
 		# Build a separator
-		$w{sep} = Gtk2::HSeparator -> new();
+		$w{sep} = Gtk3::HSeparator -> new();
 		$w{vbox} -> pack_start( $w{sep}, 0, 1, 5 );
 		
 		# Build a scrolled window
-		$w{sw} = Gtk2::ScrolledWindow -> new();
+		$w{sw} = Gtk3::ScrolledWindow -> new();
 		$w{vbox} -> pack_start( $w{sw}, 1, 1, 0 );
 		$w{sw} -> set_policy( 'automatic', 'automatic' );
 		$w{sw} -> set_shadow_type( 'none' );
 			
-			$w{vp} = Gtk2::Viewport -> new();
+			$w{vp} = Gtk3::Viewport -> new();
 			$w{sw} -> add( $w{vp} );
 			$w{vp} -> set_property( 'border-width', 5 );
 			$w{vp} -> set_shadow_type( 'none' );
 				
 				# Build and add the vbox that will contain the expect widgets
-				$w{vbexpect} = Gtk2::VBox -> new( 0, 0 );
+				$w{vbexpect} = Gtk3::VBox -> new( 0, 0 );
 				$w{vp} -> add( $w{vbexpect} );
 	
 	$$self{container} = $w{vbox};
@@ -211,144 +210,144 @@ sub _buildExpect {
 	$w{position} = scalar @{ $$self{list} };
 	
 	# Make a checkbox to use as frame's label
-	$w{active} = Gtk2::CheckButton -> new_with_label( 'Expect #' . $w{position} . ' ' );
+	$w{active} = Gtk3::CheckButton -> new_with_label( 'Expect #' . $w{position} . ' ' );
 	$w{active} -> set_active( $active );
 	
 	# Make an container frame
-	$w{frame} = Gtk2::Frame -> new;
+	$w{frame} = Gtk3::Frame -> new;
 	$w{frame} -> set_label_widget( $w{active} );
 		
 		# Build an HBox
-		$w{hbox1} = Gtk2::HBox -> new( 0, 0 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 0 );
 		$w{frame} -> add( $w{hbox1} );
 			
 			# Build a vbox for event_boxes 1 & 2
-			$w{vbox1} = Gtk2::VBox -> new( 0, 0 );
+			$w{vbox1} = Gtk3::VBox -> new( 0, 0 );
 			$w{hbox1} -> pack_start( $w{vbox1}, 0, 1, 0 );
 				
 				# Build first event_box and add a go-up arrow
-				$w{ebup} = Gtk2::EventBox -> new;
+				$w{ebup} = Gtk3::EventBox -> new;
 				$w{vbox1} -> pack_start( $w{ebup}, 1, 1, 0 );
-				$w{ebup} -> add( Gtk2::Image -> new_from_stock( 'gtk-go-up', 'small-toolbar' ) );
+				$w{ebup} -> add( Gtk3::Image -> new_from_stock( 'gtk-go-up', 'small-toolbar' ) );
 				
 				# Build first event_box and add a go-down arrow
-				$w{ebdown} = Gtk2::EventBox -> new;
+				$w{ebdown} = Gtk3::EventBox -> new;
 				$w{vbox1} -> pack_start( $w{ebdown}, 1, 1, 0 );
-				$w{ebdown} -> add( Gtk2::Image -> new_from_stock( 'gtk-go-down', 'small-toolbar' ) );
+				$w{ebdown} -> add( Gtk3::Image -> new_from_stock( 'gtk-go-down', 'small-toolbar' ) );
 			
 			# Build a vbox for expect and send entries
-			$w{vbox2} = Gtk2::VBox -> new( 0, 0 );
+			$w{vbox2} = Gtk3::VBox -> new( 0, 0 );
 			$w{hbox1} -> pack_start( $w{vbox2}, 1, 1, 0 );
 			$w{vbox2} -> set_sensitive( $active );
 				
 				# Build an HBox to contain label & expect entry
-				$w{hboxExpect} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxExpect} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox2} -> pack_start( $w{hboxExpect}, 0, 1, 0 );
 					
 					# Build and add the label
-					$w{hboxExpect} -> pack_start( Gtk2::Label -> new( 'Expect: ' ), 0, 1, 0 );
+					$w{hboxExpect} -> pack_start( Gtk3::Label -> new( 'Expect: ' ), 0, 1, 0 );
 					
 					# Build and add the expect entry
-					$w{expect} = Gtk2::Entry -> new;
+					$w{expect} = Gtk3::Entry -> new;
 					$w{hboxExpect} -> pack_start( $w{expect}, 1, 1, 0 );
 					$w{expect} -> set_text( $exp );
 					$w{expect} -> set_icon_from_stock( 'primary', 'pac-prompt' );
 					
-					$w{cbTimeOut} = Gtk2::CheckButton -> new( 'Time out (seconds): ' );
+					$w{cbTimeOut} = Gtk3::CheckButton -> new( 'Time out (seconds): ' );
 					$w{cbTimeOut} -> set_active( $time_out != -1 );
 					$w{hboxExpect} -> pack_start( $w{cbTimeOut}, 0, 1, 0 );
-					$w{time_out} = Gtk2::SpinButton -> new_with_range( 1, 65535, 1 );
+					$w{time_out} = Gtk3::SpinButton -> new_with_range( 1, 65535, 1 );
 					$w{time_out} -> set_value( $time_out);
 					$w{time_out} -> set_sensitive( $w{cbTimeOut} -> get_active );
 					$w{hboxExpect} -> pack_start( $w{time_out}, 0, 1, 0 );
 				
 				# Build an HBox to contain label, hide checkbox & send entry
-				$w{hboxSend} = Gtk2::HBox -> new( 0, 0 );
+				$w{hboxSend} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox2} -> pack_start( $w{hboxSend}, 1, 1, 0 );
 					
 					# Build and add the label
-					$w{hboxSend} -> pack_start( Gtk2::Label -> new( 'Send( ' ), 0, 1, 0 );
+					$w{hboxSend} -> pack_start( Gtk3::Label -> new( 'Send( ' ), 0, 1, 0 );
 					
 					# Build the hide checkbox
-					$w{hidden} = Gtk2::CheckButton -> new_with_label( 'Hide' );
+					$w{hidden} = Gtk3::CheckButton -> new_with_label( 'Hide' );
 					$w{hboxSend} -> pack_start( $w{hidden}, 0, 1, 0 );
 					$w{hidden} -> set_active( $hide );
 					
 					# Build and add the label
-					$w{hboxSend} -> pack_start( Gtk2::Label -> new( '): ' ), 0, 1, 0 );
+					$w{hboxSend} -> pack_start( Gtk3::Label -> new( '): ' ), 0, 1, 0 );
 					
 					# Build and add the send entry
-					$w{send} = Gtk2::Entry -> new;
+					$w{send} = Gtk3::Entry -> new;
 					$w{hboxSend} -> pack_start( $w{send}, 1, 1, 0 );
 					$w{send} -> set_icon_from_stock( 'primary', 'gtk-media-play' );
 					$w{send} -> set_text( $cmd );
 					$w{send} -> set_visibility( ! $hide );
 					
 					# Build and add the return checkbox
-					$w{return} = Gtk2::CheckButton -> new_with_label( 'Return' );
+					$w{return} = Gtk3::CheckButton -> new_with_label( 'Return' );
 					$w{hboxSend} -> pack_start( $w{return}, 0, 1, 0 );
 					$w{return} -> set_active( $return );
 					$w{return} -> set_tooltip_text( 'Sends a <RETURN> (\n) after the string is entered.\nFor IBM 3270 connections, sends a \r\f (Carriage Return and Line Feed)' );
 			
 			# Add ON_MATCH, ON_FAIL and TIME_OUT entries
 			
-			$w{vbox33} = Gtk2::HBox -> new( 0, 0);
+			$w{vbox33} = Gtk3::HBox -> new( 0, 0);
 			$w{vbox2} -> pack_start( $w{vbox33}, 0, 1, 0 );
 				
-				$w{hbox33} = Gtk2::HBox -> new( 0, 0 );
+				$w{hbox33} = Gtk3::HBox -> new( 0, 0 );
 				$w{hbox33} -> set_tooltip_text( 'If "Expect" IS matched, the "Send" string will be sent and we will "go to" selected Expect number. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)' );
 				$w{vbox33} -> pack_start( $w{hbox33}, 0, 1, 0 );
 					
-					$w{cbOnMatch} = Gtk2::CheckButton -> new( 'On MATCH: ' );
+					$w{cbOnMatch} = Gtk3::CheckButton -> new( 'On MATCH: ' );
 					$w{cbOnMatch} -> set_active( $on_match != -1 );
 					$w{hbox33} -> pack_start( $w{cbOnMatch}, 1, 1, 0 );
 					
-					$w{onmatchhbox} = Gtk2::HBox -> new( 0, 0 );
+					$w{onmatchhbox} = Gtk3::HBox -> new( 0, 0 );
 					$w{onmatchhbox} -> set_sensitive( $w{cbOnMatch} -> get_active );
 					$w{hbox33} -> pack_start( $w{onmatchhbox}, 0, 1, 0 );
 						
-						$w{rbOnMatchGoto} = Gtk2::RadioButton -> new_with_label( undef, 'goto ' );
+						$w{rbOnMatchGoto} = Gtk3::RadioButton -> new_with_label( undef, 'goto ' );
 						$w{rbOnMatchGoto} -> set_active( $on_match > -1 );
 						$w{onmatchhbox} -> pack_start( $w{rbOnMatchGoto}, 1, 1, 0 );
 						
-						$w{on_match} = Gtk2::SpinButton -> new_with_range( 0, 65535, 1 );
+						$w{on_match} = Gtk3::SpinButton -> new_with_range( 0, 65535, 1 );
 						$w{on_match} -> set_value( $on_match );
 						$w{on_match} -> set_sensitive( $w{rbOnMatchGoto} -> get_active );
 						$w{onmatchhbox} -> pack_start( $w{on_match}, 0, 1, 0 );
 						
-						$w{rbOnMatchStop} = Gtk2::RadioButton -> new_with_label_from_widget( $w{rbOnMatchGoto}, 'stop' );
+						$w{rbOnMatchStop} = Gtk3::RadioButton -> new_with_label_from_widget( $w{rbOnMatchGoto}, 'stop' );
 						$w{rbOnMatchStop} -> set_active( $on_match == -2 );
 						$w{onmatchhbox} -> pack_start( $w{rbOnMatchStop}, 1, 1, 0 );
 				
-				$w{hbox33} -> pack_start( Gtk2::VSeparator -> new, 0, 1, 5 );
+				$w{hbox33} -> pack_start( Gtk3::VSeparator -> new, 0, 1, 5 );
 				
-				$w{hbox34} = Gtk2::HBox -> new( 0, 0 );
+				$w{hbox34} = Gtk3::HBox -> new( 0, 0 );
 				$w{hbox34} -> set_tooltip_text( 'If "Expect" IS NOT matched, no string will be sent, and we will "go to" selected Expect. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)' );
 				$w{vbox33} -> pack_start( $w{hbox34}, 0, 1, 0 );
 					
-					$w{cbOnFail} = Gtk2::CheckButton -> new( 'On FAIL: ' );
+					$w{cbOnFail} = Gtk3::CheckButton -> new( 'On FAIL: ' );
 					$w{cbOnFail} -> set_active( $on_fail != -1 );
 					$w{hbox34} -> pack_start( $w{cbOnFail}, 1, 1, 0 );
 					
-					$w{onfailhbox} = Gtk2::HBox -> new( 0, 0 );
+					$w{onfailhbox} = Gtk3::HBox -> new( 0, 0 );
 					$w{onfailhbox} -> set_sensitive( $w{cbOnFail} -> get_active );
 					$w{hbox34} -> pack_start( $w{onfailhbox}, 0, 1, 0 );
 						
-						$w{rbOnFailGoto} = Gtk2::RadioButton -> new_with_label( undef, 'goto ' );
+						$w{rbOnFailGoto} = Gtk3::RadioButton -> new_with_label( undef, 'goto ' );
 						$w{rbOnFailGoto} -> set_active( $on_fail > -1 );
 						$w{onfailhbox} -> pack_start( $w{rbOnFailGoto}, 1, 1, 0 );
 						
-						$w{on_fail} = Gtk2::SpinButton -> new_with_range( 0, 65535, 1 );
+						$w{on_fail} = Gtk3::SpinButton -> new_with_range( 0, 65535, 1 );
 						$w{on_fail} -> set_value( $on_fail );
 						$w{on_fail} -> set_sensitive( $w{rbOnFailGoto} -> get_active );
 						$w{onfailhbox} -> pack_start( $w{on_fail}, 0, 1, 0 );
 						
-						$w{rbOnFailStop} = Gtk2::RadioButton -> new_with_label_from_widget( $w{rbOnFailGoto}, 'stop' );
+						$w{rbOnFailStop} = Gtk3::RadioButton -> new_with_label_from_widget( $w{rbOnFailGoto}, 'stop' );
 						$w{rbOnFailStop} -> set_active( $on_fail == -2 );
 						$w{onfailhbox} -> pack_start( $w{rbOnFailStop}, 1, 1, 0 );
 			
 			# Build delete button
-			$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+			$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 			$w{hbox1} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container
@@ -372,20 +371,21 @@ sub _buildExpect {
 	} );
 	
 	# Asign Drag and Drop functions
-	$w{active} -> drag_source_set( 'GDK_BUTTON1_MASK', [ 'move' ], { 'target' => 'PAC Expect', 'flags' => [], 'info' => 0 } );
+	my @targets = ( Gtk3::TargetEntry->new( 'PAC Expect', [], 0 ) );
+	$w{active} -> drag_source_set( 'GDK_BUTTON1_MASK', \@targets, [ 'move' ] );
 	$w{active} -> signal_connect( 'drag_begin' => sub {
 		$_[1] -> set_icon_pixbuf( _scale( _screenshot( $$self{list}[$w{position}]{'frame'} ), 256, 128, 1), 0, 0 );
 		$$self{_DND_SOURCE} = \%w;
 	} );
 	
-	$w{active} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'move' ], { 'target' => 'PAC Expect', 'flags' => [], 'info' => 0 } );
+	$w{active} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', \@targets, [ 'move' ] );
 	$w{active} -> signal_connect( 'drag_drop' => sub {
 		my $source_w = splice( @{ $$self{cfg} }, $$self{_DND_SOURCE}{position}, 1 );
 		splice( @{ $$self{cfg} }, $w{position}, 0, $source_w );
 		$self -> update;
 	} );
 
-	$w{frame} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', [ 'move' ], { 'target' => 'PAC Expect', 'flags' => [], 'info' => 0 } );
+	$w{frame} -> drag_dest_set( 'GTK_DEST_DEFAULT_ALL', \@targets, [ 'move' ] );
 	$w{frame} -> signal_connect( 'drag_drop' => sub {
 		my $source_w = splice( @{ $$self{cfg} }, $$self{_DND_SOURCE}{position}, 1 );
 		splice( @{ $$self{cfg} }, $w{position}, 0, $source_w );

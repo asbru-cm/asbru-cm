@@ -31,10 +31,8 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-#use Data::Dumper;
-
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -156,26 +154,26 @@ sub _buildGUI
 	
 	$w{vbox} = $container;
 		
-		$w{hbox1} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox1}, 0, 1, 5 );
 			
-			$w{frSSHProtocol} = Gtk2::Frame -> new( 'IP Protocol:' );
+			$w{frSSHProtocol} = Gtk3::Frame -> new( 'IP Protocol:' );
 			$w{hbox1} -> pack_start( $w{frSSHProtocol}, 1, 1, 0 );
 			$w{frSSHProtocol} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			$w{frSSHProtocol} -> set_tooltip_text( '-(4|6) : Uses IPv4, IPv6 or any of them' );
 				
-				$w{cbTELNETProtocol} = Gtk2::ComboBox -> new_text;
+				$w{cbTELNETProtocol} = Gtk3::ComboBoxText -> new;
 				$w{frSSHProtocol}  -> add( $w{cbTELNETProtocol} );
 				foreach my $ip_protocol ( sort { $a cmp $b } keys %IP_PROTOCOL ) { $w{cbTELNETProtocol} -> append_text( $ip_protocol ); };
 			
-			$w{hbox1} -> pack_start( Gtk2::Label -> new( 'Bind Address:' ), 0, 1, 0 );
-			$w{entryBindAddress} = Gtk2::Entry -> new;
+			$w{hbox1} -> pack_start( Gtk3::Label -> new( 'Bind Address:' ), 0, 1, 0 );
+			$w{entryBindAddress} = Gtk3::Entry -> new;
 			$w{hbox1} -> pack_start( $w{entryBindAddress} , 1, 1, 0 );
 			$w{entryBindAddress} -> set_size_request( 200, 20 );
 			$w{entryBindAddress} -> set_tooltip_text( '[-b ip] : Bind outgoing connection to given ip (leave blank to bind to any interface)' );
 				
-			$w{hbox1} -> pack_start( Gtk2::Label -> new( 'Escape Character:' ), 0, 1, 0 );
-			$w{entryEscapeChar} = Gtk2::Entry -> new;
+			$w{hbox1} -> pack_start( Gtk3::Label -> new( 'Escape Character:' ), 0, 1, 0 );
+			$w{entryEscapeChar} = Gtk3::Entry -> new;
 			$w{hbox1} -> pack_start( $w{entryEscapeChar} , 0, 1, 0 );
 			$w{entryEscapeChar} -> set_size_request( 40, 20 );
 			$w{entryEscapeChar} -> set_tooltip_text( '[-e [escape_character]] : Use given string (or an empty one to disable) as "Escape Character"' );

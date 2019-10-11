@@ -31,10 +31,9 @@ use strict;
 use warnings;
 
 use FindBin qw ( $RealBin $Bin $Script );
-#use Data::Dumper;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -126,34 +125,34 @@ sub _buildExecGUI {
 	my %w;
 	
 	# Build a vbox for:buttons, separator and expect widgets
-	$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+	$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 		
 		# Build a hbuttonbox for widgets actions (add, etc.)
-		$w{bbox} = Gtk2::HButtonBox -> new();
+		$w{bbox} = Gtk3::HButtonBox -> new();
 		$w{vbox} -> pack_start( $w{bbox}, 0, 1, 0 );
 		$w{bbox} -> set_layout( 'GTK_BUTTONBOX_START' );
 			
 			# Build 'add' button
-			$w{btnadd} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+			$w{btnadd} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 			$w{bbox} -> add( $w{btnadd} );
 				
 		# Build a separator
-		$w{sep} = Gtk2::HSeparator -> new;
+		$w{sep} = Gtk3::HSeparator -> new;
 		$w{vbox} -> pack_start( $w{sep}, 0, 1, 5 );
 			
 		# Build a scrolled window
-		$w{sw} = Gtk2::ScrolledWindow -> new;
+		$w{sw} = Gtk3::ScrolledWindow -> new;
 		$w{vbox} -> pack_start( $w{sw}, 1, 1, 0 );
 		$w{sw} -> set_policy( 'automatic', 'automatic' );
 		$w{sw} -> set_shadow_type( 'none' );
 			
-			$w{vp} = Gtk2::Viewport -> new;
+			$w{vp} = Gtk3::Viewport -> new;
 			$w{sw} -> add( $w{vp} );
 			$w{vp} -> set_property( 'border-width', 5 );
 			$w{vp} -> set_shadow_type( 'none' );
 				
 				# Build and add the vbox that will contain the expect widgets
-				$w{vbexec} = Gtk2::VBox -> new( 0, 0 );
+				$w{vbexec} = Gtk3::VBox -> new( 0, 0 );
 				$w{vp} -> add( $w{vbexec} );
 	
 	$$self{container} = $w{vbox};
@@ -200,59 +199,59 @@ sub _buildExec {
 	$w{position} = scalar @{ $$self{list} };
 	
 	# Build the confirm checkbox
-	$w{confirm} = Gtk2::CheckButton -> new_with_label( 'Confirm' );
+	$w{confirm} = Gtk3::CheckButton -> new_with_label( 'Confirm' );
 	$w{confirm} -> set_active( $confirm );
 	
-	$w{frame} = Gtk2::Frame -> new();
+	$w{frame} = Gtk3::Frame -> new();
 	$w{frame} -> set_label_widget( $w{confirm} );
 		
 		# Make an HBox to contain checkbox, entry and delete
-		$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+		$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		$w{frame} -> add( $w{hbox} );
 			
-			$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+			$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 			$w{hbox} -> pack_start( $w{vbox}, 1, 1, 0 );
 				
-				$w{hbox3} = Gtk2::HBox -> new( 0, 0 );
+				$w{hbox3} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox} -> pack_start( $w{hbox3}, 0, 1, 0 );
 					
 					# Build label
-					$w{lbl} = Gtk2::Label -> new( 'Command: ' );
+					$w{lbl} = Gtk3::Label -> new( 'Command: ' );
 					$w{hbox3} -> pack_start( $w{lbl}, 0, 1, 0 );
 					
 					# Build entry
-					$w{txt} = Gtk2::Entry -> new;
+					$w{txt} = Gtk3::Entry -> new;
 					$w{hbox3} -> pack_start( $w{txt}, 1, 1, 0 );
 					$w{txt} -> set_icon_from_stock( 'primary', 'gtk-execute' );
 					$w{txt} -> set_text( $txt );
 					
 					# Build checkbutton
-					$w{intro} = Gtk2::CheckButton -> new( ' send <INTRO> at the end' );
+					$w{intro} = Gtk3::CheckButton -> new( ' send <INTRO> at the end' );
 					$w{hbox3} -> pack_start( $w{intro}, 0, 1, 0 );
 					$w{intro} -> set_active( $intro );
 				
-				$w{hbox4} = Gtk2::HBox -> new( 0, 0 );
+				$w{hbox4} = Gtk3::HBox -> new( 0, 0 );
 				$w{vbox} -> pack_start( $w{hbox4}, 0, 1, 0 );
 					
 					# Build label
-					$w{lbl2} = Gtk2::Label -> new( 'Description: ' );
+					$w{lbl2} = Gtk3::Label -> new( 'Description: ' );
 					$w{hbox4} -> pack_start( $w{lbl2}, 0, 1, 0 );
 					
 					# Build entry
-					$w{desc} = Gtk2::Entry -> new;
+					$w{desc} = Gtk3::Entry -> new;
 					$w{hbox4} -> pack_start( $w{desc}, 1, 1, 0 );
 					$w{desc} -> set_text( $desc );
 				
-			$w{vbox2} = Gtk2::VBox -> new( 0, 0 );
+			$w{vbox2} = Gtk3::VBox -> new( 0, 0 );
 			$w{hbox} -> pack_start( $w{vbox2}, 0, 1, 0 );
 				
 				# Build delete button
-				$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+				$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 				$w{vbox2} -> pack_start( $w{btn}, 1, 1, 0 );
 					
 				if ( $$self{'where'} eq 'local' ) {
 					# Build exec button
-					$w{btnExec} = Gtk2::Button -> new_from_stock( 'gtk-execute' );
+					$w{btnExec} = Gtk3::Button -> new_from_stock( 'gtk-execute' );
 					$w{vbox2} -> pack_start( $w{btnExec}, 0, 1, 0 );
 				}
 	

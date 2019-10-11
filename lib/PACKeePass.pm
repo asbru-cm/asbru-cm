@@ -34,8 +34,8 @@ use Encode;
 use KeePass;
 use FindBin qw ( $RealBin $Bin $Script );
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
@@ -185,43 +185,43 @@ sub _buildKeePassGUI {
 	my %w;
 	
 	# Build a vbox
-	$w{vbox} = Gtk2::VBox -> new( 0, 0 );
+	$w{vbox} = Gtk3::VBox -> new( 0, 0 );
 		
-		$w{cbUseKeePass} = Gtk2::CheckButton -> new( 'Use KeePassX' );
+		$w{cbUseKeePass} = Gtk3::CheckButton -> new( 'Use KeePassX' );
 		$w{vbox} -> pack_start( $w{cbUseKeePass}, 0, 1, 0 );
 		
-		$w{cbKeePassAskUser} = Gtk2::CheckButton -> new( 'Ask user when multiple matches are found' );
+		$w{cbKeePassAskUser} = Gtk3::CheckButton -> new( 'Ask user when multiple matches are found' );
 		$w{vbox} -> pack_start( $w{cbKeePassAskUser}, 0, 1, 0 );
 		
-		$w{hboxkpmain} = Gtk2::HBox -> new( 0, 0 );
+		$w{hboxkpmain} = Gtk3::HBox -> new( 0, 0 );
 		$w{vbox} -> pack_start( $w{hboxkpmain}, 0, 1, 0 );
 			
-			$w{hboxkpmain} -> pack_start( Gtk2::Label -> new( 'KeePass Database file:' ), 0, 1, 0 );
+			$w{hboxkpmain} -> pack_start( Gtk3::Label -> new( 'KeePass Database file:' ), 0, 1, 0 );
 			
-			$w{fcbKeePassFile} = Gtk2::FileChooserButton -> new( '', 'GTK_FILE_CHOOSER_ACTION_OPEN' );
+			$w{fcbKeePassFile} = Gtk3::FileChooserButton -> new( '', 'GTK_FILE_CHOOSER_ACTION_OPEN' );
 			$w{fcbKeePassFile} -> set_show_hidden( 1 );
 			$w{hboxkpmain} -> pack_start( $w{fcbKeePassFile}, 1, 1, 0 );
 			
-			$w{hboxkpmain} -> pack_start( Gtk2::Label -> new( ' Master Password:' ), 0, 1, 0 );
+			$w{hboxkpmain} -> pack_start( Gtk3::Label -> new( ' Master Password:' ), 0, 1, 0 );
 			
-			$w{entryKeePassPassword} = Gtk2::Entry -> new;
+			$w{entryKeePassPassword} = Gtk3::Entry -> new;
 			$w{hboxkpmain} -> pack_start( $w{entryKeePassPassword}, 0, 1, 0 );
 			$w{entryKeePassPassword} -> set_visibility( 0 );
 	
-		$w{frameKPList} = Gtk2::Frame -> new( ' Available passwords in given Database file: ' );
+		$w{frameKPList} = Gtk3::Frame -> new( ' Available passwords in given Database file: ' );
 		$w{vbox} -> pack_start( $w{frameKPList}, 1, 1, 0 );
 			
-			$w{vbkpin} = Gtk2::VBox -> new( 0, 0 );
+			$w{vbkpin} = Gtk3::VBox -> new( 0, 0 );
 			$w{frameKPList} -> add( $w{vbkpin} );
 			
-				$w{btnPassRefresh} = Gtk2::Button -> new_from_stock( 'gtk-refresh' );
+				$w{btnPassRefresh} = Gtk3::Button -> new_from_stock( 'gtk-refresh' );
 				$w{vbkpin} -> pack_start( $w{btnPassRefresh}, 0, 1, 0 );
 				
-				$w{scKeePass} = Gtk2::ScrolledWindow -> new;
+				$w{scKeePass} = Gtk3::ScrolledWindow -> new;
 				$w{scKeePass} -> set_policy( 'automatic', 'automatic' );
 				$w{vbkpin} -> add( $w{scKeePass} );
 					
-					$w{vbKeePass} = Gtk2::VBox -> new( 0, 0 );
+					$w{vbKeePass} = Gtk3::VBox -> new( 0, 0 );
 					$w{scKeePass} -> add_with_viewport( $w{vbKeePass} );
 				
 	$$self{container} = $w{vbox};
@@ -252,50 +252,50 @@ sub _buildVar {
 	my %w;
 	
 	# Make an HBox to contain label, entry and del button
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 	$w{hbox} -> set_tooltip_text( 'Use <KPX_(title|username):title or user name> anywhere to refer to given password' );
 		
 		# Build label
-		$w{lbl0} = Gtk2::Label -> new( 'Title:' );
+		$w{lbl0} = Gtk3::Label -> new( 'Title:' );
 		$w{hbox} -> pack_start( $w{lbl0}, 0, 1, 0 );
 		
 		# Build entry
-		$w{title} = Gtk2::Entry -> new;
+		$w{title} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{title}, 0, 1, 0 );
 		$w{title} -> set_text( encode( 'unicode', $title ) );
 		$w{title} -> set_editable( 0 );
 		
 		# Build label
-		$w{lbl01} = Gtk2::Label -> new( 'URL:' );
+		$w{lbl01} = Gtk3::Label -> new( 'URL:' );
 		$w{hbox} -> pack_start( $w{lbl01}, 0, 1, 0 );
 		
 		# Build entry
-		$w{url} = Gtk2::Entry -> new;
+		$w{url} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{url}, 0, 1, 0 );
 		$w{url} -> set_text( encode( 'unicode', $url ) );
 		$w{url} -> set_editable( 0 );
 		
 		# Build label
-		$w{lbl1} = Gtk2::Label -> new( 'Username:' );
+		$w{lbl1} = Gtk3::Label -> new( 'Username:' );
 		$w{hbox} -> pack_start( $w{lbl1}, 0, 1, 0 );
 		
 		# Build entry
-		$w{var} = Gtk2::Entry -> new;
+		$w{var} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{var}, 0, 1, 0 );
 		$w{var} -> set_text( encode( 'unicode', $user ) );
 		$w{var} -> set_editable( 0 );
 		
 		# Build label
-		$w{lbl2} = Gtk2::Label -> new( ' Password:' );
+		$w{lbl2} = Gtk3::Label -> new( ' Password:' );
 		$w{hbox} -> pack_start( $w{lbl2}, 0, 1, 0 );
 		
 		# Build entry
-		$w{val} = Gtk2::Entry -> new;
+		$w{val} = Gtk3::Entry -> new;
 		$w{hbox} -> pack_start( $w{val}, 1, 1, 0 );
 		$w{val} -> set_text( encode( 'unicode', $pass ) );
 		$w{val} -> set_editable( 0 );
 		
-		$w{hide} = Gtk2::CheckButton -> new( 'Hide' );
+		$w{hide} = Gtk3::CheckButton -> new( 'Hide' );
 		$w{hbox} -> pack_start( $w{hide}, 0, 1, 0 );
 		$w{hide} -> set_active( 1 );
 		$w{hide} -> signal_connect( toggled => sub { $w{val} -> set_visibility( ! $w{hide} -> get_active ); } );

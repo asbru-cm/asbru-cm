@@ -31,11 +31,10 @@ use strict;
 use warnings;
 use FindBin qw ( $RealBin $Bin $Script );
 
-#use Data::Dumper;
 use PACUtils;
 
-# GTK2
-use Gtk2 '-init';
+# GTK
+use Gtk3 '-init';
 
 # END: Import Modules
 ###################################################################
@@ -201,51 +200,51 @@ sub _buildGUI
 	
 	$w{vbox} = $container;
 		
-		$w{hbox1} = Gtk2::HBox -> new( 0, 5 );
+		$w{hbox1} = Gtk3::HBox -> new( 0, 5 );
 		$w{vbox} -> pack_start( $w{hbox1}, 0, 1, 5 );
 			
-			$w{frSSHVersion} = Gtk2::Frame -> new( 'SSH Version:' );
+			$w{frSSHVersion} = Gtk3::Frame -> new( 'SSH Version:' );
 			$w{hbox1} -> pack_start( $w{frSSHVersion}, 0, 1, 0 );
 			$w{frSSHVersion} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			$w{frSSHVersion} -> set_tooltip_text( '-(1|any) : Use SSH v1 or let negotiate any of them' );
 				
-				$w{cbSSHVersion} = Gtk2::ComboBox -> new_text;
+				$w{cbSSHVersion} = Gtk3::ComboBoxText -> new;
 				$w{frSSHVersion} -> add( $w{cbSSHVersion} );
 				foreach my $ssh_version ( sort { $a cmp $b } keys %SSH_VERSION ) { $w{cbSSHVersion} -> append_text( $ssh_version ); };
 			
-			$w{chUseCompression} = Gtk2::CheckButton -> new_with_label( 'Use Compression' );
+			$w{chUseCompression} = Gtk3::CheckButton -> new_with_label( 'Use Compression' );
 			$w{hbox1} -> pack_start( $w{chUseCompression}, 1, 1, 0 );
 			$w{chUseCompression} -> set_tooltip_text( '[-C] : Use or not compression' );
 		
-		$w{vbox} -> pack_start( Gtk2::HSeparator -> new, 0, 1, 5 );
+		$w{vbox} -> pack_start( Gtk3::HSeparator -> new, 0, 1, 5 );
 		
-			$w{vbox} -> pack_start( Gtk2::Label -> new( 'Advanced Options:' ), 0, 1, 0 );
+			$w{vbox} -> pack_start( Gtk3::Label -> new( 'Advanced Options:' ), 0, 1, 0 );
 			
-			$w{vboxAdvOpt} = Gtk2::VBox -> new( 0, 0 );
+			$w{vboxAdvOpt} = Gtk3::VBox -> new( 0, 0 );
 			$w{vbox} -> pack_start( $w{vboxAdvOpt}, 1, 1, 5 );
-			$w{lblAdvOpt} = Gtk2::Label -> new( 'Advanced Options' );
+			$w{lblAdvOpt} = Gtk3::Label -> new( 'Advanced Options' );
 			$w{vboxAdvOpt} -> set_tooltip_text( '[-o "ssh_option=value"]' );
 			$w{vboxAdvOpt} -> set_border_width( 5 );
 				
 				# Build 'add' button
-				$w{btnaddAdvOpt} = Gtk2::Button -> new_from_stock( 'gtk-add' );
+				$w{btnaddAdvOpt} = Gtk3::Button -> new_from_stock( 'gtk-add' );
 				$w{vboxAdvOpt} -> pack_start( $w{btnaddAdvOpt}, 0, 1, 0 );
 				
 				# Build a scrolled window
-				$w{swAdvOpt} = Gtk2::ScrolledWindow -> new;
+				$w{swAdvOpt} = Gtk3::ScrolledWindow -> new;
 				$w{vboxAdvOpt} -> pack_start( $w{swAdvOpt}, 1, 1, 0 );
 				$w{swAdvOpt} -> set_policy( 'automatic', 'automatic' );
 				$w{swAdvOpt} -> set_shadow_type( 'none' );
 					
-					$w{vpAdvOpt} = Gtk2::Viewport -> new;
+					$w{vpAdvOpt} = Gtk3::Viewport -> new;
 					$w{swAdvOpt} -> add( $w{vpAdvOpt} );
 					$w{vpAdvOpt} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 						
 						# Build and add the vbox that will contain the advanced options widgets
-						$w{vbAdvOpt} = Gtk2::VBox -> new( 0, 0 );
+						$w{vbAdvOpt} = Gtk3::VBox -> new( 0, 0 );
 						$w{vpAdvOpt} -> add( $w{vbAdvOpt} );
 			
-		$w{vbox} -> pack_start( Gtk2::HSeparator -> new, 0, 1, 5 );
+		$w{vbox} -> pack_start( Gtk3::HSeparator -> new, 0, 1, 5 );
 	
 	$$self{gui} = \%w;
 	
@@ -277,28 +276,28 @@ sub _buildAdvOpt
 	$w{position} = scalar @{ $$self{listAdvOpt} };
 	
 	# Make an HBox to contain option, value and delete
-	$w{hbox} = Gtk2::HBox -> new( 0, 0 );
+	$w{hbox} = Gtk3::HBox -> new( 0, 0 );
 		
-		$w{frAdvOptOption} = Gtk2::Frame -> new( 'Option:' );
+		$w{frAdvOptOption} = Gtk3::Frame -> new( 'Option:' );
 		$w{hbox} -> pack_start( $w{frAdvOptOption}, 1, 1, 0 );
 		$w{frAdvOptOption} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryAdvOptOption} = Gtk2::Entry -> new;
+			$w{entryAdvOptOption} = Gtk3::Entry -> new;
 			$w{frAdvOptOption} -> add( $w{entryAdvOptOption} );
 			$w{entryAdvOptOption} -> set_size_request( 30, 20 );
 			$w{entryAdvOptOption} -> set_text( $option );
 		
-		$w{frAdvOptValue} = Gtk2::Frame -> new( 'Value:' );
+		$w{frAdvOptValue} = Gtk3::Frame -> new( 'Value:' );
 		$w{hbox} -> pack_start( $w{frAdvOptValue}, 1, 1, 0 );
 		$w{frAdvOptValue} -> set_shadow_type( 'GTK_SHADOW_NONE' );
 			
-			$w{entryAdvOptValue} = Gtk2::Entry -> new;
+			$w{entryAdvOptValue} = Gtk3::Entry -> new;
 			$w{frAdvOptValue} -> add( $w{entryAdvOptValue} );
 			$w{entryAdvOptValue} -> set_size_request( 30, 20 );
 			$w{entryAdvOptValue} -> set_text( $value );
 		
 		# Build delete button
-		$w{btn} = Gtk2::Button -> new_from_stock( 'gtk-delete' );
+		$w{btn} = Gtk3::Button -> new_from_stock( 'gtk-delete' );
 		$w{hbox} -> pack_start( $w{btn}, 0, 1, 0 );
 	
 	# Add built control to main container
