@@ -1055,15 +1055,18 @@ sub _setupCallbacks {
 	# Right mouse mouse on VTE
 	$$self{_GUI}{_VTE} -> signal_connect( 'button_press_event' => sub {
 		my ( $widget, $event ) = @_;
+		my $state	= $event -> get_state;
+		my $shift	= $state * ['shift-mask'];
+
 		if ( $event -> button eq 2 ) {
 			return 0 unless $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'};
 			my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk::Atom::intern_static_string( 'PRIMARY' ) ) -> wait_for_text;
 			$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
 			$$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' );
 			return 1;
-		} elsif ( $event -> button eq 3 ) {
-			#$self -> _vteMenu( $event );
-			#return 1;
+		} elsif (( $event -> button eq 3 )&&($shift)) {
+			$self -> _vteMenu( $event );
+			return 1;
 		}
 
 		return 0;
