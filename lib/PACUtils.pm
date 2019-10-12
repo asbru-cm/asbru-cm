@@ -279,6 +279,7 @@ sub _splash {
 		$WINDOWSPLASH{_VBOX} -> pack_start( $WINDOWSPLASH{_LBL}, 1, 1, 5 );
 	}
 
+	$WINDOWSPLASH{_LBL} -> set_show_text( 1 );
 	$WINDOWSPLASH{_LBL} -> set_text( $txt );
 	$WINDOWSPLASH{_LBL} -> set_fraction( $partial / $total );
 
