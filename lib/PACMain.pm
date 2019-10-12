@@ -832,7 +832,7 @@ sub _initGUI {
 		# Setup some window properties.
 		$$self{_GUI}{_PACTABS} -> set_title( "Terminals Tabbed Window : $APPNAME (v$APPVERSION)" );
 		$$self{_GUI}{_PACTABS} -> set_position( 'center' );
-		$$self{_GUI}{_PACTABS} -> set_default_icon_from_file( $APPICON );
+		Gtk3::Window::set_default_icon_from_file( $APPICON );
 		$$self{_GUI}{_PACTABS} -> set_size_request( 200, 100 );
 		$$self{_GUI}{_PACTABS} -> set_default_size( 600, 400 );
 		$$self{_GUI}{_PACTABS} -> set_resizable( 1 );
