@@ -813,6 +813,8 @@ sub _setupCallbacks {
 		return 0;
 	} );
 
+	# VTE CALL BACKS
+
 	$$self{_GUI}{_VTE} -> signal_connect( 'focus_in_event' => sub {
 		if ( $$self{_CFG}{defaults}{'change main title'} ) {
 		$PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title($$self{_TITLE} . ' - ' . $APPNAME);
@@ -843,6 +845,8 @@ sub _setupCallbacks {
 		my $alt5	= $state * ['mod5-mask'];
 
 		return 1 if defined $$self{_KEYS_RECEIVE};
+
+		$self -> _clusterCommitEvent('key_press_event', $event );
 
 		# ENTER --> reconnect if disconnected
 		if ( ( ( $keyval eq 'Return' ) || ( $keyval eq 'KP_Enter' ) ) && ( ! $$self{CONNECTED} && ! $$self{CONNECTING} ) ) {
@@ -1074,7 +1078,7 @@ sub _setupCallbacks {
 
 	# Capture mouse selection on VTE
 	$$self{_GUI}{_VTE} -> signal_connect( 'selection_changed' => sub { $$self{_GUI}{_VTE} -> copy_clipboard if $$self{_CFG}{defaults}{'selection to clipboard'}; return 0; } );
-	$$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); $self -> _clusterCommit( @_ ); } );
+	#$$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); $self -> _clusterCommit( @_ ); } );
 	$$self{_GUI}{_VTE} -> signal_connect( 'cursor_moved' => sub { $$self{_NEW_DATA} = 1; $self -> _setTabColour; } );
 
 	# Capture Drag and Drop events
@@ -2102,6 +2106,7 @@ sub _updateStatus {
 sub _clusterCommit {
 	my ( $self, $terminal, $string, $int ) = @_;
 
+	return 1;
 	return 1 unless $$self{_LISTEN_COMMIT} && ( $$self{_CLUSTER} ne '' ) && $$self{CONNECTED} && $$self{_PROPAGATE};
 
 	$$self{_LISTEN_COMMIT} = 0;
@@ -2109,6 +2114,23 @@ sub _clusterCommit {
 		next if ( ! $PACMain::RUNNING{$uuid_tmp}{terminal}{CONNECTED} ) || ( $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne $$self{_CLUSTER} ) || ( $PACMain::RUNNING{$uuid_tmp}{terminal}{_UUID_TMP} eq $$self{_UUID_TMP} );
 		$PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 0;
 		_vteFeedChild( $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VTE}, $string );
+		$PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 1;
+	}
+	$$self{_LISTEN_COMMIT} = 1;
+
+	return 1;
+}
+
+sub _clusterCommitEvent {
+	my ( $self, $type, $event ) = @_;
+
+	return 1 unless $$self{_LISTEN_COMMIT} && ( $$self{_CLUSTER} ne '' ) && $$self{CONNECTED} && $$self{_PROPAGATE};
+
+	$$self{_LISTEN_COMMIT} = 0;
+	foreach my $uuid_tmp ( keys %PACMain::RUNNING ) {
+		next if ( ! $PACMain::RUNNING{$uuid_tmp}{terminal}{CONNECTED} ) || ( $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne $$self{_CLUSTER} ) || ( $PACMain::RUNNING{$uuid_tmp}{terminal}{_UUID_TMP} eq $$self{_UUID_TMP} );
+		$PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 0;
+		$PACMain::RUNNING{$uuid_tmp}{terminal}{'_GUI'}{_VTE} -> signal_emit( $type, $event );
 		$PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 1;
 	}
 	$$self{_LISTEN_COMMIT} = 1;
