@@ -813,8 +813,11 @@ sub _setupCallbacks {
 		return 0;
 	} );
 
-	# VTE CALL BACKS
+	# ------------------------------
+	# Register callbacks from VTE
+	# ------------------------------
 
+  # Capture focus-in
 	$$self{_GUI}{_VTE} -> signal_connect( 'focus_in_event' => sub {
 		if ( $$self{_CFG}{defaults}{'change main title'} ) {
 		$PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title($$self{_TITLE} . ' - ' . $APPNAME);
@@ -1078,7 +1081,7 @@ sub _setupCallbacks {
 
 	# Capture mouse selection on VTE
 	$$self{_GUI}{_VTE} -> signal_connect( 'selection_changed' => sub { $$self{_GUI}{_VTE} -> copy_clipboard if $$self{_CFG}{defaults}{'selection to clipboard'}; return 0; } );
-	#$$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); $self -> _clusterCommit( @_ ); } );
+	$$self{_GUI}{_VTE} -> signal_connect( 'commit' => sub { $$self{_CFG}{'defaults'}{'record command history'} and $self -> _saveHistory( $_[1] ); } );
 	$$self{_GUI}{_VTE} -> signal_connect( 'cursor_moved' => sub { $$self{_NEW_DATA} = 1; $self -> _setTabColour; } );
 
 	# Capture Drag and Drop events
