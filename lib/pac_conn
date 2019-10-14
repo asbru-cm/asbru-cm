@@ -5,17 +5,17 @@
 #
 # Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
-# 
+#
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License version 3
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -185,7 +185,7 @@ if ( $$CFG{'environments'}{$UUID}{'infer user pass from KPX'} && $$CFG{'defaults
 		msg( "ERROR: KeePassX can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'" );
 		exit 1;
 	}
-	
+
 	my $re = $$CFG{'environments'}{$UUID}{'KPX title regexp'};
 	my $where = $KPXWHERE[ $$CFG{'environments'}{$UUID}{'infer from KPX where'} ];
 	my @found = findKP( \@KEEPASS, $where, qr/$re/ );
@@ -234,9 +234,9 @@ if ( ! $GETCMD ) {
 		Peer	=> $SOCK_FILE
 	) or die "ERROR: Could not open SOCKET file '$SOCK_FILE' for connecting: $!";
 	$SOCKET -> autoflush;
-	
+
 	die "ERROR: Service listening at file '$SOCK_FILE' is not PAC" unless auth( $SOCKET );
-	
+
 	$SOCKET_EXEC = IO::Socket::UNIX -> new(
 		Type	=> SOCK_STREAM,
 		Peer	=> $SOCK_EXEC_FILE
@@ -252,27 +252,27 @@ my $INT = 0;
 
 sub msg {
 	my $msg = shift or die $COLOR{'err'} . "ERROR: You must provide a message to 'msg'!!" . $COLOR{'norm'};
-	
+
 	print $COLOR{'log'} . "[$Script($$)][$NAME][$TITLE]: $msg\r\f" . $COLOR{'norm'};
 	return 1;
 }
 
 sub ctrl {
 	my $msg = shift or die "ERROR: You must provide a message to 'ctrl'!!";
-	
+
 	$DEBUG and msg( $msg );
 	return 1 unless defined $SOCKET;
-	
+
 	my $wout = '';
 	vec( $wout, fileno( $SOCKET ), 1 ) = 1;
 	select( undef, $wout, undef, 5 ) or die "ERROR: Could not write to PACMain SOCKET at $SOCK_FILE: $!";
-	
+
 	$SOCKET -> send( 'PAC_MSG_START[' . encode( 'UTF-16', $msg ) . ']PAC_MSG_END' );
 	return 1;
-} 
+}
 sub auth {
 	my $socket = shift;
-	
+
 	&ctrl( "!!_PAC_AUTH_[$$CFG{tmp}{uuid}]!!" );
 	my $auth = '';
 	sysread( $socket, $auth, 1024 );
@@ -281,16 +281,16 @@ sub auth {
 
 sub subst {
 	my $string = shift // '';
-	
+
 	my $pos = -1;
-	
+
 	return $string unless defined $$CFG{'environments'}{$UUID};
-	
+
 	$string =~ s/\<\<proxy_host\>\>/$proxy_ip/g;
 	$string =~ s/\<\<proxy_port\>\>/$proxy_port/g;
 	$string =~ s/\<\<proxy_user\>\>/$proxy_user/g;
 	$string =~ s/\<\<proxy_pass\>\>/$proxy_pass/g;
-	
+
 	my $tstamp = time;
 	my ( $dy, $dm, $dd, $th, $tm, $ts ) = split( '_', strftime( "%Y_%m_%d_%H_%M_%S", localtime ) );
 	my $name	= $$CFG{'environments'}{$UUID}{name};
@@ -298,7 +298,7 @@ sub subst {
 	my $ip		= $$CFG{'environments'}{$UUID}{ip};
 	my $user	= $$CFG{'environments'}{$UUID}{user};
 	my $pass	= $$CFG{'environments'}{$UUID}{pass};
-	
+
 	while ( $string =~ /<UUID>/go )			{ $string =~ s/<UUID>/$UUID/g;			}
 	while ( $string =~ /<TIMESTAMP>/go )	{ $string =~ s/<TIMESTAMP>/$tstamp/g;	}
 	while ( $string =~ /<DATE_Y>/go )		{ $string =~ s/<DATE_Y>/$dy/g;			}
@@ -312,22 +312,22 @@ sub subst {
 	while ( $string =~ /<IP>/go )			{ $string =~ s/<IP>/$ip/g; 				}
 	while ( $string =~ /<USER>/go )			{ $string =~ s/<USER>/$user/g; 			}
 	while ( $string =~ /<PASS>/go )			{ $string =~ s/<PASS>/$pass/g;			}
-	
+
 	# Replace '<command prompt>' with user defined value for command prompt
 	while ( $string =~ /<command prompt>/go ) { $string = $COMMAND_PROMPT; }
-	
+
 	# Replace <KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==> with KeePassX value
 	while ( $string =~ /<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==>/go ) {
 		my $what	= $1;
 		my $where	= $2;
 		my $var		= $3;
 		my $regexp	= qr/$var/;
-		
+
 		if ( ! $$CFG{'defaults'}{'keepass'}{'use_keepass'} ) {
 			msg( "WARNING: KeePassX variable '$var' can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'" );
 			next;
 		}
-		
+
 		my @found = findKP( \@KEEPASS, $where, $regexp );
 		if ( ! scalar @found)			{ msg( "ERROR: No entry '$where' found on KeePassX matching '$var'" ); exit 1; }
 		elsif ( ( ( scalar @found ) > 1 ) && $$CFG{'defaults'}{'keepass'}{'ask_user'} )	{
@@ -339,17 +339,17 @@ sub subst {
 			$string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$found[0]{$what}/g;
 		}
 	}
-	
+
 	# Replace <KPX_(title|username|url):*> with KeePassX password value
 	while ( $string =~ /<KPX_(title|username|url):(.+?)>/go ) {
 		my $type	= $1;
 		my $var		= $2;
-		
+
 		if ( ! $$CFG{'defaults'}{'keepass'}{'use_keepass'} ) {
 			msg( "WARNING: KeePassX variable '$var' can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'" );
 			next;
 		}
-		
+
 		my @found = findKP( \@KEEPASS, $type, $var );
 		if ( ! scalar @found)			{ msg( "ERROR: No entry '$type' found on KeePassX matching '$var'" ); exit 1; }
 		elsif ( ( ( scalar @found ) > 1 ) && $$CFG{'defaults'}{'keepass'}{'ask_user'} )	{
@@ -360,7 +360,7 @@ sub subst {
 			$string =~ s/<KPX_$type:\Q$var\E>/$found[0]{password}/g;
 		}
 	}
-	
+
 	# Replace '<GV:.+>' with user saved global variables for '$connection_cmd' execution
 	while ( $string =~ /<GV:(.+?)>/go ) {
 		my $var = $1;
@@ -369,7 +369,7 @@ sub subst {
 			$string =~ s/<GV:$var>/$val/g;
 		}
 	}
-	
+
 	# Replace '<V:#>' with user saved variables for '$connection_cmd'
 	while ( $string =~ /<V:(\d+?)>/go ) {
 		my $var = $1;
@@ -378,13 +378,13 @@ sub subst {
 			$string =~ s/<V:$var>/$val/g;
 		}
 	}
-	
+
 	# Replace '<ENV:#>' with environment variables for '$connection_cmd'
 	while ( $string =~ /<ENV:(.+?)>/go ) {
 		my $var = $1;
 		defined $ENV{$var} and $string =~ s/<ENV:\Q$var\E>/$ENV{$var}/g;
 	}
-	
+
 	# Replace '<ASK:#>' with user provided data for 'cmd' execution
 	while ( $string =~ /<ASK:(\d+?)>/go ) {
 		my $var = $1;
@@ -392,7 +392,7 @@ sub subst {
 		last unless defined $val;
 		$string =~ s/<ASK:\Q$var\E>/$val/g;
 	}
-	
+
 	# Replace '<ASK:*>' with user provided data for 'cmd' execution
 	while ( $string =~ /<ASK:(.+\|.+?)>/go ) {
 		my $var = $1;
@@ -404,7 +404,7 @@ sub subst {
 		defined $ret or return undef;
 		$string =~ s/<ASK:(.+\|.+?)>/$ret/g;
 	}
-	
+
 	# Replace '<ASK:*>' with user provided data for 'cmd' execution
 	while ( $string =~ /<ASK:(.+?)>/go ) {
 		my $var = $1;
@@ -412,7 +412,7 @@ sub subst {
 		last unless defined $val;
 		$string =~ s/<ASK:\Q$var\E>/$val/g;
 	}
-	
+
 	# Replace '<CMD:#>' with the result of executing 'cmd'
 	while ( $string =~ /<CMD:(.+?)>/go ) {
 		my $var = $1;
@@ -420,7 +420,7 @@ sub subst {
 		chomp $output;
 		$string =~ s/<CMD:\Q$var\E>/$output/g;
 	}
-	
+
 	return wantarray ? ( $string, $pos ) : $string;
 }
 
@@ -430,13 +430,13 @@ sub wEnterValue {
 	my $lbldown	= shift;
 	my $default	= shift;
 	my $visible	= shift // 1;
-	
+
 	my @list;
 	my $pos = -1;
-	
+
 	if ( ! defined $default ) { $default = ''; }
 	elsif ( ref( $default ) ) { @list = @{ $default }; }
-	
+
 	# Create the dialog window,
 	$_W{window}{data} = Gtk3::Dialog -> new_with_buttons(
 		"$APPNAME : Enter data",
@@ -452,26 +452,26 @@ sub wEnterValue {
 	$_W{window}{data} -> set_size_request( -1, -1 );
 	$_W{window}{data} -> set_resizable( 0 );
 	$_W{window}{data} -> set_border_width( 5 );
-		
+
 		# Create an HBox to contain a picture and a label
 		$_W{window}{gui}{hbox} = Gtk3::HBox -> new( 0, 0 );
 		$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{hbox}, 1, 1, 5 );
 		$_W{window}{gui}{hbox} -> set_border_width( 5 );
-			
+
 			# Create image
 			$_W{window}{gui}{img} = Gtk3::Image -> new_from_stock( 'gtk-edit', 'dialog' );
 			$_W{window}{gui}{hbox} -> pack_start( $_W{window}{gui}{img}, 0, 1, 5 );
-			
+
 			# Create 1st label
 			$_W{window}{gui}{lblup} = Gtk3::Label -> new;
 			$_W{window}{gui}{hbox} -> pack_start( $_W{window}{gui}{lblup}, 1, 1, 5 );
 			$_W{window}{gui}{lblup} -> set_markup( $lblup );
-		
+
 		# Create 2nd label
 		$_W{window}{gui}{lbldwn} = Gtk3::Label -> new;
 		$_W{window}{data} -> get_content_area -> pack_start( $_W{window}{gui}{lbldwn}, 1, 1, 5 );
 		$_W{window}{gui}{lbldwn} -> set_text( $lbldown );
-		
+
 		if ( @list ) {
 			# Create combobox widget
 			$_W{window}{gui}{comboList} = Gtk3::ComboBoxText -> new;
@@ -487,19 +487,19 @@ sub wEnterValue {
 			$_W{window}{gui}{entry} -> set_activates_default( 1 );
 			$_W{window}{gui}{entry} -> set_visibility( $visible );
 		}
-	
+
 	# Show the window (in a modal fashion)
 	$_W{window}{data} -> show_all;
 	my $ok = $_W{window}{data} -> run;
-	
+
 	my $val;
 	if ( @list )	{ $val = ( $ok eq 'ok' ) ? $_W{window}{gui}{comboList} -> get_active_text : undef; $pos = $_W{window}{gui}{comboList} -> get_active; }
 	else			{ $val = ( $ok eq 'ok' ) ? $_W{window}{gui}{entry} -> get_chars( 0, -1 ) : undef; }
-	
+
 	$_W{window}{data} -> destroy;
 	Gtk3::main_iteration while Gtk3::events_pending;
 	undef %_W;
-	
+
 	return wantarray ? ( $val, $pos ) : $val;
 }
 
@@ -512,7 +512,7 @@ sub _getPrompt {
 	# Delete any data accumulated before launching the command
 	$EXP -> clear_accum;
 	$EXP -> restart_timeout_upon_receive( 1 );
-	
+
 	send_slow( $EXP, "\n" );
 	my ( $matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match ) = $EXP -> expect( 0.5, [ timeout => sub { 1; } ], [ /\R.+\R/ => sub { 1; } ] );
 	$before_match =~ s/\R|\r|\f|\n//go;
@@ -522,7 +522,7 @@ sub _getPrompt {
 
 sub _execAndCapture {
 	my $tmp = shift;
-	
+
 	my $pipe	= $$tmp{pipe};
 	my $tee		= $$tmp{tee};
 	my $cmd		= $$tmp{cmd};
@@ -531,54 +531,54 @@ sub _execAndCapture {
 	my $ctrl	= $$tmp{ctrl};
 	my $lines	= $$tmp{lines};
 	my $intro	= $$tmp{intro};
-	
+
 	$cmd = subst( $cmd );
 	$cmd ||= $$ctrl{cmd};
-	
+
 	# Delete any data accumulated before launching the command
 	$EXP -> clear_accum;
 	$EXP -> restart_timeout_upon_receive( 1 );
-	
+
 	if ( $intro ) { send_slow( $EXP, $cmd . ( ( $METHOD =~ /^.*3270.*$/ ) || ( $METHOD eq 'IBM 3270/5250' ) ? "\r\f" : "\n" ) ); }
 	else { send_slow( $EXP, $cmd ); }
 	( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) and send_slow( $EXP, '##__PAC__PIPE__##' );
-	
+
 	$TIMEOUT_CMD = $$CFG{'environments'}{$UUID}{'terminal options'}{'use personal settings'} ?
 		( $$CFG{'environments'}{$UUID}{'terminal options'}{'timeout command'} || undef )
 		:
 		( $$CFG{'defaults'}{'timeout command'} || undef );
-	
+
 	$CONNECTED = 1;
-	
+
 	ctrl( "PIPE_WAIT[" . ( $TIMEOUT_CMD // 'indefinitely' ) . "][" . ( ( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) ? '##__PAC__PIPE__##' : $pattern // '' ) . "]" );
-	
+
 	my $ok = 0;
 	# Wait for pattern prompt before continue...
 	my ( $matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match ) = $EXP -> expect(
-		
+
 		$TIMEOUT_CMD,
-		
+
 		[ timeout => sub { ctrl( "ERROR:$TIMEOUT_CMD seconds waiting for expected input" ); }],
-		
+
 		[ eof => sub {
 			ctrl( "ERROR:Connection ended by remote peer!! " . $EXP -> set_accum() );
 			$CONNECTED = 0;
 			$EXP -> hard_close;
 		}],
-		
+
 		[ ( ( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) ? '##__PAC__PIPE__##' : (defined $pattern ? $pattern : '') ) => sub { $ok = 1; } ]
 	);
-	
+
 	if ( $ok && ( $pipe || $tee || $capture || defined $ctrl ) ) {
 		( ! defined $pattern && ( $pipe || $tee || $capture || defined $ctrl ) ) and send_slow( $EXP, "\x08"x17 );
-		
+
 		# Separate lines (\R matches *all kind* of new-lines: \n, \f, \r, ...)
 		my @out_lines = split( /\R/, $before_match );
 		# Remove last (prompt) line from output
 		pop @out_lines;
 		# Re-join in a single string
 		my $out = join( "\n", @out_lines );
-		
+
 		if ( $capture ) { return $out; }
 		elsif ( defined $ctrl ) {
 			$lines //= 1;
@@ -599,24 +599,24 @@ sub _execAndCapture {
 		# Advise PAC NOT to receive command output
 		ctrl( "EXEC:DISCARD_OUT" );
 	}
-	
+
 	return undef;
 }
 
 sub _execScript {
 	my $tmp = shift;
-	
+
 	return 0 unless defined $tmp;
-	
+
 	my $name	= $$tmp{name};
 	my $script	= $$tmp{script};
 	return 0 unless defined $script && defined $name;
-	
+
 	our %COMMON;	undef %COMMON;
 	our %PAC;		undef %PAC;
 	our %TERMINAL;	undef %TERMINAL;
 	our %SHARED;	undef %SHARED;
-	
+
 	$COMMON{subst}		= sub {
 		my $txt = shift // '';
 		ctrl( "SCRIPT_SUB_SUBST[NAME:$name][PID:$$][PARAMS:$txt]" );
@@ -625,7 +625,7 @@ sub _execScript {
 	$COMMON{cfg}		= sub { my $ref = shift // 0; return $ref ? $CFG : dclone( $CFG ); };
 	$COMMON{cfg_sanity}	= sub { _cfgSanityCheck( shift ); };
 	$COMMON{del_esc}	= sub { return _removeEscapeSeqs( shift // '' ); };
-	
+
 	$TERMINAL{exp}		= $EXP;
 	$TERMINAL{name}		= $NAME;
 	$TERMINAL{method}	= $METHOD;
@@ -635,18 +635,18 @@ sub _execScript {
 	$TERMINAL{ask}		= sub {
 		my $txt		= shift;
 		my $visible	= shift // 1;
-		
+
 		ctrl( "SCRIPT_SUB_ASK[NAME:$name][PID:$$][PARAMS:$txt, $visible]" );
-		
+
 		return wEnterValue( undef, "<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible );
 	};
 	$TERMINAL{msg}		= sub { msg( subst( shift ) ); };
 	$TERMINAL{log}		= sub {
 		my $file = shift // '';
 		$file = subst( $file );
-		
+
 		ctrl( "SCRIPT_SUB_LOG[NAME:$name][PID:$$][PARAMS:$file]" );
-		
+
 		$EXP -> log_file -> flush;
 		$EXP -> log_file( $file );
 		return $EXP -> log_file;
@@ -654,18 +654,18 @@ sub _execScript {
 	$TERMINAL{send}		= sub {
 		my $txt = shift // '';
 		$txt = subst( $txt );
-		
+
 		ctrl( "SCRIPT_SUB_SEND[NAME:$name][PID:$$][PARAMS:$txt]" );
-		
+
 		$EXP -> clear_accum;
 		send_slow( $EXP, $txt );
 	};
 	$TERMINAL{send_get}	= sub {
 		my $txt		= shift // '';
 		my $intro	= shift // 1;
-		
+
 		ctrl( "SCRIPT_SUB_SEND_GET[NAME:$name][PID:$$][PARAMS:$txt]" );
-		
+
 		my $out = _execAndCapture( { 'capture' => 1, 'cmd' => $txt, 'intro' => $intro } );
 		return undef unless defined $out;
 		$out =~ s/^.+?\R//go;
@@ -681,16 +681,16 @@ sub _execScript {
 	$TERMINAL{expect}	= sub {
 		my $pattern	= shift // '';
 		my $tmout	= shift // 1;
-		
+
 		ctrl( "SCRIPT_SUB_EXPECT[NAME:$name][PID:$$][PARAMS:$pattern, $tmout]" );
-		
+
 		$pattern = subst( $pattern );
 		$tmout = subst( $tmout );
-		
+
 		$TERMINAL{out1}		= undef;
 		$TERMINAL{out2}		= undef;
 		$TERMINAL{error}	= '';
-		
+
 		my $wait = $tmout;
 		while ( $wait > 0 ) {
 			$EXP -> expect(
@@ -711,23 +711,23 @@ sub _execScript {
 		}
 		return $TERMINAL{error} eq '';
 	};
-	
+
 	# Start PAC Script
 	ctrl( "SCRIPT_START[NAME:$name]" );
-    
+
 	no warnings ( 'redefine' );
-	
+
     *OLDERR = *STDERR;
 	open STDERR, ">/dev/null";
-	
+
 	eval $script;
 	%SHARED = %{ $$tmp{shared} };
-	
+
 	*STDERR = *OLDERR;
-	
+
 	$@ and return 0;
 	use warnings;
-	
+
 	return 1 unless defined &CONNECTION;
 	eval {
 		local $SIG{'TERM'}	= sub {
@@ -738,12 +738,12 @@ sub _execScript {
 			Gtk3::main_iteration while Gtk3::events_pending;
 			die;
 		};
-		
+
 		&CONNECTION;
 	};
-	
+
 	ctrl( "SCRIPT_STOP[NAME:$name]" );
-	
+
 	return 1;
 }
 
@@ -751,7 +751,7 @@ sub findKP {
 	my $kp		= shift;
 	my $where	= shift // 'title';
 	my $what	= shift // qr/.*/;
-	
+
 	my @found;
 	foreach my $hash ( @{ $kp } ) {
 		if ( ref( $what ) eq 'Regexp' )	{ next unless $$hash{$where} =~ /^$what$/; }
@@ -765,14 +765,14 @@ sub findKP {
 			comment		=> $$hash{comment}
 		} );
 	}
-	
+
 	return wantarray ? @found : scalar( @found );
 }
 
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
-BEGIN{ 
+BEGIN{
 	eval("use X11::GUITest qw ( GetWindowPos GetRootWindow )");
 
 	if ($@) {
@@ -808,48 +808,48 @@ if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && 
 if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && $proxy_ip && $proxy_port ) {
 	require IO::Socket;
 	require IO::Handle; # Just for autoflush... :(
-    
+
 	socketpair( CHILD, PARENT, AF_UNIX, SOCK_STREAM, PF_UNSPEC ) or  die "socketpair: $!";
     CHILD -> autoflush( 1 );
     PARENT -> autoflush( 1 );
-	
+
 	my $LOCAL_PORT = 0;
-	
+
 	if ( $PROXYPID = fork ) {
 		# Parent
 		close PARENT;
-		
+
 		# Wait until read $LOCAL_PORT
 		ctrl( "PROXY_THREAD:Waiting for the thread to start the proxy tunnel..." );
 		chomp( $LOCAL_PORT = <CHILD> );
 		ctrl( "PROXY_THREAD:Built tunnel to $IP:$PORT through proxy $proxy_ip:$proxy_port ($proxy_user/$proxy_pass) using local port $LOCAL_PORT..." );
-		
+
 		select( undef, undef, undef, 0.5 );
-		
+
 		# If every thing went ok, modify IP and PORT to map the tunneled connection
 		$IP		= 'localhost';
 		$PORT	= $LOCAL_PORT;
-		
+
 	} elsif ( defined $PROXYPID ) {
 		# Children
 		close CHILD;
-		
+
 		local $SIG{'INT'}	= sub { exit; };
 		local $SIG{'TERM'}	= $SIG{'INT'};
 		local $SIG{'QUIT'}	= $SIG{'INT'};
 		local $SIG{'HUP'}	= $SIG{'INT'};
 		local $SIG{'USR1'}	= $SIG{'INT'};
 		local $SIG{'USR2'}	= $SIG{'INT'};
-		
+
 		require Net::Proxy;
 		my $proxy;
-		
+
 		do {
 			$proxy = Net::Proxy -> new( {
 				in => {
 					type		=> 'tcp',
 					port		=> $LOCAL_PORT = 60000 + int( rand( 1000 ) ),
-				},  
+				},
 				out => {
 					type		=> 'tcp', # 'tcp' method allows using SOCKs proxies!! :)
 					host		=> $IP,
@@ -862,15 +862,15 @@ if ( ( ( $USE_PROXY && $FORCE_USE_PROXY < 2 || ( $FORCE_USE_PROXY == 1 ) ) ) && 
 				}
 			} );
 		} until $proxy;
-		
+
 		$proxy -> set_verbosity( 0 );
 		$proxy -> register;
-		
+
 		# Send the parent process the new created local port
 		print PARENT "$LOCAL_PORT\n";
-		
+
 		Net::Proxy -> mainloop( 1 );
-		
+
 		exit 0;
 	} else {
 		$CONNECTED = 0;
@@ -1000,7 +1000,7 @@ if ( defined $METHOD ) {
 			ctrl( "PASSWORD:Asking user for password..." );
 			$PASS = wEnterValue( undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0 ) // '';
 		}
-		
+
 		$CONNECT_OPTS =~ s/\s*-embed//go;
 		if ( `vncviewer --help 2>&1 | /bin/grep TigerVNC` ) {
 			my $pfile = $CFG_DIR . '/tmp/pac_conn_' . $$ . '_' . $UUID;
@@ -1014,7 +1014,7 @@ if ( defined $METHOD ) {
 			}
 		} else {
 			my $user = '';
-			
+
 			$connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
 			$connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
 		}
@@ -1083,17 +1083,17 @@ $EXP -> exp_internal( $DEBUG ); # EXPECT DEBUG!!
 if ( ( $METHOD =~ /^.*rdesktop$/ ) || ( $METHOD =~ /^.*freerdp.*/ ) || ( $METHOD eq 'RDP (Windows)' ) ) {
 	$CONNECTED = 1;
 	ctrl( "CONNECTED" );
-	
+
 	# No way to expect anything from 'rdesktop' command line...
 	$EXP -> expect( $TIMEOUT_CONNECT,
-		
+
 		[ eof => sub {
-			
+
 			$CONNECTED = 0;
 			ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 			$EXP -> hard_close;
 		}],
-		
+
 		# Found certificate verification string
 		[ '^.+WARNING: CERTIFICATE NAME MISMATCH!.+$', sub {
 			if ( $ACCEPT_KEY ) {
@@ -1106,10 +1106,10 @@ if ( ( $METHOD =~ /^.*rdesktop$/ ) || ( $METHOD =~ /^.*freerdp.*/ ) || ( $METHOD
 				ctrl( "CLOSE:HOSTKEY:rejected by configuration (sent 'N')" );
 			}
 		}],
-		
+
 		# Found login string
 		[ $USERNAME_PROMPT, sub {
-			
+
 			if ( ( $USER eq '' ) && ( $USER_COUNT ) ) {
 				ctrl( "CLOSE:LOGIN:Empty username is not valid to login here" );
 				$EXP -> hard_close();
@@ -1119,11 +1119,11 @@ if ( ( $METHOD =~ /^.*rdesktop$/ ) || ( $METHOD =~ /^.*freerdp.*/ ) || ( $METHOD
 			ctrl( "LOGIN:$USER" );
 			send_slow( $EXP, "$USER\n" );
 			exp_continue;
-		}],
+			}],
 		# Found password/passphrase string
 		[ $PASSWORD_PROMPT, sub {
-			
-			# First password attempt...
+
+		# First password attempt...
 			if ( ! $PASSWORD_COUNT ) {
 				$PASSWORD_COUNT++;
 				if ( ( $PASS eq '<<ASK_PASS>>' ) || ( $MANUAL ) ) {
@@ -1154,41 +1154,41 @@ if ( ( $METHOD =~ /^.*rdesktop$/ ) || ( $METHOD =~ /^.*freerdp.*/ ) || ( $METHOD
 elsif ( ( $METHOD =~ /^.*vncviewer$/ ) || ( $METHOD eq 'VNC' ) ) {
 	# Expect authentication confirmation...
 	my ( $matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match ) = $EXP -> expect( $TIMEOUT_CONNECT,
-		
+
 		[ timeout => sub {
 			$CONNECTED = 0;
 			ctrl( "CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!" );
 			$EXP -> hard_close;
 		}],
-		
+
 		[ eof => sub {
-			
+
 			$CONNECTED = 0;
 			ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 			$EXP -> hard_close;
 		}],
-		
+
 		# Found login string
 		[ '^.*Authentication successful.*$', sub {
 			$CONNECTED = 1;
 			ctrl( "CONNECTED" );
 		}],
-		
+
 		# No auth is needed
 		[ '^.*No authentication needed*$', sub {
 			$CONNECTED = 1;
 			ctrl( "CONNECTED" );
 		}],
-		
+
 		# Found login string
 		[ '^.*Conn:\s+connected to host\s+.+\s+port\s+\d+.*$', sub {
 			$CONNECTED = 1;
 			ctrl( "CONNECTED" );
 		}],
-		
+
 		# Found login string
 		[ $USERNAME_PROMPT, sub {
-			
+
 			if ( ( $USER eq '' ) && ( $USER_COUNT ) ) {
 				ctrl( "CLOSE:LOGIN:Empty username is not valid to login here" );
 				$EXP -> hard_close();
@@ -1199,16 +1199,16 @@ elsif ( ( $METHOD =~ /^.*vncviewer$/ ) || ( $METHOD eq 'VNC' ) ) {
 			send_slow( $EXP, "$USER\n" );
 			exp_continue;
 		}],
-		
+
 		# Found password/passphrase string
 		[ $PASSWORD_PROMPT, sub {
-			
+
 			my $user = $EXP -> before // '';
 			$user =~ s/^(.+?)@.+/$1/go;
-			
+
 			ctrl( "PASSWORD:Asking user for gateway's password..." );
 			$PASS = wEnterValue( undef, "<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0 );
-			
+
 			if ( defined $PASS ) {
 				$EXP -> log_stdout( 0 );
 				$PASS = subst( $PASS );
@@ -1221,21 +1221,21 @@ elsif ( ( $METHOD =~ /^.*vncviewer$/ ) || ( $METHOD eq 'VNC' ) ) {
 				$EXP -> hard_close;
 			}
 		}],
-		
+
 		# Found any other string (special case for the '-via' option)
 		[ '.*((open|connect) failed)|refused|(server closed).*', sub {
 			ctrl( "DISCONNECTED" );
 			$CONNECTED = 0;
 		}],
-		
+
 	)
 }
 elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $METHOD =~ /^.*3270.*$/ ) || ( $METHOD eq 'IBM 3270/5250' ) ) {
 	$CONNECTED = 1;
-	
+
 	# Do we have to do complex expects?
 	return 1 unless ( $EXPECT && $CONNECTED );
-	
+
 	my $end = 0;
 	my $avoid_first_expectation = 0;
 	$EXP -> restart_timeout_upon_receive( 1 );
@@ -1249,19 +1249,19 @@ elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $M
 		my $on_match	= $$hash{'on_match'}	// -1;
 		my $on_fail		= $$hash{'on_fail'}		// -1;
 		my $time_out	= $$hash{'time_out'}	// -1;
-		
+
 		next unless $active;
 		my $jump = 0;
-		
+
 		$time_out >= 0 and $TIMEOUT_CMD = $time_out;
-		
+
 		$pattern = subst( $pattern );
-		
+
 		ctrl( "EXPECT:WAITING:$pattern" );
-		
+
 		# Wait for pattern prompt before continue...
 		$EXP -> expect( $TIMEOUT_CMD,
-			
+
 			[ timeout => sub {
 				if ( $on_fail == -1 ) {
 					ctrl( "CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!" );
@@ -1277,14 +1277,14 @@ elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $M
 					$jump = 1;
 				}
 			}],
-			
+
 			[ eof => sub {
-				
+
 				$CONNECTED = 0;
 				ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 				$EXP -> hard_close();
 			}],
-			
+
 			[ ( $avoid_first_expectation ) ? '' : $pattern, sub {
 				if ( $on_match == -1 ) {
 					$jump = 0;
@@ -1303,9 +1303,9 @@ elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $M
 		next if $jump;
 		$avoid_first_expectation = 0;
 		last unless $CONNECTED;
-		
+
 		$command = subst( $command );
-		
+
 		# ... and launch command
 		if ( $hide ) {
 			ctrl( "EXPECT:SENDING:<<HIDDEN STRING>>" );
@@ -1315,13 +1315,13 @@ elsif ( ( $METHOD =~ /^.*generic$/ ) || ( $METHOD eq 'Generic Command' ) || ( $M
 			$cmd_str =~ s/\n$//go;
 			ctrl( "EXPECT:SENDING:$cmd_str" . ( $return ? '\n' : '' ) );
 		}
-		
+
 		send_slow( $EXP, $command . ( $return ? ( ( $METHOD =~ /^.*3270.*$/ ) || ( $METHOD eq 'IBM 3270/5250' ) ? "\r\f" : "\n" ) : '' ) );
 		$hide and $EXP -> log_stdout( 1 );
 	}
-	
+
 	$EXP -> restart_timeout_upon_receive( 0 );
-	
+
 	if ( $CONNECTED ) {
 		ctrl( "TITLE:$TITLE" );
 		ctrl( "CONNECTED" );
@@ -1337,28 +1337,28 @@ elsif ( $METHOD eq 'PACShell' ) {
 }
 elsif ( ! $MANUAL ) {
 	my $end = 0;
-	
+
 	# Expect password/confirmation prompt...
 	my ( $matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match ) = $EXP -> expect( $TIMEOUT_CONNECT,
-		
+
 		[ timeout => sub {
 			$CONNECTED = 0;
 			ctrl( "CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!" );
 			$EXP -> hard_close();
 		}],
-		
+
 		[ eof => sub {
-			
+
 			$CONNECTED = 0;
 			ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 			$EXP -> hard_close();
 		}],
-		
+
 		# Found sudo prompt
 		[ "\Q$SUDO_PROMPT\E", sub {
-			
+
 			$CONNECTED and $EXP -> exp_continue;
-			
+
 			# First 'sudo' password attempt...
 			if ( ! $SUDO_PASSWORD_COUNT ) {
 				$SUDO_PASSWORD_COUNT++;
@@ -1384,7 +1384,7 @@ elsif ( ! $MANUAL ) {
 				$EXP -> hard_close;
 			}
 		}],
-		
+
 		# Found Host-Key verification string
 		[ $HOSTCHANGE_PROMPT, sub {
 			my $match = $EXP -> match;
@@ -1401,14 +1401,14 @@ elsif ( ! $MANUAL ) {
 				exp_continue;
 			}
 		}],
-		
+
 		# Found "Press any key to continue" string
 		[ $ANYKEY_PROMPT, sub {
 			send_slow( $EXP, "\n" );
 			ctrl( "PRESSKEY:sending 'return' to continue connecting" );
 			exp_continue;
 		}],
-		
+
 		# Found WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED
 		[ $REMOTEHOST_PROMPT, sub {
 			my $match = $EXP -> match;
@@ -1430,10 +1430,10 @@ elsif ( ! $MANUAL ) {
 				ctrl( "CLOSE:HOSTKEY:ignoring offending hostkey by configuration" );
 			}
 		}],
-		
+
 		# Found login string
 		[ $USERNAME_PROMPT, sub {
-			
+
 			if ( ( $USER eq '' ) && ( $USER_COUNT ) ) {
 				ctrl( "CLOSE:LOGIN:Empty username is not valid to login here" );
 				$EXP -> hard_close();
@@ -1444,11 +1444,11 @@ elsif ( ! $MANUAL ) {
 			send_slow( $EXP, "$USER\n" );
 			exp_continue;
 		}],
-		
+
 		# Found password/passphrase string
 		[ $PASSWORD_PROMPT, sub {
-			
-			# A few attempts...
+
+		# A few attempts...
 			if ( $PASSWORD_COUNT < 6 ) {
 				$PASSWORD_COUNT++;
 				$WAS_ASK_PASS = 0;
@@ -1456,7 +1456,7 @@ elsif ( ! $MANUAL ) {
 					my @before = split /\n/, $EXP -> before;
 					# Extract the last line and use it is as prompt for the request password dialog
 					my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP -> match;
-					
+
 					$WAS_ASK_PASS = 1;
 					ctrl( "PASSWORD:Asking user for password..." );
 					$PASS = wEnterValue( undef, '<b>Manual Password requested</b>', $real_prompt, '', 0 );
@@ -1481,16 +1481,16 @@ elsif ( ! $MANUAL ) {
 				$EXP -> hard_close;
 			}
 		}],
-		
+
 		# Found user prompt
 		[ $COMMAND_PROMPT, sub {
-			
+
 			$CONNECTED = 1;
 			my $avoid_first_expectation = 1;
-			
+
 			# Do we have to do complex expects?
 			return 1 unless ( $EXPECT && $CONNECTED );
-			
+
 			$EXP -> restart_timeout_upon_receive( 1 );
 			for( my $i = 0; $i < scalar( @{ $$CFG{'environments'}{$UUID}{'expect'} } ); $i++ ) {
 				my $hash		= $$CFG{'environments'}{$UUID}{'expect'}[$i];
@@ -1502,19 +1502,19 @@ elsif ( ! $MANUAL ) {
 				my $on_match	= $$hash{'on_match'} // -1;
 				my $on_fail		= $$hash{'on_fail'} // -1;
 				my $time_out	= $$hash{'time_out'} // -1;
-				
+
 				next unless $active;
-				
+
 				my $jump = 0;
-				
+
 				$time_out >= 0 and $TIMEOUT_CMD = $time_out;
 				$pattern = subst( $pattern );
-				
+
 				ctrl( "EXPECT:WAITING:$pattern" );
-				
+
 				# Wait for pattern prompt before continue...
 				$EXP -> expect( $TIMEOUT_CMD,
-					
+
 					[ timeout => sub {
 						if ( $on_fail == -1 ) {
 							ctrl( "CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!" );
@@ -1530,17 +1530,17 @@ elsif ( ! $MANUAL ) {
 							$jump = 1;
 						}
 					}],
-					
+
 					[ eof => sub {
-						
+
 						$CONNECTED = 0;
 						ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 						$EXP -> hard_close();
 					}],
-					
+
 					# Found Host-Key verification string
 					[ $HOSTCHANGE_PROMPT, sub {
-						
+
 						my $match = $EXP -> match;
 						$match =~ /$HOSTCHANGE_PROMPT/g;
 						my ( $yes, $no ) = ( $1, $2 );
@@ -1555,7 +1555,7 @@ elsif ( ! $MANUAL ) {
 							ctrl( "CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')" );
 						}
 					}],
-					
+
 					[ ( $avoid_first_expectation ) ? '' : $pattern, sub {
 						if ( $on_match == -1 ) {
 							$jump = 0;
@@ -1574,9 +1574,9 @@ elsif ( ! $MANUAL ) {
 				next if $jump;
 				$avoid_first_expectation = 0;
 				last unless $CONNECTED;
-				
+
 				$command = subst( $command );
-				
+
 				# Disconnect if an error occured during command substitution (eg: when user cancelled data entry)
 				if ( not defined($command) ) {
 					$CONNECTED = 0;
@@ -1592,19 +1592,19 @@ elsif ( ! $MANUAL ) {
 					$cmd_str =~ s/\n$//go;
 					ctrl( "EXPECT:SENDING:$cmd_str" . ( $return ? '\n' : '' ) );
 				}
-				
+
 				send_slow( $EXP, $command );
 				$return and send_slow( $EXP, "\n" );
-				
+
 				$hide and $EXP -> log_stdout( 1 );
 			}
-			
+
 			$EXP -> restart_timeout_upon_receive( 0 );
-			
+
 		}],
 
 	);
-	
+
 	if ( $end || ! $error ) {
 		if ( $CONNECTED ) {
 			ctrl( "TITLE:$TITLE" );
@@ -1638,13 +1638,13 @@ $SIG{'INT'} = undef;
 $SIG{'HUP'} = sub {
 	# Avoid more interruptions
 	local $SIG{'WINCH'} = undef;
-	
+
 	my $chain_uuid = '';
 	my $CHAIN_CFG;
-	
+
 	return 1 if $INT;
 	$INT = 1;
-	
+
 	# First, read the file with the configuration to use
 	my $rin = '';
 	vec( $rin, fileno( $SOCKET ), 1 ) = 1;
@@ -1655,7 +1655,7 @@ $SIG{'HUP'} = sub {
 		$INT = 0;
 		return 1;
 	}
-	
+
 	# Second, retrieve the 'serialized' configuration to be used
 	$rin = '';
 	vec( $rin, fileno( $SOCKET ), 1 ) = 1;
@@ -1665,7 +1665,7 @@ $SIG{'HUP'} = sub {
 		$INT = 0;
 		return 1;
 	}
-	
+
 	# Prepare some progressbar data
 	my $chain_name	= $$CHAIN_CFG{'environments'}{$chain_uuid}{'name'};
 	my $exp_partial	= 0;
@@ -1676,12 +1676,12 @@ $SIG{'HUP'} = sub {
 		return 1;
 	}
 	ctrl( "CHAIN:$chain_name:$chain_uuid:$exp_partial:$exp_total" );
-	
+
 	my $TIMEOUT_CMD = $$CHAIN_CFG{'defaults'}{'timeout command'} || undef;
 	if ( $$CHAIN_CFG{'environments'}{$chain_uuid}{'terminal options'}{'use personal settings'} ) {
 		$TIMEOUT_CMD = $$CHAIN_CFG{'environments'}{$chain_uuid}{'terminal options'}{'timeout command'} || undef;
 	}
-	
+
 	my $end = 0;
 	my $avoid_first_expectation = 1;
 	$EXP -> restart_timeout_upon_receive( 1 );
@@ -1695,19 +1695,19 @@ $SIG{'HUP'} = sub {
 		my $on_match	= $$hash{'on_match'}	// -1;
 		my $on_fail		= $$hash{'on_fail'}		// -1;
 		my $time_out	= $$hash{'time_out'}	// -1;
-		
+
 		next unless $active;
 		my $jump = 0;
-		
+
 		$time_out >= 0 and $TIMEOUT_CMD = $time_out;
-		
+
 		$pattern = subst( $pattern );
-		
+
 		ctrl( "CHAIN:$chain_name:WAITING($pattern):" . ( $exp_partial++ ) . ":$exp_total" );
-		
+
 		# Wait for pattern prompt before continue...
 		$EXP -> expect( $TIMEOUT_CMD,
-			
+
 			[ timeout => sub {
 				if ( $on_fail == -1 ) {
 					ctrl( "CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!" );
@@ -1723,17 +1723,17 @@ $SIG{'HUP'} = sub {
 					$jump = 1;
 				}
 			}],
-			
+
 			[ eof => sub {
-				
+
 				$CONNECTED = 0;
 				ctrl( "CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum() );
 				$EXP -> hard_close();
 			}],
-			
+
 			# Found Host-Key verification string
 			[ $HOSTCHANGE_PROMPT, sub {
-				
+
 				my $match = $EXP -> match;
 				$match =~ /$HOSTCHANGE_PROMPT/go;
 				my ( $yes, $no ) = ( $1, $2 );
@@ -1748,7 +1748,7 @@ $SIG{'HUP'} = sub {
 					ctrl( "CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')" );
 				}
 			}],
-			
+
 			[ ( $avoid_first_expectation ) ? '' : $pattern, sub {
 				if ( $on_match == -1 ) {
 					$jump = 0;
@@ -1767,9 +1767,9 @@ $SIG{'HUP'} = sub {
 		next if $jump;
 		$avoid_first_expectation = 0;
 		last unless $CONNECTED;
-		
+
 		$command = subst( $command );
-		
+
 		# ... and launch command
 		if ( $hide ) {
 			ctrl( "CHAIN:$chain_name:SENDING(<<HIDDEN STRING>>):$exp_partial:$exp_total" );
@@ -1779,13 +1779,13 @@ $SIG{'HUP'} = sub {
 			$cmd_str =~ s/\n$//go;
 			ctrl( "CHAIN:$chain_name:SENDING:$cmd_str" . ( $return ? '\n' : '' ) . ":$exp_partial:$exp_total" );
 		}
-		
+
 		send_slow( $EXP, $command . ( $return ? ( ( $METHOD =~ /^.*3270.*$/ ) || ( $METHOD eq 'IBM 3270/5250' ) ? "\r\f" : "\n" ) : '' ) );
 	}
 
 	$EXP -> log_stdout( 0 );
 	$EXP -> restart_timeout_upon_receive( 0 );
-	
+
 	$$CHAIN_CFG{'tmp'}{'set title'} and ctrl( "TITLE:$$CHAIN_CFG{'tmp'}{'title'}" );
 	ctrl( "CONNECTED" );
 	$INT = 0;
@@ -1795,10 +1795,10 @@ $SIG{'HUP'} = sub {
 $SIG{'USR1'} = sub {
 	# Avoid more interruptions
 	local $SIG{'WINCH'} = undef;
-	
+
 	return 1 if $INT;
 	$INT = 1;
-	
+
 	# Now, read the command to execute
 	my $rin = '';
 	vec( $rin, fileno( $SOCKET ), 1 ) = 1;
@@ -1809,9 +1809,9 @@ $SIG{'USR1'} = sub {
 		$INT = 0;
 		return 1;
 	}
-	
+
 	_execAndCapture( $tmp );
-	
+
 	ctrl( $CONNECTED ? "CONNECTED" : "DISCONNECTED" );
 	$INT = 0;
 	return 1;
@@ -1820,10 +1820,10 @@ $SIG{'USR1'} = sub {
 $SIG{'USR2'} = sub {
 	# Avoid more interruptions
 	local $SIG{'WINCH'} = undef;
-	
+
 	return 1 if $INT;
 	$INT = 1;
-	
+
 	my $rin = '';
 	vec( $rin, fileno( $SOCKET ), 1 ) = 1;
 	select( $rin, undef, undef, 2 ) or return 1;
@@ -1833,10 +1833,10 @@ $SIG{'USR2'} = sub {
 		$INT = 0;
 		return 0;
 	}
-	
+
 	_execScript( $tmp );
 	ctrl( $CONNECTED ? "CONNECTED" : "DISCONNECTED" );
-	
+
 	$INT = 0;
 	return 1;
 };
@@ -1857,23 +1857,23 @@ exit 0;
 
 END {
 	return 1 unless $LOG_FILE && $REMOVE_CTRL_CHARS;
-	
+
 	ctrl( "LOGFILE:Removing CONTROL characters" );
-	
+
 	if ( ! open( F, "$LOG_FILE" ) ) {
 		ctrl( "ERROR: Could not open file '$LOG_FILE' for reading!! ($!)" );
 		return 1;
 	}
 	my @lines = <F>;
 	close F;
-	
+
 	if ( ! open( F, ">$LOG_FILE.$$" ) ) {
 		ctrl( "ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)" );
 		return 1;
 	}
 	print F _removeEscapeSeqs( join( '', @lines ) );
 	close F;
-	
+
 	rename( "$LOG_FILE.$$", $LOG_FILE ) or ctrl( "ERROR: $!" );
 }
 

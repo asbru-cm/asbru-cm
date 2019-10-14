@@ -75,6 +75,9 @@ my $EXEC_STORM_TIME	= 0.2;
 
 my @KPX;
 
+my $NPOSX = 0;
+my $NPOSY = 0;
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -374,6 +377,7 @@ sub start {
 	);
 
 	$$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS} -> _execScript( $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP} );
+	$PACMain::RUNNING{ $$self{'_UUID_TMP'} }{terminal}{_GUI}{_VTE} -> grab_focus;
 
 	return 1;
 }
@@ -389,6 +393,17 @@ sub stop {
 
 	# First of all, save THIS page's widget (to prevent closing a not selected tab)
 	my $p_widget = $$self{_GUI}{_VBOX};
+
+	if ($NPOSX>0) {
+		$NPOSX--;
+		if (($NPOSY>0)&&($NPOSX==0)) {
+			$NPOSY--;
+			$NPOSX=2;
+		}
+	} elsif ($NPOSY>0) {
+		$NPOSY--;
+		$NPOSX=1;
+	}
 
 	# May be user wants to close without confirmation...
 	if ( ( ! $force ) && ( $self -> {CONNECTED} ) ) {
@@ -641,7 +656,7 @@ sub _initGUI {
 			$$self{_GUI}{_BTNFOCUS} -> set_image( Gtk3::Image -> new_from_icon_name( 'input-keyboard', 'GTK_ICON_SIZE_BUTTON' ) );
 			$$self{_GUI}{_BTNFOCUS} -> set( 'can_focus', 0 );
 			$$self{_GUI}{bottombox} -> pack_end( $$self{_GUI}{_BTNFOCUS}, 0, 1, 4 );
-				
+
 			$$self{FOCUS} = $$self{_GUI}{_SOCKET};
 		}
 
@@ -712,16 +727,35 @@ sub _initGUI {
 		# Build a new window,
 		$$self{_WINDOWTERMINAL} = Gtk3::Window -> new;
 		$$self{_WINDOWTERMINAL} -> set_title( $$self{_TITLE} . " : $APPNAME (v$APPVERSION)" );
-		$$self{_WINDOWTERMINAL} -> set_position( 'center' );
+		$$self{_WINDOWTERMINAL} -> set_position( 'none' );
 		$$self{_WINDOWTERMINAL} -> set_size_request( 200, 100 );
 		my $hsize = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
 		my $vsize = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
+		# HPR.20191010
+		my $conns_per_row = 2;
+		if ($self -> {_CLUSTER}) {
+			if ($ENV{'NTERMINALES'}>1) {
+				my $screen	= Gtk3::Gdk::Screen::get_default;
+				my $sw		= $screen -> get_width;
+				my $sh		= $screen -> get_height-100;
+				$conns_per_row = $ENV{'NTERMINALES'} < 5 ? 2 : 3;
+				my $rows = POSIX::ceil( $ENV{'NTERMINALES'} / $conns_per_row ) || 1;
+				$hsize=int( $sw / ( POSIX::ceil( $ENV{'NTERMINALES'} / $rows ) ) );;
+				$vsize=int( $sh / ( POSIX::ceil( $ENV{'NTERMINALES'} / $rows ) ) );;
+			}
+		}
 		$$self{_WINDOWTERMINAL} -> set_default_size( $hsize, $vsize );
 		$$self{_WINDOWTERMINAL} -> maximize if $$self{_CFG}{'defaults'}{'start maximized'};
 		$$self{_WINDOWTERMINAL} -> set_icon_name( 'gtk-disconnect' );
 		$$self{_WINDOWTERMINAL} -> add( $$self{_GUI}{_VBOX} );
+		$$self{_WINDOWTERMINAL} -> move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
 		$$self{_WINDOWTERMINAL} -> show_all;
 		$$self{_WINDOWTERMINAL} -> present;
+		$NPOSX++;
+		if ($NPOSX==$conns_per_row) {
+			$NPOSY++;
+			$NPOSX=0;
+		}
 	}
 
 	_updateCFG( $self );
@@ -1028,13 +1062,16 @@ sub _setupCallbacks {
 	# Right mouse mouse on VTE
 	$$self{_GUI}{_VTE} -> signal_connect( 'button_press_event' => sub {
 		my ( $widget, $event ) = @_;
+		my $state	= $event -> get_state;
+		my $shift	= $state * ['shift-mask'];
+
 		if ( $event -> button eq 2 ) {
 			return 0 unless $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'};
 			my $txt = $$self{_GUI}{_VTE} -> get_clipboard( Gtk3::Gdk::Atom::intern_static_string( 'PRIMARY' ) ) -> wait_for_text;
 			$self -> _pasteToVte( $txt, $$self{_CFG}{'environments'}{ $$self{_UUID} }{'send slow'} );
 			$$self{FOCUS} -> child_focus( 'GTK_DIR_TAB_FORWARD' );
 			return 1;
-		} elsif ( $event -> button eq 3 ) {
+		} elsif (( $event -> button eq 3 )&&($shift)) {
 			$self -> _vteMenu( $event );
 			return 1;
 		}
@@ -2072,6 +2109,7 @@ sub _updateStatus {
 sub _clusterCommit {
 	my ( $self, $terminal, $string, $int ) = @_;
 
+	return 1;
 	return 1 unless $$self{_LISTEN_COMMIT} && ( $$self{_CLUSTER} ne '' ) && $$self{CONNECTED} && $$self{_PROPAGATE};
 
 	$$self{_LISTEN_COMMIT} = 0;
