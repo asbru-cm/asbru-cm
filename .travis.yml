@@ -68,3 +68,5 @@ after_deploy:
   - pip install -r ./packpack/tools/requirements.txt
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 deb ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 rpm ${OS} ${DIST} --keep 5
