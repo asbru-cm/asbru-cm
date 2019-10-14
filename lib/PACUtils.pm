@@ -114,7 +114,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME		= decode( 'UTF-8', 'Ásbrú Connection Manager' );
-our $APPVERSION		= '5.2.90';
+our $APPVERSION		= '6.0.0';
 our $DEBUG_LEVEL	= 1;
 our $ARCH			= '';
 my $ARCH_TMP		= `/bin/uname -m 2>&1`;
