@@ -22,6 +22,8 @@ env:
     - OS=fedora DIST=28 PACKAGE=rpm
     - OS=fedora DIST=29 PACKAGE=rpm
     - OS=fedora DIST=30 PACKAGE=rpm
+    - OS=el DIST=7 PACKAGE=rpm DOCKER_IMAGE=centos-7
+    - OS=el DIST=8 PACKAGE=rpm DOCKER_IMAGE=centos-8 DOCKER_REPO=asbru/asbru-cm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
@@ -50,9 +52,21 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       tags: true
+  - provider: packagecloud
+    skip_cleanup: true
+    repository: gtk3
+    username: ${PACKAGECLOUD_USER}
+    token: ${PACKAGECLOUD_TOKEN}
+    dist: ${OS}/${DIST}
+    package_glob: "build/*.{deb,rpm,dsc}"
+    on:
+      branch: gtk3
+
 
 after_deploy:
   # Prune old packages from packagecloud. The last 5 should be enough.
   - pip install -r ./packpack/tools/requirements.txt
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 deb ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 rpm ${OS} ${DIST} --keep 5
