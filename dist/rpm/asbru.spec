@@ -63,6 +63,7 @@ Requires:   telnet
 Requires:   bash
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
+BuildRequires: desktop-file-utils
 BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %description
