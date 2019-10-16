@@ -1,6 +1,6 @@
 # Coding Standard for Ásbru
 
-## Coding guide lines
+## Coding guidelines
 
 * Use spaces as indentation 4 Spaces per indentation level.
 * No trailing white spaces if possible.
@@ -10,6 +10,8 @@
     - reversed if `next if $true;`
     - non explicit conditional expressions
       - `($a) && ($b) and print "do this if both variables are true";`
+* Ternary operator for assigment is allowed as long as the code does not obfuscate.
+  - `my $value = ($exists) ? $exists : 1;`
 * Use of strings with interpolation.
   - Example: `$CNF_DIR = "$ENV{'HOME'}/.config/pac";`
 * Nested parenthesis should be together unless you feel that a separation makes code more readable.

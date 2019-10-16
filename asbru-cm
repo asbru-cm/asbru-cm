@@ -56,6 +56,7 @@ BEGIN {
 use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 use File::Copy;
+use PACMain;
 
 # Standard
 use strict;
@@ -79,7 +80,6 @@ our $ASBRU;
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
 
-eval "use PACMain";
 
 print "INFO: Ásbrú started ($Script) with PID $$\n";
 
