@@ -1,11 +1,14 @@
-# Coding Standard for Ásbru
+# Coding Standard
+
+This coding standard consists of recommendations when contributing to the Ásbrú Connection Manager project.  Recommendations are meant to provide guidance that, when followed, should improve the safety, reliability, and security of the project.
 
 ## Coding guidelines
 
-* Use spaces as indentation 4 Spaces per indentation level.
-* No trailing white spaces if possible.
-* Explicit if statements.
-  - No use  of:
+* Use spaces as indentation (no tabs).
+* Use 4 spaces per indentation level.
+* No trailing white space.
+* Explicit if statements:
+  - No use of:
     - `unless`
     - reversed if `next if $true;`
     - non explicit conditional expressions
@@ -21,7 +24,7 @@
     * Avoid declaring them in the middle of the block, unless is going to be used as a temporary variable inside an inner block.
 * Rules might be bent from time to time, when brings something valuable to the code over formatting.
 
-## Documentation guide lines
+## Documentation guidelines
 
 * At the end of each script the `__END__` marker should be added
   - This marker will tell the compiler to stop processing the file from that point onward.
