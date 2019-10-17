@@ -434,7 +434,7 @@ sub stop {
         $NPOSX=1;
     }
 
-    # FOR REVISION : This coding sequece looks repeted unless is it is necesary to confirm connection that many times
+    # TODO : This coding sequece looks repeted unless is it is necesary to confirm connection that many times
 
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
@@ -443,7 +443,7 @@ sub stop {
             return 1;
         }
 
-        # Check terminal is still connected after asking for confirmation. Check for post-connection commands execution
+        # Check for post-connection commands execution
         if ($$self{CONNECTED}){
             $self->_wPrePostExec('local after');
         }
@@ -926,8 +926,9 @@ sub _setupCallbacks {
                 $$self{_WINDOWTERMINAL}->present;
             }
             $$self{_GUI}{_VTE}->grab_focus;
-            # FOR REVISION: I think this line should be:
+            # TODO : I think this line should be:
             # $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_GUI}{_VTE};
+            # Acording to documentation in PACMain.pm.
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             1;
         }
