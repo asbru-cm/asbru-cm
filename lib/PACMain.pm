@@ -2133,7 +2133,7 @@ sub _setupCallbacks {
         $$self{_HAS_FOCUS} = '';
         foreach my $tmp_uuid (keys %RUNNING) {
             my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
-            if (!defined $check_gui && $check_gui eq $tab_page) {
+            if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
                 next;
             }
 
@@ -3158,9 +3158,8 @@ sub _quitProgram {
             next;
         }
         if (ref($RUNNING{$tmp_uuid}{terminal}) =~ /^PACTerminal|PACShell$/go) {
-            next;
+            $RUNNING{$tmp_uuid}{terminal}->stop(1, 0);
         }
-        $RUNNING{$tmp_uuid}{terminal}->stop(1, 0);
     }
 
     Gtk3::main_iteration while Gtk3::events_pending;   # Update GUI
