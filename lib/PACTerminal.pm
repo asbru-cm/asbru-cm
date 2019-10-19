@@ -1426,12 +1426,15 @@ sub _watchConnectionData {
                 }
             });
         } elsif ($data =~ /^SCRIPT_(START|STOP)\[NAME:(.+)\]/go) {
+            $$self{_PULSE_TIMER} = Glib::Timeout->add (100, sub {defined $$self{_GUI}{pb} and $$self{_GUI}{pb}->pulse; return $$self{_PULSE};});
+        }
+        elsif ($data =~ /^SCRIPT_(START|STOP)\[NAME:(.+)\]/go) {
             my ($status, $name) = ($1, $2);
             $$self{_SCRIPT_STATUS} = $status;
             $$self{_SCRIPT_NAME} = $name;
 
             if ($$self{CONNECTING} = $status eq 'START') {
-                if (!defined $$self{_GUI}{pb}) {
+                if (! defined $$self{_GUI}{pb}) {
                     $$self{_GUI}{pb} = Gtk3::ProgressBar->new;
                     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{pb}, 0, 1, 0);
                     $$self{_GUI}{pb}->show;
@@ -4750,3 +4753,4 @@ Reference to available methods are located at : https://developer.gnome.org/vte/
     |child-exited|$$self{_GUI}{_VTE}->signal_connect('child_exited' => sub {# my code})|
     |commit      |$$self{_GUI}{_VTE}->signal_connect('commit' => sub {# my code})      |
 
+=======
