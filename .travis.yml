@@ -2,8 +2,6 @@ sudo: required
 language: perl
 services:
         - docker
-rvm:
-  - 2.4.4
 env:
   global:
     - CHANGELOG_NAME=Asbru-CM Team
@@ -34,6 +32,7 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
+    - sudo rvm install 2.4.4
     - sudo gem install github_changelog_generator
 script: ./build.sh
 deploy:
