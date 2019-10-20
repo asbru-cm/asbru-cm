@@ -2,6 +2,8 @@ sudo: required
 language: perl
 services:
         - docker
+rvm:
+  - 2.4.4
 env:
   global:
     - CHANGELOG_NAME=Asbru-CM Team
