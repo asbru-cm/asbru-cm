@@ -2839,13 +2839,17 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox" id="hbox38">
+          <object class="GtkBox" id="imgBanner">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkImage" id="imgBannerPref">
+              <object class="GtkImage" id="imgBannerIcon">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_left">10</property>
+                <property name="margin_right">10</property>
+                <property name="stock">gtk-properties</property>
+                <property name="icon_size">6</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -2854,8 +2858,25 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkLabel" id="imgBannerText">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">10</property>
+                <property name="margin_right">10</property>
+                <property name="label" translatable="yes">Preferences</property>
+                <style>
+                  <class name="banner-text"/>
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
             </child>
+            <style>
+              <class name="banner-fill"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>

@@ -145,7 +145,8 @@ sub _initGUI {
     $$self{_WINDOWCONFIG} = $$self{_GLADE}->get_object ('windowConfig');
     $$self{_WINDOWCONFIG}->set_size_request(-1, -1);
 
-    _($self, 'imgBannerPref')->set_from_file($RES_DIR . '/asbru_banner_preferences.png');
+    _($self, 'imgBannerIcon')->set_from_file("$RES_DIR/asbru-preferences.svg");
+    _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
     _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
