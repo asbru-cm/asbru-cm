@@ -78,6 +78,8 @@ my @KPX;
 my $NPOSX = 0;
 my $NPOSY = 0;
 
+my $right_click_deep = 0;
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -1186,8 +1188,11 @@ sub _setupCallbacks {
         return 0;
     });
 
-    # Right mouse mouse on VTE
+    # Right mouse click on VTE
     $$self{_GUI}{_VTE}->signal_connect('button_press_event' => sub {
+        if ($right_click_deep) {
+            return 0;  # Bubble up, let VTE's original handler take care of it.
+        }
         my ($widget, $event) = @_;
         my $state = $event->get_state;
         my $shift = $state * ['shift-mask'];
@@ -1200,9 +1205,18 @@ sub _setupCallbacks {
             $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
             $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             return 1;
-        } elsif ($event->button eq 3) {
-            $self->_vteMenu($event);
-            return 1;
+        } elsif ($event->button eq 3 and $event -> type eq 'button-press') {
+            # See #209 for all this hack.
+            my $handled_by_vte = 0;
+            if (! $shift) {
+                $right_click_deep = 1;
+                $handled_by_vte = $$self{_GUI}{_VTE}->event($event);
+                $right_click_deep = 0;
+            }
+            if (! $handled_by_vte) {
+                $self->_vteMenu($event);
+            }
+            return 1;  # One way or another, we've handled it.
         }
 
         return 0;
