@@ -818,7 +818,7 @@ sub _initGUI {
     {
         # Build a new window,
         $$self{_WINDOWTERMINAL} = Gtk3::Window->new;
-        $$self{_WINDOWTERMINAL}->set_title($$self{_TITLE} . " : $APPNAME (v$APPVERSION)");
+        $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
         my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
@@ -933,7 +933,7 @@ sub _setupCallbacks {
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
         if ($$self{_CFG}{defaults}{'change main title'}) {
-            $PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title("$$self{_TITLE}  - $APPNAME");
+            $PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
         }
     });
 
@@ -2055,9 +2055,8 @@ sub _vteMenu {
         # Prepare the input window
         my $new_label = _wEnterValue(
             $PACMain::FUNCS{_MAIN}{_GUI}{main},
-            "<b>Temporaly renaming label '" . __($$self{_TITLE}) . "'</b>",
-            'Enter the new temporal label:',
-            $$self{_TITLE}
+            "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
+            'Enter the new temporal label:', $$self{_TITLE}
         );
         if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
             $$self{_TITLE} = $new_label;
@@ -2302,14 +2301,14 @@ sub _setTabColour {
             my $fore1 = 'foreground="' . ($$self{CONNECTED} ? $conn_color : $disconn_color) . '"';
             my $back2 = $$self{_CFG}{'environments'}{$PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{'environments'}{$PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_UUID}}{'terminal options'}{'use tab back color'} ? "background=\"$$self{_CFG}{'environments'}{$PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_UUID}}{'terminal options'}{'tab back color'}\"" : '';
             my $fore2 = 'foreground="' . ($PACMain::RUNNING{$$self{_SPLIT}}{terminal}{CONNECTED} ? $rem_conn_color : $disconn_color) . '"';
-            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back1 $fore1>$$self{_TITLE}</span> + <span $back2 $fore2>__($PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_TITLE})</span>");
+            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back1 $fore1>@{[__($$self{_TITLE})]}</span> + <span $back2 $fore2>__($PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_TITLE})</span>");
             if ($i) {
                 $PACMain::RUNNING{$$self{_SPLIT}}{terminal}->_setTabColour(--$i);
             }
         } else {
             my $back = $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use tab back color'} ? "background=\"$$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'tab back color'}\"" : '';
             my $fore = 'foreground="' . ($$self{CONNECTED} ? $conn_color : $disconn_color) . '"';
-            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back $fore>$$self{_TITLE}</span>");
+            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back $fore>@{[__($$self{_TITLE})]}</span>");
         }
     } else {
         defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL}->set_icon_from_file($$self{CONNECTED} ? "$RealBin/res/asbru_terminal64x64.png" : "$RealBin/res/asbru_terminal_x64x64.png");
@@ -2749,7 +2748,7 @@ sub _tabMenu {
         # Prepare the input window
         my $new_label = _wEnterValue(
             $PACMain::FUNCS{_MAIN}{_GUI}{main},
-            "<b>Temporaly renaming label '" . __($$self{_TITLE}) . "'</b>",
+            "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
             'Enter the new temporal label:',
             $$self{_TITLE}
         );
