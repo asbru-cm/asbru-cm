@@ -11,23 +11,23 @@ use warnings;
 use Crypt::Rijndael;
 use Digest::SHA qw(sha256);
 
-use constant DB_HEADSIZE_V1   => 124;
-use constant DB_SIG_1         => 0x9AA2D903;
-use constant DB_SIG_2_v1      => 0xB54BFB65;
-use constant DB_SIG_2_v2      => 0xB54BFB67;
-use constant DB_VER_DW_V1     => 0x00030002;
-use constant DB_VER_DW_V2     => 0x00030000; # recent KeePass is 0x0030001
+use constant DB_HEADSIZE_V1 => 124;
+use constant DB_SIG_1 => 0x9AA2D903;
+use constant DB_SIG_2_v1 => 0xB54BFB65;
+use constant DB_SIG_2_v2 => 0xB54BFB67;
+use constant DB_VER_DW_V1 => 0x00030002;
+use constant DB_VER_DW_V2 => 0x00030000; # recent KeePass is 0x0030001
 use constant DB_FLAG_RIJNDAEL => 2;
-use constant DB_FLAG_TWOFISH  => 8;
+use constant DB_FLAG_TWOFISH => 8;
 
 our $VERSION = '2.03';
 my %locker;
 my $salsa20_iv = "\xe8\x30\x09\x4b\x97\x20\x5d\x2a";
-my $qr_date = qr/^(\d\d\d\d)-(\d\d)-(\d\d)[T ](\d\d):(\d\d):(\d\d)(\.\d+|)?Z?$/;
+my $qr_date = qr/^(\d\d\d\d)-(\d\d)-(\d\d)[T](\d\d):(\d\d):(\d\d)(\.\d+|)?Z?$/;
 
 sub new {
     my $class = shift;
-    my $args  = ref($_[0]) ? {%{shift()}} : {@_};
+    my $args = ref($_[0]) ? {%{shift()}} : {@_};
     return bless $args, $class;
 }
 
@@ -37,9 +37,9 @@ sub auto_lock {
     return !exists($self->{'auto_lock'}) || $self->{'auto_lock'};
 }
 
-sub groups { shift->{'groups'} || die "No groups loaded yet\n" }
+sub groups {shift->{'groups'} || die "No groups loaded yet\n"}
 
-sub header { shift->{'header'} }
+sub header {shift->{'header'}}
 
 ###----------------------------------------------------------------###
 
@@ -94,7 +94,7 @@ sub clear {
     delete @$self{qw(header groups)};
 }
 
-sub DESTROY { shift->clear }
+sub DESTROY {shift->clear}
 
 ###----------------------------------------------------------------###
 
@@ -135,7 +135,7 @@ sub _parse_v1_header {
     die "File was smaller than db header ($size < ".DB_HEADSIZE_V1().")\n" if $size < DB_HEADSIZE_V1;
     my %h = (version => 1, header_size => DB_HEADSIZE_V1);
     my @f = qw(sig1 sig2 flags ver seed_rand enc_iv n_groups n_entries checksum seed_key rounds);
-    my $t =   'L    L    L     L   a16       a16    L        L         a32      a32      L';
+    my $t = 'L    L    L     L   a16       a16    L        L         a32      a32      L';
     @h{@f} = unpack $t, $buffer;
     die "Unsupported file version ($h{'ver'}).\n" if $h{'ver'} & 0xFFFFFF00 != DB_VER_DW_V1 & 0xFFFFFF00;
     $h{'enc_type'} = ($h{'flags'} & DB_FLAG_RIJNDAEL) ? 'rijndael'
@@ -222,7 +222,7 @@ sub _parse_v2_body {
     die "The database key appears invalid or else the database is corrupt.\n"
         if substr($buffer, 0, 32, '') ne $head->{'start_bytes'};
     $buffer = $self->unchunksum($buffer);
-    $buffer = eval { $self->decompress($buffer) } or die "Failed to decompress document: $@" if ($head->{'compression'} || '') eq '1';
+    $buffer = eval {$self->decompress($buffer)} or die "Failed to decompress document: $@" if ($head->{'compression'} || '') eq '1';
     $self->{'xml_in'} = $buffer if $self->{'keep_xml'} || $head->{'keep_xml'};
 
     my $uuid = sub {
@@ -236,17 +236,17 @@ sub _parse_v2_body {
     };
 
     # parse the XML - use our own parser since XML::Simple does not do event based actions
-    my $tri = sub { return !defined($_[0]) ? undef : ('true' eq lc $_[0]) ? 1 : ('false' eq lc $_[0]) ? 0 : undef };
+    my $tri = sub {return !defined($_[0]) ? undef : ('true' eq lc $_[0]) ? 1 : ('false' eq lc $_[0]) ? 0 : undef};
     my $s20_stream = $self->salsa20_stream({key => sha256($head->{'protected_stream_key'}), iv => $salsa20_iv, rounds => 20});
     my %BIN;
     my $META;
     my @GROUPS;
     my $level = 0;
     my $data = $self->parse_xml($buffer, {
-        top            => 'KeePassFile',
-        force_array    => {map {$_ => 1} qw(Binaries Binary Group Entry String Association Item DeletedObject)},
-        start_handlers => {Group => sub { $level++ }},
-        end_handlers   => {
+        top => 'KeePassFile',
+        force_array => {map {$_ => 1} qw(Binaries Binary Group Entry String Association Item DeletedObject)},
+        start_handlers => {Group => sub {$level++}},
+        end_handlers => {
             Meta => sub {
                 my ($node, $parent) = @_;
                 die "Found multiple intances of Meta.\n" if $META;
@@ -270,48 +270,48 @@ sub _parse_v2_body {
                     $content = '' if ! defined $content;
                     $content = $self->decode_base64($content) if length $content;
                     if ($comp && $comp eq 'True' && length $content) {
-                        eval { $content = $self->decompress($content) } or warn "Could not decompress associated binary ($id): $@";
+                        eval {$content = $self->decompress($content)} or warn "Could not decompress associated binary ($id): $@";
                     }
                     warn "Duplicate binary id $id - using most recent.\n" if exists $BIN{$id};
                     $BIN{$id} = $content;
                 } elsif ($parent_tag eq 'Entry') {
                     my $key = $node->{'Key'};
-                    $key = do { warn "Missing key for binary."; 'unknown' } if ! defined $key;
+                    $key = do {warn "Missing key for binary."; 'unknown'} if ! defined $key;
                     warn "Duplicate binary key for entry." if $parent->{'__binary__'}->{$key};
                     $parent->{'__binary__'}->{$key} = $BIN{$node->{'Value'}->{'Ref'}};
                 }
             },
             CustomData => sub {
                 my ($node, $parent, $parent_tag, $tag) = @_;
-                $parent->{$tag} = {map {$_->{'Key'} => $_->{'Value'}} @{ $node->{'Item'} || [] }}; # is order important?
+                $parent->{$tag} = {map {$_->{'Key'} => $_->{'Value'}} @{$node->{'Item'} || []}}; # is order important?
             },
             Group => sub {
                 my ($node, $parent, $parent_tag) = @_;
                 my $group = {
-                    id       => $uuid->($node->{'UUID'}),
-                    icon     => $node->{'IconID'},
-                    title    => $node->{'Name'},
+                    id => $uuid->($node->{'UUID'}),
+                    icon => $node->{'IconID'},
+                    title => $node->{'Name'},
                     expanded => $tri->($node->{'IsExpanded'}),
-                    level    => $level,
+                    level => $level,
                     accessed => $self->_parse_v2_date($node->{'Times'}->{'LastAccessTime'}),
-                    expires  => $self->_parse_v2_date($node->{'Times'}->{'ExpiryTime'}),
-                    created  => $self->_parse_v2_date($node->{'Times'}->{'CreationTime'}),
+                    expires => $self->_parse_v2_date($node->{'Times'}->{'ExpiryTime'}),
+                    created => $self->_parse_v2_date($node->{'Times'}->{'CreationTime'}),
                     modified => $self->_parse_v2_date($node->{'Times'}->{'LastModificationTime'}),
 
                     auto_type_default => $node->{'DefaultAutoTypeSequence'},
                     auto_type_enabled => $tri->($node->{'EnableAutoType'}),
-                    enable_searching  => $tri->($node->{'EnableSearching'}),
-                    last_top_entry    => $uuid->($node->{'LastTopVisibleEntry'}),
-                    expires_enabled   => $tri->($node->{'Times'}->{'Expires'}),
-                    location_changed  => $self->_parse_v2_date($node->{'Times'}->{'LocationChanged'}),
-                    usage_count       => $node->{'Times'}->{'UsageCount'},
-                    notes             => $node->{'Notes'},
+                    enable_searching => $tri->($node->{'EnableSearching'}),
+                    last_top_entry => $uuid->($node->{'LastTopVisibleEntry'}),
+                    expires_enabled => $tri->($node->{'Times'}->{'Expires'}),
+                    location_changed => $self->_parse_v2_date($node->{'Times'}->{'LocationChanged'}),
+                    usage_count => $node->{'Times'}->{'UsageCount'},
+                    notes => $node->{'Notes'},
 
                     entries => delete($node->{'__entries__'}) || [],
-                    groups  => delete($node->{'__groups__'})  || [],
+                    groups => delete($node->{'__groups__'})  || [],
                 };
                 if ($parent_tag eq 'Group') {
-                    push @{ $parent->{'__groups__'} }, $group;
+                    push @{$parent->{'__groups__'}}, $group;
                 } else {
                     push @GROUPS, $group;
                 }
@@ -319,40 +319,40 @@ sub _parse_v2_body {
             Entry => sub {
                 my ($node, $parent, $parent_tag) = @_;
                 my %str;
-                for my $s (@{ $node->{'String'} || [] }) {
+                for my $s (@{$node->{'String'} || []}) {
                     $str{$s->{'Key'}} = $s->{'Value'};
                     $str{'__protected__'}->{$s->{'Key'} =~ /^(Password|UserName|URL|Notes|Title)$/i ? lc($s->{'Key'}) : $s->{'Key'}} = 1 if $s->{'__protected__'};
                 }
                 my $entry = {
                     accessed => $self->_parse_v2_date($node->{'Times'}->{'LastAccessTime'}),
-                    created  => $self->_parse_v2_date($node->{'Times'}->{'CreationTime'}),
-                    expires  => $self->_parse_v2_date($node->{'Times'}->{'ExpiryTime'}),
+                    created => $self->_parse_v2_date($node->{'Times'}->{'CreationTime'}),
+                    expires => $self->_parse_v2_date($node->{'Times'}->{'ExpiryTime'}),
                     modified => $self->_parse_v2_date($node->{'Times'}->{'LastModificationTime'}),
-                    comment  => delete($str{'Notes'}),
-                    icon     => $node->{'IconID'},
-                    id       => $uuid->($node->{'UUID'}),
-                    title    => delete($str{'Title'}),
-                    url      => delete($str{'URL'}),
+                    comment => delete($str{'Notes'}),
+                    icon => $node->{'IconID'},
+                    id => $uuid->($node->{'UUID'}),
+                    title => delete($str{'Title'}),
+                    url => delete($str{'URL'}),
                     username => delete($str{'UserName'}),
                     password => delete($str{'Password'}),
 
-                    expires_enabled   => $tri->($node->{'Times'}->{'Expires'}),
-                    location_changed  => $self->_parse_v2_date($node->{'Times'}->{'LocationChanged'}),
-                    usage_count       => $node->{'Times'}->{'UsageCount'},
-                    tags              => $node->{'Tags'},
-                    background_color  => $node->{'BackgroundColor'},
-                    foreground_color  => $node->{'ForegroundColor'},
-                    override_url      => $node->{'OverrideURL'},
-                    auto_type         => delete($node->{'AutoType'}->{'__auto_type__'}) || [],
+                    expires_enabled => $tri->($node->{'Times'}->{'Expires'}),
+                    location_changed => $self->_parse_v2_date($node->{'Times'}->{'LocationChanged'}),
+                    usage_count => $node->{'Times'}->{'UsageCount'},
+                    tags => $node->{'Tags'},
+                    background_color => $node->{'BackgroundColor'},
+                    foreground_color => $node->{'ForegroundColor'},
+                    override_url => $node->{'OverrideURL'},
+                    auto_type => delete($node->{'AutoType'}->{'__auto_type__'}) || [],
                     auto_type_enabled => $tri->($node->{'AutoType'}->{'Enabled'}),
-                    auto_type_munge   => $node->{'AutoType'}->{'DataTransferObfuscation'} ? 1 : 0,
-                    protected         => delete($str{'__protected__'}),
+                    auto_type_munge => $node->{'AutoType'}->{'DataTransferObfuscation'} ? 1 : 0,
+                    protected => delete($str{'__protected__'}),
                 };
                 $entry->{'history'} = $node->{'History'} if defined $node->{'History'};
                 $entry->{'custom_icon_uuid'} = $node->{'CustomIconUUID'} if defined $node->{'CustomIconUUID'};
                 $entry->{'strings'} = \%str if scalar keys %str;
                 $entry->{'binary'} = delete($node->{'__binary__'}) if $node->{'__binary__'};
-                push @{ $parent->{'__entries__'} }, $entry;
+                push @{$parent->{'__entries__'}}, $entry;
             },
             String => sub {
                 my $node = shift;
@@ -365,7 +365,7 @@ sub _parse_v2_body {
             },
             Association => sub {
                 my ($node, $parent) = @_;
-                push @{ $parent->{'__auto_type__'} },  {window => $node->{'Window'}, keys => $node->{'KeystrokeSequence'}};
+                push @{$parent->{'__auto_type__'}},  {window => $node->{'Window'}, keys => $node->{'KeystrokeSequence'}};
             },
             History => sub {
                 my ($node, $parent, $parent_tag, $tag) = @_;
@@ -373,11 +373,11 @@ sub _parse_v2_body {
             },
             Association => sub {
                 my ($node, $parent) = @_;
-                push @{ $parent->{'__auto_type__'} },  {window => $node->{'Window'}, keys => $node->{'KeystrokeSequence'}};
+                push @{$parent->{'__auto_type__'}},  {window => $node->{'Window'}, keys => $node->{'KeystrokeSequence'}};
             },
             DeletedObject => sub {
                 my ($node) = @_;
-                push @{ $GROUPS[0]->{'deleted_objects'} }, {
+                push @{$GROUPS[0]->{'deleted_objects'}}, {
                     uuid => $self->decode_base64($node->{'UUID'}),
                     date => $self->_parse_v2_date($node->{'DeletionTime'}),
                 } if $GROUPS[0] && $node->{'UUID'} && $node->{'DeletionTime'};
@@ -386,9 +386,9 @@ sub _parse_v2_body {
     });
 
     my $g = $GROUPS[0];
-    @GROUPS = @{ $g->{'groups'} } if @GROUPS == 1
+    @GROUPS = @{$g->{'groups'}} if @GROUPS == 1
         && $g && $g->{'notes'} && $g->{'notes'} eq "Added as a top group by File::KeePass"
-        && @{ $g->{'groups'} || [] } && !@{ $g->{'entries'} || [] } && !$g->{'auto_type_default'};
+        && @{$g->{'groups'} || []} && !@{$g->{'entries'} || []} && !$g->{'auto_type_default'};
     return ($META, \@GROUPS);
 }
 
@@ -410,32 +410,32 @@ sub _parse_v1_groups {
         die "Group header offset is out of range. ($pos, $size)" if $pos + $size > length($buffer);
 
         if ($type == 1) {
-            $group->{'id'}       = unpack 'L', substr($buffer, $pos, 4);
+            $group->{'id'} = unpack 'L', substr($buffer, $pos, 4);
         } elsif ($type == 2) {
-            ($group->{'title'}   = substr($buffer, $pos, $size)) =~ s/\0$//;
+            ($group->{'title'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 3) {
-            $group->{'created'}  = $self->_parse_v1_date(substr($buffer, $pos, $size));
+            $group->{'created'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 4) {
             $group->{'modified'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 5) {
             $group->{'accessed'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 6) {
-            $group->{'expires'}  = $self->_parse_v1_date(substr($buffer, $pos, $size));
+            $group->{'expires'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 7) {
-            $group->{'icon'}     = unpack 'L', substr($buffer, $pos, 4);
+            $group->{'icon'} = unpack 'L', substr($buffer, $pos, 4);
         } elsif ($type == 8) {
-            $group->{'level'}    = unpack 'S', substr($buffer, $pos, 2);
+            $group->{'level'} = unpack 'S', substr($buffer, $pos, 2);
         } elsif ($type == 0xFFFF) {
             $group->{'created'} ||= '';
             $n_groups--;
             $gmap{$group->{'id'}} = $group;
             my $level = $group->{'level'} || 0;
-            if (@gref > $level + 1) { # gref is index base 1 because the root is a pointer to \@groups
+            if (@gref > $level + 1) {# gref is index base 1 because the root is a pointer to \@groups
                 splice @gref, $level + 1;
             } elsif (@gref < $level + 1) {
                 push @gref, ($gref[-1]->[-1]->{'groups'} = []);
             }
-            push @{ $gref[-1] }, $group;
+            push @{$gref[-1]}, $group;
             $group = {};
         } else {
             $group->{'unknown'}->{$type} = substr($buffer, $pos, $size);
@@ -460,39 +460,39 @@ sub _parse_v1_entries {
         die "Entry header offset is out of range for type $type. ($pos, ".length($buffer).", $size)" if $pos + $size > length($buffer);
 
         if ($type == 1) {
-            $entry->{'id'}        = substr($buffer, $pos, $size);
+            $entry->{'id'} = substr($buffer, $pos, $size);
         } elsif ($type == 2) {
-            $entry->{'group_id'}  = unpack 'L', substr($buffer, $pos, 4);
+            $entry->{'group_id'} = unpack 'L', substr($buffer, $pos, 4);
         } elsif ($type == 3) {
-            $entry->{'icon'}      = unpack 'L', substr($buffer, $pos, 4);
+            $entry->{'icon'} = unpack 'L', substr($buffer, $pos, 4);
         } elsif ($type == 4) {
-            ($entry->{'title'}    = substr($buffer, $pos, $size)) =~ s/\0$//;
+            ($entry->{'title'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 5) {
-            ($entry->{'url'}      = substr($buffer, $pos, $size)) =~ s/\0$//;
+            ($entry->{'url'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 6) {
             ($entry->{'username'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 7) {
             ($entry->{'password'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 8) {
-            ($entry->{'comment'}  = substr($buffer, $pos, $size)) =~ s/\0$//;
+            ($entry->{'comment'} = substr($buffer, $pos, $size)) =~ s/\0$//;
         } elsif ($type == 9) {
-            $entry->{'created'}   = $self->_parse_v1_date(substr($buffer, $pos, $size));
+            $entry->{'created'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 0xA) {
-            $entry->{'modified'}  = $self->_parse_v1_date(substr($buffer, $pos, $size));
+            $entry->{'modified'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 0xB) {
-            $entry->{'accessed'}  = $self->_parse_v1_date(substr($buffer, $pos, $size));
+            $entry->{'accessed'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
         } elsif ($type == 0xC) {
-            $entry->{'expires'}   = $self->_parse_v1_date(substr($buffer, $pos, $size));
-	} elsif ($type == 0xD) {
+            $entry->{'expires'} = $self->_parse_v1_date(substr($buffer, $pos, $size));
+    } elsif ($type == 0xD) {
             ($entry->{'binary_name'} = substr($buffer, $pos, $size)) =~ s/\0$//;
-	} elsif ($type == 0xE) {
-            $entry->{'binary'}    = substr($buffer, $pos, $size);
+    } elsif ($type == 0xE) {
+            $entry->{'binary'} = substr($buffer, $pos, $size);
         } elsif ($type == 0xFFFF) {
             $entry->{'created'} ||= '';
             $n_entries--;
             my $gid = delete $entry->{'group_id'};
             my $ref = $gmap->{$gid};
-            if (!$ref) { # orphaned nodes go in special group
+            if (!$ref) {# orphaned nodes go in special group
                 $gid = -1;
                 if (!$gmap->{$gid}) {
                     push @$groups, ($gmap->{$gid} = {id => $gid, title => '*Orphaned*', icon => 0, created => $self->now});
@@ -509,7 +509,7 @@ sub _parse_v1_entries {
                         warn "Discarded metastream KPX_GROUP_TREE_STATE because of a parsing error.";
                     } else {
                         for (my $i = 0; $i < $n; $i++) {
-                            my $group_id    = unpack 'L', substr($entry->{'binary'}, 4 + $i * 5, 4);
+                            my $group_id = unpack 'L', substr($entry->{'binary'}, 4 + $i * 5, 4);
                             my $is_expanded = unpack 'C', substr($entry->{'binary'}, 8 + $i * 5, 1);
                             $gmap->{$group_id}->{'expanded'} = $is_expanded;
                         }
@@ -521,7 +521,7 @@ sub _parse_v1_entries {
 
             $self->_check_v1_binary($entry);
             $self->_check_v1_auto_type($entry);
-            push @{ $ref->{'entries'} }, $entry;
+            push @{$ref->{'entries'}}, $entry;
             $entry = {};
         } else {
             $entry->{'unknown'}->{$type} = substr($buffer, $pos, $size);
@@ -536,7 +536,7 @@ sub _check_v1_binary {
         delete $e->{'binary_name'};
         return;
     }
-    my $bin   = delete $e->{'binary'};
+    my $bin = delete $e->{'binary'};
     my $bname = delete $e->{'binary_name'};
     if ((defined($bin) && length($bin)) || (defined($bname) && length($bname))) {
         defined($_) or $_ = '' for $bin, $bname;
@@ -558,9 +558,9 @@ sub _check_v1_auto_type {
         push @AT, {keys => $key, window => $win};
     }
     return if ! $e->{'comment'};
-    my %atw = my @atw = $e->{'comment'} =~ m{ ^Auto-Type-Window((?:-?\d+)?): [\t ]* (.*?) [\t ]*$ }mxg;
-    my %atk = my @atk = $e->{'comment'} =~ m{ ^Auto-Type((?:-?\d+)?): [\t ]* (.*?) [\t ]*$ }mxg;
-    $e->{'comment'} =~ s{ ^Auto-Type(?:-Window)?(?:-?\d+)?: .* \n? }{}mxg;
+    my %atw = my @atw = $e->{'comment'} =~ m{^Auto-Type-Window((?:-?\d+)?): [\t]* (.*?) [\t]*$}mxg;
+    my %atk = my @atk = $e->{'comment'} =~ m{^Auto-Type((?:-?\d+)?): [\t]* (.*?) [\t]*$}mxg;
+    $e->{'comment'} =~ s{^Auto-Type(?:-Window)?(?:-?\d+)?: .* \n?}{}mxg;
     while (@atw) {
         my ($n, $w) = (shift(@atw), shift(@atw));
         push @AT, {window => $w, keys => exists($atk{$n}) ? $atk{$n} : $atk{''}};
@@ -569,7 +569,7 @@ sub _check_v1_auto_type {
         my ($n, $k) = (shift(@atk), shift(@atk));
         push @AT, {keys => $k, window => exists($atw{$n}) ? $atw{$n} : $atw{''}};
     }
-    for (@AT) { $_->{'window'} = '' if ! defined $_->{'window'}; $_->{'keys'} = '' if ! defined $_->{'keys'} }
+    for (@AT) {$_->{'window'} = '' if ! defined $_->{'window'}; $_->{'keys'} = '' if ! defined $_->{'keys'}}
     my %uniq;
     @AT = grep {!$uniq{"$_->{'window'}\e$_->{'keys'}"}++} @AT;
     $e->{'auto_type'} = \@AT if @AT;
@@ -579,11 +579,11 @@ sub _parse_v1_date {
     my ($self, $packed) = @_;
     my @b = unpack('C*', $packed);
     my $year = ($b[0] << 6) | ($b[1] >> 2);
-    my $mon  = (($b[1] & 0b11)     << 2) | ($b[2] >> 6);
-    my $day  = (($b[2] & 0b111111) >> 1);
+    my $mon = (($b[1] & 0b11)     << 2) | ($b[2] >> 6);
+    my $day = (($b[2] & 0b111111) >> 1);
     my $hour = (($b[2] & 0b1)      << 4) | ($b[3] >> 4);
-    my $min  = (($b[3] & 0b1111)   << 2) | ($b[4] >> 6);
-    my $sec  = (($b[4] & 0b111111));
+    my $min = (($b[3] & 0b1111)   << 2) | ($b[4] >> 6);
+    my $sec = (($b[4] & 0b111111));
     return sprintf "%04d-%02d-%02d %02d:%02d:%02d", $year, $mon, $day, $hour, $min, $sec;
 }
 
@@ -656,10 +656,10 @@ sub _gen_v1_db {
         substr($head->{'seed_rand'}, 16, 16, '') if $head->{'seed_rand'} && length($head->{'seed_rand'}) == 32; # if coming from a v2 db use a smaller key (roundtripable)
     }
     my $key = $self->_master_key($pass, $head);
-    my $buffer  = '';
+    my $buffer = '';
     my $entries = '';
     my %gid;
-    my $gid = sub { # v1 groups id size can only be a 32 bit int - v2 is supposed to be a 16 digit string
+    my $gid = sub {# v1 groups id size can only be a 32 bit int - v2 is supposed to be a 16 digit string
         local $_ = my $gid = shift;
         return $gid{$gid} ||= do {
             $_ = (/^\d+$/ && $_ < 2**32) ? $_ : /^([a-f0-9]{16})/i ? hex($1) : int(rand 2**32);
@@ -668,20 +668,20 @@ sub _gen_v1_db {
         };
     };
     my %uniq;
-    my $uuid = sub { return $self->uuid(shift, \%uniq) };
+    my $uuid = sub {return $self->uuid(shift, \%uniq)};
 
     my @g = $self->find_groups({}, $groups);
     if (grep {$_->{'expanded'}} @g) {
         my $bin = pack 'L', scalar(@g);
         $bin .= pack('LC', $gid->($_->{'id'}), $_->{'expanded'} ? 1 : 0) for @g;
         my $e = ($self->find_entries({title => 'Meta-Info', username => 'SYSTEM', comment => 'KPX_GROUP_TREE_STATE', url => '$'}))[0] || $self->add_entry({
-            comment  => 'KPX_GROUP_TREE_STATE',
-            title    => 'Meta-Info',
+            comment => 'KPX_GROUP_TREE_STATE',
+            title => 'Meta-Info',
             username => 'SYSTEM',
-            url      => '$',
-            id       => '0000000000000000',
-            group    => $g[0],
-            binary   => {'bin-stream' => $bin},
+            url => '$',
+            id => '0000000000000000',
+            group => $g[0],
+            binary => {'bin-stream' => $bin},
         });
     }
     $head->{'n_groups'} = $head->{'n_entries'} = 0;
@@ -697,28 +697,28 @@ sub _gen_v1_db {
                  [8,      pack('LS', 2, $g->{'level'} || 0)],
                  [0xFFFF, pack('L', 0)]);
         push @d, [$_, map {pack('L',length $_).$_} $g->{'unknown'}->{$_}]
-            for grep {/^\d+$/ && $_ > 8} keys %{ $g->{'unknown'} || {} };
+        for grep {/^\d+$/ && $_ > 8} keys %{$g->{'unknown'} || {}};
         $buffer .= pack('S',$_->[0]).$_->[1] for sort {$a->[0] <=> $b->[0]} @d;
-        foreach my $e (@{ $g->{'entries'} || [] }) {
+        foreach my $e (@{$g->{'entries'} || []}) {
             $head->{'n_entries'}++;
 
-            my $bins = $e->{'binary'} || {}; if (ref($bins) ne 'HASH') { warn "Entry binary field was not a hashref of name/content pairs.\n"; $bins = {} }
+            my $bins = $e->{'binary'} || {}; if (ref($bins) ne 'HASH') {warn "Entry binary field was not a hashref of name/content pairs.\n"; $bins = {}}
             my @bkeys = sort keys %$bins;
             warn "Found more than one entry in the binary hashref.  Encoding only the first one of (@bkeys) on a version 1 database.\n" if @bkeys > 1;
             my $bname = @bkeys ? $bkeys[0] : '';
             my $bin = $bins->{$bname}; $bin = '' if ! defined $bin;
 
-            my $at = $e->{'auto_type'} || []; if (ref($at) ne 'ARRAY') { warn "Entry auto_type field was not an arrayref of auto_type info.\n"; $at = [] }
+            my $at = $e->{'auto_type'} || []; if (ref($at) ne 'ARRAY') {warn "Entry auto_type field was not an arrayref of auto_type info.\n"; $at = []}
             my %AT; my @AT;
             for (@$at) {
                 my ($k, $w) = map {defined($_) ? $_ : ''} @$_{qw(keys window)};
                 push @AT, $k if ! grep {$_ eq $k} @AT;
-                push @{ $AT{$k} }, $w;
+                push @{$AT{$k}}, $w;
             }
             my $txt = '';
             for my $i (1 .. @AT) {
                 $txt .= "Auto-Type".($i>1 ? "-$i" : '').": $AT[$i-1]\n";
-                $txt .= "Auto-Type-Window".($i>1 ? "-$i" : '').": $_\n" for @{ $AT{$AT[$i-1]} };
+                $txt .= "Auto-Type-Window".($i>1 ? "-$i" : '').": $_\n" for @{$AT{$AT[$i-1]}};
             }
             my $com = defined($e->{'comment'}) ? "$txt$e->{'comment'}" : $txt;
             my @d = ([1,      pack('L', 16). $uuid->($e->{'id'})],
@@ -737,7 +737,7 @@ sub _gen_v1_db {
                      [0xE,    pack('L', length($bin)).$bin],
                      [0xFFFF, pack('L', 0)]);
             push @d, [$_, pack('L', length($e->{'unknown'}->{$_})).$e->{'unknown'}->{$_}]
-                for grep {/^\d+$/ && $_ > 0xE} keys %{ $e->{'unknown'} || {} };
+            for grep {/^\d+$/ && $_ > 0xE} keys %{$e->{'unknown'} || {}};
             $entries .= pack('S',$_->[0]).$_->[1] for sort {$a->[0] <=> $b->[0]} @d;
         }
     }
@@ -752,16 +752,16 @@ sub _gen_v1_db {
 
 sub _gen_v1_header {
     my ($self, $head) = @_;
-    $head->{'sig1'}  = DB_SIG_1;
-    $head->{'sig2'}  = DB_SIG_2_v1;
+    $head->{'sig1'} = DB_SIG_1;
+    $head->{'sig2'} = DB_SIG_2_v1;
     $head->{'flags'} = DB_FLAG_RIJNDAEL;
-    $head->{'ver'}   = DB_VER_DW_V1;
+    $head->{'ver'} = DB_VER_DW_V1;
     $head->{'n_groups'}  ||= 0;
     $head->{'n_entries'} ||= 0;
     die "Length of $_ was not 32 (".length($head->{$_}).")\n" for grep {length($head->{$_}) != 32} qw(seed_key checksum);
     die "Length of $_ was not 16 (".length($head->{$_}).")\n" for grep {length($head->{$_}) != 16} qw(enc_iv seed_rand);
     my @f = qw(sig1 sig2 flags ver seed_rand enc_iv n_groups n_entries checksum seed_key rounds);
-    my $t =   'L    L    L     L   a16       a16    L        L         a32      a32      L';
+    my $t = 'L    L    L     L   a16       a16    L        L         a32      a32      L';
     my $header = pack $t, @$head{@f};
     die "Invalid generated header\n" if length($header) != DB_HEADSIZE_V1;
     return $header;
@@ -791,15 +791,16 @@ sub _gen_v2_db {
     my $key = $self->_master_key($pass, $head);
     my $header = $self->_gen_v2_header($head);
 
-    my $buffer  = '';
-    my $untri = sub { return (!defined($_[0]) && !$_[1]) ? 'null' : !$_[0] ? 'False' : 'True' };
+    my $buffer = '';
+    my $untri = sub {return (!defined($_[0]) && !$_[1]) ? 'null' : !$_[0] ? 'False' : 'True'};
     my %uniq;
-    my $uuid = sub { my $id = (defined($_[0]) && $_[0] eq '0') ? "\0"x16 : $self->uuid($_[0], \%uniq); return $self->encode_base64($id) };
+    my $uuid = sub {my $id = (defined($_[0]) && $_[0] eq '0') ? "\0"x16 : $self->uuid($_[0], \%uniq); return $self->encode_base64($id)};
 
     my @mfld = qw(Generator HeaderHash DatabaseName DatabaseNameChanged DatabaseDescription DatabaseDescriptionChanged DefaultUserName DefaultUserNameChanged
-                        MaintenanceHistoryDays Color MasterKeyChanged MasterKeyChangeRec MasterKeyChangeForce MemoryProtection
-                        RecycleBinEnabled RecycleBinUUID RecycleBinChanged EntryTemplatesGroup EntryTemplatesGroupChanged HistoryMaxItems HistoryMaxSize
-                        LastSelectedGroup LastTopVisibleGroup Binaries CustomData);
+        MaintenanceHistoryDays Color MasterKeyChanged MasterKeyChangeRec MasterKeyChangeForce MemoryProtection
+        RecycleBinEnabled RecycleBinUUID RecycleBinChanged EntryTemplatesGroup EntryTemplatesGroupChanged HistoryMaxItems HistoryMaxSize
+        LastSelectedGroup LastTopVisibleGroup Binaries CustomData
+    );
     my $META = {__sort__ => \@mfld};
     for my $key (@mfld) {
         (my $copy = $key) =~ s/([a-z])([A-Z])/${1}_${2}/g;
@@ -812,26 +813,26 @@ sub _gen_v2_db {
     };
     my $now = $self->_gen_v2_date;
     $META->{'HeaderHash'} = $self->encode_base64(sha256($header));
-    $def->(Color                      => '');
-    $def->(DatabaseDescription        => '');
+    $def->(Color => '');
+    $def->(DatabaseDescription => '');
     $def->(DatabaseDescriptionChanged => $now, $qr_date);
-    $def->(DatabaseName               => '');
-    $def->(DatabaseNameChanged        => $now, $qr_date);
-    $def->(DefaultUserName            => '');
-    $def->(DefaultUserNameChanged     => $now, $qr_date);
+    $def->(DatabaseName => '');
+    $def->(DatabaseNameChanged => $now, $qr_date);
+    $def->(DefaultUserName => '');
+    $def->(DefaultUserNameChanged => $now, $qr_date);
     $def->(EntryTemplatesGroupChanged => $now, $qr_date);
-    $def->(Generator                  => ref($self));
-    $def->(HistoryMaxItems            => 10, qr{^\d+$});
-    $def->(HistoryMaxSize             => 6291456, qr{^\d+$});
-    $def->(MaintenanceHistoryDays     => 365, qr{^\d+$});
-    $def->(MasterKeyChangeForce       => -1);
-    $def->(MasterKeyChangeRec         => -1);
-    $def->(MasterKeyChanged           => $now, $qr_date);
-    $def->(RecycleBinChanged          => $now, $qr_date);
+    $def->(Generator => ref($self));
+    $def->(HistoryMaxItems => 10, qr{^\d+$});
+    $def->(HistoryMaxSize => 6291456, qr{^\d+$});
+    $def->(MaintenanceHistoryDays => 365, qr{^\d+$});
+    $def->(MasterKeyChangeForce => -1);
+    $def->(MasterKeyChangeRec => -1);
+    $def->(MasterKeyChanged => $now, $qr_date);
+    $def->(RecycleBinChanged => $now, $qr_date);
     $META->{$_} = $uuid->($META->{$_} || 0) for qw(EntryTemplatesGroup LastSelectedGroup LastTopVisibleGroup RecycleBinUUID);
-    $META->{'RecycleBinEnabled'}      = $untri->(exists($META->{'RecycleBinEnabled'}) ? $META->{'RecycleBinEnabled'} : 1, 1);
+    $META->{'RecycleBinEnabled'} = $untri->(exists($META->{'RecycleBinEnabled'}) ? $META->{'RecycleBinEnabled'} : 1, 1);
     my $p = $META->{'MemoryProtection'} ||= {};
-    for my $new (qw(ProtectTitle ProtectUserName ProtectPassword ProtectURL ProtectNotes)) { # unflatten protection
+    for my $new (qw(ProtectTitle ProtectUserName ProtectPassword ProtectURL ProtectNotes)) {# unflatten protection
         (my $key = lc $new) =~ s/protect/protect_/;
         push @{$p->{'__sort__'}}, $new;
         $p->{$new} = (exists($META->{$key}) ? delete($META->{$key}) : ($key eq 'protect_password')) ? 'True' : 'False';
@@ -856,32 +857,32 @@ sub _gen_v2_db {
         my ($e, $parent) = @_;
         push @$parent, my $E = {
             __sort__ => [qw(UUID IconID ForegroundColor BackgroundColor OverrideURL Tags Times String AutoType History)],
-            UUID   => $uuid->($e->{'id'}),
+            UUID => $uuid->($e->{'id'}),
             IconID => $e->{'icon'} || 0,
-            Times  => {
-                __sort__             => [qw(LastModificationTime CreationTime LastAccessTime ExpiryTime Expires UsageCount LocationChanged)],
-                Expires              => $untri->($e->{'expires_enabled'}, 1),
-                UsageCount           => $e->{'usage_count'} || 0,
-                LastAccessTime       => $self->_gen_v2_date($e->{'accessed'}),
-                ExpiryTime           => $self->_gen_v2_date($e->{'expires'} || $self->default_exp),
-                CreationTime         => $self->_gen_v2_date($e->{'created'}),
+            Times => {
+                __sort__ => [qw(LastModificationTime CreationTime LastAccessTime ExpiryTime Expires UsageCount LocationChanged)],
+                Expires => $untri->($e->{'expires_enabled'}, 1),
+                UsageCount => $e->{'usage_count'} || 0,
+                LastAccessTime => $self->_gen_v2_date($e->{'accessed'}),
+                ExpiryTime => $self->_gen_v2_date($e->{'expires'} || $self->default_exp),
+                CreationTime => $self->_gen_v2_date($e->{'created'}),
                 LastModificationTime => $self->_gen_v2_date($e->{'modified'}),
-                LocationChanged      => $self->_gen_v2_date($e->{'location_changed'}),
+                LocationChanged => $self->_gen_v2_date($e->{'location_changed'}),
             },
-            Tags            => $e->{'tags'},
+            Tags => $e->{'tags'},
             BackgroundColor => $e->{'background_color'},
             ForegroundColor => $e->{'foreground_color'},
-            CustomIconUUID  => $uuid->($e->{'custom_icon_uuid'} || 0),
-            OverrideURL     => $e->{'override_url'},
-            AutoType        => {
-                Enabled     => $untri->(exists($e->{'auto_type_enabled'}) ? $e->{'auto_type_enabled'} : 1, 1),
+            CustomIconUUID => $uuid->($e->{'custom_icon_uuid'} || 0),
+            OverrideURL => $e->{'override_url'},
+            AutoType => {
+                Enabled => $untri->(exists($e->{'auto_type_enabled'}) ? $e->{'auto_type_enabled'} : 1, 1),
                 DataTransferObfuscation => $e->{'auto_type_munge'} ? 1 : 0,
             },
         };
-        foreach my $key (sort(keys %{ $e->{'strings'} || {} }), qw(Notes Password Title URL UserName)) {
+        foreach my $key (sort(keys %{$e->{'strings'} || {}}), qw(Notes Password Title URL UserName)) {
             my $val = ($key eq 'Notes') ? $e->{'comment'} : ($key=~/^(Password|Title|URL|UserName)$/) ? $e->{lc $key} : $e->{'strings'}->{$key};
             next if ! defined $val;
-            push @{ $E->{'String'} }, my $s = {
+            push @{$E->{'String'}}, my $s = {
                 Key => $key,
                 Value => $val,
             };
@@ -891,28 +892,28 @@ sub _gen_v2_db {
                 push @PROTECT_STR, \$s->{'Value'}->{'content'} if length $s->{'Value'}->{'content'};
             }
         }
-        foreach my $at (@{ $e->{'auto_type'} || [] }) {
-            push @{ $E->{'AutoType'}->{'Association'} }, {
+        foreach my $at (@{$e->{'auto_type'} || []}) {
+            push @{$E->{'AutoType'}->{'Association'}}, {
                 Window => $at->{'window'},
                 KeystrokeSequence => $at->{'keys'},
             };
         }
         my $bin = $e->{'binary'} || {}; $bin = {__anon__ => $bin} if ref($bin) ne 'HASH';
-        splice @{ $E->{'__sort__'} }, -2, 0, 'Binary' if scalar keys %$bin;
+        splice @{$E->{'__sort__'}}, -2, 0, 'Binary' if scalar keys %$bin;
         foreach my $key (sort keys %$bin) {
             push @$BIN, my $b = {
                 __attr__ => [qw(ID Compressed)],
-                ID       => $#$BIN+1,
-                content  => defined($bin->{$key}) ? $bin->{$key} : '',
+                ID => $#$BIN+1,
+                content => defined($bin->{$key}) ? $bin->{$key} : '',
             };
             $b->{'Compressed'} = (length($b->{'content'}) < 100 || $self->{'no_binary_compress'}) ? 'False' : 'True';
             if ($b->{'Compressed'} eq 'True') {
-                eval { $b->{'content'} = $self->compress($b->{'content'}) } or warn "Could not compress associated binary ($b->{'ID'}): $@";
+                eval {$b->{'content'} = $self->compress($b->{'content'})} or warn "Could not compress associated binary ($b->{'ID'}): $@";
             }
             $b->{'content'} = $self->encode_base64($b->{'content'});
-            push @{ $E->{'Binary'} }, {Key => $key, Value => {__attr__ => [qw(Ref)], Ref => $b->{'ID'}, content => ''}};
+            push @{$E->{'Binary'}}, {Key => $key, Value => {__attr__ => [qw(Ref)], Ref => $b->{'ID'}, content => ''}};
         }
-        foreach my $h (@{ $e->{'history'}||[] }) {
+        foreach my $h (@{$e->{'history'}||[]}) {
             $gen_entry->($h, $E->{'History'}->{'Entry'} ||= []);
         }
     };
@@ -922,40 +923,40 @@ sub _gen_v2_db {
         return if ref($group) ne 'HASH';
         push @$parent, my $G = {
             __sort__ => [qw(UUID Name Notes IconID Times IsExpanded DefaultAutoTypeSequence EnableAutoType EnableSearching LastTopVisibleEntry)],
-            UUID   => $uuid->($group->{'id'}),
-            Name   => $group->{'title'} || '',
-            Notes  => $group->{'notes'},
+            UUID => $uuid->($group->{'id'}),
+            Name => $group->{'title'} || '',
+            Notes => $group->{'notes'},
             IconID => $group->{'icon'} || 0,
-            Times  => {
-                __sort__             => [qw(LastModificationTime CreationTime LastAccessTime ExpiryTime Expires UsageCount LocationChanged)],
-                Expires              => $untri->($group->{'expires_enabled'}, 1),
-                UsageCount           => $group->{'usage_count'} || 0,
-                LastAccessTime       => $self->_gen_v2_date($group->{'accessed'}),
-                ExpiryTime           => $self->_gen_v2_date($group->{'expires'} || $self->default_exp),
-                CreationTime         => $self->_gen_v2_date($group->{'created'}),
+            Times => {
+                __sort__ => [qw(LastModificationTime CreationTime LastAccessTime ExpiryTime Expires UsageCount LocationChanged)],
+                Expires => $untri->($group->{'expires_enabled'}, 1),
+                UsageCount => $group->{'usage_count'} || 0,
+                LastAccessTime => $self->_gen_v2_date($group->{'accessed'}),
+                ExpiryTime => $self->_gen_v2_date($group->{'expires'} || $self->default_exp),
+                CreationTime => $self->_gen_v2_date($group->{'created'}),
                 LastModificationTime => $self->_gen_v2_date($group->{'modified'}),
-                LocationChanged      => $self->_gen_v2_date($group->{'location_changed'}),
+                LocationChanged => $self->_gen_v2_date($group->{'location_changed'}),
             },
-            IsExpanded              => $untri->($group->{'expanded'}, 1),
+            IsExpanded => $untri->($group->{'expanded'}, 1),
             DefaultAutoTypeSequence => $group->{'auto_type_default'},
-            EnableAutoType          => lc($untri->(exists($group->{'auto_type_enabled'}) ? $group->{'auto_type_enabled'} : 1)),
-            EnableSearching         => lc($untri->(exists($group->{'enable_searching'}) ? $group->{'enable_searching'} : 1)),
-            LastTopVisibleEntry     => $uuid->($group->{'last_top_entry'} || 0),
+            EnableAutoType => lc($untri->(exists($group->{'auto_type_enabled'}) ? $group->{'auto_type_enabled'} : 1)),
+            EnableSearching => lc($untri->(exists($group->{'enable_searching'}) ? $group->{'enable_searching'} : 1)),
+            LastTopVisibleEntry => $uuid->($group->{'last_top_entry'} || 0),
         };
         $G->{'CustomIconUUID'} = $uuid->($group->{'custom_icon_uuid'}) if $group->{'custom_icon_uuid'}; # TODO
-        push @{$G->{'__sort__'}}, 'Entry' if @{ $group->{'entries'} || [] };
-        foreach my $e (@{ $group->{'entries'} || [] }) {
+        push @{$G->{'__sort__'}}, 'Entry' if @{$group->{'entries'} || []};
+        foreach my $e (@{$group->{'entries'} || []}) {
             $gen_entry->($e, $G->{'Entry'} ||= []);
         }
-        push @{$G->{'__sort__'}}, 'Group' if @{ $group->{'groups'} || [] };
-        $rec->($_, $G->{'Group'} ||= []) for @{ $group->{'groups'} || []};
+        push @{$G->{'__sort__'}}, 'Group' if @{$group->{'groups'} || []};
+        $rec->($_, $G->{'Group'} ||= []) for @{$group->{'groups'} || []};
     };
     $groups = [{title => "Database", groups => [@$groups], notes => "Added as a top group by File::KeePass", expanded => 1}] if @$groups > 1;
     $rec->($_, \@GROUPS) for @$groups;
 
     if (@$groups && $groups->[0]->{'deleted_objects'}) {
-        foreach my $dob (@{ $groups->[0]->{'deleted_objects'} }) {
-            push @{ $data->{'Root'}->{'DeletedObjects'}->{'DeletedObject'} }, {
+        foreach my $dob (@{$groups->[0]->{'deleted_objects'}}) {
+            push @{$data->{'Root'}->{'DeletedObjects'}->{'DeletedObject'}}, {
                 UUID => $self->encode_base64($dob->{'uuid'}),
                 DeletionTime => $self->_gen_v2_date($dob->{'date'}),
             }
@@ -998,10 +999,10 @@ sub _gen_v2_date {
 
 sub _gen_v2_header {
     my ($self, $head) = @_;
-    $head->{'sig1'}        = DB_SIG_1;
-    $head->{'sig2'}        = DB_SIG_2_v2;
-    $head->{'ver'}         = DB_VER_DW_V2;
-    $head->{'comment'}     = '' if ! defined $head->{'comment'};
+    $head->{'sig1'} = DB_SIG_1;
+    $head->{'sig2'} = DB_SIG_2_v2;
+    $head->{'ver'} = DB_VER_DW_V2;
+    $head->{'comment'} = '' if ! defined $head->{'comment'};
     $head->{'compression'} = (!defined($head->{'compression'}) || $head->{'compression'} eq '1') ? 1 : 0;
     $head->{'0'}           ||= "\r\n\r\n";
     $head->{'protected_stream_key'} ||= join '', map {chr rand 256} 1..32;
@@ -1011,7 +1012,7 @@ sub _gen_v2_header {
 
     my $buffer = pack 'L3', @$head{qw(sig1 sig2 ver)};
 
-    my $pack = sub { my ($type, $str) = @_; $buffer .= pack('C S', $type, length($str)) . $str };
+    my $pack = sub {my ($type, $str) = @_; $buffer .= pack('C S', $type, length($str)) . $str};
     $pack->(1, $head->{'comment'}) if defined($head->{'comment'}) && length($head->{'comment'});
     $pack->(2, "\x31\xc1\xf2\xe6\xbf\x71\x43\x50\xbe\x58\x05\x21\x6a\xfc\x5a\xff"); # aes cipher
     $pack->(3, pack 'V', $head->{'compression'} ? 1 : 0);
@@ -1097,7 +1098,7 @@ sub chunksum {
 
 sub decompress {
     my ($self, $buffer) = @_;
-    eval { require Compress::Raw::Zlib } or die "Cannot load compression library to decompress database: $@";
+    eval {require Compress::Raw::Zlib} or die "Cannot load compression library to decompress database: $@";
     my ($i, $status) = Compress::Raw::Zlib::Inflate->new(-WindowBits => 31);
     die "Failed to initialize inflator ($status)\n" if $status != Compress::Raw::Zlib::Z_OK();
     $status = $i->inflate($buffer, my $out);
@@ -1107,7 +1108,7 @@ sub decompress {
 
 sub compress {
     my ($self, $buffer) = @_;
-    eval { require Compress::Raw::Zlib } or die "Cannot load compression library to compress database: $@";
+    eval {require Compress::Raw::Zlib} or die "Cannot load compression library to compress database: $@";
     my ($d, $status) = Compress::Raw::Zlib::Deflate->new(-WindowBits => 31, -AppendOutput => 1);
     die "Failed to initialize inflator ($status)\n" if $status != Compress::Raw::Zlib::Z_OK();
     $status = $d->deflate($buffer, my $out);
@@ -1119,24 +1120,24 @@ sub compress {
 
 sub decode_base64 {
     my ($self, $content) = @_;
-    eval { require MIME::Base64 } or die "Cannot load Base64 library to decode item: $@";
+    eval {require MIME::Base64} or die "Cannot load Base64 library to decode item: $@";
     return MIME::Base64::decode_base64($content);
 }
 
 sub encode_base64 {
     my ($self, $content) = @_;
-    eval { require MIME::Base64 } or die "Cannot load Base64 library to encode item: $@";
+    eval {require MIME::Base64} or die "Cannot load Base64 library to encode item: $@";
     ($content = MIME::Base64::encode_base64($content)) =~ s/\n//g;
     return $content;
 }
 
 sub parse_xml {
     my ($self, $buffer, $args) = @_;
-    eval { require XML::Parser } or die "Cannot load XML library to parse database: $@";
+    eval {require XML::Parser} or die "Cannot load XML library to parse database: $@";
     my $top = $args->{'top'};
     my $force_array = $args->{'force_array'} || {};
-    my $s_handlers  = $args->{'start_handlers'} || {};
-    my $e_handlers  = $args->{'end_handlers'}   || $args->{'handlers'} || {};
+    my $s_handlers = $args->{'start_handlers'} || {};
+    my $e_handlers = $args->{'end_handlers'}   || $args->{'handlers'} || {};
     my $data;
     my $ptr;
     my $x = XML::Parser->new(Handlers => {
@@ -1149,7 +1150,7 @@ sub parse_xml {
                 $ptr = $data = {};
             } elsif (exists($prev_ptr->{$tag})  || ($force_array->{$tag} and $prev_ptr->{$tag} ||= [])) {
                 $prev_ptr->{$tag} = [$prev_ptr->{$tag}] if 'ARRAY' ne ref $prev_ptr->{$tag};
-                push @{ $prev_ptr->{$tag} }, ($ptr = {});
+                push @{$prev_ptr->{$tag}}, ($ptr = {});
             } else {
                 $ptr = $prev_ptr->{$tag} ||= {};
             }
@@ -1178,7 +1179,7 @@ sub parse_xml {
             }
             $_->($cur_ptr, $ptr, $ptr->{'__tag__'}, $tag) if $_ = $e_handlers->{$tag} || $e_handlers->{'__any__'};
         },
-        Char => sub { if (defined $ptr->{'content'}) { $ptr->{'content'} .= $_[1] } else { $ptr->{'content'} = $_[1] } },
+        Char => sub {if (defined $ptr->{'content'}) {$ptr->{'content'} .= $_[1]} else {$ptr->{'content'} = $_[1]} },
     });
     $x->parse($buffer);
     return $data;
@@ -1199,7 +1200,7 @@ sub gen_xml {
         my $order = delete($ref->{'__sort__'}) || $args->{'sort'}->{$tag} || [sort grep {$_ ne '__attr__'} keys %$ref];
         for my $key (@$order) {
             next if ! exists $ref->{$key};
-            for my $node (ref($ref->{$key}) eq 'ARRAY' ? @{ $ref->{$key} } : $ref->{$key}) {
+            for my $node (ref($ref->{$key}) eq 'ARRAY' ? @{$ref->{$key}} : $ref->{$key}) {
                 $n++;
                 $xml .= "\n" . ($indent x $level) if $indent;
                 if (!ref $node) {
@@ -1262,14 +1263,14 @@ sub uuid {
     };
 }
 
-sub gen_uuid { shift->encode_base64(join '', map {chr rand 256} 1..12) } # (3072 bit vs 4096) only 8e28 entries vs 3e38 - but readable
+sub gen_uuid {shift->encode_base64(join '', map {chr rand 256} 1..12)} # (3072 bit vs 4096) only 8e28 entries vs 3e38 - but readable
 
 ###----------------------------------------------------------------###
 
 sub dump_groups {
     my ($self, $args, $groups) = @_;
     my $t = '';
-    my %gargs; for (keys %$args) { $gargs{$2} = $args->{$1} if /^(group_(.+))$/ };
+    my %gargs; for (keys %$args) {$gargs{$2} = $args->{$1} if /^(group_(.+))$/};
     foreach my $g ($self->find_groups(\%gargs, $groups)) {
         my $indent = '    ' x $g->{'level'};
         $t .= $indent.($g->{'expanded'} ? '-' : '+')."  $g->{'title'} ($g->{'id'}) $g->{'created'}\n";
@@ -1301,15 +1302,15 @@ sub add_group {
 sub finder_tests {
     my ($self, $args) = @_;
     my @tests;
-    foreach my $key (keys %{ $args || {} }) {
+    foreach my $key (keys %{$args || {}}) {
         next if ! defined $args->{$key};
-        my ($field, $op) = ($key =~ m{ ^ (\w+) \s* (|!|=|!~|=~|gt|lt) $ }x) ? ($1, $2) : die "Invalid find match criteria \"$key\"\n";
-        push @tests,  (!$op || $op eq '=') ? sub {  defined($_[0]->{$field}) && $_[0]->{$field} eq $args->{$key} }
-                    : ($op eq '!')         ? sub { !defined($_[0]->{$field}) || $_[0]->{$field} ne $args->{$key} }
-                    : ($op eq '=~')        ? sub {  defined($_[0]->{$field}) && $_[0]->{$field} =~ $args->{$key} }
-                    : ($op eq '!~')        ? sub { !defined($_[0]->{$field}) || $_[0]->{$field} !~ $args->{$key} }
-                    : ($op eq 'gt')        ? sub {  defined($_[0]->{$field}) && $_[0]->{$field} gt $args->{$key} }
-                    : ($op eq 'lt')        ? sub {  defined($_[0]->{$field}) && $_[0]->{$field} lt $args->{$key} }
+        my ($field, $op) = ($key =~ m{^ (\w+) \s* (|!|=|!~|=~|gt|lt) $}x) ? ($1, $2) : die "Invalid find match criteria \"$key\"\n";
+        push @tests,  (!$op || $op eq '=') ? sub {defined($_[0]->{$field}) && $_[0]->{$field} eq $args->{$key}}
+                    : ($op eq '!')         ? sub {!defined($_[0]->{$field}) || $_[0]->{$field} ne $args->{$key}}
+                    : ($op eq '=~')        ? sub {defined($_[0]->{$field}) && $_[0]->{$field} =~ $args->{$key}}
+                    : ($op eq '!~')        ? sub {!defined($_[0]->{$field}) || $_[0]->{$field} !~ $args->{$key}}
+                    : ($op eq 'gt')        ? sub {defined($_[0]->{$field}) && $_[0]->{$field} gt $args->{$key}}
+                    : ($op eq 'lt')        ? sub {defined($_[0]->{$field}) && $_[0]->{$field} lt $args->{$key}}
                     : die "Unknown op \"$op\"\n";
     }
     return @tests;
@@ -1333,7 +1334,7 @@ sub find_groups {
 
         if (!@tests || !grep{!$_->($g)} @tests) {
             push @groups, $g;
-            push @{ $self->{'__group_groups'} }, $container if $self->{'__group_groups'};
+            push @{$self->{'__group_groups'}}, $container if $self->{'__group_groups'};
         }
         push @groups, $self->find_groups($args, $g->{'groups'}, $g->{'level'} + 1) if $g->{'groups'};
     }
@@ -1364,7 +1365,7 @@ sub delete_group {
 
 sub add_entry {
     my ($self, $args, $groups) = @_;
-    $groups ||= eval { $self->groups } || [];
+    $groups ||= eval {$self->groups} || [];
     die "You must unlock the passwords before adding new entries.\n" if $self->is_locked($groups);
     $args = {%$args};
     my $group = delete($args->{'group'}) || $groups->[0] || $self->add_group({});
@@ -1374,7 +1375,7 @@ sub add_entry {
 
     my %uniq;
     foreach my $g ($self->find_groups({}, $groups)) {
-        $uniq{$_->{'id'}}++ for @{ $g->{'entries'} || [] };
+        $uniq{$_->{'id'}}++ for @{$g->{'entries'} || []};
     }
     $args->{'id'} = $self->uuid($args->{'id'}, \%uniq);
     $args->{$_} = ''         for grep {!defined $args->{$_}} qw(title url username password comment);
@@ -1385,22 +1386,22 @@ sub add_entry {
     $self->_check_v1_auto_type($args);
 
 
-    push @{ $group->{'entries'} ||= [] }, $args;
+    push @{$group->{'entries'} ||= []}, $args;
     return $args;
 }
 
 sub find_entries {
     my ($self, $args, $groups) = @_;
-    local @{ $args }{'expires gt', 'active'} = ($self->now, undef) if $args->{'active'};
+    local @{$args}{'expires gt', 'active'} = ($self->now, undef) if $args->{'active'};
     my @tests = $self->finder_tests($args);
     my @entries;
     foreach my $g ($self->find_groups({}, $groups)) {
-        foreach my $e (@{ $g->{'entries'} || [] }) {
-            local $e->{'group_id'}    = $g->{'id'};
+        foreach my $e (@{$g->{'entries'} || []}) {
+            local $e->{'group_id'} = $g->{'id'};
             local $e->{'group_title'} = $g->{'title'};
             if (!@tests || !grep{!$_->($e)} @tests) {
                 push @entries, $e;
-                push @{ $self->{'__entry_groups'} }, $g if $self->{'__entry_groups'};
+                push @{$self->{'__entry_groups'}}, $g if $self->{'__entry_groups'};
             }
         }
     }
@@ -1419,9 +1420,9 @@ sub delete_entry {
     my $self = shift;
     my ($e, $g) = $self->find_entry(@_);
     return if !$e || !$g;
-    for my $i (0 .. $#{ $g->{'entries'} || [] }) {
+    for my $i (0 .. $#{$g->{'entries'} || []}) {
         next if $g->{'entries'}->[$i] ne $e;
-        splice(@{ $g->{'entries'} }, $i, 1, ());
+        splice(@{$g->{'entries'}}, $i, 1, ());
         last;
     }
     return $e;
@@ -1433,7 +1434,7 @@ sub now {
     return sprintf '%04d-%02d-%02d %02d:%02d:%02d', $year+1900, $mon+1, $day, $hour, $min, $sec;
 }
 
-sub default_exp { shift->{'default_exp'} || '2999-12-31 23:23:59' }
+sub default_exp {shift->{'default_exp'} || '2999-12-31 23:23:59'}
 
 ###----------------------------------------------------------------###
 
@@ -1449,7 +1450,7 @@ sub lock {
     return 2 if $locker{"$groups"}; # not quite as fast as Scalar::Util::refaddr
 
     my $ref = $locker{"$groups"} = {};
-    $ref->{'_key'}    = join '', map {chr rand 256} 1..32;
+    $ref->{'_key'} = join '', map {chr rand 256} 1..32;
     $ref->{'_enc_iv'} = join '', map {chr rand 256} 1..16;
 
     foreach my $e ($self->find_entries({}, $groups)) {
@@ -1467,7 +1468,7 @@ sub unlock {
     my $ref = $locker{"$groups"};
     foreach my $e ($self->find_entries({}, $groups)) {
         my $pass = $ref->{"$e"};
-        $pass = eval { $self->decrypt_rijndael_cbc($pass, $ref->{'_key'}, $ref->{'_enc_iv'}) } if $pass;
+        $pass = eval {$self->decrypt_rijndael_cbc($pass, $ref->{'_key'}, $ref->{'_enc_iv'})} if $pass;
         $pass = '' if ! defined $pass;
         $e->{'password'} = $pass;
     }
@@ -1483,7 +1484,7 @@ sub locked_entry_password {
     $entry = $self->find_entry({id => $entry}, $groups) if ! ref $entry;
     return if ! $entry;
     my $pass = $ref->{"$entry"};
-    $pass = eval { $self->decrypt_rijndael_cbc($pass, $ref->{'_key'}, $ref->{'_enc_iv'}) } if $pass;
+    $pass = eval {$self->decrypt_rijndael_cbc($pass, $ref->{'_key'}, $ref->{'_enc_iv'})} if $pass;
     $pass = '' if ! defined $pass;
     $entry->{'accessed'} = $self->now;
     return $pass;
@@ -1506,7 +1507,7 @@ sub salsa20_stream {
 }
 
 
-sub salsa20 { # http://cr.yp.to/snuffle/salsa20/regs/salsa20.c
+sub salsa20 {# http://cr.yp.to/snuffle/salsa20/regs/salsa20.c
     my ($self, $args) = @_;
     my ($key, $iv, $rounds) = @$args{qw(key iv rounds)};
     $rounds ||= 20;
@@ -1528,39 +1529,39 @@ sub salsa20 { # http://cr.yp.to/snuffle/salsa20/regs/salsa20.c
     #            0                                  5      6      7            10                                 # 15
     my @state = ($c[0], $k[0], $k[1], $k[2], $k[3], $c[1], $v[0], $v[1], 0, 0, $c[2], $k[4], $k[5], $k[6], $k[7], $c[3]);
 
-    my $rotl32 = sub { return (($_[0] << $_[1]) | ($_[0] >> (32 - $_[1]))) & 0xffffffff };
+    my $rotl32 = sub {return (($_[0] << $_[1]) | ($_[0] >> (32 - $_[1]))) & 0xffffffff};
     my $word_to_byte = sub {
         my @x = @state;
         for (1 .. $rounds/2) {
-            $x[ 4] ^= $rotl32->(($x[ 0] + $x[12]) & 0xffffffff,  7);
-            $x[ 8] ^= $rotl32->(($x[ 4] + $x[ 0]) & 0xffffffff,  9);
-            $x[12] ^= $rotl32->(($x[ 8] + $x[ 4]) & 0xffffffff, 13);
-            $x[ 0] ^= $rotl32->(($x[12] + $x[ 8]) & 0xffffffff, 18);
-            $x[ 9] ^= $rotl32->(($x[ 5] + $x[ 1]) & 0xffffffff,  7);
-            $x[13] ^= $rotl32->(($x[ 9] + $x[ 5]) & 0xffffffff,  9);
-            $x[ 1] ^= $rotl32->(($x[13] + $x[ 9]) & 0xffffffff, 13);
-            $x[ 5] ^= $rotl32->(($x[ 1] + $x[13]) & 0xffffffff, 18);
-            $x[14] ^= $rotl32->(($x[10] + $x[ 6]) & 0xffffffff,  7);
-            $x[ 2] ^= $rotl32->(($x[14] + $x[10]) & 0xffffffff,  9);
-            $x[ 6] ^= $rotl32->(($x[ 2] + $x[14]) & 0xffffffff, 13);
-            $x[10] ^= $rotl32->(($x[ 6] + $x[ 2]) & 0xffffffff, 18);
-            $x[ 3] ^= $rotl32->(($x[15] + $x[11]) & 0xffffffff,  7);
-            $x[ 7] ^= $rotl32->(($x[ 3] + $x[15]) & 0xffffffff,  9);
-            $x[11] ^= $rotl32->(($x[ 7] + $x[ 3]) & 0xffffffff, 13);
-            $x[15] ^= $rotl32->(($x[11] + $x[ 7]) & 0xffffffff, 18);
+            $x[4] ^= $rotl32->(($x[0] + $x[12]) & 0xffffffff,  7);
+            $x[8] ^= $rotl32->(($x[4] + $x[0]) & 0xffffffff,  9);
+            $x[12] ^= $rotl32->(($x[8] + $x[4]) & 0xffffffff, 13);
+            $x[0] ^= $rotl32->(($x[12] + $x[8]) & 0xffffffff, 18);
+            $x[9] ^= $rotl32->(($x[5] + $x[1]) & 0xffffffff,  7);
+            $x[13] ^= $rotl32->(($x[9] + $x[5]) & 0xffffffff,  9);
+            $x[1] ^= $rotl32->(($x[13] + $x[9]) & 0xffffffff, 13);
+            $x[5] ^= $rotl32->(($x[1] + $x[13]) & 0xffffffff, 18);
+            $x[14] ^= $rotl32->(($x[10] + $x[6]) & 0xffffffff,  7);
+            $x[2] ^= $rotl32->(($x[14] + $x[10]) & 0xffffffff,  9);
+            $x[6] ^= $rotl32->(($x[2] + $x[14]) & 0xffffffff, 13);
+            $x[10] ^= $rotl32->(($x[6] + $x[2]) & 0xffffffff, 18);
+            $x[3] ^= $rotl32->(($x[15] + $x[11]) & 0xffffffff,  7);
+            $x[7] ^= $rotl32->(($x[3] + $x[15]) & 0xffffffff,  9);
+            $x[11] ^= $rotl32->(($x[7] + $x[3]) & 0xffffffff, 13);
+            $x[15] ^= $rotl32->(($x[11] + $x[7]) & 0xffffffff, 18);
 
-            $x[ 1] ^= $rotl32->(($x[ 0] + $x[ 3]) & 0xffffffff,  7);
-            $x[ 2] ^= $rotl32->(($x[ 1] + $x[ 0]) & 0xffffffff,  9);
-            $x[ 3] ^= $rotl32->(($x[ 2] + $x[ 1]) & 0xffffffff, 13);
-            $x[ 0] ^= $rotl32->(($x[ 3] + $x[ 2]) & 0xffffffff, 18);
-            $x[ 6] ^= $rotl32->(($x[ 5] + $x[ 4]) & 0xffffffff,  7);
-            $x[ 7] ^= $rotl32->(($x[ 6] + $x[ 5]) & 0xffffffff,  9);
-            $x[ 4] ^= $rotl32->(($x[ 7] + $x[ 6]) & 0xffffffff, 13);
-            $x[ 5] ^= $rotl32->(($x[ 4] + $x[ 7]) & 0xffffffff, 18);
-            $x[11] ^= $rotl32->(($x[10] + $x[ 9]) & 0xffffffff,  7);
-            $x[ 8] ^= $rotl32->(($x[11] + $x[10]) & 0xffffffff,  9);
-            $x[ 9] ^= $rotl32->(($x[ 8] + $x[11]) & 0xffffffff, 13);
-            $x[10] ^= $rotl32->(($x[ 9] + $x[ 8]) & 0xffffffff, 18);
+            $x[1] ^= $rotl32->(($x[0] + $x[3]) & 0xffffffff,  7);
+            $x[2] ^= $rotl32->(($x[1] + $x[0]) & 0xffffffff,  9);
+            $x[3] ^= $rotl32->(($x[2] + $x[1]) & 0xffffffff, 13);
+            $x[0] ^= $rotl32->(($x[3] + $x[2]) & 0xffffffff, 18);
+            $x[6] ^= $rotl32->(($x[5] + $x[4]) & 0xffffffff,  7);
+            $x[7] ^= $rotl32->(($x[6] + $x[5]) & 0xffffffff,  9);
+            $x[4] ^= $rotl32->(($x[7] + $x[6]) & 0xffffffff, 13);
+            $x[5] ^= $rotl32->(($x[4] + $x[7]) & 0xffffffff, 18);
+            $x[11] ^= $rotl32->(($x[10] + $x[9]) & 0xffffffff,  7);
+            $x[8] ^= $rotl32->(($x[11] + $x[10]) & 0xffffffff,  9);
+            $x[9] ^= $rotl32->(($x[8] + $x[11]) & 0xffffffff, 13);
+            $x[10] ^= $rotl32->(($x[9] + $x[8]) & 0xffffffff, 18);
             $x[12] ^= $rotl32->(($x[15] + $x[14]) & 0xffffffff,  7);
             $x[13] ^= $rotl32->(($x[12] + $x[15]) & 0xffffffff,  9);
             $x[14] ^= $rotl32->(($x[13] + $x[12]) & 0xffffffff, 13);
@@ -1628,10 +1629,10 @@ __END__
 
 
     my $e = $k->add_entry({
-        title    => 'Something',
+        title => 'Something',
         username => 'someuser',
         password => 'somepass',
-        group    => $gid,
+        group => $gid,
         # OR group => $group,
     });
     my $eid = $e->{'id'};
@@ -1790,56 +1791,56 @@ information for the currently loaded database.
 The following fields are present in both version 1 and version 2
 style databases (from the header):
 
-    enc_iv               => "123456789123456", # rand
-    enc_type             => "rijndael",
-    header_size          => 222,
-    seed_key             => "1234567890123456", # rand (32 bytes on v2)
-    seed_rand            => "12345678901234567890123456789012", # rand
-    rounds               => 6000,
-    sig1                 => "2594363651",
-    sig2                 => "3041655655", # indicates db version
-    ver                  => 196608,
-    version              => 1, # or 2
+    enc_iv => "123456789123456", # rand
+    enc_type => "rijndael",
+    header_size => 222,
+    seed_key => "1234567890123456", # rand (32 bytes on v2)
+    seed_rand => "12345678901234567890123456789012", # rand
+    rounds => 6000,
+    sig1 => "2594363651",
+    sig2 => "3041655655", # indicates db version
+    ver => 196608,
+    version => 1, # or 2
 
 The following keys will be present after the reading of a version 2
 database (from the header):
 
-    cipher               => "aes",
-    compression          => 1,
-    protected_stream     => "salsa20",
+    cipher => "aes",
+    compression => 1,
+    protected_stream => "salsa20",
     protected_stream_key => "12345678901234567890123456789012", # rand
-    start_bytes          => "12345678901234567890123456789012", # rand
+    start_bytes => "12345678901234567890123456789012", # rand
 
 Additionally, items parsed from the Meta section of a version 2
 database will be added.  The following are the available fields.
 
-    color                         => "#4FFF00",
-    custom_data                   => {key1 => "val1"},
-    database_description          => "database desc",
-    database_description_changed  => "2012-08-17 00:30:56",
-    database_name                 => "database name",
-    database_name_changed         => "2012-08-17 00:30:56",
-    default_user_name             => "",
-    default_user_name_changed     => "2012-08-17 00:30:34",
-    entry_templates_group         => "VL5nOpzlFUevGhqL71/OTA==",
+    color => "#4FFF00",
+    custom_data => {key1 => "val1"},
+    database_description => "database desc",
+    database_description_changed => "2012-08-17 00:30:56",
+    database_name => "database name",
+    database_name_changed => "2012-08-17 00:30:56",
+    default_user_name => "",
+    default_user_name_changed => "2012-08-17 00:30:34",
+    entry_templates_group => "VL5nOpzlFUevGhqL71/OTA==",
     entry_templates_group_changed => "2012-08-21 14:05:32",
-    generator                     => "KeePass",
-    history_max_items             => 10,
-    history_max_size              => 6291456, # bytes
-    last_selected_group           => "SUgL30QQqUK3tOWuNKUYJA==",
-    last_top_visible_group        => "dC1sQ1NO80W7klmRhfEUVw==",
-    maintenance_history_days      => 365,
-    master_key_change_force       => -1,
-    master_key_change_rec         => -1,
-    master_key_changed            => "2012-08-17 00:30:34",
-    protect_notes                 => 0,
-    protect_password              => 1,
-    protect_title                 => 0,
-    protect_url                   => 0,
-    protect_username              => 0
-    recycle_bin_changed           => "2012-08-17 00:30:34",
-    recycle_bin_enabled           => 1,
-    recycle_bin_uuid              => "SUgL30QQqUK3tOWuNKUYJA=="
+    generator => "KeePass",
+    history_max_items => 10,
+    history_max_size => 6291456, # bytes
+    last_selected_group => "SUgL30QQqUK3tOWuNKUYJA==",
+    last_top_visible_group => "dC1sQ1NO80W7klmRhfEUVw==",
+    maintenance_history_days => 365,
+    master_key_change_force => -1,
+    master_key_change_rec => -1,
+    master_key_changed => "2012-08-17 00:30:34",
+    protect_notes => 0,
+    protect_password => 1,
+    protect_title => 0,
+    protect_url => 0,
+    protect_username => 0
+    recycle_bin_changed => "2012-08-17 00:30:34",
+    recycle_bin_enabled => 1,
+    recycle_bin_uuid => "SUgL30QQqUK3tOWuNKUYJA=="
 
 When writing a database via either save_db or gen_db, these
 fields can be set and passed along.  Optionally, it is possible
@@ -1903,29 +1904,29 @@ Groups will look similar to the following:
 
     $g = [{
          expanded => 0,
-         icon     => 0,
-         id       => 234234234, # under v1 this is a 32 bit int, under v2 it is a 16 char id
-         title    => 'Foo',
-         level    => 0,
+         icon => 0,
+         id => 234234234, # under v1 this is a 32 bit int, under v2 it is a 16 char id
+         title => 'Foo',
+         level => 0,
          entries => [{
              accessed => "2010-06-24 15:09:19",
-             comment  => "",
-             created  => "2010-06-24 15:09:19",
-             expires  => "2999-12-31 23:23:59",
-             icon     => 0,
+             comment => "",
+             created => "2010-06-24 15:09:19",
+             expires => "2999-12-31 23:23:59",
+             icon => 0,
              modified => "2010-06-24 15:09:19",
-             title    => "Something",
+             title => "Something",
              password => 'somepass', # will be hidden if the database is locked
-             url      => "",
+             url => "",
              username => "someuser",
-             id       => "0a55ac30af68149f", # v1 is any hex char, v2 is any 16 char
+             id => "0a55ac30af68149f", # v1 is any hex char, v2 is any 16 char
          }],
          groups => [{
              expanded => 0,
-             icon     => 0,
-             id       => 994414667,
-             level    => 1,
-             title    => "Bar"
+             icon => 0,
+             id => 994414667,
+             level => 1,
+             title => "Bar"
          }],
      }];
 
@@ -1993,18 +1994,18 @@ The following fields can be passed to both v1 and v2 databases.
 
     accessed => "2010-06-24 15:09:19", # last accessed date
     auto_type => [{keys => "{USERNAME}{TAB}{PASSWORD}{ENTER}", window => "Foo*"}],
-    binary   => {foo => 'content'}; # hashref of filename/content pairs
-    comment  => "", # a comment for the system - auto-type info is normally here
-    created  => "2010-06-24 15:09:19", # entry creation date
-    expires  => "2999-12-31 23:23:59", # date entry expires
-    icon     => 0, # icon number for use with agents
+    binary => {foo => 'content'}; # hashref of filename/content pairs
+    comment => "", # a comment for the system - auto-type info is normally here
+    created => "2010-06-24 15:09:19", # entry creation date
+    expires => "2999-12-31 23:23:59", # date entry expires
+    icon => 0, # icon number for use with agents
     modified => "2010-06-24 15:09:19", # last modified
-    title    => "Something",
+    title => "Something",
     password => 'somepass', # will be hidden if the database is locked
-    url      => "http://",
+    url => "http://",
     username => "someuser",
-    id       => "0a55ac30af68149f", # auto generated if needed, v1 is any hex char, v2 is any 16 char
-    group    => $gid, # which group to add the entry to
+    id => "0a55ac30af68149f", # auto generated if needed, v1 is any hex char, v2 is any 16 char
+    group => $gid, # which group to add the entry to
 
 For compatibility with earlier versions of File::KeePass, it is
 possible to pass in a binary and binary_name when creating an entry.
@@ -2012,7 +2013,7 @@ They will be automatically converted to the hashref of
 filename/content pairs
 
     binary_name => "foo", # description of the stored binary - typically a filename
-    binary   => "content", # raw data to be stored in the system - typically a file
+    binary => "content", # raw data to be stored in the system - typically a file
 
     # results in
     binary => {"foo" => "content"}
@@ -2047,19 +2048,19 @@ reference to a group - such as that returned by find_group.
 When using a version 2 database, the following additional fields are
 also available:
 
-    expires_enabled   => 0,
-    location_changed  => "2012-08-05 12:12:12",
-    usage_count       => 0,
-    tags              => {},
-    background_color  => '#ff0000',
-    foreground_color  => '#ffffff',
-    custom_icon_uuid  => '234242342aa',
-    history           => [], # arrayref of previous entry changes
-    override_url      => $node->{'OverrideURL'},
+    expires_enabled => 0,
+    location_changed => "2012-08-05 12:12:12",
+    usage_count => 0,
+    tags => {},
+    background_color => '#ff0000',
+    foreground_color => '#ffffff',
+    custom_icon_uuid => '234242342aa',
+    history => [], # arrayref of previous entry changes
+    override_url => $node->{'OverrideURL'},
     auto_type_enabled => 1,
-    auto_type_munge   => 0, # whether or not to attempt two channel auto typing
-    protected         => {password => 1}, # indicating which strings were/should be salsa20 protected
-    strings           => {'other key' => 'other value'},
+    auto_type_munge => 0, # whether or not to attempt two channel auto typing
+    protected => {password => 1}, # indicating which strings were/should be salsa20 protected
+    strings => {'other key' => 'other value'},
 
 =item find_entries
 
@@ -2145,10 +2146,10 @@ hooks at various events.  Without the hooks, it runs similarly to
 XML::Simple::parse.
 
     my $data = $self->parse_xml($buffer, {
-        top            => 'KeePassFile',
-        force_array    => {Group => 1, Entry => 1},
-        start_handlers => {Group => sub { $level++ }},
-        end_handlers   => {Group => sub { $level-- }},
+        top => 'KeePassFile',
+        force_array => {Group => 1, Entry => 1},
+        start_handlers => {Group => sub {$level++}},
+        end_handlers => {Group => sub {$level--}},
     });
 
 =item gen_xml
@@ -2176,7 +2177,7 @@ If no data string is passed a salsa20 encrypting coderef is returned.
 
     my $encoder = $self->salsa20({key => $key, iv => $Iv}); # no data
     my $encoded = $encoder->($data);
-    my $part2   = $encoder->($more_data); # continues from previous state
+    my $part2 = $encoder->($more_data); # continues from previous state
 
 =item salsa20_stream
 
@@ -2188,7 +2189,7 @@ method maintains a buffer of xor bytes to ensure that none are wasted.
 
     my $encoder = $self->salsa20_stream({key => $key, iv => $Iv}); # no data
     my $encoded = $encoder->("1234");   # calls salsa20->()
-    my $part2   = $encoder->("1234");   # uses the same pad until 64 bytes are used
+    my $part2 = $encoder->("1234");   # uses the same pad until 64 bytes are used
 
 =back
 
