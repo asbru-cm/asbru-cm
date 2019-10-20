@@ -32,6 +32,7 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
+    - sudo gem install github_changelog_generator
 script: ./build.sh
 deploy:
   - provider: packagecloud
@@ -62,6 +63,15 @@ deploy:
     on:
       branch: gtk3
 
+after_success:
+    - if [[ -z "$TRAVIS_TAG" ]]; then
+        github_changelog_generator --token --release-branch master
+        git config user.email "travis@travis.org"
+        git config user.name "travis"
+        git add CHANGELOG.md
+        git commit --alow-empty -m "Updated CHANGELOG.md"
+        git push https://KlaasT:{GITHUB_API_KEY}@github.com/asbru-cm/asbru-cm.git HEAD:auto-build
+      fi
 
 after_deploy:
   # Prune old packages from packagecloud. The last 5 should be enough.
