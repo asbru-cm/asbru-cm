@@ -206,18 +206,18 @@ our @DONATORS_LIST = (
     'Don Jacobs'
 );
 our @PACDESKTOP = (
-'[Desktop Entry]',
-'Name=PAC',
-'Comment=Perl Auto Connector (auto start)',
-'Terminal=false',
-'Icon=pac',
-'Type=Application',
-'Exec=/usr/bin/asbru --no-splash',
-'StartupNotify=false',
-'Name[en_US]=PAC',
-'Comment[en_US]=Perl Auto Connector (auto start)',
-'Categories=Applications;Network;',
-'X-GNOME-Autostart-enabled=true',
+    '[Desktop Entry]',
+    'Name=PAC',
+    'Comment=Perl Auto Connector (auto start)',
+    'Terminal=false',
+    'Icon=pac',
+    'Type=Application',
+    'Exec=/usr/bin/asbru --no-splash',
+    'StartupNotify=false',
+    'Name[en_US]=PAC',
+    'Comment[en_US]=Perl Auto Connector (auto start)',
+    'Categories=Applications;Network;',
+    'X-GNOME-Autostart-enabled=true',
 );
 
 # END: Define GLOBAL CLASS variables
@@ -3180,8 +3180,7 @@ sub _wakeOnLan {
         while (Gtk3::events_pending) {
             Gtk3::main_iteration;
         }
-    }
-    elsif (! $ip) {
+    } elsif (! $ip) {
         $w{window}{gui}{entrymac}->set_text($mac);
         $w{window}{gui}{entrymac}->select_region(0, length($mac));
         $w{window}{gui}{lblstatus}->set_text('No IP/hostname to test reachability');
