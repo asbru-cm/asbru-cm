@@ -56,7 +56,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $BANNER = $RealBin . '/res/asbru_banner_scripts.png';
-my $CFG_DIR = $ENV{'HOME'} . '/.config/pac';
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $SCRIPTS_DIR = $CFG_DIR . '/scripts';
 
 # PAC Help

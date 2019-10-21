@@ -64,7 +64,7 @@ my $AUTOSTART_FILE = $RES_DIR . '/pac_start.desktop';
 
 my $GLADE_FILE = $RES_DIR . '/asbru.glade';
 my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
-my $CFG_DIR = $ENV{'HOME'} . '/.config/pac';
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = $CFG_DIR . '/pac.yml';
 
 my $GSETTINGS = Glib::IO::Settings->new('org.gnome.system.proxy.http');

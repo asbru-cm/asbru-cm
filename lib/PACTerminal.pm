@@ -62,7 +62,7 @@ use Vte;
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
-my $CFG_DIR = "$ENV{'HOME'}/.config/pac";
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
 my $PERL_BIN = '/usr/bin/perl';
 my $PAC_CONN = "$RealBin/lib/pac_conn";
