@@ -456,7 +456,7 @@ sub _getMethods {
     `which xfreerdp 1>/dev/null 2>&1`;
     my $xfreerdp = $?;
     $methods{'RDP (xfreerdp)'} = {
-        'installed' => sub {return (! $xfreerdp) ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp-x11'";},
+        'installed' => sub {return (! $xfreerdp) ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
             my $cfg = shift;
 
