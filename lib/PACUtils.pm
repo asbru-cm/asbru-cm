@@ -131,7 +131,7 @@ if ($ARCH_TMP =~ /x86_64/gio) {
 }
 my $RES_DIR = "$RealBin/res";
 my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
-my $CFG_DIR = "$ENV{'HOME'}/.config/pac";
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/pac.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
@@ -1958,7 +1958,7 @@ sub _cfgSanityCheck {
     defined $$cfg{'defaults'} or $$cfg{'defaults'} = {};
 
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
-    #$$cfg{'defaults'}{'config location'} //= "$ENV{HOME}/.config/pac";
+    #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
     $$cfg{'defaults'}{'record command history'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
@@ -2040,7 +2040,8 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'save session logs'} //= 0;
     $$cfg{'defaults'}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
     $$cfg{'defaults'}{'session logs folder'} //= "$CFG_DIR/session_logs";
-    $$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+    # TODO : Remove, this is from a previous migration path
+    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
     $$cfg{'defaults'}{'session logs amount'} //= 10;
     $$cfg{'defaults'}{'screenshots external viewer'} //= '/usr/bin/xdg-open';
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
@@ -2229,9 +2230,10 @@ sub _cfgSanityCheck {
             @{$$cfg{'environments'}{$uuid}{'screenshots'}} = @screenshots;
             $$cfg{'environments'}{$uuid}{'_protected'}  = $protected;
 
-            foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-                $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
-            }
+            # TODO : Remove, this is from a previous migration path
+            #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
+            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #}
 
             next;
         }
@@ -2307,7 +2309,8 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'save session logs'} //= 0;
         $$cfg{'environments'}{$uuid}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
         $$cfg{'environments'}{$uuid}{'session logs folder'} //= "$CFG_DIR/session_logs";
-        $$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+        # TODO : Remove, this is from a previous migration path
+        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
@@ -2354,9 +2357,10 @@ sub _cfgSanityCheck {
             }
             delete $$cfg{'environments'}{$uuid}{'screenshot'};
         } else {
-            foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-                $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
-            }
+            # TODO : Remove, this is from a previous migration path
+            #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
+            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #}
             if (defined $$cfg{'environments'}{$uuid}{'screenshot'}) {
                 delete $$cfg{'environments'}{$uuid}{'screenshot'};
             }

@@ -80,7 +80,7 @@ my $RES_DIR = "$RealBin/res";
 &_registerPACIcons;
 
 my $INIT_CFG_FILE = "$RealBin/res/pac.yml";
-my $CFG_DIR = "$ENV{'HOME'}/.config/pac";
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/pac.yml";
 our $R_CFG_FILE = '';
 my $CFG_FILE_FREEZE = "$CFG_DIR/pac.freeze";
@@ -120,6 +120,7 @@ sub new {
 
     my $self = {};
 
+    print STDERR "INFO: Using config directory '$CFG_DIR'\n";
     # Setup some signal handling
     $SIG{'USR1'} = sub {
         #DevNote: option currently disabled

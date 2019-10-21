@@ -50,7 +50,7 @@ use Gtk3 '-init';
 # START : Variables declaration/initialization
 my $APPNAME = $PACUtils::APPNAME;
 my $APPICON = "$RealBin/../res/asbru-logo-64.png";
-my $CFG_DIR = "$ENV{'HOME'}/.config/pac";
+my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $SCRIPTS_DIR = "$CFG_DIR/scripts";
 
 my @CMD;
