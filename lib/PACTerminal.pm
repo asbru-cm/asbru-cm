@@ -302,7 +302,7 @@ sub start {
     my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
 
-    my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
+    my $string = $method eq 'generic' ? encode('utf8',"LAUNCHING '$title'") : encode('utf8',"CONNECTING WITH '$title'");
     _vteFeed($$self{_GUI}{_VTE}, "\e[1;32m\r\n $string (" . (localtime(time)) . ") =->\e[0m\r\n\n");
 
     $$self{_PULSE} = 1;
