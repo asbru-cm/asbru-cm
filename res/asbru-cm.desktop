@@ -4,7 +4,7 @@ Comment=Ásbrú Connection Manager is a user interface that helps organizing rem
 Terminal=false
 Icon=asbru-cm
 Type=Application
-Exec=asbru-cm
+Exec=env GDK_BACKEND=x11 asbru-cm
 StartupNotify=true
 Categories=Utility;TerminalEmulator;GTK;
 X-GNOME-Autostart-enabled=false
@@ -12,16 +12,16 @@ Actions=Shell;Quick;ReadOnly;Tray;
 
 [Desktop Action Shell]
 Name=Start local shell
-Exec=asbru-cm --start-shell
+Exec=env GDK_BACKEND=x11 asbru-cm --start-shell
 
 [Desktop Action Quick]
 Name=Quick connect...
-Exec=asbru-cm --quick-conn
+Exec=env GDK_BACKEND=x11 asbru-cm --quick-conn
 
 [Desktop Action ReadOnly]
 Name=Start Read-Only instance
-Exec=asbru-cm --readonly --no-backup
+Exec=env GDK_BACKEND=x11 asbru-cm --readonly --no-backup
 
 [Desktop Action Tray]
 Name=Start in system tray
-Exec=asbru-cm --iconified
+Exec=env GDK_BACKEND=x11 asbru-cm --iconified
