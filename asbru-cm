@@ -30,7 +30,7 @@ BEGIN {
         print "Usage: $0 [options]\n";
         print "Options:\n";
         print "\t--help : show this message\n";
-        print "\t--configdir=path : absolute '/path' or relative 'path' to ~/.config/\n";
+        print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config/\n";
         print "\t--no-backup : do no create alternative config files as a backup (faster shutdown)\n";
         print "\t--start-shell : start a local terminal\n";
         print "\t--password=<pwd> : automatically logon with given password without prompting user\n";
@@ -53,7 +53,7 @@ BEGIN {
 
     # Check if user wants to use a different configuration directory
     foreach my $arg (@ARGV) {
-        if ($arg =~ /^-{1,2}configdir=\s*(.+)$/i) {
+        if ($arg =~ /^-{1,2}config-dir=\s*(.+)$/i) {
             my $path = $1;
             # Check if configuration directory is an absolute (starts with /) or relative path (does not starts with /)
             if ($path =~ m|^/|) {
@@ -188,8 +188,8 @@ asbru-cm [options]
 
 B<Options>
 
-    --help : show this message
-    --configdir=path                : absolute '/path' or relative 'path' to ~/.config/
+    --help                          : show this message
+    --config-dir=path               : absolute '/path' or relative 'path' to ~/.config/
     --no-backup                     : do no create alternative config files as a backup (faster shutdown)
     --start-shell                   : start a local terminal
     --password=<pwd>                : automatically logon with given password without prompting user
