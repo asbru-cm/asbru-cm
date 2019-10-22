@@ -272,9 +272,9 @@ sub new {
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME($$);
 
+    # Gtk style
     my $css_provider = Gtk3::CssProvider->new;
-    $css_provider->load_from_data(".dnd-icon { border: 1px solid #000000; }");
-    # GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+    $css_provider->load_from_path("$RES_DIR/asbru.css");
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
 
     # Setup known connection methods
