@@ -3016,7 +3016,7 @@ sub _saveSessionLog {
     my $self = shift;
 
     my $new_file = $$self{_LOGFILE};
-    $new_file =~ s/\s/_/go;
+    $new_file =~ s/.*\///go;
 
     my $dialog = Gtk3::FileChooserDialog->new (
         'Select file to save session log',

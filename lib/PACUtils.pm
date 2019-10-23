@@ -1550,7 +1550,7 @@ sub _wAddRenameNode {
 
     if ($action eq 'rename') {
         $name = $$cfg{'environments'}{$uuid}{'name'};
-        $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'};
+        $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
         $lblup = "<b>Renaming node ' @{[__($name)]}'</b>";
     } elsif ($action eq 'add') {
@@ -3341,9 +3341,13 @@ sub _replaceBadChars {
 sub _removeEscapeSeqs {
     my $string = shift // '';
 
-    $string =~ s/(\x1B\[\d+(;\d+)?m)|(\cM)//go;
-    $string =~ s/(\x1B|\x08)\[.//go;
-    $string =~ s/\x1B|\x08//go;
+    $string =~ s/\e\[[0-9;]*m//g;
+    $string =~ s/\e\[[0-9;]*[mG]//g;
+    $string =~ s/\e\[[0-9;]*[mGKH]//g;
+    $string =~ s/\e\[[0-9;]*[a-zA-Z]//g;
+    $string =~ s/\e\[[0-9;]*m(?:\e\[K)?//g;
+    $string =~ s/\x1B.+~\x07//g;
+    $string =~ s/(\x1B|\x08|\x07)(\[w)?//g;
 
     return $string;
 }
