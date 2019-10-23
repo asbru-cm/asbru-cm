@@ -1550,7 +1550,7 @@ sub _wAddRenameNode {
 
     if ($action eq 'rename') {
         $name = $$cfg{'environments'}{$uuid}{'name'};
-        $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'};
+        $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
         $lblup = "<b>Renaming node ' @{[__($name)]}'</b>";
     } elsif ($action eq 'add') {
