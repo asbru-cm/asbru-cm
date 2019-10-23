@@ -561,6 +561,8 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{btnOK} = Gtk3::Button->new_from_stock('gtk-ok');
     $hbbox1->set_layout('GTK_BUTTONBOX_END');
     $hbbox1->add($$self{_WINDOWCLUSTER}{btnOK});
+    my $page = $$self{_WINDOWCLUSTER}{nb}->get_nth_page(0);
+    $page->hide(1);
 
     return 1;
 }
