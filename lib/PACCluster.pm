@@ -122,6 +122,8 @@ sub show {
     }
     $$self{_WINDOWCLUSTER}{nb}->set_current_page($page);
     $$self{_WINDOWCLUSTER}{nb}->get_nth_page(0)->hide();
+    #$$self{_WINDOWCLUSTER}{nb}->get_nth_page(2)->hide();
+    $$self{_WINDOWCLUSTER}{buttonPCC}->hide();
 
     return 1;
 }
@@ -920,7 +922,6 @@ sub _setupCallbacks {
                 $self->_updateGUI;
             }
         }
-
         $self->_updateButtons1;
         $self->_updateGUI1;
         if ($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu}) {
@@ -1410,8 +1411,12 @@ sub addToCluster {
     my $cluster = shift;
 
     $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER} = $cluster;
-    $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager', 'button') if defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster};
-    $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("In CLUSTER: $cluster") if defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster};
+    if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager', 'button');
+    }
+    if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("In CLUSTER: $cluster");
+    }
     $$self{_RUNNING}{$uuid}{'terminal'}->_updateStatus;
     $self->_updateGUI;
     return 1;
@@ -1423,8 +1428,12 @@ sub delFromCluster {
     my $cluster = shift;
 
     $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER} = '';
-    $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager-off', 'button') if defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster};
-    $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("Unclustered") if defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster};
+    if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager-off', 'button');
+    }
+    if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("Unclustered");
+    }
     $$self{_RUNNING}{$uuid}{'terminal'}->_updateStatus;
     $self->_updateGUI;
     return 1;
@@ -1444,7 +1453,7 @@ sub _updateGUI {
     @{$$self{_WINDOWCLUSTER}{treeClustered}->{data}} = ();
     $$self{_CLUSTERS} = undef;
 
-    # Look into every startes terminal, and add it to the 'clusteres' or 'unclustered' tree...
+    # Look into every started terminal, and add it to the 'clustered' or 'unclustered' tree...
     foreach my $uuid (keys %{$$self{_RUNNING}}) {
         my $name = $$self{_RUNNING}{$uuid}{'terminal'}{'_NAME'};
         my $icon = $$self{_RUNNING}{$uuid}{'terminal'}{CONNECTED} ? $ICON_ON : $ICON_OFF;
