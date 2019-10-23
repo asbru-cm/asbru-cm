@@ -27,7 +27,7 @@ $|++;
 # Import Modules
 
 use FindBin qw ($RealBin $Bin $Script);
-use lib $RealBin . '/lib', $RealBin . '/lib/ex';
+use lib "$RealBin/lib", "$RealBin/lib/ex";
 
 # Standard
 use strict;
@@ -78,7 +78,9 @@ sub new {
     $self->{_UPDATING} = 0;
 
     # Build the GUI
-    _initGUI($self) or return 0;
+    if (!_initGUI($self)) {
+        return 0;
+    }
 
     # Setup callbacks
     _setupCallbacks($self);
@@ -110,9 +112,9 @@ sub show {
     $self->_updateGUI;
     $self->_updateGUI1($cluster);
     $self->_updateGUIAC($cluster);
-    my $page = 0;
+    my $page = 1;
     if (!$cluster) {
-        $page = 0;
+        $page = 1;
     } elsif (defined $PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster}) {
         $page = 2
     } else {
@@ -232,7 +234,7 @@ sub _initGUI {
     # Create a notebook widget
     $$self{_WINDOWCLUSTER}{nb} = Gtk3::Notebook->new;
     $$self{_WINDOWCLUSTER}{nb}->set_scrollable(1);
-    $$self{_WINDOWCLUSTER}{nb}->set_tab_pos('right');
+    $$self{_WINDOWCLUSTER}{nb}->set_tab_pos('top');
     # FIXME-HOMOGENEOUS            $$self{_WINDOWCLUSTER}{nb}->set('homogeneous', 1);
     $vbox0->pack_start($$self{_WINDOWCLUSTER}{nb}, 1, 1, 0);
 
@@ -614,14 +616,17 @@ sub _setupCallbacks {
     });
 
     # Capture 'comboClusters' change
+    # Combo from running clusters
     $$self{_WINDOWCLUSTER}{comboClusters}->signal_connect('changed' => sub {
-        $self->_comboClustersChanged;}
-    );
+        $self->_comboClustersChanged;
+    });
 
+    # Combo from Saved Clusters
     $$self{_WINDOWCLUSTER}{comboClusters1}->signal_connect('changed' => sub {
         $self->_comboClustersChanged1;
         $self->_updateButtons1;
     });
+    # Tree connections
     $$self{_WINDOWCLUSTER}{treeConnections}->get_selection->signal_connect('changed' => sub {
         $self->_updateButtons1;
     });
@@ -687,7 +692,9 @@ sub _setupCallbacks {
 
         #$PACMain::{FUNCS}{_MAIN}{_CFG}{tmp}{changed} = 1;
         $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
-        $PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu} and $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        if ($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu}) {
+            $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        }
 
         return 1;
     });
@@ -717,7 +724,9 @@ sub _setupCallbacks {
 
         #$PACMain::{FUNCS}{_MAIN}{_CFG}{tmp}{changed} = 1;
         $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
-        $PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu} and $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        if ($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu}) {
+            $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        }
 
         return 1;
     });
@@ -1378,13 +1387,19 @@ sub _setupCallbacks {
 
     # Capture 'Close' button clicked
     $$self{_WINDOWCLUSTER}{btnOK}->signal_connect('clicked' => sub {
-        $PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu} and $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        if ($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_nth_page($PACMain::{FUNCS}{_MAIN}{_GUI}{nbTree}->get_current_page) eq $PACMain::{FUNCS}{_MAIN}{_GUI}{vboxclu}) {
+            $PACMain::{FUNCS}{_MAIN}->_updateClustersList;
+        }
         $$self{_WINDOWCLUSTER}{main}->hide;
     });
     # Capture window closing
     $$self{_WINDOWCLUSTER}{main}->signal_connect('delete_event' => sub {$$self{_WINDOWCLUSTER}{btnOK}->activate;});
     # Capture 'Esc' keypress to close window
-    $$self{_WINDOWCLUSTER}{main}->signal_connect('key_press_event' => sub {$_[1]->keyval == 65307 and $$self{_WINDOWCLUSTER}{btnOK}->activate;});
+    $$self{_WINDOWCLUSTER}{main}->signal_connect('key_press_event' => sub {
+        if ($_[1]->keyval == 65307) {
+            $$self{_WINDOWCLUSTER}{btnOK}->activate;
+        }
+    });
     return 1;
 }
 
