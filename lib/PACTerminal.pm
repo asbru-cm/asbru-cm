@@ -445,7 +445,7 @@ sub stop {
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
-        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : $$self{_TITLE}) . "'?")) {
+        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
             return 1;
         }
 

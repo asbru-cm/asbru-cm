@@ -1925,7 +1925,8 @@ sub _setupCallbacks {
         }
         # Favourites
         elsif ($page eq $$self{_GUI}{scroll2}) {
-            $self->_updateFavouritesList; $self->_updateGUIFavourites;
+            $self->_updateFavouritesList;
+            $self->_updateGUIFavourites;
         }
         # History
         elsif ($page eq $$self{_GUI}{scroll3}) {
@@ -1933,7 +1934,8 @@ sub _setupCallbacks {
         }
         # Clusters
         else {
-            $self->_updateClustersList; $self->_updateGUIClusters;
+            $self->_updateClustersList;
+            $self->_updateGUIClusters;
         }
         return 1;
     });
@@ -3076,7 +3078,7 @@ sub _launchTerminals {
         }
         my $uuid = $$t{_UUID};
         my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale($RES_DIR . '/asbru_shell.png', 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
-        my $name = $$self{_CFG}{'environments'}{$uuid}{'name'};
+        my $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
         unshift(@{ $$self{_GUI}{treeHistory}{data} }, ({ value => [ $icon, $name, $uuid,  strftime("%H:%M:%S %d-%m-%Y", localtime($FUNCS{_STATS}{statistics}{$uuid}{start})) ] }));
     }
 
@@ -3623,7 +3625,9 @@ sub _updateGUIFavourites {
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'));
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 0;
 
-    $self->_updateGUIWithUUID($sel_uuids[0]) if $total == 1;
+    if ($total == 1) {
+        $self->_updateGUIWithUUID($sel_uuids[0]);
+    }
 
     return 1;
 }
@@ -3698,10 +3702,10 @@ sub _updateClustersList {
 
     @{ $$self{_GUI}{treeClusters}{data} } = ();
     foreach my $ac (sort { $a cmp $b } keys %{ $$self{_CFG}{defaults}{'auto cluster'} }) {
-        push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $AUTOCLUSTERICON, $ac ] }));
+        push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $AUTOCLUSTERICON, $ac ]}));
     }
     foreach my $cluster (sort { $a cmp $b } keys %{ $$self{_CLUSTER}->getCFGClusters }) {
-        push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $CLUSTERICON, $cluster ] }));
+        push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $CLUSTERICON, $cluster ]}));
     }
 
     return 1;
