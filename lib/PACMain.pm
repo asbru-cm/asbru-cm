@@ -3805,7 +3805,7 @@ sub _copyNodes {
         return 1;
     }
     foreach my $sel (@{ $sel_uuids }) {
-        $self->__dupNodes($parent, $sel, $$self{_COPY}{'data'});
+        $self->__dupNodes($parent, $sel, $$self{_COPY}{'data'}, $cut);
     }
 
     return 1;
@@ -3856,6 +3856,13 @@ sub _pasteNodes {
         return 1;
     }
 
+    if ($parent ne $$self{_COPY}{'data'}{$uuid}{'original_parent'}) {
+        # If paste is under different parent, remove copy message, it is not necessary
+        $$self{_COPY}{'data'}{$uuid}{'name'} =~ s/ - copy//;
+    }
+    # Remove original_parent value is not part of the configuration standard
+    delete $$self{_COPY}{'data'}{$uuid}{'original_parent'};
+
     # Add new node to configuration
     $$self{_CFG}{'environments'}{$uuid} = $$self{_COPY}{'data'}{$uuid};
     $$self{_CFG}{'environments'}{$uuid}{'parent'} = $parent;
@@ -3872,7 +3879,8 @@ sub _pasteNodes {
 
     # Repeat procedure for every 1st level child
     foreach my $child (keys %{ $$self{_COPY}{'data'}{$uuid}{'children'} }) {
-        $self->_pasteNodes($uuid, $child, 0); delete $$self{_COPY}{'data'}{$uuid};
+        $self->_pasteNodes($uuid, $child, 0);
+        delete $$self{_COPY}{'data'}{$uuid};
     }
 
     if ($first and $UNITY) {
@@ -3889,6 +3897,7 @@ sub __dupNodes {
     my $parent = shift;
     my $uuid = shift;
     my $cfg = shift;
+    my $cut = shift // '0';
 
     # Generate a new UUID for the copied element
     my $new_uuid = OSSP::uuid->new; $new_uuid->make("v4");
@@ -3897,7 +3906,14 @@ sub __dupNodes {
 
     # Clone the node with the NEW UUID
     $$cfg{$new_txt_uuid} = dclone($$self{_CFG}{'environments'}{$uuid});
+    print STDERR "ORIGINAL PARENT : $$cfg{$new_txt_uuid}{'parent'}\n";
+    # Save original parent node for reference on paste
+    $$cfg{$new_txt_uuid}{'original_parent'} = $$cfg{$new_txt_uuid}{'parent'};
     $$cfg{$new_txt_uuid}{'parent'} = $parent;
+    if (!$cut) {
+        # If action is not a cut, add 'copy' to the name, so it is different from previous node
+        $$cfg{$new_txt_uuid}{'name'} = "$$self{_CFG}{'environments'}{$uuid}{'name'} - copy";
+    }
     $$cfg{$parent}{'children'}{$new_txt_uuid} = 1;
 
     # Delete screenshots and statistics on duplicated node
@@ -3908,7 +3924,7 @@ sub __dupNodes {
 
     # Repeat procedure for every 1st level child
     foreach my $child ($$self{_GUI}{treeConnections}->_getChildren($uuid, 'all', 0)) {
-        $self->__dupNodes($new_txt_uuid, $child, $cfg);
+        $self->__dupNodes($new_txt_uuid, $child, $cfg, $cut);
     }
 
     return $cfg;
