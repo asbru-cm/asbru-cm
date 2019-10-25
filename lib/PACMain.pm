@@ -1535,6 +1535,7 @@ sub _setupCallbacks {
         my $modelsort = $$self{_GUI}{treeConnections}->get_model;
         my $model = $modelsort->get_model;
         my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
+        $$self{_GUI}{treeConnections}->columns_autosize;
         if ($group_uuid eq '__PAC__ROOT__') {
             return 0;
         }
