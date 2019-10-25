@@ -2584,6 +2584,9 @@ sub _tabMenu {
     # Show a popup with the opened tabs (if tabbed!!)
     my @submenu_goto;
     foreach my $uuid (keys %PACMain::RUNNING) {
+        if (!defined $PACMain::RUNNING{$uuid}{terminal}{_SPLIT}) {
+            next;
+        }
         my $i = $$self{_NOTEBOOK}->page_num($PACMain::RUNNING{$uuid}{terminal}{_SPLIT} ? $PACMain::RUNNING{$uuid}{terminal}{_SPLIT_VPANE} : $PACMain::RUNNING{$uuid}{terminal}{_GUI}{_VBOX});
         if ($uuid eq $$self{_UUID} || $i < 0) {
             next;
@@ -2623,6 +2626,9 @@ sub _tabMenu {
             my @submenu_split_v;
             my @submenu_split_h;
             foreach my $uuid_tmp (keys %PACMain::RUNNING) {
+                if (!defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT}) {
+                    next;
+                }
                 my $i = $$self{_NOTEBOOK}->page_num($PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT} ? $PACMain::RUNNING{$uuid_tmp}{terminal}{_SPLIT_VPANE} : $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VBOX});
                 if ($uuid_tmp eq $$self{_UUID_TMP} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_TITLE} eq 'Info ' || $i < 0) {
                     next;
@@ -2706,6 +2712,9 @@ sub _tabMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
+        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
+            next;
+        }
         if ($PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne '') {
             next;
         }
