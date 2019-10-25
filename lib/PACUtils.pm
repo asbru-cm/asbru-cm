@@ -3347,6 +3347,8 @@ sub _removeEscapeSeqs {
     $string =~ s/\e\[[0-9;]*m(?:\e\[K)?//g;
     $string =~ s/\x1B.+~\x07//g;
     $string =~ s/(\x1B|\x08|\x07)(\[w)?//g;
+    $string =~ s/\[\?\d+h//g;
+    $string =~ s/\]\d;//g;
 
     return $string;
 }
