@@ -3713,6 +3713,7 @@ sub _updateClustersList {
 
 sub _updateFavouritesList {
     my $self = shift;
+    my ($name);
 
     @{ $$self{_GUI}{treeFavourites}{data} } = ();
     foreach my $uuid (keys %{ $$self{_CFG}{'environments'} }) {
@@ -3720,7 +3721,14 @@ sub _updateFavouritesList {
             next;
         }
         my $icon = $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
-        my $name = $$self{_CFG}{'environments'}{$uuid}{'name'};
+        my $group = $$self{_CFG}{'environments'}{$uuid}{'parent'};
+        if ($group) {
+            $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
+            $group = __("$$self{_CFG}{'environments'}{$group}{'name'} : ");
+            $name = "$group$name";
+        } else {
+            $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
+        }
         push(@{ $$self{_GUI}{treeFavourites}{data} }, ({ value => [ $icon, $name, $uuid ] }));
     }
 
