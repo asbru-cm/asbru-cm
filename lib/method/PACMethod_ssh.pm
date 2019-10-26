@@ -226,7 +226,7 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
-    $options{useCompression} = 0;
+    $options{useCompression} = 1;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -287,7 +287,7 @@ sub _parseCfgToOptions
 
     $options{sshVersion} = $options{sshVersion2}   ? "2" : ($options{sshVersion1} ? "1" : "any");
     $options{ipVersion}  = $options{ipVersion6}    ? "6" : ($options{ipVersion4}  ? "4" : "any");
-    $options{forwardX}   = $options{optionenableX} ?  1  : ($options{optiondisablex} ?  0 : 1);
+    $options{forwardX}   = $options{optionenableX} ?  1  : 0;
 
     return \%options;
 }
