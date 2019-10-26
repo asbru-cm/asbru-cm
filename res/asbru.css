@@ -7,6 +7,7 @@
   padding: 0.25em 0;
 }
 .banner-text {
-  color: #222;
+  color: #EEE;
+  text-shadow: 0px 0px 8px rgba(17, 17, 17, 0.75);
   font-size: 2.5em;
 }
