@@ -151,7 +151,7 @@ sub DESTROY {
 sub show {
     my $self = shift;
 
-    $$self{_WINDOWPCC}{main}->set_title("Power Cluster Controller: $APPNAME (v$APPVERSION)");
+    $$self{_WINDOWPCC}{main}->set_title("$APPNAME (v$APPVERSION): Power Cluster Controller");
     $$self{_WINDOWPCC}{main}->show_all;
     $$self{_WINDOWPCC}{main}->present;
 
@@ -185,6 +185,8 @@ sub _initGUI {
 
     my $vbox0 = Gtk3::VBox->new(0, 0);
     $$self{_WINDOWPCC}{main}->add($vbox0);
+
+    $vbox0->pack_start(PACUtils::_createBanner('asbru-cluster.svg', 'Power Cluser Controller'), 0, 1, 0);
 
     my $vbox1 = Gtk3::VBox->new(0, 0);
     $vbox0->pack_start($vbox1, 0, 1, 0);

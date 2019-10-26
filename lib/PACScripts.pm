@@ -55,7 +55,6 @@ use PACUtils;
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
-my $BANNER = $RealBin . '/res/asbru_banner_scripts.png';
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $SCRIPTS_DIR = $CFG_DIR . '/scripts';
 
@@ -391,7 +390,7 @@ sub _initGUI {
     $$self{_WINDOWSCRIPTS}{main} = Gtk3::Window->new;
 
     # and setup some dialog properties.
-    $$self{_WINDOWSCRIPTS}{main}->set_title("$APPNAME : Scripts");
+    $$self{_WINDOWSCRIPTS}{main}->set_title("$APPNAME (v$APPVERSION) : Scripts");
     $$self{_WINDOWSCRIPTS}{main}->set_position('center');
     $$self{_WINDOWSCRIPTS}{main}->set_icon_from_file($APPICON);
     $$self{_WINDOWSCRIPTS}{main}->set_default_size(800, 500);
@@ -403,7 +402,7 @@ sub _initGUI {
 
             my $hboxaux = Gtk3::HBox->new(0, 0);
             $$self{_WINDOWSCRIPTS}{gui}{vbox}->pack_start($hboxaux, 0, 1, 0);
-            $hboxaux->pack_start(Gtk3::Image->new_from_file($BANNER), 0, 1, 0);
+            $hboxaux->pack_start(PACUtils::_createBanner('asbru-scripts-manager.svg', 'Scripts Manager'), 1, 1, 0);
 
             # Create an hpane
             $$self{_WINDOWSCRIPTS}{gui}{hpane} = Gtk3::HPaned->new;
