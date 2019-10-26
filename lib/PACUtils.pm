@@ -103,6 +103,7 @@ require Exporter;
     _vteFeed
     _vteFeedChild
     _vteFeedChildBinary
+    _createBanner
 ); # Functions/varibles to export
 
 @EXPORT_OK  = qw();
@@ -3055,25 +3056,28 @@ sub _wakeOnLan {
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('pac-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
+    $w{window}{data}->set_size_request(480, 0);
     $w{window}{data}->set_resizable(0);
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
-    $w{window}{data}->get_content_area->pack_start(Gtk3::Image->new_from_file("$RES_DIR/asbru_banner_wol.png"), 0, 1, 0);
+    # Banner
+    $w{window}{gui}{banner} = PACUtils::_createBanner('asbru-wol.svg', 'Wake On LAN');
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{banner}, 0, 1, 0);
 
     # Create an HBox to contain a picture and a label
     $w{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
+    $w{window}{gui}{hbox}->set_margin_top(10);
+    $w{window}{gui}{hbox}->set_margin_bottom(10);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox}, 1, 1, 0);
-
-    # Create image
-    $w{window}{gui}{img} = Gtk3::Image->new_from_icon_name('computer', 'dialog');
-    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{img}, 0, 1, 0);
 
     # Create 1st label
     $w{window}{gui}{lblup} = Gtk3::Label->new;
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
-    $w{window}{gui}{lblup}->set_markup("<b>Enter the following data\nand press 'Ok' to send Magic Packet:</b>");
+    $w{window}{gui}{lblup}->set_markup("<b>Enter the following data and press 'OK' to send Magic Packet:</b>");
 
     $w{window}{gui}{table} = Gtk3::Table->new(3, 3, 0);
+    $w{window}{gui}{table}->set_margin_top(10);
+    $w{window}{gui}{table}->set_margin_bottom(10);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{table}, 1, 1, 0);
 
     # Create MAC label
@@ -3119,18 +3123,19 @@ sub _wakeOnLan {
     $w{window}{gui}{entryport}->set_value($port);
     $w{window}{gui}{entryport}->set_activates_default(1);
 
-    $w{window}{gui}{separator} = Gtk3::HSeparator->new;
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{separator}, 0, 1, 0);
-
+    # Send to broadcast
     $w{window}{gui}{cbbroadcast} = Gtk3::CheckButton->new_with_label('Send to broadcast');
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{cbbroadcast}, 0, 1, 0);
     $w{window}{gui}{cbbroadcast}->set_active(1);
     $w{window}{gui}{cbbroadcast}->set_sensitive($ip);
-
-    $w{window}{gui}{separator} = Gtk3::HSeparator->new;
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{separator}, 0, 1, 0);
+    $w{window}{gui}{hbox2} = Gtk3::HBox->new(0, 0);
+    $w{window}{gui}{hbox2}->set_halign('center');
+    $w{window}{gui}{hbox2}->set_margin_top(10);
+    $w{window}{gui}{hbox2}->set_margin_bottom(10);
+    $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{cbbroadcast}, 1, 1, 0);
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox2}, 0, 1, 0);
 
     $w{window}{gui}{lblstatus} = Gtk3::Label->new;
+    $w{window}{gui}{lblstatus}->set_margin_bottom(20);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lblstatus}, 0, 1, 0);
     $w{window}{gui}{lblstatus}->set_text("Checking MAC for '$ip' ...");
 
@@ -3863,6 +3868,30 @@ sub _vteFeedChildBinary {
     }
 }
 
+sub _createBanner {
+    my $icon_filename = shift;
+    my $text_label = shift;
+    my $banner;
+    my $icon;
+    my $text;
+
+    $icon = Gtk3::Image->new_from_file("${RES_DIR}/${icon_filename}");
+    $icon->set_margin_left(10);
+    $icon->set_margin_right(10);
+    $text = Gtk3::Label->new();
+    $text->set_margin_left(10);
+    $text->set_margin_right(10);
+    $text->set_text($text_label);
+    $text->get_style_context->add_class('banner-text');
+    $banner = Gtk3::HBox->new(0, 0);
+    $banner->set_size_request(-1, 50);
+    $banner->get_style_context->add_class('banner-fill');
+    $banner->pack_start($icon, 0, 1, 0);
+    $banner->pack_start($text, 0, 1, 0);
+
+    return $banner;
+}
+
 1;
 
 __END__
@@ -4026,7 +4055,7 @@ Pending
 
 =head2 sub _replaceBadChars
 
-Transforme non printable messages in a printable message
+Transform non printable messages in a printable message
 
 =head2 sub _removeEscapeSeqs
 
@@ -4080,10 +4109,12 @@ Call Vte->vteFeedChild, depending on the version installed
 
 Call Vte->vteFeedChildBinary, depending on the version installed
 
+=head2 sub _createBanner
+
+Create a standard banner to be displayed on all Ásbrú Connection Manager dialogs
+
 =head1 Perl particulars
 
     @{[function(parameters)]} ==> Inside an interpolation, executes the function and uses the result as the string in that position
     Used as   : "My string @{[function(parameters)]} continues here"
     Instead of: "My string " . function(parameters) . " continues here"
-
-

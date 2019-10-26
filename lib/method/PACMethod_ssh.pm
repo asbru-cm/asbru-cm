@@ -225,11 +225,8 @@ sub _parseCfgToOptions
     my $cmd_line = shift;
 
     my %options;
-#    $options{sshVersion} = 'any';
-#    $options{ipVersion} = 'any';
     $options{noRemoteCmd} = 0;
-#    $options{forwardX} = 1;
-    $options{useCompression} = 0;
+    $options{useCompression} = 1;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -237,48 +234,46 @@ sub _parseCfgToOptions
     @{$options{dynamicForward}} = ();
     @{$options{advancedOption}} = ();
 
-
     $options{_optionL} =
-    $options{_optionR} =
-        sub{
-            my ($optionName,$forwardSpec) = @_;
-            my (undef,$bind_address,$port,$host,$hostport) =
-                #            [-L [bind_address:]port:host:hostport]
-                $forwardSpec=~m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
+    $options{_optionR} = sub {
+        my ($optionName,$forwardSpec) = @_;
+        my (undef,$bind_address,$port,$host,$hostport) =
+            #            [-L [bind_address:]port:host:hostport]
+            $forwardSpec=~m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
 
-            push @{$options{($optionName eq "_optionL" ? "forwardPort" : "remotePort")}},
-                {
-                    'localIP' =>    $bind_address    //    '',
-                    'localPort' =>    $port,
-                    'remoteIP'=>    $host,
-                    'remotePort' =>    $hostport
-                };
-        };
-    $options{_optionD} =
-        sub{
-            my (undef,$forwardSpec) = @_;
-            my (undef,$bind_address,$port) =
-                #            [-D [bind_address:]port]
-                $forwardSpec=~m/((.+)(?:\/|:))*(\d+)/;
-            push @{$options{dynamicForward}},
-                {
-                    'dynamicIP' =>    $bind_address    //    '',
-                     'dynamicPort' =>    $port
-                };
-        };
-    $options{_optionO} =
-        sub{
-            my (undef,$option,$value) = @_;
-            push @{$options{advancedOption}},
-                {
-                    'option' =>    $option,
-                    'value' =>    $value
-                };
-        };
+        push @{$options{($optionName eq "_optionL" ? "forwardPort" : "remotePort")}},
+            {
+                'localIP'    => $bind_address // '',
+                'localPort'  => $port,
+                'remoteIP'   => $host,
+                'remotePort' => $hostport
+            };
+    };
+    $options{_optionD} = sub {
+        my (undef,$forwardSpec) = @_;
+        my (undef,$bind_address,$port) =
+            #            [-D [bind_address:]port]
+            $forwardSpec=~m/((.+)(?:\/|:))*(\d+)/;
+        push @{$options{dynamicForward}},
+            {
+                'dynamicIP'   => $bind_address // '',
+                'dynamicPort' => $port
+            };
+    };
+    $options{_optionO} = sub {
+        my (undef,$option,$value) = @_;
+        push @{$options{advancedOption}},
+            {
+                'option' => $option,
+                'value'  => $value
+            };
+    };
     Getopt::Long::Configure("bundling");
     GetOptionsFromString($cmd_line, \%options,
-        "sshVersion1|1",    "sshVersion2|2",
-        "ipVersion4|4",        "ipVersion6|6",
+        "sshVersion1|1",
+        "sshVersion2|2",
+        "ipVersion4|4",
+        "ipVersion6|6",
         "optionenableX|X",
         "optiondisablex|x",
         "noRemoteCmd|N",
@@ -289,9 +284,11 @@ sub _parseCfgToOptions
         "_optionD|D=s@",
         "_optionL|L=s@",
         "_optionR|R=s@");
-    $options{sshVersion} = $options{sshVersion2} ? "2"     : $options{sshVersion1} ? "1"        : "any";
-    $options{ipVersion} = $options{ipVersion6}  ? "6"     : $options{ipVersion4}  ? "4"        : "any";
-    $options{forwardX} = $options{optionenableX}    ?  1: $options{optiondisablex}      ?  0    : 1;
+
+    $options{sshVersion} = $options{sshVersion2}   ? "2" : ($options{sshVersion1} ? "1" : "any");
+    $options{ipVersion}  = $options{ipVersion6}    ? "6" : ($options{ipVersion4}  ? "4" : "any");
+    $options{forwardX}   = $options{optionenableX} ?  1  : 0;
+
     return \%options;
 }
 

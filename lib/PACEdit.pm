@@ -167,7 +167,7 @@ sub _initGUI {
     $$self{_WINDOWEDIT} = $$self{_GLADE}->get_object ('windowEdit');
     $$self{_WINDOWEDIT}->set_size_request(-1, 550);
 
-    _($self, 'imgBannerEdit')->set_from_file($RES_DIR . '/asbru_banner_edit.png');
+    _($self, 'imgBannerEditIcon')->set_from_file($RES_DIR . '/asbru-edit.svg');
 
     $$self{_SPECIFIC} = PACMethod->new;
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);

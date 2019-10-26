@@ -3906,7 +3906,6 @@ sub __dupNodes {
 
     # Clone the node with the NEW UUID
     $$cfg{$new_txt_uuid} = dclone($$self{_CFG}{'environments'}{$uuid});
-    print STDERR "ORIGINAL PARENT : $$cfg{$new_txt_uuid}{'parent'}\n";
     # Save original parent node for reference on paste
     $$cfg{$new_txt_uuid}{'original_parent'} = $$cfg{$new_txt_uuid}{'parent'};
     $$cfg{$new_txt_uuid}{'parent'} = $parent;

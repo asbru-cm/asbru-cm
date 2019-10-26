@@ -59,7 +59,6 @@ my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RealBin/res/asbru_terminal16x16.png", 16, 16, 0);
 my $ICON_OFF = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RealBin/res/asbru_terminal_x16x16.png", 16, 16, 0);
-my $BANNER = Gtk3::Image->new_from_file("$RealBin/res/asbru_banner_cluster.png");
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -232,7 +231,7 @@ sub _initGUI {
     my $vbox0 = Gtk3::VBox->new(0, 0);
     $$self{_WINDOWCLUSTER}{main}->add($vbox0);
 
-    $vbox0->pack_start($BANNER , 0, 1, 0);
+    $vbox0->pack_start(PACUtils::_createBanner('asbru-cluster.svg', 'Cluster Management') , 0, 1, 0);
 
     # Create a notebook widget
     $$self{_WINDOWCLUSTER}{nb} = Gtk3::Notebook->new;
