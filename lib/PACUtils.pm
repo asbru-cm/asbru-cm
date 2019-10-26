@@ -3058,6 +3058,7 @@ sub _wakeOnLan {
     $w{window}{data}->set_icon_name('pac-app-big');
     $w{window}{data}->set_size_request(480, 0);
     $w{window}{data}->set_resizable(0);
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     # Banner
     $w{window}{gui}{banner} = PACUtils::_createBanner('asbru-wol.svg', 'Wake On LAN');
