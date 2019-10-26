@@ -1562,16 +1562,16 @@ sub _setupCallbacks {
     });
 
     # Capture 'treeconnections' right click
-    $$self{_GUI}{treeConnections}->signal_connect('button_release_event' => sub {
+    $$self{_GUI}{treeConnections}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
         if ($event->button ne 3) {
             return 0;
         }
         if (!$$self{_GUI}{treeConnections}->_getSelectedUUIDs) {
-            return 1;
+            return 0;
         }
         $self->_treeConnections_menu($event);
-        return 0;
+        return 1;
     });
 
     # Capture 'add connection' button clicked
@@ -2608,10 +2608,14 @@ sub _treeConnections_menu_lite {
 sub _treeConnections_menu {
     my $self = shift;
     my $event = shift;
+    my $p = '';
+    my $clip = scalar (keys %{$$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'}});
 
     my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
     if (scalar(@sel) == 0) {
         return 1;
+    } elsif ((scalar(@sel)>1)||($clip > 1)) {
+        $p = 's';
     }
     my $with_protected = $self->_hasProtectedChildren(\@sel);
     my $with_groups = 0;
@@ -2655,7 +2659,7 @@ sub _treeConnections_menu {
     # Edit
     if (scalar(@sel) == 1 && (! $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {
-            label => 'Edit connection',
+            label => "Edit connection$p",
             stockicon => 'gtk-edit',
             shortcut => '<alt>e',
             tooltip => "Edit this connection\'s data",
@@ -2774,45 +2778,49 @@ sub _treeConnections_menu {
     push(@tree_menu_items, { separator => 1 });
     # Clone connection
     push(@tree_menu_items, {
-        label => 'Clone connection',
+        label => "Clone connection$p",
         stockicon => 'gtk-copy',
         shortcut => '<control>d',
         sensitive => ((scalar(@sel) == 1) && ! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
         code => sub {
             $self->_copyNodes;
             foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
-                $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child); $$self{_COPY}{'data'} = {};
+                $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
             }
+            $$self{_COPY}{'data'} = {};
         }
     });
     # Copy
     push(@tree_menu_items, {
-        label => 'Copy node',
+        label => "Copy node$p",
         stockicon => 'gtk-copy',
         shortcut => '<control>c',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
-        code => sub{ $self->_copyNodes; }
+        code => sub{
+            $self->_copyNodes;
+            # Unselect nodes after copy
+            $$self{_GUI}{treeConnections}->get_selection()->unselect_all();
+        }
     });
     # Cut
     push(@tree_menu_items, {
-        label => 'Cut node',
+        label => "Cut node$p",
         stockicon => 'gtk-cut',
         shortcut => '<control>x',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__') && (! $with_protected)),
         code => sub{  $self->_cutNodes; }
     });
-    # Paste ?
     push(@tree_menu_items, {
-
-        label => 'Paste node',
+        label => "Paste node$p",
         stockicon => 'gtk-paste',
         shortcut => '<control>v',
-        sensitive => scalar(keys %{ $$self{_COPY}{'data'} }) && (scalar @sel == 1) && (($sel[0] eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})),
+        #sensitive => scalar(keys %{ $$self{_COPY}{'data'} }) && (scalar @sel == 1) && (($sel[0] eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})),
+        sensitive => (($clip)&&(scalar @sel == 1)) ? 1 : 0,
         code => sub {
             foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
                 $self->_pasteNodes($sel[0], $child);
-                $$self{_COPY}{'data'} = {};
             }
+            $$self{_COPY}{'data'} = {};
             return 1;
         }
     });
@@ -3906,7 +3914,6 @@ sub __dupNodes {
 
     # Clone the node with the NEW UUID
     $$cfg{$new_txt_uuid} = dclone($$self{_CFG}{'environments'}{$uuid});
-    print STDERR "ORIGINAL PARENT : $$cfg{$new_txt_uuid}{'parent'}\n";
     # Save original parent node for reference on paste
     $$cfg{$new_txt_uuid}{'original_parent'} = $$cfg{$new_txt_uuid}{'parent'};
     $$cfg{$new_txt_uuid}{'parent'} = $parent;
@@ -4676,7 +4683,12 @@ Creates a window popup menu for selected nodes
 
 =head2 sub _treeConnections_menu
 
-Create window popup for selected group node
+Create window popup on right click over connections tree
+
+It will enable or disable options based on:
+
+  * if there are elements selected
+  * if there are elements to paste
 
 =head2 sub _showAboutWindow
 
@@ -4788,6 +4800,10 @@ Toggles Connection Lista (active, inactie)
 
 For each uuid, execute __dupNodes()
 
+This duplicates nodes in memory, storing the nodes in : $$self{_COPY}{'data'}
+
+if cut == true { removes existing nodes from the tree }
+
 =head2 sub _cutNodes ()
 
 Event Handler
@@ -4798,17 +4814,16 @@ Calls _copyNodes('cut')
 
 =head2 sub _pasteNodes (parent, uuid_to_copy, first)
 
-Creates a new node on $parent rout, then adds node and children if any
+Creates a new node on $parent root, then adds a node and possible children that come in : $$self{_COPY}{'data'}
 
 Calls _pasteNodes for each children
 
 =head2 sub __dupNodes (parent, uuid, cfg)
 
-Creates a Clone of the existing uuid and assigns secuencial number to new node
-
-If node has children calls recusively to add children nodes, taking as parent the current new node
-
-    $self->__dupNodes($new_txt_uuid, $child, $cfg);
+    Creates a copy of the existing uuid and assigns secuencial number to new node
+    The copies are stored in $cfg which points to -> $$self{_COPY}{'data'}
+    If node has children calls recusively to add children nodes, taking as parent the current new node
+      $self->__dupNodes($new_txt_uuid, $child, $cfg);
 
 =head2 sub __exportNodes
 
