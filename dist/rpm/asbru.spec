@@ -53,6 +53,7 @@ Requires:   bash
 Requires:   perl-Crypt-CBC
 Requires:   perl-Crypt-Rijndael
 Requires:   perl-IO-Tty
+Requires:   perl-IO-Stty
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
@@ -65,6 +66,7 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 %autosetup -n asbru-cm-%{_github_version} -p1
 sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
 sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
+sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/pac_conn
 sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/pac_conn
 find . -type f -exec sed -i \
   -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
