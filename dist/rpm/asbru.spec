@@ -65,9 +65,10 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 %autosetup -n asbru-cm-%{_github_version} -p1
 sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
 sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
+sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib|g" lib/pac_conn
 find . -type f -exec sed -i \
-  -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" \
-  -e 's|"\$RealBin/|"%{_datadir}/%{name}/lib|g' \
+  -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
+  -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
   -e 's|/\.\.\(/\)|\1|' \
   '{}' \+
 
