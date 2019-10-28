@@ -66,8 +66,8 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
 sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
 find . -type f -exec sed -i \
-  -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
-  -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
+  -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" \
+  -e 's|"\$RealBin/|"%{_datadir}/%{name}/lib|g' \
   -e 's|/\.\.\(/\)|\1|' \
   '{}' \+
 
@@ -103,7 +103,7 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,jpg,pl,glade} res/termcap %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,jpg,pl,glade,css} res/termcap %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
 
 
