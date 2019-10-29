@@ -515,7 +515,7 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-
+    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
@@ -848,9 +848,11 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
         my ($c) = $col[1]->get_cells;
+        my ($i) = $col[0]->get_cells;
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
+        $i->set_alignment(1.0,0.0);
     }
 
     ##############################################
