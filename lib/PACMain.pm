@@ -4,7 +4,7 @@ package PACMain;
 # This file is part of Ásbrú Connection Manager
 #
 # Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
-# Copyright (C) 2010-2016 David Torrejon Vaquerizas
+# Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
@@ -2947,13 +2947,13 @@ sub _showAboutWindow {
     $dialog->set_program_name('');  # name is shown in the logo
     $dialog->set_version("v$APPVERSION");
     $dialog->set_logo(_pixBufFromFile($RES_DIR . '/asbru-logo-400.png'));
-    $dialog->set_copyright(decode('UTF-8', "Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejon Vaquerizas"));
+    $dialog->set_copyright(decode('UTF-8', "Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas"));
     $dialog->set_website('https://asbru-cm.net/');
     $dialog->set_license(decode('UTF-8', "
 Ásbrú Connection Manager
 
-Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
-Copyright (C) 2010-2016 David Torrejon Vaquerizas
+Copyright (C) 2017-2019 Ásbrú Connection Manager team <https://asbru-cm.net>
+Copyright (C) 2010-2016 David Torrejón Vaquerizas
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
