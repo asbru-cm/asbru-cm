@@ -26,6 +26,7 @@ $|++;
 ###################################################################
 # Import Modules
 
+use utf8;
 use FindBin qw ($RealBin $Bin $Script);
 my $REALBIN = $RealBin;
 use lib "$RealBin/lib", "$RealBin/lib/ex";
@@ -505,7 +506,8 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        'Icon:' => 'pixbuf',
+        #'Icon:' => 'pixbuf',
+        'Icon:' => 'hidden',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -848,11 +850,14 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
+        my ($c);
         my @col = $$self{_GUI}{"tree$tree"}->get_columns;
-        my ($c) = $col[1]->get_cells;
-        my ($i) = $col[0]->get_cells;
+        if (defined $col[1]) {
+            ($c) = $col[1]->get_cells;
+        } else {
+            ($c) = $col[0]->get_cells;
+        }
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
-        $i->set_alignment(1.0,0.0);
     }
 
     ##############################################
@@ -1196,15 +1201,7 @@ sub _setupCallbacks {
         if ((!defined $new_name)||($new_name =~ /^\s*$/go)||($new_name eq '__PAC__ROOT__')||(!defined $new_title)||($new_title =~ /^\s*$/go)) {
             return 1;
         }
-
-        my $is_group = $$self{_CFG}{'environments'}{$node_uuid}{'_is_group'} // 0;
-        my $protected = $$self{_CFG}{'environments'}{$node_uuid}{'_protected'} // 0;
-        my $gui_name =
-            ($is_group ? '<b>' : '') .
-            ($protected ? "<span $$self{_CFG}{defaults}{'protected set'}=\"$$self{_CFG}{defaults}{'protected color'}\">" : '') .
-            __($new_name) .
-            ($protected ? '</span>' : '') .
-            ($is_group ? '</b>' : '');
+        my $gui_name = $self->__treeBuildNodeName($node_uuid,$new_name);
 
         $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 1, $gui_name);
         $$self{_CFG}{'environments'}{$node_uuid}{'description'} =~ s/^Connection with \'$$self{_CFG}{environments}{$node_uuid}{name}\'/Connection with \'$new_name\'/go;
@@ -2364,15 +2361,31 @@ sub __treeSort {
 sub __treeBuildNodeName {
     my $self = shift;
     my $uuid = shift;
+    my $name = shift;
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'};
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
-    my $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
-
-    $protected and $name = "<span $p_set=\"$p_color\">" . $name . '</span>';
-    $is_group and $name = '<b>' . $name . '</b>';
+    if ($name) {
+        $name = __($name);
+    } else {
+        $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
+    }
+    if ($protected) {
+        $name = "<span $p_set=\"$p_color\">$name</span>";
+    }
+    if ($is_group) {
+        $name = "<b>\N{U+1F4C1} $name</b>";
+    } else {
+        if ($$self{_CFG}{'environments'}{$uuid}{method} eq 'SSH') {
+            $name = "\N{U+1F5A5} $name";
+        } elsif ($$self{_CFG}{'environments'}{$uuid}{method} =~ /RDP/) {
+            $name = "\N{U+1F308} $name";
+        } else {
+            $name = "\N{U+1F4A0} $name";
+        }
+    }
 
     return $name;
 }
@@ -2411,29 +2424,10 @@ sub __treeToggleProtection {
     my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
 
     foreach my $uuid (@sel) {
-
-        my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
-        my $protected = $$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0;
-        my $gui_name;
-
-        if ($$self{_CFG}{'environments'}{ $uuid }{'_protected'}) {
-            $gui_name =
-                ($is_group ? '<b>' : '') .
-                __($$self{_CFG}{'environments'}{$uuid}{'name'}) .
-                ($is_group ? '</b>' : '');
-        } else {
-            $gui_name =
-                ($is_group ? '<b>' : '') .
-                "<span $$self{_CFG}{defaults}{'protected set'}=\"$$self{_CFG}{defaults}{'protected color'}\">" .
-                __($$self{_CFG}{'environments'}{$uuid}{'name'}) .
-                '</span>' .
-                ($is_group ? '</b>' : '');
-        }
-
-        $$self{_CFG}{'environments'}{$uuid }{'_protected'} = ! $$self{_CFG}{'environments'}{ $uuid }{'_protected'};
+        $$self{_CFG}{'environments'}{$uuid}{'_protected'} = !$$self{_CFG}{'environments'}{$uuid}{'_protected'};
+        my $gui_name = $self->__treeBuildNodeName($uuid);
         $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($$self{_GUI}{treeConnections}->_getPath($uuid))), 1, $gui_name);
     }
-
     $self->_setCFGChanged(1);
 }
 

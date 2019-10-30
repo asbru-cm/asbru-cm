@@ -375,7 +375,8 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_WINDOWCLUSTER}{treeConnections} = PACTree->new (
-        'Icon:' => 'pixbuf',
+        #'Icon:' => 'pixbuf',
+        'Icon:' => 'hidden',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
