@@ -48,7 +48,7 @@ use PACUtils;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $APPICON = $RealBin . '/res/asbru-logo-64.png';
+my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
 my %LANG;
@@ -408,9 +408,12 @@ sub _setupCallbacks {
 
     $$self{_WINDOWPCC}{entryData}->signal_connect('button_release_event' => sub {
         my ($widget, $event) = @_;
-        return 0 unless $event->button eq 2;
-        return 1 if $$self{_WINDOWPCC}{cbApplyOnIntro}->get_active;
-
+        if ($event->button ne 2) {
+            return 0;
+        }
+        if ($$self{_WINDOWPCC}{cbApplyOnIntro}->get_active) {
+            return 1;
+        }
         # Get the pasted text
         my $text = $$self{_WINDOWPCC}{entryData}->get_chars(0, -1);
 
@@ -424,13 +427,13 @@ sub _setupCallbacks {
             my $this_cluster = $$self{_RUNNING}{$uuid}{'terminal'}{'_CLUSTER'} // '';
             my $vte = $$self{_RUNNING}{$uuid}{'terminal'}{'_GUI'}{_VTE};
 
-            next unless (defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active);
-
+            if (!((defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active))) {
+                next;
+            }
             $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 0;
             _vteFeedChild($$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{_VTE}, $text);
             $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 1;
         }
-
         return 1;
     });
 
@@ -447,11 +450,11 @@ sub _setupCallbacks {
 
         if ($$self{_WINDOWPCC}{cbApplyOnIntro}->get_active) {
             # Return unless INTRO is pressed
-            return 0 unless $event->keyval == 65293;
-
+            if ($event->keyval != 65293) {
+                return 0;
+            }
             my $txt = $$self{_WINDOWPCC}{entryData}->get_text;
             $$self{_WINDOWPCC}{entryData}->set_text('');
-
             $self->_execOnClusterTerminals($txt, 1);
 
             # Return 'TRUE' to prevent the characters from appearing in the entry box
@@ -463,8 +466,9 @@ sub _setupCallbacks {
             my $this_cluster = $$self{_RUNNING}{$uuid}{'terminal'}{'_CLUSTER'} // '';
             my $vte = $$self{_RUNNING}{$uuid}{'terminal'}{'_GUI'}{_VTE};
 
-            next unless (defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active);
-
+            if (!((defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active))) {
+                next;
+            }
             $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 0;
             $vte->signal_emit('key_press_event', $event);
             $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 1;
@@ -516,11 +520,11 @@ sub _setupCallbacks {
 
     $$self{_WINDOWPCC}{multiTextView}->signal_connect('button_release_event' => sub {
         my ($widget, $event) = @_;
-        return 0 unless $event->button eq 1;
-
+        if ($event->button ne 1) {
+            return 0;
+        }
         $$self{_WINDOWPCC}{btnSelection}->set_sensitive($$self{_WINDOWPCC}{multiTextView}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY') )->wait_is_text_available);
         $$self{_WINDOWPCC}{btnBlock}->set_sensitive($self->_getCurrentBlock($$self{_WINDOWPCC}{multiTextBuffer}) );
-
         return 0;
     });
 
@@ -534,7 +538,9 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{multiTextView}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
-        return 0 unless $event->button eq 3;
+        if ($event->button ne 3) {
+            return 0;
+        }
 
         my @menu_items;
 
@@ -635,12 +641,17 @@ sub _setupCallbacks {
         my $shift = $state * ['shift-mask'];
         my $alt = $state * ['mod1-mask'];
 
-        if        ($alt && (($keyval eq 'Return') || ($keyval eq 'KP_Enter') ))                    {$$self{_WINDOWPCC}{btnBlock}->clicked;}
-        elsif    ($ctrl && (($keyval eq 'Return') || ($keyval eq 'KP_Enter') ))                    {$$self{_WINDOWPCC}{btnAll}->clicked;}
-        elsif    ($ctrl && (lc $keyval eq 'y') && $SOURCEVIEW)                                        {$$self{_WINDOWPCC}{multiTextBuffer}->redo if $$self{_WINDOWPCC}{multiTextBuffer}->can_redo;}
-        elsif    ($ctrl && (lc $keyval eq 'z') && ! $SOURCEVIEW && (scalar @{$$self{_UNDO}}) )    {$$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', pop(@{$$self{_UNDO}}) ));}
-        else                                                                                            {return 0;}
-
+        if ($alt && (($keyval eq 'Return') || ($keyval eq 'KP_Enter'))) {
+            $$self{_WINDOWPCC}{btnBlock}->clicked;
+        } elsif ($ctrl && (($keyval eq 'Return') || ($keyval eq 'KP_Enter'))) {
+            $$self{_WINDOWPCC}{btnAll}->clicked;
+        } elsif ($ctrl && (lc $keyval eq 'y') && $SOURCEVIEW) {
+            $$self{_WINDOWPCC}{multiTextBuffer}->redo if $$self{_WINDOWPCC}{multiTextBuffer}->can_redo;
+        } elsif ($ctrl && (lc $keyval eq 'z') && !$SOURCEVIEW && (scalar @{$$self{_UNDO}})) {
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', pop(@{$$self{_UNDO}}) ));
+        } else {
+            return 0;
+        }
         return 1;
     });
 
@@ -700,7 +711,9 @@ sub _setupCallbacks {
         my $out = $choose->run;
         my $file = $choose->get_filename;
         $choose->destroy;
-        return 1 unless $out eq 'accept';
+        if ($out ne 'accept') {
+            return 1;
+        }
 
         # Guess the programming language of the file
         $SOURCEVIEW and $$self{_WINDOWPCC}{multiTextBuffer}->set_language(Gtk3::SourceView2::LanguageManager->get_default->guess_language($file) );
@@ -711,7 +724,9 @@ sub _setupCallbacks {
             _wMessage($$self{_WINDOWPCC}{main}, "ERROR: Can not open for reading '$file' ($!)");
             return 1;
         }
-        while (my $line = <F>) {$content .= $line;}
+        while (my $line = <F>) {
+            $content .= $line;
+        }
         close F;
 
         if ($SOURCEVIEW) {
@@ -750,7 +765,9 @@ sub _setupCallbacks {
         my $out = $choose->run;
         my $file = $choose->get_filename;
         $choose->destroy;
-        return 1 unless $out eq 'accept';
+        if ($out ne 'accept') {
+            return 1;
+        }
 
         # Loading a file should not be undoable.
         if (! open F, ">$file") {
@@ -763,16 +780,12 @@ sub _setupCallbacks {
         if ($SOURCEVIEW) {
             # Guess the programming language of the file
             $$self{_WINDOWPCC}{multiTextBuffer}->set_language(Gtk3::SourceView2::LanguageManager->get_default->guess_language($file) );
-
             my $manager = Gtk3::SourceView2::LanguageManager->get_default;
             my $language = $manager->guess_language($file);
             my $n = defined $language ? $LANG{'name_to_id'}{$language->get_name // ' <NO HIGHLIGHT>'}{n} : 0;
-
             $$self{_WINDOWPCC}{comboLang}->set_active($n);
         }
-
         _wMessage($$self{_WINDOWPCC}{main}, "Correctly saved file '$file'");
-
         return 1;
     });
 
@@ -807,34 +820,38 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnSeparate}->signal_connect('clicked' => sub {
         my $screen = Gtk3::Gdk::Screen::get_default;
         my $sw = $screen->get_width;
-        my $sh = $screen->get_height;
+        my $sh = $screen->get_height-100;
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my $total = scalar(keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}}) or return 1;
 
         my $conns_per_row = $total < 5 ? 2 : 3;
-
         my $rows = POSIX::ceil($total / $conns_per_row) || 1;
-        my $defw = int($sw / (POSIX::ceil($total / $rows) ));
-        my $defh = int($sh / (POSIX::ceil($total / $rows) ));
+        my $defw=int($sw / (POSIX::ceil($total / $rows)));
+        my $defh=int($sh / (POSIX::ceil($total / $rows)));
+
 
         my $col = 0;
         my $row = 0;
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
             my $terminal = $$self{_RUNNING}{$uuid}{'terminal'};
-
-            if ($col == $conns_per_row) {$row++; $col = 0;}
-
+            if ($col == $conns_per_row) {
+                $row++; $col = 0;
+            }
             # Resize the new 'exploded' window
-            if ($$terminal{_TABBED})    {$terminal->_tabToWin({'width' => $defw, 'height' => $defh});}
-            else                        {$$terminal{_WINDOWTERMINAL}->resize($defw, $defh);}
-
+            if ($$terminal{_TABBED}) {
+                $terminal->_tabToWin({'width' => $defw, 'height' => $defh});
+            } else {
+                $$terminal{_WINDOWTERMINAL}->resize($defw, $defh);
+            }
             # Move it to its corresponding position
-            $$terminal{_WINDOWTERMINAL}->move($defw * $col, $defh * $row);
-
-            ++$col;
+            $$terminal{_WINDOWTERMINAL}->move(($col*$defw+3),5+($row*$defh+($row*50)));
+            $col++;
+            if ($col==$conns_per_row) {
+                $row++;
+                $col=0;
+            }
         }
-
         return 1;
     });
     # Capture 'Separate' button clicked
@@ -842,7 +859,11 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnReTab}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
-        foreach my $uuid (@list) {$$self{_RUNNING}{$uuid}{'terminal'}->_winToTab unless $$self{_RUNNING}{$uuid}{'terminal'}{_TABBED};}
+        foreach my $uuid (@list) {
+            if (!$$self{_RUNNING}{$uuid}{'terminal'}{_TABBED}) {
+                $$self{_RUNNING}{$uuid}{'terminal'}->_winToTab;
+            }
+        }
     });
 
     # Capture 'Close All' button clicked
@@ -850,18 +871,22 @@ sub _setupCallbacks {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         return 1 unless scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
-        foreach my $uuid (@list) {defined $$self{_RUNNING}{$uuid}{'terminal'} and $$self{_RUNNING}{$uuid}{'terminal'}->stop('force', 'deep');}
+        foreach my $uuid (@list) {
+            if (defined $$self{_RUNNING}{$uuid}{'terminal'}) {
+                $$self{_RUNNING}{$uuid}{'terminal'}->stop('force', 'deep');
+            }
+        }
         return 1;
     });
 
     # Capture 'Close' button clicked
     $$self{_WINDOWPCC}{btnClose}->signal_connect('clicked' => sub {
         foreach my $cluster (keys %{$$self{_CLUSTERS}}) {
-            foreach my $uuid (keys %{$$self{_CLUSTERS}{$cluster}}) {$$self{_RUNNING}{$uuid}{'terminal'}{_PROPAGATE} = 1;}
+            foreach my $uuid (keys %{$$self{_CLUSTERS}{$cluster}}) {
+                $$self{_RUNNING}{$uuid}{'terminal'}{_PROPAGATE} = 1;
+            }
         }
-
         open(F, ">$CFG_DIR/pac.pcc");
-
         my ($x, $y) = $$self{_WINDOWPCC}{main}->get_position;
         my ($w, $h) = $$self{_WINDOWPCC}{main}->get_size;
         ($$self{_W}, $$self{_H}) = ($w, $h) if $$self{_WINDOWPCC}{cbShowMultiText}->get_active;
@@ -869,13 +894,11 @@ sub _setupCallbacks {
         print F '__PAC__PCC__POSITION__' . $x . ':' . $y . "\n";
         print F '__PAC__PCC__SIZE__' . $w . ':' . $h . "\n";
         print F "__PAC__PCC__MULTILINE__\n" if $$self{_WINDOWPCC}{cbShowMultiText}->get_active;
-
         $$self{_WINDOWPCC}{main}->hide;
-
-        print(F $$self{_WINDOWPCC}{multiTextBuffer}->get_property('text') // '') if ($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1);
-
+        if ($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) {
+            print(F $$self{_WINDOWPCC}{multiTextBuffer}->get_property('text') // '');
+        }
         close F;
-
         return 1;
     });
 
@@ -898,16 +921,17 @@ sub _execOnClusterTerminals {
     my $text = shift;
     my $force_subst = shift // 0;
 
-    return 1 unless defined $text;
-
+    if (!defined $text) {
+        return 1;
+    }
     my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
-
     foreach my $uuid (keys %{$$self{_RUNNING}}) {
         my $this_cluster = $$self{_RUNNING}{$uuid}{'terminal'}{'_CLUSTER'} // '';
         my $vte = $$self{_RUNNING}{$uuid}{'terminal'}{'_GUI'}{_VTE};
 
-        next unless (defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active);
-
+        if (!((defined $vte) && ((($cluster ne '') && ($this_cluster eq $cluster) ) || $$self{_WINDOWPCC}{cbSendToAll}->get_active))) {
+            next;
+        }
         $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 0;
         $$self{_RUNNING}{$uuid}{'terminal'}->_execute('remote', $text, 0, $$self{_WINDOWPCC}{cbSubstitute}->get_active || $force_subst);
         $$self{_RUNNING}{$uuid}{'terminal'}{_LISTEN_COMMIT} = 1;
@@ -948,10 +972,13 @@ sub _updateGUI {
     # Look into every started terminal, and save the list of clusters/term per cluster
     foreach my $uuid (keys %{$$self{_RUNNING}}) {
         my $name = $$self{_RUNNING}{$uuid}{'terminal'}{'_NAME'};
-        next unless defined $name;
-
+        if (!defined $name) {
+            next;
+        }
         # Populate the CLUSTER variable
-        if (my $cluster = $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER}) {$$self{_CLUSTERS}{$cluster}{$uuid} = 1;}
+        if (my $cluster = $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER}) {
+            $$self{_CLUSTERS}{$cluster}{$uuid} = 1;
+        }
     }
 
     # Now, populate the cluters combobox with the configured clusters...
@@ -960,7 +987,9 @@ sub _updateGUI {
     foreach my $cluster (sort {$a cmp $b} keys %{$$self{_CLUSTERS}}) {
         $$self{_WINDOWPCC}{comboTerminals}->append_text($cluster);
         $$self{_WINDOWPCC}{comboTerminals}->set_active(0);
-        $cluster eq $$self{_SELECTED} and $sel = $i;
+        if ($cluster eq $$self{_SELECTED}) {
+            $sel = $i
+        };
         $i++;
     }
     # Select the previously selected cluster
@@ -978,29 +1007,39 @@ sub _updateGUI {
 sub _getCurrentBlock {
     my $self = shift;
     my $txtBuffer = shift;
-
     my $txtBlock = '';
-
     my $txtAll = $txtBuffer->get_property('text') // '';
-    return '' unless $txtAll ne '';
 
+    if ($txtAll eq '') {
+        return '';
+    }
     my $iter = $txtBuffer->get_iter_at_mark($txtBuffer->get_insert);
-    $iter or return '';
-
+    if (!$iter) {
+        return '';
+    }
     my @lines = split(/\R/, $txtAll);
     my $line = $iter->get_line;
     my $line_start = $line;
     my $line_end = $line;
 
     # Find the first block line (the first non-empty line over the current cursor line)
-    for(my $i = $line; $i >= 0; $i--) {last if (($lines[$i] // '') eq ''); $line_start = $i;}
-
+    for(my $i = $line; $i >= 0; $i--) {
+        if (($lines[$i] // '') eq '') {
+            last;
+        }
+        $line_start = $i;
+    }
     # Find the last block line (the last non-empty line down the current cursor line)
-    for(my $i = $line; $i <= $#lines; $i++) {last if (($lines[$i] // '') eq ''); $line_end = $i;}
-
+    for(my $i = $line; $i <= $#lines; $i++) {
+        if (($lines[$i] // '') eq '') {
+            last;
+        }
+        $line_end = $i;
+    }
     # Now save every line
-    for(my $i = $line_start; $i <= $line_end; $i++) {$txtBlock .= ($lines[$i] // '') . "\n";}
-
+    for(my $i = $line_start; $i <= $line_end; $i++) {
+        $txtBlock .= ($lines[$i] // '') . "\n";
+    }
     return $txtBlock;
 }
 
