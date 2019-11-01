@@ -1225,7 +1225,9 @@ sub _setupCallbacks {
     # Capture mouse selection on VTE
     $$self{_GUI}{_VTE}->signal_connect('selection_changed' => sub {
         if ($$self{_CFG}{defaults}{'selection to clipboard'}) {
-            $$self{_GUI}{_VTE}->copy_clipboard;
+            if ($$self{_GUI}{_VTE}->get_has_selection) {
+                $$self{_GUI}{_VTE}->copy_clipboard;
+            }
         }
         return 0;
     });
