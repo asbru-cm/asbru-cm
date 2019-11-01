@@ -3839,6 +3839,9 @@ sub _vteFeed {
 sub _vteFeedChild {
     my $vte = shift;
     my $str = shift;
+
+    use bytes;
+    my $b = length($str);
     if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
         # Newer version only requires 1 parameter
         $vte->feed_child($str);
@@ -3847,10 +3850,10 @@ sub _vteFeedChild {
         # Not nice but let's ignore the warning for that special case
         # See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501
         local $SIG{__WARN__} = sub {};
-        $vte->feed_child($str, length($str));
+        $vte->feed_child($str, $b);
     } else {
         # Elder versions requires 2 parameters
-        $vte->feed_child($str, length($str));
+        $vte->feed_child($str, $b);
     }
 }
 
