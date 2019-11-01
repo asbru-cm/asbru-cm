@@ -1231,8 +1231,8 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
         if ($$self{_CFG}{'defaults'}{'record command history'}) {
             $self->_saveHistory($_[1]);
-            $self->_clusterCommit(@_);
         }
+        $self->_clusterCommit(@_);
     });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour;});
 

@@ -45,9 +45,9 @@ use PACUtils;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $APPICON = $RealBin . '/res/asbru-logo-64.png';
-my $TRAYICON = $RealBin . '/res/asbru-logo-tray.png';
-my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/asbru_group.png');
+my $APPICON = "$RealBin/res/asbru-logo-64.png";
+my $TRAYICON = "$RealBin/res/asbru-logo-tray.png";
+my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -64,7 +64,7 @@ sub new {
     $self->{_TRAY} = undef;
 
     if ($$self{_MAIN}{_CFG}{defaults}{'use bw icon'}) {
-        $TRAYICON = $RealBin . '/res/asbru_tray_bw.png';
+        $TRAYICON = "$RealBin/res/asbru_tray_bw.png";
     }
 
     # Build the GUI
@@ -108,14 +108,20 @@ sub _setupCallbacks {
     $$self{_TRAY}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
-        ($event->button eq 3 && ! $$self{_MAIN}{_GUI}{lockPACBtn}->get_active) and $self->_trayMenu($widget, $event);
+        if ($event->button eq 3 && !$$self{_MAIN}{_GUI}{lockPACBtn}->get_active) {
+            $self->_trayMenu($widget, $event);
+        }
 
         # Left click: show/hide main window
-        return 1 unless $event->button eq 1;
+        if ($event->button ne 1) {
+            return 1;
+        }
 
         if ($$self{_MAIN}{_GUI}{main}->get_visible) {
             # Trigger the "lock" procedure
-            $$self{_MAIN}{_GUI}{lockPACBtn}->set_active(1) if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'});
+            if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
+                $$self{_MAIN}{_GUI}{lockPACBtn}->set_active(1);
+            }
             $$self{_MAIN}->_hideConnectionsList;
         } else {
             # Check if show password is required
@@ -131,7 +137,6 @@ sub _setupCallbacks {
                 $$self{_MAIN}->_showConnectionsList;
             }
         }
-
         return 1;
     });
 
@@ -145,18 +150,19 @@ sub _trayMenu {
 
     my @m;
 
-    push(@m, {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;} });
+    push(@m, {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;}});
     push(@m, {separator => 1});
     push(@m, {label => 'Clusters', stockicon => 'pac-cluster-manager', submenu => _menuClusterConnections});
     push(@m, {label => 'Favourites', stockicon => 'pac-favourite-on', submenu => _menuFavouriteConnections});
     push(@m, {label => 'Connect to', stockicon => 'pac-group', submenu => _menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
     push(@m, {separator => 1});
-    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show;} });
-    push(@m, {label => 'Clusters...', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_CLUSTER}->show;}  });
-    push(@m, {label => 'Show Window', stockicon => 'gtk-home', code => sub {$$self{_MAIN}->_showConnectionsList;} });
+    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show;}});
+    push(@m, {label => 'Clusters...', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_CLUSTER}->show;}});
+    push(@m, {label => 'PCC', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_PCC}->show;}});
+    push(@m, {label => 'Show Window', stockicon => 'gtk-home', code => sub {$$self{_MAIN}->_showConnectionsList;}});
     push(@m, {separator => 1});
-    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow;} });
-    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram;} });
+    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow;}});
+    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram;}});
 
     _wPopUpMenu(\@m, $event, 'below calling widget');
 
