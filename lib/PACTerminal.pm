@@ -971,9 +971,6 @@ sub _setupCallbacks {
             return 1;
         }
 
-        # Send key to all terminals connected to the same cluster of this terminal
-        $self->_clusterCommitEvent('key_press_event', $event);
-
         # ENTER --> reconnect if disconnected
         if ((($keyval eq 'Return') || ($keyval eq 'KP_Enter')) && (! $$self{CONNECTED} && ! $$self{CONNECTING})) {
             $self->start;
@@ -1231,7 +1228,12 @@ sub _setupCallbacks {
         }
         return 0;
     });
-    $$self{_GUI}{_VTE}->signal_connect('commit' => sub {$$self{_CFG}{'defaults'}{'record command history'} and $self->_saveHistory($_[1]);});
+    $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
+        if ($$self{_CFG}{'defaults'}{'record command history'}) {
+            $self->_saveHistory($_[1]);
+            $self->_clusterCommit(@_);
+        }
+    });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour;});
 
     # Capture Drag and Drop events
@@ -2377,27 +2379,6 @@ sub _clusterCommit {
         }
         $PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 0;
         _vteFeedChild($PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_VTE}, $string);
-        $PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 1;
-    }
-    $$self{_LISTEN_COMMIT} = 1;
-
-    return 1;
-}
-
-sub _clusterCommitEvent {
-    my ($self, $type, $event) = @_;
-
-    if (!($$self{_LISTEN_COMMIT} && ($$self{_CLUSTER} ne '') && $$self{CONNECTED} && $$self{_PROPAGATE})) {
-        return 1;
-    }
-
-    $$self{_LISTEN_COMMIT} = 0;
-    foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if ((!$PACMain::RUNNING{$uuid_tmp}{terminal}{CONNECTED}) || ($PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne $$self{_CLUSTER}) || ($PACMain::RUNNING{$uuid_tmp}{terminal}{_UUID_TMP} eq $$self{_UUID_TMP})) {
-            next;
-        }
-        $PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 0;
-        $PACMain::RUNNING{$uuid_tmp}{terminal}{'_GUI'}{_VTE}->signal_emit($type, $event);
         $PACMain::RUNNING{$uuid_tmp}{terminal}{_LISTEN_COMMIT} = 1;
     }
     $$self{_LISTEN_COMMIT} = 1;
@@ -4615,13 +4596,6 @@ Update status information on Statusbar
 =head2 sub _clusterCommit
 
 Transmit characters to other terminals in the same cluster using the _vteFeedChild routine
-
-=head2 sub _clusterCommitEvent(type,event)
-
-Transmit characters to other terminals in same cluster using {_GUI}{_VTE}->signal_emit(type,event)
-
-    type  : event type
-    event : event object
 
 =head2 sub _saveHistory
 
