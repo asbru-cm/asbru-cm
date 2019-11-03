@@ -109,6 +109,8 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
+our %utf8icon = ('ssh',"\N{U+1F5A5}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}");
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -2362,29 +2364,31 @@ sub __treeBuildNodeName {
     my $self = shift;
     my $uuid = shift;
     my $name = shift;
+    my $method;
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'};
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
+
     if ($name) {
         $name = __($name);
     } else {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
+    if ($$self{_CFG}{'environments'}{$uuid}{method}) {
+        $method = lc($$self{_CFG}{'environments'}{$uuid}{method});
+        $method =~ s/ *\(.+//;
+    }
     if ($protected) {
-        $name = "<span $p_set=\"$p_color\">$name</span>";
+        $name = "<span $p_set='$p_color'>$name</span>";
     }
     if ($is_group) {
-        $name = "<b>\N{U+1F4C1} $name</b>";
+        $name = "\N{U+1F4C1} <b>$name</b>";
+    } elsif ($utf8icon{$method}) {
+        $name = "$utf8icon{$method}$name";
     } else {
-        if ($$self{_CFG}{'environments'}{$uuid}{method} eq 'SSH') {
-            $name = "\N{U+1F5A5} $name";
-        } elsif ($$self{_CFG}{'environments'}{$uuid}{method} =~ /RDP/) {
-            $name = "\N{U+1F308} $name";
-        } else {
-            $name = "\N{U+1F4A0} $name";
-        }
+        $name = "$utf8icon{'other'}$name";
     }
 
     return $name;
