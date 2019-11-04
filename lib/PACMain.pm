@@ -508,8 +508,7 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        #'Icon:' => 'pixbuf',
-        'Icon:' => 'hidden',
+        'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -852,14 +851,11 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
-        my ($c);
-        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
-        if (defined $col[1]) {
-            ($c) = $col[1]->get_cells;
-        } else {
-            ($c) = $col[0]->get_cells;
-        }
+        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
+        my ($c) = $col[1]->get_cells;
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
+        ($c) = $col[0]->get_cells;
+        $c->set_alignment(1,0.5);
     }
 
     ##############################################
@@ -2367,7 +2363,7 @@ sub __treeBuildNodeName {
     my $method;
     my $mname;
 
-    my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'};
+    my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
