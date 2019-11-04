@@ -2365,6 +2365,7 @@ sub __treeBuildNodeName {
     my $uuid = shift;
     my $name = shift;
     my $method;
+    my $mname;
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'};
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
@@ -2379,7 +2380,7 @@ sub __treeBuildNodeName {
     if ($$self{_CFG}{'environments'}{$uuid}{method}) {
         $method = lc($$self{_CFG}{'environments'}{$uuid}{method});
         $method =~ s/ *\(.+//;
-        $name = "<span size='x-small'>$method</span> $name";
+        $mname = "<span size='xx-small'>$method</span>";
     }
     if ($protected) {
         $name = "<span $p_set='$p_color'>$name</span>";
@@ -2387,9 +2388,9 @@ sub __treeBuildNodeName {
     if ($is_group) {
         $name = "\N{U+1F4C1} <b>$name</b>";
     } elsif ($utf8icon{$method}) {
-        $name = "$utf8icon{$method}$name";
+        $name = "$mname$utf8icon{$method}$name";
     } else {
-        $name = "$utf8icon{'other'}$name";
+        $name = "$mname$utf8icon{'other'}$name";
     }
 
     return $name;
