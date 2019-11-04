@@ -109,7 +109,7 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
-our %utf8icon = ('ssh',"\N{U+1F5A5}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}");
+our %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}");
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -2379,6 +2379,7 @@ sub __treeBuildNodeName {
     if ($$self{_CFG}{'environments'}{$uuid}{method}) {
         $method = lc($$self{_CFG}{'environments'}{$uuid}{method});
         $method =~ s/ *\(.+//;
+        $name = "<span size='x-small'>$method</span> $name";
     }
     if ($protected) {
         $name = "<span $p_set='$p_color'>$name</span>";
