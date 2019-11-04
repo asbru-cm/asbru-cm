@@ -2388,9 +2388,9 @@ sub __treeBuildNodeName {
     if ($is_group) {
         $name = "\N{U+1F4C1} <b>$name</b>";
     } elsif ($utf8icon{$method}) {
-        $name = "$mname$utf8icon{$method}$name";
+        $name = "$mname$utf8icon{$method} $name";
     } else {
-        $name = "$mname$utf8icon{'other'}$name";
+        $name = "$mname$utf8icon{'other'} $name";
     }
 
     return $name;
