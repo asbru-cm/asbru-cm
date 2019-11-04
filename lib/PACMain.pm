@@ -506,8 +506,7 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        #'Icon:' => 'pixbuf',
-        'Icon:' => 'hidden',
+        'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -850,14 +849,11 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
-        my ($c);
-        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
-        if (defined $col[1]) {
-            ($c) = $col[1]->get_cells;
-        } else {
-            ($c) = $col[0]->get_cells;
-        }
+        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
+        my ($c) = $col[1]->get_cells;
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
+        ($c) = $col[0]->get_cells;
+        $c->set_alignment(1,0.5);
     }
 
     ##############################################
@@ -2363,7 +2359,7 @@ sub __treeBuildNodeName {
     my $uuid = shift;
     my $name = shift;
 
-    my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'};
+    my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
@@ -2372,19 +2368,11 @@ sub __treeBuildNodeName {
     } else {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
+    if ($is_group) {
+        $name = "<b>$name</b>";
+    }
     if ($protected) {
         $name = "<span $p_set=\"$p_color\">$name</span>";
-    }
-    if ($is_group) {
-        $name = "<b>\N{U+1F4C1} $name</b>";
-    } else {
-        if ($$self{_CFG}{'environments'}{$uuid}{method} eq 'SSH') {
-            $name = "\N{U+1F5A5} $name";
-        } elsif ($$self{_CFG}{'environments'}{$uuid}{method} =~ /RDP/) {
-            $name = "\N{U+1F308} $name";
-        } else {
-            $name = "\N{U+1F4A0} $name";
-        }
     }
 
     return $name;
