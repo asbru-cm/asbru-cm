@@ -109,7 +109,7 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
-our %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}");
+our %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}",'group',"\N{U+1F4C1}");
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -508,7 +508,7 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        'Icon:' => 'pixbuf',
+        'Icon:' => 'hidden',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -852,10 +852,13 @@ sub _initGUI {
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[1]->get_cells;
+        my ($c);
+        if (defined $col[1]) {
+            $c = $col[1]->get_cells;
+        } else {
+            $c = $col[0]->get_cells;
+        }
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
-        ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
     }
 
     ##############################################
@@ -2382,7 +2385,7 @@ sub __treeBuildNodeName {
         $name = "<span $p_set='$p_color'>$name</span>";
     }
     if ($is_group) {
-        $name = "\N{U+1F4C1} <b>$name</b>";
+        $name = "$utf8icon{'group'} <b>$name</b>";
     } elsif ($utf8icon{$method}) {
         $name = "$mname$utf8icon{$method} $name";
     } else {
