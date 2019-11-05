@@ -277,7 +277,6 @@ sub _buildExec {
 
     # Assign a callback for deleting entry
     $w{btn}->signal_connect('clicked' => sub {
-        $$self{cfg} = $self->get_cfg();
         splice(@{$$self{list}}, $w{position}, 1);
         splice(@{$$self{cfg}}, $w{position}, 1);
         $self->update();
