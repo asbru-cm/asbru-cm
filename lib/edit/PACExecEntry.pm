@@ -64,7 +64,9 @@ sub new {
     $self->{list} = [];
 
     _buildExecGUI($self);
-    defined $$self{cfg} and PACExecEntry::update($$self{cfg});
+    if (defined $$self{cfg}) {
+        PACExecEntry::update($$self{cfg});
+    }
 
     bless($self, $class);
     return $self;
@@ -76,18 +78,28 @@ sub update {
     my $variables = shift;
     my $where = shift;
 
-    defined $cfg and $$self{cfg} = $cfg;
-    defined $variables and $$self{variables} = $variables;
-    defined $where and $$self{where} = $where;
+    if (defined $cfg) {
+        $$self{cfg} = $cfg;
+    }
+    if (defined $variables) {
+        $$self{variables} = $variables;
+    }
+    if (defined $where) {
+        $$self{where} = $where;
+    }
 
-    # Destroy previuos widgets
-    $$self{frame}{vbexec}->foreach(sub {$_[0]->destroy;});
+    # Destroy previous widgets
+    $$self{frame}{vbexec}->foreach(sub {
+        $_[0]->destroy();}
+    );
 
-    # Empty parent's widgets' list
+    # Empty parent widgets list
     $$self{list} = [];
 
-    # Now, add the -new?- widgets
-    foreach my $hash (sort {lc($$a{description}) cmp lc($$b{description})} @{$$self{cfg}}) {_buildExec($self, $hash);}
+    # Now, add configured widgets
+    foreach my $hash (sort {lc($$a{description}) cmp lc($$b{description})} @{$$self{cfg}}) {
+        _buildExec($self, $hash);
+    }
 
     return 1;
 }
@@ -101,8 +113,8 @@ sub get_cfg {
         my %hash;
         $hash{txt} = $$w{txt}->get_chars(0, -1);
         $hash{description} = $$w{desc}->get_chars(0, -1);
-        $hash{confirm} = $$w{confirm}->get_active || '0';
-        $hash{intro} = $$w{intro}->get_active || '0';
+        $hash{confirm} = $$w{confirm}->get_active() || '0';
+        $hash{intro} = $$w{intro}->get_active() || '0';
         push(@cfg, \%hash) unless $hash{txt} eq '';
     }
 
@@ -137,16 +149,16 @@ sub _buildExecGUI {
             $w{bbox}->add($w{btnadd});
 
         # Build a separator
-        $w{sep} = Gtk3::HSeparator->new;
+        $w{sep} = Gtk3::HSeparator->new();
         $w{vbox}->pack_start($w{sep}, 0, 1, 5);
 
         # Build a scrolled window
-        $w{sw} = Gtk3::ScrolledWindow->new;
+        $w{sw} = Gtk3::ScrolledWindow->new();
         $w{vbox}->pack_start($w{sw}, 1, 1, 0);
         $w{sw}->set_policy('automatic', 'automatic');
         $w{sw}->set_shadow_type('none');
 
-            $w{vp} = Gtk3::Viewport->new;
+            $w{vp} = Gtk3::Viewport->new();
             $w{sw}->add($w{vp});
             $w{vp}->set_property('border-width', 5);
             $w{vp}->set_shadow_type('none');
@@ -162,13 +174,13 @@ sub _buildExecGUI {
 
     $w{btnadd}->signal_connect('clicked', sub {
         # Save current cfg
-        $$self{cfg} = $self->get_cfg;
+        $$self{cfg} = $self->get_cfg();
         # Append an empty exec entry to cfg
         unshift(@{$$self{cfg}}, {'txt' => '', 'description' => '', 'confirm' => 0});
         # Update gui
-        $self->update;
+        $self->update();
         # Set keyboard focus on last created entry
-        $$self{list}[0]{txt}->grab_focus;
+        $$self{list}[0]{txt}->grab_focus();
         return 1;
     });
 
@@ -220,7 +232,7 @@ sub _buildExec {
                     $w{hbox3}->pack_start($w{lbl}, 0, 1, 0);
 
                     # Build entry
-                    $w{txt} = Gtk3::Entry->new;
+                    $w{txt} = Gtk3::Entry->new();
                     $w{hbox3}->pack_start($w{txt}, 1, 1, 0);
                     $w{txt}->set_icon_from_stock('primary', 'gtk-execute');
                     $w{txt}->set_text($txt);
@@ -238,7 +250,7 @@ sub _buildExec {
                     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
 
                     # Build entry
-                    $w{desc} = Gtk3::Entry->new;
+                    $w{desc} = Gtk3::Entry->new();
                     $w{hbox4}->pack_start($w{desc}, 1, 1, 0);
                     $w{desc}->set_text($desc);
 
@@ -257,13 +269,13 @@ sub _buildExec {
 
     # Add built control to main container
     $$self{frame}{vbexec}->pack_start($w{frame}, 0, 1, 0);
-    $$self{frame}{vbexec}->show_all;
+    $$self{frame}{vbexec}->show_all();
 
     $$self{list}[$w{position}] = \%w;
 
     # Setup some callbacks
 
-    # Asign a callback for deleting entry
+    # Assign a callback for deleting entry
     $w{btn}->signal_connect('clicked' => sub {
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{list}}, $w{position}, 1);
@@ -272,19 +284,24 @@ sub _buildExec {
         return 1;
     });
 
-    # Asign a callback for executing entry
+    # Assign a callback for executing entry
     $w{btnExec}->signal_connect('clicked' => sub {
         my $cmd = $w{txt}->get_chars(0, -1);
 
         # Ask for confirmation
-        $w{confirm}->get_active and ((_wConfirm(undef, "Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY') ) or return 1);
+        if ($w{confirm}->get_active()) {
+            if (!_wConfirm(undef, "Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY')) {
+                # Not confirmed, do not execute
+                return 1;
+            }
+        };
 
         system(_subst($cmd, $PACMain::FUNCS{_MAIN}{_CFG}) . ' &');
 
         return 1;
     }) if ($$self{'where'} eq 'local');
 
-    # Asign a callback to populate this entry with its own context menu
+    # Assign a callback to populate this entry with its own context menu
     $w{txt}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -300,7 +317,9 @@ sub _buildExec {
             push(@variables_menu,
             {
                 label => "<V:$j> ($value)",
-                code => sub {$w{txt}->insert_text("<V:$j>", -1, $w{txt}->get_position);}
+                code => sub {
+                    $w{txt}->insert_text("<V:$j>", -1, $w{txt}->get_position());
+                }
             });
             ++$i;
         }
@@ -316,7 +335,9 @@ sub _buildExec {
             my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
             push(@global_variables_menu, {
                 label => "<GV:$var> ($val)",
-                code => sub {$w{txt}->insert_text("<GV:$var>", -1, $w{txt}->get_position);}
+                code => sub {
+                    $w{txt}->insert_text("<GV:$var>", -1, $w{txt}->get_position());
+                }
             });
         }
         push(@menu_items, {
@@ -332,7 +353,9 @@ sub _buildExec {
             push(@environment_menu, {
                 label => "<ENV:$key>",
                 tooltip => "$key=$value",
-                code => sub {$w{txt}->insert_text("<ENV:$key>", -1, $w{txt}->get_position);}
+                code => sub {
+                    $w{txt}->insert_text("<ENV:$key>", -1, $w{txt}->get_position());
+                }
             });
         }
         push(@menu_items, {
@@ -345,7 +368,7 @@ sub _buildExec {
             label => 'Runtime substitution (<ASK:change_by_number>)',
             code => sub {
                 my $pos = $w{txt}->get_property('cursor_position');
-                $w{txt}->insert_text("<ASK:change_by_number>", -1, $w{txt}->get_position);
+                $w{txt}->insert_text("<ASK:change_by_number>", -1, $w{txt}->get_position());
                 $w{txt}->select_region($pos + 5, $pos + 21);
             }
         });
@@ -354,10 +377,9 @@ sub _buildExec {
         push(@menu_items, {
             label => 'Interactive user choose from list',
             tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
-            code => sub
-            {
+            code => sub {
                 my $pos = $w{txt}->get_property('cursor_position');
-                $w{txt}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{txt}->get_position);
+                $w{txt}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{txt}->get_position());
                 $w{txt}->select_region($pos + 5, $pos + 40);
             }
         });
@@ -368,46 +390,52 @@ sub _buildExec {
             tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
             code => sub {
                 my $pos = $w{txt}->get_property('cursor_position');
-                $w{txt}->insert_text('<CMD:command to launch>', -1, $w{txt}->get_position);
+                $w{txt}->insert_text('<CMD:command to launch>', -1, $w{txt}->get_position());
                 $w{txt}->select_region($pos + 5, $pos + 22);
             }
         });
 
         # Populate with PAC internal variables
         my @int_variables_menu;
-        push(@int_variables_menu, {label => "UUID",        code => sub {$w{txt}->insert_text("<UUID>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "TIMESTAMP",    code => sub {$w{txt}->insert_text("<TIMESTAMP>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_Y",        code => sub {$w{txt}->insert_text("<DATE_Y>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_M",        code => sub {$w{txt}->insert_text("<DATE_M>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_D",        code => sub {$w{txt}->insert_text("<DATE_D>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_H",        code => sub {$w{txt}->insert_text("<TIME_H>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_M",        code => sub {$w{txt}->insert_text("<TIME_M>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_S",        code => sub {$w{txt}->insert_text("<TIME_S>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "NAME",        code => sub {$w{txt}->insert_text("<NAME>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "TITLE",        code => sub {$w{txt}->insert_text("<TITLE>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "IP",            code => sub {$w{txt}->insert_text("<IP>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "USER",        code => sub {$w{txt}->insert_text("<USER>", -1, $w{txt}->get_position);} });
-        push(@int_variables_menu, {label => "PASS",        code => sub {$w{txt}->insert_text("<PASS>", -1, $w{txt}->get_position);} });
+        push(@int_variables_menu, {label => "UUID",      code => sub {$w{txt}->insert_text("<UUID>",      -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "TIMESTAMP", code => sub {$w{txt}->insert_text("<TIMESTAMP>", -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "DATE_Y",    code => sub {$w{txt}->insert_text("<DATE_Y>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "DATE_M",    code => sub {$w{txt}->insert_text("<DATE_M>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "DATE_D",    code => sub {$w{txt}->insert_text("<DATE_D>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "TIME_H",    code => sub {$w{txt}->insert_text("<TIME_H>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "TIME_M",    code => sub {$w{txt}->insert_text("<TIME_M>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "TIME_S",    code => sub {$w{txt}->insert_text("<TIME_S>",    -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "NAME",      code => sub {$w{txt}->insert_text("<NAME>",      -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "TITLE",     code => sub {$w{txt}->insert_text("<TITLE>",     -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "IP",        code => sub {$w{txt}->insert_text("<IP>",        -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "USER",      code => sub {$w{txt}->insert_text("<USER>",      -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
         push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
 
         # Populate with <KPX_(title|username|url):*> special string
         if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
             my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
+            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find()) {
                 push(@titles, {
                     label => "<KPX_title:$$hash{title}>",
                     tooltip => "$$hash{password}",
-                    code => sub {$w{txt}->insert_text("<KPX_title:$$hash{title}>", -1, $w{txt}->get_position);}
+                    code => sub {
+                        $w{txt}->insert_text("<KPX_title:$$hash{title}>", -1, $w{txt}->get_position());
+                    }
                 });
                 push(@usernames, {
                     label => "<KPX_username:$$hash{username}>",
                     tooltip => "$$hash{password}",
-                    code => sub {$w{txt}->insert_text("<KPX_username:$$hash{username}>", -1, $w{txt}->get_position);}
+                    code => sub {
+                        $w{txt}->insert_text("<KPX_username:$$hash{username}>", -1, $w{txt}->get_position());
+                    }
                 });
                 push(@usernames, {
                     label => "<KPX_url:$$hash{url}>",
                     tooltip => "$$hash{password}",
-                    code => sub {$w{txt}->insert_text("<KPX_url:$$hash{url}>", -1, $w{txt}->get_position);}
+                    code => sub {
+                        $w{txt}->insert_text("<KPX_url:$$hash{url}>", -1, $w{txt}->get_position());
+                    }
                 });
             }
 
@@ -427,7 +455,9 @@ sub _buildExec {
                     }, {
                         label => "KeePass Extended Query",
                         tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$w{txt}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{txt}->get_position);}
+                        code => sub {
+                            $w{txt}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{txt}->get_position());
+                        }
                     }
                 ]
             });
@@ -437,8 +467,18 @@ sub _buildExec {
 
         return 1;
     });
-    $w{txt}->signal_connect('delete_text' => sub {! $undoing and push(@undo, $w{txt}->get_chars(0, -1) ); return $_[1], $_[3];});
-    $w{txt}->signal_connect('insert_text' => sub {! $undoing and push(@undo, $w{txt}->get_chars(0, -1) ); return $_[1], $_[3];});
+    $w{txt}->signal_connect('delete_text' => sub {
+        if (!$undoing) {
+            push(@undo, $w{txt}->get_chars(0, -1));
+        }
+        return $_[1], $_[3];
+    });
+    $w{txt}->signal_connect('insert_text' => sub {
+        if (!$undoing) {
+            push(@undo, $w{txt}->get_chars(0, -1));
+        }
+        return $_[1], $_[3];
+    });
     $w{txt}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         my $keyval = '' . ($event->keyval);
