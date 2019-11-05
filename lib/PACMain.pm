@@ -4574,6 +4574,8 @@ sub _ApplyLayout {
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
+        $$self{_GUI}{main}->set_default_size(120,600);
+        #$$self{_GUI}{_PACTABS}->set_size_request(0,0);
         $$self{_GUI}{main}->resize(120,600);
     }
     $LAYOUT = $layout;

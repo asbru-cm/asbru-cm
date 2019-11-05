@@ -135,6 +135,7 @@ sub _setupCallbacks {
             } else {
                 $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
                 $$self{_MAIN}->_showConnectionsList;
+                $$self{_MAIN}{_GUI}{main}->move(1800,30);
             }
         }
         return 1;
