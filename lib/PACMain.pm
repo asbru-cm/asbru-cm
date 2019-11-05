@@ -404,6 +404,10 @@ sub start {
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
 
     # Goto GTK's event loop
+    foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+        $$self{_GUI}{$e}->hide();
+    }
+    $$self{_GUI}{main}->resize(120,600);
     Gtk3->main;
 
     return 1;
@@ -437,7 +441,7 @@ sub _initGUI {
 
     # Create a vbox3: actions, connections and other tools
     $$self{_GUI}{vbox3} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->set_size_request(200, -1);
+    $$self{_GUI}{vbox3}->set_size_request(50, -1);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox3}, 0, 0);
     } else {
@@ -486,7 +490,7 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
     # Put a separator
-    $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    #$$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
 
     # Put a notebook for connections, favourites and history
     $$self{_GUI}{nbTree} = Gtk3::Notebook->new;
@@ -652,7 +656,7 @@ sub _initGUI {
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
 
     # Put a separator
-    $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    #$$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
 
     # Create a hbox0: exec and clusters
     $$self{_GUI}{hbox0} = Gtk3::VBox->new(0, 0);
@@ -839,7 +843,8 @@ sub _initGUI {
     # Create quitBtn button
     $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    #$$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     $$self{_GUI}{quitBtn}->set('can-focus' => 0);
     $$self{_GUI}{quitBtn}->set_tooltip_text('Exit');
 
