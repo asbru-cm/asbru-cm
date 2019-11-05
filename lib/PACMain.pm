@@ -109,7 +109,8 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
-our %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}",'group',"\N{U+1F4C1}");
+my %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}",'group',"\N{U+1F4C1}");
+my $LAYOUT = 0;
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -403,11 +404,12 @@ sub start {
     # Auto start Scripts window
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
 
-    # Goto GTK's event loop
-    foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
-        $$self{_GUI}{$e}->hide();
+    my $layout = 1;
+    if ($layout) {
+        $self->_ApplyLayout($layout);
     }
-    $$self{_GUI}{main}->resize(120,600);
+
+    # Goto GTK's event loop
     Gtk3->main;
 
     return 1;
@@ -4560,6 +4562,21 @@ sub _sendAppMessage {
 
     # Do not open any file but pass the message as 'hint'
     $app->open ([], $msg.'|'.$text);
+}
+
+sub _ApplyLayout {
+    my ($self,$layout) = @_;
+
+    if ($LAYOUT eq $layout) {
+        return 0;
+    }
+    if ($layout == 1) {
+        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+            $$self{_GUI}{$e}->hide();
+        }
+        $$self{_GUI}{main}->resize(120,600);
+    }
+    $LAYOUT = $layout;
 }
 
 # END: Define PRIVATE CLASS functions
