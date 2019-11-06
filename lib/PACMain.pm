@@ -404,10 +404,7 @@ sub start {
     # Auto start Scripts window
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
 
-    my $layout = 1;
-    if ($layout) {
-        $self->_ApplyLayout($layout);
-    }
+    $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
 
     # Goto GTK's event loop
     Gtk3->main;
@@ -3209,7 +3206,6 @@ sub _saveConfiguration {
 
     _purgeUnusedOrMissingScreenshots($cfg);
     _cfgSanityCheck($cfg);
-
     _cipherCFG($cfg);
     nstore($cfg, $CFG_FILE_NFREEZE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$CFG_FILE_NFREEZE':\n\n$!");
     if ($R_CFG_FILE) {
@@ -3328,7 +3324,7 @@ sub _readConfiguration {
     $splash and PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5);
     _cfgSanityCheck($$self{_CFG});
     _decipherCFG($$self{_CFG});
-
+    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'minimal';
     return 1;
 }
 
@@ -4567,15 +4563,24 @@ sub _sendAppMessage {
 sub _ApplyLayout {
     my ($self,$layout) = @_;
 
-    if ($LAYOUT eq $layout) {
+    if (($layout)&&($LAYOUT eq $layout)) {
         return 0;
     }
-    if ($layout == 1) {
+    if ($layout eq 'minimal') {
+        # This layout to work implies some configuration settings to work correctly
+        if ($$self{_GUI}{main}->get_visible) {
+            $$self->_hideConnectionsList;
+        }
+        $$self{_CFG}{'defaults'}{'remember main size'} = 1;
+        $$self{_CFG}{'defaults'}{'start iconified'} = 1;
+        $$self{_CFG}{'defaults'}{'close to tray'} = 1;
+        $$self{_CFG}{'defaults'}{'auto save'} = 1;
+        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+        $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
         $$self{_GUI}{main}->set_default_size(120,600);
-        #$$self{_GUI}{_PACTABS}->set_size_request(0,0);
         $$self{_GUI}{main}->resize(120,600);
     }
     $LAYOUT = $layout;
