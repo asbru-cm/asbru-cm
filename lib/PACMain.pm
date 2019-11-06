@@ -3322,7 +3322,8 @@ sub _readConfiguration {
     $splash and PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5);
     _cfgSanityCheck($$self{_CFG});
     _decipherCFG($$self{_CFG});
-    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'minimal';
+
+    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'normal';
     return 1;
 }
 
