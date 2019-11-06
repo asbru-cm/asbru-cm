@@ -109,7 +109,6 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
-my %utf8icon = ('ssh',"\N{U+1F510}",'rdp',"\N{U+1F308}",'other',"\N{U+1F4A0}",'group',"\N{U+1F4C1}");
 my $LAYOUT = 0;
 
 # END: Define GLOBAL CLASS variables
@@ -489,7 +488,9 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
     # Put a separator
-    #$$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'minimal') {
+        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    }
 
     # Put a notebook for connections, favourites and history
     $$self{_GUI}{nbTree} = Gtk3::Notebook->new;
@@ -511,7 +512,7 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        'Icon:' => 'hidden',
+        'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -655,7 +656,9 @@ sub _initGUI {
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
 
     # Put a separator
-    #$$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'minimal') {
+        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    }
 
     # Create a hbox0: exec and clusters
     $$self{_GUI}{hbox0} = Gtk3::VBox->new(0, 0);
@@ -867,12 +870,7 @@ sub _initGUI {
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c);
-        if (defined $col[1]) {
-            $c = $col[1]->get_cells;
-        } else {
-            $c = $col[0]->get_cells;
-        }
+        my ($c) = $col[1]->get_cells;
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
     }
 
@@ -2378,8 +2376,6 @@ sub __treeBuildNodeName {
     my $self = shift;
     my $uuid = shift;
     my $name = shift;
-    my $method;
-    my $mname;
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
@@ -2391,20 +2387,11 @@ sub __treeBuildNodeName {
     } else {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
-    if ($$self{_CFG}{'environments'}{$uuid}{method}) {
-        $method = lc($$self{_CFG}{'environments'}{$uuid}{method});
-        $method =~ s/ *\(.+//;
-        $mname = "<span size='xx-small'>$method</span>";
-    }
     if ($protected) {
         $name = "<span $p_set='$p_color'>$name</span>";
     }
     if ($is_group) {
-        $name = "$utf8icon{'group'} <b>$name</b>";
-    } elsif ($utf8icon{$method}) {
-        $name = "$mname$utf8icon{$method} $name";
-    } else {
-        $name = "$mname$utf8icon{'other'} $name";
+        $name = "<b>$name</b>";
     }
 
     return $name;
