@@ -3764,41 +3764,44 @@ sub _makeDesktopFile {
     my $cfg = shift;
 
     if (! $$cfg{'defaults'}{'show favourites in unity'}) {
-        unlink "$ENV{HOME}/.local/share/applications/pac.desktop";
+        unlink "$ENV{HOME}/.local/share/applications/asbru.desktop";
         system('/usr/bin/xdg-desktop-menu forceupdate &');
         return 1;
     }
 
     my $d = "[Desktop Entry]\n";
-    $d .= "Name=PAC\n";
-    $d .= "Comment=Perl Auto Connector (auto start)\n";
+    $d .= "Name=Asbru Connection Manager\n";
+    $d .= "Comment=Asbru Connection Manage\n";
     $d .= "Terminal=false\n";
     $d .= "Icon=pac\n";
     $d .= "Type=Application\n";
-    $d .= "Exec=/usr/bin/pac\n";
+    $d .= "Exec=/usr/bin/asbru-cm\n";
     $d .= "StartupNotify=true\n";
-    $d .= "Name[en_US]=PAC\n";
-    $d .= "Comment[en_US]=Perl Auto Connector\n";
+    $d .= "Name[en_US]=Asbru\n";
+    $d .= "Comment[en_US]=Asbru Connetion Manager\n";
     $d .= "Categories=Applications;Network;\n";
     $d .= "X-GNOME-Autostart-enabled=false\n";
-    my $dal = 'Actions=Shell;Quick;';
+    my $dal = 'Actions=Shell;Quick;Preferences;';
     my $da = "\n[Desktop Action Shell]\n";
     $da .= "Name=<Start local shell>\n";
-    $da .= "Exec=asbru --start-shell\n";
+    $da .= "Exec=asbru-cm --start-shell\n";
     $da .= "\n[Desktop Action Quick]\n";
     $da .= "Name=<Quick connect...>\n";
-    $da .= "Exec=asbru --quick-conn\n";
-    my $action = 0;
-    foreach my $uuid (keys %{$$cfg{environments}}) {
-        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
-            next;
-        }
+    $da .= "Exec=asbru-cm --quick-conn\n";
+    $da .= "\n[Desktop Action Preferences]\n";
+    $da .= "Name=<Open Preferences...>\n";
+    $da .= "Exec=asbru-cm --preferences\n";
+#    my $action = 0;
+#    foreach my $uuid (keys %{$$cfg{environments}}) {
+#        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
+#            next;
+#        }
 
-        $dal .= "$action;";
-        $da .= "\n[Desktop Action " . $action++ . "]\n";
-        $da .= "Name=" . ($$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go) . "\n";
-        $da .= "Exec=asbru --start-uuid=$uuid\n";
-    }
+#        $dal .= "$action;";
+#        $da .= "\n[Desktop Action " . $action++ . "]\n";
+#        $da .= "Name=" . ($$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go) . "\n";
+#        $da .= "Exec=asbru-cm --start-uuid=$uuid\n";
+#    }
 
     open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
     print F "$d\n$dal\n$da\n";

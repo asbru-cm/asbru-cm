@@ -51,7 +51,9 @@ use Gtk3 -init;
 use PACUtils;
 our $UNITY = 1;
 $@ = '';
-eval { require 'PACTrayUnity.pm'; };
+eval {
+    require 'PACTrayUnity.pm';
+};
 if ($@) {
     eval { require 'PACTray.pm'; };
     $UNITY = 0;
@@ -4568,7 +4570,7 @@ sub _ApplyLayout {
     if ($layout eq 'minimal') {
         # This layout to work implies some configuration settings to work correctly
         if ($$self{_GUI}{main}->get_visible) {
-            $$self->_hideConnectionsList;
+            $self->_hideConnectionsList;
         }
         $$self{_CFG}{'defaults'}{'remember main size'} = 1;
         $$self{_CFG}{'defaults'}{'start iconified'} = 1;
