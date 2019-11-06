@@ -949,7 +949,7 @@ sub _setupCallbacks {
             # TODO : I think this line should be:
             # $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_GUI}{_VTE};
             # Acording to documentation in PACMain.pm.
-            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_GUI}{_VTE};
             1;
         }
     });
