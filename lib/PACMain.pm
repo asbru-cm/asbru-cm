@@ -805,7 +805,11 @@ sub _initGUI {
 
     # Create shellBtn button
     $$self{_GUI}{shellBtn} = Gtk3::Button->new;
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('pac-shell', 'button'));
     $$self{_GUI}{shellBtn}->set('can-focus' => 0);
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
@@ -840,10 +844,17 @@ sub _initGUI {
     $$self{_GUI}{aboutBtn}->set_tooltip_text('Show the *so needed* "About" dialog');
 
     # Create quitBtn button
-    $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+        $$self{_GUI}{quitBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
+    }
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
-    #$$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
-    $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{quitBtn}->set('can-focus' => 0);
     $$self{_GUI}{quitBtn}->set_tooltip_text('Exit');
 

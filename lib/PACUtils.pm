@@ -1519,6 +1519,7 @@ sub _wEnterValue {
     }
 
     # Show the window (in a modal fashion)
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all;
     my $ok = $w{window}{data}->run;
 
@@ -1631,6 +1632,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all;
     my $ok = $w{window}{data}->run;
 
@@ -1784,6 +1786,7 @@ sub _wMessage {
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1811,36 +1814,36 @@ sub _wProgress {
     if (! defined $WINDOWPROGRESS{_GUI}) {
         $WINDOWPROGRESS{_GUI} = Gtk3::Window->new;
 
-            $WINDOWPROGRESS{_GUI}->set_position('center');
-            $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
-            $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
-            $WINDOWPROGRESS{_GUI}->set_resizable(0);
-            if (defined $window) {
-                $WINDOWPROGRESS{_GUI}->set_transient_for($window);
-            }
-            $WINDOWPROGRESS{_GUI}->set_modal(1);
+        $WINDOWPROGRESS{_GUI}->set_position('center');
+        $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+        $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
+        $WINDOWPROGRESS{_GUI}->set_resizable(0);
+        if (defined $window) {
+            $WINDOWPROGRESS{_GUI}->set_transient_for($window);
+        }
+        $WINDOWPROGRESS{_GUI}->set_modal(1);
 
-            $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
-            $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
+        $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
+        $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
 
-            $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
+        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
 
-            $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
+        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
 
-            $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
+        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
 
-            $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{btnCancel}, 0, 1, 5);
+        $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{btnCancel}, 0, 1, 5);
 
-            $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
-            $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
+        $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
+        $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
             $WINDOWPROGRESS{_RET} = 0;
             $WINDOWPROGRESS{_GUI}->hide;
             return 1;
-            });
+        });
     }
 
     $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
@@ -1880,6 +1883,7 @@ sub _wConfirm {
     $windowConfirm->add_buttons('gtk-ok' => 'yes', 'gtk-cancel'=> 'no');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1904,6 +1908,7 @@ sub _wYesNoCancel {
     $windowConfirm->add_buttons('gtk-yes' => 'yes', 'gtk-no'=> 'no', 'gtk-cancel'=> 'cancel');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -3452,7 +3457,7 @@ sub _showUpdate {
         undef,
         'modal',
         'gtk-ok' => 'ok',
-);
+    );
 
     my $lbl = Gtk3::Label->new;
     $windowConfirm->get_content_area->pack_start($lbl, 0, 0, 5);
