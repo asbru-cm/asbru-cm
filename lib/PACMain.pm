@@ -874,6 +874,8 @@ sub _initGUI {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
         my ($c) = $col[1]->get_cells;
         $c->set('font', $$self{_CFG}{defaults}{'tree font'});
+        ($c) = $col[0]->get_cells;
+        $c->set_alignment(1,0.5);
     }
 
     ##############################################
