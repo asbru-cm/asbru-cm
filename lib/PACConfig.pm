@@ -518,6 +518,7 @@ sub _resetDefaults {
 sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
+    my %layout = ('Traditional',0,'Compact',1);
 
     # Get PROXY from environment
     my $proxy_ip = $GSETTINGS->get_string('host');
@@ -525,6 +526,7 @@ sub _updateGUIPreferences {
     my $proxy_user = $GSETTINGS->get_string('authentication-user');
     my $proxy_pass = $GSETTINGS->get_string('authentication-password');
     my $proxy_string = 'no proxy configured';
+    my $layout = 0;
 
     if ($proxy_ip) {
         $proxy_string = "$proxy_ip:$proxy_port";
@@ -606,6 +608,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgRemoveCtrlCharsConf')->set_active($$cfg{'defaults'}{'remove control chars'});
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
+    _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});
@@ -834,6 +837,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlCharsConf')->get_active;
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active;
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active;
+    $$self{_CFG}{'defaults'}{'layout'} = _($self, 'comboLayout')->get_active_text;
 
     # Terminal colors
     $$self{_CFG}{'defaults'}{'color black'} = _($self, 'colorBlack')->get_color->to_string;

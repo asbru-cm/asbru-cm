@@ -490,7 +490,7 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
     # Put a separator
-    if ($$self{_CFG}{'defaults'}{'layout'} ne 'minimal') {
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
     }
 
@@ -658,7 +658,7 @@ sub _initGUI {
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
 
     # Put a separator
-    if ($$self{_CFG}{'defaults'}{'layout'} ne 'minimal') {
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
     }
 
@@ -810,7 +810,7 @@ sub _initGUI {
 
     # Create shellBtn button
     $$self{_GUI}{shellBtn} = Gtk3::Button->new;
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
     } else {
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
@@ -849,13 +849,13 @@ sub _initGUI {
     $$self{_GUI}{aboutBtn}->set_tooltip_text('Show the *so needed* "About" dialog');
 
     # Create quitBtn button
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{quitBtn} = Gtk3::Button->new();
     } else {
         $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
     }
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     } else {
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
@@ -4567,7 +4567,7 @@ sub _ApplyLayout {
     if (($layout)&&($LAYOUT eq $layout)) {
         return 0;
     }
-    if ($layout eq 'minimal') {
+    if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
         if ($$self{_GUI}{main}->get_visible) {
             $self->_hideConnectionsList;

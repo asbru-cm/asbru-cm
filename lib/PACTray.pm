@@ -136,7 +136,7 @@ sub _setupCallbacks {
             } else {
                 $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
                 $$self{_MAIN}->_showConnectionsList();
-                if ($$self{_MAIN}{_CFG}{'defaults'}{'layout'} eq 'minimal') {
+                if ($$self{_MAIN}{_CFG}{'defaults'}{'layout'} eq 'Compact') {
                     my ($x,$y) = $self->_pos($event);
                     if ($ONCE) {
                         # Work arround the window manager?,GTk3?, so it shows at the correct place the first time
