@@ -3058,7 +3058,11 @@ sub _launchTerminals {
 
     # Check if user wants main window to be close when a terminal comes up
     if ($$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'}) {
-        $self->_hideConnectionsList;
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            $$self{_GUI}{main}->iconify;
+        } else {
+            $self->_hideConnectionsList;
+        }
     }
     if ($$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'}) {
         $$self{_GUI}{showConnBtn}->set_active(0);
