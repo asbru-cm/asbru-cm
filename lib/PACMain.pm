@@ -2389,6 +2389,9 @@ sub __treeBuildNodeName {
     } else {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
+    if ($is_group) {
+        $name = "<b>$name</b>";
+    }
     if ($protected) {
         $name = "<span $p_set='$p_color'>$name</span>";
     }
