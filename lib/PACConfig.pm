@@ -526,13 +526,15 @@ sub _updateGUIPreferences {
     my $proxy_user = $GSETTINGS->get_string('authentication-user');
     my $proxy_pass = $GSETTINGS->get_string('authentication-password');
     my $proxy_string = 'no proxy configured';
-    my $layout = 0;
 
     if ($proxy_ip) {
         $proxy_string = "$proxy_ip:$proxy_port";
     }
     if ($proxy_user) {
         $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
+    }
+    if (!defined $$cfg{'defaults'}{'layout'}) {
+        $$cfg{'defaults'}{'layout'} = 'Traditional';
     }
 
     # Main options
