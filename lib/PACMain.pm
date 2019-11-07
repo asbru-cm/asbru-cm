@@ -2198,7 +2198,11 @@ sub _setupCallbacks {
                 $$self{_GUI}{lockPACBtn}->set_active(1);
             }
             # Hide main window
-            $self->_hideConnectionsList;
+            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+                $self->_iconify;
+            } else {
+                $self->_hideConnectionsList;
+            }
         } else {
             $self->_quitProgram;
         }
