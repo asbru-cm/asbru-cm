@@ -536,6 +536,9 @@ sub _updateGUIPreferences {
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
     }
+    if (!defined $layout{$$cfg{'defaults'}{'layout'}}) {
+        $layout{$$cfg{'defaults'}{'layout'}} = 0;
+    }
 
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
