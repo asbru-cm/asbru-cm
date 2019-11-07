@@ -3336,7 +3336,7 @@ sub _readConfiguration {
     _cfgSanityCheck($$self{_CFG});
     _decipherCFG($$self{_CFG});
 
-    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'normal';
+    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'Traditional';
     return 1;
 }
 
