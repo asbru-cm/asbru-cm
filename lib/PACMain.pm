@@ -4572,12 +4572,16 @@ sub _ApplyLayout {
         if ($$self{_GUI}{main}->get_visible) {
             $self->_hideConnectionsList;
         }
-        $$self{_CFG}{'defaults'}{'remember main size'} = 1;
-        $$self{_CFG}{'defaults'}{'start iconified'} = 1;
-        $$self{_CFG}{'defaults'}{'close to tray'} = 1;
+        if ($ENV{'ASBRU_DESKTOP'} ne 'gnome-shell') {
+            $$self{_CFG}{'defaults'}{'start iconified'} = 0;
+            $$self{_CFG}{'defaults'}{'close to tray'} = 0;
+        } else {
+            $$self{_CFG}{'defaults'}{'start iconified'} = 1;
+            $$self{_CFG}{'defaults'}{'close to tray'} = 1;
+            $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+            $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
+        }
         $$self{_CFG}{'defaults'}{'auto save'} = 1;
-        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
-        $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
