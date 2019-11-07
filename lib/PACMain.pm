@@ -2199,7 +2199,7 @@ sub _setupCallbacks {
             }
             # Hide main window
             if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-                $self->_iconify;
+                $self->iconify;
             } else {
                 $self->_hideConnectionsList;
             }
