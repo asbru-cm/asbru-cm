@@ -4595,7 +4595,6 @@ sub _ApplyLayout {
         }
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
-            $$self{_CFG}{'defaults'}{'close to tray'} = 0;
             if (!$$self{_GUI}{main}->get_visible) {
                 $self->_showConnectionsList;
             }
