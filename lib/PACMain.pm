@@ -4595,8 +4595,6 @@ sub _ApplyLayout {
             if (!$$self{_GUI}{main}->get_visible) {
                 $self->_showConnectionsList;
             }
-            $$self{_GUI}{main}->set_default_size(140,600);
-            $$self{_GUI}{main}->resize(140,600);
         } else {
             if ($$self{_GUI}{main}->get_visible) {
                 $self->_hideConnectionsList;
@@ -4605,6 +4603,8 @@ sub _ApplyLayout {
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
             $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
         }
+        $$self{_GUI}{main}->set_default_size(140,600);
+        $$self{_GUI}{main}->resize(140,600);
     }
     $LAYOUT = $layout;
 }
