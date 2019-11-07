@@ -3847,7 +3847,6 @@ sub _vteFeed {
 sub _vteFeedChild {
     my $vte = shift;
     my $str = shift;
-    my @arr = unpack ('C*', $str);
 
     use bytes;
     my $b = length($str);
