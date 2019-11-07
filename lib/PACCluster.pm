@@ -375,8 +375,7 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_WINDOWCLUSTER}{treeConnections} = PACTree->new (
-        #'Icon:' => 'pixbuf',
-        'Icon:' => 'hidden',
+        'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
     );
@@ -394,6 +393,9 @@ sub _initGUI {
         value => [$GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__'],
         children => []
     });
+    my @col = $$self{_WINDOWCLUSTER}{treeConnections}->get_columns;
+    my ($c) = $col[0]->get_cells;
+    $c->set_alignment(1,0.5);
 
     # Buttons to Add/Del to/from Clusters
     my $vboxclu1 = Gtk3::VBox->new(0, 0);
@@ -1038,11 +1040,16 @@ sub _setupCallbacks {
         if (!(($uuid eq '__PAC__ROOT__') || ($PACMain::{FUNCS}{_MAIN}{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
             return 0;
         }
-        if ($tree->row_expanded($$self{_WINDOWCLUSTER}{treeConnections}->_getPath($uuid) )) {
-            $tree->collapse_row($$self{_WINDOWCLUSTER}{treeConnections}->_getPath($uuid) );
+        if ($tree->row_expanded($$self{_WINDOWCLUSTER}{treeConnections}->_getPath($uuid))) {
+            $tree->collapse_row($$self{_WINDOWCLUSTER}{treeConnections}->_getPath($uuid));
         } elsif ($uuid ne '__PAC__ROOT__') {
             $tree->expand_row($paths[0], 0);
         }
+    });
+
+    $$self{_WINDOWCLUSTER}{treeConnections}->signal_connect('row_collapsed' => sub {
+        my ($tree, $iter, $path) = @_;
+        $$self{_WINDOWCLUSTER}{treeConnections}->columns_autosize;
     });
 
     $$self{_WINDOWCLUSTER}{treeConnections}->signal_connect('key_press_event' => sub {
