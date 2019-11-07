@@ -4580,7 +4580,7 @@ sub _ApplyLayout {
     }
     if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
-        print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
+        #print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
             $$self{_CFG}{'defaults'}{'close to tray'} = 0;
