@@ -4569,13 +4569,17 @@ sub _ApplyLayout {
     }
     if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
-        if ($$self{_GUI}{main}->get_visible) {
-            $self->_hideConnectionsList;
-        }
+        print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
             $$self{_CFG}{'defaults'}{'close to tray'} = 0;
+            if (!$$self{_GUI}{main}->get_visible) {
+                $self->_showConnectionsList;
+            }
         } else {
+            if ($$self{_GUI}{main}->get_visible) {
+                $self->_hideConnectionsList;
+            }
             $$self{_CFG}{'defaults'}{'start iconified'} = 1;
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
             $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
