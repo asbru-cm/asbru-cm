@@ -4584,12 +4584,19 @@ sub _ApplyLayout {
     if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
         #print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
+        $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
+        $$self{_CFG}{'defaults'}{'auto save'} = 1;
+        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+            $$self{_GUI}{$e}->hide();
+        }
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
             $$self{_CFG}{'defaults'}{'close to tray'} = 0;
             if (!$$self{_GUI}{main}->get_visible) {
                 $self->_showConnectionsList;
             }
+            $$self{_GUI}{main}->set_default_size(140,600);
+            $$self{_GUI}{main}->resize(140,600);
         } else {
             if ($$self{_GUI}{main}->get_visible) {
                 $self->_hideConnectionsList;
@@ -4598,13 +4605,6 @@ sub _ApplyLayout {
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
             $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
         }
-        $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
-        $$self{_CFG}{'defaults'}{'auto save'} = 1;
-        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
-            $$self{_GUI}{$e}->hide();
-        }
-        $$self{_GUI}{main}->set_default_size(120,600);
-        $$self{_GUI}{main}->resize(120,600);
     }
     $LAYOUT = $layout;
 }
