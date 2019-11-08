@@ -95,7 +95,7 @@ use warnings;
 our $INIT_CFG_FILE  = "$RealBin/res/pac.yml";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $CFG_DIR_OLD    = "";
-our $CFG_FILE       = "$CFG_DIR/pac.cfg";
+our $CFG_FILE       = "$CFG_DIR/pac.yml";
 our $ASBRU;
 # END: Define GLOBAL variables
 ###################################################################
@@ -105,8 +105,10 @@ our $ASBRU;
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
 
-
 print "INFO: Ásbrú started ($Script) with PID $$\n";
+
+# Check for lost configuration
+CheckLostConfiguration();
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -155,6 +157,8 @@ if (!($ASBRU = PACMain -> new(@ARGV))) {
     exit 0
 }
 
+getDesktopEnvironment();
+
 $ASBRU->start;
 
 print "INFO: Finished $Script (PID:$$)...\n";
@@ -165,6 +169,41 @@ sub config_migration {
     my ($old_dir,$new_dir) = @_;
 
     return 0;
+}
+
+sub getDesktopEnvironment {
+    my $c;
+    # An attempt to find desktop environment
+    foreach my $d ('gnome-shell','cinnamon','lxde') {
+        $c = `pgrep -c '$d'`;
+        chop $c;
+        #print STDERR "TEST: pgrep -c '$d' = $c\n";
+        if ($c) {
+            $ENV{'ASBRU_DESKTOP'} = $d;
+            last;
+        }
+    }
+    if (!$ENV{'ASBRU_DESKTOP'}) {
+        $ENV{'ASBRU_DESKTOP'} = 'other';
+    }
+    print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
+}
+
+sub CheckLostConfiguration {
+    my $nfreeze = "$CFG_DIR/pac.nfreeze";
+
+    if ((-e $CFG_FILE) && (-s $CFG_FILE == 0) && (-e "$CFG_FILE.save")) {
+        print "INFO: Config file lost on last session, recover saved configuration\n";
+        system "cp -fp $CFG_FILE.save $CFG_FILE";
+        unlink $nfreeze;
+        return 0;
+    } elsif ((-e $nfreeze) && (-s $nfreeze == 0)) {
+        # nfreeze corrupted remove so it can be recreated
+        print "INFO: file.nfreeze lost on last session, recreating\n";
+        unlink $nfreeze;
+    }
+    # Save current known configuration
+    system "cp -fp $CFG_FILE $CFG_FILE.save";
 }
 
 END {
@@ -218,4 +257,13 @@ You may run different versions of Ásbru and each have different configuration s
 C<sub config_migration> (no parameters) (no return values)
 
 Function normally empty unless there is a migration of the configuration files.
+
+C<sub getDesktopEnvironment> (no parameters)
+
+Attempts to set $ENV{'ASBRU_DESKTOP'} to the current Desktop Environment name
+
+Used to deal with limitations on certain desktop environments.
+
+For example: gnome-shell at the time of this documentation has no Tray capability in Gtk3
+
 
