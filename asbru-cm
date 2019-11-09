@@ -199,6 +199,7 @@ sub CheckLostConfiguration {
     };
     if (($@)||(!$cfg)) {
         my $OK = 0;
+        system "mv -f $CFG_FILE $CFG_FILE.bad";
         print "INFO: Config file lost or corrupted, recover saved configuration\n";
         unlink $nfreeze;
         # Find the last good configuration
