@@ -3903,20 +3903,21 @@ sub _updateCFG {
 
 sub _wFindInTerminal {
     my $self = shift;
-
     our $searching = 0;
     our $stop = 0;
     our %w;
+    my $text;
 
     if (defined $w{window}) {
         # Load the contents of the textbuffer with the corresponding log file
-        open(F, $$self{_LOGFILE}) or die("ERROR: Could not open file '$$self{_LOGFILE}': $!");
-        @{$$self{_TEXT}} = <F>;
-        my $text = join('', @{$$self{_TEXT}});
-        $text =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-        $text =~ s/\cM//go; # Delete any Ctrl-M (^M) character
-        close F;
-        $w{window}{buffer}->set_text(encode('iso-8859-1', $text // ''));
+        if (open(F, "<:utf8",$$self{_LOGFILE})) {
+            @{$$self{_TEXT}} = <F>;
+            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+            close F;
+        } else {
+            $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+        }
+        $w{window}{buffer}->set_text($text // '');
 
         return $w{window}{data}->present;
     }
@@ -4091,13 +4092,14 @@ sub _wFindInTerminal {
     $w{window}{gui}{hboxmain}->set_position(($w{window}{data}->get_size) / 2);
 
     # Load the contents of the textbuffer with the corresponding log file
-    open(F, $$self{_LOGFILE}) or die("ERROR: Could not open file '$$self{_LOGFILE}': $!");
-    @{$$self{_TEXT}} = <F>;
-    my $text = join('', @{$$self{_TEXT}});
-    $text =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-    $text =~ s/\cM//go; # Delete any Ctrl-M (^M) character
-    close F;
-    $w{window}{buffer}->set_text(encode('iso-8859-1', $text));
+    if (open(F, "<:utf8",$$self{_LOGFILE})) {
+        @{$$self{_TEXT}} = <F>;
+        $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+        close F;
+    } else {
+        $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+    }
+    $w{window}{buffer}->set_text($text);
 
     sub _showLine {
         my $self = shift;
@@ -4148,9 +4150,7 @@ sub _wFindInTerminal {
             if ($line !~ /$regexp/g) {
                 next;
             }
-            $found{$l} = $line;
-            $found{$l} =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-            $found{$l} =~ s/\n|\r|\f|\cM//go; # Delete the ctrl-M, new-line and similar sequences
+            $found{$l} = _removeEscapeSeqs($line);
         }
 
         if ($stop) {
