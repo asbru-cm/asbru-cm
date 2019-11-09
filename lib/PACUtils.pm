@@ -3843,16 +3843,21 @@ sub _vteFeedChild {
 
     use bytes;
     my $b = length($str);
+    my @arr = unpack ('C*', $str);
+
     if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
         # Newer version only requires 1 parameter
-        my @arr = unpack ('C*', $str);
         $vte->feed_child(\@arr);
     } elsif (Vte::get_major_version() >= 1 or Vte::get_minor_version() == 52) {
         # Some distros have a special patched version of v0.52 that still requires 2 parameters; some others only one
         # Not nice but let's ignore the warning for that special case
         # See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501
-        local $SIG{__WARN__} = sub {};
-        $vte->feed_child($str, $b);
+        eval {
+            $vte->feed_child($str, $b);
+            1;
+        } or do {
+            $vte->feed_child(\@arr);
+        };
     } else {
         # Elder versions requires 2 parameters
         $vte->feed_child($str, $b);
