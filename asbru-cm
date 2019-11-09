@@ -203,7 +203,7 @@ sub CheckLostConfiguration {
         print "INFO: Config file lost or corrupted, recover saved configuration\n";
         unlink $nfreeze;
         # Find the last good configuration
-        for (my $n=1;$n < 10;$n++) {
+        for (my $n=0;$n < 10;$n++) {
             if (!-e "$CFG_FILE.$n") {
                 next;
             }
