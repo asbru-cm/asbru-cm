@@ -441,7 +441,11 @@ sub _initGUI {
 
     # Create a vbox3: actions, connections and other tools
     $$self{_GUI}{vbox3} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->set_size_request(50, -1);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{vbox3}->set_size_request(50, -1);
+    } else {
+        $$self{_GUI}{vbox3}->set_size_request(200, -1);
+    }
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox3}, 0, 0);
     } else {
@@ -701,21 +705,33 @@ sub _initGUI {
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxclusters}, 0, 1, 0);
 
     # Create clusterBtn button
-    $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{clusterBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{clusterBtn}, 1, 1, 0);
     $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
     $$self{_GUI}{clusterBtn}->set('can-focus' => 0);
     $$self{_GUI}{clusterBtn}->set_tooltip_text('Open the Clusters Administration Console');
 
     # Create scriptsBtn button
-    $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
     $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('pac-script', 'button'));
     $$self{_GUI}{scriptsBtn}->set('can-focus' => 0);
     $$self{_GUI}{scriptsBtn}->set_tooltip_text('Open the Scripts Administration Console');
 
     # Create clusterBtn button
-    $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{pccBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{pccBtn}, 1, 1, 0);
     $$self{_GUI}{pccBtn}->set_image(Gtk3::Image->new_from_stock('gtk-justify-fill', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{pccBtn}->set('can-focus' => 0);
@@ -820,9 +836,17 @@ sub _initGUI {
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
 
     # Create configBtn button
-    $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{configBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
+    }
     $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{configBtn}->set('can-focus' => 0);
     $$self{_GUI}{configBtn}->set_tooltip_text('Open the general preferences control');
 
@@ -4610,10 +4634,10 @@ sub _ApplyLayout {
             }
             $$self{_CFG}{'defaults'}{'start iconified'} = 1;
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
-            $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
         }
-        $$self{_GUI}{main}->set_default_size(140,600);
-        $$self{_GUI}{main}->resize(140,600);
+        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+        $$self{_GUI}{main}->set_default_size(130,600);
+        $$self{_GUI}{main}->resize(130,600);
     }
     $LAYOUT = $layout;
 }
