@@ -183,9 +183,9 @@ sub getDesktopEnvironment {
     }
     if (!$ENV{'ASBRU_DESKTOP'}) {
         $ENV{'ASBRU_DESKTOP'} = 'other';
-    } elsif ($ENV{'ASBRU_DESKTOP' eq 'gnome-shell'}) {
+    } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
         # Test to see it has the unite extension installed
-        if (-e '~/.local/share/gnome-shell/extensions/unite@hardpixel.eu') {
+        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
             $ENV{'ASBRU_DESKTOP'} .= '-withtray';
         }
     }
