@@ -111,8 +111,6 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 our %RUNNING;
 our %FUNCS;
 
-my $LAYOUT = 0;
-
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -4612,9 +4610,6 @@ sub _sendAppMessage {
 sub _ApplyLayout {
     my ($self,$layout) = @_;
 
-    if (($layout)&&($LAYOUT eq $layout)) {
-        return 0;
-    }
     if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
         #print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
@@ -4638,8 +4633,26 @@ sub _ApplyLayout {
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
         $$self{_GUI}{main}->set_default_size(130,600);
         $$self{_GUI}{main}->resize(130,600);
+    } else {
+        # Traditional
+        if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
+            # Load current traditional options that are changed in Compact mode
+            print STDERR "Saving traditional layout configurations\n";
+            $$self{_CFG}{'defaults'}{'layout traditional settings'} = 1;
+            $$self{_CFG}{'defaults'}{'lt tabs in main window'} = $$self{_CFG}{'defaults'}{'tabs in main window'};
+            $$self{_CFG}{'defaults'}{'lt start iconified'} = $$self{_CFG}{'defaults'}{'start iconified'};
+            $$self{_CFG}{'defaults'}{'lt close to tray'} = $$self{_CFG}{'defaults'}{'close to tray'};
+            $$self{_CFG}{'defaults'}{'lt auto save'} = $$self{_CFG}{'defaults'}{'auto save'};
+        } elsif (($$self{_CFG}{'defaults'}{'layout previous'} ne $layout) && (defined defined $$self{_CFG}{'defaults'}{'layout traditional settings'})) {
+            # Recover previous know settings after comming back from compact layout
+            print STDERR "Recover traditional layout configurations\n";
+            $$self{_CFG}{'defaults'}{'tabs in main window'} = $$self{_CFG}{'defaults'}{'lt tabs in main window'};
+            $$self{_CFG}{'defaults'}{'start iconified'} = $$self{_CFG}{'defaults'}{'lt start iconified'};
+            $$self{_CFG}{'defaults'}{'close to tray'} = $$self{_CFG}{'defaults'}{'lt close to tray'};
+            $$self{_CFG}{'defaults'}{'auto save'} = $$self{_CFG}{'defaults'}{'lt auto save'};
+        }
     }
-    $LAYOUT = $layout;
+    $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
 }
 
 # END: Define PRIVATE CLASS functions
