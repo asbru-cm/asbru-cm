@@ -737,7 +737,9 @@ sub _initGUI {
 
     # Create a vbox5: description
     $$self{_GUI}{vbox5} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox5}->set_border_width(5) if $$self{_CFG}{defaults}{'tabs in main window'};
+    if $$self{_CFG}{defaults}{'tabs in main window'} {
+        $$self{_GUI}{vbox5}->set_border_width(5);
+    }
     $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 1, 0);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox5}, 0, 0);
@@ -3150,7 +3152,9 @@ sub _launchTerminals {
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
-    $self->_showConnectionsList(0) if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'});
+    if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
+        $self->_showConnectionsList(0);
+    }
     if (@new_terminals && scalar(%RUNNING) > 1) {
         # Makes sure the focus is reset on that terminal if lost during startup process
         # (This only happens when another terminal is already open)
@@ -4638,8 +4642,8 @@ sub _ApplyLayout {
         if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
             # Load current traditional options that are changed in Compact mode
             print STDERR "Saving traditional layout configurations\n";
-            $$self{_CFG}{'defaults'}{'layout traditional settings'} = 1;
             $$self{_CFG}{'defaults'}{'lt tabs in main window'} = $$self{_CFG}{'defaults'}{'tabs in main window'};
+            $$self{_CFG}{'defaults'}{'layout traditional settings'} = 1;
             $$self{_CFG}{'defaults'}{'lt start iconified'} = $$self{_CFG}{'defaults'}{'start iconified'};
             $$self{_CFG}{'defaults'}{'lt close to tray'} = $$self{_CFG}{'defaults'}{'close to tray'};
             $$self{_CFG}{'defaults'}{'lt auto save'} = $$self{_CFG}{'defaults'}{'auto save'};
