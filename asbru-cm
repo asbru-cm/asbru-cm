@@ -188,7 +188,6 @@ sub getDesktopEnvironment {
         if (-e '~/.local/share/gnome-shell/extensions/unite@hardpixel.eu') {
             $ENV{'ASBRU_DESKTOP'} .= '-withtray';
         }
-
     }
     print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
 }

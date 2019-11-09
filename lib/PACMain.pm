@@ -737,7 +737,7 @@ sub _initGUI {
 
     # Create a vbox5: description
     $$self{_GUI}{vbox5} = Gtk3::VBox->new(0, 0);
-    if $$self{_CFG}{defaults}{'tabs in main window'} {
+    if ($$self{_CFG}{defaults}{'tabs in main window'}) {
         $$self{_GUI}{vbox5}->set_border_width(5);
     }
     $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 1, 0);
