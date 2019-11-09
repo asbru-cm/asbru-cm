@@ -82,6 +82,7 @@ use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 use File::Copy;
 use PACMain;
+use YAML qw (LoadFile);
 
 # Standard
 use strict;
@@ -191,19 +192,50 @@ sub getDesktopEnvironment {
 
 sub CheckLostConfiguration {
     my $nfreeze = "$CFG_DIR/pac.nfreeze";
+    my $cfg;
 
-    if ((-e $CFG_FILE) && (-s $CFG_FILE == 0) && (-e "$CFG_FILE.save")) {
-        print "INFO: Config file lost on last session, recover saved configuration\n";
-        system "cp -fp $CFG_FILE.save $CFG_FILE";
+    eval {
+        $cfg = YAML::LoadFile($CFG_FILE);
+    };
+    if (($@)||(!$cfg)) {
+        my $OK = 0;
+        print "INFO: Config file lost or corrupted, recover saved configuration\n";
         unlink $nfreeze;
-        return 0;
+        # Find the last good configuration
+        for (my $n=1;$n < 10;$n++) {
+            if (!-e "$CFG_FILE.$n") {
+                next;
+            }
+            print "INFO: TEST recovery file $CFG_FILE.$n\n";
+            eval {
+                $cfg = YAML::LoadFile("$CFG_FILE.$n");
+            };
+            if ((!$@)&&($cfg)) {
+                print "INFO: found good file $CFG_FILE.$n\n";
+                system "cp -fp $CFG_FILE.$n $CFG_FILE";
+                $OK = 1;
+                last;
+            } else {
+                system "mv -f $CFG_FILE.$n $CFG_FILE.$n.bad";
+            }
+        }
+        if (!$OK) {
+            die "ABORT: Have no good config file to work on";
+        }
     } elsif ((-e $nfreeze) && (-s $nfreeze == 0)) {
         # nfreeze corrupted remove so it can be recreated
         print "INFO: file.nfreeze lost on last session, recreating\n";
         unlink $nfreeze;
     }
     # Save current known configuration
-    system "cp -fp $CFG_FILE $CFG_FILE.save";
+    system "cp -fp $CFG_FILE $CFG_FILE.0";
+    # Roll 10 cofiguration start ups
+    for (my $n=9;$n > 0;$n--) {
+        my $p = $n-1;
+        if (-e "$CFG_FILE.$p") {
+            system "cp -fp $CFG_FILE.$p $CFG_FILE.$n";
+        }
+    }
 }
 
 END {
