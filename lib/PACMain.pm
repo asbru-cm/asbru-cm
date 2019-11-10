@@ -3155,7 +3155,7 @@ sub _launchTerminals {
     if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         $self->_showConnectionsList(0);
     }
-    if (@new_terminals && scalar(%RUNNING) > 1) {
+    if (@new_terminals && scalar(keys %RUNNING) > 1) {
         # Makes sure the focus is reset on that terminal if lost during startup process
         # (This only happens when another terminal is already open)
         $$self{_HAS_FOCUS} = $new_terminals[ $#new_terminals ]{_GUI}{_VTE};

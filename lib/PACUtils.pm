@@ -3860,6 +3860,7 @@ sub _vteFeedChild {
         # Not nice but let's ignore the warning for that special case
         # See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501
         eval {
+            local $SIG{__WARN__} = sub {};
             $vte->feed_child($str, $b);
             1;
         } or do {
