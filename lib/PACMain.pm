@@ -3295,10 +3295,12 @@ sub _readConfiguration {
     }
     # END of removing
 
-    if ($R_CFG_FILE) {
-        $continue and print STDERR "No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
+    if ($R_CFG_FILE && $continue) {
+         print STDERR "WARN: No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
     }
-    $continue and print STDERR "No configuration file found in '$CFG_DIR', creating a new one...\n";
+    if ($continue) {
+        print STDERR "WARN: No configuration file found in '$CFG_DIR', creating a new one...\n";
+    }
 
     # Make some sanity checks
     $splash and PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5);
