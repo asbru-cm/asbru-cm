@@ -81,8 +81,8 @@ BEGIN {
 use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 use File::Copy;
-use PACMain;
 use YAML qw (LoadFile);
+use PACMain;
 
 # Standard
 use strict;
@@ -93,10 +93,12 @@ use warnings;
 
 ###################################################################
 # START: Define GLOBAL variables
-our $INIT_CFG_FILE  = "$RealBin/res/pac.yml";
+our $CFG_FILE_NAME  = "pac.yml";
+our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $CFG_DIR_OLD    = "";
-our $CFG_FILE       = "$CFG_DIR/pac.yml";
+our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
+our $BACKUP_DIR     = "bak";
 our $ASBRU;
 # END: Define GLOBAL variables
 ###################################################################
@@ -105,11 +107,7 @@ our $ASBRU;
 
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
-
 print "INFO: Ásbrú started ($Script) with PID $$\n";
-
-# Check for lost configuration
-CheckLostConfiguration();
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -139,7 +137,7 @@ if (!-d $CFG_DIR) {
 }
 
 # Create all subdirectories
-foreach my $subdir ('autostart','screenshots','session_logs','scripts','sockets','tmp') {
+foreach my $subdir ('autostart','screenshots','session_logs','scripts','sockets','tmp','bak') {
     if (!-d "$CFG_DIR/$subdir") {
         mkdir("$CFG_DIR/$subdir");
     }
@@ -152,13 +150,14 @@ for (my $n = 1; $n < 5; $n++) {
     }
 }
 
+# Check if configuration is valid
+CheckConfigurationFile();
+
 # Start Àsbrú Connection Manager :)
 if (!($ASBRU = PACMain -> new(@ARGV))) {
     print STDERR "WARN: Ásbrú aborted.\n";
     exit 0
 }
-
-getDesktopEnvironment();
 
 $ASBRU->start;
 
@@ -172,71 +171,67 @@ sub config_migration {
     return 0;
 }
 
-sub getDesktopEnvironment {
-    my $c;
-    # An attempt to find desktop environment
-    foreach my $d ('gnome-shell','cinnamon','lxde') {
-        $c = `pgrep -c '$d'`;
-        chop $c;
-        #print STDERR "TEST: pgrep -c '$d' = $c\n";
-        if ($c) {
-            $ENV{'ASBRU_DESKTOP'} = $d;
-            last;
-        }
-    }
-    if (!$ENV{'ASBRU_DESKTOP'}) {
-        $ENV{'ASBRU_DESKTOP'} = 'other';
-    }
-    print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
-}
+sub CheckConfigurationFile {
+    use POSIX qw(strftime);
 
-sub CheckLostConfiguration {
     my $nfreeze = "$CFG_DIR/pac.nfreeze";
+    my $now = strftime "%Y%m%d%H%M%S", localtime;
+    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME";
+    my $MAX_BACKUP_FILES = 10;
     my $cfg;
+
+    if (!-e $CFG_FILE) {
+        # No configuration file, do not check anyting, it's probably the first time we start Ásbrú
+        return;
+    }
 
     eval {
         $cfg = YAML::LoadFile($CFG_FILE);
     };
-    if (($@)||(!$cfg)) {
+    if ($@ || !$cfg) {
         my $OK = 0;
-        system "mv -f $CFG_FILE $CFG_FILE.bad";
-        print "INFO: Config file lost or corrupted, recover saved configuration\n";
+        print "INFO: Config file lost or corrupted, trying to recover a previous configuration file...\n";
+        # Remove freeze file
         unlink $nfreeze;
         # Find the last good configuration
-        for (my $n=0;$n < 10;$n++) {
-            if (!-e "$CFG_FILE.$n") {
+        for (my $n=0; $n < $MAX_BACKUP_FILES; $n++) {
+            if (!-e "$BACKUP_CFG_FILE.$n") {
                 next;
             }
-            print "INFO: TEST recovery file $CFG_FILE.$n\n";
+            print "INFO: Testing recovery file $CFG_FILE_NAME.$n...\n";
             eval {
-                $cfg = YAML::LoadFile("$CFG_FILE.$n");
+                $cfg = YAML::LoadFile("$BACKUP_CFG_FILE.$n");
             };
-            if ((!$@)&&($cfg)) {
-                print "INFO: found good file $CFG_FILE.$n\n";
-                system "cp -fp $CFG_FILE.$n $CFG_FILE";
+            if (!$@ && $cfg) {
+                print "INFO: Found valid file $CFG_FILE_NAME.$n, recovering...\n";
+                system "mv -f $CFG_FILE $BACKUP_CFG_FILE.$now.bad";
+                system "cp -fp $BACKUP_CFG_FILE.$n $CFG_FILE";
                 $OK = 1;
                 last;
             } else {
-                system "mv -f $CFG_FILE.$n $CFG_FILE.$n.bad";
+                system "mv -f $BACKUP_CFG_FILE.$n $BACKUP_CFG_FILE.$n.$now.bad";
             }
         }
         if (!$OK) {
-            die "ABORT: Have no good config file to work on";
+            die "ERROR: You have no valid configuration file to load!\nERROR: Please inspect $CFG_FILE manually.";
         }
     } elsif ((-e $nfreeze) && (-s $nfreeze == 0)) {
         # nfreeze corrupted remove so it can be recreated
         print "INFO: file.nfreeze lost on last session, recreating\n";
         unlink $nfreeze;
     }
-    # Save current known configuration
-    system "cp -fp $CFG_FILE $CFG_FILE.0";
-    # Roll 10 cofiguration start ups
-    for (my $n=9;$n > 0;$n--) {
-        my $p = $n-1;
-        if (-e "$CFG_FILE.$p") {
-            system "cp -fp $CFG_FILE.$p $CFG_FILE.$n";
+
+    # Backup file already exists, roll previous backups
+    if (-e "$BACKUP_CFG_FILE.0") {
+        for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
+            my $p = $n-1; # previous
+            if (-e "$BACKUP_CFG_FILE.$p") {
+                system "cp -fp $BACKUP_CFG_FILE.$p $BACKUP_CFG_FILE.$n";
+            }
         }
     }
+    # Save current known configuration
+    system "cp -fp $CFG_FILE $BACKUP_CFG_FILE.0";
 }
 
 END {
@@ -291,12 +286,10 @@ C<sub config_migration> (no parameters) (no return values)
 
 Function normally empty unless there is a migration of the configuration files.
 
-C<sub getDesktopEnvironment> (no parameters)
+C<sub CheckConfigurationFile> (no parameters)
 
-Attempts to set $ENV{'ASBRU_DESKTOP'} to the current Desktop Environment name
+Check that the configuration file is valid.  If the valid is invalid, try to recover a valid
+configuration file from a previous version.
 
-Used to deal with limitations on certain desktop environments.
-
-For example: gnome-shell at the time of this documentation has no Tray capability in Gtk3
-
+If configuration is valid, make a copy of the file into the backup directory.
 
