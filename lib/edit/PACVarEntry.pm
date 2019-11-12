@@ -20,6 +20,9 @@ package PACVarEntry;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -114,33 +117,33 @@ sub _buildVarGUI {
     # Build a vbox for:buttons, separator and expect widgets
     $w{vbox} = Gtk3::VBox->new(0, 0);
 
-        # Build a hbuttonbox for widgets actions (add, etc.)
-        $w{bbox} = Gtk3::HButtonBox->new();
-        $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
-        $w{bbox}->set_layout('GTK_BUTTONBOX_START');
+    # Build a hbuttonbox for widgets actions (add, etc.)
+    $w{bbox} = Gtk3::HButtonBox->new();
+    $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{bbox}->set_layout('GTK_BUTTONBOX_START');
 
-            # Build 'add' button
-            $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
-            $w{bbox}->add($w{btnadd});
+    # Build 'add' button
+    $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
+    $w{bbox}->add($w{btnadd});
 
-        # Build a separator
-        $w{sep} = Gtk3::HSeparator->new();
-        $w{vbox}->pack_start($w{sep}, 0, 1, 5);
+    # Build a separator
+    $w{sep} = Gtk3::HSeparator->new();
+    $w{vbox}->pack_start($w{sep}, 0, 1, 5);
 
-        # Build a scrolled window
-        $w{sw} = Gtk3::ScrolledWindow->new();
-        $w{vbox}->pack_start($w{sw}, 1, 1, 0);
-        $w{sw}->set_policy('automatic', 'automatic');
-        $w{sw}->set_shadow_type('none');
+    # Build a scrolled window
+    $w{sw} = Gtk3::ScrolledWindow->new();
+    $w{vbox}->pack_start($w{sw}, 1, 1, 0);
+    $w{sw}->set_policy('automatic', 'automatic');
+    $w{sw}->set_shadow_type('none');
 
-            $w{vp} = Gtk3::Viewport->new();
-            $w{sw}->add($w{vp});
-            $w{vp}->set_property('border-width', 5);
-            $w{vp}->set_shadow_type('none');
+    $w{vp} = Gtk3::Viewport->new();
+    $w{sw}->add($w{vp});
+    $w{vp}->set_property('border-width', 5);
+    $w{vp}->set_shadow_type('none');
 
-                # Build and add the vbox that will contain the expect widgets
-                $w{vbvar} = Gtk3::VBox->new(0, 0);
-                $w{vp}->add($w{vbvar});
+    # Build and add the vbox that will contain the expect widgets
+    $w{vbvar} = Gtk3::VBox->new(0, 0);
+    $w{vp}->add($w{vbvar});
 
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
@@ -187,24 +190,25 @@ sub _buildVar {
     # Make an HBox to contain label, entry and del button
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-        # Build label
-        $w{lbl} = Gtk3::Label->new('<V:' . $w{position} . '> (');
-        $w{hbox}->pack_start($w{lbl}, 0, 1, 0);
+    # Build label
 
-        $w{hide} = Gtk3::CheckButton->new('hide) ');
-        $w{hbox}->pack_start($w{hide}, 0, 1, 0);
-        $w{hide}->set_active($hide // 0);
-        $w{hide}->signal_connect(toggled => sub {$w{txt}->set_visibility(! $w{hide}->get_active);});
+    $w{lbl} = Gtk3::Label->new("<V:$w{position}> (");
+    $w{hbox}->pack_start($w{lbl}, 0, 1, 0);
 
-        # Build entry
-        $w{txt} = Gtk3::Entry->new();
-        $w{hbox}->pack_start($w{txt}, 1, 1, 0);
-        $w{txt}->set_text($txt);
-        $w{txt}->set_visibility(! $w{hide}->get_active);
+    $w{hide} = Gtk3::CheckButton->new('hide) ');
+    $w{hbox}->pack_start($w{hide}, 0, 1, 0);
+    $w{hide}->set_active($hide // 0);
+    $w{hide}->signal_connect(toggled => sub {$w{txt}->set_visibility(! $w{hide}->get_active);});
 
-        # Build delete button
-        $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
-        $w{hbox}->pack_start($w{btn}, 0, 1, 0);
+    # Build entry
+    $w{txt} = Gtk3::Entry->new();
+    $w{hbox}->pack_start($w{txt}, 1, 1, 0);
+    $w{txt}->set_text($txt);
+    $w{txt}->set_visibility(! $w{hide}->get_active);
+
+    # Build delete button
+    $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
+    $w{hbox}->pack_start($w{btn}, 0, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbvar}->pack_start($w{hbox}, 0, 1, 0);

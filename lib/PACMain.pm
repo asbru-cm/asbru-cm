@@ -20,13 +20,15 @@ package PACMain;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
 ###################################################################
 # Import Modules
 
-use utf8;
 use FindBin qw ($RealBin $Bin $Script);
 my $REALBIN = $RealBin;
 use lib "$RealBin/lib", "$RealBin/lib/ex";
