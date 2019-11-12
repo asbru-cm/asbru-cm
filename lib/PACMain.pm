@@ -53,7 +53,9 @@ use Gtk3 -init;
 use PACUtils;
 our $UNITY = 1;
 $@ = '';
-eval { require 'PACTrayUnity.pm'; };
+eval {
+    require 'PACTrayUnity.pm';
+};
 if ($@) {
     eval { require 'PACTray.pm'; };
     $UNITY = 0;
@@ -404,6 +406,8 @@ sub start {
     # Auto start Scripts window
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
 
+    $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
+
     # Goto GTK's event loop
     Gtk3->main;
 
@@ -438,7 +442,11 @@ sub _initGUI {
 
     # Create a vbox3: actions, connections and other tools
     $$self{_GUI}{vbox3} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->set_size_request(200, -1);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{vbox3}->set_size_request(50, -1);
+    } else {
+        $$self{_GUI}{vbox3}->set_size_request(200, -1);
+    }
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox3}, 0, 0);
     } else {
@@ -487,7 +495,9 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
     # Put a separator
-    $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    }
 
     # Put a notebook for connections, favourites and history
     $$self{_GUI}{nbTree} = Gtk3::Notebook->new;
@@ -653,7 +663,9 @@ sub _initGUI {
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
 
     # Put a separator
-    $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    }
 
     # Create a hbox0: exec and clusters
     $$self{_GUI}{hbox0} = Gtk3::VBox->new(0, 0);
@@ -694,21 +706,33 @@ sub _initGUI {
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxclusters}, 0, 1, 0);
 
     # Create clusterBtn button
-    $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{clusterBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{clusterBtn}, 1, 1, 0);
     $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
     $$self{_GUI}{clusterBtn}->set('can-focus' => 0);
     $$self{_GUI}{clusterBtn}->set_tooltip_text('Open the Clusters Administration Console');
 
     # Create scriptsBtn button
-    $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
     $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('pac-script', 'button'));
     $$self{_GUI}{scriptsBtn}->set('can-focus' => 0);
     $$self{_GUI}{scriptsBtn}->set_tooltip_text('Open the Scripts Administration Console');
 
     # Create clusterBtn button
-    $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{pccBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
+    }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{pccBtn}, 1, 1, 0);
     $$self{_GUI}{pccBtn}->set_image(Gtk3::Image->new_from_stock('gtk-justify-fill', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{pccBtn}->set('can-focus' => 0);
@@ -716,7 +740,9 @@ sub _initGUI {
 
     # Create a vbox5: description
     $$self{_GUI}{vbox5} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox5}->set_border_width(5) if $$self{_CFG}{defaults}{'tabs in main window'};
+    if ($$self{_CFG}{defaults}{'tabs in main window'}) {
+        $$self{_GUI}{vbox5}->set_border_width(5);
+    }
     $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 1, 0);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox5}, 0, 0);
@@ -803,15 +829,27 @@ sub _initGUI {
 
     # Create shellBtn button
     $$self{_GUI}{shellBtn} = Gtk3::Button->new;
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('pac-shell', 'button'));
     $$self{_GUI}{shellBtn}->set('can-focus' => 0);
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
 
     # Create configBtn button
-    $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{configBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
+    }
     $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{configBtn}->set('can-focus' => 0);
     $$self{_GUI}{configBtn}->set_tooltip_text('Open the general preferences control');
 
@@ -838,9 +876,17 @@ sub _initGUI {
     $$self{_GUI}{aboutBtn}->set_tooltip_text('Show the *so needed* "About" dialog');
 
     # Create quitBtn button
-    $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{quitBtn} = Gtk3::Button->new();
+    } else {
+        $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
+    }
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    } else {
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
+    }
     $$self{_GUI}{quitBtn}->set('can-focus' => 0);
     $$self{_GUI}{quitBtn}->set_tooltip_text('Exit');
 
@@ -2183,7 +2229,11 @@ sub _setupCallbacks {
                 $$self{_GUI}{lockPACBtn}->set_active(1);
             }
             # Hide main window
-            $self->_hideConnectionsList;
+            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+                $$self{_GUI}{main}->iconify;
+            } else {
+                $self->_hideConnectionsList;
+            }
         } else {
             $self->_quitProgram;
         }
@@ -2368,6 +2418,7 @@ sub __treeBuildNodeName {
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
+
     if ($name) {
         $name = __($name);
     } else {
@@ -2377,7 +2428,10 @@ sub __treeBuildNodeName {
         $name = "<b>$name</b>";
     }
     if ($protected) {
-        $name = "<span $p_set=\"$p_color\">$name</span>";
+        $name = "<span $p_set='$p_color'>$name</span>";
+    }
+    if ($is_group) {
+        $name = "<b>$name</b>";
     }
 
     return $name;
@@ -2699,6 +2753,17 @@ sub _treeConnections_menu {
         sensitive =>  (scalar(@sel) == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__'),
         code => sub { $self->__importNodes }
     });
+    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        # Display settings options in gnome-shell, there is no tray icon to access it
+        push(@tree_menu_items, {
+            label => 'Settings...',
+            stockicon => 'gtk-preferences',
+            shortcut => '',
+            tooltip => 'Settings',
+            sensitive =>  1,
+            code => sub { $$self{_GUI}{configBtn}->clicked; }
+        });
+    }
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
@@ -3022,7 +3087,11 @@ sub _launchTerminals {
 
     # Check if user wants main window to be close when a terminal comes up
     if ($$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'}) {
-        $self->_hideConnectionsList;
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            $$self{_GUI}{main}->iconify;
+        } else {
+            $self->_hideConnectionsList;
+        }
     }
     if ($$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'}) {
         $$self{_GUI}{showConnBtn}->set_active(0);
@@ -3088,7 +3157,9 @@ sub _launchTerminals {
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
-    $self->_showConnectionsList(0) if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'});
+    if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
+        $self->_showConnectionsList(0);
+    }
     if (@new_terminals && scalar(keys %RUNNING) > 1) {
         # Makes sure the focus is reset on that terminal if lost during startup process
         # (This only happens when another terminal is already open)
@@ -3190,7 +3261,6 @@ sub _saveConfiguration {
 
     _purgeUnusedOrMissingScreenshots($cfg);
     _cfgSanityCheck($cfg);
-
     _cipherCFG($cfg);
     nstore($cfg, $CFG_FILE_NFREEZE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$CFG_FILE_NFREEZE':\n\n$!");
     if ($R_CFG_FILE) {
@@ -3318,6 +3388,7 @@ sub _readConfiguration {
     _cfgSanityCheck($$self{_CFG});
     _decipherCFG($$self{_CFG});
 
+    $$self{_CFG}{'defaults'}{'layout'} = defined $$self{_CFG}{'defaults'}{'layout'} ? $$self{_CFG}{'defaults'}{'layout'} : 'Traditional';
     return 1;
 }
 
@@ -4550,6 +4621,54 @@ sub _sendAppMessage {
 
     # Do not open any file but pass the message as 'hint'
     $app->open ([], $msg.'|'.$text);
+}
+
+sub _ApplyLayout {
+    my ($self,$layout) = @_;
+
+    if ($layout eq 'Compact') {
+        # This layout to work implies some configuration settings to work correctly
+        #print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
+        $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
+        $$self{_CFG}{'defaults'}{'auto save'} = 1;
+        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+            $$self{_GUI}{$e}->hide();
+        }
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            $$self{_CFG}{'defaults'}{'start iconified'} = 0;
+            if (!$$self{_GUI}{main}->get_visible) {
+                $self->_showConnectionsList;
+            }
+        } else {
+            if ($$self{_GUI}{main}->get_visible) {
+                $self->_hideConnectionsList;
+            }
+            $$self{_CFG}{'defaults'}{'start iconified'} = 1;
+            $$self{_CFG}{'defaults'}{'close to tray'} = 1;
+        }
+        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+        $$self{_GUI}{main}->set_default_size(130,600);
+        $$self{_GUI}{main}->resize(130,600);
+    } else {
+        # Traditional
+        if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
+            # Load current traditional options that are changed in Compact mode
+            print STDERR "Saving traditional layout configurations\n";
+            $$self{_CFG}{'defaults'}{'lt tabs in main window'} = $$self{_CFG}{'defaults'}{'tabs in main window'};
+            $$self{_CFG}{'defaults'}{'layout traditional settings'} = 1;
+            $$self{_CFG}{'defaults'}{'lt start iconified'} = $$self{_CFG}{'defaults'}{'start iconified'};
+            $$self{_CFG}{'defaults'}{'lt close to tray'} = $$self{_CFG}{'defaults'}{'close to tray'};
+            $$self{_CFG}{'defaults'}{'lt auto save'} = $$self{_CFG}{'defaults'}{'auto save'};
+        } elsif (($$self{_CFG}{'defaults'}{'layout previous'} ne $layout) && (defined defined $$self{_CFG}{'defaults'}{'layout traditional settings'})) {
+            # Recover previous know settings after comming back from compact layout
+            print STDERR "Recover traditional layout configurations\n";
+            $$self{_CFG}{'defaults'}{'tabs in main window'} = $$self{_CFG}{'defaults'}{'lt tabs in main window'};
+            $$self{_CFG}{'defaults'}{'start iconified'} = $$self{_CFG}{'defaults'}{'lt start iconified'};
+            $$self{_CFG}{'defaults'}{'close to tray'} = $$self{_CFG}{'defaults'}{'lt close to tray'};
+            $$self{_CFG}{'defaults'}{'auto save'} = $$self{_CFG}{'defaults'}{'lt auto save'};
+        }
+    }
+    $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
 }
 
 # END: Define PRIVATE CLASS functions

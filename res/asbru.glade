@@ -3496,6 +3496,50 @@ connecting (timeout is in seconds)</property>
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkBox" id="boxLayout">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">9</property>
+                        <child>
+                          <object class="GtkLabel" id="lblLayout">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Main Window Layout *</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="comboLayout">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item id="Traditional" translatable="yes">Traditional</item>
+                              <item id="Compact" translatable="yes">Compact</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkLabel" id="lblRestartRequired">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -3505,7 +3549,7 @@ connecting (timeout is in seconds)</property>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="position">10</property>
+                        <property name="position">11</property>
                       </packing>
                     </child>
                   </object>
