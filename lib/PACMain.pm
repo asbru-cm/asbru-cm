@@ -2150,11 +2150,7 @@ sub _setupCallbacks {
 
             $RUNNING{$tmp_uuid}{terminal}->_setTabColour;
 
-            if ($RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
-                };
-            } else {
+            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
                 eval {
                     if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window) {
                         $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window->focus(time);
