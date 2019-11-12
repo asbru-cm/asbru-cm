@@ -20,6 +20,9 @@ package PACScripts;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -556,7 +559,7 @@ sub _initGUI {
                                 $$self{_WINDOWSCRIPTS}{gui}{helpScript}->modify_font(Pango::FontDescription::from_string('monospace') );
 
                                 $$self{_WINDOWSCRIPTS}{helpBuffer}->begin_not_undoable_action;
-                                $$self{_WINDOWSCRIPTS}{helpBuffer}->set_text(encode('iso-8859-1', $PAC_SCRIPTS_HELP) );
+                                $$self{_WINDOWSCRIPTS}{helpBuffer}->set_text($PAC_SCRIPTS_HELP);
                                 $$self{_WINDOWSCRIPTS}{helpBuffer}->end_not_undoable_action;
                                 $$self{_WINDOWSCRIPTS}{helpBuffer}->place_cursor($$self{_WINDOWSCRIPTS}{helpBuffer}->get_start_iter);
 
@@ -566,7 +569,7 @@ sub _initGUI {
                             } else {
                                 $$self{_WINDOWSCRIPTS}{helpBuffer} = Gtk3::TextBuffer->new;
                                 $$self{_WINDOWSCRIPTS}{gui}{helpScript} = Gtk3::TextView->new_with_buffer($$self{_WINDOWSCRIPTS}{helpBuffer});
-                                $$self{_WINDOWSCRIPTS}{helpBuffer}->set_text(encode('iso-8859-1', $PAC_SCRIPTS_HELP) );
+                                $$self{_WINDOWSCRIPTS}{helpBuffer}->set_text($PAC_SCRIPTS_HELP);
                                 $$self{_WINDOWSCRIPTS}{helpBuffer}->place_cursor($$self{_WINDOWSCRIPTS}{helpBuffer}->get_start_iter);
                             }
 
@@ -1022,7 +1025,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         }
         # Ctrl-z
         elsif ($ctrl && (lc $keyval eq 'z') && ! $SOURCEVIEW && (scalar @{$$self{_UNDO}}) ) {
-            $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text(encode('iso-8859-1', pop(@{$$self{_UNDO}}) ));
+            $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text(pop(@{$$self{_UNDO}}));
             $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_modified(scalar(@{$$self{_UNDO}}) );
         }
         else {return  0;}
@@ -1113,7 +1116,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         return 1 if ((! defined $name) || ($name =~ /^\s*$/go) );
         return 1 if -f "$SCRIPTS_DIR/$name.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, "File '$name.pl' already exists. Overwrite it?");
 
-        if (! open(F, ">$SCRIPTS_DIR/$name.pl") ) {
+        if (! open(F,">:utf8","$SCRIPTS_DIR/$name.pl")) {
             _wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not open file '$name.pl' for writting ($!)");
             return 1;
         }
@@ -1234,7 +1237,7 @@ sub _saveFile {
     my $path = shift;
     my $file = shift // $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($path), 0);
 
-    if (! open F, ">$file") {
+    if (!open(F,">:utf8",$file)) {
         _wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not open for writting '$file' ($!)");
         return 0;
     }
@@ -1256,7 +1259,7 @@ sub _loadFile {
 
     # Loading a file should not be undoable.
     my $content = '';
-    if (! open F, $file) {
+    if (!open(F,"<:utf8",$file)) {
         $$self{_WINDOWSCRIPTS}{gui}{btnremove}->clicked if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not read file '$file' ($!)\nDelete it?");
         return 0;
     }
@@ -1265,7 +1268,7 @@ sub _loadFile {
 
     if ($SOURCEVIEW) {
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
-        $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text(encode('iso-8859-1', $content) );
+        $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text($content);
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_text($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_start_iter, $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_end_iter, 0) eq '') {
             _wMessage($$self{_WINDOWSCRIPTS}{main}, "WARNING: file '$file' is " . (-z $file ? 'empty' : 'not a valid text file!') );
         }
@@ -1276,7 +1279,7 @@ sub _loadFile {
         my $language = $manager->guess_language($file);
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_language($language);
     } else {
-        $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text(encode('iso-8859-1', $content) );
+        $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text($content);
     }
 
     $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_modified(0);
@@ -1608,7 +1611,10 @@ sub _execScript {
     my $file = $$self{_SCRIPTS}{$name};
 
     defined &SESSION and undef &SESSION;
-    if (! open(F, $file) ) {_wMessage(undef, "Could not open PAC Script file '$file' for reading: $!"); return 1;}
+    if (! open(F,"<:utf8",$file)) {
+        _wMessage(undef, "Could not open PAC Script file '$file' for reading: $!");
+        return 1;
+    }
     my @lines = <F>;
     my $txt = join('', @lines);
     close F;

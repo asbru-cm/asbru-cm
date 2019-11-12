@@ -25,6 +25,9 @@ $|++;
 
 ###################################################################
 # Import Modules
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 # Standard
 use strict;
@@ -205,7 +208,6 @@ sub _setupCallbacks {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
                 symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
                 1;
-            };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active) {
             unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
@@ -256,7 +258,9 @@ sub _setupCallbacks {
 
     # Capture the "Protect PAC with startup password" checkbutton
     _($self, 'cbCfgUseGUIPassword')->signal_connect('toggled' => sub {
-        $$self{_CFGTOGGLEPASS} or return $$self{_CFGTOGGLEPASS} = 1;
+        if (!$$self{_CFGTOGGLEPASS}) {
+            return $$self{_CFGTOGGLEPASS} = 1;
+        }
 
         if (_($self, 'cbCfgUseGUIPassword')->get_active) {
             my $pass_ok = _wSetPACPassword($self, 0);
@@ -293,6 +297,7 @@ sub _setupCallbacks {
         }
 
         my @menu_items;
+
         # Populate with <<ASK_PASS>> special string
         push(@menu_items, {
             label => 'Interactive Password input',
@@ -321,15 +326,14 @@ sub _setupCallbacks {
             submenu => \@variables_menu
         });
 
+
         # Populate with global defined variables
         my @global_variables_menu;
         foreach my $var (sort {$a cmp $b} keys %{$PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}}) {
             my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
             push(@global_variables_menu, {
                 label => "<GV:$var> ($val)",
-                code => sub {
-                    _($self, 'entryCfgSudoPassword')->insert_text("<GV:$var>", -1, _($self, 'entryCfgSudoPassword')->get_position);
-                }
+                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<GV:$var>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
             });
         }
         push(@menu_items, {
@@ -345,12 +349,9 @@ sub _setupCallbacks {
             push(@environment_menu, {
                 label => "<ENV:" . __($key) . ">",
                 tooltip => "$key=$value",
-                code => sub {
-                    _($self, 'entryCfgSudoPassword')->insert_text("<ENV:$key>", -1, _($self, 'entryCfgSudoPassword')->get_position);
-                }
+                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<ENV:$key>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
             });
         }
-
         push(@menu_items, {
             label => 'Environment variables...',
             submenu => \@environment_menu
@@ -409,7 +410,6 @@ sub _setupCallbacks {
                     code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
                 });
             }
-
             push(@menu_items, {
                 label => 'KeePassX',
                 stockicon => 'pac-keepass',
@@ -430,7 +430,9 @@ sub _setupCallbacks {
                 }]
             });
         }
+
         _wPopUpMenu(\@menu_items, $event);
+
         return 1;
     });
 
@@ -454,7 +456,7 @@ sub _exporter {
     }
     elsif ($format eq 'perl') {
         $suffix = '.dumper';
-        $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open F, ">$file" or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
+        $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
     }
 
     my $w;
@@ -473,11 +475,15 @@ sub _exporter {
         my $out = $choose->run;
         $file = $choose->get_filename;
         $choose->destroy;
-        return 1 unless $out eq 'accept';
+        if (!$out eq 'accept') {
+            return 1;
+        }
 
         $$self{_WINDOWCONFIG}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
         $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
-        Gtk3::main_iteration while Gtk3::events_pending;
+        while (Gtk3::events_pending) {
+            Gtk3::main_iteration;
+        }
     }
 
     _cfgSanityCheck($$self{_CFG});
@@ -485,7 +491,7 @@ sub _exporter {
 
     $$self{_CFG}{'__PAC__EXPORTED__FULL__'} = 1;
     eval "$func";
-    if ((! $@) && (defined $w) ) {
+    if ((!$@) && (defined $w)) {
         $w->destroy;
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
@@ -713,7 +719,7 @@ sub _updateGUIPreferences {
     $$self{_VARIABLES}->update($$self{_CFG}{'defaults'}{'global variables'});
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
-    if (! $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'}) ) {
+    if (!$$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'})) {
         show($self, 0);
         _($self, 'nbPreferences')->set_current_page(-1);
         return 0;
@@ -898,7 +904,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active) {
         $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open (F,">","$ENV{HOME}/.config/autostart/pac_start.desktop");
+        open(F, ">:utf8","$ENV{HOME}/.config/autostart/pac_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;
         $$self{_CFG}{'defaults'}{'start at session startup'} = 1;

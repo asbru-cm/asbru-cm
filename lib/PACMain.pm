@@ -20,13 +20,15 @@ package PACMain;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
 ###################################################################
 # Import Modules
 
-use utf8;
 use FindBin qw ($RealBin $Bin $Script);
 my $REALBIN = $RealBin;
 use lib "$RealBin/lib", "$RealBin/lib/ex";
@@ -362,7 +364,8 @@ sub start {
         if (! -f "$CFG_DIR/pac_notray.notified") {
             $$self{_GUI}{main}->present;
             _wMessage($$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences'->'Main Options'->'Behaviour'->'At Exit'->'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'.");
-            open F, ">$CFG_DIR/pac_notray.notified"; close F;
+            open(F,">:utf8","$CFG_DIR/pac_notray.notified");
+            close F;
         }
     }
 
@@ -1540,7 +1543,9 @@ sub _setupCallbacks {
     });
 
     # Capture 'treeconnections' selected element changed
-    $$self{_GUI}{treeConnections}->get_selection->signal_connect('changed' => sub { $self->_updateGUIPreferences; });
+    $$self{_GUI}{treeConnections}->get_selection->signal_connect('changed' => sub {
+        $self->_updateGUIPreferences;
+        });
 
     # Capture row double clicking (execute selected connection)
     $$self{_GUI}{treeConnections}->signal_connect('row_activated' => sub {
@@ -2146,7 +2151,7 @@ sub _setupCallbacks {
 
         # Check if <Ctrl>z is pushed
         if (($event->state == [ qw(control-mask) ]) && (chr($keyval) eq 'z') && (scalar @{ $$self{_UNDO} })) {
-            $$self{_GUI}{descBuffer}->set_text(encode('iso-8859-1', pop(@{ $$self{_UNDO} })));
+            $$self{_GUI}{descBuffer}->set_text(pop(@{ $$self{_UNDO} }));
             return 1;
         }
         return 0;
@@ -2995,10 +3000,10 @@ sub _showAboutWindow {
     $dialog->signal_connect('response' => sub { $_[0]->destroy; });
     $dialog->set_program_name('');  # name is shown in the logo
     $dialog->set_version("v$APPVERSION");
-    $dialog->set_logo(_pixBufFromFile($RES_DIR . '/asbru-logo-400.png'));
-    $dialog->set_copyright(decode('UTF-8', "Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas"));
+    $dialog->set_logo(_pixBufFromFile("$RES_DIR/asbru-logo-400.png"));
+    $dialog->set_copyright("Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas");
     $dialog->set_website('https://asbru-cm.net/');
-    $dialog->set_license(decode('UTF-8', "
+    $dialog->set_license("
 Ásbrú Connection Manager
 
 Copyright (C) 2017-2019 Ásbrú Connection Manager team <https://asbru-cm.net>
@@ -3016,7 +3021,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"));
+");
 
     $dialog->run;
     $dialog->destroy;
@@ -3317,9 +3322,13 @@ sub _readConfiguration {
     }
 
     if ($continue && -f $CFG_FILE_DUMPER) {
-        open F, $CFG_FILE_DUMPER or die "ERROR: Could open for reading file '$CFG_FILE_DUMPER': $!";
+        if (!open(F,"<:utf8",$CFG_FILE_DUMPER)) {
+            die "ERROR: Could open for reading file '$CFG_FILE_DUMPER': $!";
+        }
         my $data = '';
-        while (my $line = <F>) { $data .= $line }
+        while (my $line = <F>) {
+            $data .= $line;
+        }
         close F;
         my $VAR1;
         eval $data;
@@ -3337,7 +3346,9 @@ sub _readConfiguration {
     }
 
     if ($continue && -f $CFG_FILE_FREEZE) {
-        eval { $$self{_CFG} = retrieve($CFG_FILE_FREEZE); };
+        eval {
+            $$self{_CFG} = retrieve($CFG_FILE_FREEZE);
+        };
         if ($@) {
             print STDERR "WARNING: There were errors reading the '$CFG_FILE_FREEZE' config file: $@\n";
         } else {
@@ -3365,10 +3376,12 @@ sub _readConfiguration {
     }
     # END of removing
 
-    if ($R_CFG_FILE) {
-        $continue and print STDERR "No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
+    if ($R_CFG_FILE && $continue) {
+         print STDERR "WARN: No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
     }
-    $continue and print STDERR "No configuration file found in '$CFG_DIR', creating a new one...\n";
+    if ($continue) {
+        print STDERR "WARN: No configuration file found in '$CFG_DIR', creating a new one...\n";
+    }
 
     # Make some sanity checks
     $splash and PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Checking config...", 4, 5);
@@ -3433,7 +3446,7 @@ sub _saveTreeExpanded {
     my $modelsort = $tree->get_model;
     my $model = $modelsort->get_model;
 
-    open(F, ">$CFG_FILE.tree") or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
+    open(F,">:utf8","$CFG_FILE.tree") or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
     $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $uuid = $store->get_value($iter, 2);
@@ -3482,7 +3495,7 @@ sub _loadTreeExpanded {
     my %TREE_TABS;
 
     if (-f "$CFG_FILE.tree") {
-        open(F, "$CFG_FILE.tree") or die "ERROR: Could not read Tree Config file '$CFG_FILE.tree': $!";;
+        open(F,"<:utf8","$CFG_FILE.tree") or die "ERROR: Could not read Tree Config file '$CFG_FILE.tree': $!";;
         foreach my $uuid (<F>) {
 
             chomp $uuid;
@@ -3507,7 +3520,7 @@ sub _loadTreeExpanded {
 sub _saveGUIData {
     my $self = shift;
 
-    open(F, ">$CFG_FILE.gui") or die "ERROR: Could not save GUI Config file '$CFG_FILE.gui': $!";;
+    open(F,">:utf8","$CFG_FILE.gui") or die "ERROR: Could not save GUI Config file '$CFG_FILE.gui': $!";;
 
     # Save Top Window size/position
     if ($$self{_GUI}{maximized}) {
@@ -3535,7 +3548,7 @@ sub _loadGUIData {
         return 1;
     }
 
-    open(F, "$CFG_FILE.gui") or die "ERROR: Could not read GUI Config file '$CFG_FILE.gui': $!";
+    open(F,"<:utf8","$CFG_FILE.gui") or die "ERROR: Could not read GUI Config file '$CFG_FILE.gui': $!";
 
     # Read top level window's psize/position
     my $win = <F>;
@@ -3563,8 +3576,7 @@ sub _updateGUIWithUUID {
     my $is_root = $uuid eq '__PAC__ROOT__';
 
     if ($is_root) {
-
-        $$self{_GUI}{descBuffer}->set_text(encode('iso-8859-1', <<"__PAC__ROOT__DESCRIPTION__"));
+        $$self{_GUI}{descBuffer}->set_text(qq”
 
  * Welcome to $APPNAME version $APPVERSION *
 
@@ -3582,9 +3594,9 @@ sub _updateGUIWithUUID {
 
  - For the latest news, check the project website (https://asbru-cm.net/).
 
-__PAC__ROOT__DESCRIPTION__
+”);
     } else {
-        $$self{_GUI}{descBuffer}->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'description'} // ''));
+        $$self{_GUI}{descBuffer}->set_text("Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {

@@ -21,6 +21,10 @@
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -581,9 +585,9 @@ sub wEnterValue {
 
 sub send_slow {
     if ($SEND_SLOW) {
-        $_[0] -> send_slow($SEND_SLOW, encode('utf8', $_[1]));
+        $_[0] -> send_slow($SEND_SLOW, $_[1]);
     } else {
-        $_[0] -> send(encode('utf8', $_[1]));
+        $_[0] -> send($_[1]);
     }
 }
 
@@ -674,7 +678,9 @@ sub _execAndCapture {
             ctrl("$$ctrl{ctrl}:$tmp");
         } elsif ($tee) {
             $tee =~ /^>{1,2}(.+)$/go or $tee = '>' . $tee;
-            open F, "$tee" or return 1;
+            if (!open(F,"<:utf8",$tee)) {
+                return 1;
+            }
             print F $out;
             close F;
         } else {
@@ -2047,13 +2053,13 @@ sub close_log_file {
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
     }
-    if (! open(F, "$LOG_FILE")) {
+    if (!open(F,"<:utf8",$LOG_FILE)) {
         ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
         return 1;
     }
     my @lines = <F>;
     close F;
-    if (! open(F, ">$LOG_FILE.$$")) {
+    if (! open(F,">:utf8","$LOG_FILE.$$")) {
         ctrl("ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)");
         return 1;
     }
@@ -2069,14 +2075,14 @@ END {
 
     ctrl("LOGFILE:Removing CONTROL characters");
 
-    if (! open(F, "$LOG_FILE")) {
+    if (!open(F,"<:utf8",$LOG_FILE)) {
         ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
         return 1;
     }
     my @lines = <F>;
     close F;
 
-    if (! open(F, ">$LOG_FILE.$$")) {
+    if (! open(F,">:utf8","$LOG_FILE.$$")) {
         ctrl("ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)");
         return 1;
     }

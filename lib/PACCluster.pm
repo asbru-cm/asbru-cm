@@ -21,6 +21,10 @@ package PACCluster;
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -1359,7 +1363,7 @@ sub _setupCallbacks {
             my $sel = $selection[0];
             my $name = $$tree{data}[$sel][1];
             my $uuid = $$tree{data}[$sel][2];
-            $descBuffer->set_text(encode('unicode', $PACMain::FUNCS{_MAIN}{_CFG}{'environments'}{$uuid}{'description'} // '') );
+            $descBuffer->set_text($PACMain::FUNCS{_MAIN}{_CFG}{'environments'}{$uuid}{'description'} // '');
         });
 
         my $lbltotal = Gtk3::Label->new;

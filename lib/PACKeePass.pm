@@ -21,6 +21,10 @@ package PACKeePass;
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -95,7 +99,7 @@ sub update {
 
     my $pass = $$self{cfg}{'password'};
 
-    $$self{frame}{entryKeePassPassword}->set_text(encode('unicode', $pass) );
+    $$self{frame}{entryKeePassPassword}->set_text($pass);
     $$self{frame}{cbUseKeePass}->set_active($$self{cfg}{use_keepass});
     $$self{frame}{cbKeePassAskUser}->set_active($$self{cfg}{ask_user});
     $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
@@ -262,7 +266,7 @@ sub _buildVar {
         # Build entry
         $w{title} = Gtk3::Entry->new;
         $w{hbox}->pack_start($w{title}, 0, 1, 0);
-        $w{title}->set_text(encode('unicode', $title) );
+        $w{title}->set_text($title);
         $w{title}->set_editable(0);
 
         # Build label
@@ -272,7 +276,7 @@ sub _buildVar {
         # Build entry
         $w{url} = Gtk3::Entry->new;
         $w{hbox}->pack_start($w{url}, 0, 1, 0);
-        $w{url}->set_text(encode('unicode', $url) );
+        $w{url}->set_text($url);
         $w{url}->set_editable(0);
 
         # Build label
@@ -282,7 +286,7 @@ sub _buildVar {
         # Build entry
         $w{var} = Gtk3::Entry->new;
         $w{hbox}->pack_start($w{var}, 0, 1, 0);
-        $w{var}->set_text(encode('unicode', $user) );
+        $w{var}->set_text($user);
         $w{var}->set_editable(0);
 
         # Build label
@@ -292,7 +296,7 @@ sub _buildVar {
         # Build entry
         $w{val} = Gtk3::Entry->new;
         $w{hbox}->pack_start($w{val}, 1, 1, 0);
-        $w{val}->set_text(encode('unicode', $pass) );
+        $w{val}->set_text($pass);
         $w{val}->set_editable(0);
 
         $w{hide} = Gtk3::CheckButton->new('Hide');
