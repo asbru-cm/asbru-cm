@@ -21,6 +21,10 @@ package PACPCC;
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -97,7 +101,7 @@ sub new {
     #if (($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) && (open(F, "$CFG_DIR/pac.pcc") ))
 
     my @content;
-    if (open(F, "$CFG_DIR/pac.pcc") ) {
+    if (open(F,"<:utf8","$CFG_DIR/pac.pcc") ) {
         @content = <F>;
         close F;
 
@@ -128,11 +132,11 @@ sub new {
     if ($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) {
         if ($SOURCEVIEW) {
             $$self{_WINDOWPCC}{multiTextBuffer}->begin_not_undoable_action;
-            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', join('', @content) ));
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(join('', @content));
             $$self{_WINDOWPCC}{multiTextBuffer}->end_not_undoable_action;
             $$self{_WINDOWPCC}{multiTextBuffer}->set_modified(0);
         } else {
-            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', join('', @content) ));
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(join('', @content));
         }
     }
 
@@ -648,7 +652,7 @@ sub _setupCallbacks {
         } elsif ($ctrl && (lc $keyval eq 'y') && $SOURCEVIEW) {
             $$self{_WINDOWPCC}{multiTextBuffer}->redo if $$self{_WINDOWPCC}{multiTextBuffer}->can_redo;
         } elsif ($ctrl && (lc $keyval eq 'z') && !$SOURCEVIEW && (scalar @{$$self{_UNDO}})) {
-            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', pop(@{$$self{_UNDO}}) ));
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(pop(@{$$self{_UNDO}}));
         } else {
             return 0;
         }
@@ -720,7 +724,7 @@ sub _setupCallbacks {
 
         # Loading a file should not be undoable.
         my $content = '';
-        if (! open F, $file) {
+        if (!open(F,"<:utf8",$file)) {
             _wMessage($$self{_WINDOWPCC}{main}, "ERROR: Can not open for reading '$file' ($!)");
             return 1;
         }
@@ -731,7 +735,7 @@ sub _setupCallbacks {
 
         if ($SOURCEVIEW) {
             $$self{_WINDOWPCC}{multiTextBuffer}->begin_not_undoable_action;
-            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', $content) );
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text($content);
             if ($$self{_WINDOWPCC}{multiTextBuffer}->get_text($$self{_WINDOWPCC}{multiTextBuffer}->get_start_iter, $$self{_WINDOWPCC}{multiTextBuffer}->get_end_iter, 0) eq '') {
                 _wMessage($$self{_WINDOWPCC}{main}, "WARNING: file '$file' is " . (-z $file ? 'empty' : 'not a valid text file!') );
             }
@@ -745,7 +749,7 @@ sub _setupCallbacks {
 
             $$self{_WINDOWPCC}{comboLang}->set_active($n);
         } else {
-            $$self{_WINDOWPCC}{multiTextBuffer}->set_text(encode('iso-8859-1', $content) );
+            $$self{_WINDOWPCC}{multiTextBuffer}->set_text($content);
         }
 
         return 1;
@@ -770,7 +774,7 @@ sub _setupCallbacks {
         }
 
         # Loading a file should not be undoable.
-        if (! open F, ">$file") {
+        if (!open(F,">:utf8",$file)) {
             _wMessage($$self{_WINDOWPCC}{main}, "ERROR: Can not open for writting '$file' ($!)");
             return 1;
         }
@@ -886,7 +890,7 @@ sub _setupCallbacks {
                 $$self{_RUNNING}{$uuid}{'terminal'}{_PROPAGATE} = 1;
             }
         }
-        open(F, ">$CFG_DIR/pac.pcc");
+        open(F,">:utf8","$CFG_DIR/pac.pcc");
         my ($x, $y) = $$self{_WINDOWPCC}{main}->get_position;
         my ($w, $h) = $$self{_WINDOWPCC}{main}->get_size;
         ($$self{_W}, $$self{_H}) = ($w, $h) if $$self{_WINDOWPCC}{cbShowMultiText}->get_active;

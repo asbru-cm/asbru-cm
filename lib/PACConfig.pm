@@ -25,6 +25,9 @@ $|++;
 
 ###################################################################
 # Import Modules
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 # Standard
 use strict;
@@ -204,9 +207,11 @@ sub _setupCallbacks {
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
         if ((_($self, 'cbCfgAutoStart')->get_active) && (! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop") ) {
-            $$self{_CFG}{'defaults'}{'start at session startup'} = eval {symlink($AUTOSTART_FILE, $ENV{'HOME'} . '/.config/autostart/pac_start.desktop'); 1};
+            $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
+                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop"); 1
+        };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active) {
-            unlink($ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
+            unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
         }
         return 1;
@@ -255,14 +260,20 @@ sub _setupCallbacks {
 
     # Capture the "Protect PAC with startup password" checkbutton
     _($self, 'cbCfgUseGUIPassword')->signal_connect('toggled' => sub {
-        $$self{_CFGTOGGLEPASS} or return $$self{_CFGTOGGLEPASS} = 1;
+        if (!$$self{_CFGTOGGLEPASS}) {
+            return $$self{_CFGTOGGLEPASS} = 1;
+        }
 
         if (_($self, 'cbCfgUseGUIPassword')->get_active) {
             my $pass_ok = _wSetPACPassword($self, 0);
-            ! $pass_ok and $$self{_CFGTOGGLEPASS} = 0;
+            if (! $pass_ok) {
+                $$self{_CFGTOGGLEPASS} = 0;
+            }
             _($self, 'cbCfgUseGUIPassword')->set_active($pass_ok);
             _($self, 'hboxCfgPACPassword')->set_sensitive($pass_ok);
-            $pass_ok and $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
+            if ($pass_ok) {
+                $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
+            }
         } else {
             my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
@@ -282,145 +293,146 @@ sub _setupCallbacks {
     });
 
     _($self, 'entryCfgSudoPassword')->signal_connect('button_press_event' => sub {
-            my ($widget, $event) = @_;
+        my ($widget, $event) = @_;
 
-            return 0 unless $event->button eq 3;
+        if ($event->button ne 3) {
+            return 0;
+        }
 
-            my @menu_items;
+        my @menu_items;
 
-            # Populate with <<ASK_PASS>> special string
-            push(@menu_items, {
-                label => 'Interactive Password input',
-                code => sub {_($self, 'entryCfgSudoPassword')->delete_text(0, -1); _($self, 'entryCfgSudoPassword')->insert_text('<<ASK_PASS>>', -1, 0);}
+        # Populate with <<ASK_PASS>> special string
+        push(@menu_items, {
+            label => 'Interactive Password input',
+            code => sub {_($self, 'entryCfgSudoPassword')->delete_text(0, -1); _($self, 'entryCfgSudoPassword')->insert_text('<<ASK_PASS>>', -1, 0);}
+        });
+
+        # Populate with user defined variables
+        my @variables_menu;
+        my $i = 0;
+        foreach my $value (map{$_->{txt} // ''} @{$$self{variables}}) {
+            my $j = $i;
+            push(@variables_menu, {
+                label => "<V:$j> ($value)",
+                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<V:$j>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
             });
+            ++$i;
+        }
+        push(@menu_items, {
+            label => 'User variables...',
+            sensitive => scalar @{$$self{variables}},
+            submenu => \@variables_menu
+        });
 
-            # Populate with user defined variables
-            my @variables_menu;
-            my $i = 0;
-            foreach my $value (map{$_->{txt} // ''} @{$$self{variables}}) {
-                my $j = $i;
-                push(@variables_menu, {
-                    label => "<V:$j> ($value)",
-                    code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<V:$j>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
-                });
-                ++$i;
+        # Populate with global defined variables
+        my @global_variables_menu;
+        foreach my $var (sort {$a cmp $b} keys %{$PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}}) {
+            my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
+            push(@global_variables_menu, {
+                label => "<GV:$var> ($val)",
+                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<GV:$var>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
+            });
+        }
+        push(@menu_items, {
+            label => 'Global variables...',
+            sensitive => scalar(@global_variables_menu),
+            submenu => \@global_variables_menu
+        });
+
+        # Populate with environment variables
+        my @environment_menu;
+        foreach my $key (sort {$a cmp $b} keys %ENV) {
+            my $value = $ENV{$key};
+            push(@environment_menu, {
+                label => "<ENV:" . __($key) . ">",
+                tooltip => "$key=$value",
+                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<ENV:$key>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
+            });
+        }
+
+        push(@menu_items, {
+            label => 'Environment variables...',
+            submenu => \@environment_menu
+        });
+
+        # Populate with <ASK:#> special string
+        push(@menu_items, {
+            label => 'Interactive user input',
+            tooltip => 'User will be prompted to provide a value with a text box (free data type)',
+            code => sub {
+                my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
+                _($self, 'entryCfgSudoPassword')->insert_text('<ASK:number>', -1, _($self, 'entryCfgSudoPassword')->get_position);
+                _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 11);
             }
-            push(@menu_items, {
-                label => 'User variables...',
-                sensitive => scalar @{$$self{variables}},
-                submenu => \@variables_menu
-            });
+        });
 
-            # Populate with global defined variables
-            my @global_variables_menu;
-            foreach my $var (sort {$a cmp $b} keys %{$PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}}) {
-                my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
-                push(@global_variables_menu, {
-                    label => "<GV:$var> ($val)",
-                    code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<GV:$var>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
-                });
+        # Populate with <ASK:*|> special string
+        push(@menu_items, {
+            label => 'Interactive user choose from list',
+            tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
+            code => sub {
+                my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
+                _($self, 'entryCfgSudoPassword')->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, _($self, 'entryCfgSudoPassword')->get_position);
+                _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 40);
             }
-            push(@menu_items, {
-                label => 'Global variables...',
-                sensitive => scalar(@global_variables_menu),
-                submenu => \@global_variables_menu
-            });
+        });
 
-            # Populate with environment variables
-            my @environment_menu;
-            foreach my $key (sort {$a cmp $b} keys %ENV) {
-                my $value = $ENV{$key};
-                push(@environment_menu, {
-                    label => "<ENV:" . __($key) . ">",
-                    tooltip => "$key=$value",
-                    code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<ENV:$key>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
-                });
+        # Populate with <CMD:*> special string
+        push(@menu_items, {
+            label => 'Use a command output as value',
+            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            code => sub {
+                my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
+                _($self, 'entryCfgSudoPassword')->insert_text('<CMD:command to launch>', -1, _($self, 'entryCfgSudoPassword')->get_position);
+                _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 22);
             }
+        });
 
-            push(@menu_items, {
-                label => 'Environment variables...',
-                submenu => \@environment_menu
-            });
-
-            # Populate with <ASK:#> special string
-            push(@menu_items, {
-                label => 'Interactive user input',
-                tooltip => 'User will be prompted to provide a value with a text box (free data type)',
-                code => sub {
-                    my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
-                    _($self, 'entryCfgSudoPassword')->insert_text('<ASK:number>', -1, _($self, 'entryCfgSudoPassword')->get_position);
-                    _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 11);
-                }
-            });
-
-            # Populate with <ASK:*|> special string
-            push(@menu_items, {
-                label => 'Interactive user choose from list',
-                tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
-                code => sub {
-                    my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
-                    _($self, 'entryCfgSudoPassword')->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, _($self, 'entryCfgSudoPassword')->get_position);
-                    _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 40);
-                }
-            });
-
-            # Populate with <CMD:*> special string
-            push(@menu_items, {
-                label => 'Use a command output as value',
-                tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
-                code => sub {
-                    my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
-                    _($self, 'entryCfgSudoPassword')->insert_text('<CMD:command to launch>', -1, _($self, 'entryCfgSudoPassword')->get_position);
-                    _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 22);
-                }
-            });
-
-            # Populate with KeePass special strings
-            if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                my (@titles, @usernames, @urls, @query);
-                foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
-                    push(@titles, {
-                        label => "<KPX_title:$$hash{title}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_title:$$hash{title}>");}
-                    });
-                    push(@usernames, {
-                        label => "<KPX_username:$$hash{username}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_username:$$hash{username}>");}
-                    });
-                    push(@urls, {
-                        label => "<KPX_url:$$hash{url}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
-                    });
-                }
-
-                push(@menu_items, {
-                    label => 'KeePassX',
-                    stockicon => 'pac-keepass',
-                    submenu =>
-                    [{
-                            label => 'KeePassX title values',
-                            submenu => \@titles
-                        }, {
-                            label => 'KeePassX username values',
-                            submenu => \@usernames
-                        }, {
-                            label => 'KeePassX URL values',
-                            submenu => \@urls
-                        }, {
-                            label => "KeePass Extended Query",
-                            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                        }
-                    ]
+        # Populate with KeePass special strings
+        if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
+            my (@titles, @usernames, @urls, @query);
+            foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
+                push(@titles, {
+                    label => "<KPX_title:$$hash{title}>",
+                    tooltip => "$$hash{password}",
+                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_title:$$hash{title}>");}
+                });
+                push(@usernames, {
+                    label => "<KPX_username:$$hash{username}>",
+                    tooltip => "$$hash{password}",
+                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_username:$$hash{username}>");}
+                });
+                push(@urls, {
+                    label => "<KPX_url:$$hash{url}>",
+                    tooltip => "$$hash{password}",
+                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
                 });
             }
 
-            _wPopUpMenu(\@menu_items, $event);
+            push(@menu_items, {
+                label => 'KeePassX',
+                stockicon => 'pac-keepass',
+                submenu =>
+                [{
+                    label => 'KeePassX title values',
+                    submenu => \@titles
+                }, {
+                    label => 'KeePassX username values',
+                    submenu => \@usernames
+                }, {
+                    label => 'KeePassX URL values',
+                    submenu => \@urls
+                }, {
+                    label => "KeePass Extended Query",
+                    tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
+                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
+                }]
+            });
+        }
 
-            return 1;
+        _wPopUpMenu(\@menu_items, $event);
+
+        return 1;
     });
 
     $$self{_WINDOWCONFIG}->signal_connect('delete_event' => sub {_($self, 'btnCloseConfig')->clicked; return 1;});
@@ -443,7 +455,7 @@ sub _exporter {
     }
     elsif ($format eq 'perl') {
         $suffix = '.dumper';
-        $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open F, ">$file" or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
+        $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
     }
 
     my $w;
@@ -462,11 +474,15 @@ sub _exporter {
         my $out = $choose->run;
         $file = $choose->get_filename;
         $choose->destroy;
-        return 1 unless $out eq 'accept';
+        if (!$out eq 'accept') {
+            return 1;
+        }
 
         $$self{_WINDOWCONFIG}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
         $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
-        Gtk3::main_iteration while Gtk3::events_pending;
+        while (Gtk3::events_pending) {
+            Gtk3::main_iteration;
+        }
     }
 
     _cfgSanityCheck($$self{_CFG});
@@ -474,7 +490,7 @@ sub _exporter {
 
     $$self{_CFG}{'__PAC__EXPORTED__FULL__'} = 1;
     eval "$func";
-    if ((! $@) && (defined $w) ) {
+    if ((!$@) && (defined $w)) {
         $w->destroy;
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
@@ -485,7 +501,9 @@ sub _exporter {
     delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
 
     _decipherCFG($$self{_CFG});
-    defined $$self{_WINDOWCONFIG}->get_window and $$self{_WINDOWCONFIG}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr') );
+    if (defined $$self{_WINDOWCONFIG}->get_window) {
+        $$self{_WINDOWCONFIG}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+    }
 
     return $file;
 }
@@ -512,8 +530,13 @@ sub _updateGUIPreferences {
     my $proxy_user = $GSETTINGS->get_string('authentication-user');
     my $proxy_pass = $GSETTINGS->get_string('authentication-password');
     my $proxy_string = 'no proxy configured';
-    $proxy_ip        and $proxy_string = "$proxy_ip:$proxy_port";
-    $proxy_user        and $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
+
+    if ($proxy_ip) {
+        $proxy_string = "$proxy_ip:$proxy_port";
+    }
+    if ($proxy_user) {
+        $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
+    }
 
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
@@ -687,7 +710,7 @@ sub _updateGUIPreferences {
     $$self{_VARIABLES}->update($$self{_CFG}{'defaults'}{'global variables'});
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
-    if (! $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'}) ) {
+    if (!$$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'})) {
         show($self, 0);
         _($self, 'nbPreferences')->set_current_page(-1);
         return 0;
@@ -772,9 +795,13 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'screenshots external viewer'} = _($self, 'entryCfgExternalViewer')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'terminal character encoding'} = _($self, 'cfgComboCharEncode')->get_active_text;
     $$self{_CFG}{'defaults'}{'word characters'} = _($self, 'entryCfgSelectByWordChars')->get_chars(0, -1);
-    if (_($self, 'rbCfgComBoxNever')->get_active)            {$$self{_CFG}{'defaults'}{'show commands box'} = 0;}
-    elsif (_($self, 'rbCfgComBoxCombo')->get_active)        {$$self{_CFG}{'defaults'}{'show commands box'} = 1;}
-    elsif (_($self, 'rbCfgComBoxButtons')->get_active)    {$$self{_CFG}{'defaults'}{'show commands box'} = 2;}
+    if (_($self, 'rbCfgComBoxNever')->get_active) {
+        $$self{_CFG}{'defaults'}{'show commands box'} = 0;
+    } elsif (_($self, 'rbCfgComBoxCombo')->get_active) {
+        $$self{_CFG}{'defaults'}{'show commands box'} = 1;
+    } elsif (_($self, 'rbCfgComBoxButtons')->get_active) {
+        $$self{_CFG}{'defaults'}{'show commands box'} = 2;
+    }
     $$self{_CFG}{'defaults'}{'show global commands box'} = _($self, 'cbCfgShowGlobalComm')->get_active;
     $$self{_CFG}{'defaults'}{'show tray icon'} = _($self, 'cbCfgShowTrayIcon')->get_active;
     $$self{_CFG}{'defaults'}{'unsplit disconnected terminals'} = _($self, 'cbCfgUnsplitDisconnected')->get_active;
@@ -831,9 +858,13 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'color bright cyan'} = _($self, 'colorBrightCyan')->get_color->to_string;
     $$self{_CFG}{'defaults'}{'color bright white'} = _($self, 'colorBrightWhite')->get_color->to_string;
 
-    if        (_($self, 'rbOnNoTabsNothing')->get_active)    {$$self{_CFG}{'defaults'}{'when no more tabs'} = 0;}
-    elsif    (_($self, 'rbOnNoTabsClose')->get_active)        {$$self{_CFG}{'defaults'}{'when no more tabs'} = 1;}
-    else                                                        {$$self{_CFG}{'defaults'}{'when no more tabs'} = 2;}
+    if (_($self, 'rbOnNoTabsNothing')->get_active) {
+        $$self{_CFG}{'defaults'}{'when no more tabs'} = 0;
+    } elsif (_($self, 'rbOnNoTabsClose')->get_active) {
+        $$self{_CFG}{'defaults'}{'when no more tabs'} = 1;
+    } else {
+        $$self{_CFG}{'defaults'}{'when no more tabs'} = 2;
+    }
 
     #my $new_cfg_location = _($self, 'btnCfgLocation')->get_uri // "$ENV{HOME}/.config/pac";
     #$new_cfg_location =~ s/^file:\/\///go;
@@ -855,7 +886,9 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active) {
         $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open F, ">$ENV{HOME}/.config/autostart/pac_start.desktop"; print F join("\n", @PACUtils::PACDESKTOP); close F;
+        open(F, ">:utf8","$ENV{HOME}/.config/autostart/pac_start.desktop");
+        print F join("\n", @PACUtils::PACDESKTOP);
+        close F;
         $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
     }
 
