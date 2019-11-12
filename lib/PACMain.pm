@@ -3505,7 +3505,7 @@ sub _updateGUIWithUUID {
     my $is_root = $uuid eq '__PAC__ROOT__';
 
     if ($is_root) {
-        $$self{_GUI}{descBuffer}->set_text(qq”
+        $$self{_GUI}{descBuffer}->set_text(qq"
 
  * Welcome to $APPNAME version $APPVERSION *
 
@@ -3523,9 +3523,9 @@ sub _updateGUIWithUUID {
 
  - For the latest news, check the project website (https://asbru-cm.net/).
 
-”);
+");
     } else {
-        $$self{_GUI}{descBuffer}->set_text("Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}");
+        $$self{_GUI}{descBuffer}->set_text("Connection to " . ($$self{_CFG}{'environments'}{$uuid}{'title'} // ''));
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
