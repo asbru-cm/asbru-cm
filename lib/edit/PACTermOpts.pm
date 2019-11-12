@@ -20,6 +20,9 @@ package PACTermOpts;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -195,237 +198,237 @@ sub _buildTermOptsGUI {
     # Build main vbox
     $w{vbox} = Gtk3::VBox->new(0, 0);
 
-        $w{hboxopts} = Gtk3::HBox->new(0, 0);
-        $w{vbox}->pack_start($w{hboxopts}, 0, 1, 0);
+    $w{hboxopts} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hboxopts}, 0, 1, 0);
 
-            $w{frameBindings} = Gtk3::Frame->new(" Disable next key bindings for this connection: ");
-            $w{hboxopts}->pack_start($w{frameBindings}, 0, 1, 0);
-                $w{frameBindings}->set_tooltip_text("Here you can select which key bindings will not be available in this connection. ");
+    $w{frameBindings} = Gtk3::Frame->new(" Disable next key bindings for this connection: ");
+    $w{hboxopts}->pack_start($w{frameBindings}, 0, 1, 0);
+    $w{frameBindings}->set_tooltip_text("Here you can select which key bindings will not be available in this connection. ");
 
-                $w{hboxKBD} = Gtk3::HBox->new(0, 0);
-                $w{frameBindings}->add($w{hboxKBD});
-                $w{hboxKBD}->set_border_width(5);
+    $w{hboxKBD} = Gtk3::HBox->new(0, 0);
+    $w{frameBindings}->add($w{hboxKBD});
+    $w{hboxKBD}->set_border_width(5);
 
-                    $w{cbCTRLDisable} = Gtk3::CheckButton->new_with_label('CTRL');
-                    $w{hboxKBD}->pack_start($w{cbCTRLDisable}, 0, 1, 0);
+    $w{cbCTRLDisable} = Gtk3::CheckButton->new_with_label('CTRL');
+    $w{hboxKBD}->pack_start($w{cbCTRLDisable}, 0, 1, 0);
 
-                    $w{cbALTDisable} = Gtk3::CheckButton->new_with_label('ALT');
-                    $w{hboxKBD}->pack_start($w{cbALTDisable}, 0, 1, 0);
+    $w{cbALTDisable} = Gtk3::CheckButton->new_with_label('ALT');
+    $w{hboxKBD}->pack_start($w{cbALTDisable}, 0, 1, 0);
 
-                    $w{cbSHIFTDisable} = Gtk3::CheckButton->new_with_label('SHIFT');
-                    $w{hboxKBD}->pack_start($w{cbSHIFTDisable}, 0, 1, 0);
+    $w{cbSHIFTDisable} = Gtk3::CheckButton->new_with_label('SHIFT');
+    $w{hboxKBD}->pack_start($w{cbSHIFTDisable}, 0, 1, 0);
 
-            $w{frameBell} = Gtk3::Frame->new(" Other options: ");
-            $w{hboxopts}->pack_start($w{frameBell}, 0, 1, 0);
+    $w{frameBell} = Gtk3::Frame->new(" Other options: ");
+    $w{hboxopts}->pack_start($w{frameBell}, 0, 1, 0);
 
-                $w{hboxbell} = Gtk3::HBox->new(0, 0);
-                $w{frameBell}->add($w{hboxbell});
-                $w{hboxbell}->set_border_width(5);
+    $w{hboxbell} = Gtk3::HBox->new(0, 0);
+    $w{frameBell}->add($w{hboxbell});
+    $w{hboxbell}->set_border_width(5);
 
-                    $w{cbAudibleBell} = Gtk3::CheckButton->new_with_label('Audible bell');
-                    $w{hboxbell}->pack_start($w{cbAudibleBell}, 0, 1, 0);
+    $w{cbAudibleBell} = Gtk3::CheckButton->new_with_label('Audible bell');
+    $w{hboxbell}->pack_start($w{cbAudibleBell}, 0, 1, 0);
 
-                    $w{cbVisibleBell} = Gtk3::CheckButton->new_with_label('Visible bell');
-                    $w{hboxbell}->pack_start($w{cbVisibleBell}, 0, 1, 0);
+    $w{cbVisibleBell} = Gtk3::CheckButton->new_with_label('Visible bell');
+    $w{hboxbell}->pack_start($w{cbVisibleBell}, 0, 1, 0);
 
 
-        $w{frameSuper} = Gtk3::Frame->new;
-        $w{vbox}->pack_start($w{frameSuper}, 1, 1, 0);
+    $w{frameSuper} = Gtk3::Frame->new;
+    $w{vbox}->pack_start($w{frameSuper}, 1, 1, 0);
 
-            $w{cbUsePersonal} = Gtk3::CheckButton->new_with_label(' Use these personal options: ');
-            $w{frameSuper}->set_label_widget($w{cbUsePersonal});
+    $w{cbUsePersonal} = Gtk3::CheckButton->new_with_label(' Use these personal options: ');
+    $w{frameSuper}->set_label_widget($w{cbUsePersonal});
 
-            $w{vbox1} = Gtk3::VBox->new(0, 0);
-            $w{frameSuper}->add($w{vbox1});
-            $w{vbox1}->set_border_width(5);
+    $w{vbox1} = Gtk3::VBox->new(0, 0);
+    $w{frameSuper}->add($w{vbox1});
+    $w{vbox1}->set_border_width(5);
 
-                my $hbox1 = Gtk3::HBox->new(0, 0);
-                $w{vbox1}->pack_start($hbox1, 0, 1, 0);
+    my $hbox1 = Gtk3::HBox->new(0, 0);
+    $w{vbox1}->pack_start($hbox1, 0, 1, 0);
 
-                    my $frameCommandPrompt = Gtk3::Frame->new(' Prompt RegExp: ');
-                    $hbox1->pack_start($frameCommandPrompt, 1, 1, 0);
+    my $frameCommandPrompt = Gtk3::Frame->new(' Prompt RegExp: ');
+    $hbox1->pack_start($frameCommandPrompt, 1, 1, 0);
 
-                        $w{entryCfgPrompt} = Gtk3::Entry->new;
-                        $w{entryCfgPrompt}->set_icon_from_stock('primary', 'pac-prompt');
-                        $frameCommandPrompt->add($w{entryCfgPrompt});
+    $w{entryCfgPrompt} = Gtk3::Entry->new;
+    $w{entryCfgPrompt}->set_icon_from_stock('primary', 'pac-prompt');
+    $frameCommandPrompt->add($w{entryCfgPrompt});
 
-                    my $frameUserPrompt = Gtk3::Frame->new(' Username RegExp: ');
-                    $hbox1->pack_start($frameUserPrompt, 1, 1, 0);
+    my $frameUserPrompt = Gtk3::Frame->new(' Username RegExp: ');
+    $hbox1->pack_start($frameUserPrompt, 1, 1, 0);
 
-                        $w{entryCfgUserPrompt} = Gtk3::Entry->new;
-                        $frameUserPrompt->add($w{entryCfgUserPrompt});
+    $w{entryCfgUserPrompt} = Gtk3::Entry->new;
+    $frameUserPrompt->add($w{entryCfgUserPrompt});
 
-                    my $framePasswordPrompt = Gtk3::Frame->new(' Password RegExp: ');
-                    $hbox1->pack_start($framePasswordPrompt, 1, 1, 0);
+    my $framePasswordPrompt = Gtk3::Frame->new(' Password RegExp: ');
+    $hbox1->pack_start($framePasswordPrompt, 1, 1, 0);
 
-                        $w{entryCfgPasswordPrompt} = Gtk3::Entry->new;
-                        $framePasswordPrompt->add($w{entryCfgPasswordPrompt});
+    $w{entryCfgPasswordPrompt} = Gtk3::Entry->new;
+    $framePasswordPrompt->add($w{entryCfgPasswordPrompt});
 
-                my $frameTermUI = Gtk3::Frame->new(' Terminal UI: ');
-                $w{vbox1}->pack_start($frameTermUI, 0, 1, 0);
+    my $frameTermUI = Gtk3::Frame->new(' Terminal UI: ');
+    $w{vbox1}->pack_start($frameTermUI, 0, 1, 0);
 
-                    my $vboxTermUI = Gtk3::VBox->new(0, 0);
-                    $frameTermUI->add ($vboxTermUI);
+    my $vboxTermUI = Gtk3::VBox->new(0, 0);
+    $frameTermUI->add ($vboxTermUI);
 
-                        my $hboxTermUI1 = Gtk3::HBox->new(0, 0);
-                        $vboxTermUI->add ($hboxTermUI1);
-                        $hboxTermUI1->set_border_width(5);
+    my $hboxTermUI1 = Gtk3::HBox->new(0, 0);
+    $vboxTermUI->add ($hboxTermUI1);
+    $hboxTermUI1->set_border_width(5);
 
-                            my $frameTxtFore = Gtk3::Frame->new('Text color:');
-                            $hboxTermUI1->pack_start($frameTxtFore, 0, 1, 0);
-                            $frameTxtFore->set_shadow_type('none');
+    my $frameTxtFore = Gtk3::Frame->new('Text color:');
+    $hboxTermUI1->pack_start($frameTxtFore, 0, 1, 0);
+    $frameTxtFore->set_shadow_type('none');
 
-                                $w{colorText} = Gtk3::ColorButton->new;
-                                $frameTxtFore->add($w{colorText});
+    $w{colorText} = Gtk3::ColorButton->new;
+    $frameTxtFore->add($w{colorText});
 
-                            my $frameTxtBack = Gtk3::Frame->new('Back color:');
-                            $hboxTermUI1->pack_start($frameTxtBack, 0, 1, 0);
-                            $frameTxtBack->set_shadow_type('none');
+    my $frameTxtBack = Gtk3::Frame->new('Back color:');
+    $hboxTermUI1->pack_start($frameTxtBack, 0, 1, 0);
+    $frameTxtBack->set_shadow_type('none');
 
-                                $w{colorBack} = Gtk3::ColorButton->new;
-                                $frameTxtBack->add($w{colorBack});
+    $w{colorBack} = Gtk3::ColorButton->new;
+    $frameTxtBack->add($w{colorBack});
 
-                            my $frameTxtBold = Gtk3::Frame->new;
-                            $hboxTermUI1->pack_start($frameTxtBold, 0, 1, 0);
-                            $frameTxtBold->set_shadow_type('none');
+    my $frameTxtBold = Gtk3::Frame->new;
+    $hboxTermUI1->pack_start($frameTxtBold, 0, 1, 0);
+    $frameTxtBold->set_shadow_type('none');
 
-                                $w{cbBoldAsText} = Gtk3::CheckButton->new_with_label(' Bold color like Text color: ');
-                                $frameTxtBold->set_label_widget($w{cbBoldAsText});
+    $w{cbBoldAsText} = Gtk3::CheckButton->new_with_label(' Bold color like Text color: ');
+    $frameTxtBold->set_label_widget($w{cbBoldAsText});
 
-                                $w{colorBold} = Gtk3::ColorButton->new;
-                                $frameTxtBold->add($w{colorBold});
+    $w{colorBold} = Gtk3::ColorButton->new;
+    $frameTxtBold->add($w{colorBold});
 
-                            my $frameFont = Gtk3::Frame->new('Font:');
-                            $hboxTermUI1->pack_start($frameFont, 0, 1, 0);
-                            $frameFont->set_shadow_type('none');
+    my $frameFont = Gtk3::Frame->new('Font:');
+    $hboxTermUI1->pack_start($frameFont, 0, 1, 0);
+    $frameFont->set_shadow_type('none');
 
-                                $w{fontTerminal} = Gtk3::FontButton->new;
-                                $frameFont->add($w{fontTerminal});
+    $w{fontTerminal} = Gtk3::FontButton->new;
+    $frameFont->add($w{fontTerminal});
 
-                            my $frameTabBackColor = Gtk3::Frame->new;
-                            $hboxTermUI1->pack_start($frameTabBackColor, 0, 1, 0);
-                            $frameTabBackColor->set_shadow_type('none');
+    my $frameTabBackColor = Gtk3::Frame->new;
+    $hboxTermUI1->pack_start($frameTabBackColor, 0, 1, 0);
+    $frameTabBackColor->set_shadow_type('none');
 
-                                $w{cbTabBackColor} = Gtk3::CheckButton->new_with_label(' Use this Tab background color: ');
-                                $frameTabBackColor->set_label_widget($w{cbTabBackColor});
+    $w{cbTabBackColor} = Gtk3::CheckButton->new_with_label(' Use this Tab background color: ');
+    $frameTabBackColor->set_label_widget($w{cbTabBackColor});
 
-                                $w{colorTabBack} = Gtk3::ColorButton->new;
-                                $frameTabBackColor->add($w{colorTabBack});
+    $w{colorTabBack} = Gtk3::ColorButton->new;
+    $frameTabBackColor->add($w{colorTabBack});
 
-                        my $hboxTermUI2 = Gtk3::HBox->new(0, 0);
-                        $vboxTermUI->add ($hboxTermUI2);
-                        $hboxTermUI2->set_border_width(5);
+    my $hboxTermUI2 = Gtk3::HBox->new(0, 0);
+    $vboxTermUI->add ($hboxTermUI2);
+    $hboxTermUI2->set_border_width(5);
 
-                            my $frameCursor = Gtk3::Frame->new('Cursor Shape:');
-                            $hboxTermUI2->pack_start($frameCursor, 0, 1, 0);
-                            $frameCursor->set_shadow_type('none');
+    my $frameCursor = Gtk3::Frame->new('Cursor Shape:');
+    $hboxTermUI2->pack_start($frameCursor, 0, 1, 0);
+    $frameCursor->set_shadow_type('none');
 
-                                $w{comboCursorShape} = Gtk3::ComboBoxText->new;
-                                $frameCursor->add($w{comboCursorShape});
-                                foreach my $cursor (sort {$a cmp $b} keys %CURSOR_SHAPE) {$w{comboCursorShape}->append_text($cursor);};
+    $w{comboCursorShape} = Gtk3::ComboBoxText->new;
+    $frameCursor->add($w{comboCursorShape});
+    foreach my $cursor (sort {$a cmp $b} keys %CURSOR_SHAPE) {$w{comboCursorShape}->append_text($cursor);};
 
-                            my $frameScroll = Gtk3::Frame->new('Scrollback lines:');
-                            $hboxTermUI2->pack_start($frameScroll, 0, 1, 0);
-                            $frameScroll->set_shadow_type('none');
+    my $frameScroll = Gtk3::Frame->new('Scrollback lines:');
+    $hboxTermUI2->pack_start($frameScroll, 0, 1, 0);
+    $frameScroll->set_shadow_type('none');
 
-                                $w{spCfgTerminalScrollback} = Gtk3::SpinButton->new_with_range(1, 99999, 100);
-                                $frameScroll->add($w{spCfgTerminalScrollback});
+    $w{spCfgTerminalScrollback} = Gtk3::SpinButton->new_with_range(1, 99999, 100);
+    $frameScroll->add($w{spCfgTerminalScrollback});
 
-                            my $frameTransparency = Gtk3::Frame->new('Transparency:');
-                            $hboxTermUI2->pack_start($frameTransparency, 1, 1, 0);
-                            $frameTransparency->set_shadow_type('none');
+    my $frameTransparency = Gtk3::Frame->new('Transparency:');
+    $hboxTermUI2->pack_start($frameTransparency, 1, 1, 0);
+    $frameTransparency->set_shadow_type('none');
 
-                                $w{spCfgTerminalTransparency} = Gtk3::HScale->new(Gtk3::Adjustment->new(0, 0, 1, 0.1, 0.1, 0.1) );
-                                $frameTransparency->add($w{spCfgTerminalTransparency});
+    $w{spCfgTerminalTransparency} = Gtk3::HScale->new(Gtk3::Adjustment->new(0, 0, 1, 0.1, 0.1, 0.1) );
+    $frameTransparency->add($w{spCfgTerminalTransparency});
 
-                            my $frameEmulation = Gtk3::Frame->new(' Term Emulation: ');
-                            $hboxTermUI2->pack_start($frameEmulation, 0, 1, 0);
+    my $frameEmulation = Gtk3::Frame->new(' Term Emulation: ');
+    $hboxTermUI2->pack_start($frameEmulation, 0, 1, 0);
 
-                                $w{entryTermEmulation} = Gtk3::Entry->new;
-                                $frameEmulation->add($w{entryTermEmulation});
+    $w{entryTermEmulation} = Gtk3::Entry->new;
+    $frameEmulation->add($w{entryTermEmulation});
 
-                            my $frameSelectWords = Gtk3::Frame->new(' Select Word CHARS: ');
-                            $hboxTermUI2->pack_start($frameSelectWords, 0, 1, 0);
+    my $frameSelectWords = Gtk3::Frame->new(' Select Word CHARS: ');
+    $hboxTermUI2->pack_start($frameSelectWords, 0, 1, 0);
 
-                                $w{entrySelectWords} = Gtk3::Entry->new;
-                                $frameSelectWords->add($w{entrySelectWords});
+    $w{entrySelectWords} = Gtk3::Entry->new;
+    $frameSelectWords->add($w{entrySelectWords});
 
-                $w{hboxTimeSize} = Gtk3::HBox->new(0, 0);
-                $w{vbox1}->pack_start($w{hboxTimeSize}, 0, 1, 0);
+    $w{hboxTimeSize} = Gtk3::HBox->new(0, 0);
+    $w{vbox1}->pack_start($w{hboxTimeSize}, 0, 1, 0);
 
-                my $frameTimeOuts = Gtk3::Frame->new(' Time outs (seconds): ');
-                $w{hboxTimeSize}->pack_start($frameTimeOuts, 0, 1, 0);
+    my $frameTimeOuts = Gtk3::Frame->new(' Time outs (seconds): ');
+    $w{hboxTimeSize}->pack_start($frameTimeOuts, 0, 1, 0);
 
-                    my $hbox2 = Gtk3::HBox->new(0, 0);
-                    $frameTimeOuts->add($hbox2);
-                    $hbox2->set_border_width(5);
+    my $hbox2 = Gtk3::HBox->new(0, 0);
+    $frameTimeOuts->add($hbox2);
+    $hbox2->set_border_width(5);
 
-                        my $frameTOConn = Gtk3::Frame->new(' Connection ');
-                        $hbox2->pack_start($frameTOConn, 0, 1, 0),
-                        $frameTOConn->set_shadow_type('none');
-                        $frameTOConn->set_tooltip_text('Set to 0 (zero) to wait forever until connection is established');
+    my $frameTOConn = Gtk3::Frame->new(' Connection ');
+    $hbox2->pack_start($frameTOConn, 0, 1, 0),
+    $frameTOConn->set_shadow_type('none');
+    $frameTOConn->set_tooltip_text('Set to 0 (zero) to wait forever until connection is established');
 
-                            $w{spCfgTmoutConnect} = Gtk3::SpinButton->new_with_range(0, 86400, 1);
-                            $frameTOConn->add($w{spCfgTmoutConnect});
+    $w{spCfgTmoutConnect} = Gtk3::SpinButton->new_with_range(0, 86400, 1);
+    $frameTOConn->add($w{spCfgTmoutConnect});
 
-                        my $frameTOCmd = Gtk3::Frame->new(' Expect Cmd exec: ');
-                        $hbox2->pack_start($frameTOCmd, 0, 1, 0),
-                        $frameTOCmd->set_shadow_type('none');
-                        $frameTOCmd->set_tooltip_text('Set to 0 (zero) to wait forever for Expect and equivalentes commands to complete');
+    my $frameTOCmd = Gtk3::Frame->new(' Expect Cmd exec: ');
+    $hbox2->pack_start($frameTOCmd, 0, 1, 0),
+    $frameTOCmd->set_shadow_type('none');
+    $frameTOCmd->set_tooltip_text('Set to 0 (zero) to wait forever for Expect and equivalentes commands to complete');
 
-                            $w{spCfgTmoutCommand} = Gtk3::SpinButton->new_with_range(0, 86400, 1);
-                            $frameTOCmd->add($w{spCfgTmoutCommand});
+    $w{spCfgTmoutCommand} = Gtk3::SpinButton->new_with_range(0, 86400, 1);
+    $frameTOCmd->add($w{spCfgTmoutCommand});
 
-                    my $frameWindowSize = Gtk3::Frame->new(' Open NEW connection on: ');
-                    $w{hboxTimeSize}->pack_start($frameWindowSize, 0, 1, 0);
+    my $frameWindowSize = Gtk3::Frame->new(' Open NEW connection on: ');
+    $w{hboxTimeSize}->pack_start($frameWindowSize, 0, 1, 0);
 
-                        my $vboxWindowSize = Gtk3::VBox->new(0, 0);
-                        $frameWindowSize->add($vboxWindowSize);
+    my $vboxWindowSize = Gtk3::VBox->new(0, 0);
+    $frameWindowSize->add($vboxWindowSize);
 
-                            $w{cbCfgNewInTab} = Gtk3::RadioButton->new_with_label(undef, 'Tab');
-                            $vboxWindowSize->pack_start($w{cbCfgNewInTab}, 0, 1, 0);
+    $w{cbCfgNewInTab} = Gtk3::RadioButton->new_with_label(undef, 'Tab');
+    $vboxWindowSize->pack_start($w{cbCfgNewInTab}, 0, 1, 0);
 
-                            my $hboxWindowSize = Gtk3::HBox->new(0, 0);
-                            $vboxWindowSize->pack_start($hboxWindowSize, 0, 1, 0);
+    my $hboxWindowSize = Gtk3::HBox->new(0, 0);
+    $vboxWindowSize->pack_start($hboxWindowSize, 0, 1, 0);
 
-                                $w{cbCfgNewInWindow} = Gtk3::RadioButton->new_with_label($w{cbCfgNewInTab}, 'Window');
-                                $hboxWindowSize->pack_start($w{cbCfgNewInWindow}, 0, 1, 0);
+    $w{cbCfgNewInWindow} = Gtk3::RadioButton->new_with_label($w{cbCfgNewInTab}, 'Window');
+    $hboxWindowSize->pack_start($w{cbCfgNewInWindow}, 0, 1, 0);
 
-                                $w{hboxWidthHeight} = Gtk3::HBox->new(0, 0);
-                                $hboxWindowSize->pack_start($w{hboxWidthHeight}, 0, 1, 0);
+    $w{hboxWidthHeight} = Gtk3::HBox->new(0, 0);
+    $hboxWindowSize->pack_start($w{hboxWidthHeight}, 0, 1, 0);
 
-                                    $w{hboxWidthHeight}->pack_start(Gtk3::Label->new(' Width: '), 0, 1, 0);
-                                    $w{spCfgNewWindowWidth} = Gtk3::SpinButton->new_with_range(1, 4096, 10);
-                                    $w{hboxWidthHeight}->pack_start($w{spCfgNewWindowWidth}, 0, 1, 0);
+    $w{hboxWidthHeight}->pack_start(Gtk3::Label->new(' Width: '), 0, 1, 0);
+    $w{spCfgNewWindowWidth} = Gtk3::SpinButton->new_with_range(1, 4096, 10);
+    $w{hboxWidthHeight}->pack_start($w{spCfgNewWindowWidth}, 0, 1, 0);
 
-                                    $w{hboxWidthHeight}->pack_start(Gtk3::Label->new(' Height: '), 0, 1, 0);
-                                    $w{spCfgNewWindowHeight} = Gtk3::SpinButton->new_with_range(1, 4096, 10);
-                                    $w{hboxWidthHeight}->pack_start($w{spCfgNewWindowHeight}, 0, 1, 0);
+    $w{hboxWidthHeight}->pack_start(Gtk3::Label->new(' Height: '), 0, 1, 0);
+    $w{spCfgNewWindowHeight} = Gtk3::SpinButton->new_with_range(1, 4096, 10);
+    $w{hboxWidthHeight}->pack_start($w{spCfgNewWindowHeight}, 0, 1, 0);
 
-                    my $frameBackspace = Gtk3::Frame->new(' Backspace binding: ');
-                    $w{hboxTimeSize}->pack_start($frameBackspace, 0, 1, 0);
+    my $frameBackspace = Gtk3::Frame->new(' Backspace binding: ');
+    $w{hboxTimeSize}->pack_start($frameBackspace, 0, 1, 0);
 
-                        $w{comboBackspace} = Gtk3::ComboBoxText->new;
-                        $frameBackspace->add($w{comboBackspace});
+    $w{comboBackspace} = Gtk3::ComboBoxText->new;
+    $frameBackspace->add($w{comboBackspace});
 
-                my $frameEncoding = Gtk3::Frame->new(' Character Encoding: ');
-                $w{vbox1}->pack_start($frameEncoding, 1, 1, 0);
+    my $frameEncoding = Gtk3::Frame->new(' Character Encoding: ');
+    $w{vbox1}->pack_start($frameEncoding, 1, 1, 0);
 
-                    my $vboxEnc = Gtk3::VBox->new(0, 0);
-                    $frameEncoding->add($vboxEnc);
+    my $vboxEnc = Gtk3::VBox->new(0, 0);
+    $frameEncoding->add($vboxEnc);
 
-                        $w{comboEncoding} = Gtk3::ComboBoxText->new;
-                        $vboxEnc->pack_start($w{comboEncoding}, 0, 1, 0);
+    $w{comboEncoding} = Gtk3::ComboBoxText->new;
+    $vboxEnc->pack_start($w{comboEncoding}, 0, 1, 0);
 
-                        $w{lblEncoding} = Gtk3::Label->new('');
-                        $vboxEnc->pack_start($w{lblEncoding}, 1, 1, 0);
+    $w{lblEncoding} = Gtk3::Label->new('');
+    $vboxEnc->pack_start($w{lblEncoding}, 1, 1, 0);
 
-                my $sep = Gtk3::HSeparator->new;
-                $w{vbox1}->pack_start($sep, 0, 1, 5);
+    my $sep = Gtk3::HSeparator->new;
+    $w{vbox1}->pack_start($sep, 0, 1, 5);
 
-                $w{btnResetDefaults} = Gtk3::Button->new_with_label('Reset to DEFAULT values');
-                $w{vbox1}->pack_start($w{btnResetDefaults}, 0, 1, 0);
-                $w{btnResetDefaults}->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'menu') );
+    $w{btnResetDefaults} = Gtk3::Button->new_with_label('Reset to DEFAULT values');
+    $w{vbox1}->pack_start($w{btnResetDefaults}, 0, 1, 0);
+    $w{btnResetDefaults}->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'menu') );
 
     $$self{container} = $w{vbox};
     $$self{gui} = \%w;

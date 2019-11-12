@@ -21,6 +21,10 @@ package PACEdit;
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -318,7 +322,7 @@ sub _setupCallbacks {
             return 1;
         }
 
-        my $title = encode('unicode', _($self, 'entryKPXRE')->get_chars(0, -1) );
+        my $title = _($self, 'entryKPXRE')->get_chars(0,-1);
         my $where = $$self{_KPXWHERE}[_($self, 'comboKPXWhere')->get_active];
         my ($user, $pass, $comment, $created);
 
@@ -649,7 +653,7 @@ sub _updateGUIPreferences {
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
-    _($self, 'entryEditPrependCommand')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'prepend command'} // '') );
+    _($self, 'entryEditPrependCommand')->set_text($$self{_CFG}{'environments'}{$uuid}{'prepend command'} // '');
     _($self, 'entryEditPrependCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active);
     _($self, 'cbCfgQuoteCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'quote command'} // 0);
     _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active);
@@ -658,12 +662,12 @@ sub _updateGUIPreferences {
     _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'} // $CFG_DIR . '/session_logs');
     _($self, 'spEditSaveSessionLogs')->set_value($$self{_CFG}{'environments'}{$uuid}{'session logs amount'} // 10);
     _($self, 'fileCfgPublicKey')->set_uri('file://' . $$self{_CFG}{'environments'}{$uuid}{'public key'}) if  $$self{_CFG}{'environments'}{$uuid}{'public key'} ne '';
-    _($self, 'entryUserPassphrase')->set_text(decode('unicode', $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '') );
-    _($self, 'entryPassphrase')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '') );
+    _($self, 'entryUserPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '');
+    _($self, 'entryPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '');
     _($self, 'entryIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'ip'});
     _($self, 'entryPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'port'});
-    _($self, 'entryUser')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'user'}) );
-    _($self, 'entryPassword')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'pass'}) );
+    _($self, 'entryUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'user'});
+    _($self, 'entryPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'pass'});
     _($self, 'cbCfgAuthFallback')->set_active(! $$self{_CFG}{'environments'}{$uuid}{'auth fallback'});
     _($self, 'comboMethod')->set_active($$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'position'} // 4);
     _($self, 'imageMethod')->set_from_stock('pac-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
@@ -671,14 +675,14 @@ sub _updateGUIPreferences {
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'cbEditSendStringIntro')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string intro'});
-    _($self, 'entryEditSendString')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'send string txt'} // '') );
+    _($self, 'entryEditSendString')->set_text($$self{_CFG}{'environments'}{$uuid}{'send string txt'} // '');
     _($self, 'entryEditSendStringSeconds')-> set_value($$self{_CFG}{'environments'}{$uuid}{'send string every'} // 0);
     _($self, 'cbCfgAutoreconnect')->set_active($$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} // 0);
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
     _($self, 'cbInferUserPassKPX')->set_active(($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} // 0) && $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
-    _($self, 'entryKPXRE')->set_text(encode('unicode', $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} // ".*$$self{_CFG}{'environments'}{$uuid}{'title'}.*") );
+    _($self, 'entryKPXRE')->set_text($$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} // ".*$$self{_CFG}{'environments'}{$uuid}{'title'}.*");
     _($self, 'entryKPXRE')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
     _($self, 'btnCheckKPX')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
     _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);
@@ -778,12 +782,12 @@ sub _saveConfiguration {
     if        (_($self, 'rbCfgAuthUserPass')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';}
     elsif    (_($self, 'rbCfgAuthPublicKey')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'publickey';}
     elsif    (_($self, 'rbCfgAuthManual')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'manual';}
-    $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = encode('unicode', _($self, 'entryUserPassphrase')->get_chars(0, -1) );
-    $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = encode('unicode', _($self, 'entryPassphrase')->get_chars(0, -1) );
+    $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename // '';
     $$self{_CFG}{'environments'}{$uuid}{'public key'} =~ s/^(.+?\/\/)(.+)$/$2/go;
     $$self{_CFG}{'environments'}{$uuid}{'use prepend command'} = _($self, 'cbEditPrependCommand')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'prepend command'} = encode('unicode', _($self, 'entryEditPrependCommand')->get_chars(0, -1) );
+    $$self{_CFG}{'environments'}{$uuid}{'prepend command'} = _($self, 'entryEditPrependCommand')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'quote command'} = _($self, 'cbCfgQuoteCommand')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'use sudo'} = _($self, 'cbEditUseSudo')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'save session logs'} = _($self, 'cbEditSaveSessionLogs')->get_active;
@@ -792,13 +796,13 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'session logs amount'} = _($self, 'spEditSaveSessionLogs')->get_text;
     $$self{_CFG}{'environments'}{$uuid}{'ip'} = _($self, 'entryIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'port'} = _($self, 'entryPort')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'user'} = encode('unicode', _($self, 'entryUser')->get_chars(0, -1) );
-    $$self{_CFG}{'environments'}{$uuid}{'pass'} = encode('unicode', _($self, 'entryPassword')->get_property('text') );
+    $$self{_CFG}{'environments'}{$uuid}{'user'} = _($self, 'entryUser')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'pass'} = _($self, 'entryPassword')->get_property('text');
     $$self{_CFG}{'environments'}{$uuid}{'method'} = _($self, 'comboMethod')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'title'} = _($self, 'entryTabWindowTitle')->get_chars(0, -1) || "$$self{_CFG}{'environments'}{$uuid}{'name'} ";
     $$self{_CFG}{'environments'}{$uuid}{'auth fallback'} = ! _($self, 'cbCfgAuthFallback')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'send string active'} = _($self, 'cbEditSendString')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = encode('unicode', _($self, 'entryEditSendString')->get_chars(0, -1) );
+    $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = _($self, 'entryEditSendString')->get_chars(0,-1);
     $$self{_CFG}{'environments'}{$uuid}{'send string intro'} = _($self, 'cbEditSendStringIntro')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'send string every'} = _($self, 'entryEditSendStringSeconds')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} = _($self, 'cbCfgAutoreconnect')->get_active;
@@ -808,7 +812,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} = _($self, 'cbInferUserPassKPX')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} = encode('unicode', _($self, 'entryKPXRE')->get_chars(0, -1) );
+    $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} = _($self, 'entryKPXRE')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} = _($self, 'comboKPXWhere')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
 

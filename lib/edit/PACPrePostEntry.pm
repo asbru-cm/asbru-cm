@@ -20,6 +20,9 @@ package PACPrePostEntry;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -123,33 +126,33 @@ sub _buildPrePostGUI {
     # Build a vbox for:buttons, separator and expect widgets
     $w{vbox} = Gtk3::VBox->new(0, 0);
 
-        # Build a hbuttonbox for widgets actions (add, etc.)
-        $w{bbox} = Gtk3::HButtonBox->new();
-        $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
-        $w{bbox}->set_layout('GTK_BUTTONBOX_START');
+    # Build a hbuttonbox for widgets actions (add, etc.)
+    $w{bbox} = Gtk3::HButtonBox->new();
+    $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{bbox}->set_layout('GTK_BUTTONBOX_START');
 
-            # Build 'add' button
-            $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
-            $w{bbox}->add($w{btnadd});
+    # Build 'add' button
+    $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
+    $w{bbox}->add($w{btnadd});
 
-        # Build a separator
-        $w{sep} = Gtk3::HSeparator->new();
-        $w{vbox}->pack_start($w{sep}, 0, 1, 5);
+    # Build a separator
+    $w{sep} = Gtk3::HSeparator->new();
+    $w{vbox}->pack_start($w{sep}, 0, 1, 5);
 
-        # Build a scrolled window
-        $w{sw} = Gtk3::ScrolledWindow->new();
-        $w{vbox}->pack_start($w{sw}, 1, 1, 0);
-        $w{sw}->set_policy('automatic', 'automatic');
-        $w{sw}->set_shadow_type('none');
+    # Build a scrolled window
+    $w{sw} = Gtk3::ScrolledWindow->new();
+    $w{vbox}->pack_start($w{sw}, 1, 1, 0);
+    $w{sw}->set_policy('automatic', 'automatic');
+    $w{sw}->set_shadow_type('none');
 
-            $w{vp} = Gtk3::Viewport->new();
-            $w{sw}->add($w{vp});
-            $w{vp}->set_property('border-width', 5);
-            $w{vp}->set_shadow_type('none');
+    $w{vp} = Gtk3::Viewport->new();
+    $w{sw}->add($w{vp});
+    $w{vp}->set_property('border-width', 5);
+    $w{vp}->set_shadow_type('none');
 
-                # Build and add the vbox that will contain the expect widgets
-                $w{vbexec} = Gtk3::VBox->new(0, 0);
-                $w{vp}->add($w{vbexec});
+    # Build and add the vbox that will contain the expect widgets
+    $w{vbexec} = Gtk3::VBox->new(0, 0);
+    $w{vp}->add($w{vbexec});
 
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
@@ -189,26 +192,26 @@ sub _buildPrePost {
     # Make an HBox to contain checkbox and entry
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-        # Build checkbox
-        $w{ask} = Gtk3::CheckButton->new_with_label('Ask: ' . ($ask ? 'YES' : 'NO') );
-        $w{hbox}->pack_start($w{ask}, 0, 1, 0);
-        $w{ask}->set_active($ask);
+    # Build checkbox
+    $w{ask} = Gtk3::CheckButton->new_with_label('Ask: ' . ($ask ? 'YES' : 'NO') );
+    $w{hbox}->pack_start($w{ask}, 0, 1, 0);
+    $w{ask}->set_active($ask);
 
-        # Build checkbox
-        $w{default} = Gtk3::CheckButton->new_with_label('Default: ' . ($def ? 'YES' : 'NO') );
-        $w{hbox}->pack_start($w{default}, 0, 1, 0);
-        $w{default}->set_active($def);
+    # Build checkbox
+    $w{default} = Gtk3::CheckButton->new_with_label('Default: ' . ($def ? 'YES' : 'NO') );
+    $w{hbox}->pack_start($w{default}, 0, 1, 0);
+    $w{default}->set_active($def);
 
-        # Build entry
-        $w{command} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{command}, 1, 1, 0);
-        $w{command}->set_icon_from_stock('primary', 'gtk-execute');
-        $w{command}->set_text($command);
-        $w{default}->set_sensitive($command ne '');
+    # Build entry
+    $w{command} = Gtk3::Entry->new;
+    $w{hbox}->pack_start($w{command}, 1, 1, 0);
+    $w{command}->set_icon_from_stock('primary', 'gtk-execute');
+    $w{command}->set_text($command);
+    $w{default}->set_sensitive($command ne '');
 
-        # Build delete button
-        $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
-        $w{hbox}->pack_start($w{btn}, 0, 1, 0);
+    # Build delete button
+    $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
+    $w{hbox}->pack_start($w{btn}, 0, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbexec}->pack_start($w{hbox}, 0, 1, 0);
@@ -312,19 +315,19 @@ sub _buildPrePost {
 
         # Populate with PAC internal variables
         my @int_variables_menu;
-        push(@int_variables_menu, {label => "UUID",        code => sub {$w{command}->insert_text("<UUID>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIMESTAMP",    code => sub {$w{command}->insert_text("<TIMESTAMP>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_Y",        code => sub {$w{command}->insert_text("<DATE_Y>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_M",        code => sub {$w{command}->insert_text("<DATE_M>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_D",        code => sub {$w{command}->insert_text("<DATE_D>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_H",        code => sub {$w{command}->insert_text("<TIME_H>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_M",        code => sub {$w{command}->insert_text("<TIME_M>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_S",        code => sub {$w{command}->insert_text("<TIME_S>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "NAME",        code => sub {$w{command}->insert_text("<NAME>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TITLE",        code => sub {$w{command}->insert_text("<TITLE>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "IP",            code => sub {$w{command}->insert_text("<IP>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "USER",        code => sub {$w{command}->insert_text("<USER>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "PASS",        code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "UUID",code => sub {$w{command}->insert_text("<UUID>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{command}->insert_text("<TIMESTAMP>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{command}->insert_text("<DATE_Y>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "DATE_M",code => sub {$w{command}->insert_text("<DATE_M>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "DATE_D",code => sub {$w{command}->insert_text("<DATE_D>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "TIME_H",code => sub {$w{command}->insert_text("<TIME_H>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "TIME_M",code => sub {$w{command}->insert_text("<TIME_M>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "TIME_S",code => sub {$w{command}->insert_text("<TIME_S>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "NAME",code => sub {$w{command}->insert_text("<NAME>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "TITLE",code => sub {$w{command}->insert_text("<TITLE>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "IP",code => sub {$w{command}->insert_text("<IP>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "USER",code => sub {$w{command}->insert_text("<USER>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "PASS",code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
         push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
 
         # Populate with <KPX_(title|username|url):*> special string
