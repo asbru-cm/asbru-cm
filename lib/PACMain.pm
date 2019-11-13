@@ -3521,7 +3521,13 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        $$self{_GUI}{descBuffer}->set_text("Connection to " . ($$self{_CFG}{'environments'}{$uuid}{'title'} // ''));
+        my $msg;
+        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
+            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
+        } else {
+            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
+        }
+        $$self{_GUI}{descBuffer}->set_text($msg);
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
