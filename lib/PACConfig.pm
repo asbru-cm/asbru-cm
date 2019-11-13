@@ -201,6 +201,8 @@ sub _initGUI {
 
 sub _setupCallbacks {
     my $self = shift;
+    my $tabs_on_main =  _($self,'cbCfgTabsInMain')->get_active;
+
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
@@ -439,6 +441,28 @@ sub _setupCallbacks {
 
     $$self{_WINDOWCONFIG}->signal_connect('delete_event' => sub {_($self, 'btnCloseConfig')->clicked; return 1;});
     $$self{_WINDOWCONFIG}->signal_connect('key_press_event' => sub {my ($widget, $event) = @_; $event->keyval == 65307 and $$self{_WINDOWCONFIG}->hide; return 0;});
+
+    # Layout signal
+    _($self, 'comboLayout')->signal_connect('changed' => sub {
+        if (_($self, 'comboLayout')->get_active_text eq 'Traditional') {
+            _($self,'frameTabsInMainWindow')->show();
+            _($self,'frameTabsInMainWindow')->show();
+            _($self,'cbCfgStartMainMaximized')->show();
+            _($self,'cbCfgRememberSize')->show();
+            _($self,'cbCfgSaveOnExit')->show();
+            _($self,'cbCfgStartIconified')->show();
+            _($self,'cbCfgCloseToTray')->show();
+        } else {
+            _($self,'frameTabsInMainWindow')->hide();
+            _($self,'cbCfgStartMainMaximized')->hide();
+            _($self,'cbCfgRememberSize')->hide();
+            _($self,'cbCfgSaveOnExit')->hide();
+            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+                _($self,'cbCfgStartIconified')->hide();
+                _($self,'cbCfgCloseToTray')->hide();
+            }
+        }
+    });
 
     return 1;
 }
@@ -729,6 +753,19 @@ sub _updateGUIPreferences {
     if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
         _($self, 'lblRestartRequired')->set_text("(*) Requires restarting PAC for the change(s) to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text // '') );
     }
+
+    # Hide show options not available on choosen layout
+    if ($$cfg{'defaults'}{'layout'} eq 'Compact') {
+        _($self,'frameTabsInMainWindow')->hide();
+        _($self,'cbCfgStartMainMaximized')->hide();
+        _($self,'cbCfgRememberSize')->hide();
+        _($self,'cbCfgSaveOnExit')->hide();
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            _($self,'cbCfgStartIconified')->hide();
+            _($self,'cbCfgCloseToTray')->hide();
+        }
+    }
+
     return 1;
 }
 
