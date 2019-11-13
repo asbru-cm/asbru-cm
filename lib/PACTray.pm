@@ -161,6 +161,7 @@ sub _setupCallbacks {
 sub _pos {
     my ($self,$event) = @_;
     my $h = $$self{_MAIN}{_GUI}{main}->size_request->height;
+    my $w = $$self{_MAIN}{_GUI}{main}->size_request->width/2;
     my $ymax = $event->get_screen->get_height;
     my $dy = $event->window->get_height;
     my ($x, $y) = $event->window->get_origin;
@@ -175,7 +176,7 @@ sub _pos {
         # Below the event widget
         $y += $dy;
     }
-    return ($x - 120,$y);
+    return ($x - $w,$y);
 }
 
 sub _trayMenu {

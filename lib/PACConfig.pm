@@ -208,6 +208,7 @@ sub _setupCallbacks {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
                 symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
                 1;
+            };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active) {
             unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;

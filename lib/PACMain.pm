@@ -442,11 +442,7 @@ sub _initGUI {
 
     # Create a vbox3: actions, connections and other tools
     $$self{_GUI}{vbox3} = Gtk3::VBox->new(0, 0);
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{vbox3}->set_size_request(50, -1);
-    } else {
-        $$self{_GUI}{vbox3}->set_size_request(200, -1);
-    }
+    $$self{_GUI}{vbox3}->set_size_request(200, -1);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox3}, 0, 0);
     } else {
@@ -510,7 +506,10 @@ sub _initGUI {
     $$self{_GUI}{nbTreeTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new;
     $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('pac-treelist', 'button'), 0, 1, 0);
-    $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
+    }
+    $$self{_GUI}{nbTreeTab}->set_tooltip_text('Connection Tree');
     $$self{_GUI}{nbTreeTab}->show_all;
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll1}, $$self{_GUI}{nbTreeTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll1}, 1);
@@ -580,7 +579,9 @@ sub _initGUI {
     $$self{_GUI}{nbFavTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbFavTabLabel} = Gtk3::Label->new;
     $$self{_GUI}{nbFavTab}->pack_start(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'), 0, 1, 0);
-    $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
+    }
     $$self{_GUI}{nbFavTab}->show_all;
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll2}, $$self{_GUI}{nbFavTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll2}, 1);
@@ -611,7 +612,9 @@ sub _initGUI {
     $$self{_GUI}{nbHistTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbHistTabLabel} = Gtk3::Label->new;
     $$self{_GUI}{nbHistTab}->pack_start(Gtk3::Image->new_from_stock('pac-history', 'button'), 0, 1, 0);
-    $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
+    }
     $$self{_GUI}{nbHistTab}->show_all;
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll3}, $$self{_GUI}{nbHistTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll3}, 1);
@@ -841,15 +844,12 @@ sub _initGUI {
     # Create configBtn button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{configBtn} = Gtk3::Button->new();
-    } else {
-        $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
-    }
-    $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     } else {
+        $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     }
+    $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
     $$self{_GUI}{configBtn}->set('can-focus' => 0);
     $$self{_GUI}{configBtn}->set_tooltip_text('Open the general preferences control');
 
@@ -3596,7 +3596,13 @@ sub _updateGUIWithUUID {
 
 ”);
     } else {
-        $$self{_GUI}{descBuffer}->set_text("Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}");
+        my $msg;
+        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
+            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
+        } else {
+            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
+        }
+        $$self{_GUI}{descBuffer}->set_text($msg);
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
@@ -4647,8 +4653,8 @@ sub _ApplyLayout {
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
         }
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
-        $$self{_GUI}{main}->set_default_size(130,600);
-        $$self{_GUI}{main}->resize(130,600);
+        $$self{_GUI}{main}->set_default_size(220,600);
+        $$self{_GUI}{main}->resize(220,600);
     } else {
         # Traditional
         if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
