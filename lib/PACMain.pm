@@ -4655,7 +4655,6 @@ sub _setSafeLayoutOptions {
         # Traditional
         if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
             # Load current traditional options that are changed in Compact mode
-            print STDERR "Saving traditional layout configurations\n";
             $$self{_CFG}{'defaults'}{'lt tabs in main window'} = $$self{_CFG}{'defaults'}{'tabs in main window'};
             $$self{_CFG}{'defaults'}{'layout traditional settings'} = 1;
             $$self{_CFG}{'defaults'}{'lt start iconified'} = $$self{_CFG}{'defaults'}{'start iconified'};
@@ -4663,7 +4662,6 @@ sub _setSafeLayoutOptions {
             $$self{_CFG}{'defaults'}{'lt auto save'} = $$self{_CFG}{'defaults'}{'auto save'};
         } elsif (($$self{_CFG}{'defaults'}{'layout previous'} ne $layout) && (defined defined $$self{_CFG}{'defaults'}{'layout traditional settings'})) {
             # Recover previous know settings after comming back from compact layout
-            print STDERR "Recover traditional layout configurations\n";
             $$self{_CFG}{'defaults'}{'tabs in main window'} = $$self{_CFG}{'defaults'}{'lt tabs in main window'};
             $$self{_CFG}{'defaults'}{'start iconified'} = $$self{_CFG}{'defaults'}{'lt start iconified'};
             $$self{_CFG}{'defaults'}{'close to tray'} = $$self{_CFG}{'defaults'}{'lt close to tray'};
