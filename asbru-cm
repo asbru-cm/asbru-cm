@@ -153,13 +153,13 @@ for (my $n = 1; $n < 5; $n++) {
     }
 }
 
+getDesktopEnvironment();
+
 # Start Àsbrú Connection Manager :)
 if (!($ASBRU = PACMain -> new(@ARGV))) {
     print STDERR "WARN: Ásbrú aborted.\n";
     exit 0
 }
-
-getDesktopEnvironment();
 
 $ASBRU->start;
 

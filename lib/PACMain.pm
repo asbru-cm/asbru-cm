@@ -178,6 +178,9 @@ sub new {
     PACUtils::_splash(1, "Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     _readConfiguration($self);
 
+    # Set conflictive layout options as early as possible
+    _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
+
     map({
     if (/^--dump-uuid=(.+)$/) {
         require Data::Dumper;
@@ -343,6 +346,9 @@ sub start {
     # Show main interface
     $$self{_GUI}{main}->show_all;
 
+    # Apply Layout as early as possible
+    $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
+
     # Autostart selected connections
     my @idx;
     grep({ $$self{_CFG}{'environments'}{$_}{'startup launch'} and push(@idx, [ $_ ]); } keys %{ $$self{_CFG}{'environments'} });
@@ -406,7 +412,7 @@ sub start {
     # Auto start Scripts window
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
 
-    $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
+    #$self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
 
     # Goto GTK's event loop
     Gtk3->main;
@@ -4631,32 +4637,20 @@ sub _sendAppMessage {
     $app->open ([], $msg.'|'.$text);
 }
 
-sub _ApplyLayout {
+# Set and recover conflictive options
+sub _setSafeLayoutOptions {
     my ($self,$layout) = @_;
 
     if ($layout eq 'Compact') {
         # This layout to work implies some configuration settings to work correctly
-        #print STDERR "INFO: Layout Desktop set = $ENV{'ASBRU_DESKTOP'}\n";
         $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
-        $$self{_CFG}{'defaults'}{'auto save'} = 1;
-        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
-            $$self{_GUI}{$e}->hide();
-        }
+        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
-            if (!$$self{_GUI}{main}->get_visible) {
-                $self->_showConnectionsList;
-            }
         } else {
-            if ($$self{_GUI}{main}->get_visible) {
-                $self->_hideConnectionsList;
-            }
             $$self{_CFG}{'defaults'}{'start iconified'} = 1;
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
         }
-        $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
-        $$self{_GUI}{main}->set_default_size(220,600);
-        $$self{_GUI}{main}->resize(220,600);
     } else {
         # Traditional
         if ((!defined $$self{_CFG}{'defaults'}{'layout traditional settings'})||($$self{_CFG}{'defaults'}{'layout previous'} eq $layout)) {
@@ -4677,6 +4671,29 @@ sub _ApplyLayout {
         }
     }
     $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
+}
+
+# Apply layout to window and widgets
+sub _ApplyLayout {
+    my ($self,$layout) = @_;
+
+    if ($layout eq 'Compact') {
+        # This layout to work implies some configuration settings to work correctly
+        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+            $$self{_GUI}{$e}->hide();
+        }
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            if (!$$self{_GUI}{main}->get_visible) {
+                $self->_showConnectionsList;
+            }
+        } else {
+            if ($$self{_GUI}{main}->get_visible) {
+                $self->_hideConnectionsList;
+            }
+        }
+        $$self{_GUI}{main}->set_default_size(220,600);
+        $$self{_GUI}{main}->resize(220,600);
+    }
 }
 
 # END: Define PRIVATE CLASS functions
