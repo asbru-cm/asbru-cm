@@ -2276,7 +2276,8 @@ sub _setTabColour {
     my $i = shift // 1;
 
     # Auto take screenshots of connections without any of them
-    if (!(defined $$self{_TAKE_SCREENSHOT} || scalar(@{$$self{_CFG}{environments}{$$self{_UUID}}{screenshots}}))) {
+    # Disable auto screen shots on compact mode
+    if (($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') && (defined $$self{_TAKE_SCREENSHOT} && scalar(@{$$self{_CFG}{environments}{$$self{_UUID}}{screenshots}}))) {
         if (($$self{_UUID} ne '__PAC__QUICK__CONNECT__') && ($$self{_UUID} ne '__PAC_SHELL__') && $$self{'_CFG'}{'defaults'}{'show screenshots'}) {
             $$self{_TAKE_SCREENSHOT} = Glib::Timeout->add_seconds($$self{_CFG}{environments}{$$self{_UUID}}{method} =~ /rdesktop|RDP/go ? 10 : 2, sub {
                 if ((! $$self{CONNECTED}) || (! $$self{_FOCUSED})) {
@@ -2982,7 +2983,8 @@ sub _setupTabDND {
     my @targets = (Gtk3::TargetEntry->new('PAC Tabbed', [], 0));
     $$self{_GUI}{_TABLBL}->drag_source_set('GDK_BUTTON1_MASK', \@targets, ['move']);
     $$self{_GUI}{_TABLBL}->signal_connect('drag_begin' => sub {
-        $_[1]->set_icon_pixbuf(_scale(_screenshot($widget), 128, 128, 1), 0, 0);
+        # Does not work anymore on Gtk3
+        #$_[1]->set_icon_pixbuf(_scale(_screenshot($widget), 128, 128, 1), 0, 0);
         my $i = $$self{_NOTEBOOK}->page_num($$self{_GUI}{_VBOX});
         $PACMain::FUNCS{_MAIN}{DND}{source_tab} = $$self{_NOTEBOOK}->get_nth_page($i);
     });
