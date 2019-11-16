@@ -1034,6 +1034,9 @@ sub _setupCallbacks {
 
             my ($bx, $by) = $$self{_GUI}{$what}->convert_widget_to_bin_window_coords($x, $y);
             my ($path, $col, $cx, $cy) = $$self{_GUI}{$what}->get_path_at_pos($bx, $by);
+            if (!$path) {
+                return 0;
+            }
             my $model = $$self{_GUI}{$what}->get_model;
             my $uuid = $model->get_value($model->get_iter($path), 2);
 
@@ -1054,7 +1057,7 @@ sub _setupCallbacks {
                 }
                 ++$total_exp;
             }
-            my $string = "- <b>Name</b>: $name\n";
+            my $string = "- <b>Name</b>: @{[__($name)]}\n";
             $string .= "- <b>Method</b>: $method\n";
             $string .= "- <b>IP / port</b>: $ip / $port\n";
             $string .= "- <b>User</b>: $user";
@@ -1062,7 +1065,6 @@ sub _setupCallbacks {
                 $string .= "- With $total_exp active <b>Expects</b>";
             }
             $string = _subst($string, $$self{_CFG}, $uuid);
-            $tooltip_widget->set_icon_from_stock("pac-method-$method", 'button');
             $tooltip_widget->set_markup($string);
 
             return 1;
@@ -3521,7 +3523,13 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        $$self{_GUI}{descBuffer}->set_text("Connection to " . ($$self{_CFG}{'environments'}{$uuid}{'title'} // ''));
+        my $msg;
+        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
+            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
+        } else {
+            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
+        }
+        $$self{_GUI}{descBuffer}->set_text($msg);
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
