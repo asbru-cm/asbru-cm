@@ -188,10 +188,6 @@ sub CheckConfigurationFile {
         # No configuration file, do not check anyting, it's probably the first time we start Ásbrú
         return;
     }
-    # Create backup dir if it does not exists
-    if (!-d "$CFG_DIR/$BACKUP_DIR") {
-        mkdir "$CFG_DIR/$BACKUP_DIR";
-    }
     eval {
         $cfg = YAML::LoadFile($CFG_FILE);
     };
