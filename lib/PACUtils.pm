@@ -20,6 +20,9 @@ package PACUtils;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -114,7 +117,7 @@ require Exporter;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-our $APPNAME = decode('UTF-8', 'Ásbrú Connection Manager');
+our $APPNAME = 'Ásbrú Connection Manager';
 our $APPVERSION = '6.0.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
@@ -1946,7 +1949,7 @@ sub _wSetPACPassword {
         return 0;
     }
 
-    $$self{_CFG}{'defaults'}{'gui password'} = $CIPHER->encrypt_hex($new_pass1) ;
+    $$self{_CFG}{'defaults'}{'gui password'} = $CIPHER->encrypt_hex($new_pass1);
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
 
     return 1;
@@ -2096,7 +2099,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'auto cluster'} //= {};
 
     if (! defined $$cfg{'defaults'}{'keepass'} && -f "$ENV{'HOME'}/.config/keepassx/config.ini") {
-        open (F, "$ENV{'HOME'}/.config/keepassx/config.ini");
+        open (F,"<:utf8","$ENV{'HOME'}/.config/keepassx/config.ini");
         my @conf = <F>;
         close F;
         my ($lastfile) = grep(/^LastFile\=(.+)/, @conf);
@@ -2639,14 +2642,14 @@ sub _cipherCFG {
 
     foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
         if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
-            $$cfg{'defaults'}{'global variables'}{$var}{'value'} = $CIPHER->encrypt_hex(encode('utf8', $$cfg{'defaults'}{'global variables'}{$var}{'value'}));
+            $$cfg{'defaults'}{'global variables'}{$var}{'value'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'global variables'}{$var}{'value'}));
         }
     }
 
     if (defined $$cfg{'defaults'}{'keepass'}) {
-        $$cfg{'defaults'}{'keepass'}{'password'} = $CIPHER->encrypt_hex(encode('utf8', $$cfg{'defaults'}{'keepass'}{'password'}));
+        $$cfg{'defaults'}{'keepass'}{'password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'keepass'}{'password'}));
     }
-    $$cfg{'defaults'}{'sudo password'} = $CIPHER->encrypt_hex(encode('utf8', $$cfg{'defaults'}{'sudo password'}));
+    $$cfg{'defaults'}{'sudo password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'sudo password'}));
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
         if ($uuid =~ /^HASH/go) {
@@ -2657,18 +2660,18 @@ sub _cipherCFG {
             delete $$cfg{'environments'}{$uuid}{'pass'};
             next;
         }
-        $$cfg{'environments'}{$uuid}{'pass'} = $CIPHER->encrypt_hex(encode('utf8', $$cfg{'environments'}{$uuid}{'pass'}));
-        $$cfg{'environments'}{$uuid}{'passphrase'} = $CIPHER->encrypt_hex(encode('utf8', $$cfg{'environments'}{$uuid}{'passphrase'}));
+        $$cfg{'environments'}{$uuid}{'pass'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'pass'}));
+        $$cfg{'environments'}{$uuid}{'passphrase'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'passphrase'}));
 
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
             if ($$hash{'hidden'} eq '1') {
-                $$hash{'send'} = $CIPHER->encrypt_hex(encode('utf8', $$hash{'send'}));
+                $$hash{'send'} = $CIPHER->encrypt_hex(encode('UTF-8',$$hash{'send'}));
             }
         }
 
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'variables'}}) {
             if ($$hash{'hide'} eq '1') {
-                $$hash{'txt'} = $CIPHER->encrypt_hex(encode('utf8', $$hash{'txt'}));
+                $$hash{'txt'} = $CIPHER->encrypt_hex(encode('UTF-8',$$hash{'txt'}));
             }
         }
     }
@@ -2684,7 +2687,7 @@ sub _decipherCFG {
         foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
             if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
                 eval {
-                    $$cfg{'defaults'}{'global variables'}{$var}{'value'} = decode('utf8', $CIPHER->decrypt_hex($$cfg{'defaults'}{'global variables'}{$var}{'value'}));
+                    $$cfg{'defaults'}{'global variables'}{$var}{'value'} = decode('UTF-8',$CIPHER->decrypt_hex($$cfg{'defaults'}{'global variables'}{$var}{'value'}));
                 };
             }
         }
@@ -2692,11 +2695,11 @@ sub _decipherCFG {
 
     if (defined $$cfg{'defaults'}{'keepass'}) {
         eval {
-            $$cfg{'defaults'}{'keepass'}{'password'} = decode('utf8', $CIPHER->decrypt_hex($$cfg{'defaults'}{'keepass'}{'password'}));
+            $$cfg{'defaults'}{'keepass'}{'password'} = decode('UTF-8',$CIPHER->decrypt_hex($$cfg{'defaults'}{'keepass'}{'password'}));
         };
     }
     eval {
-        $$cfg{'defaults'}{'sudo password'} = decode('utf8', $CIPHER->decrypt_hex($$cfg{'defaults'}{'sudo password'}));
+        $$cfg{'defaults'}{'sudo password'} = decode('UTF-8',$CIPHER->decrypt_hex($$cfg{'defaults'}{'sudo password'}));
     };
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
@@ -2708,13 +2711,13 @@ sub _decipherCFG {
             delete $$cfg{'environments'}{$uuid}{'pass'};
             next;
         }
-        eval {$$cfg{'environments'}{$uuid}{'pass'} = decode('utf8', $CIPHER->decrypt_hex($$cfg{'environments'}{$uuid}{'pass'}));};
-        eval {$$cfg{'environments'}{$uuid}{'passphrase'} = decode('utf8', $CIPHER->decrypt_hex($$cfg{'environments'}{$uuid}{'passphrase'}));};
+        eval {$$cfg{'environments'}{$uuid}{'pass'} = decode('UTF-8',$CIPHER->decrypt_hex($$cfg{'environments'}{$uuid}{'pass'}));};
+        eval {$$cfg{'environments'}{$uuid}{'passphrase'} = decode('UTF-8',$CIPHER->decrypt_hex($$cfg{'environments'}{$uuid}{'passphrase'}));};
 
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
             if ($$hash{'hidden'} eq '1') {
                 eval {
-                    $$hash{'send'} = decode('utf8', $CIPHER->decrypt_hex($$hash{'send'}));
+                    $$hash{'send'} = $CIPHER->decrypt_hex(encode('UTF-8',$$hash{'send'}));
                 };
             }
         }
@@ -2722,7 +2725,7 @@ sub _decipherCFG {
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'variables'}}) {
             if ($$hash{'hide'} eq '1') {
                 eval {
-                    $$hash{'txt'} = decode('utf8', $CIPHER->decrypt_hex($$hash{'txt'}));
+                    $$hash{'txt'} = $CIPHER->decrypt_hex(encode('UTF-8',$$hash{'txt'}));
                 };
             }
         }
@@ -3420,7 +3423,9 @@ sub _getREADME {
 
 sub _checkREADME {
     my $readme_file = "$CFG_DIR/tmp/latest_README";
-    open F, $readme_file or return 0;
+    if (!open(F,"<:utf8",$readme_file)) {
+        return 0;
+    }
     my @readme;
     while(my $line = <F>) {
         chomp $line;
@@ -3795,7 +3800,9 @@ sub _makeDesktopFile {
         $da .= "Exec=asbru --start-uuid=$uuid\n";
     }
 
-    open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
+    if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/pac.desktop")) {
+        return 0;
+    }
     print F "$d\n$dal\n$da\n";
     close F;
     system('/usr/bin/xdg-desktop-menu forceupdate &');
@@ -3842,16 +3849,22 @@ sub _vteFeedChild {
 
     use bytes;
     my $b = length($str);
+    my @arr = unpack ('C*', $str);
+
     if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
         # Newer version only requires 1 parameter
-        my @arr = unpack ('C*', $str);
         $vte->feed_child(\@arr);
     } elsif (Vte::get_major_version() >= 1 or Vte::get_minor_version() == 52) {
         # Some distros have a special patched version of v0.52 that still requires 2 parameters; some others only one
         # Not nice but let's ignore the warning for that special case
         # See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501
-        local $SIG{__WARN__} = sub {};
-        $vte->feed_child($str, $b);
+        eval {
+            local $SIG{__WARN__} = sub {};
+            $vte->feed_child($str, $b);
+            1;
+        } or do {
+            $vte->feed_child(\@arr);
+        };
     } else {
         # Elder versions requires 2 parameters
         $vte->feed_child($str, $b);

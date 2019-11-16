@@ -21,6 +21,10 @@ package PACGlobalVarEntry;
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
 
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
+
 $|++;
 
 ###################################################################
@@ -82,7 +86,9 @@ sub update {
     $$self{list} = [];
 
     # Now, add the -new?- widgets
-    foreach my $var (sort {$a cmp $b} keys %{$$self{cfg}}) {_buildVar($self, $var, $$self{cfg}{$var}{'value'}, $$self{cfg}{$var}{'hidden'});}
+    foreach my $var (sort {$a cmp $b} keys %{$$self{cfg}}) {
+        _buildVar($self, $var, $$self{cfg}{$var}{'value'},$$self{cfg}{$var}{'hidden'});
+    }
 
     return 1;
 }
@@ -93,7 +99,9 @@ sub get_cfg {
     my %hash;
 
     foreach my $w (@{$self->{list}}) {
-        next if $$w{var}->get_chars(0, -1) eq '';
+        if ($$w{var}->get_chars(0, -1) eq '') {
+            next;
+        }
         $hash{$$w{var}->get_chars(0, -1)}{'value'} = $$w{val}->get_chars(0, -1);
         $hash{$$w{var}->get_chars(0, -1)}{'hidden'} = $$w{hide}->get_active;
     }
@@ -109,41 +117,39 @@ sub get_cfg {
 
 sub _buildVarGUI {
     my $self = shift;
-
     my $cfg = $self->{cfg};
-
     my %w;
 
     # Build a vbox for:buttons, separator and expect widgets
     $w{vbox} = Gtk3::VBox->new(0, 0);
 
-        # Build a hbuttonbox for widgets actions (add, etc.)
-        $w{bbox} = Gtk3::HButtonBox->new();
-        $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
-        $w{bbox}->set_layout('GTK_BUTTONBOX_START');
+    # Build a hbuttonbox for widgets actions (add, etc.)
+    $w{bbox} = Gtk3::HButtonBox->new();
+    $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{bbox}->set_layout('GTK_BUTTONBOX_START');
 
-            # Build 'add' button
-            $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
-            $w{bbox}->add($w{btnadd});
+    # Build 'add' button
+    $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
+    $w{bbox}->add($w{btnadd});
 
-        # Build a separator
-        $w{sep} = Gtk3::HSeparator->new();
-        $w{vbox}->pack_start($w{sep}, 0, 1, 5);
+    # Build a separator
+    $w{sep} = Gtk3::HSeparator->new();
+    $w{vbox}->pack_start($w{sep}, 0, 1, 5);
 
-        # Build a scrolled window
-        $w{sw} = Gtk3::ScrolledWindow->new();
-        $w{vbox}->pack_start($w{sw}, 1, 1, 0);
-        $w{sw}->set_policy('automatic', 'automatic');
-        $w{sw}->set_shadow_type('none');
+    # Build a scrolled window
+    $w{sw} = Gtk3::ScrolledWindow->new();
+    $w{vbox}->pack_start($w{sw}, 1, 1, 0);
+    $w{sw}->set_policy('automatic', 'automatic');
+    $w{sw}->set_shadow_type('none');
 
-            $w{vp} = Gtk3::Viewport->new();
-            $w{sw}->add($w{vp});
-            $w{vp}->set_property('border-width', 5);
-            $w{vp}->set_shadow_type('none');
+    $w{vp} = Gtk3::Viewport->new();
+    $w{sw}->add($w{vp});
+    $w{vp}->set_property('border-width', 5);
+    $w{vp}->set_shadow_type('none');
 
-                # Build and add the vbox that will contain the expect widgets
-                $w{vbvar} = Gtk3::VBox->new(0, 0);
-                $w{vp}->add($w{vbvar});
+    # Build and add the vbox that will contain the expect widgets
+    $w{vbvar} = Gtk3::VBox->new(0, 0);
+    $w{vp}->add($w{vbvar});
 
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
@@ -182,34 +188,34 @@ sub _buildVar {
     # Make an HBox to contain label, entry and del button
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-        # Build label
-        $w{lbl1} = Gtk3::Label->new('Variable:');
-        $w{hbox}->pack_start($w{lbl1}, 0, 1, 0);
+    # Build label
+    $w{lbl1} = Gtk3::Label->new('Variable:');
+    $w{hbox}->pack_start($w{lbl1}, 0, 1, 0);
 
-        # Build entry
-        $w{var} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{var}, 0, 1, 0);
-        $w{var}->set_text($var);
+    # Build entry
+    $w{var} = Gtk3::Entry->new;
+    $w{hbox}->pack_start($w{var}, 0, 1, 0);
+    $w{var}->set_text($var);
 
-        # Build label
-        $w{lbl2} = Gtk3::Label->new(' Value:');
-        $w{hbox}->pack_start($w{lbl2}, 0, 1, 0);
+    # Build label
+    $w{lbl2} = Gtk3::Label->new(' Value:');
+    $w{hbox}->pack_start($w{lbl2}, 0, 1, 0);
 
-        # Build entry
-        $w{val} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{val}, 1, 1, 0);
-        $w{val}->set_text($val);
+    # Build entry
+    $w{val} = Gtk3::Entry->new;
+    $w{hbox}->pack_start($w{val}, 1, 1, 0);
+    $w{val}->set_text($val);
 
-        $w{hide} = Gtk3::CheckButton->new('Hide');
-        $w{hbox}->pack_start($w{hide}, 0, 1, 0);
-        $w{hide}->set_active($hide);
-        $w{hide}->signal_connect(toggled => sub {$w{val}->set_visibility(! $w{hide}->get_active);});
+    $w{hide} = Gtk3::CheckButton->new('Hide');
+    $w{hbox}->pack_start($w{hide}, 0, 1, 0);
+    $w{hide}->set_active($hide);
+    $w{hide}->signal_connect(toggled => sub {$w{val}->set_visibility(! $w{hide}->get_active);});
 
-        $w{val}->set_visibility(! $w{hide}->get_active);
+    $w{val}->set_visibility(! $w{hide}->get_active);
 
-        # Build delete button
-        $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
-        $w{hbox}->pack_start($w{btn}, 0, 1, 0);
+    # Build delete button
+    $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
+    $w{hbox}->pack_start($w{btn}, 0, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbvar}->pack_start($w{hbox}, 0, 1, 0);

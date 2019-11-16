@@ -20,6 +20,9 @@ package PACTerminal;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -299,10 +302,10 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
+    my $title = encode('UTF-8',$$self{_CFG}{'environments'}{$$self{_UUID}}{'title'});
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
 
-    my $string = $method eq 'generic' ? encode('utf8',"LAUNCHING '$title'") : encode('utf8',"CONNECTING WITH '$title'");
+    my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
     _vteFeed($$self{_GUI}{_VTE}, "\e[1;32m\r\n $string (" . (localtime(time)) . ") =->\e[0m\r\n\n");
 
     $$self{_PULSE} = 1;
@@ -958,7 +961,7 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
+        my $keyval = Gtk3::Gdk::keyval_name($event->keyval) // '';
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
         my $state = $event->get_state;
         my $shift = $state * ['shift-mask'];
@@ -3118,7 +3121,9 @@ sub _pipeExecOutput {
         return 1;
     }
     foreach my $cmd (@{$pipe}) {
-        open F, ">$$self{_TMPPIPE}"; print F $out; close F;
+        open(F,">:utf8",$$self{_TMPPIPE});
+        print F $out;
+        close F;
         $out = `cat $$self{_TMPPIPE} | $cmd 2>&1`;
     }
     $$self{_EXEC}{OUT} = $out;
@@ -3906,20 +3911,21 @@ sub _updateCFG {
 
 sub _wFindInTerminal {
     my $self = shift;
-
     our $searching = 0;
     our $stop = 0;
     our %w;
+    my $text;
 
     if (defined $w{window}) {
         # Load the contents of the textbuffer with the corresponding log file
-        open(F, $$self{_LOGFILE}) or die("ERROR: Could not open file '$$self{_LOGFILE}': $!");
-        @{$$self{_TEXT}} = <F>;
-        my $text = join('', @{$$self{_TEXT}});
-        $text =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-        $text =~ s/\cM//go; # Delete any Ctrl-M (^M) character
-        close F;
-        $w{window}{buffer}->set_text(encode('iso-8859-1', $text // ''));
+        if (open(F, "<:utf8",$$self{_LOGFILE})) {
+            @{$$self{_TEXT}} = <F>;
+            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+            close F;
+        } else {
+            $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+        }
+        $w{window}{buffer}->set_text($text // '');
 
         return $w{window}{data}->present;
     }
@@ -4094,13 +4100,14 @@ sub _wFindInTerminal {
     $w{window}{gui}{hboxmain}->set_position(($w{window}{data}->get_size) / 2);
 
     # Load the contents of the textbuffer with the corresponding log file
-    open(F, $$self{_LOGFILE}) or die("ERROR: Could not open file '$$self{_LOGFILE}': $!");
-    @{$$self{_TEXT}} = <F>;
-    my $text = join('', @{$$self{_TEXT}});
-    $text =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-    $text =~ s/\cM//go; # Delete any Ctrl-M (^M) character
-    close F;
-    $w{window}{buffer}->set_text(encode('iso-8859-1', $text));
+    if (open(F, "<:utf8",$$self{_LOGFILE})) {
+        @{$$self{_TEXT}} = <F>;
+        $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+        close F;
+    } else {
+        $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+    }
+    $w{window}{buffer}->set_text($text);
 
     sub _showLine {
         my $self = shift;
@@ -4151,9 +4158,7 @@ sub _wFindInTerminal {
             if ($line !~ /$regexp/g) {
                 next;
             }
-            $found{$l} = $line;
-            $found{$l} =~ s/\x1b\[\d*;?\d*m//go; # Delete the Escape sequences
-            $found{$l} =~ s/\n|\r|\f|\cM//go; # Delete the ctrl-M, new-line and similar sequences
+            $found{$l} = _removeEscapeSeqs($line);
         }
 
         if ($stop) {

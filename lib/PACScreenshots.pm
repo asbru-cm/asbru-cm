@@ -20,6 +20,9 @@ package PACScreenshots;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -47,7 +50,7 @@ use PACUtils;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $APPICON = $RealBin . '/res/asbru-logo-64.png';
+my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
 # END: Define GLOBAL CLASS variables
@@ -67,8 +70,9 @@ sub new {
     $self->{list} = [];
 
     _buildScreenshotsGUI($self);
-    defined $self->{cfg} and PACScreenshots::update($self->{cfg});
-
+    if (defined $self->{cfg}) {
+        PACScreenshots::update($self->{cfg});
+    }
     bless($self, $class);
     return $self;
 }
@@ -78,8 +82,12 @@ sub update {
     my $cfg = shift;
     my $uuid = shift;
 
-    defined $cfg and $$self{cfg} = $cfg;
-    defined $uuid and $$self{uuid} = $uuid;
+    if (defined $cfg) {
+        $$self{cfg} = $cfg;
+    }
+    if (defined $uuid) {
+        $$self{uuid} = $uuid;
+    }
 
     # Destroy previous widgets
     $$self{frame}{hbscreenshots}->foreach(sub {$_[0]->destroy();});
@@ -88,7 +96,9 @@ sub update {
     $$self{list} = [];
 
     # Now, add the -new?- widgets
-    foreach my $file (@{$$self{cfg}{screenshots}}) {$self->_buildScreenshots($file);}
+    foreach my $file (@{$$self{cfg}{screenshots}}) {
+        $self->_buildScreenshots($file);
+    }
 
     return 1;
 }
@@ -99,7 +109,9 @@ sub add {
     my $cfg = shift;
 
     my $new_cfg = $$self{cfg};
-    defined $cfg and $new_cfg = $cfg;
+    if (defined $cfg) {
+        $new_cfg = $cfg;
+    }
 
     if (! _pixBufFromFile($file) ) {
         _wMessage(undef, "File '$file' could not be loaded as a screenshot file");
@@ -107,8 +119,12 @@ sub add {
     }
 
     my $screenshot_file = '';
-    $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand(123456789). '.png';
-    while(-f $screenshot_file) {$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand(123456789). '.png';}
+    my $rn = rand(123456789);
+    $screenshot_file = "$CFG_DIR/screenshots/pac_screenshot_$rn.png";
+    while(-f $screenshot_file) {
+        $rn = rand(123456789);
+        $screenshot_file = "$CFG_DIR/screenshots/pac_screenshot_$rn.png";
+    }
 
     copy($file, $screenshot_file);
 
@@ -136,54 +152,54 @@ sub _buildScreenshotsGUI {
     $w{hbox} = Gtk3::HBox->new(0, 0);
     $w{hbox}->set_size_request(200, 170);
 
-        # Build a buttonbox for widgets actions (add, etc.)
-        $w{bbox} = Gtk3::VButtonBox->new();
-        $w{hbox}->pack_start($w{bbox}, 0, 1, 0);
-        $w{bbox}->set_layout('GTK_BUTTONBOX_SPREAD');
+    # Build a buttonbox for widgets actions (add, etc.)
+    $w{bbox} = Gtk3::VButtonBox->new();
+    $w{hbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{bbox}->set_layout('GTK_BUTTONBOX_SPREAD');
 
-            # Build 'add' button
-            $w{btnadd} = Gtk3::Button->new();
+    # Build 'add' button
+    $w{btnadd} = Gtk3::Button->new();
 
-                $w{hboxbtnadd} = Gtk3::HBox->new(0, 5);
-                $w{btnadd}->add($w{hboxbtnadd});
-                $w{btnadd}->set('can_focus', 0);
+    $w{hboxbtnadd} = Gtk3::HBox->new(0, 5);
+    $w{btnadd}->add($w{hboxbtnadd});
+    $w{btnadd}->set('can_focus', 0);
 
-                    $w{hboxbtnadd}->pack_start(Gtk3::Image->new_from_stock('gtk-add', 'menu'), 0, 1, 5);
-                    $w{hboxbtnadd}->pack_start(Gtk3::Label->new("Add\nScreenshot"), 0, 1, 5);
-
-
-            $w{bbox}->add($w{btnadd});
-
-            $w{btnopenfolder} = Gtk3::Button->new();
-
-                $w{hboxbtnopenfolder} = Gtk3::HBox->new(0, 5);
-                $w{btnopenfolder}->add($w{hboxbtnopenfolder});
-                $w{btnopenfolder}->set('can_focus', 0);
-
-                    $w{hboxbtnopenfolder}->pack_start(Gtk3::Image->new_from_stock('gtk-open', 'menu'), 0, 1, 5);
-                    $w{hboxbtnopenfolder}->pack_start(Gtk3::Label->new("Open Folder"), 0, 1, 5);
+    $w{hboxbtnadd}->pack_start(Gtk3::Image->new_from_stock('gtk-add', 'menu'), 0, 1, 5);
+    $w{hboxbtnadd}->pack_start(Gtk3::Label->new("Add\nScreenshot"), 0, 1, 5);
 
 
-            $w{bbox}->add($w{btnopenfolder});
+    $w{bbox}->add($w{btnadd});
 
-        # Build a separator
-        $w{sep} = Gtk3::VSeparator->new();
-        $w{hbox}->pack_start($w{sep}, 0, 1, 5);
+    $w{btnopenfolder} = Gtk3::Button->new();
 
-        # Build a scrolled window
-        $w{sw} = Gtk3::ScrolledWindow->new();
-        $w{hbox}->pack_start($w{sw}, 1, 1, 0);
-        $w{sw}->set_policy('automatic', 'automatic');
-        $w{sw}->set_shadow_type('none');
+    $w{hboxbtnopenfolder} = Gtk3::HBox->new(0, 5);
+    $w{btnopenfolder}->add($w{hboxbtnopenfolder});
+    $w{btnopenfolder}->set('can_focus', 0);
 
-            $w{vp} = Gtk3::Viewport->new();
-            $w{sw}->add($w{vp});
-            $w{vp}->set_property('border-width', 5);
-            $w{vp}->set_shadow_type('none');
+    $w{hboxbtnopenfolder}->pack_start(Gtk3::Image->new_from_stock('gtk-open', 'menu'), 0, 1, 5);
+    $w{hboxbtnopenfolder}->pack_start(Gtk3::Label->new("Open Folder"), 0, 1, 5);
 
-                # Build and add the vbox that will contain the image widgets
-                $w{hbscreenshots} = Gtk3::HBox->new(0, 0);
-                $w{vp}->add($w{hbscreenshots});
+
+    $w{bbox}->add($w{btnopenfolder});
+
+    # Build a separator
+    $w{sep} = Gtk3::VSeparator->new();
+    $w{hbox}->pack_start($w{sep}, 0, 1, 5);
+
+    # Build a scrolled window
+    $w{sw} = Gtk3::ScrolledWindow->new();
+    $w{hbox}->pack_start($w{sw}, 1, 1, 0);
+    $w{sw}->set_policy('automatic', 'automatic');
+    $w{sw}->set_shadow_type('none');
+
+    $w{vp} = Gtk3::Viewport->new();
+    $w{sw}->add($w{vp});
+    $w{vp}->set_property('border-width', 5);
+    $w{vp}->set_shadow_type('none');
+
+    # Build and add the vbox that will contain the image widgets
+    $w{hbscreenshots} = Gtk3::HBox->new(0, 0);
+    $w{vp}->add($w{hbscreenshots});
 
     $$self{container} = $w{hbox};
     $$self{frame} = \%w;
@@ -211,15 +227,19 @@ sub _buildScreenshotsGUI {
     $w{hbox}->drag_dest_set('all', \@targets, ['copy', 'move']);
     $w{hbox}->signal_connect('drag_data_received' => sub {
         my ($me, $context, $x, $y, $data, $info, $time) = @_;
-
-        return 0 if (($data->length < 0) || ($data->type->name ne 'STRING') );
+        if (($data->length < 0) || ($data->type->name ne 'STRING')) {
+            return 0;
+        }
 
         foreach my $line (split(/\R/, $data->data) ) {
             $line =~ s/\R//go;
-            next unless $line =~ /file:\/\/(.+)/go;
+            if ($line !~ /file:\/\/(.+)/go) {
+                next;
+            }
             my $file = $1;
-
-            -f $file and $self->add($file);
+            if (-f $file) {
+                $self->add($file);
+            }
         }
 
         return 1;
@@ -240,10 +260,10 @@ sub _buildScreenshots {
     # Create an eventbox for the image
     $w{ebScreenshot} = Gtk3::EventBox->new;
 
-        # Create a gtkImage to contain the screenshot
-        $w{imageScreenshot} = Gtk3::Image->new;
-        -f $file and $w{imageScreenshot}->set_from_pixbuf(_scale($file, 200, 200, 1) );
-        $w{ebScreenshot}->add($w{imageScreenshot});
+    # Create a gtkImage to contain the screenshot
+    $w{imageScreenshot} = Gtk3::Image->new;
+    -f $file and $w{imageScreenshot}->set_from_pixbuf(_scale($file, 200, 200, 1) );
+    $w{ebScreenshot}->add($w{imageScreenshot});
 
     # Add built control to main container
     $$self{frame}{hbscreenshots}->pack_start($w{ebScreenshot}, 0, 1, 5);
@@ -348,8 +368,11 @@ sub _chooseScreenshot {
     );
 
     $dialog->add_filter($filter_images);
-    if (-d CFG_DIR . '/screenshots')    {$dialog->set_current_folder($CFG_DIR . '/screenshots');}
-    else                                {$dialog->set_current_folder($ENV{'HOME'});}
+    if (-d CFG_DIR . '/screenshots') {
+        $dialog->set_current_folder($CFG_DIR . '/screenshots');
+    } else {
+        $dialog->set_current_folder($ENV{'HOME'});
+    }
 
     $dialog->signal_connect('update-preview' => sub {$self->_preview($dialog);});
 
@@ -361,7 +384,9 @@ sub _chooseScreenshot {
     $cbShowHidden->signal_connect('toggled', sub {$dialog->set_show_hidden($cbShowHidden->get_active);});
 
     $dialog->show_all;
-    $dialog->run eq 'accept' and $file = $dialog->get_filename;
+    if ($dialog->run eq 'accept') {
+        $file = $dialog->get_filename;
+    }
     $dialog->destroy;
 
     return $file;
@@ -374,14 +399,15 @@ sub _preview {
     $dialog->set_preview_widget_active(0);
 
     my $file = $dialog->get_preview_filename;
-    (defined $file && -f $file) or return 1;
+    if (!(defined $file && -f $file)) {
+        return 1;
+    }
 
     my $preview = Gtk3::Image->new;
     $dialog->set_preview_widget($preview);
 
     my $preview_pixbuf = Gtk3::Gdk::Pixbuf->new_from_file_at_size($file, 256, 256);
     $preview->set_from_pixbuf($preview_pixbuf);
-
     $dialog->set_preview_widget_active($preview_pixbuf);
 
     return 1;
@@ -392,7 +418,7 @@ sub _showImage {
     my $file = shift;
 
     if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots use external viewer'}) {
-        system($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'} . ' ' . $file);
+        system($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'},$file);
         return 1;
     }
 
@@ -416,8 +442,8 @@ sub _showImage {
     my $sc = Gtk3::ScrolledWindow->new;
     my $pb = _pixBufFromFile($file);
     my $image = Gtk3::Image->new_from_pixbuf($pb);
-    my $pw = $pb->get_width       + 30;
-    my $ph = $pb->get_height      + 50;
+    my $pw = $pb->get_width + 30;
+    my $ph = $pb->get_height + 50;
 
     $sc->set_policy('automatic', 'automatic');
     $sc->set_min_content_width($pw);
@@ -426,11 +452,14 @@ sub _showImage {
 
     $sc->add_with_viewport($image);
 
-    $pw = $pb->get_width    + 30;
-    $ph = $pb->get_height    + 50;
+    $pw = $pb->get_width + 30;
+    $ph = $pb->get_height + 50;
 
-    if ($pw > $sw || $ph > $sh)    {$window->maximize;}
-    else                            {$window->set_default_size($pw, $ph);}
+    if ($pw > $sw || $ph > $sh) {
+        $window->maximize;
+    } else {
+        $window->set_default_size($pw, $ph);
+    }
 
     $window->signal_connect('response', sub {$window->destroy; return 1;});
 
