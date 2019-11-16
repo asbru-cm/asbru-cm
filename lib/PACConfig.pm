@@ -252,9 +252,9 @@ sub _setupCallbacks {
         my ($widget, $event) = @_;
         my $format = 'yaml';
         my @type;
-        push(@type, {label => 'as YAML Data', code => sub {$self->_exporter('yaml');} });
-        push(@type, {label => 'as Perl Data', code => sub {$self->_exporter('perl');} });
-        push(@type, {label => 'DEBUG Data', code => sub {$self->_exporter('debug');} });
+        push(@type, {label => 'Settings as yml', code => sub {$self->_exporter('yaml');} });
+        #push(@type, {label => 'as Perl Data', code => sub {$self->_exporter('perl');} });
+        push(@type, {label => 'Anonymized Data for DEBUG', code => sub {$self->_exporter('debug');} });
         _wPopUpMenu(\@type, $event, 1);
         return 1;
     });
@@ -461,6 +461,12 @@ sub _exporter {
         $name = 'debug';
         $suffix = '.txt';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
+        my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create an Annonymized back up file.\nThis file will contain your configuration settings without any sensitive personal data in it.\nIt is useful for debugging purposes only.\nIt is not recommended for backup purposes.\n\nCare has been taken to remove all personal information, you may review the exported data by opening and reading and editing.\n\n<b>Do you wish to continue?</b>");
+        print STDERR "$answ";
+        if (!$answ) {
+            _wMessage($$self{_WINDOWCONFIG}, "Export process has been canceled.");
+            return 1;
+        }
     }
 
     my $w;
