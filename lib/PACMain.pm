@@ -588,6 +588,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
     }
+    $$self{_GUI}{nbFavTab}->set_tooltip_text('Favourites');
     $$self{_GUI}{nbFavTab}->show_all;
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll2}, $$self{_GUI}{nbFavTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll2}, 1);
@@ -621,6 +622,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
     }
+    $$self{_GUI}{nbHistTab}->set_tooltip_text('Connection History');
     $$self{_GUI}{nbHistTab}->show_all;
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll3}, $$self{_GUI}{nbHistTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll3}, 1);
@@ -652,7 +654,10 @@ sub _initGUI {
     $$self{_GUI}{nbCluTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbCluTabLabel} = Gtk3::Label->new;
     $$self{_GUI}{nbCluTab}->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'), 0, 1, 0);
-    $$self{_GUI}{nbCluTab}->pack_start($$self{_GUI}{nbCluTabLabel}, 0, 1, 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{nbCluTab}->pack_start($$self{_GUI}{nbCluTabLabel}, 0, 1, 0);
+    }
+    $$self{_GUI}{nbCluTab}->set_tooltip_text('Clusters');
     $$self{_GUI}{nbCluTab}->show_all;
     $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{scrolledclu}, 1, 1, 0);
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{vboxclu}, $$self{_GUI}{nbCluTab});
