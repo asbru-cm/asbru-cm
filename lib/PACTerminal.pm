@@ -715,20 +715,23 @@ sub _initGUI {
     };
     $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{cbShowHist}, 0, 1, 4);
 
-    # Create a checkbox to show/hide the button bar
-    $$self{_GUI}{btnShowButtonBar} = Gtk3::ToggleButton->new;
-    $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'pac-buttonbar-show' : 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{btnShowButtonBar}->set('can-focus' => 0);
-    $$self{_GUI}{btnShowButtonBar}->set_tooltip_text('Show/Hide button bar');
-    $$self{_GUI}{btnShowButtonBar}->set_active($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1);
-    $$self{_GUI}{btnShowButtonBar}->set_inconsistent(0);
-    $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowButtonBar}, 0, 1, 4);
+    # Only in traditional mode, show additional buttons
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        # Create a checkbox to show/hide the button bar
+        $$self{_GUI}{btnShowButtonBar} = Gtk3::ToggleButton->new;
+        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'pac-buttonbar-show' : 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btnShowButtonBar}->set('can-focus' => 0);
+        $$self{_GUI}{btnShowButtonBar}->set_tooltip_text('Show/Hide button bar');
+        $$self{_GUI}{btnShowButtonBar}->set_active($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1);
+        $$self{_GUI}{btnShowButtonBar}->set_inconsistent(0);
+        $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowButtonBar}, 0, 1, 4);
 
-    # Create a button to show the info tab
-    $$self{_GUI}{btnShowInfoTab} = Gtk3::Button->new;
-    $$self{_GUI}{btnShowInfoTab}->set_image(Gtk3::Image->new_from_stock('gtk-info', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{btnShowInfoTab}->set_tooltip_text('Show information tab (Shift+Ctrl+I)');
-    $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowInfoTab}, 0, 1, 4);
+        # Create a button to show the info tab
+        $$self{_GUI}{btnShowInfoTab} = Gtk3::Button->new;
+        $$self{_GUI}{btnShowInfoTab}->set_image(Gtk3::Image->new_from_stock('gtk-info', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btnShowInfoTab}->set_tooltip_text('Show information tab (Shift+Ctrl+I)');
+        $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowInfoTab}, 0, 1, 4);
+    }
 
     if ($$self{'EMBED'}) {
         $$self{_GUI}{_BTNFOCUS} = Gtk3::Button->new_with_mnemonic('Set _keyboard focus');
@@ -895,21 +898,25 @@ sub _setupCallbacks {
         }
     });
 
-    # Show Bar
-    $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
-        if ($$self{_GUI}{btnShowButtonBar}->get_active()) {
-            $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
-            $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->show();
-        } else {
-            $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
-            $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->hide();
-        };
-    });
+    # Show Bar (if any)
+    if ($$self{_GUI}{btnShowButtonBar}) {
+        $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
+            if ($$self{_GUI}{btnShowButtonBar}->get_active()) {
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+                $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->show();
+            } else {
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
+                $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->hide();
+            };
+        });
+    }
 
-    # Info button event
-    $$self{_GUI}{btnShowInfoTab}->signal_connect('clicked', sub {
-        $self->_showInfoTab ();
-    });
+    # Info button event (if any)
+    if ($$self{_GUI}{btnShowInfoTab}) {
+        $$self{_GUI}{btnShowInfoTab}->signal_connect('clicked', sub {
+            $self->_showInfoTab ();
+        });
+    }
 
     # Mouse move in out VTE events
     $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE}->signal_connect('motion_notify_event', sub {

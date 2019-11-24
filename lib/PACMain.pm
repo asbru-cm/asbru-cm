@@ -2442,6 +2442,9 @@ sub __treeBuildNodeName {
     if ($is_group) {
         $name = "<b>$name</b>";
     }
+    if ($is_group) {
+        $name = "<b>$name</b>";
+    }
 
     return $name;
 }
