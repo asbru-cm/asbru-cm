@@ -2209,11 +2209,7 @@ sub _setupCallbacks {
 
             $RUNNING{$tmp_uuid}{terminal}->_setTabColour;
 
-            if ($RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
-                };
-            } else {
+            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
                 eval {
                     if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window) {
                         $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window->focus(time);
@@ -2442,6 +2438,9 @@ sub __treeBuildNodeName {
     }
     if ($protected) {
         $name = "<span $p_set='$p_color'>$name</span>";
+    }
+    if ($is_group) {
+        $name = "<b>$name</b>";
     }
     if ($is_group) {
         $name = "<b>$name</b>";
@@ -3589,7 +3588,7 @@ sub _updateGUIWithUUID {
     my $is_root = $uuid eq '__PAC__ROOT__';
 
     if ($is_root) {
-        $$self{_GUI}{descBuffer}->set_text(qq”
+        $$self{_GUI}{descBuffer}->set_text(qq"
 
  * Welcome to $APPNAME version $APPVERSION *
 
@@ -3607,7 +3606,7 @@ sub _updateGUIWithUUID {
 
  - For the latest news, check the project website (https://asbru-cm.net/).
 
-”);
+");
     } else {
         my $msg;
         if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
