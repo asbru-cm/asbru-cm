@@ -2377,6 +2377,9 @@ sub __treeBuildNodeName {
     if ($protected) {
         $name = "<span $p_set=\"$p_color\">$name</span>";
     }
+    if ($is_group) {
+        $name = "<b>$name</b>";
+    }
 
     return $name;
 }

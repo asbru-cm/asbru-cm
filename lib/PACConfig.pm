@@ -252,8 +252,9 @@ sub _setupCallbacks {
         my ($widget, $event) = @_;
         my $format = 'yaml';
         my @type;
-        push(@type, {label => 'as YAML data', code => sub {$self->_exporter('yaml');} });
-        push(@type, {label => 'as Perl Data', code => sub {$self->_exporter('perl');} });
+        push(@type, {label => 'Settings as yml', code => sub {$self->_exporter('yaml');} });
+        #push(@type, {label => 'as Perl Data', code => sub {$self->_exporter('perl');} });
+        push(@type, {label => 'Anonymized Data for DEBUG', code => sub {$self->_exporter('debug');} });
         _wPopUpMenu(\@type, $event, 1);
         return 1;
     });
@@ -445,6 +446,7 @@ sub _exporter {
     my $self = shift;
     my $format = shift // 'dumper';
     my $file = shift // '';
+    my $name = 'asbru';
 
     my $suffix = '';
     my $func = '';
@@ -452,14 +454,22 @@ sub _exporter {
     if ($format eq 'yaml') {
         $suffix = '.yml';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
-    }
-    elsif ($format eq 'perl') {
+    } elsif ($format eq 'perl') {
         $suffix = '.dumper';
         $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
+    } elsif ($format eq 'debug') {
+        $name = 'debug';
+        $suffix = '.txt';
+        $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
+        my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
+        if (!$answ) {
+            _wMessage($$self{_WINDOWCONFIG}, "Export process has been canceled.");
+            return 1;
+        }
     }
 
     my $w;
-    if (! $file) {
+    if (!$file) {
         my $choose = Gtk3::FileChooserDialog->new(
             "$APPNAME (v.$APPVERSION) Choose file to Export configuration as '$format'",
             $$self{_WINDOWCONFIG},
@@ -469,12 +479,12 @@ sub _exporter {
         );
         $choose->set_do_overwrite_confirmation(1);
         $choose->set_current_folder($ENV{'HOME'} // '/tmp');
-        $choose->set_current_name('pac' . $suffix);
+        $choose->set_current_name("$name$suffix");
 
         my $out = $choose->run;
         $file = $choose->get_filename;
         $choose->destroy;
-        if (!$out eq 'accept') {
+        if ($out ne 'accept') {
             return 1;
         }
 
@@ -491,6 +501,9 @@ sub _exporter {
     $$self{_CFG}{'__PAC__EXPORTED__FULL__'} = 1;
     eval "$func";
     if ((!$@) && (defined $w)) {
+        if ($format eq 'debug') {
+            $file = cleanUpPersonalData($file);
+        }
         $w->destroy;
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
@@ -506,6 +519,66 @@ sub _exporter {
     }
 
     return $file;
+}
+
+sub cleanUpPersonalData {
+    my $file = shift;
+    my $out = $file;
+    $out =~ s/debug\.txt/debug.yml/;
+
+    $SIG{__WARN__} = sub{};
+    print STDERR "SAVED IN : $file\nOUT: $out\n";
+    # Remove all personal information
+    open(F,"<:utf8",$file);
+    open(D,">:utf8",$out);
+    my $C = 0;
+    while (my $line = <F>) {
+        if ($line =~ /KPX title regexp/) {
+            $line =~ s/KPX title regexp:.+/KPX title regexp: ''/;
+        } elsif ($line =~ /^[\t ]+(send|ip|user):/) {
+            my $p = $1;
+            $line =~ s/$p:.+/$p: 'removed'/;
+        } elsif ($line =~ /^[\t ]+(title|name):/) {
+            my $p = $1;
+            if ($p eq 'name') {
+                $C++;
+            }
+            $line =~ s/$p:.+/$p: '$p $C'/;
+        } elsif ($line =~ /^[\t ]+description:/) {
+            $line =~ s/description:.+/description: 'Description'/;
+        } elsif ($line =~ /^[\t ]+public key: (.+)/) {
+            $line =~ s/public key:.+/public key: 'uses public key'/;
+        } elsif ($line =~ /^[\t ]+pass(word|phrase)?:/) {
+            $line =~ s/pass(word|phrase)?:.+/pass$1: 'removed'/;
+        } elsif ($line =~ /^[\t ]+sudo password:/) {
+            $line =~ s/sudo password:.+/sudo password: 'removed'/;
+        } elsif ($line =~ /^[\t ]+gui password:/) {
+            $line =~ s/gui password:.+/gui password: 'removed'/;
+        } elsif ($line =~ /^[\t ]+use gui password:/) {
+            $line =~ s/use gui password:.+/use gui password: 0/;
+        } elsif ($line =~ /^[\t ]+passphrase user:/) {
+            $line =~ s/passphrase user:.+/passphrase user: 'removed'/;
+        } else {
+            $line =~ s|/home/(\w+)|/home/USER|;
+        }
+        print D $line;
+    }
+    # Add runtime information
+    print D "\n\n#$APPNAME : $APPVERSION\n\n# ENV Data\n";
+    my $user = $ENV{USER} ? $ENV{USER} : $ENV{LOGNAME};
+    foreach my $k (sort keys %ENV) {
+        if ($ENV{$k} =~ /token/i) {
+            next;
+        }
+        my $str = $ENV{$k};
+        $str =~ s|$user|USER|g;
+        print D "#$k : $str\n";
+    }
+    print D "\n\n";
+    close F;
+    close D;
+    unlink $file;
+    return $out;
 }
 
 sub _resetDefaults {
