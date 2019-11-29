@@ -1782,18 +1782,16 @@ elsif (! $MANUAL) {
     }
 }
 
-sub winch {
-    $SIG{'WINCH'} = undef;
-    select(undef, undef, undef, 0.2);
-    while (!$EXP->slave) {
-        select(undef, undef, undef, 0.1);
+$SIG{'WINCH'} = sub {
+    if (!$CONNECTED) {
+        return 1;
     }
-    $EXP->slave->clone_winsize_from(\*STDIN);
-    kill 'WINCH'=>$EXP->pid if $EXP->pid;
-    $SIG{'WINCH'} = \&winch;
-    return 1;
-}
-$SIG{'WINCH'} = \&winch;
+    while (! $EXP -> slave) {
+        select(undef, undef, undef, 0.25);
+    };
+    $EXP -> slave -> clone_winsize_from(\*STDIN);
+    kill WINCH => $EXP -> pid if $EXP -> pid;
+};
 
 $SIG{'INT'} = undef;
 $SIG{'HUP'} = sub {
