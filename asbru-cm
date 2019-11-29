@@ -77,6 +77,8 @@ BEGIN {
         ###################################################################
         $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/pac";
     }
+    # Soluction providede by PerlMonks, solves for good winch scrolling issue
+    delete $ENV{'GTK_OVERLAY_SCROLLING'};}
 }
 
 ###################################################################
