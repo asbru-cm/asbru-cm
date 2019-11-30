@@ -646,9 +646,9 @@ sub _updateGUIPreferences {
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
     _($self, 'bCfgProxy')->set_sensitive(1);
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
-    _($self, 'entryCfgProxyPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
-    _($self, 'entryCfgProxyUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'});
-    _($self, 'entryCfgProxyPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'});
+    _($self, 'entryCfgProxyConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
+    _($self, 'entryCfgProxyConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'});
+    _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'});
     _($self, 'vboxCfgManualProxyConn')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active);
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
@@ -763,7 +763,7 @@ sub _saveConfiguration {
     }
 
     # Check if proxy ip and port are defined in case "force use proxy" is checked
-    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (! _($self, 'entryCfgProxyConnIP')->get_chars(0, -1) || ! _($self, 'entryCfgProxyPort')->get_chars(0, -1) )) {
+    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (! _($self, 'entryCfgProxyConnIP')->get_chars(0, -1) || ! _($self, 'entryCfgProxyConnPort')->get_chars(0, -1) )) {
         _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nPROXY IP / PORT can't be empty if 'always use proxy' is active\n\n<b>before saving this connection data!!</b>");
         return 0;
     }
@@ -776,9 +776,9 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1 if _($self, 'rbUseProxyAlways')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2 if _($self, 'rbUseProxyNever')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = _($self, 'entryCfgProxyConnIP')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'proxy port'} = _($self, 'entryCfgProxyPort')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = _($self, 'entryCfgProxyUser')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = _($self, 'entryCfgProxyPassword')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'proxy port'} = _($self, 'entryCfgProxyConnPort')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = _($self, 'entryCfgProxyConnUser')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = _($self, 'entryCfgProxyConnPassword')->get_chars(0, -1);
     if        (_($self, 'rbCfgAuthUserPass')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';}
     elsif    (_($self, 'rbCfgAuthPublicKey')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'publickey';}
     elsif    (_($self, 'rbCfgAuthManual')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'manual';}
