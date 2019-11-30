@@ -83,6 +83,10 @@ my $NPOSY = 0;
 
 my $right_click_deep = 0;
 
+my $COL_GREEN = "\e[1;32m";
+my $COL_RED   = "\e[1;31m";
+my $COL_RESET = "\e[0m";
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -306,7 +310,7 @@ sub start {
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
 
     my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
-    _vteFeed($$self{_GUI}{_VTE}, "\e[1;32m\r\n $string (" . (localtime(time)) . ") =->\e[0m\r\n\n");
+    _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_GREEN}$string (" . (localtime(time)) . ") =->${COL_RESET}\r\n\n");
 
     $$self{_PULSE} = 1;
 
@@ -330,7 +334,20 @@ sub start {
     $$self{_CFG}{'tmp'}{'uuid'} = $$self{_UUID_TMP};
 
     if ($$self{'EMBED'}) {
-        $$self{_CFG}{'tmp'}{'xid'} = $$self{_GUI}{_SOCKET}->get_window->get_xid;
+        # Create new socket window to plug the embed window from the other process (rdp, vnc, ...)
+        # (remove any remaining window before starting to add a new one)
+        $$self{_GUI}{_SOCKET} = Gtk3::Socket->new();
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->foreach(sub {$$self{_GUI}{_SOCKET_PARENT_WINDOW}->remove($_[0]);});
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->add_with_viewport($$self{_GUI}{_SOCKET});
+
+        # Retrieve the XID of the window on which the external process will have to plug into
+        if ($$self{_GUI}{_SOCKET}->get_window()) {
+            $$self{_CFG}{'tmp'}{'xid'} = $$self{_GUI}{_SOCKET}->get_window->get_xid();
+            $$self{FOCUS} = $$self{_GUI}{_SOCKET};
+        } else {
+            $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
+            _vteFeed($$self{_GUI}{_VTE}, " !! ${COL_RED}ERROR${COL_RESET}: unable to created embedded window.  Terminal will be started in a separated window.\r\n\n");
+        }
 
         $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_SOCKET}->get_allocated_width;
         $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_SOCKET}->get_allocated_height;
@@ -591,11 +608,13 @@ sub _initGUI {
     $sc->set_policy('automatic', 'automatic');
 
     # , build a Gnome VTE Terminal,
-    $$self{_GUI}{_VTE} = Vte::Terminal->new;
-    $$self{_GUI}{_VTE}->set_size_request(200, 100);
+    $$self{_GUI}{_VTE} = Vte::Terminal->new();
 
     # , add VTE to the scrolled window and...
-    $sc->add($$self{_GUI}{_VTE});
+    if (!$$self{'EMBED'}) {
+        $$self{_GUI}{_VTE}->set_size_request(200, 100);
+        $sc->add($$self{_GUI}{_VTE});
+    }
 
     $$self{_GUI}{hbHist} = Gtk3::VBox->new(0, 0);
 
@@ -627,13 +646,13 @@ sub _initGUI {
 
         $$self{FOCUS} = $$self{_GUI}{_VTE};
     } else {
-        my $sc2 = Gtk3::ScrolledWindow->new;
-        $sc2->set_shadow_type('none');
-        $sc2->set_policy('automatic', 'automatic');
-        $$self{_GUI}{_VBOX}->pack_start($sc2, 1, 1, 0);
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW} = Gtk3::ScrolledWindow->new();
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->set_shadow_type('none');
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->set_policy('automatic', 'automatic');
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
+        $$self{_GUI}{_VBOX}->pack_start($$self{_GUI}{_SOCKET_PARENT_WINDOW}, 1, 1, 0);
 
-        $$self{_GUI}{_SOCKET} = Gtk3::Socket->new;
-        $sc2->add_with_viewport($$self{_GUI}{_SOCKET});
+        $$self{_GUI}{_VBOX}->pack_start($$self{_GUI}{_VTE}, 1, 1, 0);
     }
 
     #### $vbox 2nd row: this will contain local/remote macros
@@ -734,12 +753,17 @@ sub _initGUI {
     }
 
     if ($$self{'EMBED'}) {
+        $$self{_GUI}{_BTNLOG} = Gtk3::Button->new_with_mnemonic('Hide _messages');
+        $$self{_GUI}{_BTNLOG}->set_image(Gtk3::Image->new_from_icon_name('gtk-select-all', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{_BTNLOG}->set_always_show_image(1);
+        $$self{_GUI}{_BTNLOG}->set('can_focus', 0);
+        $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{_BTNLOG}, 0, 1, 4);
+
         $$self{_GUI}{_BTNFOCUS} = Gtk3::Button->new_with_mnemonic('Set _keyboard focus');
         $$self{_GUI}{_BTNFOCUS}->set_image(Gtk3::Image->new_from_icon_name('input-keyboard', 'GTK_ICON_SIZE_BUTTON'));
         $$self{_GUI}{_BTNFOCUS}->set('can_focus', 0);
+        $$self{_GUI}{_BTNFOCUS}->set_sensitive(0);
         $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{_BTNFOCUS}, 0, 1, 4);
-
-        $$self{FOCUS} = $$self{_GUI}{_SOCKET};
     }
 
     # Create gtkstatusbar
@@ -1288,7 +1312,20 @@ sub _setupCallbacks {
 
     # If embedded, add a callback for the 'get focus' button
     if ($$self{EMBED}) {
-        $$self{_GUI}{_BTNFOCUS}->signal_connect ('clicked' => sub {$$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');});
+        $$self{_GUI}{_BTNFOCUS}->signal_connect ('clicked' => sub {
+            if (defined $$self{FOCUS}) {
+                $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
+            }
+        });
+        $$self{_GUI}{_BTNLOG}->signal_connect ('clicked' => sub {
+            if ($$self{_GUI}{_VTE}->is_visible()) {
+                # Messages (in Vte) were shown; hide them now
+                $self->_hideEmbedMessages();
+            } else {
+                # Messages (in Vte) were not shown; show them now, and hide the actual embed window
+                $self->_showEmbedMessages();
+            }
+        });
     }
 
     # Connect to the "map" signal of macrosbox widget to avoid showing it if so is configured
@@ -1326,9 +1363,14 @@ sub _setupCallbacks {
         $$self{CONNECTING} = 0;
 
         my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
-         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\e[1;31m\r\n <-= $string (" . (localtime(time)) . ")\e[0m\r\n\n");
-         }
+        if (defined $$self{_GUI}{_VTE}) {
+            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED}<-= $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+        }
+
+        # Switch to the message window
+        if ($$self{EMBED}) {
+            $self->_showEmbedMessages();
+        }
 
         if (defined $$self{_SOCKET_CLIENT}) {
             $$self{_SOCKET_CLIENT}->close;
@@ -1424,11 +1466,18 @@ sub _watchConnectionData {
                     "TightVNC: $$self{_CFG}{environments}{$$self{_UUID}}{user}";
                     my $list = _getXWindowsList;
                     if (grep({$_ =~ /$title/ and $title = $_;} keys %{$$list{'by_name'}})) {
+                        print("Add ID [" . $$list{'by_name'}{$title}{'xid'} . "] to" . $$self{_GUI}{_SOCKET} . "\n");
                         $$self{_GUI}{_SOCKET}->add_id($$list{'by_name'}{$title}{'xid'});
                     }
                     return 0;
                 });
             }
+
+            # Show embed window and hide messages
+            if ($$self{EMBED}) {
+                $self->_hideEmbedMessages();
+            }
+
         } elsif ($data =~ /^EXPLORER:(.+)/go) {
             system("xdg-open '$1' &");
         } elsif ($data =~ /^PIPE_WAIT\[(.+?)\]\[(.+)\]/go) {
@@ -1535,6 +1584,9 @@ sub _watchConnectionData {
         } elsif (($data eq 'DISCONNECTED') || ($data =~ /^CLOSE:.+/go) || ($data =~ /^TIMEOUT:.+/go) || ($data =~ /^connect\(\) failed with error '.+'$/go)) {
             if (defined $$self{_EMBED_KIDNAP}) {
                 Glib::Source->remove($$self{_EMBED_KIDNAP});
+            }
+            if ($$self{EMBED}) {
+                $self->_showEmbedMessages();
             }
             $$self{_GUI}{statusExpect}->clear;
             $$self{_BADEXIT} = $$self{CONNECTING};
@@ -2784,6 +2836,7 @@ sub _tabMenu {
     push(@vte_menu_items, {separator => 1});
     # Add a 'disconnect' button to disconnect without closing the terminal
     push(@vte_menu_items, {label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub {kill(15, $$self{_PID});}});
+    push(@vte_menu_items, {label => 'Restart session', stockicon => 'gtk-execute', sensitive => !$$self{CONNECTED} || !$$self{_PID}, code => sub {$self->start();}});
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
@@ -3907,7 +3960,7 @@ sub _updateCFG {
 # FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{'defaults'}{'visible bell'});
     }
 
-    if ($$self{_FOCUSED}) {
+    if ($$self{_FOCUSED} && $$self{FOCUS}) {
         $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
     }
     $$self{_NO_UPDATE_CFG} = 0;
@@ -4450,6 +4503,32 @@ sub _showInfoTab {
     $PACMain::FUNCS{_MAIN}{_GUI}{nb}->set_current_page(0);
 }
 
+sub _hideEmbedMessages {
+    my $self = shift;
+
+    # Hide messages and show the embed window
+    $$self{_GUI}{_VTE}->hide();
+    $$self{_GUI}{_SOCKET_PARENT_WINDOW}->show_all();
+    $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
+    $$self{_GUI}{_BTNFOCUS}->set_sensitive(1);
+
+    # Next time we click on the button, it will be to hide messages
+    $$self{_GUI}{_BTNLOG}->set_label('Show _messages');
+}
+
+sub _showEmbedMessages {
+    my $self = shift;
+
+    # Show messages and hide the embed window
+    $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
+    $$self{_GUI}{_VTE}->show();
+    $$self{_GUI}{_VTE}->grab_focus();
+    $$self{_GUI}{_BTNFOCUS}->set_sensitive(0);
+
+    # Next time we click on the button, it will be to hide messages
+    $$self{_GUI}{_BTNLOG}->set_label('Hide _messages');
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4733,6 +4812,14 @@ Returns true (1) if there are disconnected terminals, 0 if none
 =head2 sub _showInfoTab
 
 Show the information Tab
+
+=head2 sub _hideEmbedMessages
+
+For an embed connection, hide the console displaying the messages concerning the connection.
+
+=head2 sub _showEmbedMessages
+
+For an embed connection, show the console displaying the messages concerning the connection.
 
 =head1 Vte::Terminal
 

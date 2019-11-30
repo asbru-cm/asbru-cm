@@ -1082,16 +1082,20 @@ if (defined $METHOD) {
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
-                $$CFG{'tmp'}{'width'} = $Xwidth -2;
-                $$CFG{'tmp'}{'height'} = $Xheight;
+                if ($Xwidth > 3 && $Xheight > 1) {
+                    $$CFG{'tmp'}{'width'} = $Xwidth - 2;
+                    $$CFG{'tmp'}{'height'} = $Xheight;
+                }
             }
             $connection_cmd = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
             $connection_txt = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
         } elsif ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD =~ /^.*freerdp$/)) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
-                $$CFG{'tmp'}{'width'} = $Xwidth;
-                $$CFG{'tmp'}{'height'} = $Xheight;
+                if ($Xwidth > 1 && $Xheight > 1) {
+                    $$CFG{'tmp'}{'width'} = $Xwidth;
+                    $$CFG{'tmp'}{'height'} = $Xheight;
+                }
             }
             $connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
             $connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
