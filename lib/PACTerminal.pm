@@ -3017,8 +3017,8 @@ sub _saveSessionLog {
         'Select file to save session log',
         undef,
         'select-folder',
-        'gtk-ok' => 'GTK_RESPONSE_OK',
-        'gtk-cancel' => 'GTK_RESPONSE_CANCEL'
+        'gtk-cancel' => 'GTK_RESPONSE_CANCEL',
+        'gtk-ok' => 'GTK_RESPONSE_OK'
     );
     $dialog->set_action('GTK_FILE_CHOOSER_ACTION_SAVE');
     $dialog->set_do_overwrite_confirmation(1);
@@ -3419,8 +3419,8 @@ sub _wSelectChain {
             $self->{_NAME} . " : $APPNAME : Chain connections",
             $PACMain::FUNCS{_MAIN}{_GUI}{main},
             'modal',
-            'gtk-ok' => 'ok',
-            'gtk-cancel' => 'cancel'
+            'gtk-cancel' => 'cancel',
+            'gtk-ok' => 'ok'
         );
         # and setup some dialog properties.
         $w{window}{data}->set_default_response('ok');

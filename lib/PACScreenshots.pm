@@ -308,8 +308,8 @@ sub _buildScreenshots {
                         'Select file to save screenshot',
                         undef,
                         'select-folder',
-                        'gtk-ok' => 'GTK_RESPONSE_OK',
-                        'gtk-cancel' => 'GTK_RESPONSE_CANCEL'
+                        'gtk-cancel' => 'GTK_RESPONSE_CANCEL',
+                        'gtk-ok' => 'GTK_RESPONSE_OK'
                     );
                     $dialog->set_action('GTK_FILE_CHOOSER_ACTION_SAVE');
                     $dialog->set_do_overwrite_confirmation(1);
