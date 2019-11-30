@@ -645,7 +645,7 @@ sub _updateGUIPreferences {
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
     _($self, 'bCfgProxy')->set_sensitive(1);
-    _($self, 'entryCfgProxyIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
+    _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
     _($self, 'entryCfgProxyPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
     _($self, 'entryCfgProxyUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'});
     _($self, 'entryCfgProxyPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'});
@@ -763,7 +763,7 @@ sub _saveConfiguration {
     }
 
     # Check if proxy ip and port are defined in case "force use proxy" is checked
-    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (! _($self, 'entryCfgProxyIP')->get_chars(0, -1) || ! _($self, 'entryCfgProxyPort')->get_chars(0, -1) )) {
+    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (! _($self, 'entryCfgProxyConnIP')->get_chars(0, -1) || ! _($self, 'entryCfgProxyPort')->get_chars(0, -1) )) {
         _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nPROXY IP / PORT can't be empty if 'always use proxy' is active\n\n<b>before saving this connection data!!</b>");
         return 0;
     }
@@ -775,7 +775,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0 if _($self, 'rbUseProxyIfCFG')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1 if _($self, 'rbUseProxyAlways')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2 if _($self, 'rbUseProxyNever')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = _($self, 'entryCfgProxyIP')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = _($self, 'entryCfgProxyConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy port'} = _($self, 'entryCfgProxyPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = _($self, 'entryCfgProxyUser')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = _($self, 'entryCfgProxyPassword')->get_chars(0, -1);

@@ -1839,7 +1839,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyIP1">
+                                                      <object class="GtkEntry" id="entryCfgProxyConnIP">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="has_tooltip">True</property>
