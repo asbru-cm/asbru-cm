@@ -77,6 +77,9 @@ BEGIN {
         ###################################################################
         $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/pac";
     }
+    # Workaround to unexpected SSH disconnections due to wrong handling of the WINCH event in some Gnome versions
+    # See https://www.perlmonks.org/?node_id=11109454
+    delete $ENV{'GTK_OVERLAY_SCROLLING'};
 }
 
 ###################################################################
