@@ -1839,7 +1839,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyIP1">
+                                                      <object class="GtkEntry" id="entryCfgProxyConnIP">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="has_tooltip">True</property>
@@ -1877,7 +1877,8 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkSpinButton" id="entryCfgProxyPort1">
+                                                      <object class="GtkSpinButton" id="entryCfgProxyConnPort">
+                                                        <property name="width_request">130</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="invisible_char">●</property>
@@ -1917,12 +1918,11 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyUser1">
+                                                      <object class="GtkEntry" id="entryCfgProxyConnUser">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="has_tooltip">True</property>
                                                         <property name="tooltip_text" translatable="yes">Proxy user</property>
-                                                        <property name="max_length">14</property>
                                                         <property name="invisible_char">•</property>
                                                         <property name="primary_icon_activatable">False</property>
                                                         <property name="secondary_icon_activatable">False</property>
@@ -1956,7 +1956,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyPassword1">
+                                                      <object class="GtkEntry" id="entryCfgProxyConnPassword">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="has_tooltip">True</property>
@@ -2696,6 +2696,50 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
               </packing>
             </child>
             <child>
+              <object class="GtkButton" id="btnCloseEdit">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <child>
+                  <object class="GtkBox" id="hbox68">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage" id="image37">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="stock">gtk-close</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label119">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Close without saving</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkButton" id="btnSaveEdit">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
@@ -2727,50 +2771,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">_Save and Close</property>
-                        <property name="use_underline">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="btnCloseEdit">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <child>
-                  <object class="GtkBox" id="hbox68">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkImage" id="image37">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="stock">gtk-close</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label119">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">_Close without saving</property>
                         <property name="use_underline">True</property>
                       </object>
                       <packing>
@@ -8060,6 +8060,50 @@ Changes apply to next opened connections, not current</property>
                 <property name="can_focus">False</property>
                 <property name="layout_style">end</property>
                 <child>
+                  <object class="GtkButton" id="btnCloseConfig">
+                    <property name="use_action_appearance">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <child>
+                      <object class="GtkBox" id="hbox12">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkImage" id="image8">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="stock">gtk-close</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label86">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">_Close without saving</property>
+                            <property name="use_underline">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkButton" id="btnSaveConfig">
                     <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
@@ -8088,50 +8132,6 @@ Changes apply to next opened connections, not current</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">_Save and Close</property>
-                            <property name="use_underline">True</property>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton" id="btnCloseConfig">
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <child>
-                      <object class="GtkBox" id="hbox12">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkImage" id="image8">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="stock">gtk-close</property>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label86">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">_Close without saving</property>
                             <property name="use_underline">True</property>
                           </object>
                           <packing>

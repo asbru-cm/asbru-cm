@@ -87,14 +87,14 @@ $METHODS{'RDP (rdesktop)'} = "PACMethod_rdesktop"->new($CONTAINER);
 eval {require "$RealBin/lib/method/PACMethod_xfreerdp.pm";}; die $@ if $@;
 $METHODS{'RDP (xfreerdp)'} = "PACMethod_xfreerdp"->new($CONTAINER);
 
-`which vncviewer 1>/dev/null 2>&1`;
-my $xtightvncviewer = $?;
 `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
 my $tigervnc = $?;
-if (! $tigervnc) {
+if (!$tigervnc) {
+    # Force use of TigerVNC on any other VNC client
     eval {require "$RealBin/lib/method/PACMethod_tigervnc.pm";}; die $@ if $@;
     $METHODS{'VNC'} = "PACMethod_tigervnc"->new($CONTAINER);
-} elsif (! $xtightvncviewer) {
+} else {
+    # Default VNC viewer
     eval {require "$RealBin/lib/method/PACMethod_vncviewer.pm";}; die $@ if $@;
     $METHODS{'VNC'} = "PACMethod_vncviewer"->new($CONTAINER);
 }
@@ -128,10 +128,12 @@ sub change {
 
     $$self{_METHOD} = $method;
 
-    defined $cfg and $$self{_CFG} = $cfg;
+    if (defined $cfg) {
+        $$self{_CFG} = $cfg;
+    }
 
     $$self{container}->foreach(sub {$_[0]->destroy;});
-    $METHODS{$$self{_METHOD}}->_buildGUI;
+    $METHODS{$$self{_METHOD}}->_buildGUI();
     $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'});
 
     return 1;
@@ -155,9 +157,13 @@ sub update {
     return 1;
 }
 
-sub get_cfg {return $METHODS{$_[0]{_METHOD}}->get_cfg;}
+sub get_cfg {
+    return $METHODS{$_[0]{_METHOD}}->get_cfg();
+}
 
-sub embed {return $METHODS{$_[0]{_METHOD}}->embed;}
+sub embed {
+    return $METHODS{$_[0]{_METHOD}}->embed();
+}
 
 # END: Public class methods
 ###################################################################

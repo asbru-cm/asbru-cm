@@ -514,8 +514,8 @@ sub wEnterValue {
         "$APPNAME : Enter data",
         undef,
         'modal',
-        'gtk-ok' => 'ok',
-        'gtk-cancel' => 'cancel'
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
     $_W{window}{data} -> set_default_response('ok');

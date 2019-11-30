@@ -1473,8 +1473,8 @@ sub _wEnterValue {
         "$APPNAME (v$APPVERSION) : Enter data",
         undef,
         'modal',
-        'gtk-ok' => 'ok',
-        'gtk-cancel' => 'cancel'
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
@@ -1574,8 +1574,8 @@ sub _wAddRenameNode {
         "$APPNAME (v$APPVERSION) : Enter data",
         undef,
         'modal',
-        'gtk-ok' => 'ok',
-        'gtk-cancel' => 'cancel'
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
@@ -1883,7 +1883,7 @@ sub _wConfirm {
         ''
     );
     $windowConfirm->set_markup($msg);
-    $windowConfirm->add_buttons('gtk-ok' => 'yes', 'gtk-cancel'=> 'no');
+    $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
@@ -1908,7 +1908,7 @@ sub _wYesNoCancel {
         ''
     );
     $windowConfirm->set_markup($msg);
-    $windowConfirm->add_buttons('gtk-yes' => 'yes', 'gtk-no'=> 'no', 'gtk-cancel'=> 'cancel');
+    $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
@@ -3057,8 +3057,8 @@ sub _wakeOnLan {
         "$APPNAME (v$APPVERSION) : Wake On LAN",
         undef,
         'modal',
-        'gtk-ok' => 'ok',
-        'gtk-cancel' => 'cancel'
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');

@@ -487,7 +487,7 @@ sub _exporter {
         $name = 'debug';
         $suffix = '.txt';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
-        my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create an Annonymized back up file.\nThis file will contain your configuration settings without any sensitive personal data in it.\nIt is useful for debugging purposes only.\nIt is not recommended for backup purposes.\n\nCare has been taken to remove all personal information, you may review the exported data by opening and reading and editing.\n\n<b>Do you wish to continue?</b>");
+        my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
         if (!$answ) {
             _wMessage($$self{_WINDOWCONFIG}, "Export process has been canceled.");
             return 1;
