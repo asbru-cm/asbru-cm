@@ -51,6 +51,7 @@ my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $TRAYICON = "$RealBin/res/asbru-logo-tray.png";
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
+my $ONCE = 1;
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -137,13 +138,45 @@ sub _setupCallbacks {
                 }
             } else {
                 $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
-                $$self{_MAIN}->_showConnectionsList;
+                $$self{_MAIN}->_showConnectionsList();
+                if ($$self{_MAIN}{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+                    my ($x,$y) = $self->_pos($event);
+                    if ($ONCE) {
+                        # Work arround the window manager?,GTk3?, so it shows at the correct place the first time
+                        $$self{_MAIN}{_GUI}{main}->move($x,$y);
+                        $$self{_MAIN}->_hideConnectionsList();
+                        $$self{_MAIN}->_showConnectionsList();
+                        $ONCE = 0;
+                    }
+                    $$self{_MAIN}{_GUI}{main}->move($x,$y);
+                }
             }
         }
         return 1;
     });
 
     return 1;
+}
+
+sub _pos {
+    my ($self,$event) = @_;
+    my $h = $$self{_MAIN}{_GUI}{main}->size_request->height;
+    my $w = $$self{_MAIN}{_GUI}{main}->size_request->width/2;
+    my $ymax = $event->get_screen->get_height;
+    my $dy = $event->window->get_height;
+    my ($x, $y) = $event->window->get_origin;
+
+    # Over the event widget
+    if ($dy + $y + $h > $ymax) {
+        $y -= $h;
+        if ($y < 0) {
+            $y = 0;
+        }
+    } else {
+        # Below the event widget
+        $y += $dy;
+    }
+    return ($x - $w,$y);
 }
 
 sub _trayMenu {

@@ -157,6 +157,8 @@ for (my $n = 1; $n < 5; $n++) {
     }
 }
 
+getDesktopEnvironment();
+
 # Check if configuration is valid
 CheckConfigurationFile();
 
@@ -176,6 +178,32 @@ sub config_migration {
     my ($old_dir,$new_dir) = @_;
 
     return 0;
+}
+
+sub getDesktopEnvironment {
+    my $c;
+    # An attempt to find desktop environment
+    foreach my $d ('gnome-shell','cinnamon','lxde','xfce') {
+        $c = `pgrep -c '$d'`;
+        chop $c;
+        #print STDERR "TEST: pgrep -c '$d' = $c\n";
+        if ($c) {
+            $ENV{'ASBRU_DESKTOP'} = $d;
+            last;
+        }
+    }
+    if ($ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
+        $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
+    }
+    if (!$ENV{'ASBRU_DESKTOP'}) {
+        $ENV{'ASBRU_DESKTOP'} = 'other';
+    } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        # Test to see it has the unite extension installed
+        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
+            $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+        }
+    }
+    print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
 }
 
 sub CheckConfigurationFile {
@@ -292,10 +320,17 @@ C<sub config_migration> (no parameters) (no return values)
 
 Function normally empty unless there is a migration of the configuration files.
 
+C<sub getDesktopEnvironment> (no parameters)
+
+Attempts to set $ENV{'ASBRU_DESKTOP'} to the current Desktop Environment name
+
+Used to deal with limitations on certain desktop environments.
+
+For example: gnome-shell at the time of this documentation has no Tray capability in Gtk3
+
 C<sub CheckConfigurationFile> (no parameters)
 
 Check that the configuration file is valid.  If the valid is invalid, try to recover a valid
 configuration file from a previous version.
 
 If configuration is valid, make a copy of the file into the backup directory.
-

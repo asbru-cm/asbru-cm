@@ -1522,6 +1522,7 @@ sub _wEnterValue {
     }
 
     # Show the window (in a modal fashion)
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all;
     my $ok = $w{window}{data}->run;
 
@@ -1634,6 +1635,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
+    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all;
     my $ok = $w{window}{data}->run;
 
@@ -1787,6 +1789,7 @@ sub _wMessage {
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1814,36 +1817,36 @@ sub _wProgress {
     if (! defined $WINDOWPROGRESS{_GUI}) {
         $WINDOWPROGRESS{_GUI} = Gtk3::Window->new;
 
-            $WINDOWPROGRESS{_GUI}->set_position('center');
-            $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
-            $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
-            $WINDOWPROGRESS{_GUI}->set_resizable(0);
-            if (defined $window) {
-                $WINDOWPROGRESS{_GUI}->set_transient_for($window);
-            }
-            $WINDOWPROGRESS{_GUI}->set_modal(1);
+        $WINDOWPROGRESS{_GUI}->set_position('center');
+        $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+        $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
+        $WINDOWPROGRESS{_GUI}->set_resizable(0);
+        if (defined $window) {
+            $WINDOWPROGRESS{_GUI}->set_transient_for($window);
+        }
+        $WINDOWPROGRESS{_GUI}->set_modal(1);
 
-            $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
-            $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
+        $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
+        $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
 
-            $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
+        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
 
-            $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
+        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
 
-            $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
+        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
 
-            $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
-            $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{btnCancel}, 0, 1, 5);
+        $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
+        $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{btnCancel}, 0, 1, 5);
 
-            $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
-            $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
+        $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
+        $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
             $WINDOWPROGRESS{_RET} = 0;
             $WINDOWPROGRESS{_GUI}->hide;
             return 1;
-            });
+        });
     }
 
     $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
@@ -1883,6 +1886,7 @@ sub _wConfirm {
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1907,6 +1911,7 @@ sub _wYesNoCancel {
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -3457,7 +3462,7 @@ sub _showUpdate {
         undef,
         'modal',
         'gtk-ok' => 'ok',
-);
+    );
 
     my $lbl = Gtk3::Label->new;
     $windowConfirm->get_content_area->pack_start($lbl, 0, 0, 5);
@@ -3764,45 +3769,50 @@ sub _makeDesktopFile {
     my $cfg = shift;
 
     if (! $$cfg{'defaults'}{'show favourites in unity'}) {
-        unlink "$ENV{HOME}/.local/share/applications/pac.desktop";
+        unlink "$ENV{HOME}/.local/share/applications/asbru.desktop";
         system('/usr/bin/xdg-desktop-menu forceupdate &');
         return 1;
     }
 
     my $d = "[Desktop Entry]\n";
-    $d .= "Name=PAC\n";
-    $d .= "Comment=Perl Auto Connector (auto start)\n";
+    $d .= "Name=Asbru Connection Manager\n";
+    $d .= "Comment=Asbru Connection Manage\n";
     $d .= "Terminal=false\n";
     $d .= "Icon=pac\n";
     $d .= "Type=Application\n";
-    $d .= "Exec=/usr/bin/pac\n";
+    $d .= "Exec=/usr/bin/asbru-cm\n";
     $d .= "StartupNotify=true\n";
-    $d .= "Name[en_US]=PAC\n";
-    $d .= "Comment[en_US]=Perl Auto Connector\n";
+    $d .= "Name[en_US]=Asbru\n";
+    $d .= "Comment[en_US]=Asbru Connetion Manager\n";
     $d .= "Categories=Applications;Network;\n";
     $d .= "X-GNOME-Autostart-enabled=false\n";
-    my $dal = 'Actions=Shell;Quick;';
+    my $dal = 'Actions=Shell;Quick;Preferences;';
     my $da = "\n[Desktop Action Shell]\n";
     $da .= "Name=<Start local shell>\n";
-    $da .= "Exec=asbru --start-shell\n";
+    $da .= "Exec=asbru-cm --start-shell\n";
     $da .= "\n[Desktop Action Quick]\n";
     $da .= "Name=<Quick connect...>\n";
-    $da .= "Exec=asbru --quick-conn\n";
-    my $action = 0;
-    foreach my $uuid (keys %{$$cfg{environments}}) {
-        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
-            next;
-        }
+    $da .= "Exec=asbru-cm --quick-conn\n";
+    $da .= "\n[Desktop Action Preferences]\n";
+    $da .= "Name=<Open Preferences...>\n";
+    $da .= "Exec=asbru-cm --preferences\n";
+#    my $action = 0;
+#    foreach my $uuid (keys %{$$cfg{environments}}) {
+#        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
+#            next;
+#        }
 
-        $dal .= "$action;";
-        $da .= "\n[Desktop Action " . $action++ . "]\n";
-        $da .= "Name=" . ($$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go) . "\n";
-        $da .= "Exec=asbru --start-uuid=$uuid\n";
-    }
+#        $dal .= "$action;";
+#        $da .= "\n[Desktop Action " . $action++ . "]\n";
+#        $da .= "Name=" . ($$cfg{'environments'}{$uuid}{'name'} =~ s/_/__/go) . "\n";
+#        $da .= "Exec=asbru-cm --start-uuid=$uuid\n";
+#    }
 
     if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/pac.desktop")) {
         return 0;
     }
+
+    open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
     system('/usr/bin/xdg-desktop-menu forceupdate &');
@@ -3912,7 +3922,7 @@ sub _createBanner {
 
 __END__
 
-= encoding utf8
+=encoding utf8
 
 =head1 NAME
 

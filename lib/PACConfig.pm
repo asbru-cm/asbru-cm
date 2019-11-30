@@ -58,11 +58,11 @@ use PACKeePass;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $AUTOSTART_FILE = $RealBin . '/res/pac_start.desktop';
+my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
 
-my $GLADE_FILE = $RealBin . '/res/asbru.glade';
+my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $RES_DIR = $RealBin . '/res';
+my $RES_DIR = "$RealBin/res";
 
 # Connect to Gnome's GSettings
 my $GSETTINGS = Glib::IO::Settings->new('org.gnome.system.proxy.http');
@@ -80,7 +80,6 @@ sub new {
     my $self = {};
 
     $self->{_CFG} = shift;
-
     $self->{_WINDOWCONFIG} = undef;
     $self->{_TXTOPTSBUFFER} = undef;
     $self->{_GLADE} = undef;
@@ -90,7 +89,6 @@ sub new {
         'ibeam' => 1,
         'underline' => 2
     );
-
     $self->{_ENCODINGS_HASH} = _getEncodings;
     $self->{_ENCODINGS_ARRAY} = [];
     $self->{_ENCODINGS_MAP} = {};
@@ -105,7 +103,9 @@ sub new {
     );
 
     # Build the GUI
-    _initGUI($self) or return 0;
+    if (!_initGUI($self)) {
+        return 0;
+    }
 
     # Setup callbacks
     _setupCallbacks($self);
@@ -125,7 +125,9 @@ sub DESTROY {
 sub show {
     my $self = shift;
     my $update = shift // 1;
-    $update and _updateGUIPreferences($self);
+    if ($update) {
+        _updateGUIPreferences($self);
+    }
     $self->{_WINDOWCONFIG}->set_title("Default Global Options : $APPNAME (v$APPVERSION)");
     $$self{_WINDOWCONFIG}->present;
     return 1;
@@ -168,15 +170,11 @@ sub _initGUI {
     _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button') );
     _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('pac-history', 'button') );
     _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button') );
-
     _($self, 'imgKeePassOpts')->set_from_stock('pac-keepass', 'button');
-
     _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('pac-protected', 'button') );
     _($self, 'btnCfgSetGUIPassword')->set_label('Set...');
-
     _($self, 'btnExportYAML')->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button') );
     _($self, 'btnExportYAML')->set_label('Export config...');
-
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new)->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new)->{container});
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new)->{container});
@@ -203,13 +201,16 @@ sub _initGUI {
 
 sub _setupCallbacks {
     my $self = shift;
+    my $tabs_on_main =  _($self,'cbCfgTabsInMain')->get_active;
+
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
         if ((_($self, 'cbCfgAutoStart')->get_active) && (! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop") ) {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
-                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop"); 1
-        };
+                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+                1;
+            };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active) {
             unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
@@ -267,7 +268,7 @@ sub _setupCallbacks {
 
         if (_($self, 'cbCfgUseGUIPassword')->get_active) {
             my $pass_ok = _wSetPACPassword($self, 0);
-            if (! $pass_ok) {
+            if (!$pass_ok) {
                 $$self{_CFGTOGGLEPASS} = 0;
             }
             _($self, 'cbCfgUseGUIPassword')->set_active($pass_ok);
@@ -289,7 +290,6 @@ sub _setupCallbacks {
             _($self, 'hboxCfgPACPassword')->set_sensitive(0);
             $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
         }
-
         return 0;
     });
 
@@ -305,7 +305,10 @@ sub _setupCallbacks {
         # Populate with <<ASK_PASS>> special string
         push(@menu_items, {
             label => 'Interactive Password input',
-            code => sub {_($self, 'entryCfgSudoPassword')->delete_text(0, -1); _($self, 'entryCfgSudoPassword')->insert_text('<<ASK_PASS>>', -1, 0);}
+            code => sub {
+                _($self, 'entryCfgSudoPassword')->delete_text(0, -1);
+                _($self, 'entryCfgSudoPassword')->insert_text('<<ASK_PASS>>', -1, 0);
+            }
         });
 
         # Populate with user defined variables
@@ -315,7 +318,9 @@ sub _setupCallbacks {
             my $j = $i;
             push(@variables_menu, {
                 label => "<V:$j> ($value)",
-                code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<V:$j>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
+                code => sub {
+                    _($self, 'entryCfgSudoPassword')->insert_text("<V:$j>", -1, _($self, 'entryCfgSudoPassword')->get_position);
+                }
             });
             ++$i;
         }
@@ -324,6 +329,7 @@ sub _setupCallbacks {
             sensitive => scalar @{$$self{variables}},
             submenu => \@variables_menu
         });
+
 
         # Populate with global defined variables
         my @global_variables_menu;
@@ -350,7 +356,6 @@ sub _setupCallbacks {
                 code => sub {_($self, 'entryCfgSudoPassword')->insert_text("<ENV:$key>", -1, _($self, 'entryCfgSudoPassword')->get_position);}
             });
         }
-
         push(@menu_items, {
             label => 'Environment variables...',
             submenu => \@environment_menu
@@ -409,7 +414,6 @@ sub _setupCallbacks {
                     code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
                 });
             }
-
             push(@menu_items, {
                 label => 'KeePassX',
                 stockicon => 'pac-keepass',
@@ -438,6 +442,28 @@ sub _setupCallbacks {
 
     $$self{_WINDOWCONFIG}->signal_connect('delete_event' => sub {_($self, 'btnCloseConfig')->clicked; return 1;});
     $$self{_WINDOWCONFIG}->signal_connect('key_press_event' => sub {my ($widget, $event) = @_; $event->keyval == 65307 and $$self{_WINDOWCONFIG}->hide; return 0;});
+
+    # Layout signal
+    _($self, 'comboLayout')->signal_connect('changed' => sub {
+        if (_($self, 'comboLayout')->get_active_text eq 'Traditional') {
+            _($self,'frameTabsInMainWindow')->show();
+            _($self,'frameTabsInMainWindow')->show();
+            _($self,'cbCfgStartMainMaximized')->show();
+            _($self,'cbCfgRememberSize')->show();
+            _($self,'cbCfgSaveOnExit')->show();
+            _($self,'cbCfgStartIconified')->show();
+            _($self,'cbCfgCloseToTray')->show();
+        } else {
+            _($self,'frameTabsInMainWindow')->hide();
+            _($self,'cbCfgStartMainMaximized')->hide();
+            _($self,'cbCfgRememberSize')->hide();
+            _($self,'cbCfgSaveOnExit')->hide();
+            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+                _($self,'cbCfgStartIconified')->hide();
+                _($self,'cbCfgCloseToTray')->hide();
+            }
+        }
+    });
 
     return 1;
 }
@@ -596,6 +622,7 @@ sub _resetDefaults {
 sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
+    my %layout = ('Traditional',0,'Compact',1);
 
     # Get PROXY from environment
     my $proxy_ip = $GSETTINGS->get_string('host');
@@ -609,6 +636,12 @@ sub _updateGUIPreferences {
     }
     if ($proxy_user) {
         $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
+    }
+    if (!defined $$cfg{'defaults'}{'layout'}) {
+        $$cfg{'defaults'}{'layout'} = 'Traditional';
+    }
+    if (!defined $layout{$$cfg{'defaults'}{'layout'}}) {
+        $layout{$$cfg{'defaults'}{'layout'}} = 0;
     }
 
     # Main options
@@ -684,6 +717,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgRemoveCtrlCharsConf')->set_active($$cfg{'defaults'}{'remove control chars'});
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
+    _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});
@@ -792,6 +826,19 @@ sub _updateGUIPreferences {
     if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
         _($self, 'lblRestartRequired')->set_text("(*) Requires restarting PAC for the change(s) to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text // '') );
     }
+
+    # Hide show options not available on choosen layout
+    if ($$cfg{'defaults'}{'layout'} eq 'Compact') {
+        _($self,'frameTabsInMainWindow')->hide();
+        _($self,'cbCfgStartMainMaximized')->hide();
+        _($self,'cbCfgRememberSize')->hide();
+        _($self,'cbCfgSaveOnExit')->hide();
+        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            _($self,'cbCfgStartIconified')->hide();
+            _($self,'cbCfgCloseToTray')->hide();
+        }
+    }
+
     return 1;
 }
 
@@ -912,6 +959,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlCharsConf')->get_active;
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active;
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active;
+    $$self{_CFG}{'defaults'}{'layout'} = _($self, 'comboLayout')->get_active_text;
 
     # Terminal colors
     $$self{_CFG}{'defaults'}{'color black'} = _($self, 'colorBlack')->get_color->to_string;
@@ -950,12 +998,20 @@ sub _saveConfiguration {
     #}
     #$$self{_CFG}{'defaults'}{'config location'} = $new_cfg_location;
 
-    _($self, 'rbCfgStartTreeConn')->get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'connections';
-    _($self, 'rbCfgStartTreeFavs')->get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'favourites';
-    _($self, 'rbCfgStartTreeHist')->get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'history';
-    _($self, 'rbCfgStartTreeCluster')->get_active and $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
+    if (_($self, 'rbCfgStartTreeConn')->get_active) {
+        $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'connections';
+    }
+    if (_($self, 'rbCfgStartTreeFavs')->get_active) {
+        $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'favourites';
+    }
+    if (_($self, 'rbCfgStartTreeHist')->get_active) {
+        $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'history';
+    }
+    if (_($self, 'rbCfgStartTreeCluster')->get_active) {
+        $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
+    }
 
-    unlink($ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
+    unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active) {
         $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
