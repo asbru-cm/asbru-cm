@@ -2422,6 +2422,8 @@ sub __treeBuildNodeName {
     my $self = shift;
     my $uuid = shift;
     my $name = shift;
+    my $bold = '';
+    my $pset = '';
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
@@ -2433,12 +2435,13 @@ sub __treeBuildNodeName {
     } else {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
-    if ($protected) {
-        $name = "<span $p_set='$p_color'>$name</span>";
-    }
     if ($is_group) {
-        $name = "<b>$name</b>";
+        $bold = " weight='bold'";
     }
+    if ($protected) {
+        $pset = "$p_set='$p_color'";
+    }
+    $name = "<span $pset$bold>$name</span>";
 
     return $name;
 }
