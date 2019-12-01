@@ -1458,7 +1458,7 @@ sub _watchConnectionData {
                     Glib::Source->remove($$self{_EMBED_KIDNAP});
                 };
             }
-            if ($$self{EMBED} && $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' || $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'VNC') {
+            if ($$self{EMBED} && ($$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' || $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'VNC')) {
                 $$self{_EMBED_KIDNAP} = Glib::Timeout->add(500, sub {
                     my $title = 'FreeRDP: ' . $$self{_CFG}{environments}{$$self{_UUID}}{ip} . ($$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}");
                     $title = $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' ?
@@ -1466,7 +1466,6 @@ sub _watchConnectionData {
                     "TightVNC: $$self{_CFG}{environments}{$$self{_UUID}}{user}";
                     my $list = _getXWindowsList;
                     if (grep({$_ =~ /$title/ and $title = $_;} keys %{$$list{'by_name'}})) {
-                        print("Add ID [" . $$list{'by_name'}{$title}{'xid'} . "] to" . $$self{_GUI}{_SOCKET} . "\n");
                         $$self{_GUI}{_SOCKET}->add_id($$list{'by_name'}{$title}{'xid'});
                     }
                     return 0;
