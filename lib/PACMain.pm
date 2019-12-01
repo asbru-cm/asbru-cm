@@ -4649,7 +4649,6 @@ sub _setSafeLayoutOptions {
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
-            $$self{_CFG}{'defaults'}{'start iconified'} = 1;
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
         }
     } else {
