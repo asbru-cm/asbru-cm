@@ -910,9 +910,7 @@ sub _initGUI {
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[1]->get_cells;
-        $c->set('font', $$self{_CFG}{defaults}{'tree font'});
-        ($c) = $col[0]->get_cells;
+        my ($c) = $col[0]->get_cells;
         $c->set_alignment(1,0.5);
     }
 
@@ -2422,6 +2420,8 @@ sub __treeBuildNodeName {
     my $self = shift;
     my $uuid = shift;
     my $name = shift;
+    my $bold = '';
+    my $pset = '';
 
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
@@ -2434,17 +2434,12 @@ sub __treeBuildNodeName {
         $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
     }
     if ($is_group) {
-        $name = "<b>$name</b>";
+        $bold = " weight='bold'";
     }
     if ($protected) {
-        $name = "<span $p_set='$p_color'>$name</span>";
+        $pset = "$p_set='$p_color'";
     }
-    if ($is_group) {
-        $name = "<b>$name</b>";
-    }
-    if ($is_group) {
-        $name = "<b>$name</b>";
-    }
+    $name = "<span $pset$bold>$name</span>";
 
     return $name;
 }
@@ -4652,7 +4647,6 @@ sub _setSafeLayoutOptions {
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
-            $$self{_CFG}{'defaults'}{'start iconified'} = 1;
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
         }
     } else {
