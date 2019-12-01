@@ -20,6 +20,9 @@ package PACMethod_vncviewer;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -205,7 +208,7 @@ sub _buildGUI {
 
     $w{chEmbed} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, 'Embed');
     $w{hbox2}->pack_start($w{chEmbed}, 0, 1, 0);
-    $w{chEmbed}->set_tooltip_text("Embed VNC window into Àsbrú Connection Manager tab\nWARNING: Highly experimental!\nIt may not work at all\nOn failure, please, change this setting.");
+    $w{chEmbed}->set_tooltip_text("Embed VNC window into a tab of Ásbrú Connection Manager.");
 
     $w{chListen} = Gtk3::CheckButton->new_with_label('Listen');
     $w{hbox2}->pack_start($w{chListen}, 0, 1, 0);

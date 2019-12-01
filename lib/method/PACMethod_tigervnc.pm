@@ -20,6 +20,9 @@ package PACMethod_tigervnc;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+use utf8;
+binmode STDOUT,':utf8';
+binmode STDERR,':utf8';
 
 $|++;
 
@@ -214,9 +217,9 @@ sub _buildGUI {
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-ViewOnly] : View only mode');
 
-    $w{chEmbed} = Gtk3::CheckButton->new_with_label('Embed in TAB');
+    $w{chEmbed} = Gtk3::CheckButton->new_with_label('Embed');
     $w{hbox2}->pack_start($w{chEmbed}, 0, 1, 0);
-    $w{chEmbed}->set_tooltip_text('[-Parent=XID] : Embed VNC window in PAC TAB');
+    $w{chEmbed}->set_tooltip_text('[-Parent=XID] : Embed VNC window into a tab of Ásbrú Connection Manager');
 
     $w{lblVia} = Gtk3::Label->new('Via:');
     $w{hbox2}->pack_start($w{lblVia}, 0, 0, 0);
