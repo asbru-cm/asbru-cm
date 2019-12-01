@@ -5093,6 +5093,7 @@ sudo -p sudo_prompt_string ...</property>
                       <object class="GtkFrame" id="frame29">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_top">2</property>
                         <property name="border_width">2</property>
                         <property name="label_xalign">0</property>
                         <child>
@@ -5203,6 +5204,7 @@ sudo -p sudo_prompt_string ...</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, any disconnected terminal TAB/Window will be automatically closed</property>
+                        <property name="margin_top">2</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -5234,6 +5236,7 @@ sudo -p sudo_prompt_string ...</property>
                       <object class="GtkFrame" id="frame1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_top">7</property>
                         <property name="border_width">2</property>
                         <property name="label_xalign">0</property>
                         <child>
@@ -6578,9 +6581,6 @@ sudo -p sudo_prompt_string ...</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
                       <object class="GtkCheckButton" id="cbCfgStartMaximized">
                         <property name="label" translatable="yes">Start Terminals maximized: maximize either TABBED or OWN window</property>
                         <property name="use_action_appearance">False</property>
@@ -6595,7 +6595,7 @@ sudo -p sudo_prompt_string ...</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
@@ -6613,7 +6613,7 @@ sudo -p sudo_prompt_string ...</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -6706,7 +6706,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -6725,6 +6725,9 @@ Changes apply to next opened connections, not current</property>
                         <property name="fill">True</property>
                         <property name="position">4</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>
