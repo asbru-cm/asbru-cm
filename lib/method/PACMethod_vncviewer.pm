@@ -78,9 +78,8 @@ sub update {
 
     my $options = _parseCfgToOptions($$self{cfg});
 
-    $$self{gui}{chNaturalSize}->set_active(! ($$options{fullScreen} || $$options{embed}) );
+    $$self{gui}{chNaturalSize}->set_active(! ($$options{fullScreen}) );
     $$self{gui}{chFullScreen}->set_active($$options{fullScreen});
-    $$self{gui}{chEmbed}->set_active($$options{embed});
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
     $$self{gui}{spQuality}->set_value($$options{quality});
@@ -97,7 +96,6 @@ sub get_cfg {
     my %options;
 
     $options{fullScreen} = $$self{gui}{chFullScreen}->get_active;
-    $options{embed} = $$self{gui}{chEmbed}->get_active;
     $options{listen} = $$self{gui}{chListen}->get_active;
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
     $options{quality} = $$self{gui}{spQuality}->get_value;
@@ -119,7 +117,6 @@ sub _parseCfgToOptions {
 
     my %hash;
     $hash{fullScreen} = 0;
-    $hash{embed} = 0;
     $hash{nsize} = 1;
     $hash{quality} = 5;
     $hash{compressLevel} = 8;
@@ -132,8 +129,7 @@ sub _parseCfgToOptions {
         next unless $opt ne '';
         $opt =~ s/\s+$//go;
 
-        if ($opt eq 'fullscreen')            {$hash{fullScreen} = 1; $hash{embed} = 0; $hash{nsize} = 0;}
-        if ($opt eq 'embed')                {$hash{fullScreen} = 0; $hash{embed} = 1; $hash{nsize} = 0;}
+        if ($opt eq 'fullscreen')            {$hash{fullScreen} = 1; $hash{nsize} = 0;}
         $opt eq 'listen'                    and    $hash{listen} = 1;
         $opt eq 'viewonly'                    and    $hash{viewOnly} = 1;
         $opt =~ /^compresslevel\s+(\d+)$/go    and    $hash{compressLevel} = $1;
@@ -151,7 +147,6 @@ sub _parseOptionsToCfg {
     my $txt = '';
 
     $txt .= ' -fullscreen'        if $$hash{fullScreen};
-    $txt .= ' -embed'            if $$hash{embed};
     $txt .= ' -listen'            if $$hash{listen};
     $txt .= ' -viewonly'        if $$hash{viewOnly};
     $txt .= ' -depth '            . $$hash{depth} if ($$hash{depth} ne 'default');
@@ -166,7 +161,8 @@ sub _parseOptionsToCfg {
 
 sub embed {
     my $self = shift;
-    return $$self{gui}{chEmbed}->get_active;
+    # TightVNC client does not support that mode anymore
+    return 0;
 }
 
 sub _buildGUI {
@@ -205,10 +201,6 @@ sub _buildGUI {
 
     $w{chNaturalSize} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, 'Natural Size');
     $w{hbox2}->pack_start($w{chNaturalSize}, 0, 1, 0);
-
-    $w{chEmbed} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, 'Embed');
-    $w{hbox2}->pack_start($w{chEmbed}, 0, 1, 0);
-    $w{chEmbed}->set_tooltip_text("Embed VNC window into a tab of Ásbrú Connection Manager.");
 
     $w{chListen} = Gtk3::CheckButton->new_with_label('Listen');
     $w{hbox2}->pack_start($w{chListen}, 0, 1, 0);

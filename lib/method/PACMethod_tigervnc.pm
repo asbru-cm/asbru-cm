@@ -82,7 +82,6 @@ sub update {
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
     $$self{gui}{spQuality}->set_value($$options{quality});
     $$self{gui}{spCompressLevel}->set_value($$options{compressLevel});
-    $$self{gui}{chEmbed}->set_active($$options{embed});
     $$self{gui}{entryVia}->set_text($$options{via});
     $$self{gui}{cbColours}->set_active($REVCOLOURS{$$options{colours}});
 
@@ -99,7 +98,6 @@ sub get_cfg {
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
     $options{quality} = $$self{gui}{spQuality}->get_value;
     $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
-    $options{embed} = $$self{gui}{chEmbed}->get_active;
     $options{via} = $$self{gui}{entryVia}->get_chars(0, -1);
     $options{colours} = $$self{gui}{cbColours}->get_active_text;
 
@@ -122,7 +120,6 @@ sub _parseCfgToOptions {
     $hash{compressLevel} = 8;
     $hash{viewOnly} = 0;
     $hash{listen} = 0;
-    $hash{embed} = 0;
     $hash{via} = '';
 
     my @opts = split(/\s+-/, $cmd_line);
@@ -133,7 +130,6 @@ sub _parseCfgToOptions {
 
         $opt =~ /^LowColourLevel\s+(\d)$/go    and    $hash{colours} = $1;
         $opt =~ /^FullScreen=(\d+)$/go        and    $hash{fullScreen} = $1;
-        $opt =~ /^Parent=(\d+)$/go            and    $hash{embed} = $1;
         $opt =~ /^listen=(\d+)$/go            and    $hash{listen} = $1;
         $opt =~ /^ViewOnly=(\d+)$/go        and    $hash{viewOnly} = $1;
         $opt =~ /^CompressLevel=(\d+)$/go    and    $hash{compressLevel} = $1;
@@ -152,7 +148,6 @@ sub _parseOptionsToCfg {
     ($$hash{colours} ne 'AutoSelect') and $txt .= ' -AutoSelect=0';
     ($$hash{colours} ne 'AutoSelect') and $txt .= ' -LowColourLevel '    . ($COLOURS{$$hash{colours}});
     $txt .= ' -FullScreen='        . ($$hash{fullScreen}    || '0');
-    $txt .= ' -Parent=1'        if $$hash{embed};
     $txt .= ' -listen='            . ($$hash{listen}        || '0');
     $txt .= ' -ViewOnly='        . ($$hash{viewOnly}    || '0');
     $txt .= ' -CompressLevel='    . $$hash{compressLevel};
@@ -164,7 +159,8 @@ sub _parseOptionsToCfg {
 
 sub embed {
     my $self = shift;
-    return $$self{gui}{chEmbed}->get_active;
+    # TigerVNC client does not support that mode anymore
+    return 0;
 }
 
 sub _buildGUI {
@@ -216,10 +212,6 @@ sub _buildGUI {
     $w{chViewOnly} = Gtk3::CheckButton->new_with_label('View Only');
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-ViewOnly] : View only mode');
-
-    $w{chEmbed} = Gtk3::CheckButton->new_with_label('Embed');
-    $w{hbox2}->pack_start($w{chEmbed}, 0, 1, 0);
-    $w{chEmbed}->set_tooltip_text('[-Parent=XID] : Embed VNC window into a tab of Ásbrú Connection Manager');
 
     $w{lblVia} = Gtk3::Label->new('Via:');
     $w{hbox2}->pack_start($w{lblVia}, 0, 0, 0);
