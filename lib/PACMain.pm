@@ -363,16 +363,8 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if ($$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
-        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon.");
-        _($$self{_CONFIG}, 'cbCfgCloseToTray')->set_tooltip_text("WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon.");
-        _($$self{_CONFIG}, 'cbCfgShowTrayIcon')->set_tooltip_text("WARNING: Tray icon may not be available:\nIf on Unity, try installing 'libgtk2-appindicator-perl' package.\nIf on Gnome3 gnome-shell, you may need to install some extension\nlike 'TopIcons'(https://extensions.gnome.org/extension/495/topicons/) in order to be able to see tray icon.");
-        if (! -f "$CFG_DIR/pac_notray.notified") {
-            $$self{_GUI}{main}->present;
-            _wMessage($$self{_GUI}{main}, "WARNING: Tray icon may not be available:\nIf on <b>Unity</b>, try installing '<b>libgtk2-appindicator-perl</b>' package.\nIf on <b>Gnome3</b> gnome-shell, you may need to install some extension like '<b>Evil Status Icon Forever</b>' in order to be able to see tray icon.\nThis message will not appear anymore.\nSee tooltip of 'Preferences'->'Main Options'->'Behaviour'->'At Exit'->'Hide to tray instead of closing'\nYou may <b>reenable Tray</b> icon options under 'Preferences'.");
-            open(F,">:utf8","$CFG_DIR/pac_notray.notified");
-            close F;
-        }
+    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("WARNING: Tray icon may not be available: Install Unite Extension is recomended.\nhttps://extensions.gnome.org/extension/1287/unite/");
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
