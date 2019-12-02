@@ -1823,7 +1823,7 @@ sub _vteMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if ($PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
             next;
         }
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
@@ -2101,7 +2101,7 @@ sub _vteMenu {
         }
     });
     # Paste Current Connection Password
-    if ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '') {
+    if (($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '')||($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
         push(@vte_menu_items,
         {
             label => 'Paste Connection Password',
@@ -2109,7 +2109,11 @@ sub _vteMenu {
             sensitive => $$self{CONNECTED},
             shortcut => '<control><shift>p',
             code => sub {
-                $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+                if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
+                    $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'}, 1);
+                } else {
+                    $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+                }
             }
         });
     };
@@ -4510,7 +4514,7 @@ sub _hasDisconnectedTerminals {
     my @list = keys %PACMain::RUNNING;
 
     foreach my $uuid (@list) {
-        if ($PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED') {
+        if (! defined $PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} || ($PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED')) {
             return 1;
         }
     }
