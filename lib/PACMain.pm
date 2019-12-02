@@ -2714,6 +2714,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',
+            shortcut => '',
             sensitive => 1,
             code => sub {
                 my $clip = '';

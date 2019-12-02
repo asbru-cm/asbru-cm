@@ -2073,6 +2073,7 @@ sub _vteMenu {
         push(@vte_menu_items, {
             label => 'Copy Connection Password',
             stockicon => 'gtk-copy',
+            shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
                 my $clip = '';
