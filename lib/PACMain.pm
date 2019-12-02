@@ -2709,6 +2709,25 @@ sub _treeConnections_menu {
             code => sub { $$self{_GUI}{connEditBtn}->clicked; }
         });
     }
+    # Copy Connection Password
+    if (($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
+        push(@tree_menu_items, {
+            label => 'Copy Password',
+            stockicon => 'gtk-copy',
+            sensitive => 1,
+            code => sub {
+                my $clip = '';
+                my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
+                if ($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '') {
+                    $clip = $$self{_CFG}{environments}{$sel[0]}{'passphrase'};
+                } else {
+                    $clip = $$self{_CFG}{environments}{$sel[0]}{'pass'};
+                }
+                use bytes;
+                $clipboard->set_text($clip,length($clip));
+            }
+        });
+    };
     # Bulk Edit
     if ((scalar(@sel) > 1 || $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {

@@ -2068,6 +2068,25 @@ sub _vteMenu {
         shortcut => '<control><shift>c',
         code => sub {$$self{_GUI}{_VTE}->copy_clipboard;}
     });
+    # Copy Connection Password
+    if (($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '')||($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
+        push(@vte_menu_items, {
+            label => 'Copy Connection Password',
+            stockicon => 'gtk-copy',
+            sensitive => $$self{CONNECTED},
+            code => sub {
+                my $clip = '';
+                my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
+                if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
+                    $clip = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
+                } else {
+                    $clip = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
+                }
+                use bytes;
+                $clipboard->set_text($clip,length($clip));
+            }
+        });
+    };
     # Paste
     push(@vte_menu_items,
     {
