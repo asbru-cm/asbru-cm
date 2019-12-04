@@ -2076,13 +2076,8 @@ sub _vteMenu {
             shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
-                my $clip = '';
                 my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
-                if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
-                    $clip = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
-                } else {
-                    $clip = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
-                }
+                my $clip = _copyPASS($$self{_UUID});
                 use bytes;
                 $clipboard->set_text($clip,length($clip));
             }

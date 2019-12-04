@@ -2717,13 +2717,8 @@ sub _treeConnections_menu {
             shortcut => '',
             sensitive => 1,
             code => sub {
-                my $clip = '';
                 my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
-                if ($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '') {
-                    $clip = $$self{_CFG}{environments}{$sel[0]}{'passphrase'};
-                } else {
-                    $clip = $$self{_CFG}{environments}{$sel[0]}{'pass'};
-                }
+                my $clip = _copyPASS($sel[0]);
                 use bytes;
                 $clipboard->set_text($clip,length($clip));
             }
