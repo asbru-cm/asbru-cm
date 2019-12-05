@@ -2717,10 +2717,7 @@ sub _treeConnections_menu {
             shortcut => '',
             sensitive => 1,
             code => sub {
-                my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
-                my $clip = _copyPASS($sel[0]);
-                use bytes;
-                $clipboard->set_text($clip,length($clip));
+                _copyPASS($sel[0]);
             }
         });
     };

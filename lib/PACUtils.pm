@@ -3922,11 +3922,16 @@ sub _createBanner {
 sub _copyPASS {
     my $uuid = shift;
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
+    my $clip;
 
+    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
     if ($$cfg{environments}{$uuid}{'passphrase'} ne '') {
-        return $$cfg{environments}{$uuid}{'passphrase'};
+        $clip = $$cfg{environments}{$uuid}{'passphrase'};
+    } else {
+        $clip = $$cfg{environments}{$uuid}{'pass'};
     }
-    return $$cfg{environments}{$uuid}{'pass'};
+    use bytes;
+    $clipboard->set_text($clip,length($clip));
 }
 
 1;
