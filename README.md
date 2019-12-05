@@ -63,25 +63,6 @@ To do so, execute the following commands:
 
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
-### Testing the gtk3 branch
-
-Welcome to the gtk3 branch. Currently we are trying to port Ásbrú Connection Manager to use gtk3 and remove legacy gtk2 dependencies. If you want to help us and try this branch you can use the following repositories.
-
-- Debian / Ubuntu
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/gtk3/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
-  ````
-
-- Fedora
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/gtk3/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
-  ````
-
-
 ### Frequenty Asked Questions
 
 - Why did you call that project "Ásbrú" ?
