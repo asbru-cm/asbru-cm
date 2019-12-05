@@ -1,1 +1,4 @@
 *.sw?
+*.*~
+lib/lib
+lib/res

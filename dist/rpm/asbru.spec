@@ -11,8 +11,6 @@ BuildArch:  noarch
 Requires:   perl
 Requires:   perl(Carp)
 Requires:   perl(Compress::Raw::Zlib)
-Requires:   perl(Crypt::CBC)
-Requires:   perl(Crypt::Rijndael)
 Requires:   perl(Crypt::Blowfish)
 Requires:   perl(Data::Dumper)
 Requires:   perl(Digest::SHA)
@@ -23,17 +21,9 @@ Requires:   perl(Exporter)
 Requires:   perl(File::Basename)
 Requires:   perl(File::Copy)
 Requires:   perl(FindBin)
-Requires:   perl(Gnome2::GConf)
-Requires:   perl(Gtk2)
-Requires:   perl(Gtk2::AppIndicator)
-Requires:   perl(Gtk2::Ex::Simple::List)
-Requires:   perl(Gtk2::Ex::Simple::TiedCommon)
-Requires:   perl(Gtk2::GladeXML)
-Requires:   perl(Gtk2::SourceView2)
-Requires:   perl(Gtk2::Unique)
+Requires:   perl(Gtk3)
+Requires:   perl(Gtk3::SimpleList)
 Requires:   perl(IO::Handle)
-Requires:   perl(IO::Stty)
-Requires:   perl(IO::Tty)
 Requires:   perl(IO::Socket)
 Requires:   perl(IO::Socket::INET)
 Requires:   perl(MIME::Base64)
@@ -55,12 +45,15 @@ Requires:   perl(strict)
 Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
-Requires:   perl-Gnome2-Vte
 Requires:   perl-X11-GUITest
 Requires:   vte
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
+Requires:   perl-Crypt-CBC
+Requires:   perl-Crypt-Rijndael
+Requires:   perl-IO-Tty
+Requires:   perl-IO-Stty
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
@@ -73,6 +66,8 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 %autosetup -n asbru-cm-%{_github_version} -p1
 sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
 sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
+sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/pac_conn
+sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/pac_conn
 find . -type f -exec sed -i \
   -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
@@ -111,7 +106,7 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,jpg,pl,glade} res/termcap %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,jpg,pl,glade,css} %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
 
 

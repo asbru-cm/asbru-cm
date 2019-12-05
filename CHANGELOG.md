@@ -1,11 +1,68 @@
-# Change Log
+# Changelog
+
+## [Unreleased](https://github.com/asbru-cm/asbru-cm/tree/HEAD)
+
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.2.1...HEAD)
+
+**Implemented enhancements:**
+
+- Double click on tab to restart [\#281](https://github.com/asbru-cm/asbru-cm/issues/281)
+- gtk3 Minimalist Main Window [\#262](https://github.com/asbru-cm/asbru-cm/issues/262)
+- Disable ssh's X forwarding by default [\#247](https://github.com/asbru-cm/asbru-cm/issues/247)
+- not found asbru-cm deb from repository [\#237](https://github.com/asbru-cm/asbru-cm/issues/237)
+- Automatic Keyboard Focus [\#148](https://github.com/asbru-cm/asbru-cm/issues/148)
+- More compact server-list tree [\#133](https://github.com/asbru-cm/asbru-cm/issues/133)
+- Garbage characters in shell logfiles [\#132](https://github.com/asbru-cm/asbru-cm/issues/132)
+- Right-click on connection-tree changes selection [\#51](https://github.com/asbru-cm/asbru-cm/issues/51)
+- Renaming a cloned connection can be confusing [\#37](https://github.com/asbru-cm/asbru-cm/issues/37)
+
+**Fixed bugs:**
+
+- Cannot change proxy settings [\#291](https://github.com/asbru-cm/asbru-cm/issues/291)
+- Can not input username more than 14 symbols on Proxy tab [\#288](https://github.com/asbru-cm/asbru-cm/issues/288)
+- Terminals not closing on el7 [\#269](https://github.com/asbru-cm/asbru-cm/issues/269)
+- \[gtk3\] It doesn't close, the windows [\#259](https://github.com/asbru-cm/asbru-cm/issues/259)
+- Removing a local/remote command/macro might remove another one [\#252](https://github.com/asbru-cm/asbru-cm/issues/252)
+- asbru-cm gtk3 rpm missing file [\#250](https://github.com/asbru-cm/asbru-cm/issues/250)
+- Latest asbru-cm 6.0 builds not working on RHEL 7.7 [\#240](https://github.com/asbru-cm/asbru-cm/issues/240)
+- \<-= DISCONNECTED \(PRESS \<ENTER\> TO RECONNECT\)  issue in gtk3 [\#232](https://github.com/asbru-cm/asbru-cm/issues/232)
+- \[gtk3\] VNC connection \(in embed mode\) does not work properly [\#199](https://github.com/asbru-cm/asbru-cm/issues/199)
+- Deleting one cluster deletes all [\#180](https://github.com/asbru-cm/asbru-cm/issues/180)
+- VNC options empty: Can't call method "\_buildGUI" on an undefined value [\#178](https://github.com/asbru-cm/asbru-cm/issues/178)
+- Right mouse click on tab title stop working [\#169](https://github.com/asbru-cm/asbru-cm/issues/169)
+- Cannot interact with multiple selections in Connection list [\#168](https://github.com/asbru-cm/asbru-cm/issues/168)
+- ncurses: showing applications in ncurses is looking very ugly [\#143](https://github.com/asbru-cm/asbru-cm/issues/143)
+- Cluster explode: window sizes and placement are incorrect [\#98](https://github.com/asbru-cm/asbru-cm/issues/98)
+- Pasting long passwords into password prompt doesn't always work [\#49](https://github.com/asbru-cm/asbru-cm/issues/49)
+
+**Closed issues:**
+
+- GTK3 about size of preference [\#293](https://github.com/asbru-cm/asbru-cm/issues/293)
+- Manual password required [\#283](https://github.com/asbru-cm/asbru-cm/issues/283)
+- Unable to Install GTK2 or GTK3 versions on Centos 7.6 [\#274](https://github.com/asbru-cm/asbru-cm/issues/274)
+- Placement of the context menu after right click the asbru-cm tray icon \(on EL7\) [\#273](https://github.com/asbru-cm/asbru-cm/issues/273)
+- gtk3 version not running on debian 10, xfce4 [\#272](https://github.com/asbru-cm/asbru-cm/issues/272)
+- \[gtk3\] Remove termcap [\#271](https://github.com/asbru-cm/asbru-cm/issues/271)
+- Move all encoding to utf8 [\#268](https://github.com/asbru-cm/asbru-cm/issues/268)
+- Find option shows lots of weird characters [\#266](https://github.com/asbru-cm/asbru-cm/issues/266)
+- \[GTK3\] Typing text not replicated on cluster windows  [\#261](https://github.com/asbru-cm/asbru-cm/issues/261)
+- vteFeedChild [\#256](https://github.com/asbru-cm/asbru-cm/issues/256)
+- \[gtk3\] Faulty link in license dialog [\#251](https://github.com/asbru-cm/asbru-cm/issues/251)
+- gtk3 Favourites [\#245](https://github.com/asbru-cm/asbru-cm/issues/245)
+- Full width banner [\#233](https://github.com/asbru-cm/asbru-cm/issues/233)
+- SSH options: clashing local port wipes out previous entries [\#179](https://github.com/asbru-cm/asbru-cm/issues/179)
 
 ## [5.2.1](https://github.com/asbru-cm/asbru-cm/tree/5.2.1) (2019-10-26)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.2.0...5.2.1)
 
 **Implemented enhancements:**
 
+- \[gtk3\] reformat code request [\#217](https://github.com/asbru-cm/asbru-cm/issues/217)
+- PNG screenshots [\#194](https://github.com/asbru-cm/asbru-cm/issues/194)
+- Port to GTK3 and new VTE [\#176](https://github.com/asbru-cm/asbru-cm/issues/176)
 - RSA authentication on MOSH protocol [\#173](https://github.com/asbru-cm/asbru-cm/issues/173)
+- Highlight search results in terminal [\#172](https://github.com/asbru-cm/asbru-cm/issues/172)
 - Installation on Linux Mint 19.2 Tina does not work [\#166](https://github.com/asbru-cm/asbru-cm/issues/166)
 - Open duplicated connection just after current active tab [\#165](https://github.com/asbru-cm/asbru-cm/issues/165)
 - Relocate "Set keyboard focus" button to gain a piece of screen in embedded tabs [\#160](https://github.com/asbru-cm/asbru-cm/issues/160)
@@ -21,6 +78,7 @@
 
 **Fixed bugs:**
 
+- \[gtk3\] Can not type passprhasse, wrong terminal focus, can not login to any server [\#204](https://github.com/asbru-cm/asbru-cm/issues/204)
 - "split" misspelled [\#177](https://github.com/asbru-cm/asbru-cm/issues/177)
 - Size of embedded xfreerdp [\#153](https://github.com/asbru-cm/asbru-cm/issues/153)
 - Cant start SSH session since last update \(missing PACUtils.pm\) on Fedora [\#147](https://github.com/asbru-cm/asbru-cm/issues/147)
@@ -31,28 +89,38 @@
 
 **Closed issues:**
 
-- Keepalives [\#246](https://github.com/asbru-cm/asbru-cm/issues/246)
 - Warnings when renaming a connection [\#243](https://github.com/asbru-cm/asbru-cm/issues/243)
+- gtk3 utf8 encoding terminal names [\#242](https://github.com/asbru-cm/asbru-cm/issues/242)
+- \[gtk3\] Update xfreerdp dependency \(if possible\) [\#239](https://github.com/asbru-cm/asbru-cm/issues/239)
 - Draw text on the banner as real text [\#234](https://github.com/asbru-cm/asbru-cm/issues/234)
 - \(pac\_conn:22985\): Gtk-WARNING  [\#227](https://github.com/asbru-cm/asbru-cm/issues/227)
+- \[gtk3\] gtkSocket: only works under X11 [\#226](https://github.com/asbru-cm/asbru-cm/issues/226)
 - KDE Neon compatibility [\#220](https://github.com/asbru-cm/asbru-cm/issues/220)
-- asbru-cm-6.0.0~1570889814-1.el7 - Invisible Terminal title  [\#219](https://github.com/asbru-cm/asbru-cm/issues/219)
+- \[gtk3\] Windows close on vertical resize [\#216](https://github.com/asbru-cm/asbru-cm/issues/216)
+- \[gtk3\] Splash screen progress bar height [\#215](https://github.com/asbru-cm/asbru-cm/issues/215)
 - ubuntu 19.10 support please [\#214](https://github.com/asbru-cm/asbru-cm/issues/214)
+- \[gtk3\] Big GTK2 leftover cleanup [\#212](https://github.com/asbru-cm/asbru-cm/issues/212)
+- \[gtk3\] VTE right-click [\#209](https://github.com/asbru-cm/asbru-cm/issues/209)
+- \[gtk3\] Clusters sync input no longer works [\#205](https://github.com/asbru-cm/asbru-cm/issues/205)
+- \[gtk3\]  Asbru crashes if you inactivate option "Put Terminals y Tabs" [\#203](https://github.com/asbru-cm/asbru-cm/issues/203)
+- \[gtk3\] Typelib file for namespace 'Wnck', version '3.0' not found [\#202](https://github.com/asbru-cm/asbru-cm/issues/202)
 - Not installable on Debian Sid [\#201](https://github.com/asbru-cm/asbru-cm/issues/201)
 - Suspicious pipe chars in regexps [\#197](https://github.com/asbru-cm/asbru-cm/issues/197)
+- \[gtk3\] Local shell colors not remembered [\#196](https://github.com/asbru-cm/asbru-cm/issues/196)
+- \[gtk3\] Set VTE's cwd via proper API [\#195](https://github.com/asbru-cm/asbru-cm/issues/195)
+- \[gtk3\] feed\_child: passed too many parameters [\#193](https://github.com/asbru-cm/asbru-cm/issues/193)
+- \[gtk3\] Searching in the terminal doesn't work [\#192](https://github.com/asbru-cm/asbru-cm/issues/192)
+- \[gtk3\] New shortcuts shown that don't work [\#191](https://github.com/asbru-cm/asbru-cm/issues/191)
+- \[gtk3\] "Connection UUID" text entry too large [\#190](https://github.com/asbru-cm/asbru-cm/issues/190)
+- \[gtk3\] Wrong label for Proxy Configuration [\#189](https://github.com/asbru-cm/asbru-cm/issues/189)
+- \[gtk3\] Broken screenshot viewer [\#188](https://github.com/asbru-cm/asbru-cm/issues/188)
 - Launching a second Ásbrú crashes the first one [\#187](https://github.com/asbru-cm/asbru-cm/issues/187)
+- \[gtk3\] Can't launch group [\#186](https://github.com/asbru-cm/asbru-cm/issues/186)
+- \[gtk3\] Narrow input fields [\#185](https://github.com/asbru-cm/asbru-cm/issues/185)
+- \[gtk3\] No statistics for groups [\#184](https://github.com/asbru-cm/asbru-cm/issues/184)
 - Reports two more nodes [\#183](https://github.com/asbru-cm/asbru-cm/issues/183)
 - Readonly mode doesn't work [\#181](https://github.com/asbru-cm/asbru-cm/issues/181)
-- package not available for Fedora 30 [\#175](https://github.com/asbru-cm/asbru-cm/issues/175)
-- Kali Linux [\#171](https://github.com/asbru-cm/asbru-cm/issues/171)
-- Change term emulation [\#170](https://github.com/asbru-cm/asbru-cm/issues/170)
-- Problem with ctrl key [\#164](https://github.com/asbru-cm/asbru-cm/issues/164)
 - How can I load a PuTTy \(.ppk\) private key into an ssh connection? [\#161](https://github.com/asbru-cm/asbru-cm/issues/161)
-- issue freezes computer [\#156](https://github.com/asbru-cm/asbru-cm/issues/156)
-- ssh always issue with setting local  [\#151](https://github.com/asbru-cm/asbru-cm/issues/151)
-- gpg-agent or command prepend [\#150](https://github.com/asbru-cm/asbru-cm/issues/150)
-- Is there a posibility to migrate the App to Mac/Windows ? [\#146](https://github.com/asbru-cm/asbru-cm/issues/146)
-- Store only fresh logs in log files. [\#144](https://github.com/asbru-cm/asbru-cm/issues/144)
 - Common Router characters do not behave correctly \(TAB, CTRL-a, CTRL-e, UP-Arrow\) [\#141](https://github.com/asbru-cm/asbru-cm/issues/141)
 - Snap support [\#97](https://github.com/asbru-cm/asbru-cm/issues/97)
 - Error prevents RDP session from starting [\#57](https://github.com/asbru-cm/asbru-cm/issues/57)
@@ -67,6 +135,7 @@
 - Add dynamic resolution and X11::GUITest method to calculate embed window size properly [\#155](https://github.com/asbru-cm/asbru-cm/pull/155) ([figue](https://github.com/figue))
 
 ## [5.2.0](https://github.com/asbru-cm/asbru-cm/tree/5.2.0) (2019-04-19)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.1.0...5.2.0)
 
 **Implemented enhancements:**
@@ -93,34 +162,22 @@
 
 **Closed issues:**
 
-- RDP Connection Bar is missing [\#137](https://github.com/asbru-cm/asbru-cm/issues/137)
 - Wrong tooltip for Session log numbers [\#131](https://github.com/asbru-cm/asbru-cm/issues/131)
-- Fedora29 - yum-utils in conflict with dnf-utils [\#130](https://github.com/asbru-cm/asbru-cm/issues/130)
-- Issue with install  [\#129](https://github.com/asbru-cm/asbru-cm/issues/129)
-- How to manually input the username when launching a connection? [\#127](https://github.com/asbru-cm/asbru-cm/issues/127)
 - Button for saythanks.io [\#126](https://github.com/asbru-cm/asbru-cm/issues/126)
 - No colors and long wait for shell when connecting to mikrotik routers [\#125](https://github.com/asbru-cm/asbru-cm/issues/125)
-- How are passwords store in the config files? [\#121](https://github.com/asbru-cm/asbru-cm/issues/121)
 - Executing whit sshrc method [\#118](https://github.com/asbru-cm/asbru-cm/issues/118)
-- Why not know which host is alive with a ping every x minutes that passes through each host in the list. That way we would know which one is on and which one we can not connect. Thanks [\#117](https://github.com/asbru-cm/asbru-cm/issues/117)
 - Why not a Mac osx version or port??? [\#116](https://github.com/asbru-cm/asbru-cm/issues/116)
-- Please release 5.1 package for ubuntu 16.04 xenial [\#112](https://github.com/asbru-cm/asbru-cm/issues/112)
 - It doesnt connect [\#111](https://github.com/asbru-cm/asbru-cm/issues/111)
-- Backup [\#110](https://github.com/asbru-cm/asbru-cm/issues/110)
-- persistent irc channel at freenode [\#109](https://github.com/asbru-cm/asbru-cm/issues/109)
-- Can't connect to any servers [\#108](https://github.com/asbru-cm/asbru-cm/issues/108)
-- How stop hiding left panel? [\#102](https://github.com/asbru-cm/asbru-cm/issues/102)
-- abru doesn't start from Cinnamon menu [\#101](https://github.com/asbru-cm/asbru-cm/issues/101)
-- Asbru 5.1.0 hide connections panel when mouse pointer not over connections panel [\#99](https://github.com/asbru-cm/asbru-cm/issues/99)
 - Connection " is of type ", which is not supported.... [\#91](https://github.com/asbru-cm/asbru-cm/issues/91)
 - zssh support [\#88](https://github.com/asbru-cm/asbru-cm/issues/88)
-- Login via pgp hardware usb key \(e.g. Nitrokey Pro\) [\#72](https://github.com/asbru-cm/asbru-cm/issues/72)
 
 **Merged pull requests:**
 
 - update split panes separator handling [\#124](https://github.com/asbru-cm/asbru-cm/pull/124) ([syco](https://github.com/syco))
+- Add option to change main window title with terminal title. [\#103](https://github.com/asbru-cm/asbru-cm/pull/103) ([kak-tus](https://github.com/kak-tus))
 
 ## [5.1.0](https://github.com/asbru-cm/asbru-cm/tree/5.1.0) (2018-07-23)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.0.0...5.1.0)
 
 **Implemented enhancements:**
@@ -130,6 +187,7 @@
 - Add a "Close disconnected tabs" option to tab-bar-rightclick-menu [\#59](https://github.com/asbru-cm/asbru-cm/issues/59)
 - Auto-save by default [\#44](https://github.com/asbru-cm/asbru-cm/issues/44)
 - asbru-cm could not be installed in Redhat Enterprise Linux/CentOS 7 [\#30](https://github.com/asbru-cm/asbru-cm/issues/30)
+- rpm spec file [\#24](https://github.com/asbru-cm/asbru-cm/issues/24)
 
 **Fixed bugs:**
 
@@ -138,22 +196,17 @@
 - Connections Tree Panel reopenes when you switch tabs [\#58](https://github.com/asbru-cm/asbru-cm/issues/58)
 - RPM package installs /asbru-cm in root [\#47](https://github.com/asbru-cm/asbru-cm/issues/47)
 - desktop file is not installed to correct location [\#22](https://github.com/asbru-cm/asbru-cm/issues/22)
-- "Start \> n instances" usually does nothing. [\#16](https://github.com/asbru-cm/asbru-cm/issues/16)
 -  Canceling user input dialogs for expect produces an error message [\#10](https://github.com/asbru-cm/asbru-cm/issues/10)
 
 **Closed issues:**
 
-- Colors are different in Asbru-CM vs terminal or PAC Manager [\#94](https://github.com/asbru-cm/asbru-cm/issues/94)
 - Merging of two yaml configurations asbru-cm \(for wiki\) [\#85](https://github.com/asbru-cm/asbru-cm/issues/85)
 - Fedora 27/28: Permission denied opening ssh/rdp [\#84](https://github.com/asbru-cm/asbru-cm/issues/84)
-- Cannot install in Ubuntu 18.04 [\#82](https://github.com/asbru-cm/asbru-cm/issues/82)
 - Split horizontal/vertical reversed [\#71](https://github.com/asbru-cm/asbru-cm/issues/71)
-- Old pac bugs are also present in asbru-cm [\#68](https://github.com/asbru-cm/asbru-cm/issues/68)
 - Problem auto connect password [\#61](https://github.com/asbru-cm/asbru-cm/issues/61)
 - 256 color support [\#54](https://github.com/asbru-cm/asbru-cm/issues/54)
 - Mass-Import from a csv File [\#48](https://github.com/asbru-cm/asbru-cm/issues/48)
 - Add a way to force a reconnect [\#46](https://github.com/asbru-cm/asbru-cm/issues/46)
-- Terminal transparency not working [\#45](https://github.com/asbru-cm/asbru-cm/issues/45)
 - Opening a new connection maximizes the window [\#42](https://github.com/asbru-cm/asbru-cm/issues/42)
 - Focus on connections can change and not be apparent why [\#38](https://github.com/asbru-cm/asbru-cm/issues/38)
 - Export or import connections in .ssh/config [\#31](https://github.com/asbru-cm/asbru-cm/issues/31)
@@ -164,16 +217,15 @@
 - Tweaks for more vertical terminal space [\#86](https://github.com/asbru-cm/asbru-cm/pull/86) ([lukefor](https://github.com/lukefor))
 - 201804 split fix2 [\#80](https://github.com/asbru-cm/asbru-cm/pull/80) ([basos9](https://github.com/basos9))
 - Fix append group name semantics \(append instead of prepend\) [\#77](https://github.com/asbru-cm/asbru-cm/pull/77) ([basos9](https://github.com/basos9))
-- Removed deprecated "have" function [\#64](https://github.com/asbru-cm/asbru-cm/pull/64) ([daugustin](https://github.com/daugustin))
 - Don't swallow key-accelerators which are not used by asbru [\#53](https://github.com/asbru-cm/asbru-cm/pull/53) ([nomike](https://github.com/nomike))
 
 ## [5.0.0](https://github.com/asbru-cm/asbru-cm/tree/5.0.0) (2017-12-29)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.0.0-RC4...5.0.0)
 
 **Implemented enhancements:**
 
 - Superputty to Asbru [\#39](https://github.com/asbru-cm/asbru-cm/issues/39)
-- rpm spec file [\#24](https://github.com/asbru-cm/asbru-cm/issues/24)
 - Bad repository generated by asbru.sh on ubuntu [\#21](https://github.com/asbru-cm/asbru-cm/issues/21)
 - Request - Link binary to something in $PATH [\#15](https://github.com/asbru-cm/asbru-cm/issues/15)
 
@@ -187,11 +239,11 @@
 
 - Session disconected after sucessful login and interactive menu showed [\#35](https://github.com/asbru-cm/asbru-cm/issues/35)
 - User Variables does not work [\#28](https://github.com/asbru-cm/asbru-cm/issues/28)
-- Error: The program 'pac' received an X Window System error [\#27](https://github.com/asbru-cm/asbru-cm/issues/27)
 - variable not allowed to be undef where GtkTreePath is wanted at /opt/asbru/lib/PACMain.pm line 986. [\#5](https://github.com/asbru-cm/asbru-cm/issues/5)
 
 **Merged pull requests:**
 
+- Removed deprecated "have" function [\#64](https://github.com/asbru-cm/asbru-cm/pull/64) ([daugustin](https://github.com/daugustin))
 - Adding script to convert SuperPutty Sessions.xml file to Asbru-cm yam… [\#40](https://github.com/asbru-cm/asbru-cm/pull/40) ([sonicepk](https://github.com/sonicepk))
 - New style of packaging [\#33](https://github.com/asbru-cm/asbru-cm/pull/33) ([KlaasT](https://github.com/KlaasT))
 - Debian automatic building [\#32](https://github.com/asbru-cm/asbru-cm/pull/32) ([KlaasT](https://github.com/KlaasT))
@@ -200,11 +252,11 @@
 -   add Arch/Manjaro instruction and some fix for this distributives [\#25](https://github.com/asbru-cm/asbru-cm/pull/25) ([beliys](https://github.com/beliys))
 
 ## [5.0.0-RC4](https://github.com/asbru-cm/asbru-cm/tree/5.0.0-RC4) (2017-11-12)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.0.0-RC3...5.0.0-RC4)
 
 **Implemented enhancements:**
 
-- No packages for Ubuntu 17.04 [\#14](https://github.com/asbru-cm/asbru-cm/issues/14)
 - bracketed paste mode [\#12](https://github.com/asbru-cm/asbru-cm/issues/12)
 
 **Fixed bugs:**
@@ -218,6 +270,7 @@
 - Detached windows still use a logo variant of PAC [\#11](https://github.com/asbru-cm/asbru-cm/issues/11)
 
 ## [5.0.0-RC3](https://github.com/asbru-cm/asbru-cm/tree/5.0.0-RC3) (2017-10-30)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.0.0-RC2...5.0.0-RC3)
 
 **Implemented enhancements:**
@@ -230,9 +283,13 @@
 - Add screenshots [\#1](https://github.com/asbru-cm/asbru-cm/issues/1)
 
 ## [5.0.0-RC2](https://github.com/asbru-cm/asbru-cm/tree/5.0.0-RC2) (2017-09-23)
+
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.0.0-RC1...5.0.0-RC2)
 
 ## [5.0.0-RC1](https://github.com/asbru-cm/asbru-cm/tree/5.0.0-RC1) (2017-09-20)
 
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/430f98894f3724a8996f9be647d01490df4c97a4...5.0.0-RC1)
 
-\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*

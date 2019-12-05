@@ -181,14 +181,14 @@ elementTemplate = """{uuid}:
     disable CTRL key bindings: ''
     disable SHIFT key bindings: ''
     open in tab: 1
-    password prompt: "([pP]ass|[pP]ass[wW]or[dt]|ontrase.a|Enter passphrase for key '.+'):\\s*$"
+    password prompt: "([pP]ass|[pP]ass[wW]or[dt]|ontrase.a|Enter passphrase for key \'.+\'):\\s*$"
     tab back color: '#000000000000'
     terminal backspace: auto
     terminal character encoding: UTF-8
     terminal emulation: xterm
     terminal font: Monospace 9
     terminal scrollback lines: 5000
-    terminal select words: \.:_\/-A-Za-z0-9
+    terminal select words: '-.:_/'
     terminal transparency: 0
     terminal window hsize: 800
     terminal window vsize: 600
