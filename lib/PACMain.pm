@@ -2709,6 +2709,18 @@ sub _treeConnections_menu {
             code => sub { $$self{_GUI}{connEditBtn}->clicked; }
         });
     }
+    # Copy Connection Password
+    if (($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
+        push(@tree_menu_items, {
+            label => 'Copy Password',
+            stockicon => 'gtk-copy',
+            shortcut => '',
+            sensitive => 1,
+            code => sub {
+                _copyPASS($sel[0]);
+            }
+        });
+    };
     # Bulk Edit
     if ((scalar(@sel) > 1 || $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {
