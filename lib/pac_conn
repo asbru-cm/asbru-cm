@@ -1313,7 +1313,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
         }],
 
         # Found login string
-        ['^.*Conn:\s+connected to host\s+.+\s+port\s+\d+.*$', sub {
+        ['^.*Conn:\s+[cC]onnected to host\s+.+\s+port\s+\d+.*$', sub {
             $CONNECTED = 1;
             ctrl("CONNECTED");
         }],
