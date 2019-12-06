@@ -107,6 +107,7 @@ require Exporter;
     _vteFeedChild
     _vteFeedChildBinary
     _createBanner
+    _copyPASS
 ); # Functions/varibles to export
 
 @EXPORT_OK  = qw();
@@ -3916,6 +3917,21 @@ sub _createBanner {
     $banner->pack_start($text, 0, 1, 0);
 
     return $banner;
+}
+
+sub _copyPASS {
+    my $uuid = shift;
+    my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
+    my $clip;
+
+    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
+    if ($$cfg{environments}{$uuid}{'passphrase'} ne '') {
+        $clip = $$cfg{environments}{$uuid}{'passphrase'};
+    } else {
+        $clip = $$cfg{environments}{$uuid}{'pass'};
+    }
+    use bytes;
+    $clipboard->set_text($clip,length($clip));
 }
 
 1;
