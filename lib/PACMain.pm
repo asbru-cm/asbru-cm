@@ -3007,14 +3007,14 @@ sub _treeConnections_menu {
 sub _showAboutWindow {
     my $self = shift;
 
-    my $dialog = Gtk3::AboutDialog->new;
-    $dialog->signal_connect('response' => sub { $_[0]->destroy; });
-    $dialog->set_program_name('');  # name is shown in the logo
-    $dialog->set_version("v$APPVERSION");
-    $dialog->set_logo(_pixBufFromFile("$RES_DIR/asbru-logo-400.png"));
-    $dialog->set_copyright("Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas");
-    $dialog->set_website('https://asbru-cm.net/');
-    $dialog->set_license("
+    Gtk3::show_about_dialog(
+        $$self{_GUI}{main},(
+        "program_name" => '',  # name is shown in the logo
+        "version" => "v$APPVERSION",
+        "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
+        "copyright" => "Copyright (C) 2017-2019 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
+        "website" => 'https://asbru-cm.net/',
+        "license" => "
 Ásbrú Connection Manager
 
 Copyright (C) 2017-2019 Ásbrú Connection Manager team <https://asbru-cm.net>
@@ -3032,10 +3032,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-");
-
-    $dialog->run;
-    $dialog->destroy;
+"
+    ));
 
     return 1;
 }
