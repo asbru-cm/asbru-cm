@@ -418,7 +418,7 @@ sub start {
     $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'} and $$self{_SEND_STRING} = Glib::Timeout->add_seconds(
         $$self{_CFG}{environments}{$$self{_UUID}}{'send string every'},
         sub {
-            if (!$$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
+            if (not $$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
                 return 1;
             }
 
@@ -1200,7 +1200,7 @@ sub _setupCallbacks {
             }
             # e --> Show main edit connection window
             if (lc $keyval eq 'e') {
-                if (!$$self{_UUID} eq '__PAC_SHELL__') {
+                if (not $$self{_UUID} eq '__PAC_SHELL__') {
                     $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
                 }
                 return 1;
