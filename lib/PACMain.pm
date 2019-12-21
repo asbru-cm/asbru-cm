@@ -1099,7 +1099,7 @@ sub _setupCallbacks {
 
             my $total_exp = 0;
             foreach my $exp (@{$$self{_CFG}{'environments'}{$uuid}{'expect'}}) {
-                if ($$exp{'active'} // 0) {
+                if (!$$exp{'active'}) {
                     next;
                 }
                 ++$total_exp;
@@ -1309,7 +1309,7 @@ sub _setupCallbacks {
             my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs;
             # e --> Show main edit connection window
             if (chr($keyval) eq 'e') {
-                if (!$sel[0] eq '__PAC_SHELL__') {
+                if ($sel[0] ne '__PAC_SHELL__') {
                     $$self{_GUI}{connEditBtn}->clicked;
                 }
                 return 1;
@@ -1814,7 +1814,7 @@ sub _setupCallbacks {
     });
 
     $$self{_GUI}{_btnNextSearch}->signal_connect('clicked' => sub {
-        if (@{ $$self{_GUI}{_RESULT} }) {
+        if (!@{$$self{_GUI}{_RESULT}}) {
             return 1;
         }
         if ($$self{_GUI}{_ACTUAL} == $#{ $$self{_GUI}{_RESULT} }) {
@@ -3459,7 +3459,7 @@ sub _saveTreeExpanded {
     $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $uuid = $store->get_value($iter, 2);
-        if (!$tree->row_expanded($path) && $uuid ne '__PAC__ROOT__') {
+        if (!($tree->row_expanded($path) && $uuid ne '__PAC__ROOT__')) {
             return 0;
         }
         print F $uuid . "\n";

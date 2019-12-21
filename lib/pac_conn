@@ -1865,7 +1865,7 @@ $SIG{'HUP'} = sub {
         my $on_fail = $$hash{'on_fail'} // -1;
         my $time_out = $$hash{'time_out'} // -1;
 
-        if ($active) {
+        if (!$active) {
             next;
         }
         my $jump = 0;

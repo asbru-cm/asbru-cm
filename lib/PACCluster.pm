@@ -920,7 +920,7 @@ sub _setupCallbacks {
         }
         if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, "Remove running terminals from deleted cluster <b>'$cluster'</b>?")) {
             foreach my $uuid (keys %{$$self{_RUNNING}}) {
-                if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} eq $cluster) {
+                if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} ne $cluster) {
                     next;
                 }
                 $$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} = '';
@@ -1028,7 +1028,7 @@ sub _setupCallbacks {
 
         my @idx;
         foreach my $uuid (@sel) {push(@idx, [$uuid]);}
-        if (scalar @idx == 0) {
+        if (scalar @idx != 1) {
             return 0;
         }
 
@@ -1083,7 +1083,7 @@ sub _setupCallbacks {
             foreach my $uuid (@sel) {
                 push(@idx, [$uuid]);
             }
-            if (scalar @idx == 0) {
+            if (scalar @idx != 1) {
                 return 0;
             }
 
@@ -1110,7 +1110,7 @@ sub _setupCallbacks {
             foreach my $uuid (@sel) {
                 push(@idx, [$uuid]);
             }
-            if (scalar @idx == 0) {
+            if (scalar @idx != 1) {
                 return 0;
             }
 
@@ -1129,7 +1129,7 @@ sub _setupCallbacks {
 
     $$self{_WINDOWCLUSTER}{treeAutocluster}->get_selection->signal_connect('changed' => sub {
         my @selection = $$self{_WINDOWCLUSTER}{treeAutocluster}->get_selected_indices;
-        if (scalar(@selection) == 0) {
+        if (scalar(@selection) != 1) {
             return 1;
         }
         $$self{_UPDATING} = 1;
@@ -1357,7 +1357,7 @@ sub _setupCallbacks {
 
         $tree->get_selection->signal_connect('changed' => sub {
             my @selection = $tree->get_selected_indices;
-            if (scalar(@selection) == 0) {
+            if (scalar(@selection) != 1) {
                 return 1;
             }
             my $sel = $selection[0];
