@@ -190,7 +190,7 @@ sub _initGUI {
     my $vbox0 = Gtk3::VBox->new(0, 0);
     $$self{_WINDOWPCC}{main}->add($vbox0);
 
-    $vbox0->pack_start(PACUtils::_createBanner('asbru-cluster.svg', 'Power Cluser Controller'), 0, 1, 0);
+    $vbox0->pack_start(PACUtils::_createBanner('asbru-cluster.svg', 'Power Cluster Controller'), 0, 1, 0);
 
     my $vbox1 = Gtk3::VBox->new(0, 0);
     $vbox0->pack_start($vbox1, 0, 1, 0);
