@@ -1234,7 +1234,7 @@ sub _setupCallbacks {
         }
         if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, "Remove running terminals from deleted cluster <b>'$cluster'</b>?")) {
             foreach my $uuid (keys %{$$self{_RUNNING}}) {
-                if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} eq $cluster) {
+                if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} ne $cluster) {
                     next;
                 }
                 $$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} = '';
