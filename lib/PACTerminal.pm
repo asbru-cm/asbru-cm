@@ -1921,8 +1921,8 @@ sub _vteMenu {
             sensitive => $$self{CONNECTED},
             stockicon => $confirm ? 'gtk-dialog-question' : '',
             code => sub {
-                $self->_execute('remote', $cmd, $confirm);
-                if ($$self{_CLUSTER}) {
+                my $ok = $self->_execute('remote', $cmd, $confirm);
+                if (($$self{_CLUSTER})&&($ok)) {
                     $self->_clusterCommit(undef, $cmd . "\n", undef);
                 }
             }
@@ -3146,7 +3146,7 @@ sub _execute {
 
     # Ask for confirmation
     if (($confirm) && (!_wConfirm($$self{GUI}{_VBOX}, "Execute <b>'$comm'</b> " . ($where ne 'remote' ? 'LOCALLY' : 'REMOTELY')))) {
-        return 1;
+        return 0;
     }
 
     my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID});
@@ -3167,7 +3167,7 @@ sub _execute {
         my $time = join('.', gettimeofday);
         if (($time - $$self{_EXEC_LAST}) <= $EXEC_STORM_TIME) {
             _wMessage($$self{GUI}{_VBOX}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
-            return 1;
+            return 0;
         }
         $$self{_EXEC_LAST} = $time;
 
@@ -3800,8 +3800,10 @@ sub _updateCFG {
             my $confirm = $$hash{confirm};
             my $intro = $$hash{intro};
 
-            $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
-            $$self{_GUI}{_MACROSCLUSTER}->get_active and $self->_clusterCommit(undef, $cmd . "\n", undef);
+            my $ok = $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
+            if (($ok)&&($$self{_GUI}{_MACROSCLUSTER}->get_active)) {
+                $self->_clusterCommit(undef, $cmd . "\n", undef);
+            }
             return 1;
         });
         ###################################################################
@@ -3896,8 +3898,10 @@ sub _updateCFG {
             $$self{_GUI}{_MACROSBOX}->show_all;
 
             $$self{_GUI}{"_BTNMACRO_$i"}->signal_connect('clicked' => sub {
-                $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
-                $$self{_GUI}{_MACROSCLUSTER}->get_active and $self->_clusterCommit(undef, $cmd . "\n", undef);
+                my $ok = $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
+                if (($ok)&&($$self{_GUI}{_MACROSCLUSTER}->get_active)) {
+                    $self->_clusterCommit(undef, $cmd . "\n", undef);
+                }
             });
 
             ++$i;
