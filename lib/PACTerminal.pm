@@ -1920,7 +1920,12 @@ sub _vteMenu {
             tooltip => $desc ? $cmd : $desc,
             sensitive => $$self{CONNECTED},
             stockicon => $confirm ? 'gtk-dialog-question' : '',
-            code => sub {$self->_execute('remote', $cmd, $confirm)}
+            code => sub {
+                $self->_execute('remote', $cmd, $confirm);
+                if ($$self{_CLUSTER}) {
+                    $self->_clusterCommit(undef, $cmd . "\n", undef);
+                }
+            }
         });
     }
     push(@vte_menu_items,
