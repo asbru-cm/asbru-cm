@@ -221,7 +221,6 @@ sub _setupCallbacks {
     # Capture 'Show hidden files' checkbox for session log files
     $$self{cbShowHidden}->signal_connect('toggled' => sub {_($self, 'btnCfgSaveSessionLogs')->set_show_hidden($$self{cbShowHidden}->get_active);});
 
-    _($self, 'cbCfgProxyToggle')->signal_connect('toggled' => sub {_($self, 'aCfgProxy')->set_sensitive(_($self, 'cbCfgProxyToggle')->get_active);});
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {_($self, 'entryPassword')->set_visibility(_($self, 'cbConnShowPass')->get_active);});
     _($self, 'cbCfgPreConnPingPort')->signal_connect('toggled' => sub {_($self, 'spCfgPingTimeout')->set_sensitive(_($self, 'cbCfgPreConnPingPort')->get_active);});
     _($self, 'cbCfgSaveSessionLogs')->signal_connect('toggled' => sub {_($self, 'hboxCfgSaveSessionLogs')->set_sensitive(_($self, 'cbCfgSaveSessionLogs')->get_active);});
@@ -801,16 +800,31 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgShellOptions')->set_text($$cfg{'defaults'}{'shell options'});
     _($self, 'entryCfgShellDirectory')->set_text($$cfg{'defaults'}{'shell directory'});
 
+    if (defined $$cfg{'defaults'}{'proxy'}) {
+        if ($$cfg{'defaults'}{'proxy'} eq 'Jump') {
+            _($self, 'cbCfgProxyJump')->set_active(1);
+        } elsif ($$cfg{'defaults'}{'proxy'} eq 'Proxy') {
+            _($self, 'cbCfgProxyManual')->set_active(1);
+        } else {
+            _($self, 'cbCfgProxyNo')->set_active(1);
+        }
+    } else {
+        _($self, 'cbCfgProxyNo')->set_active(1);
+    }
     # Proxy Configuration
-    _($self, 'cbCfgProxyToggle')->set_active($$cfg{'defaults'}{'use proxy'});
-    _($self, 'aCfgProxy')->set_sensitive(_($self, 'cbCfgProxyToggle')->get_active);
-    _($self, 'cbCfgProxySystem')->set_active($$cfg{'defaults'}{'use system proxy'});
-    _($self, 'cbCfgProxySystem')->set('label', 'Use system proxy settings (' . $proxy_string . ')');
-    _($self, 'cbCfgProxyManual')->set_active(! $$cfg{'defaults'}{'use system proxy'});
     _($self, 'entryCfgProxyIP')->set_text($$cfg{'defaults'}{'proxy ip'});
     _($self, 'entryCfgProxyPort')->set_value(($$cfg{'defaults'}{'proxy port'} // 0) || 8080);
     _($self, 'entryCfgProxyUser')->set_text($$cfg{'defaults'}{'proxy user'});
     _($self, 'entryCfgProxyPassword')->set_text($$cfg{'defaults'}{'proxy pass'});
+
+    # Jump Configuration
+    _($self, 'entryCfgJumpIP')->set_text($$cfg{'defaults'}{'jump ip'} // '');
+    _($self, 'entryCfgJumpPort')->set_value(($$cfg{'defaults'}{'jump port'} // 22) || 22);
+    _($self, 'entryCfgJumpUser')->set_text($$cfg{'defaults'}{'jump user'} // '');
+    _($self, 'entryCfgJumpPassword')->set_text($$cfg{'defaults'}{'jump pass'} // '');
+    if ((defined $$cfg{'defaults'}{'jump key'})&&($$cfg{'defaults'}{'jump key'} ne '')&&($$cfg{'defaults'}{'proxy'} eq 'Jump')) {
+        _($self, 'fileCfgJumpPublicKey')->set_uri("file://$$cfg{'defaults'}{'jump key'}");
+    }
 
     # Global TABS
     $$self{_SHELL}->update($$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'});
@@ -882,12 +896,25 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'remember main size'} = _($self, 'cbCfgRememberSize')->get_active;
     $$self{_CFG}{'defaults'}{'save on exit'} = _($self, 'cbCfgSaveOnExit')->get_active;
     $$self{_CFG}{'defaults'}{'auto save'} = _($self, 'cbCfgAutoSave')->get_active;
-    $$self{_CFG}{'defaults'}{'use proxy'} = _($self, 'cbCfgProxyToggle')->get_active;
-    $$self{_CFG}{'defaults'}{'use system proxy'} = _($self, 'cbCfgProxySystem')->get_active;
+    if (_($self, 'cbCfgProxyManual')->get_active) {
+        $$self{_CFG}{'defaults'}{'proxy'} = 'Proxy';
+    } elsif (_($self, 'cbCfgProxyJump')->get_active) {
+        $$self{_CFG}{'defaults'}{'proxy'} = 'Jump';
+    } else {
+        $$self{_CFG}{'defaults'}{'proxy'} = 'No';
+    }
     $$self{_CFG}{'defaults'}{'proxy ip'} = _($self, 'entryCfgProxyIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy port'} = _($self, 'entryCfgProxyPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy user'} = _($self, 'entryCfgProxyUser')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy pass'} = _($self, 'entryCfgProxyPassword')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump ip'} = _($self, 'entryCfgJumpIP')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump port'} = _($self, 'entryCfgJumpPort')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump pass'} = _($self, 'entryCfgJumpPassword')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump key'} = _($self, 'fileCfgJumpPublicKey')->get_filename // '';
+    if (!_($self, 'cbCfgProxyJump')->get_active) {
+        $$self{_CFG}{'defaults'}{'jump key'} = '';
+    }
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell directory'} = _($self, 'entryCfgShellDirectory')->get_chars(0, -1);
