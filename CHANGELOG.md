@@ -1,11 +1,14 @@
 # Changelog
 
-## [Unreleased](https://github.com/asbru-cm/asbru-cm/tree/HEAD)
+## [6.0.0](https://github.com/asbru-cm/asbru-cm/tree/6.0.0) (2020-01-02)
 
-[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.2.1...HEAD)
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.2.1...6.0.0)
 
 **Implemented enhancements:**
 
+- Can not install on LinuxMint/tricia [\#321](https://github.com/asbru-cm/asbru-cm/issues/321)
+- \[gtk3\] GtkDialog mapped without a transient parent [\#312](https://github.com/asbru-cm/asbru-cm/issues/312)
+- Copy password from another connection defined in the Connections List [\#295](https://github.com/asbru-cm/asbru-cm/issues/295)
 - Double click on tab to restart [\#281](https://github.com/asbru-cm/asbru-cm/issues/281)
 - gtk3 Minimalist Main Window [\#262](https://github.com/asbru-cm/asbru-cm/issues/262)
 - Disable ssh's X forwarding by default [\#247](https://github.com/asbru-cm/asbru-cm/issues/247)
@@ -13,11 +16,16 @@
 - Automatic Keyboard Focus [\#148](https://github.com/asbru-cm/asbru-cm/issues/148)
 - More compact server-list tree [\#133](https://github.com/asbru-cm/asbru-cm/issues/133)
 - Garbage characters in shell logfiles [\#132](https://github.com/asbru-cm/asbru-cm/issues/132)
+- Flatpak support [\#83](https://github.com/asbru-cm/asbru-cm/issues/83)
+- Add feature to see RDP connection log \(especially errors\) directly in asbru-cm [\#76](https://github.com/asbru-cm/asbru-cm/issues/76)
 - Right-click on connection-tree changes selection [\#51](https://github.com/asbru-cm/asbru-cm/issues/51)
 - Renaming a cloned connection can be confusing [\#37](https://github.com/asbru-cm/asbru-cm/issues/37)
 
 **Fixed bugs:**
 
+- Some regressions in gtk3 [\#317](https://github.com/asbru-cm/asbru-cm/issues/317)
+- RPM packaging issue: res directory is in incorrect path [\#302](https://github.com/asbru-cm/asbru-cm/issues/302)
+- VNC connection status is not parsed properly \(always "connecting"\) [\#301](https://github.com/asbru-cm/asbru-cm/issues/301)
 - Cannot change proxy settings [\#291](https://github.com/asbru-cm/asbru-cm/issues/291)
 - Can not input username more than 14 symbols on Proxy tab [\#288](https://github.com/asbru-cm/asbru-cm/issues/288)
 - Terminals not closing on el7 [\#269](https://github.com/asbru-cm/asbru-cm/issues/269)
@@ -33,10 +41,15 @@
 - Cannot interact with multiple selections in Connection list [\#168](https://github.com/asbru-cm/asbru-cm/issues/168)
 - ncurses: showing applications in ncurses is looking very ugly [\#143](https://github.com/asbru-cm/asbru-cm/issues/143)
 - Cluster explode: window sizes and placement are incorrect [\#98](https://github.com/asbru-cm/asbru-cm/issues/98)
+- "Retab" button in PCC causes asbru-cm to crash [\#52](https://github.com/asbru-cm/asbru-cm/issues/52)
 - Pasting long passwords into password prompt doesn't always work [\#49](https://github.com/asbru-cm/asbru-cm/issues/49)
+- starting asbru-cm a second time leads to segfault [\#23](https://github.com/asbru-cm/asbru-cm/issues/23)
+- Guessing the hostname with \<ctrl\>+\<shift\>+\<g\> doesn't work with zsh [\#9](https://github.com/asbru-cm/asbru-cm/issues/9)
+- Errors while opening local shell should not be shown as messages of the remote session [\#4](https://github.com/asbru-cm/asbru-cm/issues/4)
 
 **Closed issues:**
 
+- \[gtk3\] alt-e does not open connection editor [\#314](https://github.com/asbru-cm/asbru-cm/issues/314)
 - GTK3 about size of preference [\#293](https://github.com/asbru-cm/asbru-cm/issues/293)
 - Manual password required [\#283](https://github.com/asbru-cm/asbru-cm/issues/283)
 - Unable to Install GTK2 or GTK3 versions on Centos 7.6 [\#274](https://github.com/asbru-cm/asbru-cm/issues/274)
@@ -45,12 +58,54 @@
 - \[gtk3\] Remove termcap [\#271](https://github.com/asbru-cm/asbru-cm/issues/271)
 - Move all encoding to utf8 [\#268](https://github.com/asbru-cm/asbru-cm/issues/268)
 - Find option shows lots of weird characters [\#266](https://github.com/asbru-cm/asbru-cm/issues/266)
+- asbru crashed, config file empty [\#265](https://github.com/asbru-cm/asbru-cm/issues/265)
 - \[GTK3\] Typing text not replicated on cluster windows  [\#261](https://github.com/asbru-cm/asbru-cm/issues/261)
 - vteFeedChild [\#256](https://github.com/asbru-cm/asbru-cm/issues/256)
 - \[gtk3\] Faulty link in license dialog [\#251](https://github.com/asbru-cm/asbru-cm/issues/251)
 - gtk3 Favourites [\#245](https://github.com/asbru-cm/asbru-cm/issues/245)
 - Full width banner [\#233](https://github.com/asbru-cm/asbru-cm/issues/233)
 - SSH options: clashing local port wipes out previous entries [\#179](https://github.com/asbru-cm/asbru-cm/issues/179)
+
+**Merged pull requests:**
+
+- added execute cluster commit on confirmed if confirmation was required [\#324](https://github.com/asbru-cm/asbru-cm/pull/324) ([hanspr](https://github.com/hanspr))
+- added cluster commit, \#304 [\#322](https://github.com/asbru-cm/asbru-cm/pull/322) ([hanspr](https://github.com/hanspr))
+- fixed regression removing unless from eq to ne [\#320](https://github.com/asbru-cm/asbru-cm/pull/320) ([hanspr](https://github.com/hanspr))
+- Fix spelling in banner of "Power Cluster Controller" [\#319](https://github.com/asbru-cm/asbru-cm/pull/319) ([merikz](https://github.com/merikz))
+- revised unless statements, caused regressions [\#318](https://github.com/asbru-cm/asbru-cm/pull/318) ([hanspr](https://github.com/hanspr))
+- \[gtk3\] regression from removal of "unless" \(fixes \#314\) [\#315](https://github.com/asbru-cm/asbru-cm/pull/315) ([merikz](https://github.com/merikz))
+- Remove GTK-Message:GtkDialog mapped without a transient parent. \(\#312\) [\#313](https://github.com/asbru-cm/asbru-cm/pull/313) ([merikz](https://github.com/merikz))
+- added feature \#295 copy password, passphrase from terminal, connections [\#298](https://github.com/asbru-cm/asbru-cm/pull/298) ([hanspr](https://github.com/hanspr))
+- Shrink preferences [\#296](https://github.com/asbru-cm/asbru-cm/pull/296) ([hanspr](https://github.com/hanspr))
+- Fix layout [\#292](https://github.com/asbru-cm/asbru-cm/pull/292) ([hanspr](https://github.com/hanspr))
+- Fix229 [\#290](https://github.com/asbru-cm/asbru-cm/pull/290) ([hanspr](https://github.com/hanspr))
+- Fix288 [\#289](https://github.com/asbru-cm/asbru-cm/pull/289) ([hanspr](https://github.com/hanspr))
+- Fix232 [\#287](https://github.com/asbru-cm/asbru-cm/pull/287) ([hanspr](https://github.com/hanspr))
+- Add layouts [\#286](https://github.com/asbru-cm/asbru-cm/pull/286) ([hanspr](https://github.com/hanspr))
+- Fix179 [\#284](https://github.com/asbru-cm/asbru-cm/pull/284) ([hanspr](https://github.com/hanspr))
+- Automatically create configuration backups [\#279](https://github.com/asbru-cm/asbru-cm/pull/279) ([hanspr](https://github.com/hanspr))
+- Proposal Export debug information [\#278](https://github.com/asbru-cm/asbru-cm/pull/278) ([hanspr](https://github.com/hanspr))
+- removed depresiated method in gtk3, fixed render problem with \<\>, fix… [\#277](https://github.com/asbru-cm/asbru-cm/pull/277) ([hanspr](https://github.com/hanspr))
+- Fix regression [\#276](https://github.com/asbru-cm/asbru-cm/pull/276) ([hanspr](https://github.com/hanspr))
+- Utf8 migration [\#275](https://github.com/asbru-cm/asbru-cm/pull/275) ([hanspr](https://github.com/hanspr))
+- Menu icons [\#260](https://github.com/asbru-cm/asbru-cm/pull/260) ([hanspr](https://github.com/hanspr))
+- Add pcc tray menu [\#258](https://github.com/asbru-cm/asbru-cm/pull/258) ([hanspr](https://github.com/hanspr))
+- Fix mouse on cluster [\#257](https://github.com/asbru-cm/asbru-cm/pull/257) ([hanspr](https://github.com/hanspr))
+- fix copy with mouse selection gets lost sometimes [\#255](https://github.com/asbru-cm/asbru-cm/pull/255) ([hanspr](https://github.com/hanspr))
+- better window placement on explode [\#254](https://github.com/asbru-cm/asbru-cm/pull/254) ([hanspr](https://github.com/hanspr))
+- Utf8 test \(\#133\) [\#253](https://github.com/asbru-cm/asbru-cm/pull/253) ([hanspr](https://github.com/hanspr))
+- Fix \#168 [\#249](https://github.com/asbru-cm/asbru-cm/pull/249) ([hanspr](https://github.com/hanspr))
+- Gtk3 Save sessions popup menu [\#244](https://github.com/asbru-cm/asbru-cm/pull/244) ([hanspr](https://github.com/hanspr))
+- Gtk3 changed configdir to config-dir [\#241](https://github.com/asbru-cm/asbru-cm/pull/241) ([hanspr](https://github.com/hanspr))
+- Gtk3 Add global configuration settings [\#238](https://github.com/asbru-cm/asbru-cm/pull/238) ([hanspr](https://github.com/hanspr))
+- Gtk3format Large cosmetic change [\#236](https://github.com/asbru-cm/asbru-cm/pull/236) ([hanspr](https://github.com/hanspr))
+- Gtk3format. PACUtils.pm coding standard [\#235](https://github.com/asbru-cm/asbru-cm/pull/235) ([hanspr](https://github.com/hanspr))
+- Gtk3format, format, coding standard and documentation [\#231](https://github.com/asbru-cm/asbru-cm/pull/231) ([hanspr](https://github.com/hanspr))
+- Gtk3format PACTerminal.pm [\#228](https://github.com/asbru-cm/asbru-cm/pull/228) ([hanspr](https://github.com/hanspr))
+- Gtk3format PACMain [\#225](https://github.com/asbru-cm/asbru-cm/pull/225) ([hanspr](https://github.com/hanspr))
+- Gtk3format asbru-cm [\#224](https://github.com/asbru-cm/asbru-cm/pull/224) ([hanspr](https://github.com/hanspr))
+- CODING STANDARDt added [\#221](https://github.com/asbru-cm/asbru-cm/pull/221) ([hanspr](https://github.com/hanspr))
+- Gtk3 Fixes and proposed improvements [\#213](https://github.com/asbru-cm/asbru-cm/pull/213) ([hanspr](https://github.com/hanspr))
 
 ## [5.2.1](https://github.com/asbru-cm/asbru-cm/tree/5.2.1) (2019-10-26)
 
@@ -217,6 +272,7 @@
 - Tweaks for more vertical terminal space [\#86](https://github.com/asbru-cm/asbru-cm/pull/86) ([lukefor](https://github.com/lukefor))
 - 201804 split fix2 [\#80](https://github.com/asbru-cm/asbru-cm/pull/80) ([basos9](https://github.com/basos9))
 - Fix append group name semantics \(append instead of prepend\) [\#77](https://github.com/asbru-cm/asbru-cm/pull/77) ([basos9](https://github.com/basos9))
+- Removed deprecated "have" function [\#64](https://github.com/asbru-cm/asbru-cm/pull/64) ([daugustin](https://github.com/daugustin))
 - Don't swallow key-accelerators which are not used by asbru [\#53](https://github.com/asbru-cm/asbru-cm/pull/53) ([nomike](https://github.com/nomike))
 
 ## [5.0.0](https://github.com/asbru-cm/asbru-cm/tree/5.0.0) (2017-12-29)
@@ -243,7 +299,6 @@
 
 **Merged pull requests:**
 
-- Removed deprecated "have" function [\#64](https://github.com/asbru-cm/asbru-cm/pull/64) ([daugustin](https://github.com/daugustin))
 - Adding script to convert SuperPutty Sessions.xml file to Asbru-cm yam… [\#40](https://github.com/asbru-cm/asbru-cm/pull/40) ([sonicepk](https://github.com/sonicepk))
 - New style of packaging [\#33](https://github.com/asbru-cm/asbru-cm/pull/33) ([KlaasT](https://github.com/KlaasT))
 - Debian automatic building [\#32](https://github.com/asbru-cm/asbru-cm/pull/32) ([KlaasT](https://github.com/KlaasT))
