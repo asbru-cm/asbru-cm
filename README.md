@@ -44,14 +44,14 @@ To do so, execute the following commands:
 - Debian / Ubuntu
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.deb.sh | sudo bash
   $ sudo apt-get install asbru-cm
   ````
 
 - Fedora
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.rpm.sh | sudo bash
   $ sudo dnf install asbru-cm
   ````
 
@@ -75,17 +75,17 @@ Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
   As [David Torrejon Vaquerizas](https://github.com/perseo22), the author of PAC Manager, could not find time, for some reasons that we respect, to continue the work on his project and was not open for external contributions ([see this](https://github.com/perseo22/pacmanager/issues/57)), a fork was needed to ensure the future and give the opportunity to the community to take over.
 
-More questions can be found on the [dedicated project wiki page](https://github.com/asbru-cm/asbru-cm/wiki/Frequently-Asked-Questions).
+More questions can be found on the [dedicated project wiki page](https://github.com/asbru-cm/v5/wiki/Frequently-Asked-Questions).
 
 ### Contributing
 
-If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
+If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/v5/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
 
-Before contributing, please review our [contributing doc](https://github.com/asbru-cm/asbru-cm/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/asbru-cm/blob/master/CODE_OF_CONDUCT.md).
+Before contributing, please review our [contributing doc](https://github.com/asbru-cm/v5/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/v5/blob/master/CODE_OF_CONDUCT.md).
 
 ### License
 
-Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
+Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/v5/blob/master/LICENSE) file.
 
 ### Packages
 
@@ -93,13 +93,13 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 
 <a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
 
-[travis-badge]: https://travis-ci.org/asbru-cm/asbru-cm.svg?branch=master
-[travis-url]: https://travis-ci.org/asbru-cm/asbru-cm
+[travis-badge]: https://travis-ci.org/asbru-cm/v5.svg?branch=master
+[travis-url]: https://travis-ci.org/asbru-cm/v5
 [license-badge]: https://img.shields.io/badge/License-GPL--3-blue.svg?style=flat
 [license-url]: LICENSE
 [deb-badge]: https://img.shields.io/badge/Packages-Debian-blue.svg?style=flat
-[deb-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=debs
+[deb-url]: https://packagecloud.io/asbru-cm/v5?filter=debs
 [rpm-badge]: https://img.shields.io/badge/Packages-RPM-blue.svg?style=flat
-[rpm-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=rpms
+[rpm-url]: https://packagecloud.io/asbru-cm/v5?filter=rpms
 [liberapay-badge]: http://img.shields.io/liberapay/patrons/asbru-cm.svg?logo=liberapay
 [liberapay-url]: https://liberapay.com/asbru-cm/donate

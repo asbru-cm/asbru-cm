@@ -54,13 +54,13 @@ deploy:
       tags: true
   - provider: packagecloud
     skip_cleanup: true
-    repository: gtk3
+    repository: v5
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
-      branch: gtk3
+      branch: legacy-v5
 
 
 after_deploy:
