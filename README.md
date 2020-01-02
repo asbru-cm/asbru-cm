@@ -63,6 +63,23 @@ To do so, execute the following commands:
 
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
+### Installation of legacy 5.x
+
+- Debian / Ubuntu
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.deb.sh | sudo bash
+  $ sudo apt-get install asbru-cm
+  ````
+
+- Fedora
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.rpm.sh | sudo bash
+  $ sudo dnf install asbru-cm
+  ````
+
+
 ### Frequenty Asked Questions
 
 - Why did you call that project "Ásbrú" ?
