@@ -342,7 +342,7 @@ sub start {
 
         # Retrieve the XID of the window on which the external process will have to plug into
         if ($$self{_GUI}{_SOCKET}->get_window()) {
-            $$self{_CFG}{'tmp'}{'xid'} = $$self{_GUI}{_SOCKET}->get_window->get_xid();
+            $$self{_CFG}{'tmp'}{'xid'} = $$self{_GUI}{_SOCKET}->get_window()->get_xid();
             $$self{FOCUS} = $$self{_GUI}{_SOCKET};
         } else {
             $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
@@ -837,8 +837,8 @@ sub _initGUI {
             if ($$self{_FOCUSED}) {
                 $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             }
-            if (defined $$self{FOCUS} && defined $$self{FOCUS}->get_window) {
-                $$self{FOCUS}->get_window->show();
+            if (defined $$self{FOCUS} && defined $$self{FOCUS}->get_window()) {
+                $$self{FOCUS}->get_window()->show();
             }
         }
         if ($$self{_CFG}{'defaults'}{'start maximized'}) {
@@ -948,7 +948,7 @@ sub _setupCallbacks {
         if ($$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
             return 0;
         }
-        my @geo = $$self{_GUI}{_VTE}->get_window->get_geometry;
+        my @geo = $$self{_GUI}{_VTE}->get_window()->get_geometry();
         if ($$self{_CFG}{defaults}{'tree on right side'}) {
             if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child1) eq $$self{_GUI}{_VBOX}) && ! $$self{_SPLIT_VERTICAL}) {
                 return 0;
@@ -1015,12 +1015,12 @@ sub _setupCallbacks {
         if (($keyval eq 'F11') && (! $$self{_CFG}{defaults}{'prevent F11'})) {
             if ($$self{_FULLSCREEN}) {
                 $$self{_FSTOTAB} and $self->_winToTab;
-                $$self{_GUI}{_VBOX}->get_window->unfullscreen;
+                $$self{_GUI}{_VBOX}->get_window()->unfullscreen();
                 $$self{_FULLSCREEN} = 0;
             } else {
                 $$self{_FSTOTAB} = $$self{_TABBED};
                 $$self{_TABBED} and $self->_tabToWin;
-                $$self{_GUI}{_VBOX}->get_window->fullscreen;
+                $$self{_GUI}{_VBOX}->get_window()->fullscreen();
                 $$self{_FULLSCREEN} = 1;
             }
             return 1;
@@ -3251,7 +3251,7 @@ sub _wPrePostExec {
     }
 
     # Change mouse cursor (to busy) in VTE window
-    $$self{_GUI}{_VBOX}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+    $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
 
     # Now, prepare the local executions window, show it, AND stop until something clicked
     $ppe{window}{data}->show_all();
@@ -3279,7 +3279,7 @@ sub _wPrePostExec {
         }
 
         # Change mouse cursor (to busy)
-        $ppe{window}{data}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+        $ppe{window}{data}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
         $ppe{window}{data}->set_sensitive(0);
 
         my $i = 0;
@@ -3304,7 +3304,7 @@ sub _wPrePostExec {
         }
 
         # Change mouse cursor (to normal)
-        $ppe{window}{data}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+        $ppe{window}{data}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
         $ppe{window}{data}->set_sensitive(1);
 
         return 1;
@@ -3359,7 +3359,7 @@ sub _wPrePostExec {
             my ($me, $response) = @_;
             $response eq '1' and _execLocalPPE($self, \%w);
             $w{window}{data}->destroy();
-            $$self{_GUI}{_VBOX}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+            $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
             undef %w;
         });
 
@@ -4215,7 +4215,7 @@ sub _wFindInTerminal {
 
         my $val = $w{window}{gui}{entry}->get_chars(0, -1);
 
-        $w{window}{gui}{vbox}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+        $w{window}{gui}{vbox}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
         $w{window}{gui}{hbtnbox}->set_sensitive(0);
         $w{window}{gui}{frame2}->set_label(' PLEASE, WAIT. SEARCHING... ');
         $w{window}{gui}{btnfind}->set_label('STOP SEARCH');
@@ -4262,7 +4262,7 @@ sub _wFindInTerminal {
             }
         }
 
-        $w{window}{gui}{vbox}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+        $w{window}{gui}{vbox}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
         $w{window}{gui}{hbtnbox}->set_sensitive(1);
         $w{window}{gui}{frame2}->set_label(' ' . scalar(keys %found) . " lines matching '$val': ");
         $w{window}{gui}{btnfind}->set_label('Find');
