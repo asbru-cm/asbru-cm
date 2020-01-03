@@ -1769,6 +1769,22 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
                                     <child>
+                                      <object class="GtkRadioButton" id="rbUseProxyIfCFG">
+                                        <property name="label" translatable="yes">Use global options</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
                                       <object class="GtkRadioButton" id="rbUseProxyNever">
                                         <property name="label" translatable="yes">Never use any proxy</property>
                                         <property name="use_action_appearance">False</property>
@@ -1779,22 +1795,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">rbUseProxyIfCFG</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkRadioButton" id="rbUseProxyIfCFG">
-                                        <property name="label" translatable="yes">Use global options</property>
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="xalign">0</property>
-                                        <property name="draw_indicator">True</property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
