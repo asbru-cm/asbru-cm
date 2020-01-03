@@ -513,6 +513,7 @@ sub stop {
         }
     } else {
         $$self{_WINDOWTERMINAL}->destroy();
+        undef($$self{_WINDOWTERMINAL});
     }
 
     # Try to ensure we leave no background "pac_conn" processes running after closing the terminal
@@ -2615,6 +2616,7 @@ sub _winToTab {
         $tabs->set_tab_reorderable($$self{_SPLIT_VPANE}, 1);
         $PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_TABBED} = 1;
         $PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_WINDOWTERMINAL}->destroy();
+        undef($PACMain::RUNNING{$$self{_SPLIT}}{terminal}{_WINDOWTERMINAL});
         if (!$PACMain::RUNNING{$$self{_SPLIT}}{'is_shell'}) {
             $PACMain::RUNNING{$$self{_SPLIT}}{terminal}->_updateCFG();
         }
@@ -2623,6 +2625,7 @@ sub _winToTab {
         $tabs->set_tab_label($$self{_GUI}{_VBOX}, $$self{_GUI}{_TABLBL});
         $tabs->set_tab_reorderable($$self{_GUI}{_VBOX}, 1);
         $$self{_WINDOWTERMINAL}->destroy();
+        undef($$self{_WINDOWTERMINAL});
     }
 
     $$self{_TABBED} = 1;
