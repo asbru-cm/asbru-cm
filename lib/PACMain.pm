@@ -344,7 +344,7 @@ sub start {
     );
 
     # Show main interface
-    $$self{_GUI}{main}->show_all;
+    $$self{_GUI}{main}->show_all();
 
     # Apply Layout as early as possible
     $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
@@ -357,7 +357,7 @@ sub start {
 
     # Autostart Shell if so is configured
     if ($$self{_CFG}{'defaults'}{'autostart shell upon PAC start'}) {
-        $$self{_GUI}{shellBtn}->clicked;
+        $$self{_GUI}{shellBtn}->clicked();
     }
 
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
@@ -370,7 +370,7 @@ sub start {
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
         $$self{_GUI}{main}->present;
     } else {
-        $self->_hideConnectionsList;
+        $self->_hideConnectionsList();
     }
 
     print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
@@ -385,7 +385,7 @@ sub start {
             }
             $$self{_GUI}{treeConnections}->expand_to_path($path);
             $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            $$self{_GUI}{connEditBtn}->clicked;
+            $$self{_GUI}{connEditBtn}->clicked();
         }
     }
 
@@ -393,16 +393,16 @@ sub start {
     grep({ /^--start-script=(.+)$/ and $$self{_SCRIPTS}->_execScript($1); } @{ $$self{_OPTS} });
 
     # Auto start Shell
-    grep({ /^--start-shell$/ and $$self{_GUI}{shellBtn}->clicked; } @{ $$self{_OPTS} });
+    grep({ /^--start-shell$/ and $$self{_GUI}{shellBtn}->clicked(); } @{ $$self{_OPTS} });
 
     # Auto start Quick Connect edit dialog
-    grep({ /^--quick-conn$/ and $$self{_GUI}{connQuickBtn}->clicked; } @{ $$self{_OPTS} });
+    grep({ /^--quick-conn$/ and $$self{_GUI}{connQuickBtn}->clicked(); } @{ $$self{_OPTS} });
 
     # Auto start Preferences dialog
-    grep({ /^--preferences$/ and $$self{_GUI}{configBtn}->clicked; } @{ $$self{_OPTS} });
+    grep({ /^--preferences$/ and $$self{_GUI}{configBtn}->clicked(); } @{ $$self{_OPTS} });
 
     # Auto start Scripts window
-    grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked; } @{ $$self{_OPTS} });
+    grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked(); } @{ $$self{_OPTS} });
 
     #$self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
 
@@ -508,7 +508,7 @@ sub _initGUI {
         $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
     }
     $$self{_GUI}{nbTreeTab}->set_tooltip_text('Connection Tree');
-    $$self{_GUI}{nbTreeTab}->show_all;
+    $$self{_GUI}{nbTreeTab}->show_all();
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll1}, $$self{_GUI}{nbTreeTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll1}, 1);
     $$self{_GUI}{scroll1}->set_policy('automatic', 'automatic');
@@ -545,7 +545,7 @@ sub _initGUI {
 
     $$self{_GUI}{_entrySearch} = Gtk3::Entry->new;
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_entrySearch}, 0, 1, 0);
-    $$self{_GUI}{_entrySearch}->grab_focus;
+    $$self{_GUI}{_entrySearch}->grab_focus();
 
     $$self{_GUI}{_hboxSearch} = Gtk3::HBox->new(1, 0);
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_hboxSearch}, 0, 1, 0);
@@ -581,7 +581,7 @@ sub _initGUI {
         $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
     }
     $$self{_GUI}{nbFavTab}->set_tooltip_text('Favourites');
-    $$self{_GUI}{nbFavTab}->show_all;
+    $$self{_GUI}{nbFavTab}->show_all();
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll2}, $$self{_GUI}{nbFavTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll2}, 1);
     $$self{_GUI}{scroll2}->set_shadow_type('none');
@@ -615,7 +615,7 @@ sub _initGUI {
         $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
     }
     $$self{_GUI}{nbHistTab}->set_tooltip_text('Connection History');
-    $$self{_GUI}{nbHistTab}->show_all;
+    $$self{_GUI}{nbHistTab}->show_all();
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll3}, $$self{_GUI}{nbHistTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll3}, 1);
     $$self{_GUI}{scroll3}->set_shadow_type('none');
@@ -650,7 +650,7 @@ sub _initGUI {
         $$self{_GUI}{nbCluTab}->pack_start($$self{_GUI}{nbCluTabLabel}, 0, 1, 0);
     }
     $$self{_GUI}{nbCluTab}->set_tooltip_text('Clusters');
-    $$self{_GUI}{nbCluTab}->show_all;
+    $$self{_GUI}{nbCluTab}->show_all();
     $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{scrolledclu}, 1, 1, 0);
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{vboxclu}, $$self{_GUI}{nbCluTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{vboxclu}, 1);
@@ -757,7 +757,7 @@ sub _initGUI {
     }
 
     # Create a notebook widget
-    my $nb = Gtk3::Notebook->new;
+    my $nb = Gtk3::Notebook->new();
     $$self{_GUI}{vbox5}->pack_start($nb, 1, 1, 0);
     $nb->set_scrollable(1);
     $nb->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
@@ -769,7 +769,7 @@ sub _initGUI {
     $tablbl->pack_start($eblbl, 0, 1, 0);
     $$self{_GUI}{_TABIMG} = Gtk3::Image->new_from_stock('gtk-info', 'menu');
     $tablbl->pack_start($$self{_GUI}{_TABIMG}, 0, 1, 0);
-    $tablbl->show_all;
+    $tablbl->show_all();
 
     # Create a vboxInfo: description
     $$self{_GUI}{vboxInfo} = Gtk3::VBox->new(0, 0);
@@ -926,7 +926,7 @@ sub _initGUI {
         $$self{_GUI}{_PACTABS}->maximize if $$self{_CFG}{'defaults'}{'start maximized'};
 
         # Create a notebook widget
-        $$self{_GUI}{nb} = Gtk3::Notebook->new;
+        $$self{_GUI}{nb} = Gtk3::Notebook->new();
         $$self{_GUI}{_PACTABS}->add($$self{_GUI}{nb});
         $$self{_GUI}{nb}->set_scrollable(1);
         $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
@@ -938,7 +938,7 @@ sub _initGUI {
     }
 
     $$self{_GUI}{nb}->set('can_focus', 0);
-    $$self{_GUI}{treeConnections}->grab_focus;
+    $$self{_GUI}{treeConnections}->grab_focus();
 
     # Load window size/position, and treeconnections size
     $self->_loadGUIData;
@@ -986,23 +986,23 @@ sub _initGUI {
     $FUNCS{_MAIN} = $self;
 
     # To show_all, or not to show_all... that's the question!! :)
-    $$self{_GUI}{main}->show_all unless $$self{_CMDLINETRAY};
+    $$self{_GUI}{main}->show_all() unless $$self{_CMDLINETRAY};
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
-    $$self{_GUI}{_vboxSearch}->hide;
+    $$self{_GUI}{_vboxSearch}->hide();
 
-    $self->_updateGUIPreferences;
+    $self->_updateGUIPreferences();
     if ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'connections') {
         $$self{_GUI}{nbTree}->set_current_page(0);
     } elsif ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'favourites') {
         $$self{_GUI}{nbTree}->set_current_page(1);
-        $self->_updateFavouritesList;
-        $self->_updateGUIFavourites;
+        $self->_updateFavouritesList();
+        $self->_updateGUIFavourites();
     } elsif ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history') {
         $$self{_GUI}{nbTree}->set_current_page(2);
-        $self->_updateGUIClusters;
+        $self->_updateGUIClusters();
     } else {
         $$self{_GUI}{nbTree}->set_current_page(3);
-        $self->_updateGUIHistory;
+        $self->_updateGUIHistory();
     }
 
     return 1;
@@ -1016,9 +1016,9 @@ sub _setupCallbacks {
         my ($command, $message) = $hint =~ /([^\|]+)\|(.*)?/;
         print "INFO: Received message : [$command]-[$message]\n";
         if ($command eq 'start-shell') {
-            $$self{_GUI}{shellBtn}->clicked;
+            $$self{_GUI}{shellBtn}->clicked();
         } elsif ($command eq 'quick-conn') {
-            $$self{_GUI}{connQuickBtn}->clicked;
+            $$self{_GUI}{connQuickBtn}->clicked();
         } elsif ($command eq 'start-uuid') {
             $self->_launchTerminals([ [ $message ] ]);
         } elsif ($command eq'show-conn') {
@@ -1029,7 +1029,7 @@ sub _setupCallbacks {
             next unless ($uuid ne '__PAC__ROOT__');
             $$self{_GUI}{treeConnections}->expand_to_path($path);
             $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            $$self{_GUI}{connEditBtn}->clicked;
+            $$self{_GUI}{connEditBtn}->clicked();
         } else {
             print "WARN: Unknown command received ($command)\n";
         }
@@ -1120,7 +1120,7 @@ sub _setupCallbacks {
         $$self{_GUI}{$what}->signal_connect('drag_begin' => sub {
             my ($me, $context, $x, $y, $data, $info, $time) = @_;
 
-            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs;
+            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs();
             if ($sel[0] eq '__PAC__ROOT__') {
                 return 0;
             }
@@ -1141,16 +1141,16 @@ sub _setupCallbacks {
             $icon_label->set_margin_bottom(3);
             $icon_window->get_style_context->add_class('dnd-icon');
             $icon_window->add($icon_label);
-            $icon_window->show_all;
-            my ($w, $h) = $icon_window->get_size;
+            $icon_window->show_all();
+            my ($w, $h) = $icon_window->get_size();
             Gtk3::drag_set_icon_widget($context, $icon_window, $w / 2, $h);
         });
 
         $$self{_GUI}{$what}->signal_connect('drag_end' => sub { $$self{'DND'} = undef; return 1; });
         $$self{_GUI}{$what}->signal_connect('drag_failed' => sub {
-            my ($w, $px, $py) = $$self{_GUI}{main}->get_window->get_pointer;
-            my $wsx = $$self{_GUI}{main}->get_window->get_width;
-            my $wsy = $$self{_GUI}{main}->get_window->get_height;
+            my ($w, $px, $py) = $$self{_GUI}{main}->get_window()->get_pointer();
+            my $wsx = $$self{_GUI}{main}->get_window()->get_width();
+            my $wsy = $$self{_GUI}{main}->get_window()->get_height();
 
             # User cancelled the drop operation: finish
             $_[2] eq 'user-cancelled' and return 0;
@@ -1183,7 +1183,7 @@ sub _setupCallbacks {
 
     # Capture 'add group' button clicked
     $$self{_GUI}{groupAddBtn}->signal_connect('clicked' => sub {
-        my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+        my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         my $group_uuid = $groups[0];
         my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'AVAILABLE CONNECTIONS';
         if (!(($group_uuid eq '__PAC__ROOT__') || $$self{_CFG}{'environments'}{$group_uuid}{'_is_group'})) {
@@ -1268,7 +1268,7 @@ sub _setupCallbacks {
 
     # Capture 'delete environment' button clicked
     $$self{_GUI}{nodeDelBtn}->signal_connect('clicked' => sub {
-        my @del = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+        my @del = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
         if (scalar(@del) && $del[0] eq '__PAC__ROOT__') {
             return 1;
@@ -1306,11 +1306,11 @@ sub _setupCallbacks {
             if (!(($event->state == [qw(mod1-mask)])&&(!$$self{_CFG}{'defaults'}{'disable ALT key bindings'}))) {
                 return 0;
             }
-            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs;
+            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs();
             # e --> Show main edit connection window
             if (chr($keyval) eq 'e') {
                 if ($sel[0] ne '__PAC_SHELL__') {
-                    $$self{_GUI}{connEditBtn}->clicked;
+                    $$self{_GUI}{connEditBtn}->clicked();
                 }
                 return 1;
             }
@@ -1318,7 +1318,10 @@ sub _setupCallbacks {
         });
 
         # Capture row double clicking (execute selected connection)
-        $$self{_GUI}{$what}->signal_connect('row_activated' => sub { $$self{_GUI}{connExecBtn}->clicked; return 1; });
+        $$self{_GUI}{$what}->signal_connect('row_activated' => sub {
+            $$self{_GUI}{connExecBtn}->clicked();
+            return 1;
+        });
 
         # Capture right click
         $$self{_GUI}{$what}->signal_connect('button_release_event' => sub {
@@ -1326,7 +1329,7 @@ sub _setupCallbacks {
             if ($event->button ne 3) {
                 return 0;
             }
-            if (!$$self{_GUI}{$what}->_getSelectedUUIDs) {
+            if (!$$self{_GUI}{$what}->_getSelectedUUIDs()) {
                 return 1;
             }
             $self->_treeConnections_menu_lite($$self{_GUI}{$what});
@@ -1335,15 +1338,18 @@ sub _setupCallbacks {
     }
 
     # Capture selected element changed
-    $$self{_GUI}{treeFavourites}->get_selection->signal_connect('changed' => sub { $self->_updateGUIFavourites; });
-    $$self{_GUI}{treeHistory}->get_selection->signal_connect('changed' => sub { $self->_updateGUIHistory; });
+    $$self{_GUI}{treeFavourites}->get_selection->signal_connect('changed' => sub { $self->_updateGUIFavourites(); });
+    $$self{_GUI}{treeHistory}->get_selection->signal_connect('changed' => sub { $self->_updateGUIHistory(); });
 
     $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
 
     # Capture 'treeClusters' row activated
-    $$self{_GUI}{treeClusters}->signal_connect('row_activated' => sub { my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames; $self->_startCluster($sel[0]); });
+    $$self{_GUI}{treeClusters}->signal_connect('row_activated' => sub {
+        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+        $self->_startCluster($sel[0]);
+    });
 
-    $$self{_GUI}{treeClusters}->get_selection->signal_connect('changed' => sub { $self->_updateGUIClusters; });
+    $$self{_GUI}{treeClusters}->get_selection->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -1379,7 +1385,7 @@ sub _setupCallbacks {
         #print "TREECONNECTIONS KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
         #print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
 
-        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
         my $is_group = 0;
         my $is_root = 0;
@@ -1398,7 +1404,7 @@ sub _setupCallbacks {
             if ($keyval == 102) {
                 $$self{_SHOWFINDTREE} = 1;
                 $$self{_GUI}{_vboxSearch}->show;
-                $$self{_GUI}{_entrySearch}->grab_focus;
+                $$self{_GUI}{_entrySearch}->grab_focus();
                 return 1;
             }
             # r --> Expand all
@@ -1442,14 +1448,14 @@ sub _setupCallbacks {
             # e --> Show main edit connection window
             if (chr($keyval) eq 'e') {
                 if (!$is_root) {
-                    $$self{_GUI}{connEditBtn}->clicked;
+                    $$self{_GUI}{connEditBtn}->clicked();
                 }
                 return 1;
             }
             # r --> Toggle protection flag
             elsif (chr($keyval) eq 'r') {
                 if (!$is_root) {
-                    $self->__treeToggleProtection;
+                    $self->__treeToggleProtection();
                 }
                 return 1;
             }
@@ -1458,13 +1464,13 @@ sub _setupCallbacks {
         # Capture 'F2' keypress to rename nodes
         elsif ($event->keyval == 65471) {
             if ((scalar(@sel) == 1) && ($sel[0] ne '__PAC__ROOT__')) {
-                $$self{_GUI}{nodeRenBtn}->clicked;
+                $$self{_GUI}{nodeRenBtn}->clicked();
             }
             return 1;
         }
         # Capture 'Del' keypress to delete connection
         elsif ($event->keyval == 65535) {
-            $$self{_GUI}{nodeDelBtn}->clicked;
+            $$self{_GUI}{nodeDelBtn}->clicked();
             return 1;
         }
         # Capture 'left arrow'  keypress to collapse row
@@ -1535,7 +1541,7 @@ sub _setupCallbacks {
         elsif (($event->keyval >= 32) && ($event->keyval <= 126)) {
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show;
-            $$self{_GUI}{_entrySearch}->grab_focus;
+            $$self{_GUI}{_entrySearch}->grab_focus();
             $$self{_GUI}{_entrySearch}->insert_text(chr($event->keyval), -1, 0);
             $$self{_GUI}{_entrySearch}->set_position(-1);
             return 1;
@@ -1547,13 +1553,13 @@ sub _setupCallbacks {
 
     # Capture 'treeconnections' selected element changed
     $$self{_GUI}{treeConnections}->get_selection->signal_connect('changed' => sub {
-        $self->_updateGUIPreferences;
+        $self->_updateGUIPreferences();
         });
 
     # Capture row double clicking (execute selected connection)
     $$self{_GUI}{treeConnections}->signal_connect('row_activated' => sub {
         my @idx;
-        foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs) {
+        foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs()) {
             push(@idx, [ $uuid ]);
         }
         if (scalar @idx != 1) {
@@ -1572,7 +1578,7 @@ sub _setupCallbacks {
             }
             $tree->row_expanded($paths[0]) ? $tree->collapse_row($paths[0]) : $tree->expand_row($paths[0], 0);
         } else {
-            $$self{_GUI}{connExecBtn}->clicked;
+            $$self{_GUI}{connExecBtn}->clicked();
         }
     });
 
@@ -1616,7 +1622,7 @@ sub _setupCallbacks {
         if ($event->button ne 3) {
             return 0;
         }
-        if (!$$self{_GUI}{treeConnections}->_getSelectedUUIDs) {
+        if (!$$self{_GUI}{treeConnections}->_getSelectedUUIDs()) {
             return 0;
         }
         $self->_treeConnections_menu($event);
@@ -1625,7 +1631,7 @@ sub _setupCallbacks {
 
     # Capture 'add connection' button clicked
     $$self{_GUI}{connAddBtn}->signal_connect('clicked' => sub {
-        my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+        my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         my $group_uuid = $groups[0];
         if (!(($group_uuid eq '__PAC__ROOT__') || $$self{_CFG}{'environments'}{$group_uuid}{'_is_group'})) {
             return 1;
@@ -1668,7 +1674,7 @@ sub _setupCallbacks {
         # Add the node to the parent's childs list
         $$self{_CFG}{'environments'}{$group_uuid}{'children'}{$txt_uuid} = 1;
 
-        $self->_updateGUIPreferences;
+        $self->_updateGUIPreferences();
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
@@ -1716,7 +1722,7 @@ sub _setupCallbacks {
         if (!$$self{_GUI}{_vboxSearch}->get_visible) {
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show;
-            $$self{_GUI}{_entrySearch}->grab_focus;
+            $$self{_GUI}{_entrySearch}->grab_focus();
         } else {
             $$self{_SHOWFINDTREE} = 0;
             $$self{_GUI}{_vboxSearch}->hide;
@@ -1728,26 +1734,26 @@ sub _setupCallbacks {
             $$self{_SHOWFINDTREE} = 0;
             $$self{_GUI}{_entrySearch}->set_text('');
             $$self{_GUI}{_vboxSearch}->hide;
-            $$self{_GUI}{treeConnections}->grab_focus;
+            $$self{_GUI}{treeConnections}->grab_focus();
             return 1;
         }
         # Capture 'up arrow'  keypress to move to previous ocurrence
         elsif ($_[1]->keyval == 65362) {
-            $$self{_GUI}{_btnPrevSearch}->clicked;
+            $$self{_GUI}{_btnPrevSearch}->clicked();
             return 1;
         }
         # Capture 'down arrow'  keypress to move to next ocurrence
         elsif ($_[1]->keyval == 65364) {
-            $$self{_GUI}{_btnNextSearch}->clicked;
+            $$self{_GUI}{_btnNextSearch}->clicked();
             return 1;
         }
         return 0
     });
 
     $$self{_GUI}{_entrySearch}->signal_connect('activate' => sub {
-        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         if ((scalar(@sel)==1)&&($sel[0] ne '__PAC__ROOT__')&&(!$$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})&&($$self{_GUI}{_entrySearch}->get_chars(0, -1) ne '')) {
-            $$self{_GUI}{connExecBtn}->clicked;
+            $$self{_GUI}{connExecBtn}->clicked();
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('focus_out_event' => sub {
@@ -1764,8 +1770,8 @@ sub _setupCallbacks {
                 return 0;
             }
             my $where = 'name';
-            $$self{_GUI}{_rbSearchHost}->get_active and $where = 'host';
-            $$self{_GUI}{_rbSearchDesc}->get_active and $where = 'desc';
+            $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
+            $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
             $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
             $$self{_GUI}{_ACTUAL} = 0;
             if (@{ $$self{_GUI}{_RESULT} }) {
@@ -1784,8 +1790,8 @@ sub _setupCallbacks {
             return 0;
         }
         my $where = 'name';
-        $$self{_GUI}{_rbSearchHost}->get_active and $where = 'host';
-        $$self{_GUI}{_rbSearchDesc}->get_active and $where = 'desc';
+        $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
+        $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
         $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
         $$self{_GUI}{_ACTUAL} = 0;
         if (@{ $$self{_GUI}{_RESULT} }) {
@@ -1827,9 +1833,9 @@ sub _setupCallbacks {
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
-        $$self{_GUI}{showConnBtn}->get_active ? $$self{_GUI}{vbox3}->show : $$self{_GUI}{vbox3}->hide;
-        if ($$self{_GUI}{showConnBtn}->get_active) {
-            $$self{_GUI}{treeConnections}->grab_focus;
+        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vbox3}->show : $$self{_GUI}{vbox3}->hide;
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{treeConnections}->grab_focus();
         }
         return 1;
     });
@@ -1837,7 +1843,7 @@ sub _setupCallbacks {
     # Catch buttons' keypresses
     $$self{_GUI}{connExecBtn}->signal_connect('clicked' => sub {
         my ($tree,@idx,%tmp);
-        my $pnum = $$self{_GUI}{nbTree}->get_current_page;
+        my $pnum = $$self{_GUI}{nbTree}->get_current_page();
         if  ($$self{_GUI}{nbTree}->get_nth_page($pnum) eq $$self{_GUI}{scroll1}) {
             $tree = $$self{_GUI}{treeConnections};
         } elsif ($$self{_GUI}{nbTree}->get_nth_page($pnum) eq $$self{_GUI}{scroll2}) {
@@ -1849,10 +1855,10 @@ sub _setupCallbacks {
             $self->_startCluster($sel[0]);
             return 1;
         }
-        if (!$tree->_getSelectedUUIDs) {
+        if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
-        foreach my $uuid ($tree->_getSelectedUUIDs) {
+        foreach my $uuid ($tree->_getSelectedUUIDs()) {
             if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
                 my @children = $$self{_GUI}{treeConnections}->_getChildren($uuid, 0, 1);
                 foreach my $child (@children) {
@@ -1869,7 +1875,7 @@ sub _setupCallbacks {
     });
     $$self{_GUI}{configBtn}->signal_connect('clicked' => sub { $$self{_CONFIG}->show; });
     $$self{_GUI}{connEditBtn}->signal_connect('clicked' => sub {
-        my $pnum = $$self{_GUI}{nbTree}->get_current_page;
+        my $pnum = $$self{_GUI}{nbTree}->get_current_page();
         my $tree;
 
         if  ($pnum == 0) {
@@ -1879,7 +1885,7 @@ sub _setupCallbacks {
         } else {
             $tree = $$self{_GUI}{treeHistory};
         }
-        my @sel = $tree->_getSelectedUUIDs;
+        my @sel = $tree->_getSelectedUUIDs();
         if (!scalar(@sel)) {
             return 1;
         }
@@ -1923,7 +1929,7 @@ sub _setupCallbacks {
         if ($$self{_NO_PROPAGATE_FAV_TOGGLE}) {
             return 1;
         }
-        my $pnum = $$self{_GUI}{nbTree}->get_current_page;
+        my $pnum = $$self{_GUI}{nbTree}->get_current_page();
         my $tree;
         if  ($pnum == 0) {
             $tree = $$self{_GUI}{treeConnections};
@@ -1932,29 +1938,29 @@ sub _setupCallbacks {
         } else {
             $tree = $$self{_GUI}{treeHistory};
         }
-        if (!$tree->_getSelectedUUIDs) {
+        if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
-        map $$self{_CFG}{'environments'}{$_}{'favourite'} = $$self{_GUI}{connFavourite}->get_active, $tree->_getSelectedUUIDs;
-        if ($$self{_GUI}{nbTree}->get_current_page == 1) {
-            $self->_updateFavouritesList;
-            $self->_updateGUIFavourites;
-            $self->_updateGUIPreferences;
+        map $$self{_CFG}{'environments'}{$_}{'favourite'} = $$self{_GUI}{connFavourite}->get_active(), $tree->_getSelectedUUIDs();
+        if ($$self{_GUI}{nbTree}->get_current_page() == 1) {
+            $self->_updateFavouritesList();
+            $self->_updateGUIFavourites();
+            $self->_updateGUIPreferences();
         }
-        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_GUI}{connFavourite}->get_active ? 'on' : 'off'), 'button'));
+        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
         if ($UNITY) {
             $FUNCS{_TRAY}->_setTrayMenu;
         }
         $self->_setCFGChanged(1);
         return 1;
     });
-    $$self{_GUI}{scriptsBtn}->signal_connect('clicked' => sub { $$self{_SCRIPTS}->show; });
-    $$self{_GUI}{pccBtn}->signal_connect('clicked' => sub { $$self{_PCC}->show; });
-    $$self{_GUI}{quitBtn}->signal_connect('clicked' => sub { $self->_quitProgram; });
-    $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration; });
-    $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow; });
+    $$self{_GUI}{scriptsBtn}->signal_connect('clicked' => sub { $$self{_SCRIPTS}->show(); });
+    $$self{_GUI}{pccBtn}->signal_connect('clicked' => sub { $$self{_PCC}->show(); });
+    $$self{_GUI}{quitBtn}->signal_connect('clicked' => sub { $self->_quitProgram(); });
+    $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration(); });
+    $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow(); });
     $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan; });
-    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active ? $self->_lockPAC : $self->_unlockPAC; });
+    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC : $self->_unlockPAC; });
 
     # Capture CONN TAB page switching
     $$self{_GUI}{nbTree}->signal_connect('switch_page' => sub {
@@ -1970,21 +1976,21 @@ sub _setupCallbacks {
 
         # Connections
         if ($page eq $$self{_GUI}{scroll1}) {
-            $self->_updateGUIPreferences;
+            $self->_updateGUIPreferences();
         }
         # Favourites
         elsif ($page eq $$self{_GUI}{scroll2}) {
-            $self->_updateFavouritesList;
-            $self->_updateGUIFavourites;
+            $self->_updateFavouritesList();
+            $self->_updateGUIFavourites();
         }
         # History
         elsif ($page eq $$self{_GUI}{scroll3}) {
-            $self->_updateGUIHistory;
+            $self->_updateGUIHistory();
         }
         # Clusters
         else {
-            $self->_updateClustersList;
-            $self->_updateGUIClusters;
+            $self->_updateClustersList();
+            $self->_updateGUIClusters();
         }
         return 1;
     });
@@ -1995,9 +2001,9 @@ sub _setupCallbacks {
             return 1;
         }
         if  ($$self{_GUI}{nb}->get_n_pages == 0) {
-            $$self{_GUI}{_PACTABS}->hide;
+            $$self{_GUI}{_PACTABS}->hide();
         } elsif ($$self{_GUI}{nb}->get_n_pages == 1) {
-            $$self{_GUI}{treeConnections}->grab_focus;
+            $$self{_GUI}{treeConnections}->grab_focus();
             $$self{_GUI}{showConnBtn}->set_active(1);
 
             if ($$self{_CFG}{defaults}{'when no more tabs'} == 0) {
@@ -2005,12 +2011,12 @@ sub _setupCallbacks {
             }
             elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
                 #quit
-                $self->_quitProgram;
+                $self->_quitProgram();
             }
             elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_active;
+                    $$self{_TRAY}{_TRAY}->set_active();
                 } else {
                     $$self{_TRAY}{_TRAY}->set_visible(1);
                 }
@@ -2019,7 +2025,7 @@ sub _setupCallbacks {
                     $$self{_GUI}{lockPACBtn}->set_active(1);
                 }
                 # Hide main window
-                $self->_hideConnectionsList;
+                $self->_hideConnectionsList();
             }
         }
         return 1;
@@ -2065,7 +2071,7 @@ sub _setupCallbacks {
         #print "TABBED WINDOW KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
 
         # Get current page's tab number
-        my $curr_page = $$self{_GUI}{nb}->get_current_page;
+        my $curr_page = $$self{_GUI}{nb}->get_current_page();
 
         # Continue checking keypress only if <Ctrl> is pushed
         if ($ctrl && $shift && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'}) && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'})) {
@@ -2079,7 +2085,7 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page($$self{_GUI}{nb}->get_n_pages - 1);
                 } else {
-                    $$self{_GUI}{nb}->prev_page;
+                    $$self{_GUI}{nb}->prev_page();
                 }
             }
             return 1;
@@ -2091,7 +2097,8 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page(-1);
                 } else {
-                    $$self{_GUI}{nb}->prev_page;
+                    print("PREV PAGE\n");
+                    $$self{_GUI}{nb}->prev_page();
                 }
             }
             # Capture <Ctrl>PgDwn/Right --> select next tab
@@ -2099,7 +2106,7 @@ sub _setupCallbacks {
                 if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
                     $$self{_GUI}{nb}->set_current_page(0);
                 } else {
-                    $$self{_GUI}{nb}->next_page;
+                    $$self{_GUI}{nb}->next_page();
                 }
             }
             # Capture <Ctrl>number --> select number tab
@@ -2114,7 +2121,7 @@ sub _setupCallbacks {
                     if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
                         $$self{_GUI}{nb}->set_current_page(0);
                     } else {
-                        $$self{_GUI}{nb}->next_page;
+                        $$self{_GUI}{nb}->next_page();
                     }
                 }
             } else {
@@ -2128,7 +2135,7 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page(-1);
                 } else {
-                    $$self{_GUI}{nb}->prev_page;
+                    $$self{_GUI}{nb}->prev_page();
                 }
             }
             # Capture <Alt>PgDwn/Right --> select next tab
@@ -2136,7 +2143,7 @@ sub _setupCallbacks {
                 if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
                     $$self{_GUI}{nb}->set_current_page(0);
                 } else {
-                    $$self{_GUI}{nb}->next_page;
+                    $$self{_GUI}{nb}->next_page();
                 }
             } else {
                 return 0;
@@ -2167,8 +2174,8 @@ sub _setupCallbacks {
         return 0;
     });
     $$self{_GUI}{descBuffer}->signal_connect('changed' => sub {
-        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
-        if (!(scalar(@sel) == 1 && $$self{_GUI}{nbTree}->get_current_page == 0 && $$self{_GUI}{descView}->is_sensitive)) {
+        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
+        if (!(scalar(@sel) == 1 && $$self{_GUI}{nbTree}->get_current_page() == 0 && $$self{_GUI}{descView}->is_sensitive)) {
             return 0;
         }
         $$self{_CFG}{environments}{$sel[0]}{description} = $$self{_GUI}{descBuffer}->get_property('text');
@@ -2179,13 +2186,14 @@ sub _setupCallbacks {
     $$self{_GUI}{nb}->signal_connect('switch_page' => sub {
         my ($nb, $p, $pnum) = @_;
 
-        $$self{_PREVTAB}=$nb->get_current_page;
+        $$self{_PREVTAB} = $nb->get_current_page();
 
         my $tab_page = $nb->get_nth_page($pnum);
 
         $$self{_HAS_FOCUS} = '';
         foreach my $tmp_uuid (keys %RUNNING) {
             my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
+
             if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
                 next;
             }
@@ -2197,15 +2205,15 @@ sub _setupCallbacks {
                 $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
             }
 
-            $RUNNING{$tmp_uuid}{terminal}->_setTabColour;
+            $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
 
             if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
                 eval {
-                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window) {
-                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window->focus(time);
+                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
+                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
                     }
                 };
-                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus;
+                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
             }
             $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
             last;
@@ -2219,7 +2227,7 @@ sub _setupCallbacks {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
             if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_active;
+                $$self{_TRAY}{_TRAY}->set_active();
             } else {
                 $$self{_TRAY}{_TRAY}->set_visible(1);
             }
@@ -2229,12 +2237,12 @@ sub _setupCallbacks {
             }
             # Hide main window
             if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-                $$self{_GUI}{main}->iconify;
+                $$self{_GUI}{main}->iconify();
             } else {
-                $self->_hideConnectionsList;
+                $self->_hideConnectionsList();
             }
         } else {
-            $self->_quitProgram;
+            $self->_quitProgram();
         }
         return 1;
     });
@@ -2243,7 +2251,7 @@ sub _setupCallbacks {
     # Save GUI size/position/... *before* it hides
     $$self{_GUI}{main}->signal_connect('unmap_event' => sub { $self->_saveGUIData; return 0; });
 
-    $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide unless $$self{_SHOWFINDTREE}; });
+    $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide() unless $$self{_SHOWFINDTREE}; });
 
     # Capture 'treeconnections' keypress
     $$self{_GUI}{main}->signal_connect('key_press_event' => sub {
@@ -2270,17 +2278,17 @@ sub _setupCallbacks {
         if($_[1]->keyval == 102)  {
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show;
-            $$self{_GUI}{_entrySearch}->grab_focus;
+            $$self{_GUI}{_entrySearch}->grab_focus();
             return 1;
         }
         # Q --> Finish
         elsif ($_[1]->keyval == 113) {
-            $PACMain::FUNCS{_MAIN}->_quitProgram;
+            $PACMain::FUNCS{_MAIN}->_quitProgram();
             return 1;
         }
         # T --> Open local shell
         elsif (lc $keyval eq 't') {
-            $$self{_GUI}{shellBtn}->clicked;
+            $$self{_GUI}{shellBtn}->clicked();
             return 1;
         }
         return 0;
@@ -2467,7 +2475,7 @@ sub __treeToggleProtection {
     my $selection = $$self{_GUI}{treeConnections}->get_selection;
     my $modelsort = $$self{_GUI}{treeConnections}->get_model;
     my $model = $modelsort->get_model;
-    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
     foreach my $uuid (@sel) {
         $$self{_CFG}{'environments'}{$uuid}{'_protected'} = !$$self{_CFG}{'environments'}{$uuid}{'_protected'};
@@ -2481,7 +2489,7 @@ sub _treeConnections_menu_lite {
     my $self = shift;
     my $tree = shift;
 
-    my @sel = $tree->_getSelectedUUIDs;
+    my @sel = $tree->_getSelectedUUIDs();
 
     if (scalar(@sel) == 0) {
         return 1;
@@ -2498,7 +2506,7 @@ sub _treeConnections_menu_lite {
             shortcut => '<alt>e',
             tooltip => "Edit this connection\'s data",
             sensitive => $sel[0] ne '__PAC_SHELL__',
-            code => sub { $$self{_GUI}{connEditBtn}->clicked; }
+            code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
         });
     }
     # Bulk Edit
@@ -2509,7 +2517,7 @@ sub _treeConnections_menu_lite {
             shortcut => '<alt>e',
             tooltip => "Bulk edit some values of selected connection\'s",
             sensitive => 1,
-            code => sub { $$self{_GUI}{connEditBtn}->clicked; }
+            code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
         });
     }
 
@@ -2596,7 +2604,7 @@ sub _treeConnections_menu_lite {
             }
             my @idx;
             my %tmp;
-            foreach my $uuid ($tree->_getSelectedUUIDs) {
+            foreach my $uuid ($tree->_getSelectedUUIDs()) {
                 $tmp{$uuid} = 1;
             }
             foreach my $uuid (keys %tmp) {
@@ -2624,7 +2632,7 @@ sub _treeConnections_menu_lite {
             code => sub {
                 my @idx;
                 my %tmp;
-                foreach my $uuid ($tree->_getSelectedUUIDs) {
+                foreach my $uuid ($tree->_getSelectedUUIDs()) {
                     $tmp{$uuid} = 1;
                 }
                 foreach my $uuid (keys %tmp) {
@@ -2653,7 +2661,7 @@ sub _treeConnections_menu {
     my $p = '';
     my $clip = scalar (keys %{$$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'}});
 
-    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
     if (scalar(@sel) == 0) {
         return 1;
     } elsif ((scalar(@sel)>1)||($clip > 1)) {
@@ -2695,7 +2703,7 @@ sub _treeConnections_menu {
             shortcut => '<alt>r',
             tooltip => "Protect or not this node, in order to avoid any changes (Edit, Delete, Rename, ...)",
             sensitive => 1,
-            code => sub { $self->__treeToggleProtection; }
+            code => sub { $self->__treeToggleProtection(); }
         });
     }
     # Edit
@@ -2706,7 +2714,7 @@ sub _treeConnections_menu {
             shortcut => '<alt>e',
             tooltip => "Edit this connection\'s data",
             sensitive => 1,
-            code => sub { $$self{_GUI}{connEditBtn}->clicked; }
+            code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
         });
     }
     # Copy Connection Password
@@ -2729,7 +2737,7 @@ sub _treeConnections_menu {
             shortcut => '<alt>e',
             tooltip => "Bulk edit some values of selected connection\'s",
             sensitive => 1,
-            code => sub { $$self{_GUI}{connEditBtn}->clicked; }
+            code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
         });
     }
     # Export
@@ -2772,7 +2780,7 @@ sub _treeConnections_menu {
             shortcut => '',
             tooltip => 'Settings',
             sensitive =>  1,
-            code => sub { $$self{_GUI}{configBtn}->clicked; }
+            code => sub { $$self{_GUI}{configBtn}->clicked(); }
         });
     }
     # Quick Edit variables
@@ -2814,14 +2822,14 @@ sub _treeConnections_menu {
             label => 'Add Connection',
             stockicon => 'pac-node-add',
             tooltip => "Create a new CONNECTION under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
-            code => sub{ $$self{_GUI}{connAddBtn}->clicked; }
+            code => sub{ $$self{_GUI}{connAddBtn}->clicked(); }
         });
         # Add Group
         push(@tree_menu_items, {
             label => 'Add Group',
             stockicon => 'pac-group-add',
             tooltip => "Create a new GROUP under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
-            code => sub{ $$self{_GUI}{groupAddBtn}->clicked; }
+            code => sub{ $$self{_GUI}{groupAddBtn}->clicked(); }
         });
     }
     # Rename
@@ -2830,14 +2838,14 @@ sub _treeConnections_menu {
         stockicon => 'gtk-spell-check',
         shortcut => 'F2',
         sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
-        code => sub { $$self{_GUI}{nodeRenBtn}->clicked; }
+        code => sub { $$self{_GUI}{nodeRenBtn}->clicked(); }
     });
     # Delete
     push(@tree_menu_items, {
         label => 'Delete...',
         stockicon => 'gtk-delete',
         sensitive => (scalar(@sel) >= 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
-        code => sub { $$self{_GUI}{nodeDelBtn}->clicked; }
+        code => sub { $$self{_GUI}{nodeDelBtn}->clicked(); }
     });
 
     push(@tree_menu_items, { separator => 1 });
@@ -2940,7 +2948,7 @@ sub _treeConnections_menu {
             }
             my @idx;
             my %tmp;
-            foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs) {
+            foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs()) {
                 if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
                     my @children = $$self{_GUI}{treeConnections}->_getChildren($uuid, 0, 1);
                     foreach my $child (@children) {
@@ -2975,7 +2983,7 @@ sub _treeConnections_menu {
             code => sub {
                 my @idx;
                 my %tmp;
-                foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs) {
+                foreach my $uuid ($$self{_GUI}{treeConnections}->_getSelectedUUIDs()) {
                     if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
                         my @children = $$self{_GUI}{treeConnections}->_getChildren($uuid, 0, 1);
                         foreach my $child (@children) {
@@ -3090,23 +3098,23 @@ sub _launchTerminals {
 
     my @new_terminals;
     if (defined $$self{_GUI} && defined $$self{_GUI}{main}) {
-        $$self{_GUI}{main}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+        $$self{_GUI}{main}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
         $$self{_GUI}{main}->set_sensitive(0);
     }
 
     # Check if user wants main window to be close when a terminal comes up
     if ($$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-            $$self{_GUI}{main}->iconify;
+            $$self{_GUI}{main}->iconify();
         } else {
-            $self->_hideConnectionsList;
+            $self->_hideConnectionsList();
         }
     }
     if ($$self{_CFG}{'defaults'}{'tabs in main window'} && $$self{_CFG}{'defaults'}{'auto hide connections list'}) {
         $$self{_GUI}{showConnBtn}->set_active(0);
     }
     if ($$self{_CFG}{'defaults'}{'auto hide button bar'}) {
-        $$self{_GUI}{hbuttonbox1}->hide;
+        $$self{_GUI}{hbuttonbox1}->hide();
     }
 
     my $wtmp;
@@ -3158,11 +3166,11 @@ sub _launchTerminals {
     }
 
     if (scalar(@{ $terminals }) > 1) {
-        $wtmp->destroy; undef $wtmp;
+        $wtmp->destroy(); undef $wtmp;
     }
 
     if (defined $$self{_GUI} && defined $$self{_GUI}{main}) {
-        $$self{_GUI}{main}->get_window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+        $$self{_GUI}{main}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
@@ -3222,11 +3230,11 @@ sub _quitProgram {
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
     }
-    $$self{_SCRIPTS}{_WINDOWSCRIPTS}{main}->hide;    # Hide scripts window
-    $$self{_CLUSTER}{_WINDOWCLUSTER}{main}->hide;    # Hide clusters window
-    $$self{_PCC}{_WINDOWPCC}{main}->hide;    # Hide PCC window
-    $$self{_GUI}{main}->hide;    # Hide main window
-    $$self{_GUI}{_PACTABS}->hide;    # Hide TABs window
+    $$self{_SCRIPTS}{_WINDOWSCRIPTS}{main}->hide();    # Hide scripts window
+    $$self{_CLUSTER}{_WINDOWCLUSTER}{main}->hide();    # Hide clusters window
+    $$self{_PCC}{_WINDOWPCC}{main}->hide();    # Hide PCC window
+    $$self{_GUI}{main}->hide();    # Hide main window
+    $$self{_GUI}{_PACTABS}->hide();    # Hide TABs window
 
     if ($$self{_READONLY}) {
         Gtk3->main_quit;
@@ -3535,14 +3543,14 @@ sub _saveGUIData {
     if ($$self{_GUI}{maximized}) {
         print F 'maximized';
     } else {
-        my ($x, $y) = $$self{_GUI}{main}->get_position;
-        my ($w, $h) = $$self{_GUI}{main}->get_size;
+        my ($x, $y) = $$self{_GUI}{main}->get_position();
+        my ($w, $h) = $$self{_GUI}{main}->get_size();
         print F $x . ':' . $y . ':' . $w . ':' . $h;
     }
     print F "\n";
 
     # Save connections list width
-    my $treepos = $$self{_GUI}{hpane}->get_position;
+    my $treepos = $$self{_GUI}{hpane}->get_position();
     print F $treepos . "\n";
 
     close F;
@@ -3618,14 +3626,14 @@ sub _updateGUIWithUUID {
         $$self{_GUI}{statistics}->update($uuid, $$self{_CFG});
         $$self{_GUI}{frameStatistics}->show;
     } else {
-        $$self{_GUI}{frameStatistics}->hide;
+        $$self{_GUI}{frameStatistics}->hide();
     }
 
     if ($$self{_CFG}{'defaults'}{'show screenshots'}) {
         $$self{_GUI}{screenshots}->update($$self{_CFG}{'environments'}{$uuid}, $uuid);
-        $$self{_GUI}{frameScreenshots}->show_all;
+        $$self{_GUI}{frameScreenshots}->show_all();
     } else {
-        $$self{_GUI}{frameScreenshots}->hide;
+        $$self{_GUI}{frameScreenshots}->hide();
     }
 
     return 1;
@@ -3634,7 +3642,7 @@ sub _updateGUIWithUUID {
 sub _updateGUIPreferences {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+    my @sel_uuids = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
     my $total = scalar(@sel_uuids);
 
     my $is_group = 0;
@@ -3675,7 +3683,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active : $$self{_TRAY}{_TRAY}->set_passive;
+        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'});
     }
@@ -3690,7 +3698,7 @@ sub _updateGUIPreferences {
 sub _updateGUIFavourites {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeFavourites}->_getSelectedUUIDs;
+    my @sel_uuids = $$self{_GUI}{treeFavourites}->_getSelectedUUIDs();
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
@@ -3725,7 +3733,7 @@ sub _updateGUIFavourites {
 sub _updateGUIHistory {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeHistory}->_getSelectedUUIDs;
+    my @sel_uuids = $$self{_GUI}{treeHistory}->_getSelectedUUIDs();
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
@@ -3822,7 +3830,7 @@ sub _updateFavouritesList {
         push(@{ $$self{_GUI}{treeFavourites}{data} }, ({ value => [ $icon, $name, $uuid ] }));
     }
 
-    $self->_updateGUIFavourites;
+    $self->_updateGUIFavourites();
 
     return 1;
 }
@@ -3871,20 +3879,20 @@ sub _showConnectionsList {
 sub _hideConnectionsList {
     my $self = shift;
 
-    ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position;
-    $$self{_GUI}{main}->hide;
+    ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position();
+    $$self{_GUI}{main}->hide();
 }
 
 sub _toggleConnectionsList {
     my $self = shift;
-    $$self{_GUI}{showConnBtn}->set_active(! $$self{_GUI}{showConnBtn}->get_active);
+    $$self{_GUI}{showConnBtn}->set_active(! $$self{_GUI}{showConnBtn}->get_active());
 }
 
 sub _copyNodes {
     my $self = shift;
     my $cut = shift // '0';
     my $parent = shift // '__PAC__COPY__';
-    my $sel_uuids = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs ];
+    my $sel_uuids = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs() ];
 
     # Empty the copy-vault
     $$self{_COPY}{'data'} = {};
@@ -3904,7 +3912,7 @@ sub _copyNodes {
 sub _cutNodes {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+    my @sel_uuids = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
     my $total = scalar(@sel_uuids);
 
     if (!$total || ($sel_uuids[0] eq '__PAC__ROOT__')) {
@@ -4021,7 +4029,7 @@ sub __dupNodes {
 
 sub __exportNodes {
     my $self = shift;
-    my $sel = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs ];
+    my $sel = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs() ];
 
     my ($list, $all, $cipher) = $self->_bulkEdit("$APPNAME (v.$APPVERSION) Choose fields to skip during Export phase", "Please, <b>check</b> the fields to be changed during the Export phase\nand put a new (may be empty) value for them.\n<b>Unchecked</b> elements will be exported with their original values.", 0, 'ask for cipher');
 
@@ -4043,7 +4051,7 @@ sub __exportNodes {
     my $out = $choose->run;
     my $file = $choose->get_filename;
     $file =~ /^(.+)\.yml$/ or $file .= '.yml';
-    $choose->destroy;
+    $choose->destroy();
 
     if ($out ne 'accept') {
         return 1;
@@ -4073,10 +4081,10 @@ sub __exportNodes {
 
     require YAML;
     if (YAML::DumpFile($file, $cfg)) {
-        $w->destroy;
+        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "Connection(s) succesfully exported to:\n\n$file");
     } else {
-        $w->destroy;
+        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file '$file':\n\n$!");
     }
 
@@ -4086,7 +4094,7 @@ sub __exportNodes {
 sub __importNodes {
     my $self = shift;
 
-    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs;
+    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
     my $parent_uuid = $sel[0];
     my $parent_name = $$self{_CFG}{'environments'}{$sel[0]}{'name'};
@@ -4107,7 +4115,7 @@ sub __importNodes {
 
     my $out = $choose->run;
     my $file = $choose->get_filename;
-    $choose->destroy;
+    $choose->destroy();
     if (($out ne 'accept') || (!-f $file) || ($file !~ /^(.+)\.yml$/go)) {
         return 1;
     }
@@ -4119,7 +4127,7 @@ sub __importNodes {
     Gtk3::main_iteration while Gtk3::events_pending;
     eval { $$self{_COPY}{'data'} = YAML::LoadFile($file); };
     if ($@) {
-        $w->destroy;
+        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file '$file':\n\n$@");
         return 1;
     }
@@ -4130,7 +4138,7 @@ sub __importNodes {
     if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__FULL__'}) {
         if (! _wConfirm($$self{_GUI}{main}, "Selected config file is a <b>FULL</b> backup.\nImporting it will result in all current data being <b>substituted</b> by the new one.\n<b>Plus, it REQUIRES restarting the application</b>.\nReplace current configuration?")) {
             delete $$self{_COPY}{'data'}{'children'};
-            $w->destroy;
+            $w->destroy();
             return 1;
         }
 
@@ -4147,7 +4155,7 @@ sub __importNodes {
         $self->_readConfiguration(0);
         $self->_loadTreeConfiguration('__PAC__ROOT__');
         delete $$self{_COPY}{'data'};
-        $w->destroy;
+        $w->destroy();
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
@@ -4159,7 +4167,7 @@ sub __importNodes {
     # Bad export file
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
         delete $$self{_COPY}{'data'}{'children'};
-        $w->destroy;
+        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "File '$file' does not look like a valid exported connection!");
         return 1;
 
@@ -4172,7 +4180,7 @@ sub __importNodes {
         }
         $$self{_COPY}{'data'} = {};
         _decipherCFG($$self{_CFG});
-        $w->destroy;
+        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "File '<b>$file</b>' succesfully imported:\n<b>$i</b> element(s) added");
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
@@ -4205,7 +4213,7 @@ sub _bulkEdit {
     );
 
     $w{data}->signal_connect('delete_event' => sub {
-        $w{data}->destroy;
+        $w{data}->destroy();
         undef %w;
         return 1;
     });
@@ -4274,7 +4282,7 @@ sub _bulkEdit {
         $w{gui}{"entryWhat$key"} = Gtk3::Entry->new;
         $w{gui}{"hboxre$key"}->pack_start($w{gui}{"entryWhat$key"}, 1, 1, 0);
         $w{gui}{"entryWhat$key"}->set_activates_default(1);
-        $w{gui}{"entryWhat$key"}->hide;
+        $w{gui}{"entryWhat$key"}->hide();
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new(' with '), 0, 1, 0);
 
@@ -4292,8 +4300,8 @@ sub _bulkEdit {
 
         # And setup some signals
         $w{gui}{"entry$key"}->signal_connect('changed', sub { $w{gui}{"cb$key"}->set_active($w{gui}{"entry$key"}->get_chars(0, -1) ne ''); });
-        $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active ? 'gtk-ok' : 'gtk-edit'), 'button'); });
-        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide; });
+        $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active() ? 'gtk-ok' : 'gtk-edit'), 'button'); });
+        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide(); });
 
         # Asign a callback to populate this entry with its own context menu
         $w{gui}{"entry$key"}->signal_connect('button_press_event' => sub {
@@ -4307,7 +4315,7 @@ sub _bulkEdit {
                 my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
                 push(@global_variables_menu, {
                     label => "<GV:$var> ($val)",
-                    code => sub { $w{gui}{"entry$key"}->insert_text("<GV:$var>", -1, $w{gui}{"entry$key"}->get_position); }
+                    code => sub { $w{gui}{"entry$key"}->insert_text("<GV:$var>", -1, $w{gui}{"entry$key"}->get_position()); }
                     });
                 }
                 push(@menu_items, {
@@ -4323,7 +4331,7 @@ sub _bulkEdit {
                     push(@environment_menu, {
                         label => "<ENV:$key>",
                         tooltip => "$key=$value",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<ENV:$key>", -1, $w{gui}{"entry$key"}->get_position); }
+                        code => sub { $w{gui}{"entry$key"}->insert_text("<ENV:$key>", -1, $w{gui}{"entry$key"}->get_position()); }
                     });
                 }
                 push(@menu_items, {
@@ -4335,7 +4343,7 @@ sub _bulkEdit {
                     label => 'Runtime substitution (<ASK:change_by_number>)',
                     code => sub {
                         my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                        $w{gui}{"entry$key"}->insert_text("<ASK:change_by_number>", -1, $w{gui}{"entry$key"}->get_position);
+                        $w{gui}{"entry$key"}->insert_text("<ASK:change_by_number>", -1, $w{gui}{"entry$key"}->get_position());
                         $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 21);
                     }
                 });
@@ -4345,7 +4353,7 @@ sub _bulkEdit {
                     tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
                     code => sub {
                         my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                        $w{gui}{"entry$key"}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{gui}{"entry$key"}->get_position);
+                        $w{gui}{"entry$key"}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{gui}{"entry$key"}->get_position());
                         $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 40);
                     }
                 });
@@ -4355,7 +4363,7 @@ sub _bulkEdit {
                     tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
                     code => sub {
                         my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                        $w{gui}{"entry$key"}->insert_text('<CMD:command to launch>', -1, $w{gui}{"entry$key"}->get_position);
+                        $w{gui}{"entry$key"}->insert_text('<CMD:command to launch>', -1, $w{gui}{"entry$key"}->get_position());
                         $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                     }
                 });
@@ -4366,17 +4374,17 @@ sub _bulkEdit {
                         push(@titles, {
                             label => "<KPX_title:$$hash{title}>",
                             tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position); }
+                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
                         });
                         push(@usernames, {
                             label => "<KPX_username:$$hash{username}>",
                             tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position); }
+                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
                         });
                         push(@urls, {
                             label => "<KPX_url:$$hash{url}>",
                             tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position); }
+                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
                         });
                     }
                     push(@menu_items, {
@@ -4395,7 +4403,7 @@ sub _bulkEdit {
                             }, {
                                 label => "KeePass Extended Query",
                                 tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                                code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position); }
+                                code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
                             }
                         ]
                     });
@@ -4433,7 +4441,7 @@ sub _bulkEdit {
         $w{gui}{"entryWhat$key"} = Gtk3::Entry->new;
         $w{gui}{"hboxre$key"}->pack_start($w{gui}{"entryWhat$key"}, 1, 1, 0);
         $w{gui}{"entryWhat$key"}->set_activates_default(1);
-        $w{gui}{"entryWhat$key"}->hide;
+        $w{gui}{"entryWhat$key"}->hide();
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new(' with '), 0, 1, 0);
 
@@ -4451,8 +4459,8 @@ sub _bulkEdit {
 
         # And setup some signals
         $w{gui}{"entry$key"}->signal_connect('changed', sub { $w{gui}{"cb$key"}->set_active($w{gui}{"entry$key"}->get_chars(0, -1) ne ''); });
-        $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active ? 'gtk-ok' : 'gtk-edit'), 'button'); });
-        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide; });
+        $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active() ? 'gtk-ok' : 'gtk-edit'), 'button'); });
+        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide(); });
 
         # Asign a callback to populate this entry with its own context menu
         $w{gui}{"entry$key"}->signal_connect('button_press_event' => sub {
@@ -4468,7 +4476,7 @@ sub _bulkEdit {
                 my $val = $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'global variables'}{$var}{'value'};
                 push(@global_variables_menu, {
                     label => "<GV:$var> ($val)",
-                    code => sub { $w{gui}{"entry$key"}->insert_text("<GV:$var>", -1, $w{gui}{"entry$key"}->get_position); }
+                    code => sub { $w{gui}{"entry$key"}->insert_text("<GV:$var>", -1, $w{gui}{"entry$key"}->get_position()); }
                 });
             }
             push(@menu_items, {
@@ -4483,7 +4491,7 @@ sub _bulkEdit {
                 push(@environment_menu, {
                     label => "<ENV:$key>",
                     tooltip => "$key=$value",
-                    code => sub { $w{gui}{"entry$key"}->insert_text("<ENV:$key>", -1, $w{gui}{"entry$key"}->get_position); }
+                    code => sub { $w{gui}{"entry$key"}->insert_text("<ENV:$key>", -1, $w{gui}{"entry$key"}->get_position()); }
                 });
             }
             push(@menu_items, {
@@ -4496,7 +4504,7 @@ sub _bulkEdit {
                 label => 'Runtime substitution (<ASK:change_by_number>)',
                 code => sub {
                     my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                    $w{gui}{"entry$key"}->insert_text("<ASK:change_by_number>", -1, $w{gui}{"entry$key"}->get_position);
+                    $w{gui}{"entry$key"}->insert_text("<ASK:change_by_number>", -1, $w{gui}{"entry$key"}->get_position());
                     $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 21);
                 }
             });
@@ -4507,7 +4515,7 @@ sub _bulkEdit {
                 tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
                 code => sub {
                     my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                    $w{gui}{"entry$key"}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{gui}{"entry$key"}->get_position);
+                    $w{gui}{"entry$key"}->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, $w{gui}{"entry$key"}->get_position());
                     $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 40);
                 }
             });
@@ -4518,7 +4526,7 @@ sub _bulkEdit {
                 tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
                 code => sub {
                     my $pos = $w{gui}{"entry$key"}->get_property('cursor_position');
-                    $w{gui}{"entry$key"}->insert_text('<CMD:command to launch>', -1, $w{gui}{"entry$key"}->get_position);
+                    $w{gui}{"entry$key"}->insert_text('<CMD:command to launch>', -1, $w{gui}{"entry$key"}->get_position());
                     $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                 }
             });
@@ -4530,17 +4538,17 @@ sub _bulkEdit {
                     push(@titles, {
                         label => "<KPX_title:$$hash{title}>",
                         tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position); }
+                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
                     });
                     push(@usernames, {
                         label => "<KPX_username:$$hash{username}>",
                         tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position); }
+                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
                     });
                     push(@urls, {
                         label => "<KPX_url:$$hash{url}>",
                         tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position); }
+                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
                     });
                 }
 
@@ -4560,7 +4568,7 @@ sub _bulkEdit {
                         }, {
                             label => "KeePass Extended Query",
                             tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position); }
+                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
                         }
                     ]
                 });
@@ -4584,10 +4592,10 @@ sub _bulkEdit {
 
     $w{data}->get_content_area->pack_start(Gtk3::HSeparator->new, 0, 1, 0);
 
-    $w{data}->show_all;
-    $groups or $w{gui}{frameAffect}->hide;
+    $w{data}->show_all();
+    $groups or $w{gui}{frameAffect}->hide();
     if ($w{data}->run ne 'ok') {
-        defined $w{data} and $w{data}->destroy;
+        defined $w{data} and $w{data}->destroy();
         return undef;
     }
 
@@ -4596,15 +4604,15 @@ sub _bulkEdit {
         my $tkey = $key;
         ($key eq 'expect') and $tkey = 'EXPECT:' . $key;
         ($key eq 'send')  and $tkey = 'EXPECT:' . $key;
-        $list{$tkey}{change} = $w{gui}{"cb$key"}->get_active;
+        $list{$tkey}{change} = $w{gui}{"cb$key"}->get_active();
         $list{$tkey}{match} = $w{gui}{"entryWhat$key"}->get_chars(0, -1);
         $list{$tkey}{value} = $w{gui}{"entry$key"}->get_chars(0, -1);
-        $list{$tkey}{regexp} = $w{gui}{"cbRE$key"}->get_active;
+        $list{$tkey}{regexp} = $w{gui}{"cbRE$key"}->get_active();
     }
-    $list{'__delete_hidden_fields__'} = $w{gui}{cbDelHidden}->get_active;
+    $list{'__delete_hidden_fields__'} = $w{gui}{cbDelHidden}->get_active();
 
-    $w{data}->destroy;
-    return \%list, $w{gui}{rballlevel}->get_active, $cipher ? $w{gui}{cbCipher}->get_active : undef;
+    $w{data}->destroy();
+    return \%list, $w{gui}{rballlevel}->get_active(), $cipher ? $w{gui}{cbCipher}->get_active() : undef;
 }
 
 sub _setCFGChanged {
@@ -4686,7 +4694,7 @@ sub _ApplyLayout {
             }
         } else {
             if ($$self{_GUI}{main}->get_visible) {
-                $self->_hideConnectionsList;
+                $self->_hideConnectionsList();
             }
         }
         $$self{_GUI}{main}->set_default_size(220,600);
