@@ -71,8 +71,6 @@ my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = $CFG_DIR . '/pac.yml';
 
-my $GSETTINGS = Glib::IO::Settings->new('org.gnome.system.proxy.http');
-
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -641,15 +639,24 @@ sub _updateGUIPreferences {
     # General options
     ####################################
 
+    if (!defined $$self{_CFG}{'environments'}{$uuid}{'use proxy'}) {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
+    }
     _($self, 'rbUseProxyIfCFG')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 0);
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
+    _($self, 'rbUseProxyJump')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3);
+    _($self, 'vboxCfgManualProxyConn')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active);
     _($self, 'bCfgProxy')->set_sensitive(1);
+    # SOCKS Proxy
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
     _($self, 'entryCfgProxyConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
     _($self, 'entryCfgProxyConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'});
-    _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'});
-    _($self, 'vboxCfgManualProxyConn')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active);
+    # Jump Server
+    _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
+    _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
+    _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
+    _($self, 'entryCfgJumpConnConfig')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump config'} // '');
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
@@ -763,8 +770,8 @@ sub _saveConfiguration {
     }
 
     # Check if proxy ip and port are defined in case "force use proxy" is checked
-    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (! _($self, 'entryCfgProxyConnIP')->get_chars(0, -1) || ! _($self, 'entryCfgProxyConnPort')->get_chars(0, -1) )) {
-        _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nPROXY IP / PORT can't be empty if 'always use proxy' is active\n\n<b>before saving this connection data!!</b>");
+    if ((_($self, 'rbUseProxyAlways')->get_active == 1) && (!_($self,'entryCfgProxyConnIP')->get_chars(0,-1) || ! _($self, 'entryCfgProxyConnPort')->get_chars(0,-1))) {
+        _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nSOCKS IP / PORT can't be empty\n\n<b>before saving this connection data!!</b>");
         return 0;
     }
 
@@ -772,16 +779,32 @@ sub _saveConfiguration {
     # IP, Port, User, Pass, ...
     ##############################
 
-    $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0 if _($self, 'rbUseProxyIfCFG')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1 if _($self, 'rbUseProxyAlways')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2 if _($self, 'rbUseProxyNever')->get_active;
+    if (_($self, 'rbUseProxyIfCFG')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
+    } elsif (_($self, 'rbUseProxyAlways')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1;
+    } elsif (_($self, 'rbUseProxyJump')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 3;
+    } else {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2;
+    }
+    # SOCKS Proxy
     $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = _($self, 'entryCfgProxyConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy port'} = _($self, 'entryCfgProxyConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = _($self, 'entryCfgProxyConnUser')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = _($self, 'entryCfgProxyConnPassword')->get_chars(0, -1);
-    if        (_($self, 'rbCfgAuthUserPass')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';}
-    elsif    (_($self, 'rbCfgAuthPublicKey')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'publickey';}
-    elsif    (_($self, 'rbCfgAuthManual')->get_active) {$$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'manual';}
+    # Jump server
+    $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = _($self, 'entryCfgJumpConnIP')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'jump config'} = _($self, 'entryCfgJumpConnConfig')->get_chars(0, -1);
+    if (_($self, 'rbCfgAuthUserPass')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
+    } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'publickey';
+    } elsif (_($self, 'rbCfgAuthManual')->get_active) {
+        $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'manual';
+    }
     $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename // '';
