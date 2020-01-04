@@ -793,6 +793,7 @@ sub _updateGUIPreferences {
             _($self, 'cbCfgProxyNo')->set_active(1);
         }
     } else {
+        $$cfg{'defaults'}{'proxy'} = '';
         _($self, 'cbCfgProxyNo')->set_active(1);
     }
     # Proxy Configuration
