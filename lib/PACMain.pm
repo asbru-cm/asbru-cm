@@ -2213,8 +2213,8 @@ sub _setupCallbacks {
                         $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
                     }
                 };
+                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
             }
-            $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
             $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
             last;
         }
