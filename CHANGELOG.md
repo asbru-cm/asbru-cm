@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.0.1](https://github.com/asbru-cm/asbru-cm/tree/6.0.1) (2020-01-04)
+
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.0...6.0.1)
+
+**Implemented enhancements:**
+
+- Password is visible on the taskbar tooltip for RDP session \(xfreerdp\) [\#328](https://github.com/asbru-cm/asbru-cm/issues/328)
+
+**Fixed bugs:**
+
+- Asbru-cm doesn't start anymore after upgrading to 6.0 [\#329](https://github.com/asbru-cm/asbru-cm/issues/329)
+- Click on re-attached tab, open an empty window [\#327](https://github.com/asbru-cm/asbru-cm/issues/327)
+
+**Closed issues:**
+
+- Dropping support for legacy distributions [\#325](https://github.com/asbru-cm/asbru-cm/issues/325)
+
 ## [6.0.0](https://github.com/asbru-cm/asbru-cm/tree/6.0.0) (2020-01-02)
 
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/5.2.1...6.0.0)
