@@ -1130,7 +1130,7 @@ if ($GETCMD) {
 # Set log file
 $EXP -> log_file($LOG_FILE);
 
-print "COMMANT AFTER TESTING, COMMAND: $connection_cmd\n";
+print "COMMENT AFTER TESTING, COMMAND: $connection_cmd\n";
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
