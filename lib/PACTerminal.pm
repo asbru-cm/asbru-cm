@@ -829,6 +829,7 @@ sub _initGUI {
         _setupTabDND($self);
 
         $tabs->append_page($$self{_GUI}{_VBOX}, $$self{_GUI}{_TABLBL});
+        $tabs->show_all();
         $$self{_GUI}{_VBOX}->show_all();
         $tabs->set_tab_reorderable($$self{_GUI}{_VBOX}, 1);
         $tabs->set_current_page(-1);
