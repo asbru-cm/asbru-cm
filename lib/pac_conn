@@ -885,13 +885,11 @@ if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
     $proxy_port = $$CFG{'environments'}{$UUID}{'jump port'};
     $proxy_user = $$CFG{'environments'}{$UUID}{'jump user'};
     $proxy_pass = $$CFG{'environments'}{$UUID}{'jump pass'};
-    if ($$CFG{'environments'}{$UUID}{'jump config'}) {
-        $CONNECT_OPTS = "-J $$CFG{'environments'}{$UUID}{'jump config'} $$CFG{'environments'}{$UUID}{'ip'}";
-    } elsif ($$CFG{'environments'}{$UUID}{'auth type'} eq 'userpass') {
-        $CONNECT_OPTS = "-J $proxy_user\@$proxy_ip:$proxy_port $$CFG{'environments'}{$UUID}{'user'}\@$$CFG{'environments'}{$UUID}{'ip'}:$$CFG{'environments'}{$UUID}{'port'}";
-    } elsif ($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey') {
-        $CONNECT_OPTS = "-J $proxy_user\@$proxy_ip:$proxy_port $$CFG{'environments'}{$UUID}{'passphrase user'}\@$$CFG{'environments'}{$UUID}{'ip'}:$$CFG{'environments'}{$UUID}{'port'}";
-    }
+    open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+    print CFG qq“Host *\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
+    print CFG qq“Host jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\nIdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n“;
+    print CFG qq“\n\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\nIdentityFile $PUBKEY\n“;
+    close CFG;
 } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
     # Use global configuration settings
     if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
@@ -901,13 +899,11 @@ if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
         $proxy_port = $$CFG{'defaults'}{'jump port'};
         $proxy_user = $$CFG{'defaults'}{'jump user'};
         $proxy_pass = $$CFG{'defaults'}{'jump pass'};
-        if ($$CFG{'defaults'}{'jump config'}) {
-            $CONNECT_OPTS = "-J $$CFG{'defaults'}{'jump config'} $$CFG{'environments'}{$UUID}{'ip'}";
-        } elsif ($$CFG{'environments'}{$UUID}{'auth type'} eq 'userpass') {
-            $CONNECT_OPTS .= "-J $proxy_user\@$proxy_ip:$proxy_port $$CFG{'environments'}{$UUID}{'user'}\@$$CFG{'environments'}{$UUID}{'ip'}:$$CFG{'environments'}{$UUID}{'port'}";
-        } elsif ($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey') {
-            $CONNECT_OPTS = "-J $proxy_user\@$proxy_ip:$proxy_port $$CFG{'environments'}{$UUID}{'passphrase user'}\@$$CFG{'environments'}{$UUID}{'ip'}:$$CFG{'environments'}{$UUID}{'port'}";
-        }
+        open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+        print CFG qq“Host *\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
+        print CFG qq“Host jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\nIdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n“;
+        print CFG qq“\n\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\nIdentityFile $PUBKEY\n“;
+        close CFG;
     } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
         # SOCKS Proxy settings
         $proxy_ip = $$CFG{'defaults'}{'proxy ip'};
@@ -939,7 +935,7 @@ if (defined $METHOD) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
         if ($proxy_jump) {
-            $connection_cmd = "ssh $CONNECT_OPTS";
+            $connection_cmd = "ssh -F $CFG_DIR/tmp/$UUID.conf -J jumpserver server";
         } else {
             $connection_cmd = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
         }
