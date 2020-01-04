@@ -71,8 +71,6 @@ my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = $CFG_DIR . '/pac.yml';
 
-my $GSETTINGS = Glib::IO::Settings->new('org.gnome.system.proxy.http');
-
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -641,6 +639,9 @@ sub _updateGUIPreferences {
     # General options
     ####################################
 
+    if (!defined $$self{_CFG}{'environments'}{$uuid}{'use proxy'}) {
+        $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
+    }
     _($self, 'rbUseProxyIfCFG')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 0);
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
@@ -652,14 +653,10 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
     _($self, 'entryCfgProxyConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'});
     # Jump Server
-    _($self, 'entryCfgJumpConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
-    _($self, 'entryCfgJumpConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
-    if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')&&($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3)) {
-        _($self, 'entryCfgJumpPublicKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
-    }
+    _($self, 'entryCfgJumpConnConfig')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump config'} // '');
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
@@ -777,10 +774,6 @@ sub _saveConfiguration {
         _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nSOCKS IP / PORT can't be empty\n\n<b>before saving this connection data!!</b>");
         return 0;
     }
-    if ((_($self, 'rbUseProxyJump')->get_active == 1) && (!_($self, 'entryCfgJumpConnIP')->get_chars(0,-1) || !_($self, 'entryCfgJumpConnPort')->get_chars(0,-1))) {
-        _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nJump IP / PORT can't be empty\n\n<b>before saving this connection data!!</b>");
-        return 0;
-    }
 
     ##############################
     # IP, Port, User, Pass, ...
@@ -804,11 +797,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = _($self, 'entryCfgJumpConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = _($self, 'entryCfgJumpConnPassword')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'jump key'} = _($self, 'entryCfgJumpPublicKey')->get_filename // '';
-    if (!_($self, 'rbUseProxyJump')->get_active) {
-        $$self{_CFG}{'environments'}{$uuid}{'jump key'} = '';
-    }
+    $$self{_CFG}{'environments'}{$uuid}{'jump config'} = _($self, 'entryCfgJumpConnConfig')->get_chars(0, -1);
     if (_($self, 'rbCfgAuthUserPass')->get_active) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
     } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {

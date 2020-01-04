@@ -64,9 +64,6 @@ my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 
-# Connect to Gnome's GSettings
-my $GSETTINGS = Glib::IO::Settings->new('org.gnome.system.proxy.http');
-
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
@@ -623,19 +620,6 @@ sub _updateGUIPreferences {
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
 
-    # Get PROXY from environment
-    my $proxy_ip = $GSETTINGS->get_string('host');
-    my $proxy_port = $GSETTINGS->get_int('port');
-    my $proxy_user = $GSETTINGS->get_string('authentication-user');
-    my $proxy_pass = $GSETTINGS->get_string('authentication-password');
-    my $proxy_string = 'no proxy configured';
-
-    if ($proxy_ip) {
-        $proxy_string = "$proxy_ip:$proxy_port";
-    }
-    if ($proxy_user) {
-        $proxy_string .= "; User: $proxy_user, Pass: <password hidden!>";
-    }
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
     }
@@ -821,10 +805,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpIP')->set_text($$cfg{'defaults'}{'jump ip'} // '');
     _($self, 'entryCfgJumpPort')->set_value(($$cfg{'defaults'}{'jump port'} // 22) || 22);
     _($self, 'entryCfgJumpUser')->set_text($$cfg{'defaults'}{'jump user'} // '');
-    _($self, 'entryCfgJumpPassword')->set_text($$cfg{'defaults'}{'jump pass'} // '');
-    if ((defined $$cfg{'defaults'}{'jump key'})&&($$cfg{'defaults'}{'jump key'} ne '')&&($$cfg{'defaults'}{'proxy'} eq 'Jump')) {
-        _($self, 'fileCfgJumpPublicKey')->set_uri("file://$$cfg{'defaults'}{'jump key'}");
-    }
+    _($self, 'entryCfgJumpConfig')->set_text($$cfg{'defaults'}{'jump config'} // '');
 
     # Global TABS
     $$self{_SHELL}->update($$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'});
@@ -903,18 +884,16 @@ sub _saveConfiguration {
     } else {
         $$self{_CFG}{'defaults'}{'proxy'} = 'No';
     }
+    # SOCKS PROXY
     $$self{_CFG}{'defaults'}{'proxy ip'} = _($self, 'entryCfgProxyIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy port'} = _($self, 'entryCfgProxyPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy user'} = _($self, 'entryCfgProxyUser')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'proxy pass'} = _($self, 'entryCfgProxyPassword')->get_chars(0, -1);
+    # JUMP SERVER
     $$self{_CFG}{'defaults'}{'jump ip'} = _($self, 'entryCfgJumpIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump port'} = _($self, 'entryCfgJumpPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
-    $$self{_CFG}{'defaults'}{'jump pass'} = _($self, 'entryCfgJumpPassword')->get_chars(0, -1);
-    $$self{_CFG}{'defaults'}{'jump key'} = _($self, 'fileCfgJumpPublicKey')->get_filename // '';
-    if (!_($self, 'cbCfgProxyJump')->get_active) {
-        $$self{_CFG}{'defaults'}{'jump key'} = '';
-    }
+    $$self{_CFG}{'defaults'}{'jump config'} = _($self, 'entryCfgJumpConfig')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell directory'} = _($self, 'entryCfgShellDirectory')->get_chars(0, -1);
