@@ -127,8 +127,6 @@ sub update {
     $$self{gui}{spCfgNewWindowWidth}->set_value($$cfg{'terminal window hsize'} // 800);
     $$self{gui}{spCfgNewWindowHeight}->set_value($$cfg{'terminal window vsize'} // 600);
 
-    $$self{gui}{entryTermEmulation}->set_text($$cfg{'terminal emulation'} // 'xterm');
-
     $$self{gui}{comboBackspace}->set_active($BACKSPACE_BINDING{$$cfg{'terminal backspace'} // 'auto'} // '0');
 
     $$self{gui}{comboEncoding}->set_active(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_MAP}{$$cfg{'terminal character encoding'} // 'UTF-8'}) // -1);
@@ -176,7 +174,6 @@ sub get_cfg {
     $options{'terminal window vsize'} = $$self{gui}{spCfgNewWindowHeight}->get_value;
     $options{'terminal character encoding'} = $$self{gui}{comboEncoding}->get_active_text;
     $options{'terminal backspace'} = $$self{gui}{comboBackspace}->get_active_text;
-    $options{'terminal emulation'} = $$self{gui}{entryTermEmulation}->get_chars(0, -1);
 
     return \%options;
 }
@@ -340,12 +337,6 @@ sub _buildTermOptsGUI {
 
     $w{spCfgTerminalTransparency} = Gtk3::HScale->new(Gtk3::Adjustment->new(0, 0, 1, 0.1, 0.1, 0.1) );
     $frameTransparency->add($w{spCfgTerminalTransparency});
-
-    my $frameEmulation = Gtk3::Frame->new(' Term Emulation: ');
-    $hboxTermUI2->pack_start($frameEmulation, 0, 1, 0);
-
-    $w{entryTermEmulation} = Gtk3::Entry->new;
-    $frameEmulation->add($w{entryTermEmulation});
 
     my $frameSelectWords = Gtk3::Frame->new(' Select Word CHARS: ');
     $hboxTermUI2->pack_start($frameSelectWords, 0, 1, 0);

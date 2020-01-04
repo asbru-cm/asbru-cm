@@ -3965,7 +3965,6 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'cursor shape'});
         $$self{_GUI}{_VTE}->set_encoding($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal character encoding'} // 'UTF-8');
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal backspace'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_emulation($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal emulation'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
 # FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'visible bell'});
@@ -3980,7 +3979,6 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{'defaults'}{'cursor shape'});
         $$self{_GUI}{_VTE}->set_encoding($$self{_CFG}{'defaults'}{'terminal character encoding'} // 'UTF-8');
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{'defaults'}{'terminal backspace'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_emulation($$self{_CFG}{'defaults'}{'terminal emulation'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{'defaults'}{'word characters'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{'defaults'}{'audible bell'});
 # FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{'defaults'}{'visible bell'});
