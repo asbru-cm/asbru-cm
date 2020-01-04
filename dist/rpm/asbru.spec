@@ -54,6 +54,7 @@ Requires:   perl-Crypt-CBC
 Requires:   perl-Crypt-Rijndael
 Requires:   perl-IO-Tty
 Requires:   perl-IO-Stty
+Requires:   libwnck3
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
@@ -137,9 +138,13 @@ fi
 
 
 %changelog
+* Thu Jan 04 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.1
+- 6.0.1 release
+* Thu Jan 02 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.0
+- 6.0.0 release
 * Tue Oct 15 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.1
 - 5.2.1 release
-* Mon Apr 19 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.0
+* Fri Apr 19 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.0
 - 5.2.0 release
 * Mon Jul 23 2018 Ásbrú Project Team <contact@asbru-cm.net> 5.1.0
 - 5.1.0 release

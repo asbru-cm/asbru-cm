@@ -63,6 +63,46 @@ To do so, execute the following commands:
 
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
+### Testing new features
+
+Our master and the snapshots are being kept as stable as possible. New features for new major releases are being developed inside the "loki" branch.
+
+Beware that Loki can sometimes behave in a malicious manner to you. You might think of "sid"
+
+You are welcome to contribute and test by checking out "loki" or by installing our builds.
+
+- Debian / Ubuntu
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
+  $ sudo apt-get install asbru-cm
+  ````
+
+- Fedora
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
+  $ sudo dnf install asbru-cm
+  ````
+
+
+### Installation of legacy 5.x
+
+- Debian / Ubuntu
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.deb.sh | sudo bash
+  $ sudo apt-get install asbru-cm
+  ````
+
+- Fedora
+
+  ````
+  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.rpm.sh | sudo bash
+  $ sudo dnf install asbru-cm
+  ````
+
+
 ### Frequenty Asked Questions
 
 - Why did you call that project "Ásbrú" ?
