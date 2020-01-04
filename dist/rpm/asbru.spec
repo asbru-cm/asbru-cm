@@ -144,7 +144,7 @@ fi
 - 6.0.0 release
 * Tue Oct 15 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.1
 - 5.2.1 release
-* Mon Apr 19 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.0
+* Fri Apr 19 2019 Ásbrú Project Team <contact@asbru-cm.net> 5.2.0
 - 5.2.0 release
 * Mon Jul 23 2018 Ásbrú Project Team <contact@asbru-cm.net> 5.1.0
 - 5.1.0 release
