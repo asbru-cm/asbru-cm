@@ -4594,8 +4594,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCfgProxy">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="aCfgProxy">
                     <property name="visible">True</property>
@@ -4630,8 +4634,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="has_tooltip">True</property>
-                            <property name="tooltip_text" translatable="yes">If selected, this option allows you to set a manual proxy for connecting</property>
+                            <property name="tooltip_text" translatable="yes">If selected, use a SOCKS proxy for all connections</property>
                             <property name="xalign">0</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">cbCfgProxyNo</property>
@@ -4697,6 +4700,7 @@ Changes apply to next opened connections, not current</property>
                                     <property name="left_padding">12</property>
                                     <child>
                                       <object class="GtkSpinButton" id="entryCfgProxyPort">
+                                        <property name="width_request">150</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">●</property>
@@ -4867,8 +4871,6 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkEntry" id="entryCfgJumpConfig">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Proxy password</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
                                       </object>
@@ -4904,8 +4906,6 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkEntry" id="entryCfgJumpIP">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Proxy IP</property>
                                         <property name="invisible_char">•</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
@@ -4940,6 +4940,7 @@ Changes apply to next opened connections, not current</property>
                                     <property name="left_padding">12</property>
                                     <child>
                                       <object class="GtkSpinButton" id="entryCfgJumpPort">
+                                        <property name="width_request">150</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">●</property>
@@ -4980,8 +4981,6 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkEntry" id="entryCfgJumpUser">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Proxy user</property>
                                         <property name="max_length">14</property>
                                         <property name="invisible_char">•</property>
                                         <property name="primary_icon_activatable">False</property>
@@ -5064,8 +5063,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameGlobalVariables">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignGlobalVar">
                     <property name="visible">True</property>
@@ -5132,8 +5135,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCmdLocal">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignCmdLocal">
                     <property name="visible">True</property>
@@ -5199,8 +5206,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCmdRemote">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignCmdRemote">
                     <property name="visible">True</property>
@@ -5266,8 +5277,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameKeePass">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignKeePass">
                     <property name="visible">True</property>
@@ -5348,7 +5363,7 @@ Changes apply to next opened connections, not current</property>
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="hbox4">
+          <object class="GtkBox" id="configFooter">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -7732,6 +7747,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignSpecific">
                     <property name="visible">True</property>
@@ -7812,6 +7828,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignPreExec">
                     <property name="visible">True</property>
@@ -7879,6 +7896,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignPostExec">
                     <property name="visible">True</property>
@@ -7946,6 +7964,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignExpect">
                     <property name="visible">True</property>
@@ -8012,6 +8031,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignMacros">
                     <property name="visible">True</property>
@@ -8079,6 +8099,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignLocal">
                     <property name="visible">True</property>
@@ -8146,6 +8167,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignVar">
                     <property name="visible">True</property>
@@ -8211,6 +8233,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignTermOpts_">
                     <property name="visible">True</property>
