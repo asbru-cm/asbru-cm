@@ -744,7 +744,6 @@ sub _updateGUIPreferences {
     _($self, 'cfgComboCharEncode')->set_active($self->{_ENCODINGS_MAP}{$$cfg{'defaults'}{'terminal character encoding'} // 'UTF-8'});
     _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'} // 'RFC-3629'});
     _($self, 'cfgComboBackspace')->set_active($$self{_BACKSPACE_BINDING}{$$cfg{'defaults'}{'terminal backspace'} // '0'});
-    _($self, 'cfgEntryTermEmulation')->set_text($$cfg{'defaults'}{'terminal emulation'} // 'xterm');
     _($self, 'cbCfgUnsplitDisconnected')->set_active($$cfg{'defaults'}{'unsplit disconnected terminals'} // '0');
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
     _($self, 'cbCfgSkip1stChainExpect')->set_active($$cfg{'defaults'}{'skip first chain expect'} // 1);
@@ -858,7 +857,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'terminal transparency'} = _($self, 'spCfgTerminalTransparency')->get_value;
     $$self{_CFG}{'defaults'}{'terminal transparency'} =~ s/,/\./go;
     $$self{_CFG}{'defaults'}{'terminal backspace'} = _($self, 'cfgComboBackspace')->get_active_text;
-    $$self{_CFG}{'defaults'}{'terminal emulation'} = _($self, 'cfgEntryTermEmulation')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'auto accept key'} = _($self, 'cbCfgAutoAcceptKeys')->get_active;
     $$self{_CFG}{'defaults'}{'record command history'} = _($self, 'cbCfgRecordHistory')->get_active;
     $$self{_CFG}{'defaults'}{'debug'} = _($self, 'cbCfgExpectDebug')->get_active;

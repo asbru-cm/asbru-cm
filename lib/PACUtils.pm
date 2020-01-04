@@ -119,7 +119,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.0.2';
+our $APPVERSION = '6.1.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -2056,7 +2056,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
     $$cfg{'defaults'}{'sort groups first'} //= 1;
     $$cfg{'defaults'}{'word characters'} //= '-.:_/';
-    $$cfg{'defaults'}{'terminal emulation'} //= 'xterm';
     $$cfg{'defaults'}{'show tray icon'} //= 1;
     $$cfg{'defaults'}{'unsplit disconnected terminals'} //= 0;
     $$cfg{'defaults'}{'confirm chains'} //= 1;
@@ -2187,7 +2186,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal emulation'} //= 'xterm';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal backspace'} //= 'auto';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal select words'} //= '-.:_/';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
@@ -2488,7 +2486,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} = '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} = 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} = 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} = 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} = 5000;
@@ -2515,7 +2512,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} //= '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} //= 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} //= 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} //= 5000;
