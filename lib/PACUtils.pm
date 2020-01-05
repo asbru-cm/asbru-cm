@@ -2088,7 +2088,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'info font'} //= 'monospace';
     $$cfg{'defaults'}{'use login shell to connect'} //= 0;
     $$cfg{'defaults'}{'audible bell'} //= 0;
-    $$cfg{'defaults'}{'visible bell'} //= 0;
     $$cfg{'defaults'}{'ctrl tab'} //= 'last';
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
@@ -2203,7 +2202,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable ALT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'audible bell'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'visible bell'} //= 0;
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
         if ($uuid =~ /^HASH/go) {
@@ -2528,7 +2526,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'audible bell'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'visible bell'} //= 0;
         }
     }
 

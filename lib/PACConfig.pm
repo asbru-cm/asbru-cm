@@ -756,7 +756,6 @@ sub _updateGUIPreferences {
     _($self, 'fontTree')->set_font_name($$cfg{'defaults'}{'tree font'});
     _($self, 'fontInfo')->set_font_name($$cfg{'defaults'}{'info font'});
     _($self, 'cbCfgAudibleBell')->set_active($$cfg{'defaults'}{'audible bell'});
-    _($self, 'cbCfgVisibleBell')->set_active($$cfg{'defaults'}{'visible bell'});
     _($self, 'cbCfgShowTerminalStatus')->set_active($$cfg{'defaults'}{'terminal show status bar'});
     _($self, 'cbCfgChangeMainTitle')->set_active($$cfg{'defaults'}{'change main title'});
     _($self, 'rbCfgSwitchTabsCtrl')->set_active(! $$cfg{'defaults'}{'how to switch tabs'});
@@ -960,7 +959,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'info font'} = _($self, 'fontInfo')->get_font_name;
     $$self{_CFG}{'defaults'}{'use login shell to connect'} = _($self, 'cbCfgUseShellToConnect')->get_active;
     $$self{_CFG}{'defaults'}{'audible bell'} = _($self, 'cbCfgAudibleBell')->get_active;
-    $$self{_CFG}{'defaults'}{'visible bell'} = _($self, 'cbCfgVisibleBell')->get_active;
     $$self{_CFG}{'defaults'}{'ctrl tab'} = _($self, 'rbCfgCtrlTabLast')->get_active ? 'last' : 'next';
     $$self{_CFG}{'defaults'}{'terminal show status bar'} = _($self, 'cbCfgShowTerminalStatus')->get_active;
     $$self{_CFG}{'defaults'}{'append group name'} = _($self, 'cbCfgAutoAppendGroupName')->get_active;
