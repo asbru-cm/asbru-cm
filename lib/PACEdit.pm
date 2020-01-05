@@ -656,7 +656,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
-    _($self, 'entryCfgJumpConnConfig')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump config'} // '');
+
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
@@ -797,7 +797,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = _($self, 'entryCfgJumpConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'jump config'} = _($self, 'entryCfgJumpConnConfig')->get_chars(0, -1);
     if (_($self, 'rbCfgAuthUserPass')->get_active) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
     } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
