@@ -1969,7 +1969,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
     #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
-    $$cfg{'defaults'}{'record command history'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
     $$cfg{'defaults'}{'back color'} //= '#000000000000';
     $$cfg{'defaults'}{'close terminal on disconnect'} //= '';
