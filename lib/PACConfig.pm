@@ -626,7 +626,9 @@ sub _updateGUIPreferences {
     if (!defined $layout{$$cfg{'defaults'}{'layout'}}) {
         $layout{$$cfg{'defaults'}{'layout'}} = 0;
     }
-
+    if (!defined $$cfg{'defaults'}{'bold is brigth'}) {
+        $$cfg{'defaults'}{'bold is brigth'} = 0;
+    }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
     _($self, 'cbCfgAutoAcceptKeys')->set_active($$cfg{'defaults'}{'auto accept key'});
@@ -730,7 +732,7 @@ sub _updateGUIPreferences {
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorBack', 'back color', _($self, 'colorBack')->get_color->to_string);
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorBold', 'bold color', _($self, 'colorBold')->get_color->to_string);
     _($self, 'colorBold')->set_sensitive(! _($self, 'cbBoldAsText')->get_active);
-    _($self, 'cbBoldAsText')->set_active($$cfg{'defaults'}{'bold color like text'} // 1);
+    _($self, 'chkBoldIsBrigth')->set_active($$cfg{'defaults'}{'bold is brigth'});
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorConnected', 'connected color', _($self, 'colorText')->get_color->to_string);
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorDisconnected', 'disconnected color', _($self, 'colorBlack')->get_color->to_string);
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorNewData', 'new data color', _($self, 'colorNewData')->get_color->to_string);
@@ -805,7 +807,9 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpIP')->set_text($$cfg{'defaults'}{'jump ip'} // '');
     _($self, 'entryCfgJumpPort')->set_value(($$cfg{'defaults'}{'jump port'} // 22) || 22);
     _($self, 'entryCfgJumpUser')->set_text($$cfg{'defaults'}{'jump user'} // '');
-    _($self, 'entryCfgJumpConfig')->set_text($$cfg{'defaults'}{'jump config'} // '');
+    if (($$cfg{'defaults'}{'proxy'} eq 'Jump')&&(defined $$self{_CFG}{'defaults'}{'jump key'})&&($$self{_CFG}{'defaults'}{'jump key'} ne '')) {
+        _($self, 'entryCfgJumpKey')->set_uri("file://$$self{_CFG}{'defaults'}{'jump key'}");
+    }
 
     # Global TABS
     $$self{_SHELL}->update($$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'});
@@ -878,10 +882,12 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'auto save'} = _($self, 'cbCfgAutoSave')->get_active;
     if (_($self, 'cbCfgProxyManual')->get_active) {
         $$self{_CFG}{'defaults'}{'proxy'} = 'Proxy';
+        $$self{_CFG}{'defaults'}{'jump key'} = '';
     } elsif (_($self, 'cbCfgProxyJump')->get_active) {
         $$self{_CFG}{'defaults'}{'proxy'} = 'Jump';
     } else {
         $$self{_CFG}{'defaults'}{'proxy'} = 'No';
+        $$self{_CFG}{'defaults'}{'jump key'} = '';
     }
     # SOCKS PROXY
     $$self{_CFG}{'defaults'}{'proxy ip'} = _($self, 'entryCfgProxyIP')->get_chars(0, -1);
@@ -892,7 +898,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'jump ip'} = _($self, 'entryCfgJumpIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump port'} = _($self, 'entryCfgJumpPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
-    $$self{_CFG}{'defaults'}{'jump config'} = _($self, 'entryCfgJumpConfig')->get_chars(0, -1);
+
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell directory'} = _($self, 'entryCfgShellDirectory')->get_chars(0, -1);
@@ -906,6 +912,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'back color'} = _($self, 'colorBack')->get_color->to_string;
     $$self{_CFG}{'defaults'}{'bold color'} = _($self, 'colorBold')->get_color->to_string;
     $$self{_CFG}{'defaults'}{'bold color like text'} = _($self, 'cbBoldAsText')->get_active;
+    $$self{_CFG}{'defaults'}{'bold is brigth'} = _($self, 'chkBoldIsBrigth')->get_active;
     $$self{_CFG}{'defaults'}{'connected color'} = _($self, 'colorConnected')->get_color->to_string;
     $$self{_CFG}{'defaults'}{'disconnected color'} = _($self, 'colorDisconnected')->get_color->to_string;
     $$self{_CFG}{'defaults'}{'new data color'} = _($self, 'colorNewData')->get_color->to_string;

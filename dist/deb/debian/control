@@ -10,6 +10,6 @@ Vcs-Browser: https://github.com/asbru-cm/asbru-cm.git
 
 Package: asbru-cm
 Architecture: all
-Depends: perl, libvte-2.91-0, libcairo-perl, libglib-perl, libpango-perl, libsocket6-perl, libexpect-perl, libnet-proxy-perl, libyaml-perl, libcrypt-cbc-perl, libcrypt-blowfish-perl, libgtk3-perl, libnet-arp-perl, libossp-uuid-perl, openssh-client, telnet, ftp, libcrypt-rijndael-perl, libxml-parser-perl, libcanberra-gtk-module, dbus-x11, libx11-guitest-perl, libgtk3-simplelist-perl, gir1.2-wnck-3.0, gir1.2-vte-2.91
+Depends: perl, libvte-2.91-0, libcairo-perl, libglib-perl, libpango-perl, libsocket6-perl, libexpect-perl, libyaml-perl, libcrypt-cbc-perl, libcrypt-blowfish-perl, libgtk3-perl, libnet-arp-perl, libossp-uuid-perl, openssh-client, telnet, ftp, libcrypt-rijndael-perl, libxml-parser-perl, libcanberra-gtk-module, dbus-x11, libx11-guitest-perl, libgtk3-simplelist-perl, gir1.2-wnck-3.0, gir1.2-vte-2.91
 Description: A free and open-source connection manager
  Ásbrú Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
