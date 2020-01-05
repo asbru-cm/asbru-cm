@@ -83,8 +83,8 @@ my $NPOSY = 0;
 
 my $right_click_deep = 0;
 
-my $COL_GREEN = "\e[1;32m";
-my $COL_RED   = "\e[1;31m";
+my $COL_GREEN = "\e[1;38;5;2m";
+my $COL_RED   = "\e[1;38;5;1m";
 my $COL_RESET = "\e[0m";
 
 # END: Define GLOBAL CLASS variables
@@ -432,8 +432,8 @@ sub start {
     );
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
-    $PACMain::RUNNING{$$self{'_UUID_TMP'}}{terminal}{_GUI}{_VTE}->grab_focus();
-
+    $$self{_GUI}{_VTE}->grab_focus();
+    $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     return 1;
 }
 
