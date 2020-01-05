@@ -3968,7 +3968,6 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal backspace'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'visible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
 # FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{'defaults'}{'terminal transparency'} > 0);
 # FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{'defaults'}{'terminal transparency'});
@@ -3982,7 +3981,6 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{'defaults'}{'terminal backspace'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{'defaults'}{'word characters'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{'defaults'}{'audible bell'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{'defaults'}{'visible bell'});
     }
 
     if ($$self{_FOCUSED} && $$self{FOCUS}) {
