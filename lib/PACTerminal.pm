@@ -432,7 +432,8 @@ sub start {
     );
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
-    $PACMain::RUNNING{$$self{'_UUID_TMP'}}{terminal}{_GUI}{_VTE}->grab_focus();
+    $$self{_GUI}{_VTE}->grab_focus();
+    $$self{_GUI}{_VTE}->set_bold_is_bright(0);
 
     return 1;
 }
