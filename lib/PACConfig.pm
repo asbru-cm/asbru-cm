@@ -807,6 +807,9 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpIP')->set_text($$cfg{'defaults'}{'jump ip'} // '');
     _($self, 'entryCfgJumpPort')->set_value(($$cfg{'defaults'}{'jump port'} // 22) || 22);
     _($self, 'entryCfgJumpUser')->set_text($$cfg{'defaults'}{'jump user'} // '');
+    if (($$cfg{'defaults'}{'proxy'} eq 'Jump')&&(defined $$self{_CFG}{'defaults'}{'jump key'})&&($$self{_CFG}{'defaults'}{'jump key'} ne '')) {
+        _($self, 'entryCfgJumpKey')->set_uri("file://$$self{_CFG}{'defaults'}{'jump key'}");
+    }
 
     # Global TABS
     $$self{_SHELL}->update($$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'});
@@ -879,10 +882,12 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'auto save'} = _($self, 'cbCfgAutoSave')->get_active;
     if (_($self, 'cbCfgProxyManual')->get_active) {
         $$self{_CFG}{'defaults'}{'proxy'} = 'Proxy';
+        $$self{_CFG}{'defaults'}{'jump key'} = '';
     } elsif (_($self, 'cbCfgProxyJump')->get_active) {
         $$self{_CFG}{'defaults'}{'proxy'} = 'Jump';
     } else {
         $$self{_CFG}{'defaults'}{'proxy'} = 'No';
+        $$self{_CFG}{'defaults'}{'jump key'} = '';
     }
     # SOCKS PROXY
     $$self{_CFG}{'defaults'}{'proxy ip'} = _($self, 'entryCfgProxyIP')->get_chars(0, -1);
@@ -893,6 +898,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'jump ip'} = _($self, 'entryCfgJumpIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump port'} = _($self, 'entryCfgJumpPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
+
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell directory'} = _($self, 'entryCfgShellDirectory')->get_chars(0, -1);

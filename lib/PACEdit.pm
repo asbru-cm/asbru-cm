@@ -656,6 +656,9 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
+    if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
+        _($self, 'entryCfgJumpConnKey')->set_uri('file://' . $$self{_CFG}{'environments'}{$uuid}{'jump key'});
+    }
 
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
@@ -804,6 +807,13 @@ sub _saveConfiguration {
     } elsif (_($self, 'rbCfgAuthManual')->get_active) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'manual';
     }
+    if ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3) {
+        $$self{_CFG}{'environments'}{$uuid}{'jump key'} = _($self, 'entryCfgJumpConnKey')->get_filename // '';
+    } else {
+        $$self{_CFG}{'environments'}{$uuid}{'jump key'} = '';
+    }
+
+
     $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename // '';
