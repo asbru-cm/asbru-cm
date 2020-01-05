@@ -617,32 +617,11 @@ sub _initGUI {
         $sc->add($$self{_GUI}{_VTE});
     }
 
-    $$self{_GUI}{hbHist} = Gtk3::VBox->new(0, 0);
-
-    # Create a scrolled window for the keypress list
-    $$self{_GUI}{sk} = Gtk3::ScrolledWindow->new();
-    $$self{_GUI}{hbHist}->pack_start($$self{_GUI}{sk}, 1, 1, 0);
-    $$self{_GUI}{sk}->set_policy('automatic', 'automatic');
-    $$self{_GUI}{sk}->set_size_request(120, 100);
-    $$self{_GUI}{treeKeys} = Gtk3::SimpleList->new(' HISTORY' => 'text', 'TIME' => 'hidden');
-    $$self{_GUI}{treeKeys}->get_selection->set_mode('single');
-    $$self{_GUI}{sk}->add($$self{_GUI}{treeKeys});
-    $$self{_GUI}{treeKeys}->set_headers_visible(1);
-    $$self{_GUI}{treeKeys}->set_enable_search(0);
-    eval {$$self{_GUI}{treeKeys}->set_can_focus(0);};
-
-    # Create a button to remove history
-    $$self{_GUI}{btnDelHist} = Gtk3::Button->new('Forget history');
-    $$self{_GUI}{hbHist}->pack_start($$self{_GUI}{btnDelHist}, 0, 0, 0);
-    $$self{_GUI}{btnDelHist}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
-    eval {$$self{_GUI}{btnDelHist}->set_can_focus(0);};
-
     if (!$$self{'EMBED'}) {
         $$self{_GUI}{_VBOX}->pack_start($$self{_GUI}{_HBOX}, 1, 1, 0);
 
         # ... put this scrolled vte in $vbox
         $$self{_GUI}{_HBOX}->pack1($sc, 1, 0);
-        $$self{_GUI}{_HBOX}->pack2($$self{_GUI}{hbHist}, 1, 0);
         $$self{_GUI}{_HBOX}->set_position(3000);
 
         $$self{FOCUS} = $$self{_GUI}{_VTE};
@@ -725,15 +704,6 @@ sub _initGUI {
     if ($$self{_CFG}{defaults}{'terminal show status bar'}) {
         $$self{_GUI}{_VBOX}->pack_end($$self{_GUI}{bottombox}, 0, 1, 0);
     }
-
-    # Create a checkbox to show or not commands history tree
-    $$self{_GUI}{cbShowHist} = Gtk3::ToggleButton->new();
-    $$self{_GUI}{cbShowHist}->set_tooltip_text('Show/Hide command history');
-    $$self{_GUI}{cbShowHist}->set_image(Gtk3::Image->new_from_stock('pac-history', 'GTK_ICON_SIZE_BUTTON'));
-    eval {
-        $$self{_GUI}{cbShowHist}->set_can_focus(0);
-    };
-    $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{cbShowHist}, 0, 1, 4);
 
     # Only in traditional mode, show additional buttons
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
@@ -893,36 +863,6 @@ sub _initGUI {
 sub _setupCallbacks {
     my $self = shift;
 
-    # Delete history click
-    $$self{_GUI}{btnDelHist}->signal_connect('clicked', sub {
-        if (_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?")) {
-            @{$$self{_GUI}{treeKeys}{data}} = ();
-        }
-    });
-
-    # Execute saved key command
-    $$self{_GUI}{treeKeys}->signal_connect('row_activated' => sub {
-        my $tree = shift;
-        my ($selected) = $tree->get_selected_indices;
-        if (!(defined $selected && $$self{CONNECTED})) {
-            return 1;
-        }
-        my $cmd = $$tree{data}[$selected][0];
-
-        $$self{_SAVE_KEYS} = 0;
-        $self->_execute('remote', $cmd, 0);
-        $$self{_SAVE_KEYS} = 1;
-    });
-
-    # Access Show History Button
-    $$self{_GUI}{cbShowHist}->signal_connect('toggled', sub {
-        if ($$self{_GUI}{cbShowHist}->get_active) {
-            $$self{_GUI}{hbHist}->show_all();
-        } else {
-            $$self{_GUI}{hbHist}->hide();
-        }
-    });
-
     # Show Bar (if any)
     if ($$self{_GUI}{btnShowButtonBar}) {
         $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
@@ -1033,13 +973,8 @@ sub _setupCallbacks {
 
         # <Shift><Ctrl><Alt>
         if (($ctrl && $alt && $shift) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'}) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
-            # d --> FULL uplicate connection
-            if (lc $keyval eq 'd') {
-                $self->_wSelectKeypress;
-                return 1;
-            }
             # X --> Reset terminal
-            elsif (lc $keyval eq 'x') {
+            if (lc $keyval eq 'x') {
                 $$self{_GUI}{_VTE}->reset(1, 1);
                 return 1;
             }
@@ -1049,10 +984,6 @@ sub _setupCallbacks {
             # r --> remove from cluster
             if (lc $keyval eq 'r') {
                 $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
-                return 1;
-            }
-            if (lc $keyval eq 'h') {
-                $$self{_GUI}{cbShowHist}->set_active(! $$self{_GUI}{cbShowHist}->get_active);
                 return 1;
             }
         }
@@ -1143,12 +1074,12 @@ sub _setupCallbacks {
                 return 1;
             }
             # f --> Find in history
-            elsif (lc $keyval eq 'f') {
-                if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    $self->_wHistory;
-                }
-                return 1;
-            }
+            #elsif (lc $keyval eq 'f') {
+                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
+                    #$self->_wHistory;
+                #}
+                #return 1;
+            #}
             # r --> Disconnect and Restart session
             elsif (lc $keyval eq 'r') {
                 $self->_disconnectAndRestartTerminal();
@@ -1207,12 +1138,12 @@ sub _setupCallbacks {
                 return 1;
             }
             # h --> Show command history window
-            if (lc $keyval eq 'h') {
-                if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    $self->_wHistory;
-                }
-                return 1;
-            }
+            #if (lc $keyval eq 'h') {
+                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
+                    #$self->_wHistory;
+                #}
+                #return 1;
+            #}
         }
         return 0;
     });
@@ -1261,9 +1192,6 @@ sub _setupCallbacks {
         return 0;
     });
     $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
-        if ($$self{_CFG}{'defaults'}{'record command history'}) {
-            $self->_saveHistory($_[1]);
-        }
         $self->_clusterCommit(@_);
     });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
@@ -1337,11 +1265,6 @@ sub _setupCallbacks {
             }
         });
     }
-    $$self{_GUI}{hbHist}->signal_connect('map' => sub {
-        if (!$$self{_NO_UPDATE_CFG}) {
-            $self->_updateCFG();
-        }
-    });
 
     # Append VTE's connection finalization with CLOSE event
     $$self{_GUI}{_VTE}->signal_connect ('child_exited' => sub {
@@ -2139,9 +2062,6 @@ sub _vteMenu {
     push(@vte_menu_items, {separator => 1});
     push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '<control>F3', code => sub {$self->_wFindInTerminal; return 1;}});
 
-    # Add show command history
-    push(@vte_menu_items, {label => 'Command History...', shortcut => '<alt>h', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{$self->_wHistory;}});
-
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
 
@@ -2269,15 +2189,6 @@ sub _vteMenu {
                 shortcut => '<control><shift>d',
                 stockicon => 'gtk-copy',
                 code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]])}
-            },
-            # Full Duplicate connection
-            {
-                label => 'FULL Duplicate connection',
-                stockicon => 'gtk-copy',
-                shortcut => '<control><shift><alt>d',
-                sensitive => $$self{_SAVE_KEYS},
-                tooltip => 'This option lets you choose which recorded commands do you want to reproduce in the Duplicated connection (use with caution!!)',
-                code => sub {$self->_wSelectKeypress;}
             },
             # Restart session
             {
@@ -2465,37 +2376,6 @@ sub _clusterCommit {
     $$self{_LISTEN_COMMIT} = 1;
 
     return 1;
-}
-
-sub _saveHistory {
-    my ($self, $string) = @_;
-    $string //= '';
-    if (!$$self{_SAVE_KEYS}) {
-        return 1;
-    }
-
-# FIXME-VTE
-if (0) {
-    my ($col, $row) = $$self{_GUI}{_VTE}->get_cursor_position;
-    my ($txt) = $$self{_GUI}{_VTE}->get_text_range($row, 0, $row, $$self{_GUI}{_VTE}->get_column_count, sub {1;});
-    $txt =~ s/^(?:(?:\s+)|(?:\s+))$//go;
-    if ((! $$self{_HAVE_PROMPT}) && ($txt !~ /^\s*$/go)) {
-        chomp $txt;
-        $$self{_HAVE_PROMPT} = $txt;
-    } elsif ($$self{_INTRO_PRESS}) {
-        chomp $txt;
-        $txt =~ s/^\Q$$self{_HAVE_PROMPT}\E//g;
-        if ($txt eq '') {
-            $$self{_INTRO_PRESS} = 0;
-            return 1;
-        }
-        $$self{_HAVE_PROMPT} = 0;
-        $$self{_INTRO_PRESS} = 0;
-        push(@{$$self{_GUI}{treeKeys}{'data'}}, [$txt, time]);
-        my $last = $#{$$self{_GUI}{treeKeys}{'data'}};
-        $$self{_GUI}{treeKeys}->set_cursor(Gtk3::TreePath->new_from_string($last), undef, 0);
-    }
-}
 }
 
 sub _tabToWin {
@@ -2822,9 +2702,6 @@ sub _tabMenu {
     push(@vte_menu_items, {separator => 1});
 
     push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '', code => sub {$self->_wFindInTerminal; return 1;}});
-
-    # Add show command history
-    push(@vte_menu_items, {label => 'Command History...', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{$self->_wHistory;}});
 
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
@@ -3566,169 +3443,10 @@ sub _wSelectChain {
 
 }
 
-sub _wSelectKeypress {
-    my $self = shift;
-
-    our %w;
-
-    if (defined $w{window}) {
-        return $w{window}{data}->present;
-    }
-
-    # Create the dialog window,
-    $w{window}{data} = Gtk3::Window->new();
-
-    $w{window}{data}->signal_connect('delete_event' => sub {
-        $w{window}{data}->destroy();
-        undef %w;
-        return 1;
-    });
-
-    $w{window}{data}->signal_connect('key_press_event' => sub {
-        my ($widget, $event) = @_;
-        my $keyval = '' . ($event->keyval);
-        if ($keyval != 65307) {
-            return 0;
-        }
-        $w{window}{gui}{btnclose}->activate();
-        return 1;
-    });
-
-    # and setup some dialog properties.
-    $w{window}{data}->set_title("$self->{_TITLE} : $APPNAME : Select keypresses to propagate to Duplicated Connection");
-    $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_from_file($APPICON);
-    $w{window}{data}->set_default_size(600, 480);
-    $w{window}{data}->set_resizable(1);
-    $w{window}{data}->set_modal(1);
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-
-    # Create a vbox
-    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
-    $w{window}{data}->add($w{window}{gui}{vbox});
-
-    $w{window}{gui}{label0} = Gtk3::Label->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{label0}, 0, 1, 0);
-    $w{window}{gui}{label0}->set_justify('center');
-    $w{window}{gui}{label0}->set_markup("<big><b><span foreground=\"#FF0000\">***************** ATTENTION *****************</span></b></big>\nAre you sure you want to duplicate this connection, including <b>every kestroke</b> registered until now?\nThat can be *very dangerous*, specially if you do not remember your keyboard activity in this terminal.\nIf unsure, click 'Cancel' and take a look at this terminals's history");
-
-    # Create frame 1
-    $w{window}{gui}{frame1} = Gtk3::Frame->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{frame1}, 1, 1, 0);
-    $w{window}{gui}{frame1}->set_label(' Command History: ');
-    $w{window}{gui}{frame1}->set_border_width(5);
-
-    # Create a GtkScrolledWindow,
-    my $sctxt = Gtk3::ScrolledWindow->new();
-    $w{window}{gui}{frame1}->add($sctxt);
-    $sctxt->set_shadow_type('none');
-    $sctxt->set_policy('automatic', 'automatic');
-    $sctxt->set_border_width(5);
-
-    # Create tree found
-    $w{window}{gui}{treefound} = Gtk3::SimpleList->new_from_treeview (
-        Gtk3::TreeView->new(),
-        ' Execute ' => 'bool',
-        ' Last Execution ' => 'text',
-        ' Command ' => 'text',
-        ' cmd ' => 'hidden'
-    );
-    $w{window}{gui}{treefound}->set_headers_visible(1);
-    $w{window}{gui}{treefound}->set_grid_lines('both');
-    $w{window}{gui}{treefound}->get_selection->set_mode('single');
-    foreach my $array (@{$$self{_GUI}{treeKeys}{data}}) {
-        my $cmd = $$array[0];
-        my $cmdt = $$array[1];
-
-        push(@{$w{window}{gui}{treefound}{data}},
-            [
-                1,
-                strftime("%Y-%m-%d %H:%M:%S", localtime($cmdt)),
-                _replaceBadChars($cmd),
-                $cmd
-            ]
-        );
-    }
-
-    # Put treefound into scrolledwindow
-    $sctxt->add($w{window}{gui}{treefound});
-
-    # Put a separator
-    $w{window}{gui}{sep} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep}, 0, 1, 5);
-
-    $w{window}{gui}{hbox1} = Gtk3::HBox->new(0, 0);
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbox1}, 0, 1, 0);
-
-    $w{window}{gui}{lblSleep} = Gtk3::Label->new('Time between commands to replicate: ');
-    $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lblSleep}, 0, 1, 0);
-
-    $w{window}{gui}{spSleep} = Gtk3::SpinButton->new_with_range(0, 86400, 1/2);
-    $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{spSleep}, 0, 1, 0);
-    $w{window}{gui}{spSleep}->set_value(1/2);
-
-    # Put a separator
-    $w{window}{gui}{sep2} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep2}, 0, 1, 5);
-
-    # Put a hbox to add exec/close buttons
-    $w{window}{gui}{hbtnbox} = Gtk3::HBox->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbtnbox}, 0, 1, 0);
-    $w{window}{gui}{hbtnbox}->set_border_width(5);
-
-    # Put a 'select all' button
-    $w{window}{gui}{btnselectall} = Gtk3::Button->new_from_stock('gtk-yes');
-    $w{window}{gui}{btnselectall}->set_label('Select all');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnselectall}, 0, 1, 0);
-    $w{window}{gui}{btnselectall}->signal_connect('clicked' => sub {foreach my $line (@{$w{window}{gui}{treefound}{data}}) {$$line[0] = 1;};});
-
-    # Put a 'select all' button
-    $w{window}{gui}{btnselectnone} = Gtk3::Button->new_from_stock('gtk-no');
-    $w{window}{gui}{btnselectnone}->set_label('Select none');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnselectnone}, 0, 1, 0);
-    $w{window}{gui}{btnselectnone}->signal_connect('clicked' => sub {foreach my $line (@{$w{window}{gui}{treefound}{data}}) {$$line[0] = 0;};});
-
-    # Put a button to execute
-    $w{window}{gui}{btnExec} = Gtk3::Button->new_from_stock('gtk-execute');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnExec}, 1, 1, 0);
-    $w{window}{gui}{btnExec}->set_label('Go _FULL Duplicate');
-    $w{window}{gui}{btnExec}->signal_connect('clicked' => sub {
-        my %keys;
-        foreach my $line (@{$w{window}{gui}{treefound}{data}}) {
-            if ($$line[0]) {
-                push(@{$keys{cmd}}, $$line[3]);
-            }
-        }
-        $keys{sleep} = $w{window}{gui}{spSleep}->get_chars(0, -1) // 1/2;
-
-        my $new_terminal = $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]], \%keys);
-
-        $w{window}{data}->destroy();
-        undef %w;
-    });
-
-    # Put a 'close' button
-    $w{window}{gui}{btnclose} = Gtk3::Button->new_from_stock('gtk-cancel');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnclose}, 0, 1, 0);
-    $w{window}{gui}{btnclose}->signal_connect('clicked' => sub {$w{window}{data}->destroy(); undef %w; return 1;});
-
-    $w{window}{data}->show_all();
-
-    return 1;
-}
-
 sub _updateCFG {
     my $self = shift;
 
     $$self{_NO_UPDATE_CFG} = 1;
-
-    if ($$self{_GUI}{hbHist}) {
-        if (($$self{_GUI}{cbShowHist}->get_active) && ($$self{_CFG}{'defaults'}{'record command history'})) {
-            $$self{_GUI}{hbHist}->show_all();
-        } else {
-            $$self{_GUI}{hbHist}->hide;
-        }
-    }
 
     if (defined $$self{_GUI}{_MACROSBOX}) {
         $$self{_GUI}{_MACROSBOX}->hide;
@@ -4273,146 +3991,6 @@ sub _wFindInTerminal {
     return 1;
 }
 
-sub _wHistory {
-    my $self = shift;
-
-    our %w;
-
-    if (defined $w{window}) {
-        return $w{window}{data}->present;
-    }
-
-    # Create the 'windowFind' dialog window,
-    $w{window}{data} = Gtk3::Window->new();
-
-    $w{window}{data}->signal_connect('delete_event' => sub {
-        $w{window}{data}->destroy();
-        undef %w;
-        return 1;
-    });
-
-    $w{window}{data}->signal_connect('key_press_event' => sub {
-        my ($widget, $event) = @_;
-        my $keyval = '' . ($event->keyval);
-        if ($keyval != 65307) {
-            return 0;
-        }
-        $w{window}{gui}{btnclose}->activate();
-        return 1;
-    });
-
-    # and setup some dialog properties.
-    $w{window}{data}->set_title("$self->{_TITLE}  : $APPNAME : Command History");
-    $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_from_file($APPICON);
-    $w{window}{data}->set_default_size(600, 480);
-    $w{window}{data}->set_resizable(1);
-    $w{window}{data}->set_modal(1);
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-
-    # Create a vbox
-    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
-    $w{window}{data}->add($w{window}{gui}{vbox});
-
-    # Create frame 1
-    $w{window}{gui}{frame1} = Gtk3::Frame->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{frame1}, 1, 1, 0);
-    $w{window}{gui}{frame1}->set_label(' Command History: ');
-    $w{window}{gui}{frame1}->set_border_width(5);
-
-    # Create a GtkScrolledWindow,
-    my $sctxt = Gtk3::ScrolledWindow->new();
-    $w{window}{gui}{frame1}->add($sctxt);
-    $sctxt->set_shadow_type('none');
-    $sctxt->set_policy('automatic', 'automatic');
-    $sctxt->set_border_width(5);
-
-    # Create treefound
-    $w{window}{gui}{treefound} = Gtk3::SimpleList->new_from_treeview (
-        Gtk3::TreeView->new(),
-        ' Execution time ' => 'text',
-        ' Command ' => 'text',
-        'cmd' => 'hidden'
-    );
-    $w{window}{gui}{treefound}->set_headers_visible(1);
-    $w{window}{gui}{treefound}->set_grid_lines('both');
-    $w{window}{gui}{treefound}->get_selection->set_mode('single');
-    foreach my $array (@{$$self{_GUI}{treeKeys}{data}}) {
-        my $cmd = $$array[0];
-        my $cmdt = $$array[1];
-        my $pretty_cmd = _replaceBadChars($cmd);
-
-        push(@{$w{window}{gui}{treefound}{data}},
-            [
-                strftime("%Y-%m-%d %H:%M:%S", localtime($cmdt)),
-                $pretty_cmd,
-                $cmd
-            ]
-        );
-    }
-
-    $w{window}{gui}{treefound}->signal_connect('row_activated' => sub {$w{window}{gui}{btnExec}->clicked});
-
-    # Put treefound into scrolled window
-    $sctxt->add($w{window}{gui}{treefound});
-
-    # Put a separator
-    $w{window}{gui}{sep} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep}, 0, 1, 5);
-
-    # Put a hbox to add exec/close buttons
-    $w{window}{gui}{hbtnbox} = Gtk3::HBox->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbtnbox}, 0, 1, 0);
-    $w{window}{gui}{hbtnbox}->set_border_width(5);
-
-    # Put a button to execute selected row
-    $w{window}{gui}{btnExec} = Gtk3::Button->new_from_stock('gtk-execute');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnExec}, 1, 1, 0);
-    $w{window}{gui}{btnExec}->signal_connect('clicked' => sub {
-        my ($selected) = $w{window}{gui}{treefound}->get_selected_indices;
-        if (!((defined $selected && $$self{CONNECTED}))) {
-            return 1;
-        }
-        my $cmd = $w{window}{gui}{treefound}{data}[$selected][2];
-
-        $$self{_SAVE_KEYS} = 0;
-        foreach my $cmd (map $w{window}{gui}{treefound}{data}[$_][2], $w{window}{gui}{treefound}->get_selected_indices) {
-            $self->_execute('remote', $cmd, 0);
-        }
-        $$self{_SAVE_KEYS} = 1;
-    });
-
-    # Put a button to copy selected rows to clipboard
-    $w{window}{gui}{btnCopy} = Gtk3::Button->new_from_stock('gtk-copy');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnCopy}, 1, 1, 0);
-    $w{window}{gui}{btnCopy}->signal_connect('clicked' => sub {
-        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->set_text (
-            join("\n", map $w{window}{gui}{treefound}{data}[$_][2], $w{window}{gui}{treefound}->get_selected_indices)
-        );
-    });
-
-    # Put a button to empty the history
-    $w{window}{gui}{btnEmpty} = Gtk3::Button->new('Forget history');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnEmpty}, 1, 1, 0);
-    $w{window}{gui}{btnEmpty}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
-    $w{window}{gui}{btnEmpty}->signal_connect('clicked' => sub {
-        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?")) {
-            return 1;
-        }
-        @{$w{window}{gui}{treefound}{data}} = ();
-        @{$$self{_GUI}{treeKeys}{data}} = ();
-    });
-
-    # Put a 'close' button
-    $w{window}{gui}{btnclose} = Gtk3::Button->new_from_stock('gtk-close');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnclose}, 0, 1, 0);
-    $w{window}{gui}{btnclose}->signal_connect('clicked' => sub {$w{window}{data}->destroy(); undef %w; return 1;});
-
-    $w{window}{data}->show_all();
-
-    return 1;
-}
-
 sub _checkSendKeystrokes {
     my $self = shift;
     my $data = shift // '';
@@ -4710,10 +4288,6 @@ Update status information on Statusbar
 
 Transmit characters to other terminals in the same cluster using the _vteFeedChild routine
 
-=head2 sub _saveHistory
-
-Store the command events in history list
-
 =head2 sub _tabToWin
 
 Move a tabbed terminal to a stand alone window
@@ -4781,10 +4355,6 @@ Documentation pending
 Pending
 
 =head3 sub _chainGUI
-
-Pending
-
-=head2 sub _wSelectKeypress
 
 Pending
 
