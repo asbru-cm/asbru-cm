@@ -1059,8 +1059,6 @@ if ($GETCMD) {
 # Set log file
 $EXP -> log_file($LOG_FILE);
 
-print "COMMENT AFTER TESTING, COMMAND: $connection_cmd\n";
-
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
 $EXP -> spawn("$connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";

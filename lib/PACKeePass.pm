@@ -114,12 +114,12 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($self, 'KeePassX Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($self, 'KeePassXC Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
-            my ($msg,$flg) = TestMasterKey($self,'a','b');
-            if ((!$flg)&&($msg =~ /^Error/)) {
+            my ($msg,$flg) = TestMasterKey($self,'a','ASBRUKeePassXCTEST');
+            if ((!$flg)&&($msg !~ /ASBRUKeePassXCTEST/)) {
                 $KPXC_MP='';
                 $mp = '';
             }
@@ -448,7 +448,7 @@ sub _testCapabilities {
         $$self{disable_keepassxc} = 1;
         return 0;
     }
-    $c = `keepassxc-cli -h`;
+    $c = `keepassxc-cli show -á 2>&1`;
     $$self{disable_keepassxc} = 0;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
