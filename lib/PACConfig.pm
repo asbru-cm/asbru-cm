@@ -176,7 +176,7 @@ sub _initGUI {
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new)->{container});
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new)->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new)->{container});
-    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new)->{container});
+    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1))->{container});
     _($self, 'nbPreferences')->show_all;
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');

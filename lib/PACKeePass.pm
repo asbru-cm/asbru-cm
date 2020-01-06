@@ -37,6 +37,7 @@ use warnings;
 use Encode;
 use FindBin qw ($RealBin $Bin $Script);
 use IPC::Open2;
+use IPC::Open3;
 
 # GTK
 use Gtk3 '-init';
@@ -50,7 +51,7 @@ use PACUtils;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-my $KPXC_MP = '';
+my $KPXC_MP = $ENV{'KPXC_MP'};
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -60,16 +61,17 @@ my $KPXC_MP = '';
 
 sub new {
     my $class = shift;
+    my $buildgui = shift;
     my $self;
 
     $self->{cfg} = shift;
     $self->{container} = undef;
     $self->{frame} = {};
 
-    $self->{entries} = [];
-
     _testCapabilities($self);
-    _buildKeePassGUI($self);
+    if ($buildgui) {
+        _buildKeePassGUI($self);
+    }
 
     bless($self, $class);
     return $self;
@@ -93,12 +95,15 @@ sub update {
     if (!$$self{cfg}{use_keepass}) {
         return 1;
     }
-    my $pass = $$self{cfg}{'password'};
-    $$self{frame}{entryKeePassPassword}->set_text($pass);
+    $$self{frame}{entryKeePassPassword}->set_text($$self{cfg}{'password'});
     $$self{frame}{cbUseKeePass}->set_active($$self{cfg}{use_keepass});
     $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
-    if ($pass) {
-        $KPXC_MP = $pass;
+    if ($$self{cfg}{'password'}) {
+        $KPXC_MP = $$self{cfg}{'password'};
+        $ENV{'KPXC_MP'} = $$self{cfg}{'password'};
+    } elsif (!$KPXC_MP) {
+        # Get Password user
+        getMasterPassword($self);
     }
     return 1;
 }
@@ -110,56 +115,107 @@ sub getMasterPassword {
     while (!$mp) {
         $mp = _wEnterValue($self, 'KeePassX Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
         # Test Master Password
+        if ($mp) {
+            $KPXC_MP = $mp;
+            my ($msg,$flg) = TestMasterKey($self,'a','b');
+            if ((!$flg)&&($msg =~ /^Error/)) {
+                $KPXC_MP='';
+                $mp = '';
+            }
+        } else {
+            last;
+        }
     }
     $KPXC_MP = $mp;
+    $ENV{'KPXC_MP'} = $mp;
     return $mp;
 }
 
-sub GetField {
+sub TestMasterKey {
     my ($s,$field,$uid) = @_;
-    my ($data,$pid);
-    my $line = 0;
-    my $cfg = $s->get_cfg();
+    my ($pid,$cfg);
     my $ok = 0;
+    my @err;
+    my @out;
 
+    if ($$s{cfg}) {
+        $cfg = $$s{cfg};
+    } else {
+        $cfg = $s->get_cfg();
+    }
+    $pid = open3(*Writer,*Reader,*ErrReader,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
+    print Writer "$KPXC_MP\n";
+    close Writer;
+    @out = <Reader>;
+    @err = <ErrReader>;
+    # Wait so we do not create zombies
+    waitpid($pid,0);
+    close Reader;
+    close ErrReader;
+    if ($?) {
+        return ($err[0],0);
+    }
+    return ('',1);
+}
+
+sub GetFieldValueFromString {
+    my ($s,$str) = @_;
+    my ($ok,$value,$field,$uid,$flg,$cfg);
+
+    if (!$str) {
+        return ($str,1);
+    }
+    if ($str !~ /<\w+:\w+>/) {
+        return ($str,1);
+    }
+    if ($$s{cfg}) {
+        $cfg = $$s{cfg};
+    } else {
+        $cfg = $s->get_cfg();
+    }
+    $str =~ s/[<>]//g;
+    ($field,$uid) = split /:/,$str;
+    ($value,$flg) = $s->GetFieldValue($field,$uid);
+    return ($value,$flg);
+}
+
+sub GetFieldValue {
+    my ($s,$field,$uid) = @_;
+    my ($pid,$cfg);
+    my $data='';
+    my @out;
+
+    if ($$s{cfg}) {
+        $cfg = $$s{cfg};
+    } else {
+        $cfg = $s->get_cfg();
+    }
     if (!$KPXC_MP) {
         # Get Password from config file or from user
         if ($$cfg{password}) {
             $KPXC_MP = $$cfg{password};
         } else {
-            $KPXC_MP = $s->getMasterPassword();
+            $s->getMasterPassword();
             if (!$KPXC_MP) {
                 # We could not get a valid password
-                return ('Bad key/master password',$ok);
+                return ('Bad key/master password',0);
             }
         }
     }
-    $pid = open2(*Reader, *Writer, "keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
+    $pid = open2(*Reader,*Writer,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
     print Writer "$KPXC_MP\n";
-    while ($data = <Reader>) {
-        $line++;
-        $data =~ s/\n//g;
-        if ($line < 3) {
-            if ($data =~ /^Insert |kdbx/) {
-                next;
-            } elsif ($data =~ /^Error|\.$/) {
-                # Bad password or file corrupted
-                last;
-            } elsif ($data =~ /$uid|\.$/) {
-                # Bad uuid
-                last;
-            }
-        }
-        if ($data =~ s/$field: *//i) {
-            $ok = 1;
-            last;
-        }
-    }
-    # Flush the rest of the output
-    while (my $x = <Reader>) {}
+    close Writer;
+    @out = <Reader>;
     # Wait so we do not create zombies
     waitpid($pid,0);
-    return ($data,$ok);
+    close Reader;
+    foreach $data (@out) {
+        $data =~ s/\n//g;
+        if ($data =~ s/$field: *//i) {
+            return ($data,1);
+        }
+    }
+    return ('',0);
 }
 
 sub get_cfg {
@@ -255,6 +311,9 @@ sub _testCapabilities {
     my $self = shift;
     my ($c);
 
+    $$self{kpxc_keyfile} = '';
+    $$self{kpxc_show_protected} = '';
+    $$self{kpxc_keyfile_opt} = '';
     $$self{kpxc_version} = `keepassxc-cli -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if (!$$self{kpxc_version}) {
@@ -265,13 +324,12 @@ sub _testCapabilities {
     $$self{disable_keepassxc} = 0;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
-    } else {
-        $$self{kpxc_keyfile} = '';
     }
     if ($c =~ /--show-protected/) {
         $$self{kpxc_show_protected} = '--show-protected';
-    } else {
-        $$self{kpxc_show_protected} = '';
+    }
+    if ((defined $$self{cfg})&&($$self{kpxc_keyfile})&&($$self{cfg}{keyfile})&&(-e $$self{cfg}{keyfile})) {
+        $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$$self{cfg}{keyfile}'";
     }
 }
 
