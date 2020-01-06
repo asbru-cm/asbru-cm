@@ -204,6 +204,8 @@ sub _initGUI {
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
     _($self, 'btnCloseEdit')->set_use_underline(1);
+    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
+
 
     return 1;
 }
@@ -574,11 +576,8 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
-    _($self, 'btnCheckKPX')->set_sensitive(1); # TODO CHECK THIS
-    _($self, 'hboxKeePass')->set_sensitive($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
+    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     _($self, 'entryUUID')->set_text($uuid);
-    _($self, 'comboKPXWhere')->set_active($$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} // 3);
-    _($self, 'comboKPXWhere')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
 
     # Populate 'comboStartScript' combobox
