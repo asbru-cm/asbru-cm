@@ -2716,7 +2716,7 @@ sub _treeConnections_menu {
         });
     }
     # Copy Connection Password
-    if (($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
+    if ((defined $$self{_CFG}{environments}{$sel[0]}{'pass'})&&(($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne ''))) {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',

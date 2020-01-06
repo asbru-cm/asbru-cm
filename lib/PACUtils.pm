@@ -297,7 +297,7 @@ sub _splash {
         return 1;
     }
 
-    if (! defined $WINDOWSPLASH{_GUI}) {
+    if (!defined $WINDOWSPLASH{_GUI}) {
         $WINDOWSPLASH{_GUI} = Gtk3::Window->new;
         $WINDOWSPLASH{_GUI}->set_type_hint('splashscreen');
         $WINDOWSPLASH{_GUI}->set_position('center');
@@ -1455,12 +1455,13 @@ sub _wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
+    my $parent = shift;
     my $stock_icon = shift // 'gtk-edit';
 
     my @list;
     my $pos = -1;
 
-    if (! defined $default) {
+    if (!defined $default) {
         $default = '';
     } elsif (ref($default)) {
         @list = @{$default};
@@ -1468,6 +1469,11 @@ sub _wEnterValue {
 
     my %w;
 
+    if (defined $WINDOWSPLASH{_GUI}) {
+        $parent = $WINDOWSPLASH{_GUI};
+    } elsif (undef $parent) {
+        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
@@ -1522,7 +1528,7 @@ sub _wEnterValue {
     }
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all;
     my $ok = $w{window}{data}->run;
 
