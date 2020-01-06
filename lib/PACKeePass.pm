@@ -166,7 +166,7 @@ sub GetFieldValueFromString {
     if (!$str) {
         return ($str,1);
     }
-    if ($str !~ /<\w+:\w+>/) {
+    if ($str !~ /<.+?:.+>/) {
         return ($str,1);
     }
     if ($$s{cfg}) {
@@ -240,7 +240,7 @@ sub get_cfg {
 sub ListEntries {
     my $self = shift;
     my $parent = shift;
-    my ($mp,$list,%w,@list,$pos);
+    my ($mp,$list,%w,$entry);
 
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
@@ -312,7 +312,14 @@ sub ListEntries {
             }
         }
     });
-
+    $w{window}{gui}{treelist}->signal_connect('row_activated' => sub {
+        my $selection = $w{window}{gui}{treelist}->get_selection;
+        my $model = $w{window}{gui}{treelist}->get_model;
+        my @paths = _getSelectedRows($selection);
+        $entry = $model->get_value($model->get_iter($paths[0]),0);
+        $w{window}{data}->response(0);
+        return 1;
+    });
 
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($parent);
@@ -320,14 +327,20 @@ sub ListEntries {
 
     my $ok = $w{window}{data}->run;
 
-    my $val = undef;
+    if ($ok eq 'ok') {
+        my $selection = $w{window}{gui}{treelist}->get_selection;
+        my $model = $w{window}{gui}{treelist}->get_model;
+        my @paths = _getSelectedRows($selection);
+        $entry = $model->get_value($model->get_iter($paths[0]),0);
+    }
 
     $w{window}{data}->destroy;
+
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
 
-    return wantarray ? ($val, $pos) : $val;
+    return $entry;
 }
 
 sub locateEntries {

@@ -307,7 +307,24 @@ sub _setupCallbacks {
 
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
-        $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+        my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+        if ($selection) {
+            # Commented for the time being, until keepassxc-cli team implement get the UUID
+            # Featre request at https://github.com/keepassxreboot/keepassxc/issues/4112
+            #my ($title,$ok) = $PACMain::FUNCS{_KEEPASS}->GetFieldValue('Uuid',$selection);
+
+            # For the time being, we will use the full path
+            my $title = $selection;
+            if ($title) {
+                if (_($self, 'rbCfgAuthUserPass')->get_active) {
+                    _($self, 'entryUser')->set_text("<username:$title>");
+                    _($self, 'entryPassword')->set_text("<password:$title>");
+                } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
+                    _($self, 'entryUserPassphrase')->set_text("<username:$title>");
+                    _($self, 'entryPassphrase')->set_text("<password:$title>");
+                }
+            }
+        }
         return 1;
     });
 
