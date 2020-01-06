@@ -637,6 +637,48 @@ Applies to automated actions:
                               </packing>
                             </child>
                             <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="spacing">7</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="lblSearchKPXC">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Search KeePassXC </property>
+                                    <property name="track_visited_links">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="btnCheckKPX">
+                                    <property name="label" translatable="yes">Check</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
                               <object class="GtkFrame" id="frameAuthMethod">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
@@ -671,85 +713,6 @@ Applies to automated actions:
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="orientation">vertical</property>
-                                                    <child>
-                                                      <object class="GtkBox" id="hboxKeePass">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
-                                                        <property name="tooltip_text" translatable="yes">Activate KeePassX integration from "Preferences" -&gt; "KeePassX Options"</property>
-                                                        <child>
-                                                          <object class="GtkCheckButton" id="cbInferUserPassKPX">
-                                                            <property name="label" translatable="yes">Infer 'User / Password' from KeePassX where:</property>
-                                                            <property name="use_action_appearance">False</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">False</property>
-                                                            <property name="xalign">0.5</property>
-                                                            <property name="draw_indicator">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">0</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkComboBoxText" id="comboKPXWhere">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">1</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkLabel" id="label92">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes"> matches Perl RegExp: </property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">2</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkEntry" id="entryKPXRE">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">3</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkButton" id="btnCheckKPX">
-                                                            <property name="label" translatable="yes">Check</property>
-                                                            <property name="use_action_appearance">False</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">4</property>
-                                                          </packing>
-                                                        </child>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">True</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">0</property>
-                                                      </packing>
-                                                    </child>
                                                     <child>
                                                       <object class="GtkBox" id="hboxCfgAuthUserPass">
                                                         <property name="visible">True</property>
@@ -1170,7 +1133,7 @@ You may also specify an optional passphrase if the key requires so</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                           </object>
@@ -4047,24 +4010,6 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
-                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
-                                    <property name="use_action_appearance">False</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
-                                    <property name="xalign">0</property>
-                                    <property name="draw_indicator">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
                                     <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="use_action_appearance">False</property>
@@ -4074,6 +4019,24 @@ connecting (timeout is in seconds)</property>
                                     <property name="has_tooltip">True</property>
                                     <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
                                     <property name="xalign">0.5</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
+                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
+                                    <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>

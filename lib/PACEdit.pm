@@ -190,8 +190,6 @@ sub _initGUI {
         $$self{_METHODS}{$method}{'position'} = $i++;
     }
 
-    map({_($self, 'comboKPXWhere')->append_text($_); push(@{$$self{_KPXWHERE}}, $_);} ('comment', 'created', 'password', 'title', 'url', 'username') );
-
     # Initialize main window
     $$self{_WINDOWEDIT}->set_icon_name('pac-app-big');
     $$self{_WINDOWEDIT}->set_position('center');
@@ -303,14 +301,6 @@ sub _setupCallbacks {
     _($self, 'cbEditPrependCommand')->signal_connect(toggled => sub {
         _($self, 'entryEditPrependCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active);
         _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active);
-    });
-
-    #_($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {_($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);});
-    _($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {
-        _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'entryKPXRE')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'btnCheckKPX')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'comboKPXWhere')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
     });
 
     # Capture 'check keepassx' button clicked
@@ -584,11 +574,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
-    _($self, 'cbInferUserPassKPX')->set_active(($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} // 0) && $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
-    _($self, 'entryKPXRE')->set_text($$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} // ".*$$self{_CFG}{'environments'}{$uuid}{'title'}.*");
-    _($self, 'entryKPXRE')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'btnCheckKPX')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);
+    _($self, 'btnCheckKPX')->set_sensitive(1); # TODO CHECK THIS
     _($self, 'hboxKeePass')->set_sensitive($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
     _($self, 'entryUUID')->set_text($uuid);
     _($self, 'comboKPXWhere')->set_active($$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} // 3);
@@ -736,9 +722,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'startup script'} = _($self, 'cbStartScript')->get_active && _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} = _($self, 'cbInferUserPassKPX')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} = _($self, 'entryKPXRE')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} = _($self, 'comboKPXWhere')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
 
     ##################
