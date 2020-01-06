@@ -957,6 +957,9 @@ sub _initGUI {
     # Build Config window
     $FUNCS{_CONFIG} = $$self{_CONFIG} = PACConfig->new($$self{_CFG});
 
+    # Get the KeePass object from configuration
+    $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
+
     # Build Edit window
     $$self{_EDIT} = PACEdit->new($$self{_CFG});
     $FUNCS{_EDIT} = $$self{_EDIT};

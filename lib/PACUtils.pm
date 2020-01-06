@@ -1455,8 +1455,8 @@ sub _wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-    my $parent = shift;
     my $stock_icon = shift // 'gtk-edit';
+    my $parent = shift;
 
     my @list;
     my $pos = -1;

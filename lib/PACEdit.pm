@@ -307,7 +307,7 @@ sub _setupCallbacks {
 
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
-        # Rewrite integration
+        $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
         return 1;
     });
 

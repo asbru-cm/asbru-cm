@@ -44,6 +44,7 @@ use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
+use PACTree;
 
 # END: Import Modules
 ###################################################################
@@ -234,6 +235,120 @@ sub get_cfg {
     }
     $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active()) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
     return \%hash;
+}
+
+sub ListEntries {
+    my $self = shift;
+    my $parent = shift;
+    my ($mp,$list,%w,@list,$pos);
+
+    # Create the dialog window,
+    $w{window}{data} = Gtk3::Dialog->new_with_buttons(
+        "KeePassXC Search",
+        undef,
+        'modal',
+        'gtk-cancel' => 'cancel',
+        'gtk-ok' => 'ok'
+    );
+    # and setup some dialog properties.
+    $w{window}{data}->set_default_response('ok');
+    $w{window}{data}->set_position('center');
+    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_resizable(1);
+    $w{window}{data}->set_default_size(600,400);
+    $w{window}{data}->set_resizable(0);
+    $w{window}{data}->set_border_width(5);
+
+    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{vbox}, 1, 1, 5);
+    $w{window}{gui}{vbox}->set_border_width(0);
+
+    # Create an HBox to contain a picture and a label
+    $w{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbox}, 0, 0, 0);
+    $w{window}{gui}{hbox}->set_border_width(0);
+
+    # Create 1st label
+    $w{window}{gui}{lblsearch} = Gtk3::Label->new('Keywords');
+    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblsearch}, 0, 0, 0);
+
+    # Search Entry
+    $w{window}{gui}{entry} = Gtk3::Entry->new;
+    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{entry}, 0, 0, 0);
+    $w{window}{gui}{entry}->set_activates_default(1);
+    $w{window}{gui}{entry}->set_visibility(1);
+    $w{window}{gui}{scroll1} = Gtk3::ScrolledWindow->new;
+    $w{window}{gui}{scroll1}->set_policy('automatic', 'automatic');
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{scroll1}, 1, 1, 1);
+
+    $w{window}{gui}{treelist} = PACTree->new('Entry:' => 'markup');
+    $w{window}{gui}{scroll1}->add($w{window}{gui}{treelist});
+    $w{window}{gui}{treelist}->set_enable_tree_lines(0);
+    $w{window}{gui}{treelist}->set_headers_visible(1);
+    $w{window}{gui}{treelist}->set_enable_search(1);
+    $w{window}{gui}{treelist}->set_has_tooltip(0);
+    $w{window}{gui}{treelist}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
+    # Implement a "TreeModelSort" to auto-sort the data
+    #my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($w{window}{gui}{treelist}->get_model);
+    #$w{window}{gui}{treelist}->set_model($sort_model_conn);
+    #$sort_model_conn->set_default_sort_func(\&__treeSort, $$self{_CFG});
+    $w{window}{gui}{treelist}->get_selection->set_mode('GTK_SELECTION_SINGLE');
+    @{$w{window}{gui}{treelist}{'data'}}=();
+
+    $w{window}{gui}{entry}->signal_connect('key_release_event' => sub {
+        my ($widget, $event) = @_;
+        my @list = ();
+
+        if (length($widget->get_text())>2) {
+            @{$w{window}{gui}{treelist}{'data'}}=();
+            @list = $self->locateEntries($widget->get_text());
+            foreach my $el (@list) {
+                if ($el !~ qw|^/|) {
+                    next;
+                }
+                $el =~ s/\n//g;
+                $el = decode('UTF-8',$el);
+                push(@{$w{window}{gui}{treelist}{'data'}},{value => [ $el ],children => []});
+            }
+        }
+    });
+
+
+    # Show the window (in a modal fashion)
+    $w{window}{data}->set_transient_for($parent);
+    $w{window}{data}->show_all;
+
+    my $ok = $w{window}{data}->run;
+
+    my $val = undef;
+
+    $w{window}{data}->destroy;
+    while (Gtk3::events_pending) {
+        Gtk3::main_iteration;
+    }
+
+    return wantarray ? ($val, $pos) : $val;
+}
+
+sub locateEntries {
+    my ($s,$str) = @_;
+    my ($pid,$cfg);
+    my @out;
+
+    $str =~ s/[\'\"]//g;
+    if ($$s{cfg}) {
+        $cfg = $$s{cfg};
+    } else {
+        $cfg = $s->get_cfg();
+    }
+    $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$str'");
+    print Writer "$KPXC_MP\n";
+    close Writer;
+    @out = <Reader>;
+    # Wait so we do not create zombies
+    waitpid($pid,0);
+    close Reader;
+    return @out;
 }
 
 # END: Public class methods
