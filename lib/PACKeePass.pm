@@ -166,17 +166,17 @@ sub get_cfg {
     my $self = shift;
 
     my %hash;
-    $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active;
-    $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename;
+    $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
+    $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename();
     if (defined $$self{frame}{'fcbKeePassKeyFile'}) {
-        $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename;
+        $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
         if (($$self{kpxc_keyfile})&&($hash{keyfile})&&(-e $hash{keyfile})) {
             $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$hash{keyfile}'";
         } else {
             $$self{kpxc_keyfile_opt} = '';
         }
     }
-    $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
+    $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active()) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
     return \%hash;
 }
 
@@ -231,6 +231,7 @@ sub _buildKeePassGUI {
     if ($$self{disable_keepassxc}) {
         $usage->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
         $w{cbUseKeePass}->set_sensitive(0);
+        $w{cbUseKeePass}->set_active(0);
         $w{hboxkpmain}->set_sensitive(0);
     } else {
         my $capabilities;
@@ -254,11 +255,10 @@ sub _testCapabilities {
     my $self = shift;
     my ($c);
 
-    $$self{kpxc_version} = `keepassxc-cli -v 2>1`;
+    $$self{kpxc_version} = `keepassxc-cli -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
-    if ((!$$self{kpxc_version})||($$self{kpxc_version} =~ /[A-Za-z]/)) {
+    if (!$$self{kpxc_version}) {
         $$self{disable_keepassxc} = 1;
-        #$$self{kpxc_version} = '';
         return 0;
     }
     $c = `keepassxc-cli -h`;
