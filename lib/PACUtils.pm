@@ -2101,28 +2101,10 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remote commands'} //= [];
     $$cfg{'defaults'}{'auto cluster'} //= {};
 
-    if (! defined $$cfg{'defaults'}{'keepass'} && -f "$ENV{'HOME'}/.config/keepassx/config.ini") {
-        open (F,"<:utf8","$ENV{'HOME'}/.config/keepassx/config.ini");
-        my @conf = <F>;
-        close F;
-        my ($lastfile) = grep(/^LastFile\=(.+)/, @conf);
-        if (defined $lastfile) {
-            $lastfile =~ s/^LastFile\=\.+\/+(.+)$/$1/gio; chomp $lastfile;
-            $$cfg{'defaults'}{'keepass'}{'database'} = "$ENV{'HOME'}/$lastfile";
-            $$cfg{'defaults'}{'keepass'}{'password'} = '';
-            $$cfg{'defaults'}{'keepass'}{'use_keepass'} = 0;
-            $$cfg{'defaults'}{'keepass'}{'ask_user'} = 1;
-        }
-    } elsif (! defined $$cfg{'defaults'}{'keepass'}) {
+    if (!defined $$cfg{'defaults'}{'keepass'}) {
         $$cfg{'defaults'}{'keepass'}{'database'} = '';
         $$cfg{'defaults'}{'keepass'}{'password'} = '';
         $$cfg{'defaults'}{'keepass'}{'use_keepass'} = 0;
-        $$cfg{'defaults'}{'keepass'}{'ask_user'} = 1;
-    } else {
-        $$cfg{'defaults'}{'keepass'}{'database'} //= '';
-        $$cfg{'defaults'}{'keepass'}{'password'} //= '';
-        $$cfg{'defaults'}{'keepass'}{'use_keepass'} //= 0;
-        $$cfg{'defaults'}{'keepass'}{'ask_user'} //= 1;
     }
 
     $$cfg{'tmp'}{'changed'} = 0;
@@ -2852,66 +2834,6 @@ sub _subst {
         while ($string =~ /<PASS>/go) {
             $string =~ s/<PASS>/$pass/g; $ret = $string;
         }
-    }
-
-    # Replace <KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==> with KeePassX value
-    while ($string =~ /<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==>/go) {
-        my $what = $1;
-        my $where = $2;
-        my $var = $3;
-        my $regexp = qr/$var/;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            msg("ERROR: KeePassX variable '@{[__($var)]}' can not be used because 'KeePassX' is not enabled under 'Preferences->KeePass Options'");
-            exit 1;
-        }
-
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($where, $regexp);
-        if (! scalar @found) {
-            msg("ERROR: No entry '$where' found on KeePassX matching '@{[__($var)]}'");
-            exit 1;
-        } elsif (((scalar @found) > 1) && $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-            msg("INFO: Found more than one entry for '$where' with value '$var'. Asking user...");
-            my $tmp = "<ASK:KeePass Passwords matching '$where' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{$what}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$tmp/g;
-        } else {
-            if ((scalar(@found) > 1) && ! $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-                msg("INFO: Found " . (scalar(@found)) ." entries for '$where' with value '$var'. Selected first entry...");
-            }
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$found[0]{$what}/g;
-        }
-        $ret = $string;
-    }
-
-    # Replace <KPX_*:*> with KeePassX 'password' value
-    while ($string =~ /<KPX_(title|username|url):(.+?)>/go) {
-        my $type = $1;
-        my $var = $2;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            _wMessage(undef, "ERROR: KeePassX variable '<b>@{[__($var)]}</b>' can not be used.\n'KeePassX' is not enabled under '<b>Preferences->KeePass Options</b>'");
-            return undef;
-        }
-
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($type, $var);
-        if (! scalar @found) {
-            _wMessage(undef, "ERROR: No entry '<b>$type</b>' found on KeePassX matching '<b>@{[__($var)]}</b>'");
-            return undef;
-        } elsif (((scalar @found) > 1) && $$CFG{defaults}{keepass}{ask_user}) {
-            my $tmp = "<ASK:KeePass Passwords matching '$type' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{password}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPX_$type:\Q$var\E>/$tmp/g;
-        } else {
-            $string =~ s/<KPX_$type:\Q$var\E>/$found[0]{password}/g;
-        }
-        $ret = $string;
     }
 
     # Replace '<GV:.+>' with user saved global variables for '$connection_cmd' execution

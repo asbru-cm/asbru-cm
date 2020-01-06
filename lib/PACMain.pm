@@ -956,8 +956,6 @@ sub _initGUI {
 
     # Build Config window
     $FUNCS{_CONFIG} = $$self{_CONFIG} = PACConfig->new($$self{_CFG});
-    # Get the KeePass object from configuration
-    $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
     # Build Edit window
     $$self{_EDIT} = PACEdit->new($$self{_CFG});
@@ -4367,47 +4365,6 @@ sub _bulkEdit {
                         $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                     }
                 });
-                # Populate with <KPX_(title|username|url):*> special string
-                if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                    my (@titles, @usernames, @urls);
-                    foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                        push(@titles, {
-                            label => "<KPX_title:$$hash{title}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                        push(@usernames, {
-                            label => "<KPX_username:$$hash{username}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                        push(@urls, {
-                            label => "<KPX_url:$$hash{url}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                    }
-                    push(@menu_items, {
-                        label => 'KeePassX',
-                        stockicon => 'pac-keepass',
-                        submenu => [
-                            {
-                                label => 'KeePassX title values',
-                                submenu => \@titles
-                            }, {
-                                label => 'KeePassX username values',
-                                submenu => \@usernames
-                            }, {
-                                label => 'KeePassX URL values',
-                                submenu => \@urls
-                            }, {
-                                label => "KeePass Extended Query",
-                                tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                                code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
-                            }
-                        ]
-                    });
-                }
 
                 _wPopUpMenu(\@menu_items, $event);
 
@@ -4530,49 +4487,6 @@ sub _bulkEdit {
                     $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                 }
             });
-
-            # Populate with <KPX_(title|username|url):*> special string
-            if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                my (@titles, @usernames, @urls);
-                foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                    push(@titles, {
-                        label => "<KPX_title:$$hash{title}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                    push(@usernames, {
-                        label => "<KPX_username:$$hash{username}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                    push(@urls, {
-                        label => "<KPX_url:$$hash{url}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                }
-
-                push(@menu_items, {
-                    label => 'KeePassX',
-                    stockicon => 'pac-keepass',
-                    submenu => [
-                        {
-                            label => 'KeePassX title values',
-                            submenu => \@titles
-                        }, {
-                            label => 'KeePassX username values',
-                            submenu => \@usernames
-                        }, {
-                            label => 'KeePassX URL values',
-                            submenu => \@urls
-                        }, {
-                            label => "KeePass Extended Query",
-                            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        }
-                    ]
-                });
-            }
 
             _wPopUpMenu(\@menu_items, $event);
 

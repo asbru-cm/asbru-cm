@@ -35,8 +35,8 @@ use strict;
 use warnings;
 
 use Encode;
-use KeePass;
 use FindBin qw ($RealBin $Bin $Script);
+use IPC::Open2;
 
 # GTK
 use Gtk3 '-init';
@@ -50,7 +50,7 @@ use PACUtils;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-
+my $KPXC_MP = '';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -60,15 +60,15 @@ use PACUtils;
 
 sub new {
     my $class = shift;
-    my $self = {};
+    my $self;
 
     $self->{cfg} = shift;
-
     $self->{container} = undef;
     $self->{frame} = {};
 
     $self->{entries} = [];
 
+    _testCapabilities($self);
     _buildKeePassGUI($self);
 
     bless($self, $class);
@@ -79,40 +79,87 @@ sub update {
     my $self = shift;
     my $cfg = shift;
 
-    # Destroy previous widgets
-    $$self{frame}{vbKeePass}->foreach(sub {$_[0]->destroy;});
-
     defined $cfg and $$self{cfg} = $cfg;
 
     my $file = $$self{cfg}{'database'};
-    defined $file or return 0;
-    $$self{frame}{fcbKeePassFile}->set_filename($file);
-
-    $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
-    return 1 unless $$self{cfg}{use_keepass};
-
-    if (($$self{cfg}{password} eq '') && (-f $$cfg{'database'}) ) {
-        my $pass = _wEnterValue($self, 'KeePassX Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
-        if (($pass // '') eq '') {$$self{frame}{cbUseKeePass}->set_active(0); return 0;}
-        $$self{cfg}{password} = $pass;
+    if (!defined $file) {
+        return 0;
     }
-
+    if ($$self{disable_keepassxc}) {
+        $$self{cfg}{use_keepass} = 0;
+    }
+    $$self{frame}{fcbKeePassFile}->set_filename($file);
+    $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
+    if (!$$self{cfg}{use_keepass}) {
+        return 1;
+    }
     my $pass = $$self{cfg}{'password'};
-
     $$self{frame}{entryKeePassPassword}->set_text($pass);
     $$self{frame}{cbUseKeePass}->set_active($$self{cfg}{use_keepass});
-    $$self{frame}{cbKeePassAskUser}->set_active($$self{cfg}{ask_user});
     $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
-
-    return 0 unless $pass ne '';
-
-    # Reload DDBB if no entries are found
-    $self->reload;
-
-    # Now, add the -new?- widgets
-    foreach my $hash (@{$$self{entries}}) {$self->_buildVar($$hash{title}, $$hash{url}, $$hash{username}, $$hash{password});}
-
+    if ($pass) {
+        $KPXC_MP = $pass;
+    }
     return 1;
+}
+
+sub getMasterPassword {
+    my $self = shift;
+    my $mp = '';
+
+    while (!$mp) {
+        $mp = _wEnterValue($self, 'KeePassX Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        # Test Master Password
+    }
+    $KPXC_MP = $mp;
+    return $mp;
+}
+
+sub GetField {
+    my ($s,$field,$uid) = @_;
+    my ($data,$pid);
+    my $line = 0;
+    my $cfg = $s->get_cfg();
+    my $ok = 0;
+
+    if (!$KPXC_MP) {
+        # Get Password from config file or from user
+        if ($$cfg{password}) {
+            $KPXC_MP = $$cfg{password};
+        } else {
+            $KPXC_MP = $s->getMasterPassword();
+            if (!$KPXC_MP) {
+                # We could not get a valid password
+                return ('Bad key/master password',$ok);
+            }
+        }
+    }
+    $pid = open2(*Reader, *Writer, "keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
+    print Writer "$KPXC_MP\n";
+    while ($data = <Reader>) {
+        $line++;
+        $data =~ s/\n//g;
+        if ($line < 3) {
+            if ($data =~ /^Insert |kdbx/) {
+                next;
+            } elsif ($data =~ /^Error|\.$/) {
+                # Bad password or file corrupted
+                last;
+            } elsif ($data =~ /$uid|\.$/) {
+                # Bad uuid
+                last;
+            }
+        }
+        if ($data =~ s/$field: *//i) {
+            $ok = 1;
+            last;
+        }
+    }
+    # Flush the rest of the output
+    while (my $x = <Reader>) {}
+    # Wait so we do not create zombies
+    waitpid($pid,0);
+    return ($data,$ok);
 }
 
 sub get_cfg {
@@ -120,59 +167,17 @@ sub get_cfg {
 
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active;
-    $hash{ask_user} = $$self{frame}{'cbKeePassAskUser'}->get_active;
     $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename;
+    if (defined $$self{frame}{'fcbKeePassKeyFile'}) {
+        $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename;
+        if (($$self{kpxc_keyfile})&&($hash{keyfile})&&(-e $hash{keyfile})) {
+            $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$hash{keyfile}'";
+        } else {
+            $$self{kpxc_keyfile_opt} = '';
+        }
+    }
     $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
-
     return \%hash;
-}
-
-sub reload {
-    my $self = shift;
-    my $force = shift // 0;
-    my $cfg = shift // $$self{cfg};
-
-    return 1 unless $force || ! scalar(@{$$self{entries}});
-    $$self{entries} = [];
-
-    my $KEEPASS = KeePass->new;
-    eval {$KEEPASS->load_db($$cfg{'database'}, $$cfg{'password'})};
-    if ($@) {
-        _wMessage(undef, "ERROR: Could not open '$$cfg{database}' for reading as KeePass Database file:\n$@");
-        return wantarray ? undef : 0;
-    }
-    $KEEPASS->unlock;
-
-    foreach my $hash ($KEEPASS->find_entries({'title =~' => qr/.*/}) ) {
-        next if (exists $$hash{'binary'}{'bin-stream'} && $$hash{'comment'} eq 'KPX_CUSTOM_ICONS_4');
-        Encode::_utf8_on($$hash{title});
-        Encode::_utf8_on($$hash{url});
-        Encode::_utf8_on($$hash{username});
-        Encode::_utf8_on($$hash{password});
-        Encode::_utf8_on($$hash{created});
-        Encode::_utf8_on($$hash{comment});
-        push(@{$$self{entries}}, {
-            title => $$hash{title},
-            url => $$hash{url},
-            username => $$hash{username},
-            password => $$hash{password},
-            created => $$hash{created},
-            comment => $$hash{comment}
-        });
-    }
-    undef $KEEPASS;
-
-    return 1;
-}
-
-sub find {
-    my $self = shift;
-    my $where = shift // 'title';
-    my $what = shift // qr/.*/;
-
-    my @kpx = _findKP($$self{entries}, $where, $what);
-
-    return wantarray ? @kpx : scalar(@kpx);
 }
 
 # END: Public class methods
@@ -185,132 +190,89 @@ sub _buildKeePassGUI {
     my $self = shift;
 
     my $cfg = $self->{cfg};
-
     my %w;
 
     # Build a vbox
-    $w{vbox} = Gtk3::VBox->new(0, 0);
+    $w{vbox} = Gtk3::VBox->new(0,0);
 
-        $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassX');
-        $w{vbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
+    $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassXC');
+    $w{vbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
 
-        $w{cbKeePassAskUser} = Gtk3::CheckButton->new('Ask user when multiple matches are found');
-        $w{vbox}->pack_start($w{cbKeePassAskUser}, 0, 1, 0);
+    $w{hboxkpmain} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 0);
 
-        $w{hboxkpmain} = Gtk3::HBox->new(0, 0);
-        $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 0);
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Database file:'), 0, 1, 0);
 
-            $w{hboxkpmain}->pack_start(Gtk3::Label->new('KeePass Database file:'), 0, 1, 0);
+    $w{fcbKeePassFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
+    $w{fcbKeePassFile}->set_show_hidden(1);
+    $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 1, 1, 0);
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password:'), 0, 1, 0);
 
-            $w{fcbKeePassFile} = Gtk3::FileChooserButton->new('', 'GTK_FILE_CHOOSER_ACTION_OPEN');
-            $w{fcbKeePassFile}->set_show_hidden(1);
-            $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 1, 1, 0);
+    $w{entryKeePassPassword} = Gtk3::Entry->new;
+    $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 0, 1, 0);
+    $w{entryKeePassPassword}->set_visibility(0);
 
-            $w{hboxkpmain}->pack_start(Gtk3::Label->new(' Master Password:'), 0, 1, 0);
-
-            $w{entryKeePassPassword} = Gtk3::Entry->new;
-            $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 0, 1, 0);
-            $w{entryKeePassPassword}->set_visibility(0);
-
-        $w{frameKPList} = Gtk3::Frame->new(' Available passwords in given Database file: ');
-        $w{vbox}->pack_start($w{frameKPList}, 1, 1, 0);
-
-            $w{vbkpin} = Gtk3::VBox->new(0, 0);
-            $w{frameKPList}->add($w{vbkpin});
-
-                $w{btnPassRefresh} = Gtk3::Button->new_from_stock('gtk-refresh');
-                $w{vbkpin}->pack_start($w{btnPassRefresh}, 0, 1, 0);
-
-                $w{scKeePass} = Gtk3::ScrolledWindow->new;
-                $w{scKeePass}->set_policy('automatic', 'automatic');
-                $w{vbkpin}->add($w{scKeePass});
-
-                    $w{vbKeePass} = Gtk3::VBox->new(0, 0);
-                    $w{scKeePass}->add_with_viewport($w{vbKeePass});
+    if ($$self{kpxc_keyfile}) {
+        $w{hboxkpmain}->pack_start(Gtk3::Label->new('Key File:'), 0, 1, 0);
+        $w{fcbKeePassKeyFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
+        $w{fcbKeePassKeyFile}->set_show_hidden(1);
+        $w{hboxkpmain}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
+    }
+    my $usage =  Gtk3::Label->new();
+    $usage->set_halign('start');
+    $w{vbox}->pack_start($usage, 0, 1, 0);
 
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
 
-    $w{entryKeePassPassword}->signal_connect('activate', sub {$w{btnPassRefresh}->clicked;});
-
-    $w{cbUseKeePass}->signal_connect('toggled', sub {$w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active)});
-
-    $w{btnPassRefresh}->signal_connect('clicked', sub {
-        return 1 unless $w{cbUseKeePass}->get_active;
-        $w{btnPassRefresh}->set_sensitive(0);
-        my $hash = $self->get_cfg;
-        $self->reload('force', $hash) and $self->update($hash);
-        $w{btnPassRefresh}->set_sensitive(1);
+    $w{cbUseKeePass}->signal_connect('toggled', sub {
+        $w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active);
     });
-
+    if ($$self{disable_keepassxc}) {
+        $usage->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
+        $w{cbUseKeePass}->set_sensitive(0);
+        $w{hboxkpmain}->set_sensitive(0);
+    } else {
+        my $capabilities;
+        if ($$self{kpxc_keyfile}) {
+            $capabilities .= "<b>Use Key File</b> Enabled\n";
+        } else {
+            $capabilities .= "<b>Use Key File</b> Disabled (update to latest version)\n";
+        }
+        if ($$self{kpxc_show_protected}) {
+            $capabilities .= "<b>Protected passwords</b> Yes\n";
+        } else {
+            $capabilities .= "<b>Protected passwords</b> No\n";
+        }
+        $usage->set_markup("\n\n<b>keepassxc-cli</b> Version $$self{kpxc_version}\n\n$capabilities");
+    }
+    $w{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
     return 1;
 }
 
-sub _buildVar {
+sub _testCapabilities {
     my $self = shift;
-    my $title = shift;
-    my $url = shift;
-    my $user = shift;
-    my $pass = shift;
+    my ($c);
 
-    my %w;
-
-    # Make an HBox to contain label, entry and del button
-    $w{hbox} = Gtk3::HBox->new(0, 0);
-    $w{hbox}->set_tooltip_text('Use <KPX_(title|username):title or user name> anywhere to refer to given password');
-
-        # Build label
-        $w{lbl0} = Gtk3::Label->new('Title:');
-        $w{hbox}->pack_start($w{lbl0}, 0, 1, 0);
-
-        # Build entry
-        $w{title} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{title}, 0, 1, 0);
-        $w{title}->set_text($title);
-        $w{title}->set_editable(0);
-
-        # Build label
-        $w{lbl01} = Gtk3::Label->new('URL:');
-        $w{hbox}->pack_start($w{lbl01}, 0, 1, 0);
-
-        # Build entry
-        $w{url} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{url}, 0, 1, 0);
-        $w{url}->set_text($url);
-        $w{url}->set_editable(0);
-
-        # Build label
-        $w{lbl1} = Gtk3::Label->new('Username:');
-        $w{hbox}->pack_start($w{lbl1}, 0, 1, 0);
-
-        # Build entry
-        $w{var} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{var}, 0, 1, 0);
-        $w{var}->set_text($user);
-        $w{var}->set_editable(0);
-
-        # Build label
-        $w{lbl2} = Gtk3::Label->new(' Password:');
-        $w{hbox}->pack_start($w{lbl2}, 0, 1, 0);
-
-        # Build entry
-        $w{val} = Gtk3::Entry->new;
-        $w{hbox}->pack_start($w{val}, 1, 1, 0);
-        $w{val}->set_text($pass);
-        $w{val}->set_editable(0);
-
-        $w{hide} = Gtk3::CheckButton->new('Hide');
-        $w{hbox}->pack_start($w{hide}, 0, 1, 0);
-        $w{hide}->set_active(1);
-        $w{hide}->signal_connect(toggled => sub {$w{val}->set_visibility(! $w{hide}->get_active);});
-
-        $w{val}->set_visibility(! $w{hide}->get_active);
-
-    # Add built control to main container
-    $$self{frame}{vbKeePass}->pack_start($w{hbox}, 0, 1, 0);
-    $$self{frame}{vbKeePass}->show_all;
-
-    return %w;
+    $$self{kpxc_version} = `keepassxc-cli -v 2>1`;
+    $$self{kpxc_version} =~ s/\n//g;
+    if ((!$$self{kpxc_version})||($$self{kpxc_version} =~ /[A-Za-z]/)) {
+        $$self{disable_keepassxc} = 1;
+        #$$self{kpxc_version} = '';
+        return 0;
+    }
+    $c = `keepassxc-cli -h`;
+    $$self{disable_keepassxc} = 0;
+    if ($c =~ /--key-file/) {
+        $$self{kpxc_keyfile} = '--key-file';
+    } else {
+        $$self{kpxc_keyfile} = '';
+    }
+    if ($c =~ /--show-protected/) {
+        $$self{kpxc_show_protected} = '--show-protected';
+    } else {
+        $$self{kpxc_show_protected} = '';
+    }
 }
 
 # END: Private functions definitions

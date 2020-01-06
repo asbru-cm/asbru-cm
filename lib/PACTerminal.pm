@@ -265,17 +265,6 @@ sub new {
 
     }, $self);
 
-    # If KeePass is selected, load it's database and prepare submenu for VTE right-click
-    if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-        foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-            push(@KPX,
-            {
-                label => "Title: '$$hash{title}', Username: '$$hash{username}'",
-                tooltip => "$$hash{password}",
-                code => sub {_vteFeedChild($$self{_GUI}{_VTE}, $$hash{password});}
-            });
-        }
-    }
     #Accessability shortcuts
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
@@ -369,7 +358,6 @@ sub start {
     $new_cfg{'defaults'} = dclone($$self{_CFG}{'defaults'});
     $new_cfg{'environments'}{$$self{_UUID}} = dclone($$self{_CFG}{'environments'}{$$self{_UUID}});
     $new_cfg{'tmp'} = dclone($$self{_CFG}{'tmp'});
-    @{$new_cfg{'keepass'}} = $PACMain::FUNCS{_KEEPASS}->find;
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
@@ -1960,24 +1948,6 @@ sub _vteMenu {
         submenu => \@environment_menu
     });
 
-    # Populate with KeePass entries
-    if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-        my @kpx;
-        foreach my $entry ($PACMain::FUNCS{_KEEPASS}->find) {
-            push(@kpx,
-            {
-                label => "Title:$$entry{title},User:$$entry{username}",
-                tooltip => "Password:$$entry{password}",
-                code => sub {_vteFeedChild($$self{_GUI}{_VTE}, $$entry{password});}
-            });
-        }
-        push(@insert_menu_items,
-        {
-            label => 'KeePassX',
-            stockicon => 'pac-keepass',
-            submenu => \@kpx
-        });
-    }
     push(@vte_menu_items,
     {
         label => 'Insert value',
