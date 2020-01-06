@@ -41,7 +41,6 @@ use File::Copy;
 use Encode qw (encode decode);
 use IO::Socket::INET;
 use Time::HiRes qw (gettimeofday);
-use KeePass;
 
 # GTK
 use Gtk3 '-init';

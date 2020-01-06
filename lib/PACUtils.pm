@@ -45,7 +45,6 @@ use Net::Ping;
 use YAML;
 use OSSP::uuid;
 use Encode;
-use KeePass;
 use DynaLoader; # Required for PACTerminal and PACShell modules
 
 # GTK
