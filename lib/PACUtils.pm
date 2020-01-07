@@ -2948,6 +2948,12 @@ sub _subst {
         $ret = $string;
     }
 
+    # KeePassXC
+    if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $string =~ s/<(\w+):(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
+    }
+
     $out{'pos'} = $pos;
     return wantarray ? ($ret, \%out) : $ret;
 }

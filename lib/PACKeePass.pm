@@ -180,6 +180,16 @@ sub GetFieldValueFromString {
     return ($value,$flg);
 }
 
+sub RegexTransform {
+    my ($s,$field,$uid) = @_;
+
+    my ($value,$flg) = $s->GetFieldValue($field,$uid);
+    if ($flg) {
+        return $value;
+    }
+    return '';
+}
+
 sub GetFieldValue {
     my ($s,$field,$uid) = @_;
     my ($pid,$cfg);

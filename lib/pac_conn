@@ -167,13 +167,14 @@ my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
+my $kpxc;
 
 $IP = subst($IP);
 $PORT = subst($PORT);
 
 # Use keepass ?
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-    my ($ok,$kpxc);
+    my ($ok);
     $kpxc = PACKeePass->new(0,$$CFG{'defaults'}{'keepass'});
     ($USER,$ok) = $kpxc->GetFieldValueFromString($USER);
     if (!$ok) {
@@ -390,6 +391,11 @@ sub subst {
         my $output = `$var 2>&1`;
         chomp $output;
         $string =~ s/<CMD:\Q$var\E>/$output/g;
+    }
+
+    # KeePassXC
+    if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
+        $string =~ s/<(\w+):(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
     }
 
     return wantarray ? ($string, $pos) : $string;
