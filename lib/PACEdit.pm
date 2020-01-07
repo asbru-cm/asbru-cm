@@ -658,6 +658,8 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpConnKey')->set_uri('file://' . $$self{_CFG}{'environments'}{$uuid}{'jump key'});
+    } else {
+        _($self, 'entryCfgJumpConnKey')->set_uri('');
     }
 
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
@@ -753,6 +755,23 @@ sub _updateGUIPreferences {
         _($self, 'imgProtectedEdit')->set_from_stock('pac-unprotected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(1);
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.');
+    }
+
+    # Control SSH capabilities
+    my $ssh = `ssh 2>&1`;
+    $ssh =~ s/\n//g;
+    $ssh =~ s/[ \t][ \t]+/ /g;
+    print STDERR "$ssh\n";
+    if ($ssh =~ /-J /) {
+        # Enable Jump Host
+        _($self, 'rbUseProxyJump')->set_sensitive(1);
+        _($self, 'hbox38')->set_sensitive(1);
+        _($self, 'hbox34')->set_sensitive(1);
+    } else {
+        # Disable Jump Host
+        _($self, 'rbUseProxyJump')->set_sensitive(0);
+        _($self, 'hbox38')->set_sensitive(0);
+        _($self, 'hbox34')->set_sensitive(0);
     }
 
     return 1;
