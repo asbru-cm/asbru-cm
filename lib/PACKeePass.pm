@@ -144,7 +144,7 @@ sub TestMasterKey {
     } else {
         $cfg = $s->get_cfg();
     }
-    $pid = open3(*Writer,*Reader,*ErrReader,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
+    $pid = open3(*Writer,*Reader,*ErrReader,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -203,7 +203,7 @@ sub GetFieldValue {
             }
         }
     }
-    $pid = open2(*Reader,*Writer,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$uid'");
+    $pid = open2(*Reader,*Writer,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -354,13 +354,20 @@ sub locateEntries {
     } else {
         $cfg = $s->get_cfg();
     }
-    $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} $$cfg{database} '$str'");
-    print Writer "$KPXC_MP\n";
-    close Writer;
-    @out = <Reader>;
-    # Wait so we do not create zombies
-    waitpid($pid,0);
-    close Reader;
+    {
+        no warnings 'once';
+        open(SAVERR,">&STDERR");
+        open(STDERR,"> /dev/null");
+        $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '$str'");
+        print Writer "$KPXC_MP\n";
+        close Writer;
+        @out = <Reader>;
+        # Wait so we do not create zombies
+        waitpid($pid,0);
+        close Reader;
+        open(STDERR,">&SAVERR");
+    }
+
     return @out;
 }
 
