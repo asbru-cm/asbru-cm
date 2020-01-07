@@ -539,10 +539,12 @@ sub wEnterValue {
     $_W{window}{gui}{hbox} -> pack_start($_W{window}{gui}{lblup}, 1, 1, 5);
     $_W{window}{gui}{lblup} -> set_markup($lblup);
 
-    # Create 2nd label
-    $_W{window}{gui}{lbldwn} = Gtk3::Label -> new;
-    $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{lbldwn}, 1, 1, 5);
-    $_W{window}{gui}{lbldwn} -> set_text($lbldown);
+    if (defined $lbldown) {
+        # Create 2nd label
+        $_W{window}{gui}{lbldwn} = Gtk3::Label -> new;
+        $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{lbldwn}, 1, 1, 5);
+        $_W{window}{gui}{lbldwn} -> set_text($lbldown);
+    }
 
     if (@list) {
         # Create combobox widget
@@ -1539,7 +1541,7 @@ elsif (! $MANUAL) {
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
                 exp_continue;
             } else {
-                my $val = wEnterValue(undef, $match, undef) // return undef;
+                my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
                 exp_continue;
