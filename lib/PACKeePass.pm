@@ -255,19 +255,6 @@ sub _buildVar {
 
     my %w;
 
-    if (undef $title) {
-        $title = '';
-    }
-    if (undef $url) {
-        $url = '';
-    }
-    if (undef $user) {
-        $user = '';
-    }
-    if (undef $pass) {
-        $pass = '';
-    }
-
     # Make an HBox to contain label, entry and del button
     $w{hbox} = Gtk3::HBox->new(0, 0);
     $w{hbox}->set_tooltip_text('Use <KPX_(title|username):title or user name> anywhere to refer to given password');
@@ -279,7 +266,9 @@ sub _buildVar {
     # Build entry
     $w{title} = Gtk3::Entry->new;
     $w{hbox}->pack_start($w{title}, 0, 1, 0);
-    $w{title}->set_text($title);
+    if ($title) {
+        $w{title}->set_text($title);
+    }
     $w{title}->set_editable(0);
 
     # Build label
@@ -289,7 +278,9 @@ sub _buildVar {
     # Build entry
     $w{url} = Gtk3::Entry->new;
     $w{hbox}->pack_start($w{url}, 0, 1, 0);
-    $w{url}->set_text($url);
+    if ($url) {
+        $w{url}->set_text($url);
+    }
     $w{url}->set_editable(0);
 
     # Build label
@@ -299,7 +290,9 @@ sub _buildVar {
     # Build entry
     $w{var} = Gtk3::Entry->new;
     $w{hbox}->pack_start($w{var}, 0, 1, 0);
-    $w{var}->set_text($user);
+    if ($user) {
+        $w{var}->set_text($user);
+    }
     $w{var}->set_editable(0);
 
     # Build label
@@ -309,7 +302,9 @@ sub _buildVar {
     # Build entry
     $w{val} = Gtk3::Entry->new;
     $w{hbox}->pack_start($w{val}, 1, 1, 0);
-    $w{val}->set_text($pass);
+    if ($pass) {
+        $w{val}->set_text($pass);
+    }
     $w{val}->set_editable(0);
 
     $w{hide} = Gtk3::CheckButton->new('Hide');
