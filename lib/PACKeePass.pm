@@ -482,3 +482,79 @@ sub _testCapabilities {
 ###################################################################
 
 1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+PACKeePass.pm
+
+=head1 SYNOPSIS
+
+Handles integration to KeePassXC using : keepassxc-cli
+
+    $kpxc = PACKeePass->new(OPT_BG);
+    OPT_BG = [0|1]
+             1 : Create object and Build GUI to configure
+             0 : Create object to access available methods
+
+=head1 DESCRIPTION
+
+=head2
+
+Important object variables
+
+    $KPXC_MP : holds the current database master password
+
+=head2 sub update
+
+Updates configuration settings from current selections in gui
+
+=head2 sub getMasterPassword
+
+Routine to ask for master password to user, infinite retries or cancel to exit
+
+=head2 sub TestMasterKey
+
+Connects to database with an unknown field value to test if response is:
+
+    Error : Could not connect, so password is wrong
+    Could not find XXXXXX uuid, so it could connect
+
+=head2 sub GetFieldValueFromString
+
+Check if string has the correct format <field|uuid>
+
+    false: return dame string
+    true : extract field and uuid and call GetFieldValue(field,uuid)
+
+=head2 sub RegexTransform
+
+Use this method inside a regex expression to replace keepassxc ocurrences in a string
+
+Usage:
+
+    $str =~ s/<(.+?)\|(.+?)>/$kpxc->RegexTransform($1,$2)/ge;
+
+=head2 sub GetFieldValue
+
+Connect to database and query field value, return value or empty if not found
+
+=head2 sub get_cfg
+
+Recover settings from current GUI configuration
+
+head2 sub ListEntries
+
+Build a window with a search entry and a listbox, show results from search entry in the listbox
+
+    call locateEntries on each typed key by user (3 characters are required to start the search)
+
+Allow user to select a row and return the selected key path
+
+head2 sub locateEntries
+
+Query the complete database for a search pattern and show the entries found in a listbox
+
