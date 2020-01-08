@@ -2951,7 +2951,7 @@ sub _subst {
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
         my $kpxc = $PACMain::FUNCS{_KEEPASS};
-        $string =~ s/<(\w+):(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
+        $string =~ s/<(\w+)\|(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
     }
 
     $out{'pos'} = $pos;

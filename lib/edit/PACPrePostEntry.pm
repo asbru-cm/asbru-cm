@@ -338,7 +338,7 @@ sub _buildPrePost {
                 my $pos = $w{command}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{command}->insert_text("<username:$selection>", -1, $w{expect}->get_position);
+                    $w{command}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });
@@ -349,7 +349,7 @@ sub _buildPrePost {
                 my $pos = $w{command}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{command}->insert_text("<password:$selection>", -1, $w{expect}->get_position);
+                    $w{command}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });

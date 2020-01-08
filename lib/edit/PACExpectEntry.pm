@@ -699,7 +699,7 @@ sub _buildExpect {
                 my $pos = $w{expect}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{expect}->insert_text("<username:$selection>", -1, $w{expect}->get_position);
+                    $w{expect}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });
@@ -710,7 +710,7 @@ sub _buildExpect {
                 my $pos = $w{expect}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{expect}->insert_text("<password:$selection>", -1, $w{expect}->get_position);
+                    $w{expect}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });
@@ -836,7 +836,7 @@ sub _buildExpect {
                 my $pos = $w{send}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{send}->insert_text("<username:$selection>", -1, $w{expect}->get_position);
+                    $w{send}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });
@@ -847,7 +847,7 @@ sub _buildExpect {
                 my $pos = $w{send}->get_property('cursor_position');
                 my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
                 if ($selection) {
-                    $w{send}->insert_text("<password:$selection>", -1, $w{expect}->get_position);
+                    $w{send}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
                 }
             }
         });

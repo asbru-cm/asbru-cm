@@ -317,11 +317,11 @@ sub _setupCallbacks {
             my $title = $selection;
             if ($title) {
                 if (_($self, 'rbCfgAuthUserPass')->get_active) {
-                    _($self, 'entryUser')->set_text("<username:$title>");
-                    _($self, 'entryPassword')->set_text("<password:$title>");
+                    _($self, 'entryUser')->set_text("<username|$title>");
+                    _($self, 'entryPassword')->set_text("<password|$title>");
                 } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
-                    _($self, 'entryUserPassphrase')->set_text("<username:$title>");
-                    _($self, 'entryPassphrase')->set_text("<password:$title>");
+                    _($self, 'entryUserPassphrase')->set_text("<username|$title>");
+                    _($self, 'entryPassphrase')->set_text("<password|$title>");
                 }
             }
         }

@@ -166,7 +166,7 @@ sub GetFieldValueFromString {
     if (!$str) {
         return ($str,1);
     }
-    if ($str !~ /<.+?:.+>/) {
+    if ($str !~ /<.+?\|.+>/) {
         return ($str,1);
     }
     if ($$s{cfg}) {
