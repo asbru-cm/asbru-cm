@@ -656,7 +656,6 @@ sub _updateGUIPreferences {
     my $ssh = `ssh 2>&1`;
     $ssh =~ s/\n//g;
     $ssh =~ s/[ \t][ \t]+/ /g;
-    print STDERR "$ssh\n";
     if ($ssh =~ /-J /) {
         # Enable Jump Host
         _($self, 'rbUseProxyJump')->set_sensitive(1);
