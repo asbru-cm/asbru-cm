@@ -175,7 +175,7 @@ sub GetFieldValueFromString {
         $cfg = $s->get_cfg();
     }
     $str =~ s/[<>]//g;
-    ($field,$uid) = split /:/,$str;
+    ($field,$uid) = split /\|/,$str;
     ($value,$flg) = $s->GetFieldValue($field,$uid);
     return ($value,$flg);
 }
