@@ -1420,7 +1420,7 @@ elsif (! $MANUAL) {
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
                 exp_continue;
             } else {
-                my $val = wEnterValue(undef, $match, "Answere yes/no") // return undef;
+                my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
                 exp_continue;
