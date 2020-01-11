@@ -2096,6 +2096,8 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
+    $$cfg{'defaults'}{'capture xterm title'} //= 0;
+    $$cfg{'defaults'}{'tree overlay scrolling'} //= 1;
 
     $$cfg{'defaults'}{'global variables'} //= {};
     $$cfg{'defaults'}{'local commands'} //= [];

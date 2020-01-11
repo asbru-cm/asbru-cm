@@ -4347,6 +4347,8 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkSeparator" id="vseparator5">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="margin_right">6</property>
                             <property name="orientation">vertical</property>
                           </object>
                           <packing>
@@ -4360,7 +4362,7 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkLabel" id="label41">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Info TAB Font: </property>
+                            <property name="label" translatable="yes">Font for info tab: </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4399,7 +4401,7 @@ connecting (timeout is in seconds)</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkCheckButton" id="cbCfgEnableTreeLines">
-                            <property name="label" translatable="yes">Show  lines in Connections Tree</property>
+                            <property name="label" translatable="yes">Show  lines in connections tree</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -4417,6 +4419,8 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkSeparator" id="vseparator4">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="margin_right">6</property>
                             <property name="orientation">vertical</property>
                           </object>
                           <packing>
@@ -4430,7 +4434,7 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkLabel" id="label67">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Connections Tree Font (*): </property>
+                            <property name="label" translatable="yes">Font for the connections tree (*): </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4464,13 +4468,15 @@ connecting (timeout is in seconds)</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgSaveShowScreenshots">
-                        <property name="label" translatable="yes">Show screenshots</property>
+                      <object class="GtkCheckButton" id="cbCfgEnableOverlayScrolling">
+                        <property name="label" translatable="yes">Enable overlay scrolling for connections tree</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
+                        <property name="tooltip_text" translatable="yes">If enabled, the scrollbars are only added as traditional widgets when a mouse is present. Otherwise, they are overlayed on top of the content, as narrow indicators.</property>
+                        <property name="xalign">0</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
@@ -4480,50 +4486,18 @@ connecting (timeout is in seconds)</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgShowStatistics">
-                        <property name="label" translatable="yes">Show statistics</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">6</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgShowTrayIcon">
-                        <property name="label" translatable="yes">Always show Tray icon</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
-                        <property name="active">True</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">7</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox" id="hbox48">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="spacing">41</property>
                         <child>
-                          <object class="GtkCheckButton" id="cbCfgBWTrayIcon">
-                            <property name="label" translatable="yes">Use Black &amp; White tray icon (*) </property>
+                          <object class="GtkCheckButton" id="cbCfgSaveShowScreenshots">
+                            <property name="label" translatable="yes">Show screenshots</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="xalign">0.5</property>
+                            <property name="xalign">0</property>
                             <property name="draw_indicator">True</property>
                           </object>
                           <packing>
@@ -4533,10 +4507,14 @@ connecting (timeout is in seconds)</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkImage" id="imgTrayIcon">
+                          <object class="GtkCheckButton" id="cbCfgShowStatistics">
+                            <property name="label" translatable="yes">Show statistics</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4548,7 +4526,75 @@ connecting (timeout is in seconds)</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">8</property>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">14</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgShowTrayIcon">
+                            <property name="label" translatable="yes">Always show Tray icon</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="xalign">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="hbox48">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkCheckButton" id="cbCfgBWTrayIcon">
+                                <property name="label" translatable="yes">Use Black &amp; White tray icon (*) </property>
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage" id="imgTrayIcon">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="stock">gtk-missing-image</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
                       </packing>
                     </child>
                     <child>
