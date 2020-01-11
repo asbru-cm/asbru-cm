@@ -3,7 +3,7 @@
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -1144,8 +1144,6 @@ if ($GETCMD) {
 
 # Set log file
 $EXP -> log_file($LOG_FILE);
-
-print "COMMENT AFTER TESTING, COMMAND: $connection_cmd\n";
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
