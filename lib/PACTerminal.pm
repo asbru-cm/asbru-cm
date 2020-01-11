@@ -2004,7 +2004,7 @@ sub _vteMenu {
             shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
-                _copyPASS($$self{_UUID});
+                _copyPass($$self{_UUID});
             }
         });
     };

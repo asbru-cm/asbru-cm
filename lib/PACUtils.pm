@@ -107,8 +107,9 @@ require Exporter;
     _vteFeedChild
     _vteFeedChildBinary
     _createBanner
-    _copyPASS
-); # Functions/varibles to export
+    _copyPass
+    _appName
+); # Functions/variables to export
 
 @EXPORT_OK  = qw();
 
@@ -3911,7 +3912,7 @@ sub _createBanner {
     return $banner;
 }
 
-sub _copyPASS {
+sub _copyPass {
     my $uuid = shift;
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
     my $clip;
@@ -3924,6 +3925,10 @@ sub _copyPASS {
     }
     use bytes;
     $clipboard->set_text($clip,length($clip));
+}
+
+sub _appName {
+    return "$APPNAME $APPVERSION";
 }
 
 1;

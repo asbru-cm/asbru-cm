@@ -2725,7 +2725,7 @@ sub _treeConnections_menu {
             shortcut => '',
             sensitive => 1,
             code => sub {
-                _copyPASS($sel[0]);
+                _copyPass($sel[0]);
             }
         });
     };
