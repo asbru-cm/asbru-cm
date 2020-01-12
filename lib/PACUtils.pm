@@ -106,8 +106,9 @@ require Exporter;
     _vteFeedChild
     _vteFeedChildBinary
     _createBanner
-    _copyPASS
-); # Functions/varibles to export
+    _copyPass
+    _appName
+); # Functions/variables to export
 
 @EXPORT_OK  = qw();
 
@@ -2100,6 +2101,8 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
+    $$cfg{'defaults'}{'capture xterm title'} //= 0;
+    $$cfg{'defaults'}{'tree overlay scrolling'} //= 1;
 
     $$cfg{'defaults'}{'global variables'} //= {};
     $$cfg{'defaults'}{'local commands'} //= [];
@@ -3844,7 +3847,7 @@ sub _createBanner {
     return $banner;
 }
 
-sub _copyPASS {
+sub _copyPass {
     my $uuid = shift;
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
     my $clip;
@@ -3857,6 +3860,10 @@ sub _copyPASS {
     }
     use bytes;
     $clipboard->set_text($clip,length($clip));
+}
+
+sub _appName {
+    return "$APPNAME $APPVERSION";
 }
 
 1;

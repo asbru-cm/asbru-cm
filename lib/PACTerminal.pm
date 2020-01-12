@@ -898,6 +898,16 @@ sub _setupCallbacks {
     # Register callbacks from VTE
     # ------------------------------
 
+    # Capture VTE title changes
+    # note: actually raised by the appropriate Xterm escape sequence, see http://www.faqs.org/docs/Linux-mini/Xterm-Title.html#s3
+    $$self{_GUI}{_VTE}->signal_connect('window-title-changed' => sub {
+        my ($terminal, $myself) = @_;
+        my $new_title=$terminal->get_window_title();
+        if ($$self{_CFG}{defaults}{'capture xterm title'}) {
+            $$myself{_TITLE} = $new_title;
+        }
+    }, $self);
+
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
         if ($$self{_CFG}{defaults}{'change main title'}) {
@@ -1977,7 +1987,7 @@ sub _vteMenu {
             shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
-                _copyPASS($$self{_UUID});
+                _copyPass($$self{_UUID});
             }
         });
     };

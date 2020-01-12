@@ -500,9 +500,10 @@ sub _initGUI {
     # FIXME-HOMOGENEOUS     $$self{_GUI}{nbTree}->set('homogeneous', 0);
 
     # Create a scrolled1 scrolled window to contain the connections tree
-    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new();
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{nbTreeTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('pac-treelist', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
@@ -2098,7 +2099,6 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page(-1);
                 } else {
-                    print("PREV PAGE\n");
                     $$self{_GUI}{nb}->prev_page();
                 }
             }
@@ -2719,17 +2719,17 @@ sub _treeConnections_menu {
         });
     }
     # Copy Connection Password
-    if ((defined $$self{_CFG}{environments}{$sel[0]}{'pass'})&&(($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne ''))) {
+    if ((defined($$self{_CFG}{environments}{$sel[0]}{'pass'}) && $$self{_CFG}{environments}{$sel[0]}{'pass'} ne '') || (defined($$self{_CFG}{environments}{$sel[0]}{'passphrase'}) && $$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',
             shortcut => '',
             sensitive => 1,
             code => sub {
-                _copyPASS($sel[0]);
+                _copyPass($sel[0]);
             }
         });
-    };
+    }
     # Bulk Edit
     if ((scalar(@sel) > 1 || $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {
@@ -3681,6 +3681,7 @@ sub _updateGUIPreferences {
 
     $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {

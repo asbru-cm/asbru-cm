@@ -45,7 +45,7 @@ Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
 Requires:   perl-X11-GUITest
-Requires:   vte
+Requires:   vte291
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
@@ -137,6 +137,8 @@ fi
 
 
 %changelog
+* Sat Jan 11 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.2
+- 6.0.2 release
 * Sat Jan 04 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.1
 - 6.0.1 release
 * Thu Jan 02 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.0
