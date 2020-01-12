@@ -46,7 +46,7 @@ Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
 Requires:   perl-X11-GUITest
-Requires:   vte
+Requires:   vte291
 Requires:   ftp
 Requires:   telnet
 Requires:   bash
