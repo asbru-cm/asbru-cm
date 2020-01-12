@@ -2850,7 +2850,7 @@ sub _subst {
             $string =~ s/<IP>/$ip/g; $ret = $string;
         }
         while ($string =~ /<USER>/go) {
-            $string =~ s/<USER>/$ip/g; $ret = $string;
+            $string =~ s/<USER>/$user/g; $ret = $string;
         }
         while ($string =~ /<PASS>/go) {
             $string =~ s/<PASS>/$pass/g; $ret = $string;

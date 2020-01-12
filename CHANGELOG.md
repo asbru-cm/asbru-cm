@@ -1,5 +1,45 @@
 # Changelog
 
+## [6.0.2](https://github.com/asbru-cm/asbru-cm/tree/6.0.2) (2020-01-11)
+
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.1...6.0.2)
+
+**Implemented enhancements:**
+
+- Reverse button order to "Cancel" "OK"? [\#229](https://github.com/asbru-cm/asbru-cm/issues/229)
+- asbru for centos [\#60](https://github.com/asbru-cm/asbru-cm/issues/60)
+- Icons and some buttons are small on 4K display [\#55](https://github.com/asbru-cm/asbru-cm/issues/55)
+- Built in color schemes [\#8](https://github.com/asbru-cm/asbru-cm/issues/8)
+
+**Fixed bugs:**
+
+- Host key verification throws script error [\#344](https://github.com/asbru-cm/asbru-cm/issues/344)
+- local command automated username error. [\#341](https://github.com/asbru-cm/asbru-cm/issues/341)
+- RDP keyboard stops to work [\#331](https://github.com/asbru-cm/asbru-cm/issues/331)
+- Remote commands in Cluster connections   [\#304](https://github.com/asbru-cm/asbru-cm/issues/304)
+- SSH connection via SOCKS proxy not working [\#280](https://github.com/asbru-cm/asbru-cm/issues/280)
+- Crash when re-attaching window [\#70](https://github.com/asbru-cm/asbru-cm/issues/70)
+
+**Closed issues:**
+
+- Terminals Tabbed Window fails in Compact Window Layout [\#352](https://github.com/asbru-cm/asbru-cm/issues/352)
+- Keepass does not work in latest [\#343](https://github.com/asbru-cm/asbru-cm/issues/343)
+- asbru-cm.spec - another similar minor issue [\#333](https://github.com/asbru-cm/asbru-cm/issues/333)
+- asbru-cm.spec file - minor correction [\#332](https://github.com/asbru-cm/asbru-cm/issues/332)
+- Resizing left menu section doesn't repaint the console properly [\#310](https://github.com/asbru-cm/asbru-cm/issues/310)
+- 2FA under Authentication options [\#300](https://github.com/asbru-cm/asbru-cm/issues/300)
+- \[gtk3\] VTE history of commands [\#211](https://github.com/asbru-cm/asbru-cm/issues/211)
+- \[gtk3\] VTE bold is bright option [\#210](https://github.com/asbru-cm/asbru-cm/issues/210)
+- \[gtk3\] VTE visible bell [\#208](https://github.com/asbru-cm/asbru-cm/issues/208)
+- \[gtk3\] VTE: Remove or rework "Term Emulation" [\#206](https://github.com/asbru-cm/asbru-cm/issues/206)
+
+**Merged pull requests:**
+
+- fix343 [\#350](https://github.com/asbru-cm/asbru-cm/pull/350) ([hanspr](https://github.com/hanspr))
+- fix \#341 [\#347](https://github.com/asbru-cm/asbru-cm/pull/347) ([hanspr](https://github.com/hanspr))
+- fix \#344 [\#346](https://github.com/asbru-cm/asbru-cm/pull/346) ([hanspr](https://github.com/hanspr))
+- fixed regression tabbed terminals [\#334](https://github.com/asbru-cm/asbru-cm/pull/334) ([hanspr](https://github.com/hanspr))
+
 ## [6.0.1](https://github.com/asbru-cm/asbru-cm/tree/6.0.1) (2020-01-04)
 
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.0...6.0.1)

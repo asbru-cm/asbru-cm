@@ -2098,7 +2098,6 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page(-1);
                 } else {
-                    print("PREV PAGE\n");
                     $$self{_GUI}{nb}->prev_page();
                 }
             }
@@ -2719,7 +2718,7 @@ sub _treeConnections_menu {
         });
     }
     # Copy Connection Password
-    if (($$self{_CFG}{environments}{$sel[0]}{'pass'} ne '')||($$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
+    if ((defined($$self{_CFG}{environments}{$sel[0]}{'pass'}) && $$self{_CFG}{environments}{$sel[0]}{'pass'} ne '') || (defined($$self{_CFG}{environments}{$sel[0]}{'passphrase'}) && $$self{_CFG}{environments}{$sel[0]}{'passphrase'} ne '')) {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',
@@ -2729,7 +2728,7 @@ sub _treeConnections_menu {
                 _copyPass($sel[0]);
             }
         });
-    };
+    }
     # Bulk Edit
     if ((scalar(@sel) > 1 || $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {

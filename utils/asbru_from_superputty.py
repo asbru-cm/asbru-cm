@@ -222,7 +222,7 @@ def main():
     temp += [x.ymlString for x in branchList]
     temp += [x.ymlString for x in deviceList]
  
-    print "\n".join(temp)
+    print("\n".join(temp))
  
  
 if __name__ == "__main__":
