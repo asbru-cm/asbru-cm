@@ -176,7 +176,7 @@ sub _initGUI {
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new)->{container});
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new)->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new)->{container});
-    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new)->{container});
+    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1))->{container});
     _($self, 'nbPreferences')->show_all;
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -389,47 +389,6 @@ sub _setupCallbacks {
                 _($self, 'entryCfgSudoPassword')->select_region($pos + 5, $pos + 22);
             }
         });
-
-        # Populate with KeePass special strings
-        if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls, @query);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_title:$$hash{title}>");}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_username:$$hash{username}>");}
-                });
-                push(@urls, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
-                });
-            }
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [{
-                    label => 'KeePassX title values',
-                    submenu => \@titles
-                }, {
-                    label => 'KeePassX username values',
-                    submenu => \@usernames
-                }, {
-                    label => 'KeePassX URL values',
-                    submenu => \@urls
-                }, {
-                    label => "KeePass Extended Query",
-                    tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                }]
-            });
-        }
 
         _wPopUpMenu(\@menu_items, $event);
 
@@ -815,11 +774,7 @@ sub _updateGUIPreferences {
     $$self{_VARIABLES}->update($$self{_CFG}{'defaults'}{'global variables'});
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
-    if (!$$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'})) {
-        show($self, 0);
-        _($self, 'nbPreferences')->set_current_page(-1);
-        return 0;
-    }
+    $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
 
     if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
         _($self, 'lblRestartRequired')->set_text("(*) Requires restarting PAC for the change(s) to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text // '') );

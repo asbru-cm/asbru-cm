@@ -42,7 +42,7 @@ use POSIX qw (strftime);
 use Encode qw (encode decode);
 use IO::Socket::INET;
 use Encode;
-use KeePass;
+use PACKeePass;
 use PACUtils;
 
 use Gtk3 '-init';
@@ -167,40 +167,30 @@ my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
-my @KEEPASS = @{$$CFG{'keepass'} // []};
+my $kpxc;
 
 $IP = subst($IP);
 $PORT = subst($PORT);
-# Use keepass
-if ($$CFG{'environments'}{$UUID}{'infer user pass from KPX'} && $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-    # TODO : I think this will never happen previous if already stated that use_keepass is true
-    if (!$$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        msg("ERROR: KeePassX can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'");
-        exit 1;
-    }
 
-    my $re = $$CFG{'environments'}{$UUID}{'KPX title regexp'};
-    my $where = $KPXWHERE[$$CFG{'environments'}{$UUID}{'infer from KPX where'}];
-    my @found = findKP(\@KEEPASS, $where, qr/$re/);
-    if (! scalar @found) {
-        msg("ERROR: No entry '$where' found on KeePassX matching '$re'");
-        exit 1;
-    } elsif (((scalar @found) > 1) && $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-        msg("INFO: Found " . (scalar @found) . " entries with '$where' matching '$re' while inferring. Asking user...");
-        my $tmp = "<ASK:KeePass '$where' matching '$TITLE':";
-        foreach my $hash (@found) {
-            $tmp .= "|$$hash{$where}";
-        }
-        $tmp .= '>';
-        my ($str, $pos) = subst($tmp);
-        if (! defined $str) {
-            msg("INFO: Connection canceled by user");
-            exit 1;
-        }
-        ($USER, $PASS) = ($found[$pos]{username}, $found[$pos]{password});
-    } else {
-        msg("INFO: Using with $where '$found[0]{$where}' matching '$re' (username: $USER, password: hidden!!) while inferring...");
-        ($USER, $PASS) = ($found[0]{username}, $found[0]{password});
+# Use keepass ?
+if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
+    my ($ok);
+    $kpxc = PACKeePass->new(0,$$CFG{'defaults'}{'keepass'});
+    ($USER,$ok) = $kpxc->GetFieldValueFromString($USER);
+    if (!$ok) {
+        die "$USER";
+    }
+    ($PASS,$ok) = $kpxc->GetFieldValueFromString($PASS);
+    if (!$ok) {
+        die "$PASS";
+    }
+    ($PASSPHRASE,$ok) = $kpxc->GetFieldValueFromString($PASSPHRASE);
+    if (!$ok) {
+        die "$PASSPHRASE";
+    }
+    ($PASSPHRASE_USER,$ok) = $kpxc->GetFieldValueFromString($PASSPHRASE_USER);
+    if (!$ok) {
+        die "$PASSPHRASE_USER";
     }
 } else {
     $USER = subst($USER);
@@ -337,62 +327,6 @@ sub subst {
         $string = $COMMAND_PROMPT;
     }
 
-    # Replace <KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==> with KeePassX value
-    while ($string =~ /<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==>/go) {
-        my $what = $1;
-        my $where = $2;
-        my $var = $3;
-        my $regexp = qr/$var/;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            msg("WARNING: KeePassX variable '$var' can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'");
-            next;
-        }
-
-        my @found = findKP(\@KEEPASS, $where, $regexp);
-        if (! scalar @found) {
-            msg("ERROR: No entry '$where' found on KeePassX matching '$var'");
-            exit 1;
-        } elsif (((scalar @found) > 1) && $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-            msg("INFO: Found more than one entry for '$where' with value '$var'. Asking user...");
-            my $tmp = "<ASK:KeePass Passwords matching '$where' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{$what}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$tmp/g;
-        } else {
-            msg("INFO: Found " . (scalar(@found)) ." entries for '$where' with value '$var'. Selected first entry...") if (scalar(@found) > 1) && ! $$CFG{'defaults'}{'keepass'}{'ask_user'};
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$found[0]{$what}/g;
-        }
-    }
-
-    # Replace <KPX_(title|username|url):*> with KeePassX password value
-    while ($string =~ /<KPX_(title|username|url):(.+?)>/go) {
-        my $type = $1;
-        my $var = $2;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            msg("WARNING: KeePassX variable '$var' can not be used because 'KeePassX' is not enabled under 'Preferences -> KeePass Options'");
-            next;
-        }
-
-        my @found = findKP(\@KEEPASS, $type, $var);
-        if (! scalar @found) {
-            msg("ERROR: No entry '$type' found on KeePassX matching '$var'"); exit 1;
-        } elsif (((scalar @found) > 1) && $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-            msg("WARNING: Found more than one entry for '$type' with value '$var'. Asking user...");
-            my $tmp = "<ASK:KeePass Passwords matching '$type' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{password}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPX_$type:\Q$var\E>/$tmp/g;
-        } else {
-            $string =~ s/<KPX_$type:\Q$var\E>/$found[0]{password}/g;
-        }
-    }
-
     # Replace '<GV:.+>' with user saved global variables for '$connection_cmd' execution
     while ($string =~ /<GV:(.+?)>/go) {
         my $var = $1;
@@ -457,6 +391,11 @@ sub subst {
         my $output = `$var 2>&1`;
         chomp $output;
         $string =~ s/<CMD:\Q$var\E>/$output/g;
+    }
+
+    # KeePassXC
+    if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
+        $string =~ s/<(\w+)\|(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
     }
 
     return wantarray ? ($string, $pos) : $string;

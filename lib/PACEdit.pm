@@ -190,8 +190,6 @@ sub _initGUI {
         $$self{_METHODS}{$method}{'position'} = $i++;
     }
 
-    map({_($self, 'comboKPXWhere')->append_text($_); push(@{$$self{_KPXWHERE}}, $_);} ('comment', 'created', 'password', 'title', 'url', 'username') );
-
     # Initialize main window
     $$self{_WINDOWEDIT}->set_icon_name('pac-app-big');
     $$self{_WINDOWEDIT}->set_position('center');
@@ -206,6 +204,8 @@ sub _initGUI {
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
     _($self, 'btnCloseEdit')->set_use_underline(1);
+    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
+
 
     return 1;
 }
@@ -305,38 +305,26 @@ sub _setupCallbacks {
         _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active);
     });
 
-    #_($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {_($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);});
-    _($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {
-        _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'entryKPXRE')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'btnCheckKPX')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
-        _($self, 'comboKPXWhere')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active);
-    });
-
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
-        if (! $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            _wMessage($$self{_WINDOWEDIT}, "ERROR: <b>KeePassX</b> can not be used because\nit is not enabled under <b>'Preferences->KeePass Options'</b>");
-            return 1;
+        my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+        if ($selection) {
+            # Commented for the time being, until keepassxc-cli team implement get the UUID
+            # Featre request at https://github.com/keepassxreboot/keepassxc/issues/4112
+            #my ($title,$ok) = $PACMain::FUNCS{_KEEPASS}->GetFieldValue('Uuid',$selection);
+
+            # For the time being, we will use the full path
+            my $title = $selection;
+            if ($title) {
+                if (_($self, 'rbCfgAuthUserPass')->get_active) {
+                    _($self, 'entryUser')->set_text("<username|$title>");
+                    _($self, 'entryPassword')->set_text("<password|$title>");
+                } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
+                    _($self, 'entryUserPassphrase')->set_text("<username|$title>");
+                    _($self, 'entryPassphrase')->set_text("<password|$title>");
+                }
+            }
         }
-
-        my $title = _($self, 'entryKPXRE')->get_chars(0,-1);
-        my $where = $$self{_KPXWHERE}[_($self, 'comboKPXWhere')->get_active];
-        my ($user, $pass, $comment, $created);
-
-        $PACMain::FUNCS{_KEEPASS}->reload;
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($where, qr/$title/);
-        if (! scalar @found)            {_wMessage(undef, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'"); return 1;}
-        elsif (((scalar @found) > 1) && $$self{_CFG}{defaults}{keepass}{ask_user})    {
-            my $tmp = "<ASK:KeePass $where matching '$title':"; foreach my $hash (@found) {$tmp .= '|' . $$hash{$where};} $tmp .= '>';
-            my ($str, $out) = _subst($tmp);
-            ($user, $pass, $comment, $created) = ($found[$$out{pos}]{username}, $found[$$out{pos}]{password}, $found[$$out{pos}]{comment}, $found[$$out{pos}]{created});
-        } else {
-            ($user, $pass, $comment, $created) = ($found[0]{username}, $found[0]{password}, $found[0]{comment}, $found[0]{created});
-        }
-
-        _wMessage($$self{_WINDOWEDIT}, "KeePass data inferred for $where '<b>" . __($title) . "</b>'\n - <b>User:</b> " . __($user) . "\n - <b>Password:</b> " . __($pass) . "\n - <b>Created:</b> " . __($created) . "\n - <b>Comment:</b> " . __($comment) );
-
         return 1;
     });
 
@@ -408,49 +396,6 @@ sub _setupCallbacks {
                 _($self, "entryEditSendString")->select_region($pos + 5, $pos + 22);
             }
         });
-
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_title:$$hash{title}>");}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_username:$$hash{username}>");}
-                });
-                push(@urls, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_url:$$hash{url}>");}
-                });
-            }
-
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [{
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {_($self, "entryEditSendString")->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                    }
-                ]
-            });
-        }
 
         _wPopUpMenu(\@menu_items, $event);
 
@@ -555,49 +500,6 @@ sub _setupCallbacks {
                 }
             });
 
-            # Populate with KeePass special strings
-            if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                my (@titles, @usernames, @urls, @query);
-                foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
-                    push(@titles, {
-                        label => "<KPX_title:$$hash{title}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_title:$$hash{title}>");}
-                    });
-                    push(@usernames, {
-                        label => "<KPX_username:$$hash{username}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_username:$$hash{username}>");}
-                    });
-                    push(@urls, {
-                        label => "<KPX_url:$$hash{url}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_url:$$hash{url}>");}
-                    });
-                }
-
-                push(@menu_items, {
-                    label => 'KeePassX',
-                    stockicon => 'pac-keepass',
-                    submenu =>
-                    [{
-                            label => 'KeePassX title values',
-                            submenu => \@titles
-                        }, {
-                            label => 'KeePassX username values',
-                            submenu => \@usernames
-                        }, {
-                            label => 'KeePassX URL values',
-                            submenu => \@urls
-                        }, {
-                            label => "KeePass Extended Query",
-                            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub {_($self, "entry$w")->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                        }
-                    ]
-                });
-            }
-
             _wPopUpMenu(\@menu_items, $event);
 
             return 1;
@@ -693,15 +595,8 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
-    _($self, 'cbInferUserPassKPX')->set_active(($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} // 0) && $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
-    _($self, 'entryKPXRE')->set_text($$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} // ".*$$self{_CFG}{'environments'}{$uuid}{'title'}.*");
-    _($self, 'entryKPXRE')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'btnCheckKPX')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active);
-    _($self, 'hboxKeePass')->set_sensitive($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
+    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     _($self, 'entryUUID')->set_text($uuid);
-    _($self, 'comboKPXWhere')->set_active($$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} // 3);
-    _($self, 'comboKPXWhere')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
 
     # Populate 'comboStartScript' combobox
@@ -861,9 +756,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'startup script'} = _($self, 'cbStartScript')->get_active && _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} = _($self, 'cbInferUserPassKPX')->get_active;
-    $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} = _($self, 'entryKPXRE')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} = _($self, 'comboKPXWhere')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
 
     ##################

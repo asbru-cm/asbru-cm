@@ -330,49 +330,29 @@ sub _buildPrePost {
         push(@int_variables_menu, {label => "PASS",code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
         push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
 
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                next if(exists $$hash{'binary'}{'bin-stream'} && $$hash{'comment'} eq 'KPX_CUSTOM_ICONS_4');
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{command}->insert_text("<KPX_title:$$hash{title}>", -1, $w{command}->get_position);}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{command}->insert_text("<KPX_username:$$hash{username}>", -1, $w{command}->get_position);}
-                });
-                push(@urls, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{command}->insert_text("<KPX_url:$$hash{url}>", -1, $w{command}->get_position);}
-                });
+        # Copy User,Password from KeePassXC
+        push(@menu_items, {
+            label => 'Add Username KeePassXC',
+            tooltip => 'KeePassXC Username',
+            code => sub {
+                my $pos = $w{command}->get_property('cursor_position');
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                if ($selection) {
+                    $w{command}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
+                }
             }
-
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu => [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$w{command}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{command}->get_position);}
-                    }
-                ]
-            });
-        }
+        });
+        push(@menu_items, {
+            label => 'Add Password KeePassXC',
+            tooltip => 'KeePassXC Password',
+            code => sub {
+                my $pos = $w{command}->get_property('cursor_position');
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                if ($selection) {
+                    $w{command}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
+                }
+            }
+        });
 
         _wPopUpMenu(\@menu_items, $event);
 
