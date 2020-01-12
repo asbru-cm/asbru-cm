@@ -85,7 +85,7 @@ sub update {
     defined $cfg and $$self{cfg} = $cfg;
 
     my $file = $$self{cfg}{'database'};
-    if (!defined $file) {
+    if ((!defined $file)||(-d $file)||(!-e $file)) {
         return 0;
     }
     if ($$self{disable_keepassxc}) {
@@ -235,6 +235,9 @@ sub get_cfg {
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
     $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename();
+    if ((!defined $hash{database})||(-d $hash{database})||(!-e $hash{database})) {
+        $hash{database} = '';
+    }
     if (defined $$self{frame}{'fcbKeePassKeyFile'}) {
         $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
         if (($$self{kpxc_keyfile})&&($hash{keyfile})&&(-e $hash{keyfile})) {
