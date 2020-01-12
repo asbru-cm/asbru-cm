@@ -657,7 +657,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
-        _($self, 'entryCfgJumpConnKey')->set_uri('file://' . $$self{_CFG}{'environments'}{$uuid}{'jump key'});
+        _($self, 'entryCfgJumpConnKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
     } else {
         _($self, 'entryCfgJumpConnKey')->set_uri('');
     }
@@ -673,9 +673,13 @@ sub _updateGUIPreferences {
     _($self, 'entryEditLogFileName')->set_text($$self{_CFG}{'environments'}{$uuid}{'session log pattern'});
     _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'} // $CFG_DIR . '/session_logs');
     _($self, 'spEditSaveSessionLogs')->set_value($$self{_CFG}{'environments'}{$uuid}{'session logs amount'} // 10);
-    _($self, 'fileCfgPublicKey')->set_uri('file://' . $$self{_CFG}{'environments'}{$uuid}{'public key'}) if  $$self{_CFG}{'environments'}{$uuid}{'public key'} ne '';
     _($self, 'entryUserPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '');
     _($self, 'entryPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '');
+    if  (($$self{_CFG}{'environments'}{$uuid}{'public key'})&&(!-d $$self{_CFG}{'environments'}{$uuid}{'public key'})&& (-e $$self{_CFG}{'environments'}{$uuid}{'public key'})) {
+        _($self, 'fileCfgPublicKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'public key'}");
+    } else {
+        _($self, 'fileCfgPublicKey')->set_uri('');
+    }
     _($self, 'entryIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'ip'});
     _($self, 'entryPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'port'});
     _($self, 'entryUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'user'});
@@ -834,8 +838,11 @@ sub _saveConfiguration {
 
     $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename // '';
-    $$self{_CFG}{'environments'}{$uuid}{'public key'} =~ s/^(.+?\/\/)(.+)$/$2/go;
+    if  (($$self{_CFG}{'environments'}{$uuid}{'public key'})&&(!-d $$self{_CFG}{'environments'}{$uuid}{'public key'})&& (-e $$self{_CFG}{'environments'}{$uuid}{'public key'})) {
+        $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename;
+    } else {
+        $$self{_CFG}{'environments'}{$uuid}{'public key'} = '';
+    }
     $$self{_CFG}{'environments'}{$uuid}{'use prepend command'} = _($self, 'cbEditPrependCommand')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'prepend command'} = _($self, 'entryEditPrependCommand')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'quote command'} = _($self, 'cbCfgQuoteCommand')->get_active;

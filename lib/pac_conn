@@ -901,6 +901,11 @@ if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
     $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port %h %p'";
 } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 3) {
     # Use this connection Jump Server settings
+    if (!$$CFG{'environments'}{$UUID}{'jump key'}) {
+        die "IdentityFile for jump server is requeired, can not connect\n";
+    } elsif (!$PUBKEY) {
+        die "IdentityFile for destination server is requeired, can not connect\n";
+    }
     $proxy_jump = 1;
     $proxy_ip = $$CFG{'environments'}{$UUID}{'jump ip'};
     $proxy_port = $$CFG{'environments'}{$UUID}{'jump port'};
@@ -915,6 +920,11 @@ if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
     # Use global configuration settings
     if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
         # Jump Server settings
+        if (!$$CFG{'defaults'}{'jump key'}) {
+            die "IdentityFile for jump server is requeired, can not connect\n";
+        } elsif (!$PUBKEY) {
+            die "IdentityFile for destination server is requeired, can not connect\n";
+        }
         $proxy_jump = 1;
         $proxy_ip = $$CFG{'defaults'}{'jump ip'};
         $proxy_port = $$CFG{'defaults'}{'jump port'};
@@ -922,7 +932,7 @@ if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
         $proxy_pass = $$CFG{'defaults'}{'jump pass'};
         open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
         print CFG qq“Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
-        print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\nIdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n“;
+        print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\nIdentityFile $$CFG{'defaults'}{'jump key'}\n“;
         print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\nIdentityFile $PUBKEY\n“;
         close CFG;
     } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
