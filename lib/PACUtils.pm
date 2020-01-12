@@ -826,7 +826,11 @@ sub _getMethods {
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
-            _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
+            if (($$cfg{'public key'})&&(!-d $$cfg{'public key'}) && (-e $$cfg{'public key'})) {
+                _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'});
+            } else {
+                _($self, 'fileCfgPublicKey')->set_filename('');
+            }
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
