@@ -2097,7 +2097,6 @@ sub _setupCallbacks {
                 if ($curr_page == 0) {
                     $$self{_GUI}{nb}->set_current_page(-1);
                 } else {
-                    print("PREV PAGE\n");
                     $$self{_GUI}{nb}->prev_page();
                 }
             }
