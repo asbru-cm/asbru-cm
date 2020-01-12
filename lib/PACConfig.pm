@@ -3,7 +3,7 @@ package PACConfig;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -749,6 +749,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
     _($self, 'cbCfgSkip1stChainExpect')->set_active($$cfg{'defaults'}{'skip first chain expect'} // 1);
     _($self, 'cbCfgEnableTreeLines')->set_active($$cfg{'defaults'}{'enable tree lines'} // 0);
+    _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
     _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
     _($self, 'cbCfgHideConnSubMenu')->set_active($$cfg{'defaults'}{'hide connections submenu'});
@@ -937,6 +938,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'confirm chains'} = _($self, 'cbCfgConfirmChains')->get_active;
     $$self{_CFG}{'defaults'}{'skip first chain expect'} = _($self, 'cbCfgSkip1stChainExpect')->get_active;
     $$self{_CFG}{'defaults'}{'enable tree lines'} = _($self, 'cbCfgEnableTreeLines')->get_active;
+    $$self{_CFG}{'defaults'}{'tree overlay scrolling'} = _($self, 'cbCfgEnableOverlayScrolling')->get_active();
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} = _($self, 'cbCfgCheckVersions')->get_active;
     $$self{_CFG}{'defaults'}{'show statistics'} = _($self, 'cbCfgShowStatistics')->get_active;

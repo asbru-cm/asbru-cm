@@ -3,7 +3,7 @@ package PACEdit;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -761,7 +761,6 @@ sub _updateGUIPreferences {
     my $ssh = `ssh 2>&1`;
     $ssh =~ s/\n//g;
     $ssh =~ s/[ \t][ \t]+/ /g;
-    print STDERR "$ssh\n";
     if ($ssh =~ /-J /) {
         # Enable Jump Host
         _($self, 'rbUseProxyJump')->set_sensitive(1);
