@@ -125,7 +125,7 @@ sub show {
     $$self{_UUID} = shift;
     $$self{_IS_NEW} = shift // 0;
 
-    $self->_updateGUIPreferences;
+    $self->_updateGUIPreferences();
 
     my $title;
     if ($$self{_IS_NEW} eq 'quick') {
@@ -143,8 +143,6 @@ sub show {
     }
 
     $$self{_WINDOWEDIT}->set_title($title);
-    $$self{_WINDOWEDIT}->show_all;
-    $$self{_WINDOWEDIT}->present;
 
     if ($$self{_IS_NEW}) {_($self, 'nbProps')->set_current_page(0); _($self, 'entryIP')->grab_focus; _($self, 'nbDetails')->set_current_page(0);}
 
@@ -181,7 +179,7 @@ sub _initGUI {
     _($self, 'alignMacros')->add(($$self{_MACROS} = PACExecEntry->new)->{container});
     _($self, 'alignLocal')->add(($$self{_LOCAL_EXEC} = PACExecEntry->new)->{container});
     _($self, 'alignExpect')->add(($$self{_EXPECT_EXEC} = PACExpectEntry->new)->{container});
-    _($self, 'nbProps')->show_all;
+    _($self, 'nbProps')->show_all();
 
     # Populate 'Method' combobox
     my $i = 0;
@@ -458,7 +456,14 @@ sub _setupCallbacks {
     });
 
     # Capture proxy usage change
-    _($self, 'rbUseProxyAlways')->signal_connect('toggled' => sub {_($self, 'vboxCfgManualProxyConn')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active);});
+    _($self, 'rbUseProxyAlways')->signal_connect('toggled' => sub {
+        _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active());
+    });
+
+    # Capture jump host change
+    _($self, 'rbUseProxyJump')->signal_connect('toggled' => sub {
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+    });
 
     # Capture right mouse click to show custom context menu
     foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
@@ -617,11 +622,6 @@ sub _setupCallbacks {
         return 0;
     });
 
-    _($self, 'nbProps')->signal_connect('switch_page' => sub {
-        $_[0]->show_all;
-        return 0;
-    });
-
     # Capture 'startup script' checkbutton changed
     _($self, 'cbStartScript')->signal_connect(toggled => sub {
         _($self, 'comboStartScript')->set_sensitive(_($self, 'cbStartScript')->get_active);
@@ -646,7 +646,8 @@ sub _updateGUIPreferences {
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
     _($self, 'rbUseProxyJump')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3);
-    _($self, 'vboxCfgManualProxyConn')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active);
+    _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active());
+    _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     _($self, 'bCfgProxy')->set_sensitive(1);
     # SOCKS Proxy
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
@@ -743,8 +744,8 @@ sub _updateGUIPreferences {
     &{$$self{_METHODS}{_($self, 'comboMethod')->get_active_text}{'updateGUI'}}($$self{_CFG}{'environments'}{$$self{_UUID}});
 
     ##########################################################################################################
-    $$self{_WINDOWEDIT}->show_all; # Without this line, $$self{_SPECIFIC} widgets WILL NOT BE SHOWN!!!!!!!!!
-    $$self{_WINDOWEDIT}->present;
+    $$self{_WINDOWEDIT}->show_all(); # Without this line, $$self{_SPECIFIC} widgets WILL NOT BE SHOWN!!!!!!!!!
+    $$self{_WINDOWEDIT}->present();
     ##########################################################################################################
     _($self, 'rbCfgAuthUserPass')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass');
     _($self, 'rbCfgAuthPublicKey')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey');
@@ -761,20 +762,25 @@ sub _updateGUIPreferences {
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.');
     }
 
-    # Control SSH capabilities
-    my $ssh = `ssh 2>&1`;
-    $ssh =~ s/\n//g;
-    $ssh =~ s/[ \t][ \t]+/ /g;
-    if ($ssh =~ /-J /) {
-        # Enable Jump Host
-        _($self, 'rbUseProxyJump')->set_sensitive(1);
-        _($self, 'hbox38')->set_sensitive(1);
-        _($self, 'hbox34')->set_sensitive(1);
+    # Show Jump options in network settings (only for SSH method)
+    if ($$self{_CFG}{'environments'}{$uuid}{'method'} eq "SSH") {
+        # Control SSH capabilities
+        my $ssh = `ssh 2>&1`;
+        $ssh =~ s/\n//g;
+        $ssh =~ s/[ \t][ \t]+/ /g;
+        if ($ssh =~ /-J /) {
+            # Enable Jump Host
+            _($self, 'rbUseProxyJump')->set_sensitive(1);
+            _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
+        } else {
+            # Disable Jump Host
+            _($self, 'rbUseProxyJump')->set_sensitive(0);
+            _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
+        }
+
+        _($self, 'vboxJumpCfg')->set_visible(1);
     } else {
-        # Disable Jump Host
-        _($self, 'rbUseProxyJump')->set_sensitive(0);
-        _($self, 'hbox38')->set_sensitive(0);
-        _($self, 'hbox34')->set_sensitive(0);
+        _($self, 'vboxJumpCfg')->set_visible(0);
     }
 
     return 1;
@@ -804,11 +810,11 @@ sub _saveConfiguration {
     # IP, Port, User, Pass, ...
     ##############################
 
-    if (_($self, 'rbUseProxyIfCFG')->get_active) {
+    if (_($self, 'rbUseProxyIfCFG')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
-    } elsif (_($self, 'rbUseProxyAlways')->get_active) {
+    } elsif (_($self, 'rbUseProxyAlways')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1;
-    } elsif (_($self, 'rbUseProxyJump')->get_active) {
+    } elsif (_($self, 'rbUseProxyJump')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 3;
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2;
