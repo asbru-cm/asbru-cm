@@ -688,7 +688,6 @@ sub _updateGUIPreferences {
     _($self, 'entryUserPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '');
     _($self, 'entryPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '');
     if  (($$self{_CFG}{'environments'}{$uuid}{'public key'})&&(!-d $$self{_CFG}{'environments'}{$uuid}{'public key'})&& (-e $$self{_CFG}{'environments'}{$uuid}{'public key'})) {
-        print STDERR "A: $$self{_CFG}{'environments'}{$uuid}{'public key'}\n";
         _($self, 'fileCfgPublicKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'public key'}");
     } else {
         _($self, 'fileCfgPublicKey')->set_uri("file://$ENV{'HOME'}");
