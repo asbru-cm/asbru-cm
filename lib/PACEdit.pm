@@ -465,6 +465,16 @@ sub _setupCallbacks {
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     });
 
+    _($self, 'btnEditClearJumpPrivateKey')->signal_connect('clicked' => sub {
+        _($self, 'entryCfgJumpConnKey')->set_uri("file://$ENV{'HOME'}");
+        _($self, 'entryCfgJumpConnKey')->unselect_uri("file://$ENV{'HOME'}");
+    });
+
+    _($self, 'btnEditClearPrivateKey')->signal_connect('clicked' => sub {
+        _($self, 'fileCfgPublicKey')->set_uri("file://$ENV{'HOME'}");
+        _($self, 'fileCfgPublicKey')->unselect_uri("file://$ENV{'HOME'}");
+    });
+
     # Capture right mouse click to show custom context menu
     foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
@@ -660,7 +670,8 @@ sub _updateGUIPreferences {
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
     } else {
-        _($self, 'entryCfgJumpConnKey')->set_uri('');
+        _($self, 'entryCfgJumpConnKey')->set_uri("file://$ENV{'HOME'}");
+        _($self, 'entryCfgJumpConnKey')->unselect_uri("file://$ENV{'HOME'}");
     }
 
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
@@ -679,7 +690,8 @@ sub _updateGUIPreferences {
     if  (($$self{_CFG}{'environments'}{$uuid}{'public key'})&&(!-d $$self{_CFG}{'environments'}{$uuid}{'public key'})&& (-e $$self{_CFG}{'environments'}{$uuid}{'public key'})) {
         _($self, 'fileCfgPublicKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'public key'}");
     } else {
-        _($self, 'fileCfgPublicKey')->set_uri('');
+        _($self, 'fileCfgPublicKey')->set_uri("file://$ENV{'HOME'}");
+        _($self, 'fileCfgPublicKey')->unselect_uri("file://$ENV{'HOME'}");
     }
     _($self, 'entryIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'ip'});
     _($self, 'entryPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'port'});
