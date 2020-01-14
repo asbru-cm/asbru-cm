@@ -402,7 +402,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -473,7 +473,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -547,7 +547,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (_($self, 'entryPassword')->get_chars(0, -1) eq '') && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (_($self, 'entryPassword')->get_chars(0, -1) eq '')) {
                 push(@faults, "Password (User/Password authentication method selected)");
             }
 
@@ -785,7 +785,7 @@ sub _getMethods {
                 push(@faults, 'Port');
             }
             # TODO : Check if this nested "ifs" can be rewritten
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -853,7 +853,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -918,7 +918,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -985,7 +985,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1051,7 +1051,7 @@ sub _getMethods {
                 push(@faults, 'Port');
             }
             # TODO : Check if this nested "ifs" can be rewritten
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1120,7 +1120,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
