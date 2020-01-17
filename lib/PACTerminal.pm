@@ -3698,11 +3698,11 @@ sub _updateCFG {
     ]; # light white
     # Update some VTE options
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
         if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
             _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
-            $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
         }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'} : $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color'}));
@@ -3713,11 +3713,11 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
         if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
             _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
-            $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
         }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'}));
