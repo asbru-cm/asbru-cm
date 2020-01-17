@@ -3693,7 +3693,7 @@ sub _updateCFG {
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
         if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
-            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'});
+            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'},$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
         }
@@ -3706,9 +3706,9 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
-        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}), $colors);
         if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
-            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'});
+            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'},$$self{_CFG}{'defaults'}{'back color'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
         }
@@ -3733,9 +3733,27 @@ sub _updateCFG {
 sub _setTransparency {
     my $self = shift;
     my $transparency = shift;
+    my $bgcolor = shift;
     my $alpha = 1 - $transparency;
+    my ($r,$g,$b);
 
-    my $color = Gtk3::Gdk::RGBA::parse("rgba(0,0,0,$alpha)");
+    if (length($bgcolor)==13) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})\w{2}(\w{2})\w{2}(\w{2})\w{2}/;
+    } elsif (length($bgcolor) == 7) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})(\w{2})(\w{2})/;
+    } else {
+        ($r,$g,$b) = (0,0,0);
+    }
+    if ($r) {
+        $r = hex($r);
+    }
+    if ($g) {
+        $g = hex($g);
+    }
+    if ($b) {
+        $b = hex($b);
+    }
+    my $color = Gtk3::Gdk::RGBA::parse("rgba($r,$g,$b,$alpha)");
     $$self{_GUI}{_VTE}->set_color_background($color);
 }
 
