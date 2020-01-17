@@ -849,14 +849,7 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
 
         if ((($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'})&&($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0))||($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
-            my $win = $$self{_WINDOWTERMINAL};
-            $win->signal_connect("draw" => \&mydraw);
-            my $screen = $win->get_screen();
-            my $visual = $screen->get_rgba_visual();
-            if (($visual) && ($screen->is_composited())) {
-                $win->set_visual($visual);
-            }
-            $win->set_app_paintable(1);
+            _setWindowPaintable($$self{_WINDOWTERMINAL});
         }
 
         $$self{_WINDOWTERMINAL}->show_all();
