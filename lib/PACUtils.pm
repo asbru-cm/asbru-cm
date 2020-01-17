@@ -108,6 +108,7 @@ require Exporter;
     _createBanner
     _copyPass
     _appName
+    _setWindowPaintable
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -3863,6 +3864,28 @@ sub _copyPass {
 
 sub _appName {
     return "$APPNAME $APPVERSION";
+}
+
+sub _setWindowPaintable {
+    my $win = shift;
+
+    $win->signal_connect("draw" => \&mydraw);
+    my $screen = $win->get_screen();
+    my $visual = $screen->get_rgba_visual();
+    if (($visual) && ($screen->is_composited())) {
+        $win->set_visual($visual);
+    }
+    $win->set_app_paintable(1);
+}
+
+sub mydraw {
+    my ($w,$c) = @_;
+
+    $c->set_source_rgba(128,128,128,1);
+    $c->set_operator('source');
+    $c->paint();
+    $c->set_operator('over');
+    return 0;
 }
 
 1;

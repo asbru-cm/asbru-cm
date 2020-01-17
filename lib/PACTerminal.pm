@@ -815,6 +815,7 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
+
         my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
         my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
         # HPR.20191010
@@ -837,6 +838,11 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
         $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
+
+        if ((($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'})&&($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0))||($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+            _setWindowPaintable($$self{_WINDOWTERMINAL});
+        }
+
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
         $NPOSX++;
@@ -3640,28 +3646,31 @@ sub _updateCFG {
     _setTabColour($self);
 
     my $colors = [Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color black'} // '#000000000000'),  # black
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})]; # light white
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})
+    ]; # light white
     # Update some VTE options
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'});
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'},$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'} : $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'cursor shape'});
@@ -3670,11 +3679,13 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{'defaults'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{'defaults'}{'terminal transparency'});
-        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}), $colors);
+        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'},$$self{_CFG}{'defaults'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{'defaults'}{'cursor shape'});
@@ -3690,6 +3701,31 @@ sub _updateCFG {
     $$self{_NO_UPDATE_CFG} = 0;
 
     return 1;
+}
+
+sub _setTransparency {
+    my $self = shift;
+    my $transparency = shift;
+    my $bgcolor = shift;
+    my $alpha = 1 - $transparency;
+    my ($r,$g,$b) = (0,0,0);
+
+    if (length($bgcolor)==13) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})\w{2}(\w{2})\w{2}(\w{2})\w{2}/;
+    } elsif (length($bgcolor) == 7) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})(\w{2})(\w{2})/;
+    }
+    if ($r) {
+        $r = hex($r);
+    }
+    if ($g) {
+        $g = hex($g);
+    }
+    if ($b) {
+        $b = hex($b);
+    }
+    my $color = Gtk3::Gdk::RGBA::parse("rgba($r,$g,$b,$alpha)");
+    $$self{_GUI}{_VTE}->set_color_background($color);
 }
 
 sub _wFindInTerminal {
