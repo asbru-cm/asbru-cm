@@ -3739,16 +3739,6 @@ sub _setTransparency {
     $$self{_GUI}{_VTE}->set_color_background($color);
 }
 
-sub mydraw {
-    my ($w,$c) = @_;
-
-    $c->set_source_rgba(128,128,128,1);
-    $c->set_operator('source');
-    $c->paint();
-    $c->set_operator('over');
-    return 0;
-}
-
 sub _wFindInTerminal {
     my $self = shift;
     our $searching = 0;
