@@ -418,6 +418,16 @@ sub start {
 ###################################################################
 # START: Define PRIVATE CLASS functions
 
+sub mydraw {
+    my ($w,$c) = @_;
+
+    $c->set_source_rgba(128,128,128,1);
+    $c->set_operator('source');
+    $c->paint();
+    $c->set_operator('over');
+    return 0;
+}
+
 sub _initGUI {
     my $self = shift;
 
@@ -430,6 +440,18 @@ sub _initGUI {
     # Create main window
     ##############################################
     $$self{_GUI}{main} = Gtk3::Window->new;
+
+    if (($$self{_CFG}{defaults}{'tabs in main window'})&&($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+        my $win = $$self{_GUI}{main};
+        $win->signal_connect("draw" => \&mydraw);
+        my $screen = $win->get_screen();
+        my $visual = $screen->get_rgba_visual();
+        if (($visual) && ($screen->is_composited())) {
+            $win->set_visual($visual);
+        }
+        $win->set_app_paintable(1);
+    }
+
 
     # Create a vbox1: main, status
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
