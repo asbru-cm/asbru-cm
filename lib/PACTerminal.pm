@@ -3735,14 +3735,12 @@ sub _setTransparency {
     my $transparency = shift;
     my $bgcolor = shift;
     my $alpha = 1 - $transparency;
-    my ($r,$g,$b);
+    my ($r,$g,$b) = (0,0,0);
 
     if (length($bgcolor)==13) {
         ($r,$g,$b) = $bgcolor =~ m/(\w{2})\w{2}(\w{2})\w{2}(\w{2})\w{2}/;
     } elsif (length($bgcolor) == 7) {
         ($r,$g,$b) = $bgcolor =~ m/(\w{2})(\w{2})(\w{2})/;
-    } else {
-        ($r,$g,$b) = (0,0,0);
     }
     if ($r) {
         $r = hex($r);
