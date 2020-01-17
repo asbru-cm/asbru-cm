@@ -20,6 +20,7 @@ package PACMethod_ssh;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+
 use utf8;
 binmode STDOUT,':utf8';
 binmode STDERR,':utf8';
@@ -267,7 +268,7 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
-    $options{useCompression} = 1;
+    #$options{useCompression} = 1;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -623,8 +624,9 @@ sub _buildGUI
     $w{btnadd}->signal_connect('clicked', sub {
         my $local_port = 1;
         $$self{cfg} = $self->get_cfg();
-        if ($$self{cfg} =~ /L.+(\d+):/) {
-            $local_port = $1+1;
+        my $next = () = $$self{cfg} =~ /-[LR]/g;
+        if ($next) {
+            $local_port = $next+1;
         }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
@@ -636,8 +638,9 @@ sub _buildGUI
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
         $$self{cfg} = $self->get_cfg();
-        if ($$self{cfg} =~ /L.+(\d+):/) {
-            $local_port = $1+1;
+        my $next = () = $$self{cfg} =~ /-[LR]/g;
+        if ($next) {
+            $local_port = $next+1;
         }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
@@ -647,9 +650,14 @@ sub _buildGUI
     });
 
     $w{btnaddDynamic}->signal_connect('clicked', sub {
+        my $local_port = 1080;
         $$self{cfg} = $self->get_cfg();
+        my $next = () = $$self{cfg} =~ /D \d+/g;
+        if ($next) {
+            $local_port = $local_port+$next;
+        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
-        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => '', 'dynamicPort' => 1080});
+        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => '', 'dynamicPort' => $local_port});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;
