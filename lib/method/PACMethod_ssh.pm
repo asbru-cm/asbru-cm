@@ -211,7 +211,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}){
-            _wMessage(undef,"CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!");
+            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!");
         }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{forwardPort}}, \%hash);
@@ -238,7 +238,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}}) {
-            _wMessage(undef,"CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!");
+            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!");
         }
         $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}} = 1;
         push(@{$options{dynamicForward}}, \%hash);
@@ -374,6 +374,8 @@ sub _buildGUI
     my $cfg = $self->{cfg};
 
     my %w;
+
+    $$self{_WINEDIT} = $container->get_toplevel();
 
     $w{vbox} = $container;
     $w{vbox}->set_border_width(5);
