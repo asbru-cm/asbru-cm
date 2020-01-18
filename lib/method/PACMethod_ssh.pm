@@ -35,6 +35,7 @@ use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
 use PACUtils;
+use List::Util qw(max);
 
 use Getopt::Long qw(GetOptionsFromString);
 
@@ -210,7 +211,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}){
-            return "CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!";
+            _wMessage(undef,"CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!");
         }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{forwardPort}}, \%hash);
@@ -237,7 +238,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}}) {
-            return "CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!";
+            _wMessage(undef,"CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!");
         }
         $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}} = 1;
         push(@{$options{dynamicForward}}, \%hash);
@@ -620,22 +621,13 @@ sub _buildGUI
     # Button(s) callback(s)
     $w{btnadd}->signal_connect('clicked', sub {
         my $local_port = 1;
-        my @usedPorts = ();
 
         $$self{cfg} = $self->get_cfg();
-        my @ports = split /-[LR]/,$$self{cfg};
-        foreach my $p (@ports) {
-            $p =~ s/:.*| //g;
-            if ($p =~ /\D/) {
-                next;
-            }
-            push @usedPorts,$p;
-        }
-        @usedPorts = sort { $a <=> $b } @usedPorts;
-        if (@usedPorts) {
-            $local_port = $usedPorts[-1] + 1;
-        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
+        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
+        if (@usedPorts) {
+            $local_port = max(@usedPorts) + 1;
+        }
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
@@ -644,22 +636,13 @@ sub _buildGUI
 
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
-        my @usedPorts = ();
 
         $$self{cfg} = $self->get_cfg();
-        my @ports = split /-[LR]/,$$self{cfg};
-        foreach my $p (@ports) {
-            $p =~ s/:.*| //g;
-            if ($p =~ /\D/) {
-                next;
-            }
-            push @usedPorts,$p;
-        }
-        @usedPorts = sort { $a <=> $b } @usedPorts;
-        if (@usedPorts) {
-            $local_port = $usedPorts[-1] + 1;
-        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
+        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{remotePort}};
+        if (@usedPorts) {
+            $local_port = max(@usedPorts) + 1;
+        }
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
