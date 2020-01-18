@@ -109,6 +109,7 @@ require Exporter;
     _createBanner
     _copyPass
     _appName
+    _setWindowPaintable
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -3932,6 +3933,28 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
+sub _setWindowPaintable {
+    my $win = shift;
+
+    $win->signal_connect("draw" => \&mydraw);
+    my $screen = $win->get_screen();
+    my $visual = $screen->get_rgba_visual();
+    if (($visual) && ($screen->is_composited())) {
+        $win->set_visual($visual);
+    }
+    $win->set_app_paintable(1);
+}
+
+sub mydraw {
+    my ($w,$c) = @_;
+
+    $c->set_source_rgba(240,240,240,1);
+    $c->set_operator('source');
+    $c->paint();
+    $c->set_operator('over');
+    return 0;
+}
+
 1;
 
 __END__
@@ -4152,6 +4175,16 @@ Call Vte->vteFeedChildBinary, depending on the version installed
 =head2 sub _createBanner
 
 Create a standard banner to be displayed on all Ásbrú Connection Manager dialogs
+
+=head2 sub _setWindowPaintable
+
+Takes a window object, attaches a general drawing routine and sets the paintable property to true
+
+Hack to make transparent terminals
+
+=head2 sub mydraw
+
+Generic routine to draw a gray background for widgets that do not painted their own.
 
 =head1 Perl particulars
 
