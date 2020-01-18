@@ -225,9 +225,6 @@ sub get_cfg
         if (!$hash{'localPort'} || !$hash{'remoteIP'} || !$hash{'remotePort'}) {
             next;
         }
-        if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}) {
-            return "CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Remote Port Forwarding is already in use!";
-        }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
     }
@@ -623,10 +620,20 @@ sub _buildGUI
     # Button(s) callback(s)
     $w{btnadd}->signal_connect('clicked', sub {
         my $local_port = 1;
+        my @usedPorts = ();
+
         $$self{cfg} = $self->get_cfg();
-        my $next = () = $$self{cfg} =~ /-[LR]/g;
-        if ($next) {
-            $local_port = $next+1;
+        my @ports = split /-[LR]/,$$self{cfg};
+        foreach my $p (@ports) {
+            $p =~ s/:.*| //g;
+            if ($p =~ /\D/) {
+                next;
+            }
+            push @usedPorts,$p;
+        }
+        @usedPorts = sort { $a <=> $b } @usedPorts;
+        if (@usedPorts) {
+            $local_port = $usedPorts[-1] + 1;
         }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
@@ -637,10 +644,20 @@ sub _buildGUI
 
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
+        my @usedPorts = ();
+
         $$self{cfg} = $self->get_cfg();
-        my $next = () = $$self{cfg} =~ /-[LR]/g;
-        if ($next) {
-            $local_port = $next+1;
+        my @ports = split /-[LR]/,$$self{cfg};
+        foreach my $p (@ports) {
+            $p =~ s/:.*| //g;
+            if ($p =~ /\D/) {
+                next;
+            }
+            push @usedPorts,$p;
+        }
+        @usedPorts = sort { $a <=> $b } @usedPorts;
+        if (@usedPorts) {
+            $local_port = $usedPorts[-1] + 1;
         }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
