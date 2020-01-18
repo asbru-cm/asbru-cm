@@ -324,7 +324,10 @@ sub _setupCallbacks {
 
         $PACMain::FUNCS{_KEEPASS}->reload;
         my @found = $PACMain::FUNCS{_KEEPASS}->find($where, qr/$title/);
-        if (! scalar @found)            {_wMessage(undef, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'"); return 1;}
+        if (! scalar @found) {
+            wMessage($$self{_WINDOWEDIT}, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'");
+            return 1;
+        }
         elsif (((scalar @found) > 1) && $$self{_CFG}{defaults}{keepass}{ask_user})    {
             my $tmp = "<ASK:KeePass $where matching '$title':"; foreach my $hash (@found) {$tmp .= '|' . $$hash{$where};} $tmp .= '>';
             my ($str, $out) = _subst($tmp);
