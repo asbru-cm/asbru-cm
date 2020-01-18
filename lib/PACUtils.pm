@@ -1793,10 +1793,13 @@ sub _wMessage {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1889,11 +1892,14 @@ sub _wConfirm {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1914,11 +1920,14 @@ sub _wYesNoCancel {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -3881,7 +3890,7 @@ sub _setWindowPaintable {
 sub mydraw {
     my ($w,$c) = @_;
 
-    $c->set_source_rgba(128,128,128,1);
+    $c->set_source_rgba(240,240,240,1);
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');
@@ -4108,6 +4117,16 @@ Call Vte->vteFeedChildBinary, depending on the version installed
 =head2 sub _createBanner
 
 Create a standard banner to be displayed on all Ásbrú Connection Manager dialogs
+
+=head2 sub _setWindowPaintable
+
+Takes a window object, attaches a general drawing routine and sets the paintable property to true
+
+Hack to make transparent terminals
+
+=head2 sub mydraw
+
+Generic routine to draw a gray background for widgets that do not painted their own.
 
 =head1 Perl particulars
 
