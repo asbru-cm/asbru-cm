@@ -85,6 +85,8 @@ my $right_click_deep = 0;
 
 my $COL_GREEN = "\e[1;38;5;2m";
 my $COL_RED   = "\e[1;38;5;1m";
+my $COL_BLUE  = "\e[1;38;5;33m";
+my $COL_YELL  = "\e[1;38;5;11m";
 my $COL_RESET = "\e[0m";
 
 # END: Define GLOBAL CLASS variables
@@ -306,11 +308,11 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = encode('UTF-8',$$self{_CFG}{'environments'}{$$self{_UUID}}{'title'});
+    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
 
-    my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
-    _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_GREEN}$string (" . (localtime(time)) . ") =->${COL_RESET}\r\n\n");
+    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
+    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")\r\n\n");
 
     $$self{_PULSE} = 1;
 
