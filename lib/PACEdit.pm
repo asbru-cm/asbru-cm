@@ -324,7 +324,10 @@ sub _setupCallbacks {
 
         $PACMain::FUNCS{_KEEPASS}->reload;
         my @found = $PACMain::FUNCS{_KEEPASS}->find($where, qr/$title/);
-        if (! scalar @found)            {_wMessage(undef, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'"); return 1;}
+        if (! scalar @found) {
+            wMessage($$self{_WINDOWEDIT}, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'");
+            return 1;
+        }
         elsif (((scalar @found) > 1) && $$self{_CFG}{defaults}{keepass}{ask_user})    {
             my $tmp = "<ASK:KeePass $where matching '$title':"; foreach my $hash (@found) {$tmp .= '|' . $$hash{$where};} $tmp .= '>';
             my ($str, $out) = _subst($tmp);
@@ -657,7 +660,6 @@ sub _updateGUIPreferences {
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
     _($self, 'rbUseProxyJump')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3);
     _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active());
-    _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     _($self, 'bCfgProxy')->set_sensitive(1);
     # SOCKS Proxy
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'});
@@ -783,10 +785,12 @@ sub _updateGUIPreferences {
         if ($ssh =~ /-J /) {
             # Enable Jump Host
             _($self, 'rbUseProxyJump')->set_sensitive(1);
-            _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
+            _($self, 'rbUseProxyJump')->set_tooltip_text("An alternative to SSH tunneling to access internal machines through gateway");
+            _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         } else {
             # Disable Jump Host
             _($self, 'rbUseProxyJump')->set_sensitive(0);
+            _($self, 'rbUseProxyJump')->set_tooltip_text("Your system does not support jump hosts");
             _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
         }
 

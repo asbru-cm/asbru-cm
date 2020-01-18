@@ -20,6 +20,7 @@ package PACMethod_ssh;
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 ###############################################################################
+
 use utf8;
 binmode STDOUT,':utf8';
 binmode STDERR,':utf8';
@@ -34,6 +35,7 @@ use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
 use PACUtils;
+use List::Util qw(max);
 
 use Getopt::Long qw(GetOptionsFromString);
 
@@ -209,7 +211,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}){
-            return "CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!";
+            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!");
         }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{forwardPort}}, \%hash);
@@ -224,9 +226,6 @@ sub get_cfg
         if (!$hash{'localPort'} || !$hash{'remoteIP'} || !$hash{'remotePort'}) {
             next;
         }
-        if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}) {
-            return "CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Remote Port Forwarding is already in use!";
-        }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
     }
@@ -239,7 +238,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}}) {
-            return "CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!";
+            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!");
         }
         $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}} = 1;
         push(@{$options{dynamicForward}}, \%hash);
@@ -267,7 +266,7 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
-    $options{useCompression} = 1;
+    #$options{useCompression} = 1;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -375,6 +374,8 @@ sub _buildGUI
     my $cfg = $self->{cfg};
 
     my %w;
+
+    $$self{_WINEDIT} = $container->get_toplevel();
 
     $w{vbox} = $container;
     $w{vbox}->set_border_width(5);
@@ -622,11 +623,13 @@ sub _buildGUI
     # Button(s) callback(s)
     $w{btnadd}->signal_connect('clicked', sub {
         my $local_port = 1;
+
         $$self{cfg} = $self->get_cfg();
-        if ($$self{cfg} =~ /L.+(\d+):/) {
-            $local_port = $1+1;
-        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
+        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
+        if (@usedPorts) {
+            $local_port = max(@usedPorts) + 1;
+        }
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
@@ -635,11 +638,13 @@ sub _buildGUI
 
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
+
         $$self{cfg} = $self->get_cfg();
-        if ($$self{cfg} =~ /L.+(\d+):/) {
-            $local_port = $1+1;
-        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
+        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{remotePort}};
+        if (@usedPorts) {
+            $local_port = max(@usedPorts) + 1;
+        }
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
@@ -647,9 +652,14 @@ sub _buildGUI
     });
 
     $w{btnaddDynamic}->signal_connect('clicked', sub {
+        my $local_port = 1080;
         $$self{cfg} = $self->get_cfg();
+        my $next = () = $$self{cfg} =~ /D \d+/g;
+        if ($next) {
+            $local_port = $local_port+$next;
+        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
-        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => '', 'dynamicPort' => 1080});
+        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => '', 'dynamicPort' => $local_port});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;

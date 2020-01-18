@@ -85,6 +85,8 @@ my $right_click_deep = 0;
 
 my $COL_GREEN = "\e[1;38;5;2m";
 my $COL_RED   = "\e[1;38;5;1m";
+my $COL_BLUE  = "\e[1;38;5;33m";
+my $COL_YELL  = "\e[1;38;5;11m";
 my $COL_RESET = "\e[0m";
 
 # END: Define GLOBAL CLASS variables
@@ -241,7 +243,7 @@ sub new {
             if (defined $self->{_SOCKET_CONN}) {
                 $self->{_SOCKET_CONN}->close();
             }
-            _wMessage(undef, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
+            _wMessage($$self{_WINDOWTERMINAL}, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
             return 0;
         }
 
@@ -306,11 +308,11 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = encode('UTF-8',$$self{_CFG}{'environments'}{$$self{_UUID}}{'title'});
+    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
 
-    my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
-    _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_GREEN}$string (" . (localtime(time)) . ") =->${COL_RESET}\r\n\n");
+    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
+    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")\r\n\n");
 
     $$self{_PULSE} = 1;
 
@@ -465,7 +467,7 @@ sub stop {
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
-        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
+        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
             return 1;
         }
 
@@ -824,6 +826,7 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
+
         my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
         my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
         # HPR.20191010
@@ -846,6 +849,11 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
         $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
+
+        if ((($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'})&&($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0))||($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+            _setWindowPaintable($$self{_WINDOWTERMINAL});
+        }
+
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
         $NPOSX++;
@@ -1211,17 +1219,17 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
     $$self{_GUI}{_VTE}->signal_connect('drag_drop' => sub {
         if (!$$self{CONNECTED}) {
-            _wMessage($$self{GUI}{_VBOX}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
             return 0;
         } elsif ($$self{CONNECTING}) {
-            _wMessage($$self{GUI}{_VBOX}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
             return 0;
         } elsif ($$self{CONNECTED} && (scalar @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}} == 1)) {
             my $sel = shift @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}};
             my $name = $$self{_CFG}{environments}{$sel}{name};
             my $title = $$self{_CFG}{environments}{$sel}{title};
             if (!$self->_wSelectChain($sel)) {
-                _wMessage(undef, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
+                _wMessage($$self{_WINDOWTERMINAL}, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
             }
             if ($$self{_FOCUSED}) {
                 $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
@@ -1470,7 +1478,7 @@ sub _watchConnectionData {
             $$self{_TITLE} = $1;
             $self->_updateCFG();
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
-            _wMessage(undef, $1, 1);
+            _wMessage($$self{_WINDOWTERMINAL}, $1, 1);
             next;
         } elsif ($data eq 'RESTART') {
             $$self{_RESTART} = 1;
@@ -1492,7 +1500,7 @@ sub _watchConnectionData {
             select($rin, undef, undef, 2) or return 1;
             $$self{_EXEC}{RECEIVED} = undef;
             eval {$$self{_EXEC}{RECEIVED} = ${fd_retrieve($$self{_SOCKET_CLIENT_EXEC})};};
-            if ($@) {_wMessage(undef, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
+            if ($@) {_wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
             if (defined $$self{_EXEC}{RECEIVED}) {
                 $$self{_EXEC_PROCESS} = Glib::Timeout->add(100, sub {$self->_pipeExecOutput; return 0;});
             }
@@ -2750,7 +2758,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
+        if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
             return 1;
         }
         foreach my $uuid (@list) {
@@ -3001,18 +3009,18 @@ sub _saveSessionLog {
     $new_file = $dialog->get_filename;
     $dialog->destroy();
 
-    my $confirm = _wYesNoCancel(undef, 'Do you want to remove escape sequences from the saved log?');
+    my $confirm = _wYesNoCancel($$self{_WINDOWTERMINAL}, 'Do you want to remove escape sequences from the saved log?');
 
     if ($confirm eq 'yes') {
         if (!open(F, "$$self{_LOGFILE}")) {
-            _wMessage(undef, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
             return 1;
         }
         my @lines = <F>;
         close F;
 
         if (!open(F, ">$new_file")) {
-            _wMessage(undef, "ERROR: Could not open file '$new_file' for writting!! ($!)");
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$new_file' for writting!! ($!)");
             return 1;
         }
         print F _removeEscapeSeqs(join('', @lines));
@@ -3035,13 +3043,13 @@ sub _execute {
     my $intro = shift // 1;
 
     # Ask for confirmation
-    if (($confirm) && (!_wConfirm($$self{GUI}{_VBOX}, "Execute <b>'$comm'</b> " . ($where ne 'remote' ? 'LOCALLY' : 'REMOTELY')))) {
+    if (($confirm) && (!_wConfirm($$self{_WINDOWTERMINAL}, "Execute <b>'$comm'</b> " . ($where ne 'remote' ? 'LOCALLY' : 'REMOTELY')))) {
         return 0;
     }
 
     my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID});
     if (!defined $cmd) {
-        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
+        _wMessage($$self{_WINDOWTERMINAL}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
         return 0;
     }
 
@@ -3056,13 +3064,13 @@ sub _execute {
         # Prevent "Remote Executions storms" (half a second between interruptions to spawned processes)
         my $time = join('.', gettimeofday);
         if (($time - $$self{_EXEC_LAST}) <= $EXEC_STORM_TIME) {
-            _wMessage($$self{GUI}{_VBOX}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
             return 0;
         }
         $$self{_EXEC_LAST} = $time;
 
         if (!kill('USR1', $$self{_PID})) {
-            _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
             return 0;
         }
         my %tmp;
@@ -3348,7 +3356,7 @@ sub _wSelectChain {
         if ($ppe{window}{gui}{cbExecInCluster}->get_active) {
             foreach my $cluster_uuid (keys %PACMain::RUNNING) {
                 if (! kill('HUP', $PACMain::RUNNING{$cluster_uuid}{terminal}{_PID})) {
-                    _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                    _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                     return 0;
                 }
 
@@ -3359,7 +3367,7 @@ sub _wSelectChain {
             }
         } else {
             if (! kill('HUP', $$self{_PID})) {
-                _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                 return 0;
             }
 
@@ -3667,28 +3675,31 @@ sub _updateCFG {
     _setTabColour($self);
 
     my $colors = [Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color black'} // '#000000000000'),  # black
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})]; # light white
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})
+    ]; # light white
     # Update some VTE options
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'});
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'},$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'} : $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'cursor shape'});
@@ -3697,11 +3708,13 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{'defaults'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{'defaults'}{'terminal transparency'});
-        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}), $colors);
+        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'},$$self{_CFG}{'defaults'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{'defaults'}{'cursor shape'});
@@ -3717,6 +3730,31 @@ sub _updateCFG {
     $$self{_NO_UPDATE_CFG} = 0;
 
     return 1;
+}
+
+sub _setTransparency {
+    my $self = shift;
+    my $transparency = shift;
+    my $bgcolor = shift;
+    my $alpha = 1 - $transparency;
+    my ($r,$g,$b) = (0,0,0);
+
+    if (length($bgcolor)==13) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})\w{2}(\w{2})\w{2}(\w{2})\w{2}/;
+    } elsif (length($bgcolor) == 7) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})(\w{2})(\w{2})/;
+    }
+    if ($r) {
+        $r = hex($r);
+    }
+    if ($g) {
+        $g = hex($g);
+    }
+    if ($b) {
+        $b = hex($b);
+    }
+    my $color = Gtk3::Gdk::RGBA::parse("rgba($r,$g,$b,$alpha)");
+    $$self{_GUI}{_VTE}->set_color_background($color);
 }
 
 sub _wFindInTerminal {
@@ -4068,7 +4106,7 @@ sub _closeAllTerminals {
     my $self = shift;
     my @list = keys %PACMain::RUNNING;
 
-    if (!(scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close <b>all</b> terminals?"))) {
+    if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close <b>all</b> terminals?"))) {
         return 1;
     }
     foreach my $uuid (@list) {

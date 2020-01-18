@@ -812,7 +812,7 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnRestartAll}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
-        return 1 unless scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to RESTART <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
+        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, "Are you sure you want to RESTART <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
         foreach my $uuid (@list) {
             kill(15, $$self{_RUNNING}{$uuid}{'terminal'}{_PID}) if ($$self{_RUNNING}{$uuid}{'terminal'}{_PID} // 0);
             $$self{_RUNNING}{$uuid}{'terminal'}->start;
@@ -874,7 +874,7 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnCloseAll}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
-        return 1 unless scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
+        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, "Are you sure you want to CLOSE <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
         foreach my $uuid (@list) {
             if (defined $$self{_RUNNING}{$uuid}{'terminal'}) {
                 $$self{_RUNNING}{$uuid}{'terminal'}->stop('force', 'deep');

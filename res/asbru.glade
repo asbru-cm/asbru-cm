@@ -1839,6 +1839,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">False</property>
+                                            <property name="tooltip_text" translatable="yes">SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.</property>
                                             <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
                                             <property name="group">rbUseProxyIfCFG</property>
@@ -1868,8 +1869,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                       <object class="GtkEntry" id="entryCfgProxyConnIP">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Proxy IP</property>
+                                                        <property name="tooltip_text" translatable="yes">Host name or IP address of the SOCKS proxy</property>
                                                         <property name="margin_left">9</property>
                                                         <property name="invisible_char">•</property>
                                                         <property name="primary_icon_activatable">False</property>
@@ -1954,8 +1954,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                       <object class="GtkEntry" id="entryCfgProxyConnUser">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Proxy user</property>
+                                                        <property name="tooltip_text" translatable="yes">Proxy user name</property>
                                                         <property name="invisible_char">•</property>
                                                         <property name="max_width_chars">10</property>
                                                         <property name="primary_icon_activatable">False</property>
@@ -1993,7 +1992,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                       <object class="GtkEntry" id="entryCfgProxyConnPassword">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
                                                         <property name="tooltip_text" translatable="yes">Proxy password</property>
                                                         <property name="visibility">False</property>
                                                         <property name="invisible_char">•</property>
@@ -2043,6 +2041,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">False</property>
+                                            <property name="tooltip_text" translatable="yes">An alternative to SSH tunneling to access internal machines through gateway</property>
                                             <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
                                             <property name="group">rbUseProxyIfCFG</property>
@@ -2077,8 +2076,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                           <object class="GtkEntry" id="entryCfgJumpConnIP">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
-                                                            <property name="has_tooltip">True</property>
-                                                            <property name="tooltip_text" translatable="yes">Proxy IP</property>
+                                                            <property name="tooltip_text" translatable="yes">Host name or IP address of the jump server</property>
                                                             <property name="margin_left">9</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="primary_icon_activatable">False</property>
@@ -2161,8 +2159,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                           <object class="GtkEntry" id="entryCfgJumpConnUser">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
-                                                            <property name="has_tooltip">True</property>
-                                                            <property name="tooltip_text" translatable="yes">Proxy user</property>
+                                                            <property name="tooltip_text" translatable="yes">Host server user</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="primary_icon_activatable">False</property>
                                                             <property name="secondary_icon_activatable">False</property>
@@ -2214,6 +2211,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="focus_on_click">False</property>
+                                                    <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump server</property>
                                                     <property name="create_folders">False</property>
                                                     <property name="local_only">False</property>
                                                     <property name="preview_widget_active">False</property>
@@ -3060,6 +3058,11 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="adjTransparency">
+    <property name="upper">1</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.20000000000000001</property>
   </object>
   <object class="GtkAdjustment" id="adjWindowHeight">
     <property name="lower">100</property>
@@ -6637,8 +6640,12 @@ sudo -p sudo_prompt_string ...</property>
                                               <object class="GtkScale" id="spCfgTerminalTransparency">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
-                                                <property name="fill_level">0</property>
-                                                <property name="round_digits">1</property>
+                                                <property name="adjustment">adjTransparency</property>
+                                                <property name="show_fill_level">True</property>
+                                                <property name="fill_level">1</property>
+                                                <property name="round_digits">2</property>
+                                                <property name="digits">2</property>
+                                                <property name="value_pos">left</property>
                                               </object>
                                             </child>
                                           </object>
