@@ -1787,10 +1787,13 @@ sub _wMessage {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1883,11 +1886,14 @@ sub _wConfirm {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1908,11 +1914,14 @@ sub _wYesNoCancel {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
