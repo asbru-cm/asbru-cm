@@ -501,6 +501,22 @@ sub _setupCallbacks {
         }
     });
 
+    # Capture proxy usage change
+    _($self, 'cbCfgProxyManual')->signal_connect('toggled' => sub {
+        _($self, 'hboxPrefProxyManualOptions')->set_sensitive(_($self, 'cbCfgProxyManual')->get_active());
+    });
+
+    # Capture jump host change
+    _($self, 'cbCfgProxyJump')->signal_connect('toggled' => sub {
+        _($self, 'vboxPrefJumpCfgOptions')->set_sensitive(_($self, 'cbCfgProxyJump')->get_active());
+    });
+
+    # Clear private key
+    _($self, 'btnConfigClearJumpPrivateKey')->signal_connect('clicked' => sub {
+        _($self, 'entryCfgJumpKey')->set_uri("file://$ENV{'HOME'}");
+        _($self, 'entryCfgJumpKey')->unselect_uri("file://$ENV{'HOME'}");
+    });
+
     return 1;
 }
 
@@ -849,6 +865,10 @@ sub _updateGUIPreferences {
     if (($$cfg{'defaults'}{'proxy'} eq 'Jump')&&(defined $$self{_CFG}{'defaults'}{'jump key'})&&($$self{_CFG}{'defaults'}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpKey')->set_uri("file://$$self{_CFG}{'defaults'}{'jump key'}");
     }
+
+    # Disable options that are currently not used
+    _($self, 'hboxPrefProxyManualOptions')->set_sensitive(_($self, 'cbCfgProxyManual')->get_active());
+    _($self, 'vboxPrefJumpCfgOptions')->set_sensitive(_($self, 'cbCfgProxyJump')->get_active());
 
     # Global TABS
     $$self{_SHELL}->update($$self{_CFG}{'environments'}{'__PAC_SHELL__'}{'terminal options'});
