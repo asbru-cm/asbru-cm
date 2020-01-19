@@ -854,7 +854,7 @@ sub findKP {
     return wantarray ? @found : scalar(@found);
 }
 
-sub setsshproxy {
+sub _setSshProxy {
     my $method = shift;
 
     # Set variables in case they are used in function : sub subst()
@@ -960,7 +960,7 @@ if (defined $METHOD) {
     # TERMINAL METHODS (ssh, telnet, etc)
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
-        setsshproxy('ssh');
+        _setSshProxy('ssh');
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }
@@ -996,7 +996,7 @@ if (defined $METHOD) {
         $connection_txt = $connection_cmd;
         print "*$connection_cmd*\n";
     } elsif (($METHOD =~ /^.*sftp.*$/) || ($METHOD eq 'SFTP')) {
-        setsshproxy('ssh');
+        _setSshProxy('ssh');
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
