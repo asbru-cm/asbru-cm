@@ -281,6 +281,11 @@ sub new {
     #Accessability shortcuts
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
+    # Autohide non tabbed help terminals
+    if ((!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+        $$self{_WINDOWTERMINAL}->hide();
+    }
+
     bless($self, $class);
     return $self;
 }
@@ -1356,7 +1361,7 @@ sub _setupCallbacks {
             $self->_wPrePostExec('local after');
 
             # And close if so is configured
-            if ($$self{_CFG}{'defaults'}{'close terminal on disconnect'} && ! $$self{_BADEXIT}) {
+            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT})) {
                 $self->stop(undef, 1);
             }
         }
@@ -1546,6 +1551,12 @@ sub _watchConnectionData {
             $$self{_PID} = $2;
             $$self{CONNECTING} = 1;
             $$self{_RESTART} = 0;
+        } elsif ($data eq 'UNHIDE_TERMINAL') {
+            $$self{_BADEXIT} = 1;
+            $$self{CONNECTING} = 1;
+            if (defined $$self{_WINDOWTERMINAL}) {
+                $$self{_WINDOWTERMINAL}->show();
+            }
         }
 
         $$self{_LAST_STATUS} = $data;
