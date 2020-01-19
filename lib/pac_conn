@@ -3,7 +3,7 @@
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -67,11 +67,13 @@ my $PASSWORD_COUNT = 0;
 my $WAS_ASK_PASS = 0;
 my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
-my %PROXY;
-my $PROXYPID;
 my $SOCKET;
 my $SOCKET_EXEC;
-my $PROXYFIED = 0;
+my $proxy_ip = '';
+my $proxy_port = '';
+my $proxy_user = '';
+my $proxy_pass = '';
+my $proxy_jump = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
@@ -91,9 +93,6 @@ eval {
     $EXP -> slave -> clone_winsize_from(\*STDIN);
 };
 
-# Connect to Gnome's GSettings
-my $GSETTINGS = Glib::IO::Settings -> new('org.gnome.system.proxy.http');
-
 # END OF : Variables declaration/initialization
 ########################################################
 
@@ -102,9 +101,6 @@ my $GSETTINGS = Glib::IO::Settings -> new('org.gnome.system.proxy.http');
 sub __disconnect {
     my $signal = shift;
     ctrl("DISCONNECTING");
-    if (defined $PROXYPID) {
-        kill(15, $PROXYPID);
-    }
     $EXP -> hard_close;
     ctrl("DISCONNECTED");
     exit 0;
@@ -122,12 +118,6 @@ $SIG{'QUIT'} = \&__disconnect;
 $CFG_FILE = shift;
 $UUID = shift or die "$COLOR{'err'}ERROR: You must provide a profile to connect to!!$COLOR{'norm'}";
 $GETCMD = shift // 0;
-
-# Get PROXY from environment
-$PROXY{'env'}{'ip'} = $GSETTINGS -> get_string('host');
-$PROXY{'env'}{'port'} = $GSETTINGS -> get_int('port');
-$PROXY{'env'}{'user'} = $GSETTINGS -> get_string('authentication-user');
-$PROXY{'env'}{'pass'} = $GSETTINGS -> get_string('authentication-password');
 
 # Load the 'freezed' configuration
 $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE': $!";
@@ -168,9 +158,6 @@ my $RESTART = $$CFG{'environments'}{$UUID}{'autoreconnect'} // 0;
 my $SEND_SLOW = ($$CFG{'environments'}{$UUID}{'send slow'} // 0) / 1000;
 my $TITLE = $$CFG{'environments'}{$UUID}{'title'};
 my $EXPECT = defined $$CFG{'environments'}{$UUID}{'expect'};
-my $USE_PROXY = $$CFG{'defaults'}{'use proxy'};
-my $USE_SYSTEM_PROXY = $$CFG{'defaults'}{'use system proxy'};
-my $FORCE_USE_PROXY = $$CFG{'environments'}{$UUID}{'use proxy'} || '0';
 my $USE_PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use prepend command'};
 my $PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'prepend command'};
 my $QUOTE_COMMAND = $$CFG{'environments'}{$UUID}{'quote command'} && $USE_PREPEND_COMMAND;
@@ -181,10 +168,6 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my @KEEPASS = @{$$CFG{'keepass'} // []};
-$PROXY{'cfg'}{'ip'} = $$CFG{'defaults'}{'proxy ip'};
-$PROXY{'cfg'}{'port'} = $$CFG{'defaults'}{'proxy port'};
-$PROXY{'cfg'}{'user'} = $$CFG{'defaults'}{'proxy user'};
-$PROXY{'cfg'}{'pass'} = $$CFG{'defaults'}{'proxy pass'};
 
 $IP = subst($IP);
 $PORT = subst($PORT);
@@ -225,24 +208,9 @@ if ($$CFG{'environments'}{$UUID}{'infer user pass from KPX'} && $$CFG{'defaults'
 }
 $PASSPHRASE = subst($PASSPHRASE);
 $PASSPHRASE_USER = subst($PASSPHRASE_USER);
-$PROXY{'cfg'}{'ip'} = subst($PROXY{'cfg'}{'ip'});
-$PROXY{'cfg'}{'port'} = subst($PROXY{'cfg'}{'port'});
-$PROXY{'cfg'}{'user'} = subst($PROXY{'cfg'}{'user'});
-$PROXY{'cfg'}{'pass'} = subst($PROXY{'cfg'}{'pass'});
 
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
-
-my $proxy_ip = $PROXY{($USE_SYSTEM_PROXY) ? 'env' : 'cfg'}{'ip'};
-my $proxy_port = $PROXY{($USE_SYSTEM_PROXY) ? 'env' : 'cfg'}{'port'};
-my $proxy_user = $PROXY{($USE_SYSTEM_PROXY) ? 'env' : 'cfg'}{'user'} // '';
-my $proxy_pass = $PROXY{($USE_SYSTEM_PROXY) ? 'env' : 'cfg'}{'pass'} // '';
-if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
-    $proxy_ip = $$CFG{'environments'}{$UUID}{'proxy ip'};
-    $proxy_port = $$CFG{'environments'}{$UUID}{'proxy port'};
-    $proxy_user = $$CFG{'environments'}{$UUID}{'proxy user'};
-    $proxy_pass = $$CFG{'environments'}{$UUID}{'proxy pass'};
-}
 
 if (! $GETCMD) {
     $SOCKET = IO::Socket::UNIX -> new(
@@ -310,10 +278,11 @@ sub subst {
         return $string;
     }
 
-    $string =~ s/\<\<proxy_host\>\>/$proxy_ip/g;
-    $string =~ s/\<\<proxy_port\>\>/$proxy_port/g;
-    $string =~ s/\<\<proxy_user\>\>/$proxy_user/g;
-    $string =~ s/\<\<proxy_pass\>\>/$proxy_pass/g;
+    $string =~ s/\<\<(proxy|jump)_host\>\>/$proxy_ip/g;
+    $string =~ s/\<\<(proxy|jump)_port\>\>/$proxy_port/g;
+    $string =~ s/\<\<(proxy|jump)_user\>\>/$proxy_user/g;
+    $string =~ s/\<\<(proxy|jump)_pass\>\>/$proxy_pass/g;
+    #$string =~ s/\<\<jump_key\>\>/$proxy_key/g;
 
     my $tstamp = time;
     my ($dy, $dm, $dd, $th, $tm, $ts) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
@@ -900,99 +869,81 @@ BEGIN{
 # END OF : Procedures definition
 ########################################################
 
-# User wants to use a proxy, check that Net::Proxy is available
-if ((($USE_PROXY && $FORCE_USE_PROXY < 2 || ($FORCE_USE_PROXY == 1))) && $proxy_ip && $proxy_port) {
+# Prepare Networking
 
-    # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available/32608860#32608860
-    my $rc =  eval{require Net::Proxy};
-    if (! $rc) {
-        $rc = do {
-            no strict;
-            *stash = *{"Net::Proxy::"};
-            scalar keys %stash;
+# Set variables in case they are used in function : sub subst()
+my $ssh_config = '';
+if (($$CFG{'environments'}{$UUID}{'use proxy'} == 3) || ($$CFG{'environments'}{$UUID}{'use proxy'} == 0)) {
+    if (-e "/etc/ssh/ssh_config") {
+        open (SSHC,"<:utf8","/etc/ssh/ssh_config");
+        while (my $l = <SSHC>) {
+            $l =~ s/\n//g;
+            $l =~ s/^[\t ]+//;
+            if (!$l) {
+                next;
+            } elsif ($l =~ /^#/) {
+                next;
+            } elsif ($l =~ /^Host \*/) {
+                next;
+            }
+            $ssh_config .= "$l\n";
         }
-    }
-
-    if (! $rc) {
-        msg("ERROR: To use proxied connection, Ásbrú requires perl module Net::Proxy (see https://metacpan.org/pod/Net::Proxy).\n");
-        msg("Please install this module on your system or disable proxy settings for this connection.\n");
-        exit 1;
+        close SSHC;
     }
 }
 
-# Prepare the threaded proxy tunnel
-if ((($USE_PROXY && $FORCE_USE_PROXY < 2 || ($FORCE_USE_PROXY == 1))) && $proxy_ip && $proxy_port) {
-    require IO::Socket;
-    require IO::Handle; # Just for autoflush... :(
-
-    socketpair(CHILD, PARENT, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or  die "socketpair: $!";
-    CHILD -> autoflush(1);
-    PARENT -> autoflush(1);
-
-    my $LOCAL_PORT = 0;
-
-    if ($PROXYPID = fork) {
-        # Parent
-        close PARENT;
-
-        # Wait until read $LOCAL_PORT
-        ctrl("PROXY_THREAD:Waiting for the thread to start the proxy tunnel...");
-        chomp($LOCAL_PORT = <CHILD>);
-        ctrl("PROXY_THREAD:Built tunnel to $IP:$PORT through proxy $proxy_ip:$proxy_port ($proxy_user/$proxy_pass) using local port $LOCAL_PORT...");
-
-        select(undef, undef, undef, 0.5);
-
-        # If every thing went ok, modify IP and PORT to map the tunneled connection
-        $IP = 'localhost';
-        $PORT = $LOCAL_PORT;
-
-    } elsif (defined $PROXYPID) {
-        # Children
-        close CHILD;
-
-        local $SIG{'INT'} = sub {exit;};
-        local $SIG{'TERM'} = $SIG{'INT'};
-        local $SIG{'QUIT'} = $SIG{'INT'};
-        local $SIG{'HUP'} = $SIG{'INT'};
-        local $SIG{'USR1'} = $SIG{'INT'};
-        local $SIG{'USR2'} = $SIG{'INT'};
-
-        require Net::Proxy;
-        my $proxy;
-
-        do {
-            $proxy = Net::Proxy -> new({
-                in => {
-                    type => 'tcp',
-                    port => $LOCAL_PORT = 60000 + int(rand(1000)),
-                },
-                out => {
-                    type => 'tcp', # 'tcp' method allows using SOCKs proxies!! :)
-                    host => $IP,
-                    port => $PORT,
-                    proxy_host => $proxy_ip,
-                    proxy_port => $proxy_port,
-                    proxy_user => $proxy_user,
-                    proxy_pass => $proxy_pass,
-                    proxy_agent => "Ásbrú Connection Manager (https://www.asbru-cm.net/)"
-                }
-            });
-        } until $proxy;
-
-        $proxy -> set_verbosity(0);
-        $proxy -> register;
-
-        # Send the parent process the new created local port
-        print PARENT "$LOCAL_PORT\n";
-
-        Net::Proxy -> mainloop(1);
-
-        exit 0;
-    } else {
-        $CONNECTED = 0;
-        ctrl("ERROR:Could not 'fork' to create proxy object ($!)");
-        ctrl("CLOSE");
-        exit 1;
+if ($$CFG{'environments'}{$UUID}{'use proxy'} == 1) {
+    # Use this connection SOCKS Proxy settings
+    $proxy_ip = $$CFG{'environments'}{$UUID}{'proxy ip'};
+    $proxy_port = $$CFG{'environments'}{$UUID}{'proxy port'};
+    $proxy_user = $$CFG{'environments'}{$UUID}{'proxy user'};
+    $proxy_pass = $$CFG{'environments'}{$UUID}{'proxy pass'};
+    $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port %h %p'";
+} elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 3) {
+    # Use this connection Jump Server settings
+    $proxy_jump = 1;
+    $proxy_ip = $$CFG{'environments'}{$UUID}{'jump ip'};
+    $proxy_port = $$CFG{'environments'}{$UUID}{'jump port'};
+    $proxy_user = $$CFG{'environments'}{$UUID}{'jump user'};
+    $proxy_pass = $$CFG{'environments'}{$UUID}{'jump pass'};
+    open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+    print CFG qq“Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
+    print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n“;
+    if ($$CFG{'environments'}{$UUID}{'jump key'}) {
+        print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
+    }
+    print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+    if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+        print CFG "IdentityFile $PUBKEY\n";
+    }
+    close CFG;
+} elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
+    # Use global configuration settings
+    if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
+        # Jump Server settings
+        $proxy_jump = 1;
+        $proxy_ip = $$CFG{'defaults'}{'jump ip'};
+        $proxy_port = $$CFG{'defaults'}{'jump port'};
+        $proxy_user = $$CFG{'defaults'}{'jump user'};
+        $proxy_pass = $$CFG{'defaults'}{'jump pass'};
+        open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+        print CFG qq“Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
+        print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n“;
+        if ($$CFG{'defaults'}{'jump key'}) {
+            print CFG "IdentityFile $$CFG{'defaults'}{'jump key'}\n";
+        }
+        print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+        if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+            print CFG "IdentityFile $PUBKEY\n";
+        }
+        close CFG;
+    } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
+        # SOCKS Proxy settings
+        $proxy_ip = $$CFG{'defaults'}{'proxy ip'};
+        $proxy_port = $$CFG{'defaults'}{'proxy port'};
+        $proxy_user = $$CFG{'defaults'}{'proxy user'};
+        $proxy_pass = $$CFG{'defaults'}{'proxy pass'};
+        $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
     }
 }
 
@@ -1016,7 +967,11 @@ if (defined $METHOD) {
         } elsif (! $AUTHFALLBACK) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
-        $connection_cmd = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
+        if ($proxy_jump) {
+            $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
+        } else {
+            $connection_cmd = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
+        }
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*mosh.*$/) || ($METHOD eq 'MOSH')) {
         $METHOD = 'mosh';
@@ -1198,9 +1153,6 @@ if ($$CFG{'environments'}{$UUID}{'terminal options'}{'use personal settings'}) {
 $connection_cmd = subst($connection_cmd);
 if ($GETCMD) {
     print $connection_cmd;
-    if ($PROXYPID) {
-        kill(9, $PROXYPID);
-    }
     exit 0;
 }
 
@@ -2044,10 +1996,6 @@ if (defined $EXP -> pid) {
     kill(15, $EXP -> pid);
 }
 $EXP -> hard_close;
-
-if (defined $PROXYPID && $PROXYPID) {
-    kill(15, $PROXYPID);
-}
 
 close_log_file();
 

@@ -51,13 +51,13 @@ deploy:
       tags: true
   - provider: packagecloud
     skip_cleanup: true
-    repository: gtk3
+    repository: loki
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
-      branch: gtk3
+      branch: loki
 
 
 after_deploy:
@@ -65,5 +65,5 @@ after_deploy:
   - pip install -r ./packpack/tools/requirements.txt
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots deb ${OS} ${DIST} --keep 5
   - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/snapshots rpm ${OS} ${DIST} --keep 5
-  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 deb ${OS} ${DIST} --keep 5
-  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/gtk3 rpm ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/loki deb ${OS} ${DIST} --keep 5
+  - python ./packpack/tools/packagecloud prune ${PACKAGECLOUD_USER}/loki rpm ${OS} ${DIST} --keep 5

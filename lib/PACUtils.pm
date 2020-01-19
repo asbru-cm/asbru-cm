@@ -107,8 +107,10 @@ require Exporter;
     _vteFeedChild
     _vteFeedChildBinary
     _createBanner
-    _copyPASS
-); # Functions/varibles to export
+    _copyPass
+    _appName
+    _setWindowPaintable
+); # Functions/variables to export
 
 @EXPORT_OK  = qw();
 
@@ -119,7 +121,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.0.4';
+our $APPVERSION = '6.1.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -825,7 +827,6 @@ sub _getMethods {
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
-            _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
@@ -1787,10 +1788,13 @@ sub _wMessage {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1883,11 +1887,14 @@ sub _wConfirm {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1908,11 +1915,14 @@ sub _wYesNoCancel {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1969,7 +1979,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
     #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
-    $$cfg{'defaults'}{'record command history'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
     $$cfg{'defaults'}{'back color'} //= '#000000000000';
     $$cfg{'defaults'}{'close terminal on disconnect'} //= '';
@@ -2056,7 +2065,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
     $$cfg{'defaults'}{'sort groups first'} //= 1;
     $$cfg{'defaults'}{'word characters'} //= '-.:_/';
-    $$cfg{'defaults'}{'terminal emulation'} //= 'xterm';
     $$cfg{'defaults'}{'show tray icon'} //= 1;
     $$cfg{'defaults'}{'unsplit disconnected terminals'} //= 0;
     $$cfg{'defaults'}{'confirm chains'} //= 1;
@@ -2089,7 +2097,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'info font'} //= 'monospace';
     $$cfg{'defaults'}{'use login shell to connect'} //= 0;
     $$cfg{'defaults'}{'audible bell'} //= 0;
-    $$cfg{'defaults'}{'visible bell'} //= 0;
     $$cfg{'defaults'}{'ctrl tab'} //= 'last';
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
@@ -2098,6 +2105,8 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
+    $$cfg{'defaults'}{'capture xterm title'} //= 0;
+    $$cfg{'defaults'}{'tree overlay scrolling'} //= 1;
 
     $$cfg{'defaults'}{'global variables'} //= {};
     $$cfg{'defaults'}{'local commands'} //= [];
@@ -2187,7 +2196,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal emulation'} //= 'xterm';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal backspace'} //= 'auto';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal select words'} //= '-.:_/';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
@@ -2205,7 +2213,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable ALT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'audible bell'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'visible bell'} //= 0;
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
         if ($uuid =~ /^HASH/go) {
@@ -2488,7 +2495,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} = '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} = 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} = 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} = 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} = 5000;
@@ -2515,7 +2521,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} //= '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} //= 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} //= 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} //= 5000;
@@ -2532,7 +2537,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'audible bell'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'visible bell'} //= 0;
         }
     }
 
@@ -3919,7 +3923,7 @@ sub _createBanner {
     return $banner;
 }
 
-sub _copyPASS {
+sub _copyPass {
     my $uuid = shift;
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
     my $clip;
@@ -3932,6 +3936,32 @@ sub _copyPASS {
     }
     use bytes;
     $clipboard->set_text($clip,length($clip));
+}
+
+sub _appName {
+    return "$APPNAME $APPVERSION";
+}
+
+sub _setWindowPaintable {
+    my $win = shift;
+
+    $win->signal_connect("draw" => \&mydraw);
+    my $screen = $win->get_screen();
+    my $visual = $screen->get_rgba_visual();
+    if (($visual) && ($screen->is_composited())) {
+        $win->set_visual($visual);
+    }
+    $win->set_app_paintable(1);
+}
+
+sub mydraw {
+    my ($w,$c) = @_;
+
+    $c->set_source_rgba(240,240,240,1);
+    $c->set_operator('source');
+    $c->paint();
+    $c->set_operator('over');
+    return 0;
 }
 
 1;
@@ -4154,6 +4184,16 @@ Call Vte->vteFeedChildBinary, depending on the version installed
 =head2 sub _createBanner
 
 Create a standard banner to be displayed on all Ásbrú Connection Manager dialogs
+
+=head2 sub _setWindowPaintable
+
+Takes a window object, attaches a general drawing routine and sets the paintable property to true
+
+Hack to make transparent terminals
+
+=head2 sub mydraw
+
+Generic routine to draw a gray background for widgets that do not painted their own.
 
 =head1 Perl particulars
 

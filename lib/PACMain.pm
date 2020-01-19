@@ -431,6 +431,11 @@ sub _initGUI {
     ##############################################
     $$self{_GUI}{main} = Gtk3::Window->new;
 
+    if (($$self{_CFG}{defaults}{'tabs in main window'})&&($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+        _setWindowPaintable($$self{_GUI}{main});
+    }
+
+
     # Create a vbox1: main, status
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
     $$self{_GUI}{main}->add($$self{_GUI}{vbox1});
@@ -500,9 +505,10 @@ sub _initGUI {
     # FIXME-HOMOGENEOUS     $$self{_GUI}{nbTree}->set('homogeneous', 0);
 
     # Create a scrolled1 scrolled window to contain the connections tree
-    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new();
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{nbTreeTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('pac-treelist', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
@@ -2724,7 +2730,7 @@ sub _treeConnections_menu {
             shortcut => '',
             sensitive => 1,
             code => sub {
-                _copyPASS($sel[0]);
+                _copyPass($sel[0]);
             }
         });
     }
@@ -3679,6 +3685,7 @@ sub _updateGUIPreferences {
 
     $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {
