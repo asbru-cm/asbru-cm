@@ -855,6 +855,8 @@ sub findKP {
 }
 
 sub setsshproxy {
+    my $method = shift;
+
     # Set variables in case they are used in function : sub subst()
     my $ssh_config = '';
     if (($$CFG{'environments'}{$UUID}{'use proxy'} == 3) || ($$CFG{'environments'}{$UUID}{'use proxy'} == 0)) {
@@ -958,7 +960,7 @@ if (defined $METHOD) {
     # TERMINAL METHODS (ssh, telnet, etc)
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
-        setsshproxy();
+        setsshproxy('ssh');
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }
@@ -994,6 +996,7 @@ if (defined $METHOD) {
         $connection_txt = $connection_cmd;
         print "*$connection_cmd*\n";
     } elsif (($METHOD =~ /^.*sftp.*$/) || ($METHOD eq 'SFTP')) {
+        setsshproxy('ssh');
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
