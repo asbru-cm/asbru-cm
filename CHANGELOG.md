@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.0.3](https://github.com/asbru-cm/asbru-cm/tree/6.0.3) (2020-01-17)
+
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.2...6.0.3)
+
+**Implemented enhancements:**
+
+- Port asbru\_from\_superputty.py to python3 [\#355](https://github.com/asbru-cm/asbru-cm/issues/355)
+- Invalid scroll position in KDE \(gtk3\) [\#303](https://github.com/asbru-cm/asbru-cm/issues/303)
+
+**Fixed bugs:**
+
+- Question: Is there a dependency on Python 2? [\#354](https://github.com/asbru-cm/asbru-cm/issues/354)
+
+**Closed issues:**
+
+- libnet-proxy-perl dependency old and deprecated [\#218](https://github.com/asbru-cm/asbru-cm/issues/218)
+
 ## [6.0.2](https://github.com/asbru-cm/asbru-cm/tree/6.0.2) (2020-01-11)
 
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.1...6.0.2)
