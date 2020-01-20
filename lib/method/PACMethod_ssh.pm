@@ -632,6 +632,7 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
+        push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
@@ -662,7 +663,6 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
-        push (@usedPorts,map {$_->{remotePort}} @{$opt_hash->{remotePort}});
         push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = (max(@usedPorts)>=$local_port) ? max(@usedPorts) + 1 : 1080;
