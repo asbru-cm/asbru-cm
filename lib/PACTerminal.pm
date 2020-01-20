@@ -281,6 +281,11 @@ sub new {
     #Accessability shortcuts
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
+    # Autohide non tabbed help terminals
+    if ((!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+        $$self{_WINDOWTERMINAL}->hide();
+    }
+
     bless($self, $class);
     return $self;
 }
@@ -389,9 +394,12 @@ sub start {
     $PACMain::FUNCS{_STATS}->start($$self{_UUID});
     # Start and fork our connector
     my @args;
-    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {@args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)"];}
-    else {@args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}];}
-    if (! $$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
+    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)"];
+    } else {
+        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}];
+    }
+    if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
         $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
         $$self{CONNECTING} = 0;
         return 0;
@@ -1353,7 +1361,7 @@ sub _setupCallbacks {
             $self->_wPrePostExec('local after');
 
             # And close if so is configured
-            if ($$self{_CFG}{'defaults'}{'close terminal on disconnect'} && ! $$self{_BADEXIT}) {
+            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT})) {
                 $self->stop(undef, 1);
             }
         }
@@ -1543,6 +1551,12 @@ sub _watchConnectionData {
             $$self{_PID} = $2;
             $$self{CONNECTING} = 1;
             $$self{_RESTART} = 0;
+        } elsif ($data eq 'UNHIDE_TERMINAL') {
+            $$self{_BADEXIT} = 1;
+            $$self{CONNECTING} = 1;
+            if (defined $$self{_WINDOWTERMINAL}) {
+                $$self{_WINDOWTERMINAL}->show();
+            }
         }
 
         $$self{_LAST_STATUS} = $data;

@@ -632,12 +632,10 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
-        push (@usedPorts,map {$_->{remotePort}} @{$opt_hash->{remotePort}});
-        push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
-        push(@{$$opt_hash{forwardPort}}, {'localIP' => 'localhost', 'localPort' => $local_port, 'remoteIP' => '0.0.0.0', 'remotePort' => 1});
+        push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;
