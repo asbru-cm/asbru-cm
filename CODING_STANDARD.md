@@ -23,6 +23,9 @@ This coding standard consists of recommendations when contributing to the √Åsbr√
     * `my ($var1, $var2, $var3);`
     * Avoid declaring them in the middle of the block, unless is going to be used as a temporary variable inside an inner block.
 * Rules might be bent from time to time, when brings something valuable to the code over formatting.
+* Function naming
+    * Use camel case, example : myLongNameFunction
+    * Add an undersocore to local function names : _myPrivateFunction
 
 ## Documentation guidelines
 
