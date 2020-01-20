@@ -229,7 +229,7 @@ sub get_cfg
             next;
         }
         if (defined $lpr{$hash{'localIP'}}{$hash{'localPort'}}){
-            _wMessage($$self{_WINEDIT},"WARNING: Same Remote Port $hash{'remotePort'} defined more than once!");
+            _wMessage($$self{_WINEDIT},"WARNING: Same Remote Port $hash{'localPort'} defined more than once!");
         }
         $lpr{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
