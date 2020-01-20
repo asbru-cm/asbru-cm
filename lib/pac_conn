@@ -1180,6 +1180,10 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             $EXP -> hard_close;
         }],
 
+        ['\[ERROR\]', sub {
+            ctrl("UNHIDE_TERMINAL");
+        }],
+
         # Found certificate verification string
         ['^.+WARNING: CERTIFICATE NAME MISMATCH!.+$', sub {
             if ($ACCEPT_KEY) {
@@ -1189,6 +1193,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             } else {
                 $CONNECTED = 0;
                 send_slow($EXP, "N\n");
+                ctrl("UNHIDE_TERMINAL");
                 ctrl("CLOSE:HOSTKEY:rejected by configuration (sent 'N')");
             }
         }],
@@ -1224,6 +1229,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     ctrl("PASSWORD:Sent (not shown)");
                     exp_continue;
                 } else {
+                    ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
                     $EXP -> hard_close;
