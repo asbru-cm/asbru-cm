@@ -217,6 +217,8 @@ sub get_cfg
         push(@{$options{forwardPort}}, \%hash);
     }
 
+    my %lpr;
+
     foreach my $w (@{$$self{listRemote}}) {
         my %hash;
         $hash{'localIP'} = $$w{entryPFLocalIP}->get_chars(0, -1) || '';
@@ -226,7 +228,10 @@ sub get_cfg
         if (!$hash{'localPort'} || !$hash{'remoteIP'} || !$hash{'remotePort'}) {
             next;
         }
-        $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
+        if (defined $lpr{$hash{'localIP'}}{$hash{'localPort'}}){
+            _wMessage($$self{_WINEDIT},"WARNING: Same Remote Port $hash{'localPort'} defined more than once!");
+        }
+        $lpr{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
     }
 
@@ -458,7 +463,7 @@ sub _buildGUI
     $w{vbox2} = Gtk3::VBox->new(0, 0);
     $w{lblLocal} = Gtk3::Label->new('Local Port Forwarding');
     $w{nb}->append_page($w{vbox2}, $w{lblLocal});
-    $w{vbox2}->set_tooltip_text('[-L [bind_address:]local_port:remote_address:remote_port] : Forward local_port to remote_address->remote_port');
+    $w{vbox2}->set_tooltip_markup("<b>-L [bind_address:]port:host:hostport</b>\nForward Local Address:port <i>(bind_address:port)</i> → Remote Address:port <i>(host:hostport)</i>");
     $w{vbox2}->set_border_width(5);
 
     $w{hboxorder} = Gtk3::HBox->new(0, 0);
@@ -503,7 +508,7 @@ sub _buildGUI
     $w{vbox3} = Gtk3::VBox->new(0, 0);
     $w{lblRemote} = Gtk3::Label->new('Remote Port Forwarding');
     $w{nb}->append_page($w{vbox3}, $w{lblRemote});
-    $w{vbox3}->set_tooltip_text('[-R [bind_address:]port:address:remote_port] :Bring remote_port to local_address->local_port');
+    $w{vbox3}->set_tooltip_markup("<b>-R [bind_address:]port:host:hostport</b>\nBring Remote Address:port <i>(bind_address:port)</i> → Local Address:port <i>(host:hostport)</i>");
     $w{vbox3}->set_border_width(5);
 
     $w{hboxorder2} = Gtk3::HBox->new(0, 0);
@@ -548,7 +553,7 @@ sub _buildGUI
     $w{vbox33} = Gtk3::VBox->new(0, 0);
     $w{lblDynamic} = Gtk3::Label->new('Dynamic Socks Proxy');
     $w{nb}->append_page($w{vbox33}, $w{lblDynamic});
-    $w{vbox33}->set_tooltip_text('[-D [bind_address:]local_port] : Create a Dynamic Socks proxy at local_port');
+    $w{vbox33}->set_tooltip_markup("<b>-D [bind_address:]local_port</b>\nCreate a Dynamic Socks proxy at localport");
     $w{vbox33}->set_border_width(5);
 
     $w{hboxorder3} = Gtk3::HBox->new(0, 0);
@@ -626,6 +631,7 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
+        push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
@@ -637,10 +643,11 @@ sub _buildGUI
 
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
+        my @usedPorts;
 
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
-        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{remotePort}};
+        push (@usedPorts,map {$_->{localPort}} @{$opt_hash->{remotePort}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
@@ -653,12 +660,13 @@ sub _buildGUI
     $w{btnaddDynamic}->signal_connect('clicked', sub {
         my $local_port = 1080;
         $$self{cfg} = $self->get_cfg();
-        my $next = () = $$self{cfg} =~ /D \d+/g;
-        if ($next) {
-            $local_port = $local_port+$next;
-        }
         my $opt_hash = _parseCfgToOptions($$self{cfg});
-        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => '', 'dynamicPort' => $local_port});
+        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
+        push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
+        if (@usedPorts) {
+            $local_port = (max(@usedPorts)>=$local_port) ? max(@usedPorts) + 1 : 1080;
+        }
+        push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => 'localhost', 'dynamicPort' => $local_port});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;
@@ -681,10 +689,10 @@ sub _buildForward
     my $self = shift;
     my $hash = shift;
 
-    my $localIP = $$hash{'localIP'}        // '';
-    my $localPort = $$hash{'localPort'}    // 1;
-    my $remoteIP = $$hash{'remoteIP'}    // 'localhost';
-    my $remotePort = $$hash{'remotePort'}    // 1;
+    my $localIP = $$hash{'localIP'} // 'localhost';
+    my $localPort = $$hash{'localPort'} // 1;
+    my $remoteIP = $$hash{'remoteIP'} // '';
+    my $remotePort = $$hash{'remotePort'} // 1;
     my @undo;
     my $undoing = 0;
     my %w;
@@ -694,7 +702,7 @@ sub _buildForward
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Bind Address:');
+    $w{frPFLocalIP} = Gtk3::Frame->new('Local Address:');
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -702,9 +710,8 @@ sub _buildForward
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
-    $w{entryPFLocalIP}->set_tooltip_text('Bind incoming connection to given ip (leave blank to bind to any interface)');
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Local Port:');
+    $w{frPFLocalPort} = Gtk3::Frame->new('Port:');
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -722,7 +729,7 @@ sub _buildForward
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Remote Port:');
+    $w{frPFRemotePort} = Gtk3::Frame->new('Port:');
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -813,7 +820,7 @@ sub _buildRemote
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Bind Address:');
+    $w{frPFLocalIP} = Gtk3::Frame->new('Remote Address:');
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -821,9 +828,8 @@ sub _buildRemote
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
-    $w{entryPFLocalIP}->set_tooltip_text('Bind outgoing connection to given ip (leave blank to bind to any interface)');
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Local Port:');
+    $w{frPFLocalPort} = Gtk3::Frame->new('Port:');
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -832,7 +838,7 @@ sub _buildRemote
     $w{spinPFLocalPort}->set_size_request(30, 20);
     $w{spinPFLocalPort}->set_value($localPort);
 
-    $w{frPFRemoteIP} = Gtk3::Frame->new('Remote Address:');
+    $w{frPFRemoteIP} = Gtk3::Frame->new('Local Address:');
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -841,7 +847,7 @@ sub _buildRemote
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Remote Port:');
+    $w{frPFRemotePort} = Gtk3::Frame->new('Port:');
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
