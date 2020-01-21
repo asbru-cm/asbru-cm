@@ -336,9 +336,9 @@ sub _buildPrePost {
             tooltip => 'KeePassXC Username',
             code => sub {
                 my $pos = $w{command}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
                 if ($selection) {
-                    $w{command}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
+                    $w{command}->insert_text("<username|$selection>", -1, $w{command}->get_position);
                 }
             }
         });
@@ -347,9 +347,9 @@ sub _buildPrePost {
             tooltip => 'KeePassXC Password',
             code => sub {
                 my $pos = $w{command}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
                 if ($selection) {
-                    $w{command}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
+                    $w{command}->insert_text("<password|$selection>", -1, $w{command}->get_position);
                 }
             }
         });

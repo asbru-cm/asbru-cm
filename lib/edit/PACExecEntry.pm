@@ -420,9 +420,9 @@ sub _buildExec {
             tooltip => 'KeePassXC Username',
             code => sub {
                 my $pos = $w{txt}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
                 if ($selection) {
-                    $w{txt}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
+                    $w{txt}->insert_text("<username|$selection>", -1, $w{txt}->get_position);
                 }
             }
         });
@@ -431,9 +431,9 @@ sub _buildExec {
             tooltip => 'KeePassXC Password',
             code => sub {
                 my $pos = $w{txt}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
+                my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
                 if ($selection) {
-                    $w{txt}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
+                    $w{txt}->insert_text("<password|$selection>", -1, $w{txt}->get_position);
                 }
             }
         });
