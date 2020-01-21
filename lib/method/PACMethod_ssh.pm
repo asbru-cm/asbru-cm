@@ -217,6 +217,8 @@ sub get_cfg
         push(@{$options{forwardPort}}, \%hash);
     }
 
+    my %lpr;
+
     foreach my $w (@{$$self{listRemote}}) {
         my %hash;
         $hash{'localIP'} = $$w{entryPFLocalIP}->get_chars(0, -1) || '';
@@ -226,10 +228,10 @@ sub get_cfg
         if (!$hash{'localPort'} || !$hash{'remoteIP'} || !$hash{'remotePort'}) {
             next;
         }
-        if (defined $lp{$hash{'remoteIP'}}{$hash{'remotePort'}}){
-            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'remotePort'} on Local IP '$hash{'remoteIP'}' defined in Remote Port Forwarding is already in use!");
+        if (defined $lpr{$hash{'localIP'}}{$hash{'localPort'}}){
+            _wMessage($$self{_WINEDIT},"WARNING: Same Remote Port $hash{'localPort'} defined more than once!");
         }
-        $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
+        $lpr{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
     }
 
@@ -630,12 +632,11 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
-        push (@usedPorts,map {$_->{remotePort}} @{$opt_hash->{remotePort}});
         push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
-        push(@{$$opt_hash{forwardPort}}, {'localIP' => 'localhost', 'localPort' => $local_port, 'remoteIP' => '0.0.0.0', 'remotePort' => 1});
+        push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;
@@ -643,16 +644,15 @@ sub _buildGUI
 
     $w{btnaddRemote}->signal_connect('clicked', sub {
         my $local_port = 1;
+        my @usedPorts;
 
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
-        my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
-        push (@usedPorts,map {$_->{remotePort}} @{$opt_hash->{remotePort}});
-        push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
+        push (@usedPorts,map {$_->{localPort}} @{$opt_hash->{remotePort}});
         if (@usedPorts) {
             $local_port = max(@usedPorts) + 1;
         }
-        push(@{$$opt_hash{remotePort}}, {'localIP' => '0.0.0.0', 'localPort' => 1, 'remoteIP' => 'localhost', 'remotePort' => $local_port});
+        push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
         $self->update($$self{cfg});
         return 1;
@@ -663,7 +663,6 @@ sub _buildGUI
         $$self{cfg} = $self->get_cfg();
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         my @usedPorts = map {$_->{localPort}} @{$opt_hash->{forwardPort}};
-        push (@usedPorts,map {$_->{remotePort}} @{$opt_hash->{remotePort}});
         push (@usedPorts,map {$_->{dynamicPort}} @{$opt_hash->{dynamicForward}});
         if (@usedPorts) {
             $local_port = (max(@usedPorts)>=$local_port) ? max(@usedPorts) + 1 : 1080;
