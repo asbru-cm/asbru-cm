@@ -317,8 +317,9 @@ sub _setupCallbacks {
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
         my $selection = $PACMain::FUNCS{_KEEPASS}->ListEntries($$self{_WINDOWEDIT});
         if ($selection) {
-            # Commented for the time being, until keepassxc-cli team implement get the UUID
-            # Featre request at https://github.com/keepassxreboot/keepassxc/issues/4112
+            # Commented for the time being, until keepassxc-cli team implements get the UUID
+            # Feature request at https://github.com/keepassxreboot/keepassxc/issues/4112
+            # Feature request at https://github.com/keepassxreboot/keepassxc/issues/4113
             #my ($title,$ok) = $PACMain::FUNCS{_KEEPASS}->GetFieldValue('Uuid',$selection);
 
             # For the time being, we will use the full path
