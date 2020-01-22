@@ -176,19 +176,19 @@ $PORT = subst($PORT);
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     my ($ok);
     $kpxc = PACKeePass->new(0,$$CFG{'defaults'}{'keepass'});
-    ($USER,$ok) = $kpxc->GetFieldValueFromString($USER);
+    ($USER,$ok) = $kpxc->getFieldValueFromString($USER);
     if (!$ok) {
         die "$USER";
     }
-    ($PASS,$ok) = $kpxc->GetFieldValueFromString($PASS);
+    ($PASS,$ok) = $kpxc->getFieldValueFromString($PASS);
     if (!$ok) {
         die "$PASS";
     }
-    ($PASSPHRASE,$ok) = $kpxc->GetFieldValueFromString($PASSPHRASE);
+    ($PASSPHRASE,$ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
     if (!$ok) {
         die "$PASSPHRASE";
     }
-    ($PASSPHRASE_USER,$ok) = $kpxc->GetFieldValueFromString($PASSPHRASE_USER);
+    ($PASSPHRASE_USER,$ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
     if (!$ok) {
         die "$PASSPHRASE_USER";
     }
@@ -395,7 +395,7 @@ sub subst {
 
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        $string =~ s/<(\w+)\|(.+?)>/$kpxc->RegexTransform($1,$2)/eg;
+        $string =~ s/<(\w+)\|(.+?)>/$kpxc->regexTransform($1,$2)/eg;
     }
 
     return wantarray ? ($string, $pos) : $string;

@@ -118,7 +118,7 @@ sub getMasterPassword {
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
-            my ($msg,$flg) = TestMasterKey($self,'a','ASBRUKeePassXCTEST');
+            my ($msg,$flg) = testMasterKey($self,'a','ASBRUKeePassXCTEST');
             if ((!$flg)&&($msg !~ /ASBRUKeePassXCTEST/)) {
                 $KPXC_MP='';
                 $mp = '';
@@ -132,7 +132,7 @@ sub getMasterPassword {
     return $mp;
 }
 
-sub TestMasterKey {
+sub testMasterKey {
     my ($s,$field,$uid) = @_;
     my ($pid,$cfg);
     my $ok = 0;
@@ -159,7 +159,7 @@ sub TestMasterKey {
     return ('',1);
 }
 
-sub GetFieldValueFromString {
+sub getFieldValueFromString {
     my ($s,$str) = @_;
     my ($ok,$value,$field,$uid,$flg,$cfg);
 
@@ -176,21 +176,21 @@ sub GetFieldValueFromString {
     }
     $str =~ s/[<>]//g;
     ($field,$uid) = split /\|/,$str;
-    ($value,$flg) = $s->GetFieldValue($field,$uid);
+    ($value,$flg) = $s->getFieldValue($field,$uid);
     return ($value,$flg);
 }
 
-sub RegexTransform {
+sub regexTransform {
     my ($s,$field,$uid) = @_;
 
-    my ($value,$flg) = $s->GetFieldValue($field,$uid);
+    my ($value,$flg) = $s->getFieldValue($field,$uid);
     if ($flg) {
         return $value;
     }
     return '';
 }
 
-sub GetFieldValue {
+sub getFieldValue {
     my ($s,$field,$uid) = @_;
     my ($pid,$cfg);
     my $data='';
@@ -250,7 +250,7 @@ sub get_cfg {
     return \%hash;
 }
 
-sub ListEntries {
+sub listEntries {
     my $self = shift;
     my $parent = shift;
     my ($mp,$list,%w,$entry);
@@ -314,7 +314,7 @@ sub ListEntries {
 
         if (length($widget->get_text())>2) {
             @{$w{window}{gui}{treelist}{'data'}}=();
-            @list = $self->locateEntries($widget->get_text());
+            @list = $self->_locateEntries($widget->get_text());
             foreach my $el (@list) {
                 if ($el !~ qw|^/|) {
                     next;
@@ -356,7 +356,13 @@ sub ListEntries {
     return $entry;
 }
 
-sub locateEntries {
+# END: Public class methods
+###################################################################
+
+###################################################################
+# START: Private functions definitions
+
+sub _locateEntries {
     my ($s,$str) = @_;
     my ($pid,$cfg);
     my @out;
@@ -379,16 +385,10 @@ sub locateEntries {
         waitpid($pid,0);
         close Reader;
         open(STDERR,">&SAVERR");
-    }
+    };
 
     return @out;
 }
-
-# END: Public class methods
-###################################################################
-
-###################################################################
-# START: Private functions definitions
 
 sub _buildKeePassGUI {
     my $self = shift;
@@ -519,29 +519,29 @@ Updates configuration settings from current selections in gui
 
 Routine to ask for master password to user, infinite retries or cancel to exit
 
-=head2 sub TestMasterKey
+=head2 sub testMasterKey
 
 Connects to database with an unknown field value to test if response is:
 
     Error : Could not connect, so password is wrong
     Could not find XXXXXX uuid, so it could connect
 
-=head2 sub GetFieldValueFromString
+=head2 sub getFieldValueFromString
 
 Check if string has the correct format <field|uuid>
 
     false: return dame string
-    true : extract field and uuid and call GetFieldValue(field,uuid)
+    true : extract field and uuid and call getFieldValue(field,uuid)
 
-=head2 sub RegexTransform
+=head2 sub regexTransform
 
 Use this method inside a regex expression to replace keepassxc ocurrences in a string
 
 Usage:
 
-    $str =~ s/<(.+?)\|(.+?)>/$kpxc->RegexTransform($1,$2)/ge;
+    $str =~ s/<(.+?)\|(.+?)>/$kpxc->regexTransform($1,$2)/ge;
 
-=head2 sub GetFieldValue
+=head2 sub getFieldValue
 
 Connect to database and query field value, return value or empty if not found
 
@@ -549,15 +549,15 @@ Connect to database and query field value, return value or empty if not found
 
 Recover settings from current GUI configuration
 
-head2 sub ListEntries
+head2 sub listEntries
 
 Build a window with a search entry and a listbox, show results from search entry in the listbox
 
-    call locateEntries on each typed key by user (3 characters are required to start the search)
+    call _locateEntries on each typed key by user (3 characters are required to start the search)
 
 Allow user to select a row and return the selected key path
 
-head2 sub locateEntries
+head2 sub _locateEntries
 
 Query the complete database for a search pattern and show the entries found in a listbox
 
