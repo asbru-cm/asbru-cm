@@ -1966,6 +1966,10 @@ sub _vteMenu {
     # Populate with environment variables
     my @environment_menu;
     foreach my $key (sort {$a cmp $b} keys %ENV) {
+        # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+        if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+            next;
+        }
         my $value = $ENV{$key};
         push(@environment_menu,
         {
