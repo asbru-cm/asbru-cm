@@ -240,6 +240,7 @@ sub __ {
     my $str = shift // '';
 
     $str =~ s/\&/&amp;/go;
+    $str =~ s/\|/&#124;/go;
     $str =~ s/\'/&apos;/go;
     $str =~ s/\"/&quot;/go;
     $str =~ s/</&lt;/go;
@@ -252,6 +253,7 @@ sub __text {
     my $str = shift // '';
 
     $str =~ s/&amp;/\&/go;
+    $str =~ s/&#124;/\|/go;
     $str =~ s/&apos;/\'/go;
     $str =~ s/&quot;/\"/go;
     $str =~ s/&lt;/</go;

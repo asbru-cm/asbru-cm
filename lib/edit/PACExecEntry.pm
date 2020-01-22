@@ -292,7 +292,7 @@ sub _buildExec {
 
         # Ask for confirmation
         if ($w{confirm}->get_active()) {
-            if (!_wConfirm(undef, "Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY')) {
+            if (!_wConfirm($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},"Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY')) {
                 # Not confirmed, do not execute
                 return 1;
             }
@@ -307,7 +307,9 @@ sub _buildExec {
     $w{txt}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
-        return 0 unless $event->button eq 3;
+        if ($event->button != 3) {
+            return 0;
+        }
 
         my @menu_items;
 
@@ -414,30 +416,31 @@ sub _buildExec {
         push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
         push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
 
-        # Copy User,Password from KeePassXC
-        push(@menu_items, {
-            label => 'Add Username KeePassXC',
-            tooltip => 'KeePassXC Username',
-            code => sub {
-                my $pos = $w{txt}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
-                if ($selection) {
-                    $w{txt}->insert_text("<username|$selection>", -1, $w{txt}->get_position);
+        if ($PACMain::FUNCS{_KEEPASS}->getUseKeePass()) {
+            # Copy User,Password from KeePassXC
+            push(@menu_items, {
+                label => 'Add Username KeePassXC',
+                tooltip => 'KeePassXC Username',
+                code => sub {
+                    my $pos = $w{txt}->get_property('cursor_position');
+                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
+                    if ($selection) {
+                        $w{txt}->insert_text("<username|$selection>", -1, $w{txt}->get_position);
+                    }
                 }
-            }
-        });
-        push(@menu_items, {
-            label => 'Add Password KeePassXC',
-            tooltip => 'KeePassXC Password',
-            code => sub {
-                my $pos = $w{txt}->get_property('cursor_position');
-                my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
-                if ($selection) {
-                    $w{txt}->insert_text("<password|$selection>", -1, $w{txt}->get_position);
+            });
+            push(@menu_items, {
+                label => 'Add Password KeePassXC',
+                tooltip => 'KeePassXC Password',
+                code => sub {
+                    my $pos = $w{txt}->get_property('cursor_position');
+                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
+                    if ($selection) {
+                        $w{txt}->insert_text("<password|$selection>", -1, $w{txt}->get_position);
+                    }
                 }
-            }
-        });
-
+            });
+        }
         _wPopUpMenu(\@menu_items, $event);
 
         return 1;

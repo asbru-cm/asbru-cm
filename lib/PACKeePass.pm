@@ -109,6 +109,12 @@ sub update {
     return 1;
 }
 
+sub getUseKeePass {
+    my $self = shift;
+
+    return $$self{cfg}{use_keepass} // 0;
+}
+
 sub getMasterPassword {
     my $self = shift;
     my $mp = '';

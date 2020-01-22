@@ -144,7 +144,11 @@ sub show {
 
     $$self{_WINDOWEDIT}->set_title($title);
 
-    if ($$self{_IS_NEW}) {_($self, 'nbProps')->set_current_page(0); _($self, 'entryIP')->grab_focus; _($self, 'nbDetails')->set_current_page(0);}
+    if ($$self{_IS_NEW}) {
+        _($self, 'nbProps')->set_current_page(0);
+        _($self, 'entryIP')->grab_focus;
+        _($self, 'nbDetails')->set_current_page(0);
+    }
 
     $$self{_WINDOWEDIT}->set_modal(1);
 
@@ -531,6 +535,20 @@ sub _setupCallbacks {
                     _($self, "entry$w")->select_region($pos + 5, $pos + 22);
                 }
             });
+
+            if ($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'}) {
+                push(@menu_items, {
+                    label => 'Add Url KeePassXC',
+                    tooltip => 'KeePassXC Url',
+                    code => sub {
+                        my $pos = _($self, "entry$w")->get_property('cursor_position');
+                        my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
+                        if ($selection) {
+                            _($self, "entry$w")->insert_text("<url|$selection>", -1, _($self, "entry$w")->get_position);
+                        }
+                    }
+                });
+            }
 
             _wPopUpMenu(\@menu_items, $event);
 
