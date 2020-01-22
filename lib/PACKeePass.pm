@@ -362,6 +362,33 @@ sub listEntries {
     return $entry;
 }
 
+sub setRigthClickMenuEntry {
+    my ($s,$win,$what,$input,$menu_items) = @_;
+    my ($lbl,$field);
+
+    if (!$s->getUseKeePass()) {
+        return 0;
+    } elsif (!$what) {
+        return 0;
+    }
+    foreach $field (split /,/,$what) {
+        $lbl = ucfirst($field);
+
+        push(@$menu_items, {
+            label => "Add $lbl KeePassXC",
+            tooltip => "KeePassXC $lbl",
+            code => sub {
+                my $pos = $input->get_property('cursor_position');
+                my $selection = $s->listEntries($win);
+                if ($selection) {
+                    $input->insert_text("<$field|$selection>", -1, $input->get_position);
+                }
+            }
+        });
+    }
+    return 1;
+}
+
 # END: Public class methods
 ###################################################################
 

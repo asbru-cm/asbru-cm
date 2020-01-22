@@ -416,31 +416,8 @@ sub _buildExec {
         push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
         push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
 
-        if ($PACMain::FUNCS{_KEEPASS}->getUseKeePass()) {
-            # Copy User,Password from KeePassXC
-            push(@menu_items, {
-                label => 'Add Username KeePassXC',
-                tooltip => 'KeePassXC Username',
-                code => sub {
-                    my $pos = $w{txt}->get_property('cursor_position');
-                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
-                    if ($selection) {
-                        $w{txt}->insert_text("<username|$selection>", -1, $w{txt}->get_position);
-                    }
-                }
-            });
-            push(@menu_items, {
-                label => 'Add Password KeePassXC',
-                tooltip => 'KeePassXC Password',
-                code => sub {
-                    my $pos = $w{txt}->get_property('cursor_position');
-                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
-                    if ($selection) {
-                        $w{txt}->insert_text("<password|$selection>", -1, $w{txt}->get_position);
-                    }
-                }
-            });
-        }
+        $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username,password',$w{txt},\@menu_items);
+
         _wPopUpMenu(\@menu_items, $event);
 
         return 1;

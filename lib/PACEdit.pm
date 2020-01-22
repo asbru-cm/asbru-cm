@@ -536,19 +536,7 @@ sub _setupCallbacks {
                 }
             });
 
-            if ($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'}) {
-                push(@menu_items, {
-                    label => 'Add Url KeePassXC',
-                    tooltip => 'KeePassXC Url',
-                    code => sub {
-                        my $pos = _($self, "entry$w")->get_property('cursor_position');
-                        my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($PACMain::FUNCS{_EDIT}{_WINDOWEDIT});
-                        if ($selection) {
-                            _($self, "entry$w")->insert_text("<url|$selection>", -1, _($self, "entry$w")->get_position);
-                        }
-                    }
-                });
-            }
+            $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
 
             _wPopUpMenu(\@menu_items, $event);
 
