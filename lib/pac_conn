@@ -994,7 +994,6 @@ if (defined $METHOD) {
         }
         $connection_cmd = "$METHOD $CONNECT_OPTS ${USER}\@$IP";
         $connection_txt = $connection_cmd;
-        print "*$connection_cmd*\n";
     } elsif (($METHOD =~ /^.*sftp.*$/) || ($METHOD eq 'SFTP')) {
         _setSshProxy('ssh');
         $METHOD = 'sftp';
