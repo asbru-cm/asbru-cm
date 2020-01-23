@@ -316,9 +316,15 @@ sub start {
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
+    my $reconnect_msg = '';
+    my $reconnect_count = '';
 
-    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
-    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")\r\n\n");
+    if ($$self{'_RECONNECTS'}) {
+        $reconnect_msg = 'RE';
+        $reconnect_count = " ${COL_RED}attempt:$$self{'_RECONNECTS'}${COL_RESET}";
+    }
+    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}${reconnect_msg}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}${reconnect_msg}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
+    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")$reconnect_count\r\n\n");
 
     $$self{_PULSE} = 1;
 
@@ -1315,7 +1321,7 @@ sub _setupCallbacks {
 
         my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED} $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
 
         # Switch to the message window
@@ -1355,7 +1361,7 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if (($$self{_RESTART})&&($$self{_RECONNECTS}<5)) {
+        if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
             sleep($$self{_RECONNECTS});
             $$self{_RECONNECTS}++;
             $self->start;
