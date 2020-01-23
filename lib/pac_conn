@@ -1179,7 +1179,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
     $EXP -> expect($TIMEOUT_CONNECT,
 
         [eof => sub {
-
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
             $EXP -> hard_close;
@@ -1401,7 +1400,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                     $i = --$on_match;
                 }
             }]
-);
+        );
         last if $end;
         next if $jump;
         $avoid_first_expectation = 0;
@@ -1442,7 +1441,7 @@ elsif ($METHOD eq 'PACShell') {
     $CONNECTED = 1;
     ctrl("CONNECTED");
 }
-elsif (! $MANUAL) {
+elsif (!$MANUAL) {
     my $end = 0;
 
     # Expect password/confirmation prompt...
@@ -1451,23 +1450,23 @@ elsif (! $MANUAL) {
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            $EXP -> hard_close();
+            if ($RESTART) {
+                ctrl('RESTART');
+            }
+            $EXP->hard_close();
         }],
 
         [eof => sub {
-
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-            $EXP -> hard_close();
+            $EXP->hard_close();
         }],
 
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
-
             if ($CONNECTED) {
                 $EXP -> exp_continue;
             }
-
             # First 'sudo' password attempt...
             if (! $SUDO_PASSWORD_COUNT) {
                 $SUDO_PASSWORD_COUNT++;
@@ -1593,7 +1592,6 @@ elsif (! $MANUAL) {
 
         # Found user prompt
         [$COMMAND_PROMPT, sub {
-
             $CONNECTED = 1;
             my $avoid_first_expectation = 1;
 
@@ -1647,7 +1645,6 @@ elsif (! $MANUAL) {
                     }],
 
                     [eof => sub {
-
                         $CONNECTED = 0;
                         ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
                         $EXP -> hard_close();
@@ -1993,7 +1990,7 @@ $SIG{'USR2'} = sub {
 };
 
 if ($CONNECTED) {
-    $EXP -> interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
+    $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
 my $why = $?;
@@ -2003,10 +2000,10 @@ if (($why ne 0) && $RESTART) {
 }
 
 # Finish this expect session
-if (defined $EXP -> pid) {
-    kill(15, $EXP -> pid);
+if (defined $EXP->pid) {
+    kill(15, $EXP->pid);
 }
-$EXP -> hard_close;
+$EXP->hard_close;
 
 close_log_file();
 

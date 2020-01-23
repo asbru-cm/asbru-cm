@@ -120,6 +120,7 @@ sub new {
     $self->{_STATUS_COUNT} = 0;
     $self->{_LISTEN_COMMIT} = 1;
     $self->{_RESTART} = 0;
+    $self->{_RECONNECTS} = 0;
     $self->{_GUI} = undef;
     $self->{_KEYS_BUFFER} = '';
     $self->{_SAVE_KEYS} = 1;
@@ -1314,7 +1315,7 @@ sub _setupCallbacks {
 
         my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED}<-= $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED} $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
 
         # Switch to the message window
@@ -1354,7 +1355,9 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if ($$self{_RESTART}) {
+        if (($$self{_RESTART})&&($$self{_RECONNECTS}<5)) {
+            sleep($$self{_RECONNECTS});
+            $$self{_RECONNECTS}++;
             $self->start;
         } else {
             # Check for post-connection commands execution
@@ -1387,6 +1390,8 @@ sub _watchConnectionData {
     while (my $data = shift(@{$self->{_SOCKET_BUFFER}})) {
         $data = decode('UTF-16', $data);
 
+        print "DATA:$data\n";
+
         if ($data eq 'CONNECTED') {
             $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ok-small', 'button');
             $$self{_GUI}{statusIcon}->set_tooltip_text('Connected');
@@ -1394,6 +1399,7 @@ sub _watchConnectionData {
             $$self{CONNECTED} = 1;
             $$self{CONNECTING} = 0;
             $$self{_BADEXIT} = 0;
+            $$self{_RECONNECTS} = 0;
             if (defined $$self{_GUI}{pb}) {
                 $$self{_GUI}{pb}->destroy();
             }
