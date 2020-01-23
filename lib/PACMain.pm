@@ -782,13 +782,15 @@ sub _initGUI {
     $nb->append_page($$self{_GUI}{vboxInfo}, $tablbl);
 
     # Create a scrolled2 scrolled window to contain the description textview
-    $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{scrollDescription}, 1, 1, 0);
     $$self{_GUI}{scrollDescription}->set_policy('automatic', 'automatic');
 
     # Create descView as a gtktextview with descBuffer
-    $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new;
+    $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new();
     $$self{_GUI}{descView} = Gtk3::TextView->new_with_buffer($$self{_GUI}{descBuffer});
+    $$self{_GUI}{descView}->set_editable(0);
+    $$self{_GUI}{descView}->set_can_focus(0);
     $$self{_GUI}{descView}->set_border_width(5);
     $$self{_GUI}{scrollDescription}->add($$self{_GUI}{descView});
     $$self{_GUI}{descView}->set_wrap_mode('GTK_WRAP_WORD');
