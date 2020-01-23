@@ -1390,8 +1390,6 @@ sub _watchConnectionData {
     while (my $data = shift(@{$self->{_SOCKET_BUFFER}})) {
         $data = decode('UTF-16', $data);
 
-        print "DATA:$data\n";
-
         if ($data eq 'CONNECTED') {
             $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ok-small', 'button');
             $$self{_GUI}{statusIcon}->set_tooltip_text('Connected');
