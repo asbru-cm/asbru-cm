@@ -118,6 +118,7 @@ sub new {
     $self->{_STATUS_COUNT} = 0;
     $self->{_LISTEN_COMMIT} = 1;
     $self->{_RESTART} = 0;
+    $self->{_RECONNECTS} = 0;
     $self->{_GUI} = undef;
     $self->{_KEYS_BUFFER} = '';
     $self->{_SAVE_KEYS} = 1;
@@ -385,10 +386,11 @@ sub start {
 
     $$self{CONNECTING} = 1;
     $PACMain::FUNCS{_STATS}->start($$self{_UUID});
+    my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
-    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {@args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)"];}
-    else {@args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}];}
+    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {@args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];}
+    else {@args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];}
     if (! $$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
         $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
         $$self{CONNECTING} = 0;
@@ -1405,7 +1407,9 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if ($$self{_RESTART}) {
+        if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
+            sleep($$self{_RECONNECTS});
+            $$self{_RECONNECTS}++;
             $self->start;
         } else {
             # Check for post-connection commands execution
@@ -1445,6 +1449,7 @@ sub _watchConnectionData {
             $$self{CONNECTED} = 1;
             $$self{CONNECTING} = 0;
             $$self{_BADEXIT} = 0;
+            $$self{_RECONNECTS} = 0;
             if (defined $$self{_GUI}{pb}) {
                 $$self{_GUI}{pb}->destroy();
             }
