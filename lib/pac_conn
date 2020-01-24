@@ -60,6 +60,7 @@ my $SCRIPTS_DIR = "$CFG_DIR/scripts";
 my @CMD;
 my $CFG_FILE;
 my $CFG;
+my $IS_CLUSTER;
 my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
@@ -117,6 +118,7 @@ $SIG{'QUIT'} = \&__disconnect;
 # Retrieve command line options
 $CFG_FILE = shift;
 $UUID = shift or die "$COLOR{'err'}ERROR: You must provide a profile to connect to!!$COLOR{'norm'}";
+$IS_CLUSTER = shift // 0;
 $GETCMD = shift // 0;
 
 # Load the 'freezed' configuration
@@ -168,6 +170,10 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my @KEEPASS = @{$$CFG{'keepass'} // []};
+
+if (!$RESTART && $IS_CLUSTER) {
+    $RESTART = 1;
+}
 
 $IP = subst($IP);
 $PORT = subst($PORT);

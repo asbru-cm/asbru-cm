@@ -399,12 +399,13 @@ sub start {
 
     $$self{CONNECTING} = 1;
     $PACMain::FUNCS{_STATS}->start($$self{_UUID});
+    my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)"];
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
     } else {
-        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}];
+        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
     }
     if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
         $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
@@ -428,7 +429,9 @@ sub start {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{pb}, 0, 1, 0);
     $$self{_GUI}{pb}->show();
 
-    $$self{_CLUSTER} and $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    if ($$self{_CLUSTER}) {
+        $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
 
     # Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
     defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
