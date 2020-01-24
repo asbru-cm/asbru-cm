@@ -60,6 +60,7 @@ my $SCRIPTS_DIR = "$CFG_DIR/scripts";
 my @CMD;
 my $CFG_FILE;
 my $CFG;
+my $IS_CLUSTER;
 my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
@@ -121,6 +122,7 @@ $SIG{'QUIT'} = \&__disconnect;
 # Retrieve command line options
 $CFG_FILE = shift;
 $UUID = shift or die "$COLOR{'err'}ERROR: You must provide a profile to connect to!!$COLOR{'norm'}";
+$IS_CLUSTER = shift // 0;
 $GETCMD = shift // 0;
 
 # Get PROXY from environment
@@ -185,6 +187,11 @@ $PROXY{'cfg'}{'ip'} = $$CFG{'defaults'}{'proxy ip'};
 $PROXY{'cfg'}{'port'} = $$CFG{'defaults'}{'proxy port'};
 $PROXY{'cfg'}{'user'} = $$CFG{'defaults'}{'proxy user'};
 $PROXY{'cfg'}{'pass'} = $$CFG{'defaults'}{'proxy pass'};
+
+if (!$RESTART && $IS_CLUSTER) {
+    $RESTART = 1;
+}
+
 
 $IP = subst($IP);
 $PORT = subst($PORT);
@@ -1488,6 +1495,9 @@ elsif (! $MANUAL) {
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
+            if ($RESTART) {
+                ctrl('RESTART');
+            }
             $EXP -> hard_close();
         }],
 
