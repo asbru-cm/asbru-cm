@@ -1103,10 +1103,12 @@ if (defined $METHOD) {
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
             }
         } else {
-            my $user = '';
+            my $user = $USER ? "UserName=$USER" : '';
 
-            $connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
-            $connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            #$connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            #$connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
         }
     }
     ##############################################
@@ -1166,6 +1168,7 @@ if ($GETCMD) {
     print $connection_cmd;
     exit 0;
 }
+print "v$connection_cmd\n";
 
 # Set log file
 $EXP->log_file($LOG_FILE);
