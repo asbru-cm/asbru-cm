@@ -1860,10 +1860,10 @@ sub _vteMenu {
 
     # Show the list of REMOTE commands to execute
     my @cmd_remote_sub_menu;
-    # Organize Remote commands by groups
+    # Organize Remote commands by groups, Join Terminal Macros they are the same
     my %hgs;
     my $lg;
-    foreach my $hash (@{$$self{_CFG}{'defaults'}{'remote commands'}}) {
+    foreach my $hash (@{$$self{_CFG}{'defaults'}{'remote commands'}},@{$self->{_CFG}{'environments'}{$$self{_UUID}}{'macros'}}) {
         my $cmd = ref($hash) ? $$hash{txt} : $hash;
         my $desc = ref($hash) ? $$hash{description} : $hash;
         my $confirm = ref($hash) ? $$hash{confirm} : 0;
@@ -1908,23 +1908,6 @@ sub _vteMenu {
     # Push Others at the end with no group
     if (@{$hgs{'Other???'}}) {
         push(@cmd_remote_sub_menu,@{$hgs{'Other???'}});
-    }
-    # Push Terminal Macros After Remote Commands
-    push(@cmd_remote_sub_menu, {separator => 1});
-    foreach my $hash (@{$self->{_CFG}{'environments'}{$$self{_UUID}}{'macros'}}) {
-        my $cmd = ref($hash) ? $$hash{txt} : $hash;
-        my $desc = ref($hash) ? $$hash{description} : $hash;
-        my $confirm = ref($hash) ? $$hash{confirm} : 0;
-        if ($cmd eq '') {
-            next;
-        }
-        push(@cmd_remote_sub_menu, {
-            label => ($confirm ? 'CONFIRM: ' : '') . ($desc ? $desc : $cmd),
-            tooltip => $desc ? $cmd : $desc,
-            sensitive => $$self{CONNECTED},
-            stockicon => $confirm ? 'gtk-dialog-question' : '',
-            code => sub {$self->_execute('remote', $cmd, $confirm)}
-        });
     }
     push(@vte_menu_items, {
         label => 'Remote commands',
