@@ -1258,9 +1258,11 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
 
         [timeout => sub {
-            $CONNECTED = 0;
-            ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            $EXP->hard_close;
+            $CONNECTED = 1;
+            ctrl("CONNECTED");
+            #$CONNECTED = 0;
+            #ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
+            #$EXP->hard_close;
         }],
 
         [eof => sub {

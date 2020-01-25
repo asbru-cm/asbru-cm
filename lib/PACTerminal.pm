@@ -1373,7 +1373,7 @@ sub _setupCallbacks {
             $self->_wPrePostExec('local after');
 
             # And close if so is configured
-            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT})) {
+            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT} || $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} !~ /ssh/i)) {
                 $self->stop(undef, 1);
             }
         }
