@@ -118,6 +118,10 @@ sub get_cfg {
         $hash{description} = $$w{desc}->get_chars(0, -1);
         $hash{confirm} = $$w{confirm}->get_active() || '0';
         $hash{intro} = $$w{intro}->get_active() || '0';
+        # Force no descriptions equal to command
+        if (!$hash{description}) {
+            $hash{description} = $hash{txt};
+        }
         push(@cfg, \%hash) unless $hash{txt} eq '';
     }
 
