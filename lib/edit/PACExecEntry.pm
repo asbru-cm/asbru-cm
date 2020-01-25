@@ -255,7 +255,7 @@ sub _buildExec {
     # Build label
     $w{lbl2} = Gtk3::Label->new('Description: ');
     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
-    $w{hbox4}->set_tooltip_text('Group:Description');
+    $w{hbox4}->set_tooltip_markup("<i>Group</i><b>:</b><i>Description</i>\n<b>Group:</b> This value will group all commands with the same name in the menu.\n\nExample <b>Mysql</b>:<i>Show tables</i>");
 
     # Build entry
     $w{desc} = Gtk3::Entry->new();
