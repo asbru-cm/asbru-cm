@@ -1876,6 +1876,8 @@ sub _vteMenu {
             code => sub {$self->_execute('remote', $cmd, $confirm)}
         });
     }
+    my %hgs;
+    my $lg;
     foreach my $hash (@{$$self{_CFG}{'defaults'}{'remote commands'}}) {
         my $cmd = ref($hash) ? $$hash{txt} : $hash;
         my $desc = ref($hash) ? $$hash{description} : $hash;
@@ -1883,11 +1885,15 @@ sub _vteMenu {
         if ($cmd eq '') {
             next;
         }
-        push(@cmd_remote_sub_menu,
-        {
-            label => ($confirm ? 'CONFIRM: ' : '') . ($desc ? $desc : $cmd),
-            tooltip => $desc ? $cmd : $desc,
+        my ($g,$d) = split /:/,$desc,2;
+        if (!$d) {
+            $d = $g;
+            $g = 'Other';
+        }
+        push (@{$hgs{$g}}, {
+            label => $d,
             sensitive => $$self{CONNECTED},
+            tooltip => $cmd,
             stockicon => $confirm ? 'gtk-dialog-question' : '',
             code => sub {
                 my $ok = $self->_execute('remote', $cmd, $confirm);
@@ -1895,6 +1901,13 @@ sub _vteMenu {
                     $self->_clusterCommit(undef, $cmd . "\n", undef);
                 }
             }
+        });
+    }
+    foreach my $g (sort keys %hgs) {
+        push(@cmd_remote_sub_menu, {
+            label => $g,
+            stockicon => 'gtk-execute',
+            submenu => \@{$hgs{$g}},
         });
     }
     push(@vte_menu_items,

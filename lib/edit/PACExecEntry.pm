@@ -251,6 +251,7 @@ sub _buildExec {
     # Build label
     $w{lbl2} = Gtk3::Label->new('Description: ');
     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
+    $w{hbox4}->set_tooltip_text('Group:Description');
 
     # Build entry
     $w{desc} = Gtk3::Entry->new();
