@@ -1109,6 +1109,7 @@ if (defined $METHOD) {
             #$connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
             $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
             $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $METHOD = "Real$METHOD";
         }
     }
     ##############################################
@@ -1168,7 +1169,6 @@ if ($GETCMD) {
     print $connection_cmd;
     exit 0;
 }
-print "v$connection_cmd\n";
 
 # Set log file
 $EXP->log_file($LOG_FILE);
@@ -1259,13 +1259,15 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     # Expect authentication confirmation...
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
-
         [timeout => sub {
-            $CONNECTED = 1;
-            ctrl("CONNECTED");
-            #$CONNECTED = 0;
-            #ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            #$EXP->hard_close;
+            if ($METHOD =~ /Real/) {
+                $CONNECTED = 1;
+                ctrl("CONNECTED");
+            } else {
+                $CONNECTED = 0;
+                ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
+                $EXP->hard_close;
+            }
         }],
 
         [eof => sub {

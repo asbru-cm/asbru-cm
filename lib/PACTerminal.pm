@@ -283,7 +283,7 @@ sub new {
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
     # Autohide non tabbed help terminals
-    if ((!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+    if ((defined $$self{_WINDOWTERMINAL})&&(!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
         $$self{_WINDOWTERMINAL}->hide();
     }
 
