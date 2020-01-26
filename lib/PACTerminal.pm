@@ -1906,7 +1906,7 @@ sub _vteMenu {
         });
     }
     # Push Others at the end with no group
-    if (@{$hgs{'Other???'}}) {
+    if ((defined $hgs{'Other???'})&&(@{$hgs{'Other???'}})) {
         push(@cmd_remote_sub_menu,@{$hgs{'Other???'}});
     }
     push(@vte_menu_items, {

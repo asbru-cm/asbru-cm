@@ -122,6 +122,8 @@ sub get_cfg {
         if (!$hash{description}) {
             $hash{description} = $hash{txt};
         }
+        # Normalize capitalization of groups
+        $hash{description} =~ s/^(.+?):/\u\L$1\E:/;
         push(@cfg, \%hash) unless $hash{txt} eq '';
     }
 
