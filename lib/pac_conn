@@ -1102,14 +1102,17 @@ if (defined $METHOD) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
             }
-        } else {
+        } elsif (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
             my $user = $USER ? "UserName=$USER" : '';
 
-            #$connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
-            #$connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
             $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
             $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
             $METHOD = "Real$METHOD";
+        } else {
+            my $user = '';
+
+            $connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
         }
     }
     ##############################################
@@ -1261,6 +1264,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
         [timeout => sub {
             if ($METHOD =~ /Real/) {
+                # Spacial case for RealVNC, no information to control timeout, logins, etc.
                 $CONNECTED = 1;
                 ctrl("CONNECTED");
             } else {
