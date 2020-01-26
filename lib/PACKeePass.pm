@@ -501,7 +501,7 @@ sub _testCapabilities {
         $$self{disable_keepassxc} = 1;
         return 0;
     }
-    $c = `keepassxc-cli show -á 2>&1`;
+    $c = `keepassxc-cli -h show 2>&1`;
     $$self{disable_keepassxc} = 0;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
