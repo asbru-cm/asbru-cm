@@ -3,7 +3,7 @@ package PACTray;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -141,7 +141,7 @@ sub _setupCallbacks {
                 $$self{_MAIN}->_showConnectionsList();
                 if ($$self{_MAIN}{_CFG}{'defaults'}{'layout'} eq 'Compact') {
                     my ($x,$y) = $self->_pos($event);
-                    # Work arround the window manager, so it shows in the correct plave all the time
+                    # Workaround the window manager, so it shows in the correct place all the time
                     $$self{_MAIN}->_hideConnectionsList();
                     $$self{_MAIN}->_showConnectionsList();
                     $$self{_MAIN}{_GUI}{main}->move($x,$y);
