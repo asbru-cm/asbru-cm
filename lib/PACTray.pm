@@ -141,13 +141,9 @@ sub _setupCallbacks {
                 $$self{_MAIN}->_showConnectionsList();
                 if ($$self{_MAIN}{_CFG}{'defaults'}{'layout'} eq 'Compact') {
                     my ($x,$y) = $self->_pos($event);
-                    if ($ONCE) {
-                        # Work arround the window manager?,GTk3?, so it shows at the correct place the first time
-                        $$self{_MAIN}{_GUI}{main}->move($x,$y);
-                        $$self{_MAIN}->_hideConnectionsList();
-                        $$self{_MAIN}->_showConnectionsList();
-                        $ONCE = 0;
-                    }
+                    # Work arround the window manager, so it shows in the correct plave all the time
+                    $$self{_MAIN}->_hideConnectionsList();
+                    $$self{_MAIN}->_showConnectionsList();
                     $$self{_MAIN}{_GUI}{main}->move($x,$y);
                 }
             }
