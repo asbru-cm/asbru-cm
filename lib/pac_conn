@@ -904,12 +904,12 @@ sub _setSshProxy {
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
             print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
         }
-        if (!$PASSPHRASE_USER) {
-            $PASSPHRASE_USER = $USER;
-        }
-        print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
-        if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
-            print CFG "IdentityFile $PUBKEY\n";
+        if ($method =~ /ssh/i) {
+            # Second server is only important for SSH JumpHost
+            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+            if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+                print CFG "IdentityFile $PUBKEY\n";
+            }
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
