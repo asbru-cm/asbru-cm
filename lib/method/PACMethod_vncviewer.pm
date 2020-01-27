@@ -147,6 +147,12 @@ sub _setGUIState {
         $$self{gui}{hbox1R}->set_sensitive(1);
         $$self{gui}{hbox1R}->show();
     } else {
+        if (!$$options{depth}) {
+            $$options{depth} = 0;
+        }
+        if (!$$options{quality}) {
+            $$options{quality} = 0;
+        }
         if (!defined $DEPTH{$$options{depth}}) {
             $$options{depth} = 'default';
         }
