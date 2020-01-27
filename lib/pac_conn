@@ -904,11 +904,18 @@ sub _setSshProxy {
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
             print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
         }
+        if (!$PASSPHRASE_USER) {
+            $PASSPHRASE_USER = $USER;
+        }
         print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
         if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
             print CFG "IdentityFile $PUBKEY\n";
         }
         close CFG;
+        if ($method =~ /VNC|RDP/i) {
+            $proxy_jump = 2;
+            system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $PORT:localhost:$PORT jumpserver";
+        }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
         if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
@@ -938,6 +945,7 @@ sub _setSshProxy {
             $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
         }
     }
+    return 0;
 }
 
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
@@ -1047,6 +1055,7 @@ if (defined $METHOD) {
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
         $METHOD = $1;
+        _setSshProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1090,9 +1099,16 @@ if (defined $METHOD) {
             ctrl("PASSWORD:Asking user for password...");
             $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
-
+        my $method = 'VNC';
         $CONNECT_OPTS =~ s/ -client \w+//;
         $CONNECT_OPTS =~ s/\s*-embed//go;
+        if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+            $method = "RealVNC";
+        }
+        _setSshProxy($method);
+        if ($proxy_jump) {
+            $IP = '127.0.0.1';
+        }
         if (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
@@ -2009,6 +2025,10 @@ $SIG{'USR2'} = sub {
 
 if ($CONNECTED) {
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
+}
+
+if ($proxy_jump == 2) {
+    system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -O exit jumpserver";
 }
 
 my $why = $?;
