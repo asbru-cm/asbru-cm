@@ -90,7 +90,6 @@ sub update {
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
     $$self{gui}{spCompressLevel}->set_value($$options{compressLevel} // 0);
-    $$self{gui}{entryVia}->set_text($$options{via});
 
     _setGUIState($self,$options);
 
@@ -113,7 +112,6 @@ sub get_cfg {
     } else {
         $options{quality} = $$self{gui}{spQuality}->get_value;
     }
-    $options{via} = $$self{gui}{entryVia}->get_chars(0, -1);
     $options{depth} = $$self{gui}{cbDepth}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -148,8 +146,6 @@ sub _setGUIState {
         $$self{gui}{hbox1}->hide();
         $$self{gui}{hbox1R}->set_sensitive(1);
         $$self{gui}{hbox1R}->show();
-        $$self{gui}{hbox4}->set_sensitive(0);
-        $$self{gui}{hbox4}->hide();
     } else {
         if (!defined $DEPTH{$$options{depth}}) {
             $$options{depth} = 'default';
@@ -164,8 +160,6 @@ sub _setGUIState {
         $$self{gui}{hbox1}->show();
         $$self{gui}{hbox1R}->set_sensitive(0);
         $$self{gui}{hbox1R}->hide();
-        $$self{gui}{hbox4}->set_sensitive(1);
-        $$self{gui}{hbox4}->show();
     }
 }
 
@@ -177,7 +171,6 @@ sub _parseCfgToOptions {
     $hash{fullScreen} = 0;
     $hash{nsize} = 1;
     $hash{compressLevel} = 8;
-    $hash{via} = '';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -214,8 +207,6 @@ sub _parseCfgToOptions {
             $hash{depth} = $1;
         } elsif ($opt =~ /^colorlevel\s+(\w+)$/) {
             $hash{depth} = $Rdepth{$1};
-        } elsif ($opt =~ /^via\s+(.+)$/) {
-            $hash{via} = $1;
         }
     }
 
@@ -254,9 +245,6 @@ sub _parseOptionsToCfg {
     } else {
         $txt .= " -depth $$hash{depth}";
         $txt .= " -compresslevel $$hash{compressLevel}";
-    }
-    if ($$hash{via}) {
-        $txt .= " -via $$hash{via}";
     }
 
     #print "$txt\n";
@@ -344,17 +332,6 @@ sub _buildGUI {
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
 
-    $w{hbox4} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox4}, 0, 0, 0);
-
-    $w{lblVia} = Gtk3::Label->new('Proxy SSH Via:');
-    $w{hbox4}->pack_start($w{lblVia}, 0, 0, 0);
-    $w{lblVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{entryVia} = Gtk3::Entry->new;
-    $w{hbox4}->pack_start($w{entryVia}, 0, 1, 0);
-    $w{entryVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
     $w{spQualityR}->signal_connect('changed', sub {
         my $w = shift;
 
@@ -377,8 +354,6 @@ sub _buildGUI {
             } else {
                 $$self{gui}{hbox3}->set_sensitive(0);
             }
-            $$self{gui}{hbox4}->set_sensitive(0);
-            $$self{gui}{hbox4}->hide();
             $$self{gui}{cbDepth}->remove_all();
             foreach my $depth (8, 64, 256, 'full') {$$self{gui}{cbDepth}->append_text($depth);};
             $$self{gui}{cbDepth}->set_active(3);
@@ -387,8 +362,6 @@ sub _buildGUI {
             $$self{gui}{hbox1R}->hide();
             $$self{gui}{hbox1R}->set_sensitive(0);
             $$self{gui}{hbox1}->set_sensitive(1);
-            $$self{gui}{hbox4}->set_sensitive(1);
-            $$self{gui}{hbox4}->show();
             $$self{gui}{cbDepth}->remove_all();
             foreach my $depth (8, 15, 16, 24, 32, 'default') {$$self{gui}{cbDepth}->append_text($depth);};
             $$self{gui}{cbDepth}->set_active(5);
