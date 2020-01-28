@@ -1109,16 +1109,17 @@ if (defined $METHOD) {
             $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
         my $method = 'VNC';
-        $CONNECT_OPTS =~ s/ -client \w+//;
         $CONNECT_OPTS =~ s/\s*-embed//go;
         if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
-            $method = "RealVNC";
+            $method = 'RealVNC';
+        } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+            $method = 'TigerVNC';
         }
         _setSshProxy($method);
         if ($proxy_jump) {
             $IP = '127.0.0.1';
         }
-        if (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
@@ -1128,7 +1129,7 @@ if (defined $METHOD) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
             }
-        } elsif (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+        } elsif ($method eq 'RealVNC') {
             my $user = $USER ? "UserName=$USER" : '';
 
             $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
@@ -1290,7 +1291,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
         [timeout => sub {
             if ($METHOD =~ /Real/) {
-                # Spacial case for RealVNC, no information to control timeout, logins, etc.
+                # Special case for RealVNC, no information to control timeout, logins, etc.
                 $CONNECTED = 1;
                 ctrl("CONNECTED");
             } else {

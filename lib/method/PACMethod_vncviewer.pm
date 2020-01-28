@@ -44,13 +44,11 @@ use Gtk3 '-init';
 # Define GLOBAL CLASS variables
 
 my $ENCODINGS = "Tight Zlib Hextile CoRRE RRE CopyRect Raw";
-my %DEPTH = (8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4, 'default' => 5);
 my %DEPTHR = (8 => 0, 64 => 1, 256 => 2, 'full' => 3);
 my %depthR = (8 => 'rgb111', 64 => 'rgb222', 256 => 'pal8', 'full' => 'full');
 my %Rdepth = ('rgb111'=>8,'rgb222'=>64,'pal8'=>256, 'full' => 'full');
 my %QUALITY = ('auto',0,'high',1,'medium',2,'low',3,'custom',4);
-my %CLIENT = ('TigerVNC',0,'TightVNC',1,'RealVNC',2);
-my $RES_DIR = $RealBin . '/res';
+my $RES_DIR = "$RealBin/res";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -83,13 +81,10 @@ sub update {
 
     my $options = _parseCfgToOptions($$self{cfg});
 
-    $$self{gui}{spVNC}->set_active($CLIENT{$$options{vncClient}});
-
     $$self{gui}{chNaturalSize}->set_active(! ($$options{fullScreen}) );
     $$self{gui}{chFullScreen}->set_active($$options{fullScreen});
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
-    $$self{gui}{spCompressLevel}->set_value($$options{compressLevel} // 0);
 
     _setGUIState($self,$options);
 
@@ -101,17 +96,10 @@ sub get_cfg {
 
     my %options;
 
-    $options{vncClient} = $$self{gui}{spVNC}->get_active_text;
-
     $options{fullScreen} = $$self{gui}{chFullScreen}->get_active;
     $options{listen} = $$self{gui}{chListen}->get_active;
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
-    $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
-    if ($options{vncClient} eq 'RealVNC') {
-        $options{quality} = $$self{gui}{spQualityR}->get_active_text;
-    } else {
-        $options{quality} = $$self{gui}{spQuality}->get_value;
-    }
+    $options{quality} = $$self{gui}{spQualityR}->get_active_text;
     $options{depth} = $$self{gui}{cbDepth}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -127,56 +115,29 @@ sub _setGUIState {
     my $self = shift;
     my $options = shift;
 
-    if ($$options{vncClient} eq 'RealVNC') {
-        $$self{gui}{hbox1R}->set_sensitive(1);
-        $$self{gui}{spQualityR}->set_active($QUALITY{$$options{quality}});
-        if (!defined $DEPTHR{$$options{depth}}) {
-            $$options{depth} = 'full';
-        }
-        $$self{gui}{cbDepth}->remove_all();
-        foreach my $depth (8, 64, 256, 'full') {$$self{gui}{cbDepth}->append_text($depth);};
-        $$self{gui}{cbDepth}->set_active($DEPTHR{$$options{depth}});
-        if ($$options{quality} eq 'custom') {
-            $$self{gui}{hbox3}->set_sensitive(1);
-        } else {
-            $$self{gui}{hbox3}->set_sensitive(0);
-        }
-        $$self{gui}{spQuality}->set_value(5);
-        $$self{gui}{hbox1}->set_sensitive(0);
-        $$self{gui}{hbox1}->hide();
-        $$self{gui}{hbox1R}->set_sensitive(1);
-        $$self{gui}{hbox1R}->show();
-    } else {
-        if (!$$options{depth}) {
-            $$options{depth} = 0;
-        }
-        if (!$$options{quality}) {
-            $$options{quality} = 0;
-        }
-        if (!defined $DEPTH{$$options{depth}}) {
-            $$options{depth} = 'default';
-        }
-        $$self{gui}{cbDepth}->remove_all();
-        foreach my $depth (8, 15, 16, 24, 32, 'default') {$$self{gui}{cbDepth}->append_text($depth);};
-        $$self{gui}{cbDepth}->set_active($DEPTH{$$options{depth}});
-        $$self{gui}{hbox3}->set_sensitive(1);
-        $$self{gui}{spQuality}->set_value($$options{quality});
-        $$self{gui}{spQualityR}->set_active(0);
-        $$self{gui}{hbox1}->set_sensitive(1);
-        $$self{gui}{hbox1}->show();
-        $$self{gui}{hbox1R}->set_sensitive(0);
-        $$self{gui}{hbox1R}->hide();
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{spQualityR}->set_active($QUALITY{$$options{quality}});
+    if (!defined $DEPTHR{$$options{depth}}) {
+        $$options{depth} = 'full';
     }
+    if ($$options{quality} eq 'custom') {
+        $$self{gui}{hbox3}->set_sensitive(1);
+    } else {
+        $$self{gui}{hbox3}->set_sensitive(0);
+    }
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{hbox1R}->show();
 }
 
 sub _parseCfgToOptions {
     my $cmd_line = shift;
 
     my %hash;
-    $hash{vncClient} = 'TigerVNC';
     $hash{fullScreen} = 0;
     $hash{nsize} = 1;
     $hash{compressLevel} = 8;
+    $hash{depth} = 'full';
+    $hash{quality} = 'auto';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -184,23 +145,9 @@ sub _parseCfgToOptions {
         next unless $opt ne '';
         $opt =~ s/\s+$//go;
 
-        if ($opt =~ /^client\s+(\w+)$/go) {
-            $hash{vncClient} = $1;
-        } elsif ($opt =~ /^compresslevel\s+(\d+)$/) {
-            $hash{compressLevel} = $1;
-        } elsif ($opt =~ /^quality/go) {
-            if ($hash{vncClient} eq 'RealVNC') {
-                $hash{depth} = 'full';
-                $hash{quality} = 'auto';
-                if ($opt =~ /^quality\s+([a-z]+)$/) {
-                    $hash{quality} = $1;
-                }
-            } else {
-                $hash{depth} = 'default';
-                $hash{quality} = 5;
-                if ($opt =~ /^quality\s+(\d+)$/) {
-                    $hash{quality} = $1;
-                }
+        if ($opt =~ /^quality/go) {
+            if ($opt =~ /^quality\s+([a-z]+)$/) {
+                $hash{quality} = $1;
             }
         } elsif ($opt eq 'fullscreen') {
             $hash{fullScreen} = 1;
@@ -223,15 +170,10 @@ sub _parseOptionsToCfg {
     my $hash = shift;
     my $txt = '';
 
-    $txt .= " -client $$hash{vncClient}";
     if (!$$hash{quality}) {
-        if ($$hash{vncClient} eq 'RealVNC') {
+        $$hash{quality} = 'auto';
+        if ($QUALITY{$$hash{quality}} eq '') {
             $$hash{quality} = 'auto';
-            if ($QUALITY{$$hash{quality}} eq '') {
-                $$hash{quality} = 'auto';
-            }
-        } else {
-            $$hash{quality} = 5;
         }
     }
     if ($$hash{fullScreen}) {
@@ -244,14 +186,7 @@ sub _parseOptionsToCfg {
         $txt .= ' -viewonly';
     }
     $txt .= " -quality $$hash{quality}";
-    if ($$hash{vncClient} eq 'RealVNC') {
-        if ($$hash{quality} eq 'custom') {
-            $txt .= " -colorlevel $depthR{$$hash{depth}}";
-        }
-    } else {
-        $txt .= " -depth $$hash{depth}";
-        $txt .= " -compresslevel $$hash{compressLevel}";
-    }
+    $txt .= " -colorlevel $depthR{$$hash{depth}}";
 
     #print "$txt\n";
     return $txt;
@@ -259,7 +194,7 @@ sub _parseOptionsToCfg {
 
 sub embed {
     my $self = shift;
-    # TightVNC client does not support that mode anymore
+    # vncviewer client does not support that mode anymore
     return 0;
 }
 
@@ -273,33 +208,6 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
-    $w{hboxvnc} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hboxvnc}, 0, 1, 5);
-    $w{frVNC} = Gtk3::Label->new('VNC Client :');
-    $w{hboxvnc}->pack_start($w{frVNC}, 0, 0, 0);
-    $w{spVNC} = Gtk3::ComboBoxText->new();
-    foreach my $q ('TigerVNC','TightVNC','RealVNC') {$w{spVNC}->append_text($q);};
-    $w{hboxvnc}->pack_start($w{spVNC}, 0, 0, 0);
-
-    # TigerVNC
-    $w{hbox1} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
-    $w{frCompressLevel} = Gtk3::Frame->new('Compression level (1: min, 10: max) :');
-    $w{hbox1}->pack_start($w{frCompressLevel}, 1, 1, 0);
-    $w{frCompressLevel}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
-
-    $w{spCompressLevel} = Gtk3::HScale->new(Gtk3::Adjustment->new(8, 1, 11, 1.0, 1.0, 1.0) );
-    $w{frCompressLevel}->add($w{spCompressLevel});
-
-    $w{frQuality} = Gtk3::Frame->new('Picture quality (1: min, 10: max) :');
-    $w{hbox1}->pack_start($w{frQuality}, 1, 1, 0);
-    $w{frQuality}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
-
-    $w{spQuality} = Gtk3::HScale->new(Gtk3::Adjustment->new(5, 1, 11, 1.0, 1.0, 1.0) );
-    $w{frQuality}->add($w{spQuality});
-
-
-    # RealVNC
     $w{hbox1R} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1R}, 0, 1, 5);
 
@@ -317,9 +225,8 @@ sub _buildGUI {
 
     $w{cbDepth} = Gtk3::ComboBoxText->new();
     $w{hbox3}->pack_start($w{cbDepth}, 0, 1, 0);
-    foreach my $depth (8, 15, 16, 24, 32, 'default') {$w{cbDepth}->append_text($depth);};
+    foreach my $depth (8, 64, 256, 'full') {$w{cbDepth}->append_text($depth);};
 
-    # TigerVNC
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
 
@@ -345,32 +252,6 @@ sub _buildGUI {
             $$self{gui}{hbox3}->set_sensitive(1);
         } else {
             $$self{gui}{hbox3}->set_sensitive(0);
-        }
-    });
-    $w{spVNC}->signal_connect('changed', sub {
-        my $w = shift;
-
-        if ($w->get_active_text eq 'RealVNC') {
-            $$self{gui}{hbox1R}->show();
-            $$self{gui}{hbox1}->hide();
-            $$self{gui}{hbox1R}->set_sensitive(1);
-            $$self{gui}{hbox1}->set_sensitive(0);
-            if ((defined $$self{gui}{spQualityR}->get_active_text)&&($$self{gui}{spQualityR}->get_active_text eq 'custom')) {
-                $$self{gui}{hbox3}->set_sensitive(1);
-            } else {
-                $$self{gui}{hbox3}->set_sensitive(0);
-            }
-            $$self{gui}{cbDepth}->remove_all();
-            foreach my $depth (8, 64, 256, 'full') {$$self{gui}{cbDepth}->append_text($depth);};
-            $$self{gui}{cbDepth}->set_active(3);
-        } else {
-            $$self{gui}{hbox1}->show();
-            $$self{gui}{hbox1R}->hide();
-            $$self{gui}{hbox1R}->set_sensitive(0);
-            $$self{gui}{hbox1}->set_sensitive(1);
-            $$self{gui}{cbDepth}->remove_all();
-            foreach my $depth (8, 15, 16, 24, 32, 'default') {$$self{gui}{cbDepth}->append_text($depth);};
-            $$self{gui}{cbDepth}->set_active(5);
         }
     });
 
