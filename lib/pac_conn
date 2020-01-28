@@ -914,6 +914,15 @@ sub _setSshProxy {
         close CFG;
         if ($method =~ /VNC|RDP/i) {
             $proxy_jump = 2;
+
+            if (-e "$CFG_DIR/tmp/$UUID.ctl") {
+                # Avoid open a second terminal with the same UUID
+                my $check = `ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -T -O check jumpserver 2>&1`;
+                if ($check =~ /=\d+/) {
+                    ctrl("UNHIDE_TERMINAL");
+                    die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
+                }
+            }
             system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $PORT:localhost:$PORT jumpserver";
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
@@ -2028,7 +2037,7 @@ if ($CONNECTED) {
 }
 
 if ($proxy_jump == 2) {
-    system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -O exit jumpserver";
+    system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -T -O exit jumpserver";
 }
 
 my $why = $?;
