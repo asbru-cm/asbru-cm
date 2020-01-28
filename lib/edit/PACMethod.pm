@@ -90,8 +90,6 @@ $METHODS{'RDP (xfreerdp)'} = "PACMethod_xfreerdp"->new($CONTAINER);
 my $tigervnc = `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
 my $realvnc = `vncviewer --help 2>&1 | /bin/grep RealVNC`;
 
-$realvnc='';
-
 if ($tigervnc) {
     # Use TigerVNC
     eval {require "$RealBin/lib/method/PACMethod_tigervnc.pm";}; die $@ if $@;

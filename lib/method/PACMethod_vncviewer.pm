@@ -43,8 +43,8 @@ use Gtk3 '-init';
 ###################################################################
 # Define GLOBAL CLASS variables
 
+my $ENCODINGS = "Tight Zlib Hextile CoRRE RRE CopyRect Raw";
 my %DEPTH = (8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4, 'default' => 5);
-my %QUALITY = ('auto',0,'high',1,'medium',2,'low',3,'custom',4);
 my $RES_DIR = $RealBin . '/res';
 
 # END: Define GLOBAL CLASS variables
@@ -82,15 +82,9 @@ sub update {
     $$self{gui}{chFullScreen}->set_active($$options{fullScreen});
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
-    $$self{gui}{spQuality}->set_active($QUALITY{$$options{quality}});
-    $$self{gui}{entryVia}->set_text($$options{via});
+    $$self{gui}{spQuality}->set_value($$options{quality});
+    $$self{gui}{spCompressLevel}->set_value($$options{compressLevel});
     $$self{gui}{cbDepth}->set_active($DEPTH{$$options{depth} // 'default'});
-
-    if ($$self{gui}{spQuality} eq 'custon') {
-        $$self{gui}{hbox3}->set_sensitive(1);
-    } else {
-        $$self{gui}{hbox3}->set_sensitive(0);
-    }
 
     return 1;
 }
@@ -103,8 +97,8 @@ sub get_cfg {
     $options{fullScreen} = $$self{gui}{chFullScreen}->get_active;
     $options{listen} = $$self{gui}{chListen}->get_active;
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
-    $options{quality} = $$self{gui}{spQuality}->get_active_text;
-    $options{via} = $$self{gui}{entryVia}->get_chars(0, -1);
+    $options{quality} = $$self{gui}{spQuality}->get_value;
+    $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
     $options{depth} = $$self{gui}{cbDepth}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -122,9 +116,9 @@ sub _parseCfgToOptions {
     my %hash;
     $hash{fullScreen} = 0;
     $hash{nsize} = 1;
-    $hash{quality} = 'auto';
+    $hash{quality} = 5;
+    $hash{compressLevel} = 8;
     $hash{depth} = 'default';
-    $hash{via} = '';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -132,25 +126,12 @@ sub _parseCfgToOptions {
         next unless $opt ne '';
         $opt =~ s/\s+$//go;
 
-        if ($opt eq 'fullscreen') {
-            $hash{fullScreen} = 1;
-            $hash{nsize} = 0;
-        }
-        if ($opt eq 'listen') {
-            $hash{listen} = 1;
-        }
-        if ($opt eq 'viewonly') {
-            $hash{viewOnly} = 1;
-        }
-        if ($opt =~ /^quality\s+(\w+)$/go) {
-            $hash{quality} = $1;
-        }
-        if ($opt =~ /^depth\s+(\d+)$/go) {
-            $hash{depth} = $1;
-        }
-        if ($opt =~ /^via\s+(.+)$/go) {
-            $hash{via} = $1;
-        }
+        if ($opt eq 'fullscreen')            {$hash{fullScreen} = 1; $hash{nsize} = 0;}
+        $opt eq 'listen'                    and    $hash{listen} = 1;
+        $opt eq 'viewonly'                    and    $hash{viewOnly} = 1;
+        $opt =~ /^compresslevel\s+(\d+)$/go    and    $hash{compressLevel} = $1;
+        $opt =~ /^quality\s+(\d+)$/go        and    $hash{quality} = $1;
+        $opt =~ /^depth\s+(\d+)$/go            and    $hash{depth} = $1;
     }
 
     return \%hash;
@@ -161,26 +142,14 @@ sub _parseOptionsToCfg {
 
     my $txt = '';
 
-    if (!$$hash{quality}) {
-        $$hash{quality} = 'auto';
-    }
-    if ($QUALITY{$$hash{quality}} eq '') {
-        $$hash{quality} = 'auto';
-    }
-    if ($$hash{fullScreen}) {
-        $txt .= ' -fullscreen';
-    }
-    if ($$hash{listen}) {
-        $txt .= ' -listen';
-    }
-    if ($$hash{viewOnly}) {
-        $txt .= ' -viewonly';
-    }
-    if (($$hash{depth} ne 'default')&&($$hash{quality} eq 'custom')) {
-        $txt .= " -depth $$hash{depth}";
-    }
-    $txt .= " -quality $$hash{quality}";
-    $txt .= " -via $$hash{via}" if $$hash{via};
+    $txt .= ' -fullscreen'        if $$hash{fullScreen};
+    $txt .= ' -listen'            if $$hash{listen};
+    $txt .= ' -viewonly'        if $$hash{viewOnly};
+    $txt .= ' -depth '            . $$hash{depth} if ($$hash{depth} ne 'default');
+    $txt .= ' -compresslevel '    . $$hash{compressLevel};
+    $txt .= ' -quality '        . $$hash{quality};
+    $txt .= " -encodings \"$ENCODINGS\"";
+    $txt .= ' -autopass';
 
     return $txt;
 }
@@ -201,14 +170,28 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
+    $w{hboxReal} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
+    $w{lblClient} = Gtk3::Label->new();
+    $w{lblClient}->set_markup('<b>VNC configuration</b>');
+    $w{hboxReal}->pack_start($w{lblClient}, 0, 0, 0);
+
     $w{hbox1} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
 
-    $w{frQuality} = Gtk3::Label->new('Picture quality :');
-    $w{hbox1}->pack_start($w{frQuality}, 0, 0, 0);
-    $w{spQuality} = Gtk3::ComboBoxText->new();
-    foreach my $q ('auto','high','medium','low','custom') {$w{spQuality}->append_text($q);};
-    $w{hbox1}->pack_start($w{spQuality}, 0, 0, 0);
+    $w{frCompressLevel} = Gtk3::Frame->new('Compression level (1: min, 10: max) :');
+    $w{hbox1}->pack_start($w{frCompressLevel}, 1, 1, 0);
+    $w{frCompressLevel}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
+
+    $w{spCompressLevel} = Gtk3::HScale->new(Gtk3::Adjustment->new(8, 1, 11, 1.0, 1.0, 1.0) );
+    $w{frCompressLevel}->add($w{spCompressLevel});
+
+    $w{frQuality} = Gtk3::Frame->new('Picture quality (1: min, 10: max) :');
+    $w{hbox1}->pack_start($w{frQuality}, 1, 1, 0);
+    $w{frQuality}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
+
+    $w{spQuality} = Gtk3::HScale->new(Gtk3::Adjustment->new(5, 1, 11, 1.0, 1.0, 1.0) );
+    $w{frQuality}->add($w{spQuality});
 
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
@@ -228,37 +211,14 @@ sub _buildGUI {
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
 
-    $w{hbox3} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox3}, 0, 0, 0);
+    $w{frDepth} = Gtk3::Frame->new('Colour depth (bpp):');
+    $w{hbox2}->pack_start($w{frDepth}, 0, 1, 0);
+    $w{frDepth}->set_shadow_type('GTK_SHADOW_NONE');
+    $w{frDepth}->set_tooltip_text('[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits per pixel)');
 
-    $w{frDepth} = Gtk3::Label->new('Colour depth (bpp):');
-    $w{hbox3}->pack_start($w{frDepth}, 0, 1, 0);
-
-    $w{cbDepth} = Gtk3::ComboBoxText->new();
-    $w{hbox3}->pack_start($w{cbDepth}, 0, 1, 0);
+    $w{cbDepth} = Gtk3::ComboBoxText->new;
+    $w{frDepth}->add($w{cbDepth});
     foreach my $depth (8, 15, 16, 24, 32, 'default') {$w{cbDepth}->append_text($depth);};
-
-    $w{hbox4} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox4}, 0, 0, 0);
-
-    $w{lblVia} = Gtk3::Label->new('Proxy SSH Via:');
-    $w{hbox4}->pack_start($w{lblVia}, 0, 0, 0);
-    $w{lblVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{entryVia} = Gtk3::Entry->new;
-    $w{hbox4}->pack_start($w{entryVia}, 0, 1, 0);
-    $w{entryVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{spQuality}->signal_connect('changed', sub {
-        my $w = shift;
-
-        if ($w->get_active_text eq 'custom') {
-            $$self{gui}{hbox3}->set_sensitive(1);
-        } else {
-            $$self{gui}{hbox3}->set_sensitive(0);
-        }
-
-    });
 
     $$self{gui} = \%w;
 
