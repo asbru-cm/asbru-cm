@@ -1,4 +1,4 @@
-package PACMethod_vncviewer;
+package PACMethod_realvnc;
 
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
@@ -43,9 +43,12 @@ use Gtk3 '-init';
 ###################################################################
 # Define GLOBAL CLASS variables
 
-my %DEPTH = (8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4, 'default' => 5);
+my $ENCODINGS = "Tight Zlib Hextile CoRRE RRE CopyRect Raw";
+my %DEPTHR = (8 => 0, 64 => 1, 256 => 2, 'full' => 3);
+my %depthR = (8 => 'rgb111', 64 => 'rgb222', 256 => 'pal8', 'full' => 'full');
+my %Rdepth = ('rgb111'=>8,'rgb222'=>64,'pal8'=>256, 'full' => 'full');
 my %QUALITY = ('auto',0,'high',1,'medium',2,'low',3,'custom',4);
-my $RES_DIR = $RealBin . '/res';
+my $RES_DIR = "$RealBin/res";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -82,15 +85,8 @@ sub update {
     $$self{gui}{chFullScreen}->set_active($$options{fullScreen});
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
-    $$self{gui}{spQuality}->set_active($QUALITY{$$options{quality}});
-    $$self{gui}{entryVia}->set_text($$options{via});
-    $$self{gui}{cbDepth}->set_active($DEPTH{$$options{depth} // 'default'});
 
-    if ($$self{gui}{spQuality} eq 'custon') {
-        $$self{gui}{hbox3}->set_sensitive(1);
-    } else {
-        $$self{gui}{hbox3}->set_sensitive(0);
-    }
+    _setGUIState($self,$options);
 
     return 1;
 }
@@ -103,8 +99,7 @@ sub get_cfg {
     $options{fullScreen} = $$self{gui}{chFullScreen}->get_active;
     $options{listen} = $$self{gui}{chListen}->get_active;
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
-    $options{quality} = $$self{gui}{spQuality}->get_active_text;
-    $options{via} = $$self{gui}{entryVia}->get_chars(0, -1);
+    $options{quality} = $$self{gui}{spQualityR}->get_active_text;
     $options{depth} = $$self{gui}{cbDepth}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -116,15 +111,33 @@ sub get_cfg {
 ###################################################################
 # START: Private functions definitions
 
+sub _setGUIState {
+    my $self = shift;
+    my $options = shift;
+
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{spQualityR}->set_active($QUALITY{$$options{quality}});
+    if (!defined $DEPTHR{$$options{depth}}) {
+        $$options{depth} = 'full';
+    }
+    if ($$options{quality} eq 'custom') {
+        $$self{gui}{hbox3}->set_sensitive(1);
+    } else {
+        $$self{gui}{hbox3}->set_sensitive(0);
+    }
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{hbox1R}->show();
+}
+
 sub _parseCfgToOptions {
     my $cmd_line = shift;
 
     my %hash;
     $hash{fullScreen} = 0;
     $hash{nsize} = 1;
+    $hash{compressLevel} = 8;
+    $hash{depth} = 'full';
     $hash{quality} = 'auto';
-    $hash{depth} = 'default';
-    $hash{via} = '';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -132,24 +145,21 @@ sub _parseCfgToOptions {
         next unless $opt ne '';
         $opt =~ s/\s+$//go;
 
-        if ($opt eq 'fullscreen') {
+        if ($opt =~ /^quality/go) {
+            if ($opt =~ /^quality\s+([a-z]+)$/) {
+                $hash{quality} = $1;
+            }
+        } elsif ($opt eq 'fullscreen') {
             $hash{fullScreen} = 1;
             $hash{nsize} = 0;
-        }
-        if ($opt eq 'listen') {
+        } elsif ($opt eq 'listen') {
             $hash{listen} = 1;
-        }
-        if ($opt eq 'viewonly') {
+        } elsif ($opt eq 'viewonly') {
             $hash{viewOnly} = 1;
-        }
-        if ($opt =~ /^quality\s+(\w+)$/go) {
-            $hash{quality} = $1;
-        }
-        if ($opt =~ /^depth\s+(\d+)$/go) {
+        } elsif ($opt =~ /^depth\s+(\d+)$/) {
             $hash{depth} = $1;
-        }
-        if ($opt =~ /^via\s+(.+)$/go) {
-            $hash{via} = $1;
+        } elsif ($opt =~ /^colorlevel\s+(\w+)$/) {
+            $hash{depth} = $Rdepth{$1};
         }
     }
 
@@ -158,14 +168,13 @@ sub _parseCfgToOptions {
 
 sub _parseOptionsToCfg {
     my $hash = shift;
-
     my $txt = '';
 
     if (!$$hash{quality}) {
         $$hash{quality} = 'auto';
-    }
-    if ($QUALITY{$$hash{quality}} eq '') {
-        $$hash{quality} = 'auto';
+        if ($QUALITY{$$hash{quality}} eq '') {
+            $$hash{quality} = 'auto';
+        }
     }
     if ($$hash{fullScreen}) {
         $txt .= ' -fullscreen';
@@ -176,18 +185,16 @@ sub _parseOptionsToCfg {
     if ($$hash{viewOnly}) {
         $txt .= ' -viewonly';
     }
-    if (($$hash{depth} ne 'default')&&($$hash{quality} eq 'custom')) {
-        $txt .= " -depth $$hash{depth}";
-    }
     $txt .= " -quality $$hash{quality}";
-    $txt .= " -via $$hash{via}" if $$hash{via};
+    $txt .= " -colorlevel $depthR{$$hash{depth}}";
 
+    #print "$txt\n";
     return $txt;
 }
 
 sub embed {
     my $self = shift;
-    # TightVNC client does not support that mode anymore
+    # vncviewer client does not support that mode anymore
     return 0;
 }
 
@@ -201,14 +208,31 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
-    $w{hbox1} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
+    $w{hboxReal} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
 
-    $w{frQuality} = Gtk3::Label->new('Picture quality :');
-    $w{hbox1}->pack_start($w{frQuality}, 0, 0, 0);
-    $w{spQuality} = Gtk3::ComboBoxText->new();
-    foreach my $q ('auto','high','medium','low','custom') {$w{spQuality}->append_text($q);};
-    $w{hbox1}->pack_start($w{spQuality}, 0, 0, 0);
+    $w{lblReal} = Gtk3::Label->new();
+    $w{lblReal}->set_markup('<b>RealVNC configuration</b>');
+    $w{hboxReal}->pack_start($w{lblReal}, 0, 0, 0);
+
+
+    $w{hbox1R} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hbox1R}, 0, 1, 5);
+    $w{frQualityR} = Gtk3::Label->new('Picture quality :');
+    $w{hbox1R}->pack_start($w{frQualityR}, 0, 0, 0);
+    $w{spQualityR} = Gtk3::ComboBoxText->new();
+    foreach my $q ('auto','high','medium','low','custom') {$w{spQualityR}->append_text($q);};
+    $w{hbox1R}->pack_start($w{spQualityR}, 0, 0, 0);
+
+    # Both
+    $w{hbox3} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hbox3}, 0, 0, 0);
+    $w{frDepth} = Gtk3::Label->new('Colour depth (bpp):');
+    $w{hbox3}->pack_start($w{frDepth}, 0, 1, 0);
+
+    $w{cbDepth} = Gtk3::ComboBoxText->new();
+    $w{hbox3}->pack_start($w{cbDepth}, 0, 1, 0);
+    foreach my $depth (8, 64, 256, 'full') {$w{cbDepth}->append_text($depth);};
 
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
@@ -228,28 +252,7 @@ sub _buildGUI {
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
 
-    $w{hbox3} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox3}, 0, 0, 0);
-
-    $w{frDepth} = Gtk3::Label->new('Colour depth (bpp):');
-    $w{hbox3}->pack_start($w{frDepth}, 0, 1, 0);
-
-    $w{cbDepth} = Gtk3::ComboBoxText->new();
-    $w{hbox3}->pack_start($w{cbDepth}, 0, 1, 0);
-    foreach my $depth (8, 15, 16, 24, 32, 'default') {$w{cbDepth}->append_text($depth);};
-
-    $w{hbox4} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox4}, 0, 0, 0);
-
-    $w{lblVia} = Gtk3::Label->new('Proxy SSH Via:');
-    $w{hbox4}->pack_start($w{lblVia}, 0, 0, 0);
-    $w{lblVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{entryVia} = Gtk3::Entry->new;
-    $w{hbox4}->pack_start($w{entryVia}, 0, 1, 0);
-    $w{entryVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{spQuality}->signal_connect('changed', sub {
+    $w{spQualityR}->signal_connect('changed', sub {
         my $w = shift;
 
         if ($w->get_active_text eq 'custom') {
@@ -257,7 +260,6 @@ sub _buildGUI {
         } else {
             $$self{gui}{hbox3}->set_sensitive(0);
         }
-
     });
 
     $$self{gui} = \%w;
