@@ -208,9 +208,16 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
+    $w{hboxReal} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
+
+    $w{lblReal} = Gtk3::Label->new();
+    $w{lblReal}->set_markup('<b>RealVNC configuration</b>');
+    $w{hboxReal}->pack_start($w{lblReal}, 0, 0, 0);
+
+
     $w{hbox1R} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1R}, 0, 1, 5);
-
     $w{frQualityR} = Gtk3::Label->new('Picture quality :');
     $w{hbox1R}->pack_start($w{frQualityR}, 0, 0, 0);
     $w{spQualityR} = Gtk3::ComboBoxText->new();
