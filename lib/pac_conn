@@ -170,6 +170,7 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my @KEEPASS = @{$$CFG{'keepass'} // []};
+my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
     $RESTART = 1;
@@ -913,7 +914,7 @@ sub _setSshProxy {
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
-            my $LPORT = $PORT;
+            $LPORT = $PORT;
             my $break = 10;
 
             $proxy_jump = 2;
@@ -1130,6 +1131,7 @@ if (defined $METHOD) {
         _setSshProxy($method);
         if ($proxy_jump) {
             $IP = '127.0.0.1';
+            $PORT = $LPORT;
         }
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
