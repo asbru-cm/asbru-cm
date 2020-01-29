@@ -185,8 +185,10 @@ sub _parseOptionsToCfg {
     if ($$hash{viewOnly}) {
         $txt .= ' -viewonly';
     }
+    if ($$hash{depth}) {
+        $txt .= " -colorlevel $depthR{$$hash{depth}}";
+    }
     $txt .= " -quality $$hash{quality}";
-    $txt .= " -colorlevel $depthR{$$hash{depth}}";
 
     #print "$txt\n";
     return $txt;

@@ -913,6 +913,9 @@ sub _setSshProxy {
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
+            my $LPORT = $PORT;
+            my $break = 10;
+
             $proxy_jump = 2;
 
             if (-e "$CFG_DIR/tmp/$UUID.ctl") {
@@ -923,7 +926,16 @@ sub _setSshProxy {
                     die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
                 }
             }
-            system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $PORT:localhost:$PORT jumpserver";
+            # Check if port we want to bind is not alreay in use
+            while (($break)&&(my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
+                if ($msg !~ /:$LPORT/) {
+                    # netstat not installed?
+                    last;
+                }
+                $LPORT++;
+                $break--;
+            }
+            system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $LPORT:localhost:$PORT jumpserver";
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
@@ -1810,6 +1822,10 @@ $SIG{'HUP'} = sub {
 
     my $chain_uuid = '';
     my $CHAIN_CFG;
+
+    if ($proxy_jump == 2) {
+        system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -T -O exit jumpserver";
+    }
 
     if ($INT) {
         return 1;
