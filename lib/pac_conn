@@ -189,7 +189,7 @@ $PROXY{'cfg'}{'user'} = $$CFG{'defaults'}{'proxy user'};
 $PROXY{'cfg'}{'pass'} = $$CFG{'defaults'}{'proxy pass'};
 
 if (!$RESTART && $IS_CLUSTER) {
-    $RESTART = 1;
+    $RESTART = 2;
 }
 
 
@@ -1505,6 +1505,9 @@ elsif (! $MANUAL) {
 
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
+            if ($RESTART) {
+                ctrl('RESTART');
+            }
             $EXP -> hard_close();
         }],
 
@@ -2040,6 +2043,10 @@ $SIG{'USR2'} = sub {
 };
 
 if ($CONNECTED) {
+    # Restart only on connection start, not at the end of the session
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        $RESTART = 0;
+    }
     $EXP -> interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
