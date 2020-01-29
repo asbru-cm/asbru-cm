@@ -173,7 +173,7 @@ my @KEEPASS = @{$$CFG{'keepass'} // []};
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
-    $RESTART = 1;
+    $RESTART = 2;
 }
 
 $IP = subst($IP);
@@ -991,6 +991,9 @@ sub _hardClose {
     if ($proxy_jump == 2) {
         system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
     }
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        ctrl('RESTART');
+    }
     return 0;
 }
 
@@ -1536,15 +1539,14 @@ elsif (!$MANUAL) {
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            if ($RESTART) {
-                ctrl('RESTART');
-            }
+            _hardClose($UUID);
             $EXP->hard_close();
         }],
 
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
             $EXP->hard_close();
         }],
 
@@ -1575,6 +1577,7 @@ elsif (!$MANUAL) {
             # ... second 'sudo' password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided 'sudo' password was rejected");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1672,6 +1675,7 @@ elsif (!$MANUAL) {
             # ... too many password attempts: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1733,6 +1737,7 @@ elsif (!$MANUAL) {
                     [eof => sub {
                         $CONNECTED = 0;
                         ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+                        _hardClose($UUID);
                         $EXP->hard_close();
                     }],
 
@@ -2078,6 +2083,10 @@ $SIG{'USR2'} = sub {
 };
 
 if ($CONNECTED) {
+    # Restart only when connecting at startup connection
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        $RESTART = 0;
+    }
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
