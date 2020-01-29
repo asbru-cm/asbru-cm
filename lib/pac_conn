@@ -937,6 +937,8 @@ sub _setSshProxy {
                 $break--;
             }
             system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+            $IP = '127.0.0.1';
+            $PORT = $LPORT;
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
@@ -1129,10 +1131,6 @@ if (defined $METHOD) {
             $method = 'TigerVNC';
         }
         _setSshProxy($method);
-        if ($proxy_jump) {
-            $IP = '127.0.0.1';
-            $PORT = $LPORT;
-        }
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
