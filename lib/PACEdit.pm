@@ -236,7 +236,7 @@ sub __checkRBAuth {
     } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_label("SSH Tunnel port forward");
+        _($self, 'rbUseProxyJump')->set_label("Use SSH Tunnel");
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
