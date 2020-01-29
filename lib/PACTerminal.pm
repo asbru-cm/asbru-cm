@@ -1408,7 +1408,6 @@ sub _setupCallbacks {
         $$self{_PID} = 0;
 
         if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
-            sleep($$self{_RECONNECTS});
             $$self{_RECONNECTS}++;
             $self->start;
         } else {
