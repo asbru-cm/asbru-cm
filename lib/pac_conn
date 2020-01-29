@@ -972,13 +972,14 @@ sub _setSshProxy {
     return 0;
 }
 
-sub _killProxyTunnel {
+# Place any thing that has to be done before a hard_close
+sub _hardClose {
     my ($uuid)  = @_;
 
-    if ($proxy_jump < 2) {
-        return 0;
+    if ($proxy_jump == 2) {
+        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
     }
-    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    return 0;
 }
 
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
@@ -1241,7 +1242,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-            _killProxyTunnel($UUID);
+            _hardClose($UUID);
             $EXP->hard_close;
         }],
 
@@ -1268,7 +1269,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                _killProxyTunnel($UUID);
+                _hardClose($UUID);
                 $EXP->hard_close();
             }
             $USER_COUNT++;
@@ -1298,14 +1299,14 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
-                    _killProxyTunnel($UUID);
+                    _hardClose($UUID);
                     $EXP->hard_close;
                 }
             }
             # ... second password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
-                _killProxyTunnel($UUID);
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1322,7 +1323,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
             } else {
                 $CONNECTED = 0;
                 ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-                _killProxyTunnel($UUID);
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1331,7 +1332,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-            _killProxyTunnel($UUID);
+            _hardClose($UUID);
             $EXP->hard_close;
         }],
 
@@ -1358,7 +1359,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                _killProxyTunnel($UUID);
+                _hardClose($UUID);
                 $EXP->hard_close();
             }
             $USER_COUNT++;
@@ -1386,7 +1387,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
                 exp_continue;
             } else {
                 ctrl("CLOSE:PASSWORD:Password input cancelled by user");
-                _killProxyTunnel($UUID);
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1840,7 +1841,7 @@ $SIG{'HUP'} = sub {
     my $chain_uuid = '';
     my $CHAIN_CFG;
 
-    _killProxyTunnel($UUID);
+    _hardClose($UUID);
 
     if ($INT) {
         return 1;
@@ -2068,7 +2069,7 @@ if ($CONNECTED) {
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
-_killProxyTunnel($UUID);
+_hardClose($UUID);
 
 my $why = $?;
 
