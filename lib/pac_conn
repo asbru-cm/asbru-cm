@@ -935,7 +935,7 @@ sub _setSshProxy {
                 $LPORT++;
                 $break--;
             }
-            system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $LPORT:localhost:$PORT jumpserver";
+            system "ssh -F $CFG_DIR/tmp/$UUID.conf -S $CFG_DIR/tmp/$UUID.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
