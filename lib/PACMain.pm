@@ -789,8 +789,6 @@ sub _initGUI {
     # Create descView as a gtktextview with descBuffer
     $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new();
     $$self{_GUI}{descView} = Gtk3::TextView->new_with_buffer($$self{_GUI}{descBuffer});
-    $$self{_GUI}{descView}->set_editable(0);
-    $$self{_GUI}{descView}->set_can_focus(0);
     $$self{_GUI}{descView}->set_border_width(5);
     $$self{_GUI}{scrollDescription}->add($$self{_GUI}{descView});
     $$self{_GUI}{descView}->set_wrap_mode('GTK_WRAP_WORD');
@@ -3620,13 +3618,7 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        my $msg;
-        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
-            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
-        } else {
-            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
-        }
-        $$self{_GUI}{descBuffer}->set_text($msg);
+        $$self{_GUI}{descBuffer}->set_text(decode('utf8',$$self{_CFG}{'environments'}{$uuid}{'description'} // ' '));
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
