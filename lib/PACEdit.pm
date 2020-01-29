@@ -236,7 +236,7 @@ sub __checkRBAuth {
     } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_label("Use SSH Tunnel");
+        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
@@ -248,7 +248,7 @@ sub __checkRBAuth {
         _($self, 'vboxJumpCfg')->set_visible(0);
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
-        _($self, 'rbUseProxyJump')->set_label("SSH Tunnel port forward");
+        _($self, 'rbUseProxyJump')->set_label("User SSH tunnel");
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
@@ -840,7 +840,7 @@ sub _updateGUIPreferences {
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_label("SSH Tunnel port forward");
+        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     } else {
