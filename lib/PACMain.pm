@@ -3124,7 +3124,7 @@ sub _launchTerminals {
 
     my $wtmp;
     scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting '<b><big>". (scalar(@{ $terminals })) . "</big></b>' terminals...", 0);
-    $ENV{'NTERMINALES'} = scalar(@{ $terminals });
+    $$self{_NTERMINALS} = scalar(@{ $terminals });
 
     # Create all selected terminals
     foreach my $sel (@{ $terminals }) {
