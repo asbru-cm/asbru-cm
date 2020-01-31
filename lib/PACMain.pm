@@ -906,9 +906,14 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        $col[0]->set_visible(0);
+    foreach my $tree ('Connections','Favourites','History') {
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        if ($tree eq 'Connections') {
+            $col[0]->set_visible(0);
+        } else {
+            my ($c) = $col[1]->get_cells;
+            $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+        }
     }
 
     ##############################################
