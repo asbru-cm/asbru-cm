@@ -2443,7 +2443,7 @@ sub __treeBuildNodeName {
     if ($protected) {
         $pset = "$p_set='$p_color'";
     }
-    $name = "<span $pset$bold>$name</span>";
+    $name = "<span $pset$bold  font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
 
     return $name;
 }
