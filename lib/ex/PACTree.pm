@@ -111,12 +111,12 @@ sub _addNode {
 
         # Parent group is __PAC__ROOT__
         if ((! defined $parent_uuid) || ($parent_uuid eq '__PAC__ROOT__') ) {
-            push(@{$$self{'data'}}, {value => [$icon, $gui_name, $new_uuid]});
+            push(@{$$self{'data'}}, {value => ['', $gui_name, $new_uuid, $icon]});
             return 1;
         }
         # Parent group found, insert here (the TreeModelSort will order it itself)
         elsif ($this_uuid eq $parent_uuid) {
-            splice(@{$$elem_hash{'children'}}, 0, 0, ({value => [$icon, $gui_name, $new_uuid]}) );
+            splice(@{$$elem_hash{'children'}}, 0, 0, ({value => ['', $gui_name, $new_uuid, $icon]}) );
             return 1;
         }
         # Parent group not found, keep on searching in its children
@@ -191,13 +191,23 @@ sub new {
 sub new_from_treeview {
     my $class = shift;
     my $view = shift;
-    croak "treeview is not a Gtk3::TreeView"
-        unless defined ($view)
-           and UNIVERSAL::isa ($view, 'Gtk3::TreeView');
-    croak "Usage: $class\->new_from_treeview (treeview, title => type, ...)\n"
-        . " expecting a treeview reference and list of column title and type name pairs.\n"
-        . " can't create a SimpleTree with no columns"
-        unless @_ >= 2; # key1, val1
+    croak "treeview is not a Gtk3::TreeView" unless defined($view) and UNIVERSAL::isa ($view, 'Gtk3::TreeView');
+    croak "Usage: $class\->new_from_treeview (treeview, title => type, ...)\nexpecting a treeview reference and list of column title and type name pairs.\n can't create a SimpleTree with no columns" unless @_ >= 2; # key1, val1
+
+    $class->add_column_type('image_text',
+        type => 'Glib::Scalar',
+        renderer => 'Gtk3::CellRendererPixbuf',
+        attr => sub {
+            my ($treecol, $cell, $model, $iter, $col_num) = @_;
+            my $pixrd = Gtk3::CellRendererPixbuf->new();
+            my $txtrd = Gtk3::CellRendererText->new();
+            $treecol->clear();
+            $treecol->pack_start($pixrd,0);
+            $treecol->pack_start($txtrd,1);
+            $treecol->add_attribute($pixrd,'pixbuf',3);
+            $treecol->add_attribute($txtrd,'markup',1);
+        }
+    );
     my @column_info = ();
     for (my $i = 0; $i < @_ ; $i+=2) {
         my $typekey = $_[$i+1];

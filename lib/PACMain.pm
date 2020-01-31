@@ -522,9 +522,10 @@ sub _initGUI {
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
-        'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'List:' => 'image_text',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'Icon:' => 'pixbuf',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -532,7 +533,7 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
+    #$$self{_GUI}{treeConnections}->set_level_indentation(-2);
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
@@ -541,7 +542,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ '', '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__',$GROUPICON_ROOT ],
             children => []
         }
     );
@@ -907,9 +908,12 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections', 'Favourites', 'History') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        if ($tree eq 'Connections') {
+            $col[1]->set_visible(0);
+        }
         my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+        $c->set_alignment(0,0);
     }
 
     ##############################################
@@ -3421,7 +3425,7 @@ sub _loadTreeConfiguration {
 
     @{ $$self{_GUI}{treeConnections}{'data'} } =
     ({
-        value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+        value => [ '', '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__', $GROUPICON_ROOT ],
         children => []
     });
     foreach my $child (keys %{ $$self{_CFG}{environments}{'__PAC__ROOT__'}{children} }) {
@@ -3443,7 +3447,7 @@ sub __recurLoadTree {
 
     if (!$$self{_CFG}{environments}{$uuid}{'_is_group'}) {
         push(@list, {
-            value => [ $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'}, $node_name, $uuid ],
+            value => [ '', $node_name, $uuid, $$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'icon'} ],
             children => []
         });
     } else {
@@ -3452,7 +3456,7 @@ sub __recurLoadTree {
             push(@clist, $self->__recurLoadTree($child));
         }
         push(@list, {
-            value => [ $GROUPICONCLOSED, $node_name, $uuid ],
+            value => [ '', $node_name, $uuid, $GROUPICONCLOSED ],
             children => \@clist
         });
     }
@@ -3618,7 +3622,10 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        $$self{_GUI}{descBuffer}->set_text(decode('utf8',$$self{_CFG}{'environments'}{$uuid}{'description'} // ' '));
+        if (!$$self{_CFG}{'environments'}{$uuid}{'description'}) {
+            $$self{_CFG}{'environments'}{$uuid}{'description'} = 'Write any comments for your connection here ...';
+        }
+        $$self{_GUI}{descBuffer}->set_text("$$self{_CFG}{'environments'}{$uuid}{'description'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
@@ -4145,7 +4152,7 @@ sub __importNodes {
         Gtk3::main_iteration while Gtk3::events_pending;
         @{ $$self{_GUI}{treeConnections}{'data'} } = ();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ({
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ '', '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__',$GROUPICON_ROOT ],
             children => []
         });
         Gtk3::main_iteration while Gtk3::events_pending;
