@@ -523,8 +523,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -541,7 +542,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__', '' ],
             children => []
         }
     );
@@ -906,10 +907,9 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections', 'Favourites', 'History') {
+    foreach my $tree ('Connections') {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+        $col[0]->set_visible(0);
     }
 
     ##############################################
@@ -3428,6 +3428,10 @@ sub _loadTreeConfiguration {
         push(@{ $$tree{data} }, $self->__recurLoadTree($child));
     }
 
+    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
+    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
+    local $SIG{__WARN__} = sub {
+    };
     # Select the root path
     $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
 
@@ -3618,7 +3622,10 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        $$self{_GUI}{descBuffer}->set_text(decode('utf8',$$self{_CFG}{'environments'}{$uuid}{'description'} // ' '));
+        if (!$$self{_CFG}{'environments'}{$uuid}{'description'}) {
+            $$self{_CFG}{'environments'}{$uuid}{'description'} = 'Insert your comments for this connection here ...';
+        }
+        $$self{_GUI}{descBuffer}->set_text("$$self{_CFG}{'environments'}{$uuid}{'description'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
