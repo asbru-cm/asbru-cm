@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -533,7 +533,6 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
