@@ -912,8 +912,6 @@ sub _initGUI {
         if ($tree eq 'Connections') {
             $col[1]->set_visible(0);
         }
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(0,0);
     }
 
     ##############################################
@@ -3432,6 +3430,10 @@ sub _loadTreeConfiguration {
         push(@{ $$tree{data} }, $self->__recurLoadTree($child));
     }
 
+    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
+    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
+    local $SIG{__WARN__} = sub {
+    };
     # Select the root path
     $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
 

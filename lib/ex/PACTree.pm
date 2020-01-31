@@ -196,7 +196,7 @@ sub new_from_treeview {
 
     $class->add_column_type('image_text',
         type => 'Glib::Scalar',
-        renderer => 'Gtk3::CellRendererPixbuf',
+        renderer => 'Gtk3::CellRendererText',
         attr => sub {
             my ($treecol, $cell, $model, $iter, $col_num) = @_;
             my $pixrd = Gtk3::CellRendererPixbuf->new();
