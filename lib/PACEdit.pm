@@ -211,7 +211,7 @@ sub _initGUI {
 sub __checkRBAuth {
     my $self = shift;
 
-    if (_($self, 'comboMethod')->get_active_text() !~ /RDP|VNC|Generic|3270/go) {
+    if (_($self, 'comboMethod')->get_active_text() =~ /SSH|SFTP/i) {
         if(_($self, 'rbCfgAuthManual')->get_active()) {
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'labelExpect')->set_sensitive(0);
@@ -225,6 +225,33 @@ sub __checkRBAuth {
             _($self, 'alignExpect')->set_has_tooltip(0);
 
         }
+        _($self, 'rbUseProxyJump')->set_label("Use Jump Server");
+        my $status = _($self, 'rbUseProxyJump')->get_active();
+        _($self, 'rbUseProxyJump')->set_sensitive(1);
+        _($self, 'rbUseProxyJump')->set_tooltip_text("An alternative to SSH tunneling to access internal machines through gateway");
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+        _($self, 'vboxJumpCfgOptions')->set_sensitive($status);
+        _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'vboxCfgManualProxyConn')->set_visible(1);
+    } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
+        _($self, 'rbUseProxyJump')->set_sensitive(1);
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
+        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+        _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'vboxCfgManualProxyConn')->set_visible(0);
+    } else {
+        if (_($self, 'rbUseProxyJump')->get_active()) {
+            _($self, 'rbUseProxyIfCFG')->set_active(1);
+        }
+        _($self, 'vboxJumpCfg')->set_visible(0);
+        _($self, 'rbUseProxyJump')->set_sensitive(0);
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
+        _($self, 'rbUseProxyJump')->set_label("User SSH tunnel");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+        _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
 
     _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active());
@@ -248,7 +275,7 @@ sub _setupCallbacks {
     });
 
     # Capture 'Method' changed
-    _($self, 'comboMethod')->signal_connect(changed => sub {
+    _($self, 'comboMethod')->signal_connect('changed' => sub {
         my $method = _($self, 'comboMethod')->get_active_text();
 
         my $installed = &{$$self{_METHODS}{$method}{'installed'}};
@@ -257,6 +284,7 @@ sub _setupCallbacks {
 
         &{$$self{_METHODS}{$method}{'updateGUI'}}($$self{_CFG}{'environments'}{$$self{_UUID}});
         $$self{_SPECIFIC}->change($method, $$self{_CFG}{'environments'}{$$self{_UUID}});
+        __checkRBAuth($self);
     });
 
     # Capture "User/Pass" connection radiobutton state change
@@ -795,9 +823,11 @@ sub _updateGUIPreferences {
         $ssh =~ s/[ \t][ \t]+/ /g;
         if ($ssh =~ /-J /) {
             # Enable Jump Host
+            _($self, 'rbUseProxyJump')->set_label("Use Jump Server");
             _($self, 'rbUseProxyJump')->set_sensitive(1);
             _($self, 'rbUseProxyJump')->set_tooltip_text("An alternative to SSH tunneling to access internal machines through gateway");
             _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+            _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
         } else {
             # Disable Jump Host
             _($self, 'rbUseProxyJump')->set_sensitive(0);
@@ -806,8 +836,18 @@ sub _updateGUIPreferences {
         }
 
         _($self, 'vboxJumpCfg')->set_visible(1);
+    } elsif ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /VNC|RDP/) {
+        _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'rbUseProxyJump')->set_sensitive(1);
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
+        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     } else {
         _($self, 'vboxJumpCfg')->set_visible(0);
+        _($self, 'vboxJumpCfg')->set_visible(0);
+        _($self, 'rbUseProxyJump')->set_sensitive(0);
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
     }
 
     return 1;
