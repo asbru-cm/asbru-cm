@@ -58,7 +58,7 @@ my $APPVERSION = $PACUtils::APPVERSION;
 
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CLUSTERS_FILE = "$CFG_DIR/pac_clusters.nfreeze";
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RealBin/res/asbru_terminal16x16.png", 16, 16, 0);
@@ -103,6 +103,11 @@ sub DESTROY {
 sub show {
     my $self = shift;
     my $cluster = shift // 0;
+
+    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
+    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
+    local $SIG{__WARN__} = sub {
+    };
 
     $$self{_WINDOWCLUSTER}{main}->set_title("Cluster Administration : $APPNAME (v$APPVERSION)");
     $$self{_WINDOWCLUSTER}{main}->set_position('center');
@@ -380,8 +385,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_WINDOWCLUSTER}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_WINDOWCLUSTER}{scrollclu}->add($$self{_WINDOWCLUSTER}{treeConnections});
     $$self{_WINDOWCLUSTER}{treeConnections}->set_headers_visible(0);
@@ -398,8 +404,7 @@ sub _initGUI {
         children => []
     });
     my @col = $$self{_WINDOWCLUSTER}{treeConnections}->get_columns;
-    my ($c) = $col[0]->get_cells;
-    $c->set_alignment(1,0.5);
+    $col[0]->set_visible(0);
 
     # Buttons to Add/Del to/from Clusters
     my $vboxclu1 = Gtk3::VBox->new(0, 0);

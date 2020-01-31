@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -523,8 +523,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -532,7 +533,6 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
@@ -541,7 +541,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__', '' ],
             children => []
         }
     );
@@ -906,10 +906,14 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections', 'Favourites', 'History') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+    foreach my $tree ('Connections','Favourites','History') {
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        if ($tree eq 'Connections') {
+            $col[0]->set_visible(0);
+        } else {
+            my ($c) = $col[1]->get_cells;
+            $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+        }
     }
 
     ##############################################
@@ -2444,7 +2448,7 @@ sub __treeBuildNodeName {
     if ($protected) {
         $pset = "$p_set='$p_color'";
     }
-    $name = "<span $pset$bold>$name</span>";
+    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
 
     return $name;
 }
@@ -3428,6 +3432,10 @@ sub _loadTreeConfiguration {
         push(@{ $$tree{data} }, $self->__recurLoadTree($child));
     }
 
+    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
+    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
+    local $SIG{__WARN__} = sub {
+    };
     # Select the root path
     $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
 
@@ -3618,7 +3626,10 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        $$self{_GUI}{descBuffer}->set_text(decode('utf8',$$self{_CFG}{'environments'}{$uuid}{'description'} // ' '));
+        if (!$$self{_CFG}{'environments'}{$uuid}{'description'}) {
+            $$self{_CFG}{'environments'}{$uuid}{'description'} = 'Insert your comments for this connection here ...';
+        }
+        $$self{_GUI}{descBuffer}->set_text("$$self{_CFG}{'environments'}{$uuid}{'description'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
