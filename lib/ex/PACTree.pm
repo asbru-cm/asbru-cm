@@ -198,6 +198,22 @@ sub new_from_treeview {
         . " expecting a treeview reference and list of column title and type name pairs.\n"
         . " can't create a SimpleTree with no columns"
         unless @_ >= 2; # key1, val1
+
+    $class->add_column_type('image_text',
+        type => 'Glib::Scalar',
+        renderer => 'Gtk3::CellRendererText',
+        attr => sub {
+            my ($treecol, $cell, $model, $iter, $col_num) = @_;
+            my $pixrd = Gtk3::CellRendererPixbuf->new();
+            my $txtrd = Gtk3::CellRendererText->new();
+            $treecol->clear();
+            $treecol->pack_start($pixrd,0);
+            $treecol->pack_start($txtrd,1);
+            $treecol->add_attribute($pixrd,'pixbuf',0);
+            $treecol->add_attribute($txtrd,'markup',1);
+        }
+    );
+
     my @column_info = ();
     for (my $i = 0; $i < @_ ; $i+=2) {
         my $typekey = $_[$i+1];

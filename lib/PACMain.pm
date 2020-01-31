@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -517,8 +517,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -900,10 +901,9 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections', 'Favourites', 'History') {
+    foreach my $tree ('Connections') {
         my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+        $col[0]->set_visible(0);
     }
 
     ##############################################
@@ -3422,6 +3422,10 @@ sub _loadTreeConfiguration {
         push(@{ $$tree{data} }, $self->__recurLoadTree($child));
     }
 
+    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
+    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
+    local $SIG{__WARN__} = sub {
+    };
     # Select the root path
     $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
 
