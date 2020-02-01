@@ -3617,13 +3617,10 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        my $msg;
-        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
-            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
-        } else {
-            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
+        if (!$$self{_CFG}{'environments'}{$uuid}{'description'}) {
+            $$self{_CFG}{'environments'}{$uuid}{'description'} = 'Insert your comments for this connection here ...';
         }
-        $$self{_GUI}{descBuffer}->set_text($msg);
+        $$self{_GUI}{descBuffer}->set_text("$$self{_CFG}{'environments'}{$uuid}{'description'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
