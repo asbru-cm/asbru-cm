@@ -911,8 +911,9 @@ sub _saveConfiguration {
 
     $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
-    if  (($$self{_CFG}{'environments'}{$uuid}{'public key'})&&(!-d $$self{_CFG}{'environments'}{$uuid}{'public key'})&& (-e $$self{_CFG}{'environments'}{$uuid}{'public key'})) {
-        $$self{_CFG}{'environments'}{$uuid}{'public key'} = _($self, 'fileCfgPublicKey')->get_filename();
+    my $keyfile = _($self, 'fileCfgPublicKey')->get_filename();
+    if  (($keyfile)&&(!-d $keyfile)&& (-e $keyfile)) {
+        $$self{_CFG}{'environments'}{$uuid}{'public key'} = $keyfile;
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'public key'} = '';
     }
