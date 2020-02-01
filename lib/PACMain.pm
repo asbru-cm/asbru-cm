@@ -541,7 +541,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__', '' ],
+            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
             children => []
         }
     );
@@ -3432,12 +3432,8 @@ sub _loadTreeConfiguration {
         push(@{ $$tree{data} }, $self->__recurLoadTree($child));
     }
 
-    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
-    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
-    local $SIG{__WARN__} = sub {
-    };
     # Select the root path
-    $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
+    $tree->set_cursor($tree->_getPath('__PAC__ROOT__'), undef, 0);
 
     return 1;
 }
