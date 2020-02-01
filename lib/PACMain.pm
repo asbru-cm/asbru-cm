@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
