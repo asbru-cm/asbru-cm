@@ -380,8 +380,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_WINDOWCLUSTER}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_WINDOWCLUSTER}{scrollclu}->add($$self{_WINDOWCLUSTER}{treeConnections});
     $$self{_WINDOWCLUSTER}{treeConnections}->set_headers_visible(0);
@@ -398,8 +399,7 @@ sub _initGUI {
         children => []
     });
     my @col = $$self{_WINDOWCLUSTER}{treeConnections}->get_columns;
-    my ($c) = $col[0]->get_cells;
-    $c->set_alignment(1,0.5);
+    $col[0]->set_visible(0);
 
     # Buttons to Add/Del to/from Clusters
     my $vboxclu1 = Gtk3::VBox->new(0, 0);

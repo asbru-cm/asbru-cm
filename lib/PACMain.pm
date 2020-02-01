@@ -517,8 +517,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -526,7 +527,7 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
+
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
@@ -900,10 +901,14 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections', 'Favourites', 'History') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+    foreach my $tree ('Connections','Favourites','History') {
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        if ($tree eq 'Connections') {
+            $col[0]->set_visible(0);
+        } else {
+            my ($c) = $col[1]->get_cells;
+            $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+        }
     }
 
     ##############################################
@@ -2438,7 +2443,7 @@ sub __treeBuildNodeName {
     if ($protected) {
         $pset = "$p_set='$p_color'";
     }
-    $name = "<span $pset$bold>$name</span>";
+    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
 
     return $name;
 }
