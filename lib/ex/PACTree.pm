@@ -199,21 +199,27 @@ sub new_from_treeview {
         . " can't create a SimpleTree with no columns"
         unless @_ >= 2; # key1, val1
 
+    # Defines a special column type that does not use a standard renderer
+    # The renderer is built by function 'column_builder'
+    # The renderer will assume the first attribute of the model is defining the icon to show
+    # and the second attribute contains the markup text to display
     $class->add_column_type('image_text',
         type => 'Glib::Scalar',
-        renderer => 'Gtk3::CellRendererText',
-        attr => sub {
-            my ($treecol, $cell, $model, $iter, $col_num) = @_;
+        renderer => undef,
+        column_builder => sub {
             my $pixrd = Gtk3::CellRendererPixbuf->new();
             my $txtrd = Gtk3::CellRendererText->new();
-            $treecol->clear();
-            $treecol->pack_start($pixrd,0);
-            $treecol->pack_start($txtrd,1);
-            $treecol->add_attribute($pixrd,'pixbuf',0);
-            $treecol->add_attribute($txtrd,'markup',1);
+            my $column = Gtk3::TreeViewColumn->new();
+            $column->pack_start($pixrd, 0);
+            $column->pack_start($txtrd, 1);
+            $column->add_attribute($pixrd, 'pixbuf', 0);
+            $column->add_attribute($txtrd, 'markup', 1);
+            return $column;
         }
     );
 
+    # Build the columns list for this new tree
+    # according to the definition of column types
     my @column_info = ();
     for (my $i = 0; $i < @_ ; $i+=2) {
         my $typekey = $_[$i+1];
@@ -234,14 +240,23 @@ sub new_from_treeview {
             type => $type,
             rtype => $column_types{$_[$i+1]}{renderer},
             attr => $column_types{$_[$i+1]}{attr},
+            column_builder => $column_types{$_[$i+1]}{column_builder},
         };
     }
+
+    ## Create the store
     my $model = Gtk3::TreeStore->new (map {$_->{type}} @column_info);
+
+    ## Create the view
     # just in case, 'cause i'm paranoid like that.
     map {$view->remove_column ($_)} $view->get_columns;
     $view->set_model ($model);
     for (my $i = 0; $i < @column_info ; $i++) {
-        if('CODE' eq ref $column_info[$i]{attr})
+        if (!defined($column_info[$i]{rtype}) && defined($column_info[$i]{column_builder}) && ('CODE' eq ref $column_info[$i]{column_builder})) {
+            # A column builder has been defined
+            $view->append_column($column_info[$i]{column_builder}());
+        }
+        elsif ('CODE' eq ref $column_info[$i]{attr})
         {
             $view->insert_column_with_data_func (-1,
                 $column_info[$i]{title},
