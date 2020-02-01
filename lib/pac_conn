@@ -1029,7 +1029,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
@@ -1048,7 +1048,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
             $CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
@@ -1062,7 +1062,7 @@ if (defined $METHOD) {
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
