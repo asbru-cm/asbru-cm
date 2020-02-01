@@ -104,11 +104,6 @@ sub show {
     my $self = shift;
     my $cluster = shift // 0;
 
-    # After moving logic to have icon,text in same cell, an error showed up on execution of set cursor.
-    # I do not understand the error, and I do not see any wrong effect. Do not know what it has to be fixed.
-    local $SIG{__WARN__} = sub {
-    };
-
     $$self{_WINDOWCLUSTER}{main}->set_title("Cluster Administration : $APPNAME (v$APPVERSION)");
     $$self{_WINDOWCLUSTER}{main}->set_position('center');
     $$self{_WINDOWCLUSTER}{main}->show_all;
