@@ -21,6 +21,9 @@ spinbutton:hover {
     border: 1px solid #555555;
     background-color: #ffffff;
 }
+checkbutton:hover, radiobutton:hover {
+    background-color:#FFEBBB;
+}
 .button-cp {
     border: 1px solid #F5F5F5;
     border-radius: 0px;
