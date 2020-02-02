@@ -1,4 +1,4 @@
-package PACMethod_vncviewer;
+package PACMethod_realvnc;
 
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
@@ -44,8 +44,11 @@ use Gtk3 '-init';
 # Define GLOBAL CLASS variables
 
 my $ENCODINGS = "Tight Zlib Hextile CoRRE RRE CopyRect Raw";
-my %DEPTH = (8 => 0, 15 => 1, 16 => 2, 24 => 3, 32 => 4, 'default' => 5);
-my $RES_DIR = $RealBin . '/res';
+my %DEPTHR = (8 => 0, 64 => 1, 256 => 2, 'full' => 3);
+my %depthR = (8 => 'rgb111', 64 => 'rgb222', 256 => 'pal8', 'full' => 'full');
+my %Rdepth = ('rgb111'=>8,'rgb222'=>64,'pal8'=>256, 'full' => 'full');
+my %QUALITY = ('auto',0,'high',1,'medium',2,'low',3,'custom',4);
+my $RES_DIR = "$RealBin/res";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -82,9 +85,8 @@ sub update {
     $$self{gui}{chFullScreen}->set_active($$options{fullScreen});
     $$self{gui}{chListen}->set_active($$options{listen});
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
-    $$self{gui}{spQuality}->set_value($$options{quality});
-    $$self{gui}{spCompressLevel}->set_value($$options{compressLevel});
-    $$self{gui}{cbDepth}->set_active($DEPTH{$$options{depth} // 'default'});
+
+    _setGUIState($self,$options);
 
     return 1;
 }
@@ -97,8 +99,7 @@ sub get_cfg {
     $options{fullScreen} = $$self{gui}{chFullScreen}->get_active;
     $options{listen} = $$self{gui}{chListen}->get_active;
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
-    $options{quality} = $$self{gui}{spQuality}->get_value;
-    $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
+    $options{quality} = $$self{gui}{spQualityR}->get_active_text;
     $options{depth} = $$self{gui}{cbDepth}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -110,15 +111,33 @@ sub get_cfg {
 ###################################################################
 # START: Private functions definitions
 
+sub _setGUIState {
+    my $self = shift;
+    my $options = shift;
+
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{spQualityR}->set_active($QUALITY{$$options{quality}});
+    if (!defined $DEPTHR{$$options{depth}}) {
+        $$options{depth} = 'full';
+    }
+    if ($$options{quality} eq 'custom') {
+        $$self{gui}{hbox3}->set_sensitive(1);
+    } else {
+        $$self{gui}{hbox3}->set_sensitive(0);
+    }
+    $$self{gui}{hbox1R}->set_sensitive(1);
+    $$self{gui}{hbox1R}->show();
+}
+
 sub _parseCfgToOptions {
     my $cmd_line = shift;
 
     my %hash;
     $hash{fullScreen} = 0;
     $hash{nsize} = 1;
-    $hash{quality} = 5;
     $hash{compressLevel} = 8;
-    $hash{depth} = 'default';
+    $hash{depth} = 'full';
+    $hash{quality} = 'auto';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -126,12 +145,22 @@ sub _parseCfgToOptions {
         next unless $opt ne '';
         $opt =~ s/\s+$//go;
 
-        if ($opt eq 'fullscreen')            {$hash{fullScreen} = 1; $hash{nsize} = 0;}
-        $opt eq 'listen'                    and    $hash{listen} = 1;
-        $opt eq 'viewonly'                    and    $hash{viewOnly} = 1;
-        $opt =~ /^compresslevel\s+(\d+)$/go    and    $hash{compressLevel} = $1;
-        $opt =~ /^quality\s+(\d+)$/go        and    $hash{quality} = $1;
-        $opt =~ /^depth\s+(\d+)$/go            and    $hash{depth} = $1;
+        if ($opt =~ /^quality/go) {
+            if ($opt =~ /^quality\s+([a-z]+)$/) {
+                $hash{quality} = $1;
+            }
+        } elsif ($opt eq 'fullscreen') {
+            $hash{fullScreen} = 1;
+            $hash{nsize} = 0;
+        } elsif ($opt eq 'listen') {
+            $hash{listen} = 1;
+        } elsif ($opt eq 'viewonly') {
+            $hash{viewOnly} = 1;
+        } elsif ($opt =~ /^depth\s+(\d+)$/) {
+            $hash{depth} = $1;
+        } elsif ($opt =~ /^colorlevel\s+(\w+)$/) {
+            $hash{depth} = $Rdepth{$1};
+        }
     }
 
     return \%hash;
@@ -139,24 +168,35 @@ sub _parseCfgToOptions {
 
 sub _parseOptionsToCfg {
     my $hash = shift;
-
     my $txt = '';
 
-    $txt .= ' -fullscreen'        if $$hash{fullScreen};
-    $txt .= ' -listen'            if $$hash{listen};
-    $txt .= ' -viewonly'        if $$hash{viewOnly};
-    $txt .= ' -depth '            . $$hash{depth} if ($$hash{depth} ne 'default');
-    $txt .= ' -compresslevel '    . $$hash{compressLevel};
-    $txt .= ' -quality '        . $$hash{quality};
-    $txt .= " -encodings \"$ENCODINGS\"";
-    $txt .= ' -autopass';
+    if (!$$hash{quality}) {
+        $$hash{quality} = 'auto';
+        if ($QUALITY{$$hash{quality}} eq '') {
+            $$hash{quality} = 'auto';
+        }
+    }
+    if ($$hash{fullScreen}) {
+        $txt .= ' -fullscreen';
+    }
+    if ($$hash{listen}) {
+        $txt .= ' -listen';
+    }
+    if ($$hash{viewOnly}) {
+        $txt .= ' -viewonly';
+    }
+    if ($$hash{depth}) {
+        $txt .= " -colorlevel $depthR{$$hash{depth}}";
+    }
+    $txt .= " -quality $$hash{quality}";
 
+    #print "$txt\n";
     return $txt;
 }
 
 sub embed {
     my $self = shift;
-    # TightVNC client does not support that mode anymore
+    # vncviewer client does not support that mode anymore
     return 0;
 }
 
@@ -173,25 +213,27 @@ sub _buildGUI {
     $w{hboxReal} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
     $w{lblClient} = Gtk3::Label->new();
-    $w{lblClient}->set_markup('<b>VNC configuration</b>');
+    $w{lblClient}->set_markup('<b>RealVNC configuration</b>');
     $w{hboxReal}->pack_start($w{lblClient}, 0, 0, 0);
 
-    $w{hbox1} = Gtk3::HBox->new(0, 5);
-    $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
 
-    $w{frCompressLevel} = Gtk3::Frame->new('Compression level (1: min, 10: max) :');
-    $w{hbox1}->pack_start($w{frCompressLevel}, 1, 1, 0);
-    $w{frCompressLevel}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
+    $w{hbox1R} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hbox1R}, 0, 1, 5);
+    $w{frQualityR} = Gtk3::Label->new('Picture quality :');
+    $w{hbox1R}->pack_start($w{frQualityR}, 0, 0, 0);
+    $w{spQualityR} = Gtk3::ComboBoxText->new();
+    foreach my $q ('auto','high','medium','low','custom') {$w{spQualityR}->append_text($q);};
+    $w{hbox1R}->pack_start($w{spQualityR}, 0, 0, 0);
 
-    $w{spCompressLevel} = Gtk3::HScale->new(Gtk3::Adjustment->new(8, 1, 11, 1.0, 1.0, 1.0) );
-    $w{frCompressLevel}->add($w{spCompressLevel});
+    # Both
+    $w{hbox3} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hbox3}, 0, 0, 0);
+    $w{frDepth} = Gtk3::Label->new('Colour depth (bpp):');
+    $w{hbox3}->pack_start($w{frDepth}, 0, 1, 0);
 
-    $w{frQuality} = Gtk3::Frame->new('Picture quality (1: min, 10: max) :');
-    $w{hbox1}->pack_start($w{frQuality}, 1, 1, 0);
-    $w{frQuality}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
-
-    $w{spQuality} = Gtk3::HScale->new(Gtk3::Adjustment->new(5, 1, 11, 1.0, 1.0, 1.0) );
-    $w{frQuality}->add($w{spQuality});
+    $w{cbDepth} = Gtk3::ComboBoxText->new();
+    $w{hbox3}->pack_start($w{cbDepth}, 0, 1, 0);
+    foreach my $depth (8, 64, 256, 'full') {$w{cbDepth}->append_text($depth);};
 
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
@@ -211,14 +253,15 @@ sub _buildGUI {
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
 
-    $w{frDepth} = Gtk3::Frame->new('Colour depth (bpp):');
-    $w{hbox2}->pack_start($w{frDepth}, 0, 1, 0);
-    $w{frDepth}->set_shadow_type('GTK_SHADOW_NONE');
-    $w{frDepth}->set_tooltip_text('[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits per pixel)');
+    $w{spQualityR}->signal_connect('changed', sub {
+        my $w = shift;
 
-    $w{cbDepth} = Gtk3::ComboBoxText->new;
-    $w{frDepth}->add($w{cbDepth});
-    foreach my $depth (8, 15, 16, 24, 32, 'default') {$w{cbDepth}->append_text($depth);};
+        if ($w->get_active_text eq 'custom') {
+            $$self{gui}{hbox3}->set_sensitive(1);
+        } else {
+            $$self{gui}{hbox3}->set_sensitive(0);
+        }
+    });
 
     $$self{gui} = \%w;
 
