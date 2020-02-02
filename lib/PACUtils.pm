@@ -1265,7 +1265,7 @@ sub _registerPACIcons {
         'pac-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
         'pac-tray' => "$RES_DIR/asbru-logo-tray.png",
         'pac-treelist' => "$RES_DIR/asbru_treelist.svg",
-        'pac-wol' => "$RES_DIR/asbru_wol.png",
+        'pac-wol' => "$RES_DIR/asbru_wol.svg",
         'pac-prompt' => "$RES_DIR/asbru_prompt.png",
         'pac-protected' => "$RES_DIR/asbru_protected.png",
         'pac-unprotected' => "$RES_DIR/asbru_unprotected.png",
