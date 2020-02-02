@@ -2018,7 +2018,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'proxy port'} //= 8080;
     $$cfg{'defaults'}{'proxy user'} //= '';
     $$cfg{'defaults'}{'shell binary'} //= $ENV{'SHELL'} // '/bin/bash';
-    $$cfg{'defaults'}{'shell options'} //= '-login';
+    $$cfg{'defaults'}{'shell options'} //= ($ENV{'SHELL'} ? '' : '-login');
     $$cfg{'defaults'}{'shell directory'} //= $ENV{'HOME'};
     $$cfg{'defaults'}{'tabs position'} //= 'top';
     $$cfg{'defaults'}{'auto save'} //= 1;
