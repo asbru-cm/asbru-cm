@@ -1031,7 +1031,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_telnet.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_telnet.svg", 16, 16, 0),
         'escape' => ["\c]", "quit\n"]
     };
 
@@ -1101,7 +1101,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_sftp.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_sftp.svg", 16, 16, 0)
     };
 
     $methods{'FTP'} = {
@@ -1165,7 +1165,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ftp.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ftp.svg", 16, 16, 0)
     };
 
     $methods{'Generic Command'} = {
@@ -1215,7 +1215,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_generic.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_generic.svg", 16, 16, 0)
     };
 
     return %methods;
@@ -1224,35 +1224,35 @@ sub _getMethods {
 sub _registerPACIcons {
     my %icons = (
         'pac-app-big' => "$RES_DIR/asbru-logo-64.png",
-        'pac-group-add' => "$RES_DIR/asbru_group_add_16x16.png",
-        'pac-node-add' => "$RES_DIR/asbru_node_add_16x16.png",
+        'pac-group-add' => "$RES_DIR/asbru_group_add_16x16.svg",
+        'pac-node-add' => "$RES_DIR/asbru_node_add_16x16.svg",
         'pac-node-del' => "$RES_DIR/asbru_node_del_16x16.png",
         'pac-chain' => "$RES_DIR/asbru_chain.png",
         'pac-cluster-auto' => "$RES_DIR/asbru_cluster_auto.png",
         'pac-cluster-manager2' => "$RES_DIR/asbru_cluster_manager2.png",
-        'pac-cluster-manager' => "$RES_DIR/asbru_cluster_manager.png",
+        'pac-cluster-manager' => "$RES_DIR/asbru_cluster_manager.svg",
         'pac-cluster-manager-off' => "$RES_DIR/asbru_cluster_manager_off.png",
-        'pac-favourite-on' => "$RES_DIR/asbru_favourite_on.png",
-        'pac-favourite-off' => "$RES_DIR/asbru_favourite_off.png",
+        'pac-favourite-on' => "$RES_DIR/asbru_favourite_on.svg",
+        'pac-favourite-off' => "$RES_DIR/asbru_favourite_off.svg",
         'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
         'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
         'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.svg",
         'pac-group' => "$RES_DIR/asbru_group.png",
-        'pac-history' => "$RES_DIR/asbru_history.png",
+        'pac-history' => "$RES_DIR/asbru_history.svg",
         'pac-keepass' => "$RES_DIR/asbru_keepass.png",
         'pac-method-WebDAV' => "$RES_DIR/asbru_method_cadaver.png",
         'pac-method-MOSH' => "$RES_DIR/asbru_method_mosh.png",
         'pac-method-IBM 3270/5250' => "$RES_DIR/asbru_method_3270.jpg",
         'pac-method-Serial (cu)' => "$RES_DIR/asbru_method_cu.jpg",
-        'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.jpg",
-        'pac-method-Generic Command' => "$RES_DIR/asbru_method_generic.jpg",
+        'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.svg",
+        'pac-method-Generic Command' => "$RES_DIR/asbru_method_generic.svg",
         'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.svg",
         'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.svg",
         'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.svg",
         'pac-method-Serial (remote-tty)' => "$RES_DIR/asbru_method_remote-tty.jpg",
-        'pac-method-SFTP' => "$RES_DIR/asbru_method_sftp.jpg",
+        'pac-method-SFTP' => "$RES_DIR/asbru_method_sftp.svg",
         'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.svg",
-        'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.jpg",
+        'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.svg",
         'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.svg",
         'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.png",
         'pac-script' => "$RES_DIR/asbru_script.png",
@@ -1264,7 +1264,7 @@ sub _registerPACIcons {
         'pac-terminal-ko-big' => "$RES_DIR/asbru_terminal_x64x64.png",
         'pac-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
         'pac-tray' => "$RES_DIR/asbru-logo-tray.png",
-        'pac-treelist' => "$RES_DIR/asbru_treelist.png",
+        'pac-treelist' => "$RES_DIR/asbru_treelist.svg",
         'pac-wol' => "$RES_DIR/asbru_wol.png",
         'pac-prompt' => "$RES_DIR/asbru_prompt.png",
         'pac-protected' => "$RES_DIR/asbru_protected.png",
