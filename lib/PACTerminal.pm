@@ -1416,6 +1416,7 @@ sub _watchConnectionData {
             }
             $$self{_GUI}{pb} = undef;
             $$self{_SCRIPT_STATUS} = 'STOP';
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             $PACMain::FUNCS{_CLUSTER}->_updateGUI();
             $self->_updateCFG();
             $data = $self->_checkSendKeystrokes($data);
