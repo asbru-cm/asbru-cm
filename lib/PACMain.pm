@@ -2457,9 +2457,9 @@ sub __treeBuildNodeName {
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
-    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'};
+    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
-    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'};
+    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'} // '#000000';
 
     if ($name) {
         $name = __($name);
