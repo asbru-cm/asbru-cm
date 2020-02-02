@@ -22,7 +22,7 @@ spinbutton:hover {
     background-color: #ffffff;
 }
 .button-cp {
-    border: 1px solid rgba(240,240,240,0);
+    border: 1px solid #F5F5F5;
     border-radius: 0px;
     padding: 0px;
     margin: 0px;
