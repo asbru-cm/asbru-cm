@@ -1237,7 +1237,7 @@ sub _registerPACIcons {
         'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
         'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
         'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.svg",
-        'pac-group' => "$RES_DIR/asbru_group.png",
+        'pac-group' => "$RES_DIR/asbru_group.svg",
         'pac-history' => "$RES_DIR/asbru_history.svg",
         'pac-keepass' => "$RES_DIR/asbru_keepass.png",
         'pac-method-WebDAV' => "$RES_DIR/asbru_method_cadaver.png",
