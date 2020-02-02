@@ -1,3 +1,34 @@
+button {
+    border: 1px solid #dddddd;
+    margin: 1px;
+}
+button:hover {
+    border: 1px solid #555555;
+    background-color: #ffffff;
+}
+entry:focus {
+    background-color:#FFEBBB;
+}
+spinbutton {
+    font-size: 0.9em;
+    border: 1px solid #dddddd;
+    background-color: #dddddd;
+    border-radius: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+spinbutton:hover {
+    border: 1px solid #555555;
+    background-color: #ffffff;
+}
+.button-cp {
+    border-radius: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+tooltip {
+    font-size: 0.8em;
+}
 .dnd-icon {
   border: 1px solid #000000;
 }

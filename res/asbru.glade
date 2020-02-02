@@ -4065,24 +4065,6 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
-                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
-                                    <property name="use_action_appearance">False</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
-                                    <property name="xalign">0</property>
-                                    <property name="draw_indicator">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
                                     <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="use_action_appearance">False</property>
@@ -4092,6 +4074,24 @@ connecting (timeout is in seconds)</property>
                                     <property name="has_tooltip">True</property>
                                     <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
                                     <property name="xalign">0.5</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
+                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
+                                    <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -6657,6 +6657,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(0,0,0)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">0</property>
@@ -6670,6 +6673,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(204,0,0)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">1</property>
@@ -6683,6 +6689,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(78,154,6)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">2</property>
@@ -6696,6 +6705,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(196,160,0)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">3</property>
@@ -6709,6 +6721,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(32,74,135)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">4</property>
@@ -6722,6 +6737,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(92,53,102)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">5</property>
@@ -6735,6 +6753,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(6,152,154)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">6</property>
@@ -6748,6 +6769,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(211,215,207)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">7</property>
@@ -6761,6 +6785,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(239,41,41)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">1</property>
@@ -6774,6 +6801,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(138,226,52)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">2</property>
@@ -6787,6 +6817,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(252,233,79)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">3</property>
@@ -6800,6 +6833,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(114,159,207)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">4</property>
@@ -6813,6 +6849,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(173,127,168)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">5</property>
@@ -6826,6 +6865,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(52,226,226)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">6</property>
@@ -6839,6 +6881,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(238,238,236)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">7</property>
@@ -6852,6 +6897,9 @@ sudo -p sudo_prompt_string ...</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="receives_default">True</property>
                                                     <property name="rgba">rgb(85,87,83)</property>
+                                                    <style>
+                                                      <class name="button-cp"/>
+                                                    </style>
                                                   </object>
                                                   <packing>
                                                     <property name="left_attach">0</property>
@@ -6866,6 +6914,7 @@ sudo -p sudo_prompt_string ...</property>
                                           <object class="GtkLabel" id="label82">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="margin_bottom">3</property>
                                             <property name="label" translatable="yes">Colors:</property>
                                             <property name="use_markup">True</property>
                                           </object>
