@@ -1159,6 +1159,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                             <property name="receives_default">False</property>
                                             <property name="has_tooltip">True</property>
                                             <property name="tooltip_text" translatable="yes">Checking this may improve login speed on some systems, but may break compatibility with SSH agent, Seahorse, ...</property>
+                                            <property name="halign">start</property>
                                             <property name="xalign">0.5</property>
                                             <property name="draw_indicator">True</property>
                                           </object>
@@ -1789,6 +1790,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
@@ -1805,6 +1807,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">rbUseProxyIfCFG</property>
@@ -1827,6 +1830,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="tooltip_text" translatable="yes">SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                     <property name="group">rbUseProxyIfCFG</property>
@@ -2025,6 +2029,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="tooltip_text" translatable="yes">An alternative to SSH tunneling to access internal machines through gateway</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                     <property name="group">rbUseProxyIfCFG</property>
@@ -3078,14 +3083,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkRadioButton" id="rbUnprotected">
-    <property name="label" translatable="yes">radiobutton</property>
-    <property name="visible">True</property>
-    <property name="can_focus">True</property>
-    <property name="receives_default">False</property>
-    <property name="active">True</property>
-    <property name="draw_indicator">True</property>
-  </object>
   <object class="GtkWindow" id="windowConfig">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Preferences</property>
@@ -3625,6 +3622,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -3641,6 +3639,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -3747,6 +3746,7 @@ connecting (timeout is in seconds)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
@@ -3764,6 +3764,7 @@ connecting (timeout is in seconds)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
@@ -3781,6 +3782,7 @@ connecting (timeout is in seconds)</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="no_show_all">True</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -3886,7 +3888,6 @@ connecting (timeout is in seconds)</property>
                                             <property name="receives_default">False</property>
                                             <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
-                                            <property name="group">rbUnprotected</property>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
@@ -3904,7 +3905,6 @@ connecting (timeout is in seconds)</property>
                                             <property name="xalign">0</property>
                                             <property name="active">True</property>
                                             <property name="draw_indicator">True</property>
-                                            <property name="group">rbUnprotected</property>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
@@ -4077,6 +4077,7 @@ connecting (timeout is in seconds)</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="halign">start</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">rbCfgExternalViewer</property>
@@ -4175,15 +4176,16 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
-                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
+                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
+                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
-                                    <property name="xalign">0.5</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
+                                    <property name="halign">start</property>
+                                    <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -4193,15 +4195,16 @@ connecting (timeout is in seconds)</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
-                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
+                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
+                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
-                                    <property name="xalign">0</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
+                                    <property name="halign">start</property>
+                                    <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -4219,6 +4222,7 @@ connecting (timeout is in seconds)</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
                                     <property name="tooltip_text" translatable="yes">If checked, the connections list will be shown/hidden when the mouse enters/leaves the connections list area.</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
@@ -4603,6 +4607,7 @@ connecting (timeout is in seconds)</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">If enabled, the scrollbars are only added as traditional widgets when a mouse is present. Otherwise, they are overlayed on top of the content, as narrow indicators.</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
@@ -4732,6 +4737,7 @@ connecting (timeout is in seconds)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
@@ -4749,6 +4755,7 @@ connecting (timeout is in seconds)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -5612,6 +5619,7 @@ sudo -p sudo_prompt_string ...</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, any disconnected terminal TAB/Window will be automatically closed</property>
+                        <property name="halign">start</property>
                         <property name="margin_top">2</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
@@ -5631,6 +5639,7 @@ sudo -p sudo_prompt_string ...</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, any disconnected terminal in a splitted window will be directly unsplitted to its own TAB/Window</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -6570,6 +6579,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="halign">start</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -7071,6 +7081,7 @@ sudo -p sudo_prompt_string ...</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, Terminals will be maximized on connect</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7089,6 +7100,7 @@ sudo -p sudo_prompt_string ...</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, any disconnected terminal in a splitted window will be directly unsplitted to its own TAB/Window</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7175,6 +7187,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
+                            <property name="halign">start</property>
                             <property name="xalign">0.5</property>
                             <property name="draw_indicator">True</property>
                           </object>
@@ -7200,6 +7213,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, main window title takes terminal title</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7373,6 +7387,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, lots of debug info will be output on every terminal. It will also save a .yml (YAML) config faile is "Save" button is clicked. BEWARE!! This option will make appear plain text passwords!!</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7391,6 +7406,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">This options allows you (if unchecked) to prevent the Connections submenu from appearing when right-click on any terminal. That will speed up showing the right-click submenu</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7407,6 +7423,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7425,6 +7442,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, a confirmation window will popup when chaining executions</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7443,6 +7461,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, first expect in the chain will be skipped (ie: skip any command prompt not matching the actual one)</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7459,6 +7478,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7477,6 +7497,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, ignore any F11 key press</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7708,6 +7729,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="halign">start</property>
                         <property name="xalign">0.5</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -7869,6 +7891,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
+                            <property name="halign">start</property>
                             <property name="xalign">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -7895,6 +7918,7 @@ Changes apply to next opened connections, not current</property>
 
 SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.
 </property>
+                                <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">cbCfgProxyNo</property>
@@ -8089,6 +8113,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                 <property name="tooltip_text" translatable="yes">If selected, use a jump server proxy for all connections.
 
 Jump server is an alternative to SSH tunneling to access internal machines through gateway.</property>
+                                <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">cbCfgProxyNo</property>
