@@ -685,6 +685,10 @@ sub _updateGUIPreferences {
     if (!defined $$cfg{'defaults'}{'bold is brigth'}) {
         $$cfg{'defaults'}{'bold is brigth'} = 0;
     }
+    if (!defined $$cfg{'defaults'}{'unprotected set'}) {
+        $$cfg{'defaults'}{'unprotected set'} = 'foreground';
+
+    }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
     _($self, 'cbCfgAutoAcceptKeys')->set_active($$cfg{'defaults'}{'auto accept key'});
@@ -728,9 +732,15 @@ sub _updateGUIPreferences {
     #_($self, 'cbCfgCheckVersions')->set_active($$cfg{'defaults'}{'check versions at start'});
     #_($self, 'btnCheckVersion')->set_sensitive(! $PACMain::FUNCS{_MAIN}{_UPDATING});
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'});
+
+    _($self, 'rbCfgUnForeground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'foreground');
+    _($self, 'rbCfgUnBackground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'background');
+    _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgUnProtected', 'unprotected color', _($self, 'colorCfgUnProtected')->get_color()->to_string());
+
     _($self, 'rbCfgForeground')->set_active($$cfg{'defaults'}{'protected set'} eq 'foreground');
     _($self, 'rbCfgBackground')->set_active($$cfg{'defaults'}{'protected set'} eq 'background');
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgProtected', 'protected color', _($self, 'colorCfgProtected')->get_color()->to_string());
+
     _($self, 'cbCfgUseGUIPassword')->set_active($$cfg{'defaults'}{'use gui password'});
     _($self, 'hboxCfgPACPassword')->set_sensitive($$cfg{'defaults'}{'use gui password'});
     _($self, 'cbCfgUseGUIPasswordTray')->set_active($$cfg{'defaults'}{'use gui password tray'});
@@ -1002,8 +1012,13 @@ sub _saveConfiguration {
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} = _($self, 'cbCfgCheckVersions')->get_active();
     $$self{_CFG}{'defaults'}{'show statistics'} = _($self, 'cbCfgShowStatistics')->get_active();
+
+    $$self{_CFG}{'defaults'}{'unprotected set'} = _($self, 'rbCfgUnForeground')->get_active() ? 'foreground' : 'background' ;
+    $$self{_CFG}{'defaults'}{'unprotected color'} = _($self, 'colorCfgUnProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'protected set'} = _($self, 'rbCfgForeground')->get_active() ? 'foreground' : 'background' ;
     $$self{_CFG}{'defaults'}{'protected color'} = _($self, 'colorCfgProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
     $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} = _($self, 'cbCfgCTRLDisable')->get_active();

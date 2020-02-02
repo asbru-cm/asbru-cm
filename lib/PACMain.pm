@@ -555,7 +555,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>Connections</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
             children => []
         }
     );
@@ -1214,7 +1214,7 @@ sub _setupCallbacks {
     $$self{_GUI}{groupAddBtn}->signal_connect('clicked' => sub {
         my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         my $group_uuid = $groups[0];
-        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'Connections';
+        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'My Connections';
         if (!(($group_uuid eq '__PAC__ROOT__') || $$self{_CFG}{'environments'}{$group_uuid}{'_is_group'})) {
             return 1;
         }
@@ -2457,7 +2457,9 @@ sub __treeBuildNodeName {
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
+    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'};
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
+    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'};
 
     if ($name) {
         $name = __($name);
@@ -2469,6 +2471,8 @@ sub __treeBuildNodeName {
     }
     if ($protected) {
         $pset = "$p_set='$p_color'";
+    } else {
+        $pset = "$p_unset='$p_uncolor'";
     }
     $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
 
@@ -3447,7 +3451,7 @@ sub _loadTreeConfiguration {
 
     @{ $$self{_GUI}{treeConnections}{'data'} } =
     ({
-        value => [ $GROUPICON_ROOT, '<b>Connections</b>', '__PAC__ROOT__' ],
+        value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
         children => []
     });
     foreach my $child (keys %{ $$self{_CFG}{environments}{'__PAC__ROOT__'}{children} }) {
@@ -3630,13 +3634,13 @@ sub _updateGUIWithUUID {
 
  - To create a New GROUP of Connections:
 
-   1- 'click' over 'Connections' (to create it at root) or any other GROUP
+   1- 'click' over 'My Connections' (to create it at root) or any other GROUP
    2- 'click' on the most left icon over the connections tree (or right-click over selected GROUP)
    3- Follow instructions
 
  - To create a New CONNECTION in a selected Group or at root:
 
-   1- Select the container group to create the new connection into (or 'Connections' to create it at root)
+   1- Select the container group to create the new connection into (or 'My Connections' to create it at root)
    2- 'click' on the second most left icon over the connections tree (or right-click over selected GROUP)
    3- Follow instructions
 
@@ -4174,7 +4178,7 @@ sub __importNodes {
         Gtk3::main_iteration while Gtk3::events_pending;
         @{ $$self{_GUI}{treeConnections}{'data'} } = ();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ({
-            value => [ $GROUPICON_ROOT, '<b>Connections</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
             children => []
         });
         Gtk3::main_iteration while Gtk3::events_pending;
