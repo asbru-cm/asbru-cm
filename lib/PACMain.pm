@@ -752,7 +752,9 @@ sub _initGUI {
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
     $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('pac-script', 'button'));
     $$self{_GUI}{scriptsBtn}->set('can-focus' => 0);
-    $$self{_GUI}{scriptsBtn}->get_style_context()->add_class("button-cp");
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{scriptsBtn}->get_style_context()->add_class("button-cp");
+    }
     $$self{_GUI}{scriptsBtn}->set_tooltip_text('Open the Scripts Administration Console');
 
     # Create clusterBtn button
@@ -864,7 +866,9 @@ sub _initGUI {
     }
     $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('pac-shell', 'button'));
     $$self{_GUI}{shellBtn}->set('can-focus' => 0);
-    $$self{_GUI}{shellBtn}->get_style_context()->add_class("button-cp");
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{shellBtn}->get_style_context()->add_class("button-cp");
+    }
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
 
     # Create configBtn button
@@ -2474,7 +2478,7 @@ sub __treeBuildNodeName {
     } else {
         $pset = "$p_unset='$p_uncolor'";
     }
-    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
+    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'> $name</span>";
 
     return $name;
 }

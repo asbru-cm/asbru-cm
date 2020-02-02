@@ -899,7 +899,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_mosh.png", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_mosh.svg", 16, 16, 0),
         'escape' => ["\c^x."]
     };
 
@@ -1241,7 +1241,7 @@ sub _registerPACIcons {
         'pac-history' => "$RES_DIR/asbru_history.svg",
         'pac-keepass' => "$RES_DIR/asbru_keepass.png",
         'pac-method-WebDAV' => "$RES_DIR/asbru_method_cadaver.png",
-        'pac-method-MOSH' => "$RES_DIR/asbru_method_mosh.png",
+        'pac-method-MOSH' => "$RES_DIR/asbru_method_mosh.svg",
         'pac-method-IBM 3270/5250' => "$RES_DIR/asbru_method_3270.jpg",
         'pac-method-Serial (cu)' => "$RES_DIR/asbru_method_cu.jpg",
         'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.svg",

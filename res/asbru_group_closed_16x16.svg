@@ -7,10 +7,10 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   height="16px"
+   height="16"
    version="1.1"
    viewBox="0 0 16 16"
-   width="16px"
+   width="16"
    id="svg9"
    sodipodi:docname="asbru_group_closed_16x16.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)">
@@ -39,8 +39,8 @@
      inkscape:window-height="1021"
      id="namedview11"
      showgrid="false"
-     inkscape:zoom="14.75"
-     inkscape:cx="-14.372881"
+     inkscape:zoom="52.125"
+     inkscape:cx="-4.7002398"
      inkscape:cy="8"
      inkscape:window-x="0"
      inkscape:window-y="30"
@@ -51,15 +51,15 @@
   <g
      id="Icons with numbers"
      style="fill:#ffcc00;fill-rule:evenodd;stroke:none;stroke-width:1"
-     transform="matrix(1,0,0,1.3333333,0,-2.6666667)">
+     transform="matrix(1,0,0,1.3333332,0,-2.6666669)">
     <g
        id="Group"
        transform="translate(-240)"
-       style="fill:#ffcc00">
+       style="fill:#ffcc00;stroke-width:1">
       <path
          d="m 241.00087,4 h 13.99826 C 255.55537,4 256,4.4456547 256,4.9953976 V 13.004602 C 256,13.544336 255.55189,14 254.99913,14 H 241.00087 C 240.44463,14 240,13.554345 240,13.004602 V 4.9953976 C 240,4.4556644 240.44811,4 241.00087,4 Z M 243,2 h 4 l 1,1 h -6 z m 0,0"
          id="Rectangle 136"
-         style="fill:#ffcc00"
+         style="fill:#ffcc00;stroke-width:1"
          inkscape:connector-curvature="0" />
     </g>
   </g>
