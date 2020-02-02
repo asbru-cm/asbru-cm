@@ -2,6 +2,10 @@ button {
     border: 1px solid #dddddd;
     margin: 1px;
 }
+radiobutton, checkbutton {
+    border: 1px solid rgba(1,1,1,0);
+    margin: 1px;
+}
 button:hover {
     border: 1px solid #555555;
     background-color: #ffffff;
@@ -22,7 +26,7 @@ spinbutton:hover {
     background-color: #ffffff;
 }
 checkbutton:hover, radiobutton:hover {
-    background-color:#FFEBBB;
+    border: 1px solid #555555;
 }
 .button-cp {
     border: 1px solid #F5F5F5;
