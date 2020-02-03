@@ -63,13 +63,13 @@ use PACTermOpts;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $RES_DIR = $RealBin . '/res';
-my $AUTOSTART_FILE = $RES_DIR . '/pac_start.desktop';
-
-my $GLADE_FILE = $RES_DIR . '/asbru.glade';
-my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
+my $RES_DIR = "$RealBin/res";
+my $AUTOSTART_FILE = "$RES_DIR/pac_start.desktop";
+my $THEME_DIR = "$RES_DIR/themes/defualt";
+my $GLADE_FILE = "$RES_DIR/asbru.glade";
+my $INIT_CFG_FILE = "$RES_DIR/pac.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = $CFG_DIR . '/pac.yml';
+my $CFG_FILE = "$CFG_DIR/pac.yml";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -167,7 +167,7 @@ sub _initGUI {
     $$self{_WINDOWEDIT} = $$self{_GLADE}->get_object('windowEdit');
     $$self{_WINDOWEDIT}->set_size_request(-1, 550);
 
-    _($self, 'imgBannerEditIcon')->set_from_file($RES_DIR . '/asbru-edit.svg');
+    _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);

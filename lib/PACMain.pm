@@ -87,6 +87,7 @@ my $RES_DIR = "$RealBin/res";
 my $INIT_CFG_FILE = "$RealBin/res/pac.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $THEME_DIR = "$RES_DIR/themes/default";
 our $R_CFG_FILE = '';
 my $CFG_FILE_FREEZE = "$CFG_DIR/pac.freeze";
 my $CFG_FILE_NFREEZE = "$CFG_DIR/pac.nfreeze";
@@ -96,12 +97,12 @@ my $PAC_START_PROGRESS = 0;
 my $PAC_START_TOTAL = 6;
 
 my $APPICON = "$RES_DIR/asbru-logo-64.png";
-my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
-my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
-my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.svg");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
+my $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
+my $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_manager.png");
+my $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
+my $GROUPICON = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -180,6 +181,14 @@ sub new {
 
     # Set conflictive layout options as early as possible
     _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
+
+    print "A:$THEME_DIR\n";
+    if ($$self{_CFG}{'defaults'}{'theme'}) {
+        $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
+    }
+    $$self{_THEME} = $THEME_DIR;
+    print "B:$THEME_DIR\n";
+    print "V:$THEME_DIR ($$self{_THEME})\n";
 
     map({
     if (/^--dump-uuid=(.+)$/) {
@@ -282,7 +291,7 @@ sub new {
 
     # Gtk style
     my $css_provider = Gtk3::CssProvider->new;
-    $css_provider->load_from_path("$RES_DIR/asbru.css");
+    $css_provider->load_from_path("$THEME_DIR/asbru.css");
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
 
     # Setup known connection methods
@@ -3062,7 +3071,7 @@ sub _showAboutWindow {
         $$self{_GUI}{main},(
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
-        "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
+        "logo" => _pixBufFromFile("$THEME_DIR/asbru-logo-400.png"),
         "copyright" => "Copyright (C) 2017-2020 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
@@ -3203,7 +3212,7 @@ sub _launchTerminals {
             next;
         }
         my $uuid = $$t{_UUID};
-        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale($RES_DIR . '/asbru_shell.png', 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
+        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_shell.png", 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
         my $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
         unshift(@{ $$self{_GUI}{treeHistory}{data} }, ({ value => [ $icon, $name, $uuid,  strftime("%H:%M:%S %d-%m-%Y", localtime($FUNCS{_STATS}{statistics}{$uuid}{start})) ] }));
     }

@@ -58,11 +58,13 @@ my $APPVERSION = $PACUtils::APPVERSION;
 
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CLUSTERS_FILE = "$CFG_DIR/pac_clusters.nfreeze";
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
-my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
-my $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RealBin/res/asbru_terminal16x16.png", 16, 16, 0);
-my $ICON_OFF = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RealBin/res/asbru_terminal_x16x16.png", 16, 16, 0);
+my $RES_DIR = "$RealBin/res";
+my $THEME_DIR;
+my $GROUPICONCLOSED;
+my $GROUPICON_ROOT;
+my $AUTOCLUSTERICON;
+my $ICON_ON;
+my $ICON_OFF;
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -103,6 +105,13 @@ sub DESTROY {
 sub show {
     my $self = shift;
     my $cluster = shift // 0;
+
+    $THEME_DIR = $PACMain::FUNCS{_MAIN}{_THEME};
+    $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
+    $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.png");
+    $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
+    $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_terminal16x16.png", 16, 16, 0);
+    $ICON_OFF = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_terminal_x16x16.png", 16, 16, 0);
 
     $$self{_WINDOWCLUSTER}{main}->set_title("Cluster Administration : $APPNAME (v$APPVERSION)");
     $$self{_WINDOWCLUSTER}{main}->set_position('center');

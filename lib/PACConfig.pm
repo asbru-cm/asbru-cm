@@ -63,6 +63,7 @@ my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
 my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
+my $THEME_DIR = "$RES_DIR/themes/default";
 
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
@@ -147,7 +148,7 @@ sub _initGUI {
     $$self{_WINDOWCONFIG} = $$self{_GLADE}->get_object ('windowConfig');
     $$self{_WINDOWCONFIG}->set_size_request(-1, -1);
 
-    _($self, 'imgBannerIcon')->set_from_file("$RES_DIR/asbru-preferences.svg");
+    _($self, 'imgBannerIcon')->set_from_file("$THEME_DIR/asbru-preferences.svg");
     _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
