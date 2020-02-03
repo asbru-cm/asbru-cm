@@ -4245,7 +4245,7 @@ sub _wFindInTerminal {
                 Gtk3::main_iteration;
             }
             chomp $line;
-            if ($line !~ /$regexp/g) {
+            if ($line !~ /$regexp/) {
                 next;
             }
             $found{$l} = _removeEscapeSeqs($line);
