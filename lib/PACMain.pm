@@ -656,10 +656,12 @@ sub _initGUI {
 
     $$self{_GUI}{vboxclu} = Gtk3::VBox->new(0, 0);
 
-    $$self{_GUI}{btneditclu} = Gtk3::Button->new_with_label(' Manage Clusters');
-    $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{btneditclu}, 0, 1, 0);
-    $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{btneditclu}->set('can-focus', 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{btneditclu} = Gtk3::Button->new_with_label(' Manage Clusters');
+        $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{btneditclu}, 0, 1, 0);
+        $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btneditclu}->set('can-focus', 0);
+    }
 
     # Create a scrolledclu scrolled window to contain the clusters tree
     $$self{_GUI}{scrolledclu} = Gtk3::ScrolledWindow->new;
@@ -1374,7 +1376,9 @@ sub _setupCallbacks {
     $$self{_GUI}{treeFavourites}->get_selection->signal_connect('changed' => sub { $self->_updateGUIFavourites(); });
     $$self{_GUI}{treeHistory}->get_selection->signal_connect('changed' => sub { $self->_updateGUIHistory(); });
 
-    $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
+    }
 
     # Capture 'treeClusters' row activated
     $$self{_GUI}{treeClusters}->signal_connect('row_activated' => sub {
