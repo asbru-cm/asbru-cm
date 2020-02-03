@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -523,8 +523,9 @@ sub _initGUI {
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup',
+        'Name:' => 'hidden',
         'UUID:' => 'hidden',
+        'List:' => 'image_text',
     );
     $$self{_GUI}{scroll1}->add($$self{_GUI}{treeConnections});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
@@ -532,7 +533,6 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $$self{_GUI}{treeConnections}->set_level_indentation(-2);
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
@@ -789,8 +789,6 @@ sub _initGUI {
     # Create descView as a gtktextview with descBuffer
     $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new();
     $$self{_GUI}{descView} = Gtk3::TextView->new_with_buffer($$self{_GUI}{descBuffer});
-    $$self{_GUI}{descView}->set_editable(0);
-    $$self{_GUI}{descView}->set_can_focus(0);
     $$self{_GUI}{descView}->set_border_width(5);
     $$self{_GUI}{scrollDescription}->add($$self{_GUI}{descView});
     $$self{_GUI}{descView}->set_wrap_mode('GTK_WRAP_WORD');
@@ -908,10 +906,14 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections', 'Favourites', 'History') {
-        my @col = $$self{_GUI}{'tree' . $tree}->get_columns;
-        my ($c) = $col[0]->get_cells;
-        $c->set_alignment(1,0.5);
+    foreach my $tree ('Connections','Favourites','History') {
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        if ($tree eq 'Connections') {
+            $col[0]->set_visible(0);
+        } else {
+            my ($c) = $col[1]->get_cells;
+            $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+        }
     }
 
     ##############################################
@@ -2447,7 +2449,7 @@ sub __treeBuildNodeName {
     if ($protected) {
         $pset = "$p_set='$p_color'";
     }
-    $name = "<span $pset$bold>$name</span>";
+    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
 
     return $name;
 }
@@ -3127,7 +3129,7 @@ sub _launchTerminals {
 
     my $wtmp;
     scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting '<b><big>". (scalar(@{ $terminals })) . "</big></b>' terminals...", 0);
-    $ENV{'NTERMINALES'} = scalar(@{ $terminals });
+    $$self{_NTERMINALS} = scalar(@{ $terminals });
 
     # Create all selected terminals
     foreach my $sel (@{ $terminals }) {
@@ -3185,9 +3187,7 @@ sub _launchTerminals {
     if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         $self->_showConnectionsList(0);
     }
-    if (@new_terminals && scalar(keys %RUNNING) > 1) {
-        # Makes sure the focus is reset on that terminal if lost during startup process
-        # (This only happens when another terminal is already open)
+    if (@new_terminals) {
         $$self{_HAS_FOCUS} = $new_terminals[ $#new_terminals ]{_GUI}{_VTE};
     }
 
@@ -3432,7 +3432,7 @@ sub _loadTreeConfiguration {
     }
 
     # Select the root path
-    $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
+    $tree->set_cursor($tree->_getPath('__PAC__ROOT__'), undef, 0);
 
     return 1;
 }
@@ -3621,13 +3621,10 @@ sub _updateGUIWithUUID {
 
 ");
     } else {
-        my $msg;
-        if (defined $$self{_CFG}{'environments'}{$uuid}{'title'} && $$self{_CFG}{'environments'}{$uuid}{'title'}) {
-            $msg = "Connection to $$self{_CFG}{'environments'}{$uuid}{'title'}";
-        } else {
-            $msg = $$self{_CFG}{'environments'}{$uuid}{'description'};
+        if (!$$self{_CFG}{'environments'}{$uuid}{'description'}) {
+            $$self{_CFG}{'environments'}{$uuid}{'description'} = 'Insert your comments for this connection here ...';
         }
-        $$self{_GUI}{descBuffer}->set_text($msg);
+        $$self{_GUI}{descBuffer}->set_text("$$self{_CFG}{'environments'}{$uuid}{'description'}");
     }
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {

@@ -120,6 +120,7 @@ sub new {
     $self->{_STATUS_COUNT} = 0;
     $self->{_LISTEN_COMMIT} = 1;
     $self->{_RESTART} = 0;
+    $self->{_RECONNECTS} = 0;
     $self->{_GUI} = undef;
     $self->{_KEYS_BUFFER} = '';
     $self->{_SAVE_KEYS} = 1;
@@ -271,7 +272,7 @@ sub new {
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
     # Autohide non tabbed help terminals
-    if ((!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+    if ((defined $$self{_WINDOWTERMINAL})&&(!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
         $$self{_WINDOWTERMINAL}->hide();
     }
 
@@ -304,9 +305,15 @@ sub start {
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
+    my $reconnect_msg = '';
+    my $reconnect_count = '';
 
-    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
-    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")\r\n\n");
+    if ($$self{'_RECONNECTS'}) {
+        $reconnect_msg = 'RE';
+        $reconnect_count = " ${COL_RED}attempt:$$self{'_RECONNECTS'}${COL_RESET}";
+    }
+    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}${reconnect_msg}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}${reconnect_msg}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
+    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")$reconnect_count\r\n\n");
 
     $$self{_PULSE} = 1;
 
@@ -380,12 +387,13 @@ sub start {
 
     $$self{CONNECTING} = 1;
     $PACMain::FUNCS{_STATS}->start($$self{_UUID});
+    my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID}; exit)"];
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
     } else {
-        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}];
+        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
     }
     if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
         $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
@@ -409,7 +417,9 @@ sub start {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{pb}, 0, 1, 0);
     $$self{_GUI}{pb}->show();
 
-    $$self{_CLUSTER} and $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    if ($$self{_CLUSTER}) {
+        $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
 
     # Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
     defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
@@ -825,17 +835,21 @@ sub _initGUI {
 
         my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
         my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
-        # HPR.20191010
+
         my $conns_per_row = 2;
         if ($self->{_CLUSTER}) {
-            if ($ENV{'NTERMINALES'}>1) {
+            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
                 my $screen = Gtk3::Gdk::Screen::get_default;
                 my $sw = $screen->get_width;
                 my $sh = $screen->get_height-100;
-                $conns_per_row = $ENV{'NTERMINALES'} < 5 ? 2 : 3;
-                my $rows = POSIX::ceil($ENV{'NTERMINALES'} / $conns_per_row) || 1;
-                $hsize=int($sw / (POSIX::ceil($ENV{'NTERMINALES'} / $rows)));
-                $vsize=int($sh / (POSIX::ceil($ENV{'NTERMINALES'} / $rows)));
+                $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
+                my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
+                $hsize=int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
+                    $vsize=int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                } else {
+                    $vsize = $sh;
+                }
             }
         }
         $$self{_WINDOWTERMINAL}->set_default_size($hsize, $vsize);
@@ -1302,7 +1316,7 @@ sub _setupCallbacks {
 
         my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED}<-= $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
 
         # Switch to the message window
@@ -1342,14 +1356,16 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if ($$self{_RESTART}) {
+        if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
+            sleep($$self{_RECONNECTS});
+            $$self{_RECONNECTS}++;
             $self->start;
         } else {
             # Check for post-connection commands execution
             $self->_wPrePostExec('local after');
 
             # And close if so is configured
-            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT})) {
+            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT} || $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} !~ /ssh/i)) {
                 $self->stop(undef, 1);
             }
         }
@@ -1382,11 +1398,13 @@ sub _watchConnectionData {
             $$self{CONNECTED} = 1;
             $$self{CONNECTING} = 0;
             $$self{_BADEXIT} = 0;
+            $$self{_RECONNECTS} = 0;
             if (defined $$self{_GUI}{pb}) {
                 $$self{_GUI}{pb}->destroy();
             }
             $$self{_GUI}{pb} = undef;
             $$self{_SCRIPT_STATUS} = 'STOP';
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             $PACMain::FUNCS{_CLUSTER}->_updateGUI();
             $self->_updateCFG();
             $data = $self->_checkSendKeystrokes($data);
@@ -3833,7 +3851,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnfind} = Gtk3::Button->new_from_stock('gtk-find');
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{btnfind}, 0, 1, 0);
     $w{window}{gui}{btnfind}->signal_connect('clicked' => sub {
-        if (! $searching) {
+        if (!$searching) {
             $searching = 1;
             $self->_find;
             $searching = 0;
@@ -3991,7 +4009,7 @@ sub _wFindInTerminal {
                 Gtk3::main_iteration;
             }
             chomp $line;
-            if ($line !~ /$regexp/g) {
+            if ($line !~ /$regexp/) {
                 next;
             }
             $found{$l} = _removeEscapeSeqs($line);

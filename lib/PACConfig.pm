@@ -231,7 +231,8 @@ sub _setupCallbacks {
         _($self, 'entryCfgExternalViewer')->set_sensitive(! _($self, 'rbCfgInternalViewer')->get_active());
     });
     _($self, 'btnSaveConfig')->signal_connect('clicked' => sub {
-        $self->_saveConfiguration; _($self, 'btnCloseConfig')->activate();
+        $self->_saveConfiguration();
+        $self->_closeConfiguration();
     });
     _($self, 'cbBoldAsText')->signal_connect('toggled' => sub {
         _($self, 'colorBold')->set_sensitive(! _($self, 'cbBoldAsText')->get_active());
@@ -249,7 +250,7 @@ sub _setupCallbacks {
         system('/usr/bin/xdg-open ' . (_($self, 'btnCfgSaveSessionLogs')->get_current_folder()));
     });
     _($self, 'btnCloseConfig')->signal_connect('clicked' => sub {
-        $$self{_WINDOWCONFIG}->hide();
+        $self->_closeConfiguration();
     });
     _($self, 'btnResetDefaults')->signal_connect('clicked' => sub {
         $self->_resetDefaults();
@@ -438,7 +439,9 @@ sub _setupCallbacks {
     });
     $$self{_WINDOWCONFIG}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-        $event->keyval == 65307 and $$self{_WINDOWCONFIG}->hide();
+        if ($event->keyval == 65307) {
+            $self->_closeConfiguration();
+        }
         return 0;
     });
 
@@ -857,6 +860,12 @@ sub _updateGUIPreferences {
     }
 
     return 1;
+}
+
+sub _closeConfiguration {
+    my $self = shift;
+
+    $$self{_WINDOWCONFIG}->hide();
 }
 
 sub _saveConfiguration {

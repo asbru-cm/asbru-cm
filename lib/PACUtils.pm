@@ -782,10 +782,10 @@ sub _getMethods {
             my @faults;
 
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
-                push(@faults, 'IP/Hostname');
+                push(@faults, 'IP/Hostname cannot be empty');
             }
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
-                push(@faults, 'Port');
+                push(@faults, 'Port cannot be empty');
             }
             # TODO : Check if this nested "ifs" can be rewritten
             if (_($self, 'rbCfgAuthUserPass')->get_active) {

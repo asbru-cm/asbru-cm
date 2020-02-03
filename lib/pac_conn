@@ -60,6 +60,7 @@ my $SCRIPTS_DIR = "$CFG_DIR/scripts";
 my @CMD;
 my $CFG_FILE;
 my $CFG;
+my $IS_CLUSTER;
 my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
@@ -117,6 +118,7 @@ $SIG{'QUIT'} = \&__disconnect;
 # Retrieve command line options
 $CFG_FILE = shift;
 $UUID = shift or die "$COLOR{'err'}ERROR: You must provide a profile to connect to!!$COLOR{'norm'}";
+$IS_CLUSTER = shift // 0;
 $GETCMD = shift // 0;
 
 # Load the 'freezed' configuration
@@ -202,21 +204,21 @@ $PASSPHRASE_USER = subst($PASSPHRASE_USER);
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
 
 if (! $GETCMD) {
-    $SOCKET = IO::Socket::UNIX -> new(
+    $SOCKET = IO::Socket::UNIX->new(
         Type => SOCK_STREAM,
         Peer => $SOCK_FILE
     ) or die "ERROR: Could not open SOCKET file '$SOCK_FILE' for connecting: $!";
-    $SOCKET -> autoflush;
+    $SOCKET->autoflush;
 
     if (!auth($SOCKET)) {
         die "ERROR: Service listening at file '$SOCK_FILE' is not PAC";
     }
 
-    $SOCKET_EXEC = IO::Socket::UNIX -> new(
+    $SOCKET_EXEC = IO::Socket::UNIX->new(
         Type => SOCK_STREAM,
         Peer => $SOCK_EXEC_FILE
     ) or die "ERROR: Could not open SOCKET file '$SOCK_EXEC_FILE' for connecting: $!";
-    $SOCKET_EXEC -> autoflush;
+    $SOCKET_EXEC->autoflush;
 }
 
 my %_W;
@@ -246,7 +248,7 @@ sub ctrl {
     vec($wout, fileno($SOCKET), 1) = 1;
     select(undef, $wout, undef, 5) or die "ERROR: Could not write to PACMain SOCKET at $SOCK_FILE: $!";
 
-    $SOCKET -> send('PAC_MSG_START[' . encode('UTF-16', $msg) . ']PAC_MSG_END');
+    $SOCKET->send('PAC_MSG_START[' . encode('UTF-16', $msg) . ']PAC_MSG_END');
     return 1;
 }
 sub auth {
@@ -417,7 +419,7 @@ sub wEnterValue {
     }
 
     # Create the dialog window,
-    $_W{window}{data} = Gtk3::Dialog -> new_with_buttons(
+    $_W{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME : Enter data",
         undef,
         'modal',
@@ -425,65 +427,65 @@ sub wEnterValue {
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
-    $_W{window}{data} -> set_default_response('ok');
-    $_W{window}{data} -> set_position('center');
-    $_W{window}{data} -> set_icon_from_file($APPICON);
-    $_W{window}{data} -> set_size_request(-1, -1);
-    $_W{window}{data} -> set_resizable(0);
-    $_W{window}{data} -> set_border_width(5);
+    $_W{window}{data}->set_default_response('ok');
+    $_W{window}{data}->set_position('center');
+    $_W{window}{data}->set_icon_from_file($APPICON);
+    $_W{window}{data}->set_size_request(-1, -1);
+    $_W{window}{data}->set_resizable(0);
+    $_W{window}{data}->set_border_width(5);
 
     # Create an HBox to contain a picture and a label
-    $_W{window}{gui}{hbox} = Gtk3::HBox -> new(0, 0);
-    $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{hbox}, 1, 1, 5);
-    $_W{window}{gui}{hbox} -> set_border_width(5);
+    $_W{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
+    $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{hbox}, 1, 1, 5);
+    $_W{window}{gui}{hbox}->set_border_width(5);
 
     # Create image
-    $_W{window}{gui}{img} = Gtk3::Image -> new_from_stock('gtk-edit', 'dialog');
-    $_W{window}{gui}{hbox} -> pack_start($_W{window}{gui}{img}, 0, 1, 5);
+    $_W{window}{gui}{img} = Gtk3::Image->new_from_stock('gtk-edit', 'dialog');
+    $_W{window}{gui}{hbox}->pack_start($_W{window}{gui}{img}, 0, 1, 5);
 
     # Create 1st label
-    $_W{window}{gui}{lblup} = Gtk3::Label -> new;
-    $_W{window}{gui}{hbox} -> pack_start($_W{window}{gui}{lblup}, 1, 1, 5);
-    $_W{window}{gui}{lblup} -> set_markup($lblup);
+    $_W{window}{gui}{lblup} = Gtk3::Label->new;
+    $_W{window}{gui}{hbox}->pack_start($_W{window}{gui}{lblup}, 1, 1, 5);
+    $_W{window}{gui}{lblup}->set_markup($lblup);
 
     if (defined $lbldown) {
         # Create 2nd label
-        $_W{window}{gui}{lbldwn} = Gtk3::Label -> new;
-        $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{lbldwn}, 1, 1, 5);
-        $_W{window}{gui}{lbldwn} -> set_text($lbldown);
+        $_W{window}{gui}{lbldwn} = Gtk3::Label->new;
+        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{lbldwn}, 1, 1, 5);
+        $_W{window}{gui}{lbldwn}->set_text($lbldown);
     }
 
     if (@list) {
         # Create combobox widget
-        $_W{window}{gui}{comboList} = Gtk3::ComboBoxText -> new;
-        $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{comboList}, 0, 1, 0);
-        $_W{window}{gui}{comboList} -> set_property('can_focus', 0);
+        $_W{window}{gui}{comboList} = Gtk3::ComboBoxText->new;
+        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{comboList}, 0, 1, 0);
+        $_W{window}{gui}{comboList}->set_property('can_focus', 0);
         foreach my $text (@list) {
-            $_W{window}{gui}{comboList} -> append_text($text)
+            $_W{window}{gui}{comboList}->append_text($text)
         };
-        $_W{window}{gui}{comboList} -> set_active(0);
+        $_W{window}{gui}{comboList}->set_active(0);
     } else {
         # Create the entry widget
-        $_W{window}{gui}{entry} = Gtk3::Entry -> new;
-        $_W{window}{data} -> get_content_area -> pack_start($_W{window}{gui}{entry}, 0, 1, 5);
-        $_W{window}{gui}{entry} -> set_text($default);
-        $_W{window}{gui}{entry} -> set_activates_default(1);
-        $_W{window}{gui}{entry} -> set_visibility($visible);
+        $_W{window}{gui}{entry} = Gtk3::Entry->new;
+        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{entry}, 0, 1, 5);
+        $_W{window}{gui}{entry}->set_text($default);
+        $_W{window}{gui}{entry}->set_activates_default(1);
+        $_W{window}{gui}{entry}->set_visibility($visible);
     }
 
     # Show the window (in a modal fashion)
-    $_W{window}{data} -> show_all;
-    my $ok = $_W{window}{data} -> run;
+    $_W{window}{data}->show_all;
+    my $ok = $_W{window}{data}->run;
 
     my $val;
     if (@list) {
-        $val = ($ok eq 'ok') ? $_W{window}{gui}{comboList} -> get_active_text : undef;
-        $pos = $_W{window}{gui}{comboList} -> get_active;
+        $val = ($ok eq 'ok') ? $_W{window}{gui}{comboList}->get_active_text : undef;
+        $pos = $_W{window}{gui}{comboList}->get_active;
     } else {
-        $val = ($ok eq 'ok') ? $_W{window}{gui}{entry} -> get_chars(0, -1) : undef;
+        $val = ($ok eq 'ok') ? $_W{window}{gui}{entry}->get_chars(0, -1) : undef;
     }
 
-    $_W{window}{data} -> destroy;
+    $_W{window}{data}->destroy;
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
@@ -494,19 +496,19 @@ sub wEnterValue {
 
 sub send_slow {
     if ($SEND_SLOW) {
-        $_[0] -> send_slow($SEND_SLOW, $_[1]);
+        $_[0]->send_slow($SEND_SLOW, $_[1]);
     } else {
-        $_[0] -> send($_[1]);
+        $_[0]->send($_[1]);
     }
 }
 
 sub _getPrompt {
     # Delete any data accumulated before launching the command
-    $EXP -> clear_accum;
-    $EXP -> restart_timeout_upon_receive(1);
+    $EXP->clear_accum;
+    $EXP->restart_timeout_upon_receive(1);
 
     send_slow($EXP, "\n");
-    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP -> expect(0.5, [timeout => sub {1;}], [/\R.+\R/ => sub {1;}]);
+    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect(0.5, [timeout => sub {1;}], [/\R.+\R/ => sub {1;}]);
     $before_match =~ s/\R|\r|\f|\n//go;
     $before_match =~ s/(^\s*)|(\s*$)//go;
     return $before_match;
@@ -528,8 +530,8 @@ sub _execAndCapture {
     $cmd ||= $$ctrl{cmd};
 
     # Delete any data accumulated before launching the command
-    $EXP -> clear_accum;
-    $EXP -> restart_timeout_upon_receive(1);
+    $EXP->clear_accum;
+    $EXP->restart_timeout_upon_receive(1);
 
     if ($intro) {
         send_slow($EXP, $cmd . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250') ? "\r\f" : "\n"));
@@ -551,16 +553,16 @@ sub _execAndCapture {
 
     my $ok = 0;
     # Wait for pattern prompt before continue...
-    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP -> expect(
+    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect(
 
         $TIMEOUT_CMD,
 
         [timeout => sub {ctrl("ERROR:$TIMEOUT_CMD seconds waiting for expected input");}],
 
         [eof => sub {
-            ctrl("ERROR:Connection ended by remote peer!! " . $EXP -> set_accum());
+            ctrl("ERROR:Connection ended by remote peer!! " . $EXP->set_accum());
             $CONNECTED = 0;
-            $EXP -> hard_close;
+            $EXP->hard_close;
         }],
 
         [((! defined $pattern && ($pipe || $tee || $capture || defined $ctrl)) ? '##__PAC__PIPE__##' : (defined $pattern ? $pattern : '')) => sub {$ok = 1;}]
@@ -653,9 +655,9 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_LOG[NAME:$name][PID:$$][PARAMS:$file]");
 
-        $EXP -> log_file -> flush;
-        $EXP -> log_file($file);
-        return $EXP -> log_file;
+        $EXP->log_file->flush;
+        $EXP->log_file($file);
+        return $EXP->log_file;
     };
     $TERMINAL{send} = sub {
         my $txt = shift // '';
@@ -663,7 +665,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_SEND[NAME:$name][PID:$$][PARAMS:$txt]");
 
-        $EXP -> clear_accum;
+        $EXP->clear_accum;
         send_slow($EXP, $txt);
     };
     $TERMINAL{send_get} = sub {
@@ -703,12 +705,12 @@ sub _execScript {
 
         my $wait = $tmout;
         while ($wait > 0) {
-            $EXP -> expect(
+            $EXP->expect(
                 1,
                 [eof => sub {$TERMINAL{error} = "Connection closed while waiting for pattern '$pattern'", exit 1;}],
                 [$pattern => sub {
-                    $TERMINAL{out1} = $EXP -> before;
-                    $TERMINAL{out2} = $EXP -> after;
+                    $TERMINAL{out1} = $EXP->before;
+                    $TERMINAL{out2} = $EXP->after;
                     $TERMINAL{error} = '';
                     last;
                 }]
@@ -748,7 +750,7 @@ sub _execScript {
             ctrl("SCRIPT_STOPPED_MANUALLY[NAME:$name]");
             msg("PAC Script '$name' terminated by user request (TERM(15) signal)");
             if (defined $_W{window}{data}){
-                $_W{window}{data} -> destroy;
+                $_W{window}{data}->destroy;
             }
             undef %_W;
             while (Gtk3::events_pending) {
@@ -836,11 +838,17 @@ sub _setSshProxy {
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
             print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
         }
-        print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
-        if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
-            print CFG "IdentityFile $PUBKEY\n";
+        if ($method =~ /ssh/i) {
+            # Second server is only important for SSH JumpHost
+            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+            if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+                print CFG "IdentityFile $PUBKEY\n";
+            }
         }
         close CFG;
+        if ($method =~ /VNC|RDP/i) {
+            _openTunnel($UUID);
+        }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
         if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
@@ -856,11 +864,18 @@ sub _setSshProxy {
             if ($$CFG{'defaults'}{'jump key'}) {
                 print CFG "IdentityFile $$CFG{'defaults'}{'jump key'}\n";
             }
-            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
-            if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
-                print CFG "IdentityFile $PUBKEY\n";
+            if ($method =~ /ssh/i) {
+                # Second server is only important for SSH JumpHost
+                print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+                if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+                    print CFG "IdentityFile $PUBKEY\n";
+                }
             }
             close CFG;
+            if ($method =~ /VNC|RDP/i) {
+                _openTunnel($UUID);
+            }
+
         } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
             # SOCKS Proxy settings
             $proxy_ip = $$CFG{'defaults'}{'proxy ip'};
@@ -870,6 +885,49 @@ sub _setSshProxy {
             $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
         }
     }
+    return 0;
+}
+
+sub _openTunnel {
+    my ($uuid) = @_;
+    my $break = 10;
+
+    $LPORT = $PORT;
+    $proxy_jump = 2;
+
+    if (-e "$CFG_DIR/tmp/$uuid.ctl") {
+        # Avoid open a second terminal with the same UUID
+        my $check = `ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O check jumpserver 2>&1`;
+        if ($check =~ /=\d+/) {
+            ctrl("UNHIDE_TERMINAL");
+            die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
+        }
+    }
+    # Check if port we want to bind is not alreay in use
+    while (($break)&&(my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
+        if ($msg !~ /:$LPORT/) {
+            # netstat not installed?
+            last;
+        }
+        $LPORT++;
+        $break--;
+    }
+    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    $IP = '127.0.0.1';
+    $PORT = $LPORT;
+}
+
+# Place any thing that has to be done before a hard_close
+sub _hardClose {
+    my ($uuid)  = @_;
+
+    if ($proxy_jump == 2) {
+        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    }
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        ctrl('RESTART');
+    }
+    return 0;
 }
 
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
@@ -904,7 +962,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
@@ -923,7 +981,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
             $CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
@@ -932,13 +990,12 @@ if (defined $METHOD) {
         }
         $connection_cmd = "$METHOD $CONNECT_OPTS ${USER}\@$IP";
         $connection_txt = $connection_cmd;
-        print "*$connection_cmd*\n";
     } elsif (($METHOD =~ /^.*sftp.*$/) || ($METHOD eq 'SFTP')) {
         _setSshProxy('ssh');
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
@@ -980,6 +1037,7 @@ if (defined $METHOD) {
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
         $METHOD = $1;
+        _setSshProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1023,9 +1081,15 @@ if (defined $METHOD) {
             ctrl("PASSWORD:Asking user for password...");
             $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
-
+        my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
-        if (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+            $method = 'RealVNC';
+        } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+            $method = 'TigerVNC';
+        }
+        _setSshProxy($method);
+        if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
@@ -1035,6 +1099,12 @@ if (defined $METHOD) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
             }
+        } elsif ($method eq 'RealVNC') {
+            my $user = $USER ? "UserName=$USER" : '';
+
+            $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $METHOD = "Real$METHOD";
         } else {
             my $user = '';
 
@@ -1101,27 +1171,27 @@ if ($GETCMD) {
 }
 
 # Set log file
-$EXP -> log_file($LOG_FILE);
+$EXP->log_file($LOG_FILE);
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
-$EXP -> spawn("$connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
+$EXP->spawn("$connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
-$EXP -> exp_internal($DEBUG); # EXPECT DEBUG!!
+$EXP->exp_internal($DEBUG); # EXPECT DEBUG!!
 
 if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'RDP (Windows)')) {
     $CONNECTED = 1;
     ctrl("CONNECTED");
 
     # No way to expect anything from 'rdesktop' command line...
-    $EXP -> expect($TIMEOUT_CONNECT,
+    $EXP->expect($TIMEOUT_CONNECT,
 
         [eof => sub {
-
             $CONNECTED = 0;
-            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-            $EXP -> hard_close;
+            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
+            $EXP->hard_close;
         }],
 
         ['\[ERROR\]', sub {
@@ -1147,7 +1217,8 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                $EXP -> hard_close();
+                _hardClose($UUID);
+                $EXP->hard_close();
             }
             $USER_COUNT++;
             $USER = subst($USER);
@@ -1166,42 +1237,51 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Please, enter Password", '', 0);
                 }
                 if (defined $PASS) {
-                    $EXP -> log_stdout(0);
+                    $EXP->log_stdout(0);
                     $PASS = subst($PASS);
                     send_slow($EXP, "$PASS\n", 'hide');
-                    $EXP -> log_stdout(1);
+                    $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
                     exp_continue;
                 } else {
                     ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
-                    $EXP -> hard_close;
+                    _hardClose($UUID);
+                    $EXP->hard_close;
                 }
             }
             # ... second password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
-                $EXP -> hard_close;
+                _hardClose($UUID);
+                $EXP->hard_close;
             }
         }],
     )
 }
 elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     # Expect authentication confirmation...
-    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP -> expect($TIMEOUT_CONNECT,
-
+    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
         [timeout => sub {
-            $CONNECTED = 0;
-            ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            $EXP -> hard_close;
+            if ($METHOD =~ /Real/) {
+                # Special case for RealVNC, no information to control timeout, logins, etc.
+                $CONNECTED = 1;
+                ctrl("CONNECTED");
+            } else {
+                $CONNECTED = 0;
+                ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
+                _hardClose($UUID);
+                $EXP->hard_close;
+            }
         }],
 
         [eof => sub {
 
             $CONNECTED = 0;
-            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-            $EXP -> hard_close;
+            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
+            $EXP->hard_close;
         }],
 
         # Found login string
@@ -1227,7 +1307,8 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                $EXP -> hard_close();
+                _hardClose($UUID);
+                $EXP->hard_close();
             }
             $USER_COUNT++;
             $USER = subst($USER);
@@ -1239,22 +1320,23 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
         # Found password/passphrase string
         [$PASSWORD_PROMPT, sub {
 
-            my $user = $EXP -> before // '';
+            my $user = $EXP->before // '';
             $user =~ s/^(.+?)@.+/$1/go;
 
             ctrl("PASSWORD:Asking user for gateway's password...");
             $PASS = wEnterValue(undef, "<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0);
 
             if (defined $PASS) {
-                $EXP -> log_stdout(0);
+                $EXP->log_stdout(0);
                 $PASS = subst($PASS);
                 send_slow($EXP, "$PASS\n", 'hide');
-                $EXP -> log_stdout(1);
+                $EXP->log_stdout(1);
                 ctrl("PASSWORD:Sent (not shown)");
                 exp_continue;
             } else {
                 ctrl("CLOSE:PASSWORD:Password input cancelled by user");
-                $EXP -> hard_close;
+                _hardClose($UUID);
+                $EXP->hard_close;
             }
         }],
 
@@ -1276,7 +1358,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
 
     my $end = 0;
     my $avoid_first_expectation = 0;
-    $EXP -> restart_timeout_upon_receive(1);
+    $EXP->restart_timeout_upon_receive(1);
     for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
         my $hash = $$CFG{'environments'}{$UUID}{'expect'}[$i];
         my $pattern = $$hash{'expect'} // '';
@@ -1302,13 +1384,13 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
         ctrl("EXPECT:WAITING:$pattern");
 
         # Wait for pattern prompt before continue...
-        $EXP -> expect($TIMEOUT_CMD,
+        $EXP->expect($TIMEOUT_CMD,
 
             [timeout => sub {
                 if ($on_fail == -1) {
                     ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                     $CONNECTED = 0;
-                    $EXP -> hard_close;
+                    $EXP->hard_close;
                 } elsif ($on_fail == -2) {
                     ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                     $CONNECTED = 1;
@@ -1323,8 +1405,8 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
             [eof => sub {
 
                 $CONNECTED = 0;
-                ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-                $EXP -> hard_close();
+                ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+                $EXP->hard_close();
             }],
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
@@ -1340,7 +1422,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                     $i = --$on_match;
                 }
             }]
-);
+        );
         last if $end;
         next if $jump;
         $avoid_first_expectation = 0;
@@ -1353,7 +1435,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
         # ... and launch command
         if ($hide) {
             ctrl("EXPECT:SENDING:<<HIDDEN STRING>>");
-            $EXP -> log_stdout(0);
+            $EXP->log_stdout(0);
         } else {
             my $cmd_str = $command;
             $cmd_str =~ s/\n$//go;
@@ -1362,18 +1444,18 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
 
         send_slow($EXP, $command . ($return ? (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250') ? "\r\f" : "\n") : ''));
         if ($hide) {
-            $EXP -> log_stdout(1);
+            $EXP->log_stdout(1);
         }
     }
 
-    $EXP -> restart_timeout_upon_receive(0);
+    $EXP->restart_timeout_upon_receive(0);
 
     if ($CONNECTED) {
         ctrl("TITLE:$TITLE");
         ctrl("CONNECTED");
     } else {
         $CONNECTED = 0;
-        ctrl("DISCONNECTED:" . ($EXP -> error));
+        ctrl("DISCONNECTED:" . ($EXP->error));
     }
 
 }
@@ -1381,32 +1463,31 @@ elsif ($METHOD eq 'PACShell') {
     $CONNECTED = 1;
     ctrl("CONNECTED");
 }
-elsif (! $MANUAL) {
+elsif (!$MANUAL) {
     my $end = 0;
 
     # Expect password/confirmation prompt...
-    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP -> expect($TIMEOUT_CONNECT,
+    my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
 
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            $EXP -> hard_close();
+            _hardClose($UUID);
+            $EXP->hard_close();
         }],
 
         [eof => sub {
-
             $CONNECTED = 0;
-            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-            $EXP -> hard_close();
+            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
+            $EXP->hard_close();
         }],
 
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
-
             if ($CONNECTED) {
-                $EXP -> exp_continue;
+                $EXP->exp_continue;
             }
-
             # First 'sudo' password attempt...
             if (! $SUDO_PASSWORD_COUNT) {
                 $SUDO_PASSWORD_COUNT++;
@@ -1415,27 +1496,28 @@ elsif (! $MANUAL) {
                     $SUDO_PASSWORD = wEnterValue(undef, '<b>Password requested</b>', "Enter 'sudo' password for '$ENV{'USER'}'", '', 0);
                 }
                 if (defined $SUDO_PASSWORD) {
-                    $EXP -> log_stdout(0);
+                    $EXP->log_stdout(0);
                     $SUDO_PASSWORD = subst($SUDO_PASSWORD);
                     send_slow($EXP, "$SUDO_PASSWORD\n", 'hide');
-                    $EXP -> log_stdout(1);
+                    $EXP->log_stdout(1);
                     ctrl("PASSWORD:'sudo' password sent (not shown)");
                     exp_continue;
                 } else {
                     ctrl("CLOSE:PASSWORD:Password for 'sudo' input cancelled by user");
-                    $EXP -> hard_close;
+                    $EXP->hard_close;
                 }
             }
             # ... second 'sudo' password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided 'sudo' password was rejected");
-                $EXP -> hard_close;
+                _hardClose($UUID);
+                $EXP->hard_close;
             }
         }],
 
         # Found Host-Key verification string
         [$HOSTCHANGE_PROMPT, sub {
-            my $match = $EXP -> match;
+            my $match = $EXP->match;
             $match =~ /$HOSTCHANGE_PROMPT/g;
             my ($yes, $no) = ($1, $2);
             if ($ACCEPT_KEY) {
@@ -1459,7 +1541,7 @@ elsif (! $MANUAL) {
 
         # Found WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED
         [$REMOTEHOST_PROMPT, sub {
-            my $match = $EXP -> match;
+            my $match = $EXP->match;
             chomp $match;
             $match =~ /$REMOTEHOST_PROMPT/go;
             my ($known_hosts, $line) = ($1, $2);
@@ -1484,7 +1566,7 @@ elsif (! $MANUAL) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                $EXP -> hard_close();
+                $EXP->hard_close();
             }
             $USER_COUNT++;
             $USER = subst($USER);
@@ -1501,38 +1583,38 @@ elsif (! $MANUAL) {
                 $PASSWORD_COUNT++;
                 $WAS_ASK_PASS = 0;
                 if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
-                    my @before = split /\n/, $EXP -> before;
+                    my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
-                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP -> match;
+                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match;
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
                     $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0);
                 }
                 if (defined $PASS) {
-                    $EXP -> log_stdout(0);
+                    $EXP->log_stdout(0);
                     $PASS = subst($PASS);
                     send_slow($EXP, "$PASS\n", 'hide');
-                    $EXP -> log_stdout(1);
+                    $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
                     # Next time we will ask the password since the automatic one did not work
                     $PASS = '<<ASK_PASS>>';
                     exp_continue;
                 } else {
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
-                    $EXP -> hard_close;
+                    $EXP->hard_close;
                 }
             }
             # ... too many password attempts: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
-                $EXP -> hard_close;
+                _hardClose($UUID);
+                $EXP->hard_close;
             }
         }],
 
         # Found user prompt
         [$COMMAND_PROMPT, sub {
-
             $CONNECTED = 1;
             my $avoid_first_expectation = 1;
 
@@ -1541,7 +1623,7 @@ elsif (! $MANUAL) {
                 return 1;
             }
 
-            $EXP -> restart_timeout_upon_receive(1);
+            $EXP->restart_timeout_upon_receive(1);
             for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
                 my $hash = $$CFG{'environments'}{$UUID}{'expect'}[$i];
                 my $pattern = $$hash{'expect'} // '';
@@ -1567,13 +1649,13 @@ elsif (! $MANUAL) {
                 ctrl("EXPECT:WAITING:$pattern");
 
                 # Wait for pattern prompt before continue...
-                $EXP -> expect($TIMEOUT_CMD,
+                $EXP->expect($TIMEOUT_CMD,
 
                     [timeout => sub {
                         if ($on_fail == -1) {
                             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                             $CONNECTED = 0;
-                            $EXP -> hard_close;
+                            $EXP->hard_close;
                         } elsif ($on_fail == -2) {
                             ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                             $CONNECTED = 1;
@@ -1586,16 +1668,16 @@ elsif (! $MANUAL) {
                     }],
 
                     [eof => sub {
-
                         $CONNECTED = 0;
-                        ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-                        $EXP -> hard_close();
+                        ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+                        _hardClose($UUID);
+                        $EXP->hard_close();
                     }],
 
                     # Found Host-Key verification string
                     [$HOSTCHANGE_PROMPT, sub {
 
-                        my $match = $EXP -> match;
+                        my $match = $EXP->match;
                         $match =~ /$HOSTCHANGE_PROMPT/g;
                         my ($yes, $no) = ($1, $2);
                         if ($ACCEPT_KEY) {
@@ -1605,7 +1687,7 @@ elsif (! $MANUAL) {
                         } else {
                             send_slow($EXP, "$no\n");
                             $CONNECTED = 0;
-                            $EXP -> hard_close();
+                            $EXP->hard_close();
                             ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
                         }
                     }],
@@ -1646,7 +1728,7 @@ elsif (! $MANUAL) {
                 # otherwise launch command
                 if ($hide) {
                     ctrl("EXPECT:SENDING:<<HIDDEN STRING>>" . ($return ? '\n' : ''));
-                    $EXP -> log_stdout(0);
+                    $EXP->log_stdout(0);
                 } else {
                     my $cmd_str = $command;
                     $cmd_str =~ s/\n$//go;
@@ -1659,11 +1741,11 @@ elsif (! $MANUAL) {
                 }
 
                 if ($hide) {
-                    $EXP -> log_stdout(1);
+                    $EXP->log_stdout(1);
                 }
             }
 
-            $EXP -> restart_timeout_upon_receive(0);
+            $EXP->restart_timeout_upon_receive(0);
 
         }],
 
@@ -1679,9 +1761,9 @@ elsif (! $MANUAL) {
         ctrl("DISCONNECTED:$error");
     }
 } else {    # TODO this should be an elsif
-    if (! defined $EXP -> error) {
+    if (! defined $EXP->error) {
         $CONNECTED = 0;
-        ctrl("DISCONNECTING:" . ($EXP -> error));
+        ctrl("DISCONNECTING:" . ($EXP->error));
     } else {
         $CONNECTED = 1;
         ctrl("CONNECTING:Manual authentication requested");
@@ -1694,11 +1776,11 @@ $SIG{'WINCH'} = sub {
     if (!$CONNECTED) {
         return 1;
     }
-    while (! $EXP -> slave) {
+    while (! $EXP->slave) {
         select(undef, undef, undef, 0.25);
     };
-    $EXP -> slave -> clone_winsize_from(\*STDIN);
-    kill WINCH => $EXP -> pid if $EXP -> pid;
+    $EXP->slave->clone_winsize_from(\*STDIN);
+    kill WINCH => $EXP->pid if $EXP->pid;
 };
 
 $SIG{'INT'} = undef;
@@ -1708,6 +1790,8 @@ $SIG{'HUP'} = sub {
 
     my $chain_uuid = '';
     my $CHAIN_CFG;
+
+    _hardClose($UUID);
 
     if ($INT) {
         return 1;
@@ -1757,7 +1841,7 @@ $SIG{'HUP'} = sub {
 
     my $end = 0;
     my $avoid_first_expectation = 1;
-    $EXP -> restart_timeout_upon_receive(1);
+    $EXP->restart_timeout_upon_receive(1);
     for(my $i = 0; $i < scalar(@{$$CHAIN_CFG{'environments'}{$chain_uuid}{'expect'}}); $i++) {
         my $hash = $$CHAIN_CFG{'environments'}{$chain_uuid}{'expect'}[$i];
         my $pattern = $$hash{'expect'} // '';
@@ -1783,13 +1867,13 @@ $SIG{'HUP'} = sub {
         ctrl("CHAIN:$chain_name:WAITING($pattern):" . ($exp_partial++) . ":$exp_total");
 
         # Wait for pattern prompt before continue...
-        $EXP -> expect($TIMEOUT_CMD,
+        $EXP->expect($TIMEOUT_CMD,
 
             [timeout => sub {
                 if ($on_fail == -1) {
                     ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                     $CONNECTED = 0;
-                    $EXP -> hard_close;
+                    $EXP->hard_close;
                 } elsif ($on_fail == -2) {
                     ctrl("CHAIN:EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                     $CONNECTED = 1;
@@ -1804,14 +1888,14 @@ $SIG{'HUP'} = sub {
             [eof => sub {
 
                 $CONNECTED = 0;
-                ctrl("CLOSE:Connection ended by remote peer!! " . $EXP -> set_accum());
-                $EXP -> hard_close();
+                ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+                $EXP->hard_close();
             }],
 
             # Found Host-Key verification string
             [$HOSTCHANGE_PROMPT, sub {
 
-                my $match = $EXP -> match;
+                my $match = $EXP->match;
                 $match =~ /$HOSTCHANGE_PROMPT/go;
                 my ($yes, $no) = ($1, $2);
                 if ($ACCEPT_KEY) {
@@ -1821,7 +1905,7 @@ $SIG{'HUP'} = sub {
                 } else {
                     send_slow($EXP, $no . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250')) ? "\r\f" : "\n");
                     $CONNECTED = 0;
-                    $EXP -> hard_close();
+                    $EXP->hard_close();
                     ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
                 }
             }],
@@ -1856,7 +1940,7 @@ $SIG{'HUP'} = sub {
         # ... and launch command
         if ($hide) {
             ctrl("CHAIN:$chain_name:SENDING(<<HIDDEN STRING>>):$exp_partial:$exp_total");
-            $EXP -> log_stdout(0);
+            $EXP->log_stdout(0);
         } else {
             my $cmd_str = $command;
             $cmd_str =~ s/\n$//go;
@@ -1866,8 +1950,8 @@ $SIG{'HUP'} = sub {
         send_slow($EXP, $command . ($return ? (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250') ? "\r\f" : "\n") : ''));
     }
 
-    $EXP -> log_stdout(0);
-    $EXP -> restart_timeout_upon_receive(0);
+    $EXP->log_stdout(0);
+    $EXP->restart_timeout_upon_receive(0);
 
     if ($$CHAIN_CFG{'tmp'}{'set title'}) {
         ctrl("TITLE:$$CHAIN_CFG{'tmp'}{'title'}");
@@ -1932,8 +2016,14 @@ $SIG{'USR2'} = sub {
 };
 
 if ($CONNECTED) {
-    $EXP -> interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
+    # Restart only when connecting at startup connection
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        $RESTART = 0;
+    }
+    $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
+
+_hardClose($UUID);
 
 my $why = $?;
 
@@ -1942,10 +2032,10 @@ if (($why ne 0) && $RESTART) {
 }
 
 # Finish this expect session
-if (defined $EXP -> pid) {
-    kill(15, $EXP -> pid);
+if (defined $EXP->pid) {
+    kill(15, $EXP->pid);
 }
-$EXP -> hard_close;
+$EXP->hard_close;
 
 close_log_file();
 

@@ -707,8 +707,6 @@ Applies to automated actions:
                                           <object class="GtkFrame" id="frame6">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Username/password authentication</property>
                                             <property name="label_xalign">0</property>
                                             <child>
                                               <object class="GtkAlignment" id="alignUserPass">
@@ -856,6 +854,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="tooltip_text" translatable="yes">Use a user name and a password to authenticate to the target server.</property>
                                                 <property name="xalign">0.5</property>
                                                 <property name="active">True</property>
                                                 <property name="draw_indicator">True</property>
@@ -872,9 +871,6 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                           <object class="GtkFrame" id="framePublicKey">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Use OpenSSH identity file to connect
-You may also specify an optional passphrase if the key requires so</property>
                                             <property name="border_width">2</property>
                                             <property name="label_xalign">0</property>
                                             <child>
@@ -910,6 +906,9 @@ You may also specify an optional passphrase if the key requires so</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
                                                             <property name="focus_on_click">False</property>
+                                                            <property name="tooltip_text" translatable="yes">The SSH private key to use.  If must be a valid existing file.
+
+If not specified or invalid, the default SSH private key of your system will be used.  Typically ~/.ssh/id_rsa.</property>
                                                             <property name="create_folders">False</property>
                                                             <property name="local_only">False</property>
                                                             <property name="preview_widget_active">False</property>
@@ -1054,6 +1053,7 @@ You may also specify an optional passphrase if the key requires so</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="tooltip_text" translatable="yes">Use an SSH private to authenticate on the target server.</property>
                                                 <property name="xalign">0.5</property>
                                                 <property name="draw_indicator">True</property>
                                                 <property name="group">rbCfgAuthUserPass</property>

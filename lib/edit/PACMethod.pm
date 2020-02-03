@@ -87,14 +87,19 @@ $METHODS{'RDP (rdesktop)'} = "PACMethod_rdesktop"->new($CONTAINER);
 eval {require "$RealBin/lib/method/PACMethod_xfreerdp.pm";}; die $@ if $@;
 $METHODS{'RDP (xfreerdp)'} = "PACMethod_xfreerdp"->new($CONTAINER);
 
-`vncviewer --help 2>&1 | /bin/grep TigerVNC`;
-my $tigervnc = $?;
-if (!$tigervnc) {
-    # Force use of TigerVNC on any other VNC client
+my $tigervnc = `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
+my $realvnc = `vncviewer --help 2>&1 | /bin/grep RealVNC`;
+
+if ($tigervnc) {
+    # Use TigerVNC
     eval {require "$RealBin/lib/method/PACMethod_tigervnc.pm";}; die $@ if $@;
     $METHODS{'VNC'} = "PACMethod_tigervnc"->new($CONTAINER);
+} elsif ($realvnc) {
+    # Use RealVNC
+    eval {require "$RealBin/lib/method/PACMethod_realvnc.pm";}; die $@ if $@;
+    $METHODS{'VNC'} = "PACMethod_realvnc"->new($CONTAINER);
 } else {
-    # Default VNC viewer
+    # Other VNC
     eval {require "$RealBin/lib/method/PACMethod_vncviewer.pm";}; die $@ if $@;
     $METHODS{'VNC'} = "PACMethod_vncviewer"->new($CONTAINER);
 }
