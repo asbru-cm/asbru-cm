@@ -691,7 +691,9 @@ sub _updateGUIPreferences {
     }
     if (!defined $$cfg{'defaults'}{'unprotected set'}) {
         $$cfg{'defaults'}{'unprotected set'} = 'foreground';
-
+    }
+    if (!defined $$cfg{'defaults'}{'theme'}) {
+        $$cfg{'defaults'}{'theme'} = 'default';
     }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
@@ -773,6 +775,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
     _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
+    _($self, 'comboTheme')->set_active($layout{$$cfg{'defaults'}{'theme'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});
@@ -1055,6 +1058,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active();
     $$self{_CFG}{'defaults'}{'layout'} = _($self, 'comboLayout')->get_active_text();
+    $$self{_CFG}{'defaults'}{'theme'} = _($self, 'comboTheme')->get_active_text();
 
     # Terminal colors
     $$self{_CFG}{'defaults'}{'color black'} = _($self, 'colorBlack')->get_color()->to_string();

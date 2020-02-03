@@ -3198,7 +3198,35 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkLabel" id="lblLayout1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;Icons Theme *&lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                            <property name="track_visited_links">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="comboTheme">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item id="default" translatable="yes">default</item>
+                              <item id="asbru-color" translatable="yes">asbru-color</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">3</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -4177,25 +4205,6 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
-                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
-                                    <property name="use_action_appearance">False</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
-                                    <property name="halign">start</property>
-                                    <property name="xalign">0.5</property>
-                                    <property name="draw_indicator">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
                                     <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
                                     <property name="use_action_appearance">False</property>
@@ -4206,6 +4215,25 @@ connecting (timeout is in seconds)</property>
                                     <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
                                     <property name="halign">start</property>
                                     <property name="xalign">0</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
+                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
+                                    <property name="halign">start</property>
+                                    <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
