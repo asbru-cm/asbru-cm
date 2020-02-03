@@ -3877,7 +3877,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnfind} = Gtk3::Button->new_from_stock('gtk-find');
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{btnfind}, 0, 1, 0);
     $w{window}{gui}{btnfind}->signal_connect('clicked' => sub {
-        if (! $searching) {
+        if (!$searching) {
             $searching = 1;
             $self->_find;
             $searching = 0;
@@ -4035,7 +4035,7 @@ sub _wFindInTerminal {
                 Gtk3::main_iteration;
             }
             chomp $line;
-            if ($line !~ /$regexp/g) {
+            if ($line !~ /$regexp/) {
                 next;
             }
             $found{$l} = _removeEscapeSeqs($line);
