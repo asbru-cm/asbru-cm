@@ -1223,6 +1223,10 @@ sub _getMethods {
 
 sub _registerPACIcons {
     my %icons = (
+        'gtk-edit' => "$RES_DIR/gtk-edit.svg",
+        'gtk-delete' => "$RES_DIR/gtk-delete.svg",
+        'gtk-find' => "$RES_DIR/gtk-find.svg",
+        'gtk-spell-check' => "$RES_DIR/gtk-spell-check.svg",
         'pac-app-big' => "$RES_DIR/asbru-logo-64.png",
         'pac-group-add' => "$RES_DIR/asbru_group_add_16x16.svg",
         'pac-node-add' => "$RES_DIR/asbru_node_add_16x16.svg",
@@ -1254,7 +1258,7 @@ sub _registerPACIcons {
         'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.svg",
         'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.svg",
         'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.svg",
-        'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.png",
+        'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.svg",
         'pac-script' => "$RES_DIR/asbru_script.png",
         'pac-shell' => "$RES_DIR/asbru_shell.png",
         'pac-tab' => "$RES_DIR/asbru_tab.png",

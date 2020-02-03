@@ -40,7 +40,7 @@
      id="namedview11"
      showgrid="false"
      inkscape:zoom="26.0625"
-     inkscape:cx="16"
+     inkscape:cx="3.2997602"
      inkscape:cy="16"
      inkscape:window-x="0"
      inkscape:window-y="30"
@@ -65,43 +65,38 @@
     </marker>
   </defs>
   <g
-     id="g838"
-     transform="matrix(2,0,0,2,0,-31.999999)"
-     style="stroke-width:0.5">
+     id="Icons with numbers"
+     style="fill:#999999;fill-rule:evenodd;stroke:none;stroke-width:0.5"
+     transform="matrix(2,0,0,2.6666666,0,-5.333333)">
     <g
-       transform="matrix(1,0,0,1.3333333,0,13.333333)"
-       style="fill:#ffcc00;fill-rule:evenodd;stroke:none;stroke-width:0.5"
-       id="Icons with numbers">
-      <g
-         style="fill:#ffcc00;stroke-width:0.5"
-         transform="translate(-240)"
-         id="Group">
-        <path
-           inkscape:connector-curvature="0"
-           style="fill:#ffcc00;stroke-width:0.5"
-           id="Rectangle 136"
-           d="m 241.00087,4 h 13.99826 C 255.55537,4 256,4.4456547 256,4.9953976 V 13.004602 C 256,13.544336 255.55189,14 254.99913,14 H 241.00087 C 240.44463,14 240,13.554345 240,13.004602 V 4.9953976 C 240,4.4556644 240.44811,4 241.00087,4 Z M 243,2 h 4 l 1,1 h -6 z m 0,0" />
-      </g>
+       id="Group"
+       transform="translate(-240)"
+       style="fill:#999999;stroke-width:0.5">
+      <path
+         d="m 241.00087,4 h 13.99826 C 255.55537,4 256,4.4456547 256,4.9953976 V 13.004602 C 256,13.544336 255.55189,14 254.99913,14 H 241.00087 C 240.44463,14 240,13.554345 240,13.004602 V 4.9953976 C 240,4.4556644 240.44811,4 241.00087,4 Z M 243,2 h 4 l 1,1 h -6 z m 0,0"
+         id="Rectangle 136"
+         style="fill:#999999;stroke-width:0.5"
+         inkscape:connector-curvature="0" />
     </g>
-    <g
-       style="stroke:#008000;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       transform="matrix(0.73228346,0,0,0.73228346,5.9786627,22.093771)"
-       id="g837">
-      <rect
-         style="opacity:1;fill:#008000;fill-opacity:1;stroke:#008000;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-         id="rect818"
-         width="9.7458029"
-         height="2.2254195"
-         x="3.1270988"
-         y="6.88729" />
-      <rect
-         style="opacity:1;fill:#008000;fill-opacity:1;stroke:#008000;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-         id="rect818-0"
-         width="9.7458029"
-         height="2.2254195"
-         x="3.1270983"
-         y="-9.11271"
-         transform="rotate(90)" />
-    </g>
+  </g>
+  <g
+     id="g837"
+     transform="matrix(1.4645669,0,0,1.4645669,11.957325,12.187543)"
+     style="fill:#333333;stroke:#333333;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers">
+    <rect
+       y="6.88729"
+       x="3.1270988"
+       height="2.2254195"
+       width="9.7458029"
+       id="rect818"
+       style="opacity:1;fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers" />
+    <rect
+       transform="rotate(90)"
+       y="-9.11271"
+       x="3.1270983"
+       height="2.2254195"
+       width="9.7458029"
+       id="rect818-0"
+       style="opacity:1;fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.40967742;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers" />
   </g>
 </svg>
