@@ -457,7 +457,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -528,7 +528,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -597,7 +597,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_vncviewer.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_vncviewer.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -787,15 +787,8 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port cannot be empty');
             }
-            # TODO : Check if this nested "ifs" can be rewritten
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
-                if (! _($self, 'entryUser')->get_chars(0, -1)) {
-                    push(@faults, 'User (User/Password authentication method selected)');
-                }
-            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
-                if (! _($self, 'fileCfgPublicKey')->get_filename) {
-                    push(@faults, 'Public Key File (Public Key authentication method selected)');
-                }
+            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'cbInferUserPassKPX')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
+                push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
 
             return @faults;
@@ -840,7 +833,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive($autossh);
             _($self, 'cbAutossh')->set_active($$cfg{'autossh'});
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ssh.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ssh.svg", 16, 16, 0),
         'escape' => ['~.']
     };
 
@@ -1240,9 +1233,9 @@ sub _registerPACIcons {
         'pac-cluster-manager-off' => "$RES_DIR/asbru_cluster_manager_off.png",
         'pac-favourite-on' => "$RES_DIR/asbru_favourite_on.png",
         'pac-favourite-off' => "$RES_DIR/asbru_favourite_off.png",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.png",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.png",
-        'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.png",
+        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
+        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
+        'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.svg",
         'pac-group' => "$RES_DIR/asbru_group.png",
         'pac-history' => "$RES_DIR/asbru_history.png",
         'pac-keepass' => "$RES_DIR/asbru_keepass.png",
@@ -1252,14 +1245,14 @@ sub _registerPACIcons {
         'pac-method-Serial (cu)' => "$RES_DIR/asbru_method_cu.jpg",
         'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.jpg",
         'pac-method-Generic Command' => "$RES_DIR/asbru_method_generic.jpg",
-        'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.jpg",
-        'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.jpg",
-        'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.jpg",
+        'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.svg",
+        'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.svg",
+        'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.svg",
         'pac-method-Serial (remote-tty)' => "$RES_DIR/asbru_method_remote-tty.jpg",
         'pac-method-SFTP' => "$RES_DIR/asbru_method_sftp.jpg",
-        'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.jpg",
+        'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.svg",
         'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.jpg",
-        'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.jpg",
+        'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.svg",
         'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.png",
         'pac-script' => "$RES_DIR/asbru_script.png",
         'pac-shell' => "$RES_DIR/asbru_shell.png",
@@ -2030,7 +2023,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'proxy port'} //= 8080;
     $$cfg{'defaults'}{'proxy user'} //= '';
     $$cfg{'defaults'}{'shell binary'} //= $ENV{'SHELL'} // '/bin/bash';
-    $$cfg{'defaults'}{'shell options'} //= '-login';
+    $$cfg{'defaults'}{'shell options'} //= ($ENV{'SHELL'} ? '' : '-login');
     $$cfg{'defaults'}{'shell directory'} //= $ENV{'HOME'};
     $$cfg{'defaults'}{'tabs position'} //= 'top';
     $$cfg{'defaults'}{'auto save'} //= 1;

@@ -91,7 +91,7 @@ my %COLOR = (
 $Expect::Multiline_Matching = 1;
 my $EXP = new Expect;
 eval {
-    $EXP -> slave -> clone_winsize_from(\*STDIN);
+    $EXP->slave->clone_winsize_from(\*STDIN);
 };
 
 # END OF : Variables declaration/initialization
@@ -102,7 +102,7 @@ eval {
 sub __disconnect {
     my $signal = shift;
     ctrl("DISCONNECTING");
-    $EXP -> hard_close;
+    $EXP->hard_close;
     ctrl("DISCONNECTED");
     exit 0;
 }
@@ -169,6 +169,15 @@ my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
+my $LPORT;
+
+if (!$RESTART && $IS_CLUSTER) {
+    $RESTART = 2;
+}
+
+$IP = subst($IP);
+$PORT = subst($PORT);
+
 my $kpxc;
 
 # Use keepass ?
