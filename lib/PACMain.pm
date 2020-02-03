@@ -182,13 +182,10 @@ sub new {
     # Set conflictive layout options as early as possible
     _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
 
-    print "A:$THEME_DIR\n";
     if ($$self{_CFG}{'defaults'}{'theme'}) {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
     }
     $$self{_THEME} = $THEME_DIR;
-    print "B:$THEME_DIR\n";
-    print "V:$THEME_DIR ($$self{_THEME})\n";
 
     map({
     if (/^--dump-uuid=(.+)$/) {
