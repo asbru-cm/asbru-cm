@@ -82,7 +82,6 @@ sub update {
     $$self{gui}{chViewOnly}->set_active($$options{viewOnly});
     $$self{gui}{spQuality}->set_value($$options{quality});
     $$self{gui}{spCompressLevel}->set_value($$options{compressLevel});
-    $$self{gui}{entryVia}->set_text($$options{via});
     $$self{gui}{cbColours}->set_active($REVCOLOURS{$$options{colours}});
 
     return 1;
@@ -98,7 +97,6 @@ sub get_cfg {
     $options{viewOnly} = $$self{gui}{chViewOnly}->get_active;
     $options{quality} = $$self{gui}{spQuality}->get_value;
     $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
-    $options{via} = $$self{gui}{entryVia}->get_chars(0, -1);
     $options{colours} = $$self{gui}{cbColours}->get_active_text;
 
     return _parseOptionsToCfg(\%options);
@@ -120,7 +118,6 @@ sub _parseCfgToOptions {
     $hash{compressLevel} = 8;
     $hash{viewOnly} = 0;
     $hash{listen} = 0;
-    $hash{via} = '';
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts)
@@ -134,7 +131,6 @@ sub _parseCfgToOptions {
         $opt =~ /^ViewOnly=(\d+)$/go        and    $hash{viewOnly} = $1;
         $opt =~ /^CompressLevel=(\d+)$/go    and    $hash{compressLevel} = $1;
         $opt =~ /^QualityLevel=(\d+)$/go    and    $hash{quality} = $1;
-        $opt =~ /^via\s+(.+)$/go            and    $hash{via} = $1;
     }
 
     return \%hash;
@@ -152,7 +148,6 @@ sub _parseOptionsToCfg {
     $txt .= ' -ViewOnly='        . ($$hash{viewOnly}    || '0');
     $txt .= ' -CompressLevel='    . $$hash{compressLevel};
     $txt .= ' -QualityLevel='    . $$hash{quality};
-    $txt .= " -via $$hash{via}" if $$hash{via};
 
     return $txt;
 }
@@ -172,6 +167,12 @@ sub _buildGUI {
     my %w;
 
     $w{vbox} = $container;
+
+    $w{hboxReal} = Gtk3::HBox->new(0, 5);
+    $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
+    $w{lblClient} = Gtk3::Label->new();
+    $w{lblClient}->set_markup('<b>TigerVNC configuration</b>');
+    $w{hboxReal}->pack_start($w{lblClient}, 0, 0, 0);
 
     $w{hbox1} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
@@ -212,14 +213,6 @@ sub _buildGUI {
     $w{chViewOnly} = Gtk3::CheckButton->new_with_label('View Only');
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-ViewOnly] : View only mode');
-
-    $w{lblVia} = Gtk3::Label->new('Via:');
-    $w{hbox2}->pack_start($w{lblVia}, 0, 0, 0);
-    $w{lblVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
-
-    $w{entryVia} = Gtk3::Entry->new;
-    $w{hbox2}->pack_start($w{entryVia}, 0, 1, 0);
-    $w{entryVia}->set_tooltip_text('[-via gateway] : Starts an SSH to tunnel the connection');
 
     $$self{gui} = \%w;
 

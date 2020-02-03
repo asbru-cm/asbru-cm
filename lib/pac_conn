@@ -170,9 +170,10 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my @KEEPASS = @{$$CFG{'keepass'} // []};
+my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
-    $RESTART = 1;
+    $RESTART = 2;
 }
 
 $IP = subst($IP);
@@ -904,11 +905,17 @@ sub _setSshProxy {
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
             print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
         }
-        print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
-        if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
-            print CFG "IdentityFile $PUBKEY\n";
+        if ($method =~ /ssh/i) {
+            # Second server is only important for SSH JumpHost
+            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+            if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+                print CFG "IdentityFile $PUBKEY\n";
+            }
         }
         close CFG;
+        if ($method =~ /VNC|RDP/i) {
+            _openTunnel($UUID);
+        }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
         if ($$CFG{'defaults'}{'proxy'} eq 'Jump') {
@@ -924,11 +931,18 @@ sub _setSshProxy {
             if ($$CFG{'defaults'}{'jump key'}) {
                 print CFG "IdentityFile $$CFG{'defaults'}{'jump key'}\n";
             }
-            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
-            if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
-                print CFG "IdentityFile $PUBKEY\n";
+            if ($method =~ /ssh/i) {
+                # Second server is only important for SSH JumpHost
+                print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+                if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
+                    print CFG "IdentityFile $PUBKEY\n";
+                }
             }
             close CFG;
+            if ($method =~ /VNC|RDP/i) {
+                _openTunnel($UUID);
+            }
+
         } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
             # SOCKS Proxy settings
             $proxy_ip = $$CFG{'defaults'}{'proxy ip'};
@@ -938,6 +952,49 @@ sub _setSshProxy {
             $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
         }
     }
+    return 0;
+}
+
+sub _openTunnel {
+    my ($uuid) = @_;
+    my $break = 10;
+
+    $LPORT = $PORT;
+    $proxy_jump = 2;
+
+    if (-e "$CFG_DIR/tmp/$uuid.ctl") {
+        # Avoid open a second terminal with the same UUID
+        my $check = `ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O check jumpserver 2>&1`;
+        if ($check =~ /=\d+/) {
+            ctrl("UNHIDE_TERMINAL");
+            die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
+        }
+    }
+    # Check if port we want to bind is not alreay in use
+    while (($break)&&(my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
+        if ($msg !~ /:$LPORT/) {
+            # netstat not installed?
+            last;
+        }
+        $LPORT++;
+        $break--;
+    }
+    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    $IP = '127.0.0.1';
+    $PORT = $LPORT;
+}
+
+# Place any thing that has to be done before a hard_close
+sub _hardClose {
+    my ($uuid)  = @_;
+
+    if ($proxy_jump == 2) {
+        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    }
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        ctrl('RESTART');
+    }
+    return 0;
 }
 
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
@@ -972,7 +1029,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
@@ -991,7 +1048,7 @@ if (defined $METHOD) {
         }
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
             $CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
@@ -1005,7 +1062,7 @@ if (defined $METHOD) {
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
-            $key = "-i \"$PUBKEY\"" . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
         } elsif (! $AUTHFALLBACK) {
@@ -1047,6 +1104,7 @@ if (defined $METHOD) {
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
         $METHOD = $1;
+        _setSshProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1090,9 +1148,15 @@ if (defined $METHOD) {
             ctrl("PASSWORD:Asking user for password...");
             $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
-
+        my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
-        if (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+            $method = 'RealVNC';
+        } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+            $method = 'TigerVNC';
+        }
+        _setSshProxy($method);
+        if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
@@ -1102,6 +1166,12 @@ if (defined $METHOD) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
             }
+        } elsif ($method eq 'RealVNC') {
+            my $user = $USER ? "UserName=$USER" : '';
+
+            $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $METHOD = "Real$METHOD";
         } else {
             my $user = '';
 
@@ -1187,6 +1257,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
             $EXP->hard_close;
         }],
 
@@ -1213,6 +1284,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
+                _hardClose($UUID);
                 $EXP->hard_close();
             }
             $USER_COUNT++;
@@ -1242,12 +1314,14 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
+                    _hardClose($UUID);
                     $EXP->hard_close;
                 }
             }
             # ... second password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1256,17 +1330,24 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
     # Expect authentication confirmation...
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
-
         [timeout => sub {
-            $CONNECTED = 0;
-            ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            $EXP->hard_close;
+            if ($METHOD =~ /Real/) {
+                # Special case for RealVNC, no information to control timeout, logins, etc.
+                $CONNECTED = 1;
+                ctrl("CONNECTED");
+            } else {
+                $CONNECTED = 0;
+                ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
+                _hardClose($UUID);
+                $EXP->hard_close;
+            }
         }],
 
         [eof => sub {
 
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
             $EXP->hard_close;
         }],
 
@@ -1293,6 +1374,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
+                _hardClose($UUID);
                 $EXP->hard_close();
             }
             $USER_COUNT++;
@@ -1320,6 +1402,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
                 exp_continue;
             } else {
                 ctrl("CLOSE:PASSWORD:Password input cancelled by user");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1456,15 +1539,14 @@ elsif (!$MANUAL) {
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            if ($RESTART) {
-                ctrl('RESTART');
-            }
+            _hardClose($UUID);
             $EXP->hard_close();
         }],
 
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+            _hardClose($UUID);
             $EXP->hard_close();
         }],
 
@@ -1495,6 +1577,7 @@ elsif (!$MANUAL) {
             # ... second 'sudo' password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided 'sudo' password was rejected");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1592,6 +1675,7 @@ elsif (!$MANUAL) {
             # ... too many password attempts: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
+                _hardClose($UUID);
                 $EXP->hard_close;
             }
         }],
@@ -1653,6 +1737,7 @@ elsif (!$MANUAL) {
                     [eof => sub {
                         $CONNECTED = 0;
                         ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
+                        _hardClose($UUID);
                         $EXP->hard_close();
                     }],
 
@@ -1772,6 +1857,8 @@ $SIG{'HUP'} = sub {
 
     my $chain_uuid = '';
     my $CHAIN_CFG;
+
+    _hardClose($UUID);
 
     if ($INT) {
         return 1;
@@ -1996,8 +2083,14 @@ $SIG{'USR2'} = sub {
 };
 
 if ($CONNECTED) {
+    # Restart only when connecting at startup connection
+    if ($IS_CLUSTER && ($RESTART == 2)) {
+        $RESTART = 0;
+    }
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
+
+_hardClose($UUID);
 
 my $why = $?;
 
