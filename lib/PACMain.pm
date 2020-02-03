@@ -82,7 +82,7 @@ my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
 my $RES_DIR = "$RealBin/res";
 
 # Register icons on Gtk
-&_registerPACIcons;
+#&_registerPACIcons;
 
 my $INIT_CFG_FILE = "$RealBin/res/pac.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
@@ -97,12 +97,12 @@ my $PAC_START_PROGRESS = 0;
 my $PAC_START_TOTAL = 6;
 
 my $APPICON = "$RES_DIR/asbru-logo-64.png";
-my $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
-my $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_manager.png");
-my $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
-my $GROUPICON = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
-my $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
-my $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
+my $AUTOCLUSTERICON;
+my $CLUSTERICON;
+my $GROUPICON_ROOT;
+my $GROUPICON;
+my $GROUPICONOPEN;
+my $GROUPICONCLOSED;
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -186,6 +186,15 @@ sub new {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
     }
     $$self{_THEME} = $THEME_DIR;
+    print STDERR "INFO: theme dir '$$self{_THEME}'\n";
+
+    _registerPACIcons($THEME_DIR);
+    $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
+    $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_manager.png");
+    $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
+    $GROUPICON = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+    $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+    $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
 
     map({
     if (/^--dump-uuid=(.+)$/) {
@@ -292,7 +301,7 @@ sub new {
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
 
     # Setup known connection methods
-    %{ $$self{_METHODS} } = _getMethods($self);
+    %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
 
     bless($self, $class);
 

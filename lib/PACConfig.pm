@@ -679,6 +679,7 @@ sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
+    my %theme = ('default',0,'asbru-color',1);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -775,7 +776,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
     _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
-    _($self, 'comboTheme')->set_active($layout{$$cfg{'defaults'}{'theme'}});
+    _($self, 'comboTheme')->set_active($theme{$$cfg{'defaults'}{'theme'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});

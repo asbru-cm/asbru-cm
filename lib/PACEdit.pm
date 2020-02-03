@@ -99,8 +99,12 @@ sub new {
     $self->{_LOCAL_EXEC} = undef;
     $self->{_TXTOPTSBUFFER} = undef;
 
+    if ($$self{_CFG}{defaults}{theme}) {
+        $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{defaults}{theme}";
+    }
+
     # Setup known connection methods
-    %{$$self{_METHODS}} = _getMethods($self);
+    %{$$self{_METHODS}} = _getMethods($self,$THEME_DIR);
 
     # Build the GUI
     _initGUI($self) or return 0;

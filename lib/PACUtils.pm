@@ -389,8 +389,12 @@ sub _pixBufFromFile {
 
 sub _getMethods {
     my $self = shift;
-
+    my $theme_dir = shift;
     my %methods;
+
+    if ($theme_dir) {
+        $THEME_DIR = $theme_dir;
+    }
 
     `which rdesktop 1>/dev/null 2>&1`;
     my $rdesktop = $?;
@@ -1223,6 +1227,11 @@ sub _getMethods {
 }
 
 sub _registerPACIcons {
+    my $theme_dir = shift;
+    if ($theme_dir) {
+        $THEME_DIR = $theme_dir;
+    }
+
     my %icons = (
         'gtk-edit' => "$THEME_DIR/gtk-edit.svg",
         'gtk-delete' => "$THEME_DIR/gtk-delete.svg",
