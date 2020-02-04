@@ -2223,6 +2223,12 @@ sub _setupCallbacks {
             last;
         }
         $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
+        if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
+            # Info Tab, show connection list
+            $$self{_GUI}{showConnBtn}->set_active(1);
+        } elsif (($$self{_CFG}{'defaults'}{'auto hide connections list'})&&($$self{_GUI}{showConnBtn}->get_active())) {
+            $$self{_GUI}{showConnBtn}->set_active(0);
+        }
         return 1;
     });
 
