@@ -891,7 +891,6 @@ sub _setProxy {
         $proxy_port = $$CFG{'environments'}{$UUID}{'proxy port'};
         $proxy_user = $$CFG{'environments'}{$UUID}{'proxy user'};
         $proxy_pass = $$CFG{'environments'}{$UUID}{'proxy pass'};
-        print("OK $method \n");
         if ($method =~ /ssh/i) {
             $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port %h %p'";
         } else {
@@ -1183,7 +1182,6 @@ if (defined $METHOD) {
         } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
             $method = 'TigerVNC';
         }
-        print("VNC $method !!");
         _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
