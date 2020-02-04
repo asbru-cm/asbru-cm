@@ -988,7 +988,7 @@ sub _openSocksTunnel {
 
     $LPORT = _getLocalPort($PORT);
 
-    system("rm -f $pipe");
+    unlink($pipe);
     system("mkfifo $pipe");
     system("nc -l -p $LPORT <$pipe | nc -x $proxy_ip:$proxy_port $IP $PORT >$pipe &");
     $IP = '127.0.0.1';
@@ -1014,9 +1014,13 @@ sub _getLocalPort {
 # Place any thing that has to be done before a hard_close
 sub _hardClose {
     my ($uuid)  = @_;
+    my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
 
     if ($proxy_jump == 2) {
         system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    }
+    if (-e $pipe) {
+        unlink($pipe);
     }
     if ($IS_CLUSTER && ($RESTART == 2)) {
         ctrl('RESTART');
