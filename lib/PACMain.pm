@@ -190,7 +190,7 @@ sub new {
 
     _registerPACIcons($THEME_DIR);
     $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
-    $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_manager.png");
+    $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_connection.svg");
     $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
     $GROUPICON = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
     $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
@@ -3224,7 +3224,7 @@ sub _launchTerminals {
             next;
         }
         my $uuid = $$t{_UUID};
-        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_shell.png", 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
+        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_shell.svg", 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
         my $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
         unshift(@{ $$self{_GUI}{treeHistory}{data} }, ({ value => [ $icon, $name, $uuid,  strftime("%H:%M:%S %d-%m-%Y", localtime($FUNCS{_STATS}{statistics}{$uuid}{start})) ] }));
     }
