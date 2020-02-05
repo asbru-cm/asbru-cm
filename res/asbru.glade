@@ -65,11 +65,6 @@ If not, see <http://www.gnu.org/licenses/>.
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="adjSecondMsWait">
-    <property name="upper">5000</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
   <object class="GtkWindow" id="windowEdit">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
@@ -162,11 +157,11 @@ If not, see <http://www.gnu.org/licenses/>.
                                 <property name="can_focus">False</property>
                                 <property name="border_width">2</property>
                                 <property name="label_xalign">0</property>
+                                <property name="shadow_type">none</property>
                                 <child>
                                   <object class="GtkAlignment" id="alignConnection">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="left_padding">12</property>
                                     <child>
                                       <object class="GtkBox" id="vbox21">
                                         <property name="visible">True</property>
@@ -244,6 +239,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         <property name="tooltip_text" translatable="yes">If checked, 'sudo' command will be prepended to the connection method, along with the "-p &lt;selected_prompt&gt;" command line option configured in "Preferences -&gt; Main Options -&gt; Advanced", and the also selected password will be used when that prompt is found</property>
                                                         <child>
                                                           <object class="GtkCheckButton" id="cbEditUseSudo">
+                                                            <property name="label" translatable="yes"> </property>
                                                             <property name="use_action_appearance">False</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
@@ -261,7 +257,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                           <object class="GtkLabel" id="label88">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes"> Run with &lt;span foreground="red"&gt;'sudo'&lt;/span&gt;</property>
+                                                            <property name="label" translatable="yes">Run with &lt;span foreground="red"&gt;&lt;b&gt;sudo&lt;/b&gt;&lt;/span&gt;</property>
                                                             <property name="use_markup">True</property>
                                                             <property name="xalign">0</property>
                                                           </object>
@@ -279,15 +275,38 @@ If not, see <http://www.gnu.org/licenses/>.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkCheckButton" id="cbAutossh">
-                                                        <property name="label" translatable="yes">Use 'autossh'</property>
-                                                        <property name="use_action_appearance">False</property>
+                                                      <object class="GtkBox">
                                                         <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="receives_default">False</property>
-                                                        <property name="border_width">2</property>
-                                                        <property name="xalign">0.5</property>
-                                                        <property name="draw_indicator">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <child>
+                                                          <object class="GtkCheckButton" id="cbAutossh">
+                                                            <property name="label" translatable="yes"> </property>
+                                                            <property name="use_action_appearance">False</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="receives_default">False</property>
+                                                            <property name="xalign">0</property>
+                                                            <property name="draw_indicator">True</property>
+                                                          </object>
+                                                          <packing>
+                                                            <property name="expand">False</property>
+                                                            <property name="fill">True</property>
+                                                            <property name="position">0</property>
+                                                          </packing>
+                                                        </child>
+                                                        <child>
+                                                          <object class="GtkLabel">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">Use &lt;i&gt;autossh&lt;/i&gt;</property>
+                                                            <property name="use_markup">True</property>
+                                                          </object>
+                                                          <packing>
+                                                            <property name="expand">False</property>
+                                                            <property name="fill">True</property>
+                                                            <property name="position">1</property>
+                                                          </packing>
+                                                        </child>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
@@ -307,18 +326,6 @@ If not, see <http://www.gnu.org/licenses/>.
                                                 <property name="expand">False</property>
                                                 <property name="fill">True</property>
                                                 <property name="position">0</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkSeparator" id="vseparator1">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="orientation">vertical</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">1</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -483,21 +490,10 @@ If not, see <http://www.gnu.org/licenses/>.
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkSeparator" id="hseparator2">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="padding">2</property>
-                                            <property name="position">1</property>
-                                          </packing>
-                                        </child>
-                                        <child>
                                           <object class="GtkBox" id="hbox50">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="halign">start</property>
                                             <child>
                                               <object class="GtkCheckButton" id="cbCfgStartupLaunch">
                                                 <property name="label" translatable="yes">Launch at startup</property>
@@ -507,7 +503,8 @@ If not, see <http://www.gnu.org/licenses/>.
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
                                                 <property name="tooltip_text" translatable="yes">If checked, this session will be executed upon startup</property>
-                                                <property name="xalign">0.5</property>
+                                                <property name="halign">start</property>
+                                                <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                               </object>
                                               <packing>
@@ -518,17 +515,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkSeparator" id="vseparator2">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="orientation">vertical</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="padding">4</property>
-                                                <property name="position">1</property>
-                                              </packing>
+                                              <placeholder/>
                                             </child>
                                             <child>
                                               <object class="GtkCheckButton" id="cbCfgAutoreconnect">
@@ -549,19 +536,6 @@ If not, see <http://www.gnu.org/licenses/>.
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkSeparator" id="vseparator3">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="orientation">vertical</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="padding">4</property>
-                                                <property name="position">3</property>
-                                              </packing>
-                                            </child>
-                                            <child>
                                               <object class="GtkLabel" id="label89">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
@@ -570,7 +544,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                               <packing>
                                                 <property name="expand">False</property>
                                                 <property name="fill">True</property>
-                                                <property name="position">4</property>
+                                                <property name="position">3</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -587,16 +561,18 @@ Applies to automated actions:
 - Paste from clipboard</property>
                                                 <property name="invisible_char">•</property>
                                                 <property name="activates_default">True</property>
+                                                <property name="text" translatable="yes">1</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
                                                 <property name="adjustment">adjSecondMsWait</property>
                                                 <property name="snap_to_ticks">True</property>
                                                 <property name="numeric">True</property>
+                                                <property name="value">1</property>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
                                                 <property name="fill">True</property>
-                                                <property name="position">5</property>
+                                                <property name="position">4</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -608,9 +584,22 @@ Applies to automated actions:
                                               <packing>
                                                 <property name="expand">False</property>
                                                 <property name="fill">True</property>
-                                                <property name="position">6</property>
+                                                <property name="position">5</property>
                                               </packing>
                                             </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkSeparator">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -626,7 +615,7 @@ Applies to automated actions:
                                   <object class="GtkLabel" id="label91">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">&lt;b&gt; Host: &lt;/b&gt;</property>
+                                    <property name="label" translatable="yes">&lt;b&gt; Host&lt;/b&gt;</property>
                                     <property name="use_markup">True</property>
                                   </object>
                                 </child>
@@ -643,12 +632,12 @@ Applies to automated actions:
                                 <property name="can_focus">False</property>
                                 <property name="border_width">2</property>
                                 <property name="label_xalign">0</property>
+                                <property name="shadow_type">none</property>
                                 <child>
                                   <object class="GtkAlignment" id="alignAuthMethod">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xscale">0.94999998807907104</property>
-                                    <property name="left_padding">12</property>
                                     <child>
                                       <object class="GtkBox" id="vbox32">
                                         <property name="visible">True</property>
@@ -659,12 +648,12 @@ Applies to automated actions:
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
                                             <child>
                                               <object class="GtkAlignment" id="alignUserPass">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="xscale">0.94999998807907104</property>
-                                                <property name="left_padding">12</property>
                                                 <child>
                                                   <object class="GtkBox" id="vbox33">
                                                     <property name="visible">True</property>
@@ -879,7 +868,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                             </child>
                                             <child type="label">
                                               <object class="GtkRadioButton" id="rbCfgAuthUserPass">
-                                                <property name="label" translatable="yes">User / Password: </property>
+                                                <property name="label" translatable="yes">User / Password </property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
@@ -898,17 +887,30 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                           </packing>
                                         </child>
                                         <child>
+                                          <object class="GtkSeparator">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
                                           <object class="GtkFrame" id="framePublicKey">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="border_width">2</property>
                                             <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
                                             <child>
                                               <object class="GtkAlignment" id="alignPublicKey">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="xscale">0.94999998807907104</property>
-                                                <property name="left_padding">12</property>
                                                 <child>
                                                   <object class="GtkBox" id="vbox34">
                                                     <property name="visible">True</property>
@@ -1078,7 +1080,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                             </child>
                                             <child type="label">
                                               <object class="GtkRadioButton" id="rbCfgAuthPublicKey">
-                                                <property name="label" translatable="yes">Private Key: </property>
+                                                <property name="label" translatable="yes">Private Key </property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
@@ -1093,7 +1095,18 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">1</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkSeparator" id="hseparator4">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">3</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1136,18 +1149,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">2</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkSeparator" id="hseparator4">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">3</property>
+                                            <property name="position">4</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1166,7 +1168,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">4</property>
+                                            <property name="position">5</property>
                                           </packing>
                                         </child>
                                       </object>
@@ -1177,7 +1179,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                   <object class="GtkLabel" id="label94">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes"> &lt;b&gt;Authentication:&lt;/b&gt; </property>
+                                    <property name="label" translatable="yes"> &lt;b&gt;Authentication&lt;/b&gt; </property>
                                     <property name="use_markup">True</property>
                                   </object>
                                 </child>
@@ -1241,7 +1243,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                 <property name="tooltip_text" translatable="yes">Allows you to send a Perl RegEx string to the connected terminal every given amount of seconds</property>
                                 <child>
                                   <object class="GtkCheckButton" id="cbEditSendString">
-                                    <property name="label" translatable="yes">Programatically send string:</property>
+                                    <property name="label" translatable="yes">Programatically send string</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1354,7 +1356,7 @@ Or(manual): LD_PATH=/my/favourite/path
 Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <child>
                                       <object class="GtkCheckButton" id="cbEditPrependCommand">
-                                        <property name="label" translatable="yes">Prepend command: </property>
+                                        <property name="label" translatable="yes">Prepend command </property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
@@ -1421,7 +1423,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="can_focus">False</property>
                                 <child>
                                   <object class="GtkCheckButton" id="cbStartScript">
-                                    <property name="label" translatable="yes">Start next script when connection is launched: </property>
+                                    <property name="label" translatable="yes">Start next script when connection is launched </property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1459,12 +1461,12 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">2</property>
                                 <property name="label_xalign">0</property>
+                                <property name="shadow_type">none</property>
                                 <child>
                                   <object class="GtkAlignment" id="alignment14">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xscale">0.94999998807907104</property>
-                                    <property name="left_padding">12</property>
                                     <child>
                                       <object class="GtkBox" id="vboxEditSaveSessionLogs">
                                         <property name="visible">True</property>
@@ -1663,7 +1665,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 </child>
                                 <child type="label">
                                   <object class="GtkCheckButton" id="cbEditSaveSessionLogs">
-                                    <property name="label" translatable="yes">Auto save Session logs: </property>
+                                    <property name="label" translatable="yes">Auto save Session logs</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1683,6 +1685,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <object class="GtkBox" id="hbox62">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="margin_bottom">6</property>
                                 <child>
                                   <object class="GtkLabel" id="lblUUID">
                                     <property name="visible">True</property>
@@ -1715,7 +1718,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 </child>
                               </object>
                               <packing>
-                                <property name="expand">True</property>
+                                <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="position">4</property>
                               </packing>
@@ -2227,6 +2230,21 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="chkEnableProxy">
+                                        <property name="label" translatable="yes">Add SOCKS proxy configuration</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -3033,6 +3051,11 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="adjSecondMsWait">
+    <property name="upper">5000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjTransparency">
     <property name="upper">1</property>
