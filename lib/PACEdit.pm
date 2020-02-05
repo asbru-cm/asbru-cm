@@ -240,7 +240,7 @@ sub __checkRBAuth {
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
-        _($self, 'vboxCfgManualProxyConn')->set_visible(0);
+        _($self, 'vboxCfgManualProxyConn')->set_visible(1);
     } else {
         if (_($self, 'rbUseProxyJump')->get_active()) {
             _($self, 'rbUseProxyIfCFG')->set_active(1);
