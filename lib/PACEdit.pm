@@ -217,8 +217,7 @@ sub __checkRBAuth {
             _($self, 'labelExpect')->set_sensitive(0);
             _($self, 'labelExpect')->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
             _($self, 'alignExpect')->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
-        }
-        else{
+        } else{
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelExpect')->set_tooltip_text("EXPECT remote patterns AND-THEN-EXECUTE remote commands");
@@ -518,6 +517,10 @@ sub _setupCallbacks {
         _($self, 'fileCfgPublicKey')->unselect_uri("file://$ENV{'HOME'}");
     });
 
+    _($self, 'chkEnableProxy')->signal_connect('toggled' => sub {
+        _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'chkEnableProxy')->get_active());
+    });
+
     # Capture right mouse click to show custom context menu
     foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
@@ -695,6 +698,9 @@ sub _updateGUIPreferences {
     if (!defined $$self{_CFG}{'environments'}{$uuid}{'use proxy'}) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
     }
+    if ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} != 3) {
+        $$self{_CFG}{'environments'}{$uuid}{'jump plus proxy'} = 0;
+    }
     _($self, 'rbUseProxyIfCFG')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 0);
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
@@ -708,6 +714,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
+    _($self, 'chkEnableProxy')->set_active($$self{_CFG}{'environments'}{$uuid}{'jump plus proxy'} // 0);
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
     } else {
@@ -834,7 +841,6 @@ sub _updateGUIPreferences {
             _($self, 'rbUseProxyJump')->set_tooltip_text("Your system does not support jump hosts");
             _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
         }
-
         _($self, 'vboxJumpCfg')->set_visible(1);
     } elsif ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /VNC|RDP/) {
         _($self, 'vboxJumpCfg')->set_visible(1);
@@ -878,13 +884,20 @@ sub _saveConfiguration {
     ##############################
 
     if (_($self, 'rbUseProxyIfCFG')->get_active()) {
+        # Global options
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
     } elsif (_($self, 'rbUseProxyAlways')->get_active()) {
+        # Use Proxy
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 1;
     } elsif (_($self, 'rbUseProxyJump')->get_active()) {
+        # Jump Host / Tunnel
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 3;
     } else {
+        # Never use proxy
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 2;
+    }
+    if (_($self, 'chkEnableProxy')->get_active() && $$self{_CFG}{'environments'}{$uuid}{'use proxy'} != 3) {
+        _($self, 'chkEnableProxy')->set_active(0);
     }
     # SOCKS Proxy
     $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = _($self, 'entryCfgProxyConnIP')->get_chars(0, -1);
@@ -895,6 +908,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = _($self, 'entryCfgJumpConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'jump plus proxy'} = _($self, 'chkEnableProxy')->get_active();
     if (_($self, 'rbCfgAuthUserPass')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
     } elsif (_($self, 'rbCfgAuthPublicKey')->get_active()) {
@@ -907,7 +921,6 @@ sub _saveConfiguration {
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'jump key'} = '';
     }
-
 
     $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = _($self, 'entryUserPassphrase')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = _($self, 'entryPassphrase')->get_chars(0, -1);
@@ -983,3 +996,24 @@ sub _saveConfiguration {
 ###################################################################
 
 1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+PACEdit.pm
+
+=head1 SYNOPSIS
+
+Edit connection settings
+
+=head1 DESCRIPTION
+
+=head2 Important Global Variables
+
+    use proxy = 0           Use global configurarion
+    use proxy = 1           Use this connection proxy settings
+    use proxy = 2           Never use a proxy
+    use proxy = 3           SSH: Jump Server    VNC/RDP: ssh tunnel
