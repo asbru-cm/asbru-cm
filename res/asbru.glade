@@ -6682,7 +6682,7 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="homogeneous">True</property>
+                                        <property name="spacing">10</property>
                                         <child>
                                           <object class="GtkLabel" id="label61">
                                             <property name="visible">True</property>
@@ -6808,6 +6808,7 @@ Changes apply to next opened connections, not current</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">False</property>
                                             <property name="halign">start</property>
+                                            <property name="margin_right">16</property>
                                             <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
                                           </object>
@@ -6824,6 +6825,7 @@ Changes apply to next opened connections, not current</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">False</property>
+                                            <property name="halign">start</property>
                                             <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
                                           </object>
