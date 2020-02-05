@@ -918,7 +918,7 @@ sub _setProxy {
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
-            _openSocksTunnel($UUID);
+            _openSshTunnel($UUID);
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
@@ -944,7 +944,7 @@ sub _setProxy {
             }
             close CFG;
             if ($method =~ /VNC|RDP/i) {
-                _openSocksTunnel($UUID);
+                _openSshTunnel($UUID);
             }
 
         } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
