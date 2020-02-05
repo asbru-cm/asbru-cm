@@ -222,8 +222,8 @@ sub __checkRBAuth {
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelExpect')->set_tooltip_text("EXPECT remote patterns AND-THEN-EXECUTE remote commands");
             _($self, 'alignExpect')->set_has_tooltip(0);
-
         }
+        _($self, 'chkEnableProxy')->set_sensitive(0);
         _($self, 'rbUseProxyJump')->set_label("Use Jump Server");
         my $status = _($self, 'rbUseProxyJump')->get_active();
         _($self, 'rbUseProxyJump')->set_sensitive(1);
@@ -233,6 +233,7 @@ sub __checkRBAuth {
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'vboxCfgManualProxyConn')->set_visible(1);
     } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
+        _($self, 'chkEnableProxy')->set_sensitive(1);
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
         _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
@@ -721,7 +722,9 @@ sub _updateGUIPreferences {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$ENV{'HOME'}");
         _($self, 'entryCfgJumpConnKey')->unselect_uri("file://$ENV{'HOME'}");
     }
-
+    if ($$self{_CFG}{'environments'}{$uuid}{'jump plus proxy'}) {
+        _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(1);
+    }
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);

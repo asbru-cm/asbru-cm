@@ -918,7 +918,7 @@ sub _setProxy {
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
-            _openSshTunnel($UUID);
+            _openSshTunnel($UUID,$$CFG{'environments'}{$UUID}{'jump plus proxy'});
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
@@ -964,7 +964,8 @@ sub _setProxy {
 }
 
 sub _openSshTunnel {
-    my ($uuid) = @_;
+    my ($uuid,$proxy) = @_;
+    my $proxyCmd = '';
 
     $proxy_jump = 2;
 
@@ -978,7 +979,14 @@ sub _openSshTunnel {
     }
     # Check if port we want to bind is not alreay in use
     $LPORT = _getLocalPort($PORT);
-    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    if ($proxy) {
+        my ($ip,$port);
+
+        $ip = $$CFG{'environments'}{$UUID}{'proxy ip'};
+        $port = $$CFG{'environments'}{$UUID}{'proxy port'};
+        $proxyCmd = "-o ProxyCommand='nc -x $ip:$port %h %p'";
+    }
+    system "ssh $proxyCmd -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
