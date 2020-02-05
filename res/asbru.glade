@@ -172,6 +172,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="spacing">5</property>
+                                            <property name="baseline_position">top</property>
                                             <child>
                                               <object class="GtkBox" id="vbox22">
                                                 <property name="visible">True</property>
@@ -198,6 +199,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                       <object class="GtkComboBoxText" id="comboMethod">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
+                                                        <property name="valign">start</property>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">True</property>
@@ -345,7 +347,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                           <object class="GtkLabel" id="labelIP">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">Host: </property>
+                                                            <property name="label" translatable="yes">Host </property>
                                                             <property name="use_markup">True</property>
                                                           </object>
                                                           <packing>
@@ -386,7 +388,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                           <object class="GtkLabel" id="labelPort">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes"> Port: </property>
+                                                            <property name="label" translatable="yes"> Port </property>
                                                             <property name="use_markup">True</property>
                                                           </object>
                                                           <packing>
@@ -402,6 +404,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                             <property name="can_focus">True</property>
                                                             <property name="has_tooltip">True</property>
                                                             <property name="tooltip_text" translatable="yes">Port number to connect to</property>
+                                                            <property name="valign">start</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="activates_default">True</property>
                                                             <property name="width_chars">6</property>
@@ -428,8 +431,8 @@ If not, see <http://www.gnu.org/licenses/>.
                                                     </child>
                                                   </object>
                                                   <packing>
-                                                    <property name="expand">True</property>
-                                                    <property name="fill">True</property>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">False</property>
                                                     <property name="position">0</property>
                                                   </packing>
                                                 </child>
@@ -695,7 +698,7 @@ Applies to automated actions:
                                                           <object class="GtkLabel" id="label92">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes"> matches Perl RegExp: </property>
+                                                            <property name="label" translatable="yes"> matches Perl RegExp </property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">False</property>
@@ -750,7 +753,7 @@ Applies to automated actions:
                                                             <object class="GtkLabel" id="labelUser">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">User: </property>
+                                                            <property name="label" translatable="yes">User </property>
                                                             <property name="use_markup">True</property>
                                                             </object>
                                                             <packing>
@@ -792,7 +795,7 @@ Applies to automated actions:
                                                             <object class="GtkLabel" id="label93">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">  Password: </property>
+                                                            <property name="label" translatable="yes">  Password </property>
                                                             </object>
                                                             <packing>
                                                             <property name="expand">True</property>
@@ -924,7 +927,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                           <object class="GtkLabel" id="labelUser1">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">Private key file: </property>
+                                                            <property name="label" translatable="yes">Private key file </property>
                                                             <property name="use_markup">True</property>
                                                           </object>
                                                           <packing>
@@ -984,7 +987,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                                             <object class="GtkLabel" id="labelUserPassphrase">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">User: </property>
+                                                            <property name="label" translatable="yes">User </property>
                                                             <property name="use_markup">True</property>
                                                             </object>
                                                             <packing>
@@ -1022,7 +1025,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                                           <object class="GtkLabel" id="labelPass1">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">  Passphrase: </property>
+                                                            <property name="label" translatable="yes">  Passphrase </property>
                                                             <property name="use_markup">True</property>
                                                           </object>
                                                           <packing>
@@ -1248,6 +1251,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
@@ -1285,6 +1289,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text" translatable="yes">Append a "Return/Intro" at the end of the given string to be sent</property>
+                                        <property name="halign">start</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -1361,6 +1366,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="halign">start</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -1394,6 +1400,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text" translatable="yes">If cheked, the resulting connectino command (eg: ssh -L 10123:localhost:10456 -l user1 10.10.10.1) will be surrounded with double quotes ("), in order to provide some more compatibility to the "Prepend command"  (eg: gksudo requires the given command to be quoted)</property>
+                                        <property name="halign">start</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -1428,6 +1435,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
@@ -1553,6 +1561,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="halign">start</property>
                                                 <property name="xalign">0.5</property>
                                                 <property name="draw_indicator">True</property>
                                               </object>
@@ -1670,6 +1679,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
