@@ -3767,7 +3767,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkCheckButton" id="cbCfgPreConnPingPort">
-                            <property name="label" translatable="yes">Check port status at connect . Timeout: </property>
+                            <property name="label" translatable="yes">Check port status at connect . Timeout </property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -4641,7 +4641,7 @@ connecting (timeout is in seconds)</property>
                                       <object class="GtkLabel" id="label65">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Show connections on (*): </property>
+                                        <property name="label" translatable="yes">Show connections on (*) </property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -4747,7 +4747,7 @@ connecting (timeout is in seconds)</property>
                         </child>
                         <child type="label">
                           <object class="GtkCheckButton" id="cbCfgTabsInMain">
-                            <property name="label" translatable="yes">Put Terminal TABS in Main Window (*): </property>
+                            <property name="label" translatable="yes">Put Terminal TABS in Main Window (*)</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -4969,8 +4969,9 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label56">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">PASSWORD prompt: </property>
+                            <property name="label" translatable="yes">PASSWORD prompt </property>
                             <property name="justify">right</property>
+                            <property name="width_chars">21</property>
                             <property name="xalign">1</property>
                           </object>
                           <packing>
@@ -4982,7 +4983,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label70">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">USERNAME prompt: </property>
+                            <property name="label" translatable="yes">USERNAME prompt </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -4995,7 +4996,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label71">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Command prompt: </property>
+                            <property name="label" translatable="yes">Command prompt </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -5008,7 +5009,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label80">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Remote host key changed: </property>
+                            <property name="label" translatable="yes">Remote host key changed </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -5021,7 +5022,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label47">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Select-by-word characters: </property>
+                            <property name="label" translatable="yes">Select-by-word characters </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -5034,7 +5035,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label78">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Host-key verification string: </property>
+                            <property name="label" translatable="yes">Host-key verification string </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -5047,7 +5048,7 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label79">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Press any key to continue: </property>
+                            <property name="label" translatable="yes">Press any key to continue </property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
                           </object>
@@ -5073,9 +5074,12 @@ the first parenthesis refers to "filename" and second to "linenumber"</property>
                           <object class="GtkLabel" id="label83">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;'sudo'&lt;/b&gt; password prompt: </property>
+                            <property name="hexpand">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;sudo&lt;/b&gt; password prompt </property>
                             <property name="use_markup">True</property>
                             <property name="justify">right</property>
+                            <property name="width_chars">21</property>
+                            <property name="xalign">1</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -5106,7 +5110,7 @@ sudo -p sudo_prompt_string ...</property>
                           <object class="GtkLabel" id="label84">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes"> , &lt;b&gt;'sudo'&lt;/b&gt; password: </property>
+                            <property name="label" translatable="yes"> , &lt;b&gt;sudo&lt;/b&gt; password </property>
                             <property name="use_markup">True</property>
                             <property name="justify">right</property>
                             <property name="xalign">1</property>
@@ -5170,9 +5174,9 @@ sudo -p sudo_prompt_string ...</property>
                           <object class="GtkAlignment" id="alignment8">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="border_width">2</property>
+                            <property name="border_width">0</property>
+                            <property name="xalign">0</property>
                             <property name="xscale">0.94999998807907104</property>
-                            <property name="left_padding">12</property>
                             <child>
                               <object class="GtkBox" id="vbox9">
                                 <property name="visible">True</property>
@@ -5204,7 +5208,7 @@ sudo -p sudo_prompt_string ...</property>
                                     <property name="tooltip_text" translatable="yes">The screenshot's file name will be appended at the end of the given command</property>
                                     <child>
                                       <object class="GtkRadioButton" id="rbCfgExternalViewer">
-                                        <property name="label" translatable="yes">External viewer:</property>
+                                        <property name="label" translatable="yes">External viewer</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
@@ -5250,7 +5254,8 @@ sudo -p sudo_prompt_string ...</property>
                           <object class="GtkLabel" id="label42">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">When opening screenshots, use: </property>
+                            <property name="margin_bottom">3</property>
+                            <property name="label" translatable="yes">When opening screenshots, use </property>
                             <property name="use_markup">True</property>
                           </object>
                         </child>
@@ -5411,7 +5416,7 @@ sudo -p sudo_prompt_string ...</property>
                                   <object class="GtkLabel" id="label33">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">Time to connect:</property>
+                                    <property name="label" translatable="yes">Time to connect </property>
                                     <property name="use_markup">True</property>
                                     <property name="xalign">0</property>
                                   </object>
@@ -5447,7 +5452,7 @@ sudo -p sudo_prompt_string ...</property>
                                   <object class="GtkLabel" id="label34">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes"> Expect Cmd exec:</property>
+                                    <property name="label" translatable="yes"> Expect Cmd exec </property>
                                     <property name="use_markup">True</property>
                                   </object>
                                   <packing>
@@ -5538,7 +5543,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <object class="GtkLabel" id="label25">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Save in: </property>
+                                        <property name="label" translatable="yes">Save in </property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5625,7 +5630,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="can_focus">False</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
-                                        <property name="label" translatable="yes"> Files to save: </property>
+                                        <property name="label" translatable="yes"> Files to save </property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5789,9 +5794,11 @@ sudo -p sudo_prompt_string ...</property>
                                                 <property name="can_focus">False</property>
                                                 <child>
                                                   <object class="GtkLabel" id="label2">
+                                                    <property name="width_request">150</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">Switch TABs with: </property>
+                                                    <property name="label" translatable="yes">Switch TABs with </property>
+                                                    <property name="xalign">0</property>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
@@ -5846,9 +5853,11 @@ sudo -p sudo_prompt_string ...</property>
                                                 <property name="can_focus">False</property>
                                                 <child>
                                                   <object class="GtkLabel" id="label81">
+                                                    <property name="width_request">150</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">When closing last TAB: </property>
+                                                    <property name="label" translatable="yes">When closing last TAB </property>
+                                                    <property name="xalign">0</property>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
@@ -5945,6 +5954,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <object class="GtkRadioButton" id="cbCfgNewInWindow">
                                         <property name="label" translatable="yes">Windows</property>
                                         <property name="use_action_appearance">False</property>
+                                        <property name="width_request">168</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -5969,7 +5979,7 @@ sudo -p sudo_prompt_string ...</property>
                                           <object class="GtkLabel" id="label39">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Width=</property>
+                                            <property name="label" translatable="yes">Width </property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -5999,7 +6009,7 @@ sudo -p sudo_prompt_string ...</property>
                                           <object class="GtkLabel" id="label40">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">  Height=</property>
+                                            <property name="label" translatable="yes">  Height </property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -7524,41 +7534,91 @@ Changes apply to next opened connections, not current</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgExpectDebug">
-                        <property name="label" translatable="yes">Expect DEBUG: make Expect object show information on what's going on, in order to aid in debugging</property>
-                        <property name="use_action_appearance">False</property>
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">If checked, lots of debug info will be output on every terminal. It will also save a .yml (YAML) config faile is "Save" button is clicked. BEWARE!! This option will make appear plain text passwords!!</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgExpectDebug">
+                            <property name="label" translatable="yes">Expect DEBUG</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text" translatable="yes">If checked, lots of debug info will be output on every terminal. It will also save a .yml (YAML) config faile is "Save" button is clicked. BEWARE!! This option will make appear plain text passwords!!</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_left">9</property>
+                            <property name="label" translatable="yes">&lt;span color="#888888"&gt;&lt;i&gt;make Expect object show information on what's going on, in order to aid in debugging&lt;/i&gt;&lt;/span&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgHideConnSubMenu">
-                        <property name="label" translatable="yes">Hide Connections submenu: if UNchecked, there may be big delays to show right-click submenu</property>
-                        <property name="use_action_appearance">False</property>
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">This options allows you (if unchecked) to prevent the Connections submenu from appearing when right-click on any terminal. That will speed up showing the right-click submenu</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgHideConnSubMenu">
+                            <property name="label" translatable="yes">Hide Connections submenu</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text" translatable="yes">This options allows you (if unchecked) to prevent the Connections submenu from appearing when right-click on any terminal. That will speed up showing the right-click submenu</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="label" translatable="yes">&lt;span color="#888888"&gt;&lt;i&gt;if &lt;b&gt;unchecked&lt;/b&gt;, there may be big delays to show right-click submenu&lt;/i&gt;&lt;/span&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -7575,7 +7635,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">6</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <child>
@@ -7594,62 +7654,136 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgSkip1stChainExpect">
+                            <property name="label" translatable="yes">Skip first Chain expect</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text" translatable="yes">If checked, first expect in the chain will be skipped (ie: skip any command prompt not matching the actual one)</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="label" translatable="yes">&lt;span color="#888888"&gt;&lt;i&gt;which uses to be a &lt;b&gt;command prompt&lt;/b&gt; expect command&lt;/i&gt;&lt;/span&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgPreventF11">
+                            <property name="label" translatable="yes">Prevent F11 from going</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text" translatable="yes">If checked, ignore any F11 key press</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;fullscreen&lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
                         <property name="position">8</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgSkip1stChainExpect">
-                        <property name="label" translatable="yes">Skip first Chain expect (which uses to be a &lt;command prompt&gt; expect command)</property>
-                        <property name="use_action_appearance">False</property>
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">If checked, first expect in the chain will be skipped (ie: skip any command prompt not matching the actual one)</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgUseShellToConnect">
+                            <property name="label" translatable="yes">Use login shell to start connections</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="label" translatable="yes">&lt;span color="#888888"&gt;&lt;i&gt;if checked, it may resolve some problems with &lt;b&gt;ENV&lt;/b&gt;ironment varibles&lt;/i&gt;&lt;/span&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgUseShellToConnect">
-                        <property name="label" translatable="yes">Use login shell to start connections: if checked, it may resolve some problems with ENVironment varibles</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgPreventF11">
-                        <property name="label" translatable="yes">Prevent F11 from going 'fullscreen'</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">If checked, ignore any F11 key press</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">11</property>
                       </packing>
                     </child>
                   </object>
@@ -7748,15 +7882,34 @@ Changes apply to next opened connections, not current</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">8</property>
                     <child>
+                      <object class="GtkCheckButton" id="cbCfgAutoStartShell">
+                        <property name="label" translatable="yes">Start a shell upon startup</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="halign">start</property>
+                        <property name="xalign">0.5</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkBox" id="hbox5">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label8">
+                            <property name="width_request">100</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Shell Binary: </property>
+                            <property name="label" translatable="yes">Shell Binary</property>
                             <property name="justify">right</property>
+                            <property name="xalign">0</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -7784,7 +7937,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">0</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
@@ -7793,10 +7946,12 @@ Changes apply to next opened connections, not current</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label76">
+                            <property name="width_request">100</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Shell Options: </property>
+                            <property name="label" translatable="yes">Shell Options</property>
                             <property name="justify">right</property>
+                            <property name="xalign">0</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -7824,7 +7979,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">1</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -7833,10 +7988,12 @@ Changes apply to next opened connections, not current</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label77">
+                            <property name="width_request">100</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Initial Directory: </property>
+                            <property name="label" translatable="yes">Initial Directory</property>
                             <property name="justify">right</property>
+                            <property name="xalign">0</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -7860,23 +8017,6 @@ Changes apply to next opened connections, not current</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgAutoStartShell">
-                        <property name="label" translatable="yes">Start a shell upon startup</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -8051,7 +8191,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkRadioButton" id="cbCfgProxyManual">
-                                <property name="label" translatable="yes">SOCKS proxy:</property>
+                                <property name="label" translatable="yes">SOCKS proxy</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -8103,7 +8243,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                       <object class="GtkLabel" id="label26">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">IP / Host:</property>
+                                        <property name="label" translatable="yes">IP / Host</property>
                                       </object>
                                     </child>
                                   </object>
@@ -8143,7 +8283,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                       <object class="GtkLabel" id="label27">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Port:</property>
+                                        <property name="label" translatable="yes">Port</property>
                                       </object>
                                     </child>
                                   </object>
@@ -8180,7 +8320,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                       <object class="GtkLabel" id="label28">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">User:</property>
+                                        <property name="label" translatable="yes">User</property>
                                       </object>
                                     </child>
                                   </object>
@@ -8217,7 +8357,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                       <object class="GtkLabel" id="label29">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Password:</property>
+                                        <property name="label" translatable="yes">Password</property>
                                       </object>
                                     </child>
                                   </object>
@@ -8304,7 +8444,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                                           <object class="GtkLabel" id="label120">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">IP / Host:</property>
+                                            <property name="label" translatable="yes">IP / Host</property>
                                           </object>
                                         </child>
                                       </object>
@@ -8344,7 +8484,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                                           <object class="GtkLabel" id="label121">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Port:</property>
+                                            <property name="label" translatable="yes">Port</property>
                                           </object>
                                         </child>
                                       </object>
@@ -8381,7 +8521,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                                           <object class="GtkLabel" id="label122">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">User:</property>
+                                            <property name="label" translatable="yes">User</property>
                                           </object>
                                         </child>
                                       </object>
@@ -8406,7 +8546,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                                       <object class="GtkLabel" id="labelConnKey1">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Private key file: </property>
+                                        <property name="label" translatable="yes">Private key file </property>
                                         <property name="use_markup">True</property>
                                       </object>
                                       <packing>
@@ -8471,8 +8611,14 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                     </child>
                   </object>
                 </child>
-                <child type="label_item">
-                  <placeholder/>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_bottom">4</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Global Network Settings&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
                 </child>
               </object>
               <packing>
@@ -8542,7 +8688,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                   <object class="GtkLabel" id="label14">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> User defined Global Variables: </property>
+                    <property name="label" translatable="yes">&lt;b&gt;User defined Global Variables&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -8612,7 +8758,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                   <object class="GtkLabel" id="label43">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Global common local commands list: </property>
+                    <property name="label" translatable="yes">&lt;b&gt;Global common local commands list&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -8682,7 +8828,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                   <object class="GtkLabel" id="label46">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Global common remote commands list: </property>
+                    <property name="label" translatable="yes">&lt;b&gt;Global common remote commands list&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -8752,7 +8898,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                   <object class="GtkLabel" id="label75">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> KeePass Options</property>
+                    <property name="label" translatable="yes">&lt;b&gt; KeePass Options&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
