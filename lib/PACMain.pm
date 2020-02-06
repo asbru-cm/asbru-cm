@@ -4756,6 +4756,7 @@ sub _ApplyLayout {
             if ($$self{_GUI}{main}->get_visible) {
                 $self->_hideConnectionsList();
             }
+            $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
         $$self{_GUI}{main}->set_default_size(220,600);
         $$self{_GUI}{main}->resize(220,600);

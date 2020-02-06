@@ -261,7 +261,11 @@ sub _setupCallbacks {
         return 1;
     });
     _($self, 'cfgComboCharEncode')->signal_connect('changed' => sub {
-        _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        my $desc = __($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        if ($desc) {
+            $desc = "<span size='x-small'>$desc</span>";
+        }
+        _($self, 'cfgLblCharEncode')->set_markup($desc);
     });
     _($self, 'cbCfgBWTrayIcon')->signal_connect('toggled' => sub {
         _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'pac-tray-bw' : 'pac-tray', 'menu');
@@ -818,7 +822,8 @@ sub _updateGUIPreferences {
     _($self, 'btnCfgSaveSessionLogs')->set_current_folder($$cfg{'defaults'}{'session logs folder'});
     _($self, 'spCfgSaveSessionLogs')->set_value($$cfg{'defaults'}{'session logs amount'});
     _($self, 'cfgComboCharEncode')->set_active($self->{_ENCODINGS_MAP}{$$cfg{'defaults'}{'terminal character encoding'} // 'UTF-8'});
-    _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'} // 'RFC-3629'});
+    my $desc = __($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'}} // 'RFC-3629');
+    _($self, 'cfgLblCharEncode')->set_markup("<span size='x-small'>$desc</span>");
     _($self, 'cfgComboBackspace')->set_active($$self{_BACKSPACE_BINDING}{$$cfg{'defaults'}{'terminal backspace'} // '0'});
     _($self, 'cbCfgUnsplitDisconnected')->set_active($$cfg{'defaults'}{'unsplit disconnected terminals'} // '0');
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
