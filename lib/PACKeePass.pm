@@ -432,28 +432,38 @@ sub _buildKeePassGUI {
     # Build a vbox
     $w{vbox} = Gtk3::VBox->new(0,0);
 
-    $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassXC');
+    $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassXC ');
+    $w{cbUseKeePass}->set_margin_top(10);
+    $w{cbUseKeePass}->set_margin_bottom(5);
     $w{vbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
 
-    $w{hboxkpmain} = Gtk3::HBox->new(0, 0);
-    $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 0);
+    $w{hboxkpmain} = Gtk3::HBox->new(0, 3);
+    $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
 
-    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Database file:'), 0, 1, 0);
+    $w{dblabel} = Gtk3::Label->new('Database file');
+    $w{dblabel}->set_size_request(100,-1);
+    $w{dblabel}->set_xalign(0);
+    $w{hboxkpmain}->pack_start($w{dblabel}, 0, 0, 0);
 
     $w{fcbKeePassFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
     $w{fcbKeePassFile}->set_show_hidden(1);
-    $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 1, 1, 0);
-    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password:'), 0, 1, 0);
+    $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 0, 0, 0);
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password '), 0, 1, 0);
 
-    $w{entryKeePassPassword} = Gtk3::Entry->new;
+    $w{entryKeePassPassword} = Gtk3::Entry->new();
     $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 0, 1, 0);
     $w{entryKeePassPassword}->set_visibility(0);
 
     if ($$self{kpxc_keyfile}) {
-        $w{hboxkpmain}->pack_start(Gtk3::Label->new('Key File:'), 0, 1, 0);
+        $w{hboxkpkeyfile} = Gtk3::HBox->new(0, 3);
+        $w{keylabel} = Gtk3::Label->new('Key file');
+        $w{vbox}->pack_start($w{hboxkpkeyfile}, 0, 1, 0);
+        $w{hboxkpkeyfile}->pack_start($w{keylabel}, 0, 0, 0);
+        $w{keylabel}->set_size_request(100,-1);
+        $w{keylabel}->set_xalign(0);
         $w{fcbKeePassKeyFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
         $w{fcbKeePassKeyFile}->set_show_hidden(1);
-        $w{hboxkpmain}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
+        $w{hboxkpkeyfile}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
     }
     my $usage =  Gtk3::Label->new();
     $usage->set_halign('start');
@@ -464,6 +474,9 @@ sub _buildKeePassGUI {
 
     $w{cbUseKeePass}->signal_connect('toggled', sub {
         $w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active);
+        if ($$self{kpxc_keyfile}) {
+            $w{hboxkpkeyfile}->set_sensitive($w{cbUseKeePass}->get_active);
+        }
     });
     if ($$self{disable_keepassxc}) {
         $usage->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
@@ -485,6 +498,9 @@ sub _buildKeePassGUI {
         $usage->set_markup("\n\n<b>keepassxc-cli</b> Version $$self{kpxc_version}\n\n$capabilities");
     }
     $w{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
+    if ($$self{kpxc_keyfile}) {
+        $w{hboxkpkeyfile}->set_sensitive($$self{cfg}{use_keepass});
+    }
     return 1;
 }
 
