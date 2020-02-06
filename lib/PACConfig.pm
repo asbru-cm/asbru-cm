@@ -725,6 +725,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
+    _($self, 'entryCfgPasswordPrompt')->select_region(0,0);
     _($self, 'entryCfgHostKeyVerification')->set_text($$cfg{'defaults'}{'hostkey changed prompt'});
     _($self, 'entryCfgPressAnyKey')->set_text($$cfg{'defaults'}{'press any key prompt'});
     _($self, 'entryCfgRemoteHostChanged')->set_text($$cfg{'defaults'}{'remote host changed prompt'});
