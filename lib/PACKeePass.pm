@@ -85,6 +85,7 @@ sub update {
     defined $cfg and $$self{cfg} = $cfg;
 
     my $file = $$self{cfg}{'database'};
+    my $key = $$self{cfg}{'keyfile'};
     if ((!defined $file)||(-d $file)||(!-e $file)) {
         return 0;
     }
@@ -92,6 +93,10 @@ sub update {
         $$self{cfg}{use_keepass} = 0;
     }
     $$self{frame}{fcbKeePassFile}->set_filename($file);
+    if ($key) {
+        $$self{frame}{fcbKeePassKeyFile}->set_filename($key);
+        $$self{kpxc_keyfile_opt} = "--key-file '$key'";
+    }
     $$self{frame}{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
     if (!$$self{cfg}{use_keepass}) {
         return 1;
@@ -307,10 +312,6 @@ sub listEntries {
     $w{window}{gui}{treelist}->set_enable_search(1);
     $w{window}{gui}{treelist}->set_has_tooltip(0);
     $w{window}{gui}{treelist}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    # Implement a "TreeModelSort" to auto-sort the data
-    #my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($w{window}{gui}{treelist}->get_model);
-    #$w{window}{gui}{treelist}->set_model($sort_model_conn);
-    #$sort_model_conn->set_default_sort_func(\&__treeSort, $$self{_CFG});
     $w{window}{gui}{treelist}->get_selection->set_mode('GTK_SELECTION_SINGLE');
     @{$w{window}{gui}{treelist}{'data'}}=();
 
@@ -437,7 +438,7 @@ sub _buildKeePassGUI {
     $w{cbUseKeePass}->set_margin_bottom(5);
     $w{vbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
 
-    $w{hboxkpmain} = Gtk3::HBox->new(0, 3);
+    $w{hboxkpmain} = Gtk3::HBox->new(0, 4);
     $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
 
     $w{dblabel} = Gtk3::Label->new('Database file');
@@ -446,10 +447,13 @@ sub _buildKeePassGUI {
     $w{hboxkpmain}->pack_start($w{dblabel}, 0, 0, 0);
 
     $w{fcbKeePassFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
-    $w{fcbKeePassFile}->set_show_hidden(1);
+    $w{fcbKeePassFile}->set_show_hidden(0);
     $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 0, 0, 0);
-    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password '), 0, 1, 0);
 
+    $w{btnClearPassFile} = Gtk3::Button->new('Clear');
+    $w{hboxkpmain}->pack_start($w{btnClearPassFile}, 0, 1, 0);
+
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password '), 0, 1, 0);
     $w{entryKeePassPassword} = Gtk3::Entry->new();
     $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 0, 1, 0);
     $w{entryKeePassPassword}->set_visibility(0);
@@ -462,8 +466,16 @@ sub _buildKeePassGUI {
         $w{keylabel}->set_size_request(100,-1);
         $w{keylabel}->set_xalign(0);
         $w{fcbKeePassKeyFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
-        $w{fcbKeePassKeyFile}->set_show_hidden(1);
+        $w{fcbKeePassKeyFile}->set_show_hidden(0);
         $w{hboxkpkeyfile}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
+
+        $w{btnClearkeyfile} = Gtk3::Button->new('Clear');
+        $w{hboxkpkeyfile}->pack_start($w{btnClearkeyfile}, 0, 1, 0);
+
+        $w{btnClearkeyfile}->signal_connect('clicked' => sub {
+            $w{fcbKeePassKeyFile}->set_uri("file://$ENV{'HOME'}");
+            $w{fcbKeePassKeyFile}->unselect_uri("file://$ENV{'HOME'}");
+        });
     }
     my $usage =  Gtk3::Label->new();
     $usage->set_halign('start');
@@ -501,6 +513,12 @@ sub _buildKeePassGUI {
     if ($$self{kpxc_keyfile}) {
         $w{hboxkpkeyfile}->set_sensitive($$self{cfg}{use_keepass});
     }
+
+    $w{btnClearPassFile}->signal_connect('clicked' => sub {
+        $w{fcbKeePassFile}->set_uri("file://$ENV{'HOME'}");
+        $w{fcbKeePassFile}->unselect_uri("file://$ENV{'HOME'}");
+    });
+
     return 1;
 }
 

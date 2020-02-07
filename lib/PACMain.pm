@@ -1115,10 +1115,12 @@ sub _setupCallbacks {
                 }
                 ++$total_exp;
             }
+            $ip =~ s/<.+?\|.+?>/******/;
+            $user =~ s/<.+?\|.+?>/******/;
             my $string = "- <b>Name</b>: @{[__($name)]}\n";
             $string .= "- <b>Method</b>: $method\n";
             $string .= "- <b>IP / port</b>: @{[__($ip)]}:$port\n";
-            $string .= "- <b>User</b>: $user";
+            $string .= "- <b>User</b>: @{[__($user)]}";
             if ($total_exp) {
                 $string .= "- With $total_exp active <b>Expects</b>";
             }
