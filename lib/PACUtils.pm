@@ -787,7 +787,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port cannot be empty');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'cbInferUserPassKPX')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
                 push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
 
