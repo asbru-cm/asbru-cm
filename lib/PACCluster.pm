@@ -60,6 +60,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CLUSTERS_FILE = "$CFG_DIR/pac_clusters.nfreeze";
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR;
+my $GROUPICONOPEN;
 my $GROUPICONCLOSED;
 my $GROUPICON_ROOT;
 my $AUTOCLUSTERICON;
@@ -108,6 +109,7 @@ sub show {
 
     $THEME_DIR = $PACMain::FUNCS{_MAIN}{_THEME};
     $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
+    $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
     $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
     $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
     $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_terminal16x16.png", 16, 16, 0);
@@ -151,7 +153,7 @@ sub _loadTreeConfiguration {
     my $tree = shift // $$self{_WINDOWCLUSTER}{treeConnections};
 
     @{$$self{_WINDOWCLUSTER}{treeConnections}{'data'}} = ({
-        value => [$GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__'],
+        value => [$GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__'],
         children => []
     });
     foreach my $child (keys %{$PACMain::{FUNCS}{_MAIN}{_CFG}{environments}{'__PAC__ROOT__'}{children}}) {
@@ -266,10 +268,10 @@ sub _initGUI {
     my $hbox1 = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($hbox1, 1, 1, 0);
 
-    my $frame0 = Gtk3::Frame->new(' UNCLUSTERED TERMINALS: ');
+    my $frame0 = Gtk3::Frame->new(' Unclustered Terminals: ');
     $hbox1->pack_start($frame0, 1, 1, 0);
     my $frame0lbl = Gtk3::Label->new;
-    $frame0lbl->set_markup(' <b>UNCLUSTERED TERMINALS:</b> ');
+    $frame0lbl->set_markup(' <b>Clustered Terminals:</b> ');
     $frame0->set_label_widget($frame0lbl);
 
     # Terminals list
@@ -314,10 +316,10 @@ sub _initGUI {
     my $vbox3 = Gtk3::VBox->new(0, 0);
     $hbox1->pack_start($vbox3, 1, 1, 0);
 
-    my $frame1 = Gtk3::Frame->new(' ACTIVE CLUSTERS: ');
+    my $frame1 = Gtk3::Frame->new(' Active Clusters: ');
     $vbox3->pack_start($frame1, 0, 1, 0);
     my $frame1lbl = Gtk3::Label->new();
-    $frame1lbl->set_markup(' <b>ACTIVE CLUSTERS:</b> ');
+    $frame1lbl->set_markup(' <b>Active Clusters:</b> ');
     $frame1->set_label_widget($frame1lbl);
 
     my $vbox4 = Gtk3::VBox->new(0, 0);
@@ -343,10 +345,10 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{delCluster}->set('can-focus' => 0);
     $$self{_WINDOWCLUSTER}{delCluster}->set_sensitive(0);
 
-    my $frame2 = Gtk3::Frame->new(' TERMINALS: ');
+    my $frame2 = Gtk3::Frame->new(' Terminals: ');
     $vbox3->pack_start($frame2, 1, 1, 0);
     my $frame2lbl = Gtk3::Label->new();
-    $frame2lbl->set_markup(' <b>TERMINALS IN SELECTED CLUSTER:</b> ');
+    $frame2lbl->set_markup(' <b>Terminals in selected Cluster:</b> ');
     $frame2->set_label_widget($frame2lbl);
 
     my $vbox5 = Gtk3::VBox->new(0, 0);
@@ -404,7 +406,7 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{treeConnections}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
 
     @{$$self{_WINDOWCLUSTER}{treeConnections}{'data'}} = ({
-        value => [$GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__'],
+        value => [$GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__'],
         children => []
     });
     my @col = $$self{_WINDOWCLUSTER}{treeConnections}->get_columns;
@@ -647,6 +649,23 @@ sub _setupCallbacks {
     # Tree connections
     $$self{_WINDOWCLUSTER}{treeConnections}->get_selection->signal_connect('changed' => sub {
         $self->_updateButtons1;
+    });
+
+    $$self{_WINDOWCLUSTER}{treeConnections}->signal_connect('row_expanded' => sub {
+        my ($tree, $iter, $path) = @_;
+
+        my $selection = $$self{_WINDOWCLUSTER}{treeConnections}->get_selection;
+        my $modelsort = $$self{_WINDOWCLUSTER}{treeConnections}->get_model;
+        my $model = $modelsort->get_model;
+        my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
+        if ($group_uuid eq '__PAC__ROOT__') {
+            return 0;
+        }
+        $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 0, $GROUPICONOPEN);
+        foreach my $child ($$self{_WINDOWCLUSTER}{treeConnections}->_getChildren($group_uuid, 1, 0)) {
+            $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($$self{_WINDOWCLUSTER}{treeConnections}->_getPath($child))), 0, $GROUPICONCLOSED);
+        }
+        return 1;
     });
 
     $$self{_WINDOWCLUSTER}{treeClustered1}->get_selection->signal_connect('changed' => sub {
@@ -1062,7 +1081,17 @@ sub _setupCallbacks {
 
     $$self{_WINDOWCLUSTER}{treeConnections}->signal_connect('row_collapsed' => sub {
         my ($tree, $iter, $path) = @_;
+
+        my $selection = $$self{_WINDOWCLUSTER}{treeConnections}->get_selection;
+        my $modelsort = $$self{_WINDOWCLUSTER}{treeConnections}->get_model;
+        my $model = $modelsort->get_model;
+        my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
         $$self{_WINDOWCLUSTER}{treeConnections}->columns_autosize;
+        if ($group_uuid eq '__PAC__ROOT__') {
+            return 0;
+        }
+        $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 0, $GROUPICONCLOSED);
+        return 1;
     });
 
     $$self{_WINDOWCLUSTER}{treeConnections}->signal_connect('key_press_event' => sub {
