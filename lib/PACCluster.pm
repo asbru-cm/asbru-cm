@@ -268,10 +268,10 @@ sub _initGUI {
     my $hbox1 = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($hbox1, 1, 1, 0);
 
-    my $frame0 = Gtk3::Frame->new(' Unclustered Terminals: ');
+    my $frame0 = Gtk3::Frame->new(' Unclustered Terminals');
     $hbox1->pack_start($frame0, 1, 1, 0);
     my $frame0lbl = Gtk3::Label->new;
-    $frame0lbl->set_markup(' <b>Clustered Terminals:</b> ');
+    $frame0lbl->set_markup(' <b>Clustered Terminals</b> ');
     $frame0->set_label_widget($frame0lbl);
 
     # Terminals list
@@ -316,10 +316,10 @@ sub _initGUI {
     my $vbox3 = Gtk3::VBox->new(0, 0);
     $hbox1->pack_start($vbox3, 1, 1, 0);
 
-    my $frame1 = Gtk3::Frame->new(' Active Clusters: ');
+    my $frame1 = Gtk3::Frame->new(' Active Clusters');
     $vbox3->pack_start($frame1, 0, 1, 0);
     my $frame1lbl = Gtk3::Label->new();
-    $frame1lbl->set_markup(' <b>Active Clusters:</b> ');
+    $frame1lbl->set_markup(' <b>Active Clusters</b> ');
     $frame1->set_label_widget($frame1lbl);
 
     my $vbox4 = Gtk3::VBox->new(0, 0);
@@ -345,10 +345,10 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{delCluster}->set('can-focus' => 0);
     $$self{_WINDOWCLUSTER}{delCluster}->set_sensitive(0);
 
-    my $frame2 = Gtk3::Frame->new(' Terminals: ');
+    my $frame2 = Gtk3::Frame->new(' Terminals');
     $vbox3->pack_start($frame2, 1, 1, 0);
     my $frame2lbl = Gtk3::Label->new();
-    $frame2lbl->set_markup(' <b>Terminals in selected Cluster:</b> ');
+    $frame2lbl->set_markup(' <b>Terminals in selected Cluster</b> ');
     $frame2->set_label_widget($frame2lbl);
 
     my $vbox5 = Gtk3::VBox->new(0, 0);
@@ -375,7 +375,7 @@ sub _initGUI {
 
     my $tablbl2 = Gtk3::HBox->new(0, 0);
     my $lbl2 = Gtk3::Label->new;
-    $lbl2->set_markup('<b>SAVED CLUSTERS </b>');
+    $lbl2->set_markup('<b>Saved Clusters </b>');
     $tablbl2->pack_start($lbl2, 0, 1, 0);
     $tablbl2->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager', 'menu'), 0, 1, 0);
     $tablbl2->show_all;
@@ -434,10 +434,10 @@ sub _initGUI {
     my $vbox3clu = Gtk3::VBox->new(0, 0);
     $hboxclu->pack_start($vbox3clu, 0, 1, 0);
 
-    my $frame1clu = Gtk3::Frame->new(' CONFIGURED CLUSTERS: ');
+    my $frame1clu = Gtk3::Frame->new(' Configured Clusters');
     $vbox3clu->pack_start($frame1clu, 0, 1, 0);
     my $frame1lblclu = Gtk3::Label->new;
-    $frame1lblclu->set_markup(' <b>CONFIGURED CLUSTERS:</b> ');
+    $frame1lblclu->set_markup(' <b>Configured Clusters</b> ');
     $frame1clu->set_label_widget($frame1lblclu);
 
     my $vbox4clu = Gtk3::VBox->new(0, 0);
@@ -468,10 +468,10 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{delCluster1}->set('can-focus' => 0);
     $$self{_WINDOWCLUSTER}{delCluster1}->set_sensitive(0);
 
-    my $frame2clu = Gtk3::Frame->new(' TERMINALS: ');
+    my $frame2clu = Gtk3::Frame->new(' Terminals');
     $vbox3clu->pack_start($frame2clu, 1, 1, 0);
     my $frame2lblclu = Gtk3::Label->new;
-    $frame2lblclu->set_markup(' <b>TERMINALS IN SELECTED CLUSTER:</b> ');
+    $frame2lblclu->set_markup(' <b>Terminals in selected cluster</b> ');
     $frame2clu->set_label_widget($frame2lblclu);
 
     my $vbox5clu = Gtk3::VBox->new(0, 0);
@@ -495,7 +495,7 @@ sub _initGUI {
     # Add an "autocluster" tab
     my $tablbl3 = Gtk3::HBox->new(0, 0);
     my $lbl3 = Gtk3::Label->new;
-    $lbl3->set_markup('<b>AUTO CLUSTERS </b>');
+    $lbl3->set_markup('<b>Auto Clusters </b>');
     $tablbl3->pack_start($lbl3, 0, 1, 0);
     $tablbl3->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'menu'), 0, 1, 0);
     $tablbl3->show_all;
@@ -540,7 +540,7 @@ sub _initGUI {
     my $frameac = Gtk3::Frame->new;
     $hboxautoclu->pack_start($frameac, 1, 1, 0);
     my $frameaclbl = Gtk3::Label->new;
-    $frameaclbl->set_markup(' <b>AUTOCLUSTER MATCHING PROPERTIES:</b> ');
+    $frameaclbl->set_markup(' <b>Auto Matching Properties</b> ');
     $frameac->set_label_widget($frameaclbl);
     $frameac->set_tooltip_text("These entries accept Regular Expressions,like:\n^server\\d+\nor\nconn.*\\d{1,3}\$\nor any other Perl RegExp");
 
@@ -548,19 +548,19 @@ sub _initGUI {
     $frameac->add($vboxacprops);
 
     my $hboxacpname = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacpname, 0, 1, 0);
-    $hboxacpname->pack_start(Gtk3::Label->new('Name:') , 0, 1, 0);
+    $hboxacpname->pack_start(Gtk3::Label->new('Name') , 0, 1, 0);
     $hboxacpname->pack_start($$self{_WINDOWCLUSTER}{entryname} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacptitle = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacptitle, 0, 1, 0);
-    $hboxacptitle->pack_start(Gtk3::Label->new('Title:') , 0, 1, 0);
+    $hboxacptitle->pack_start(Gtk3::Label->new('Title') , 0, 1, 0);
     $hboxacptitle->pack_start($$self{_WINDOWCLUSTER}{entrytitle} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacphost = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacphost, 0, 1, 0);
-    $hboxacphost->pack_start(Gtk3::Label->new('IP/Host:') , 0, 1, 0);
+    $hboxacphost->pack_start(Gtk3::Label->new('IP/Host') , 0, 1, 0);
     $hboxacphost->pack_start($$self{_WINDOWCLUSTER}{entryhost} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacpdesc = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacpdesc, 0, 1, 0);
-    $hboxacpdesc->pack_start(Gtk3::Label->new('Description:') , 0, 1, 0);
+    $hboxacpdesc->pack_start(Gtk3::Label->new('Description') , 0, 1, 0);
     $hboxacpdesc->pack_start($$self{_WINDOWCLUSTER}{entrydesc} = Gtk3::Entry->new, 1, 1, 0);
 
     $$self{_WINDOWCLUSTER}{btnCheckAC} = Gtk3::Button->new;
