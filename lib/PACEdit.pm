@@ -244,7 +244,7 @@ sub __checkRBAuth {
         _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
-        _($self, 'vboxCfgManualProxyConn')->set_visible(0);
+        _($self, 'vboxCfgManualProxyConn')->set_visible(1);
     } else {
         if (_($self, 'rbUseProxyJump')->get_active()) {
             _($self, 'rbUseProxyIfCFG')->set_active(1);
@@ -310,11 +310,11 @@ sub _setupCallbacks {
     _($self, 'btnSaveEdit')->signal_connect('clicked' => sub {
         if ($$self{_IS_NEW} eq 'quick') {
             $self->_saveConfiguration or return 1;
-            _($self, 'btnCloseEdit')->activate;
+            $self->_closeConfiguration();
             $PACMain::FUNCS{_MAIN}->_launchTerminals([['__PAC__QUICK__CONNECT__'] ]);
         } else {
             $self->_saveConfiguration or return 1;
-            _($self, 'btnCloseEdit')->activate;
+            $self->_closeConfiguration();
         }
     });
 
@@ -385,7 +385,7 @@ sub _setupCallbacks {
 
     # Capture 'close' button clicked
     _($self, 'btnCloseEdit')->signal_connect('clicked' => sub {
-        $$self{_WINDOWEDIT}->hide();
+        $self->_closeConfiguration();
     });
 
     # Capture right mouse click to show custom context menu on "Programatically send string"
@@ -668,14 +668,16 @@ sub _setupCallbacks {
 
     # Capture window closing
     $$self{_WINDOWEDIT}->signal_connect('delete_event' => sub {
-        $$self{_WINDOWEDIT}->hide();
+        $self->_closeConfiguration();
         return 1;
     });
 
     $$self{_WINDOWEDIT}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         # Capture 'Esc' keypress to close window
-        $event->keyval == 65307 and $$self{_WINDOWEDIT}->hide;
+        if ($event->keyval == 65307) {
+            $self->_closeConfiguration();
+        }
         return 0;
     });
 
@@ -981,6 +983,12 @@ sub _saveConfiguration {
     $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path) ), 0, $$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'icon'});
 
     return 1;
+}
+
+sub _closeConfiguration {
+    my $self = shift;
+
+    $$self{_WINDOWEDIT}->hide();
 }
 
 # END: Define PRIVATE CLASS functions

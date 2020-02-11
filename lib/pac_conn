@@ -70,10 +70,12 @@ my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
 my $SOCKET;
 my $SOCKET_EXEC;
+my $proxy_type = 'socks5';
 my $proxy_ip = '';
 my $proxy_port = '';
 my $proxy_user = '';
 my $proxy_pass = '';
+my $proxy_cmd = '';
 my $proxy_jump = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
@@ -861,7 +863,7 @@ sub findKP {
     return wantarray ? @found : scalar(@found);
 }
 
-sub _setSshProxy {
+sub _setProxy {
     my $method = shift;
 
     # Set variables in case they are used in function : sub subst()
@@ -891,7 +893,12 @@ sub _setSshProxy {
         $proxy_port = $$CFG{'environments'}{$UUID}{'proxy port'};
         $proxy_user = $$CFG{'environments'}{$UUID}{'proxy user'};
         $proxy_pass = $$CFG{'environments'}{$UUID}{'proxy pass'};
-        $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port %h %p'";
+        $proxy_cmd  = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
+        if ($method =~ /ssh/i) {
+            $CONNECT_OPTS .= " -o ProxyCommand='$proxy_cmd %h %p'";
+        } else {
+            _openSocksTunnel();
+        }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 3) {
         # Use this connection Jump Server settings
         $proxy_jump = 1;
@@ -914,7 +921,7 @@ sub _setSshProxy {
         }
         close CFG;
         if ($method =~ /VNC|RDP/i) {
-            _openTunnel($UUID);
+            _openSshTunnel($UUID);
         }
     } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0) {
         # Use global configuration settings
@@ -940,7 +947,7 @@ sub _setSshProxy {
             }
             close CFG;
             if ($method =~ /VNC|RDP/i) {
-                _openTunnel($UUID);
+                _openSshTunnel($UUID);
             }
 
         } elsif ($$CFG{'defaults'}{'proxy'} eq 'Proxy') {
@@ -949,17 +956,36 @@ sub _setSshProxy {
             $proxy_port = $$CFG{'defaults'}{'proxy port'};
             $proxy_user = $$CFG{'defaults'}{'proxy user'};
             $proxy_pass = $$CFG{'defaults'}{'proxy pass'};
-            $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
+            $proxy_cmd  = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
+            if ($method =~ /ssh/i) {
+                $CONNECT_OPTS .= " -o ProxyCommand='$proxy_cmd  %h %p'";
+            } else {
+                _openSocksTunnel();
+            }
         }
     }
     return 0;
 }
 
-sub _openTunnel {
-    my ($uuid) = @_;
-    my $break = 10;
+sub _getProxyCmd {
+    my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
 
-    $LPORT = $PORT;
+    if ($proxy_user ne '') {
+        `which ncat 1>/dev/null 2>&1`;
+        if (! $?) {
+            return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
+        }
+        ctrl("UNHIDE_TERMINAL");
+        print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
+        die();
+    } else {
+        return "nc -x $proxy_ip:$proxy_port";
+    }
+}
+
+sub _openSshTunnel {
+    my ($uuid) = @_;
+
     $proxy_jump = 2;
 
     if (-e "$CFG_DIR/tmp/$uuid.ctl") {
@@ -971,7 +997,31 @@ sub _openTunnel {
         }
     }
     # Check if port we want to bind is not alreay in use
-    while (($break)&&(my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
+    $LPORT = _getLocalPort($PORT);
+    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    $IP = '127.0.0.1';
+    $PORT = $LPORT;
+}
+
+sub _openSocksTunnel {
+    my $pipe = "$CFG_DIR/tmp/pipe_$UUID";
+
+    $LPORT = _getLocalPort($PORT);
+    $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
+
+    unlink($pipe);
+    system("mkfifo $pipe");
+    system("nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
+    $IP = '127.0.0.1';
+    $PORT = $LPORT;
+}
+
+# Find out a free local TCP port
+sub _getLocalPort {
+    my $LPORT = shift;
+    my $break = 100;
+
+    while ($break && (my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
         if ($msg !~ /:$LPORT/) {
             # netstat not installed?
             last;
@@ -979,17 +1029,19 @@ sub _openTunnel {
         $LPORT++;
         $break--;
     }
-    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
-    $IP = '127.0.0.1';
-    $PORT = $LPORT;
+    return $LPORT;
 }
 
 # Place any thing that has to be done before a hard_close
 sub _hardClose {
     my ($uuid)  = @_;
+    my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
 
     if ($proxy_jump == 2) {
         system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    }
+    if (-e $pipe) {
+        unlink($pipe);
     }
     if ($IS_CLUSTER && ($RESTART == 2)) {
         ctrl('RESTART');
@@ -1023,7 +1075,7 @@ if (defined $METHOD) {
     # TERMINAL METHODS (ssh, telnet, etc)
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
-        _setSshProxy('ssh');
+        _setProxy('ssh');
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }
@@ -1058,7 +1110,7 @@ if (defined $METHOD) {
         $connection_cmd = "$METHOD $CONNECT_OPTS ${USER}\@$IP";
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*sftp.*$/) || ($METHOD eq 'SFTP')) {
-        _setSshProxy('ssh');
+        _setProxy('ssh');
         $METHOD = 'sftp';
         my $key = '';
         if ($AUTH eq 'publickey') {
@@ -1104,7 +1156,7 @@ if (defined $METHOD) {
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
         $METHOD = $1;
-        _setSshProxy('RDP');
+        _setProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1155,7 +1207,7 @@ if (defined $METHOD) {
         } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
             $method = 'TigerVNC';
         }
-        _setSshProxy($method);
+        _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
