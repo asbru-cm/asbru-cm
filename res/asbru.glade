@@ -390,7 +390,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         </child>
                                                         <child>
                                                           <object class="GtkSpinButton" id="entryPort">
-                                                            <property name="width_request">130</property>
+                                                            <property name="width_request">150</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
                                                             <property name="has_tooltip">True</property>
