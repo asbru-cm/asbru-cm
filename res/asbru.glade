@@ -390,7 +390,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         </child>
                                                         <child>
                                                           <object class="GtkSpinButton" id="entryPort">
-                                                            <property name="width_request">130</property>
+                                                            <property name="width_request">150</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
                                                             <property name="has_tooltip">True</property>
@@ -7686,17 +7686,13 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCfgProxy">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">4</property>
-                <property name="margin_right">4</property>
-                <property name="margin_top">20</property>
-                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="aCfgProxy">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xscale">0.94999998807907104</property>
+                    <property name="top_padding">12</property>
                     <property name="left_padding">12</property>
                     <child>
                       <object class="GtkBox" id="vboxProxy">
