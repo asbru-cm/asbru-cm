@@ -83,8 +83,10 @@ my $NPOSY = 0;
 
 my $right_click_deep = 0;
 
-my $COL_GREEN = "\e[1;32m";
-my $COL_RED   = "\e[1;31m";
+my $COL_GREEN = "\e[1;38;5;2m";
+my $COL_RED   = "\e[1;38;5;1m";
+my $COL_BLUE  = "\e[1;38;5;33m";
+my $COL_YELL  = "\e[1;38;5;11m";
 my $COL_RESET = "\e[0m";
 
 # END: Define GLOBAL CLASS variables
@@ -242,7 +244,7 @@ sub new {
             if (defined $self->{_SOCKET_CONN}) {
                 $self->{_SOCKET_CONN}->close();
             }
-            _wMessage(undef, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
+            _wMessage($$self{_WINDOWTERMINAL}, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
             return 0;
         }
 
@@ -280,6 +282,11 @@ sub new {
     #Accessability shortcuts
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
+    # Autohide non tabbed help terminals
+    if ((defined $$self{_WINDOWTERMINAL})&&(!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+        $$self{_WINDOWTERMINAL}->hide();
+    }
+
     bless($self, $class);
     return $self;
 }
@@ -307,11 +314,17 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = encode('UTF-8',$$self{_CFG}{'environments'}{$$self{_UUID}}{'title'});
+    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
+    my $reconnect_msg = '';
+    my $reconnect_count = '';
 
-    my $string = $method eq 'generic' ? "LAUNCHING '$title'" : "CONNECTING WITH '$title'";
-    _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_GREEN}$string (" . (localtime(time)) . ") =->${COL_RESET}\r\n\n");
+    if ($$self{'_RECONNECTS'}) {
+        $reconnect_msg = 'RE';
+        $reconnect_count = " ${COL_RED}attempt:$$self{'_RECONNECTS'}${COL_RESET}";
+    }
+    my $string = $method eq 'generic' ? encode('UTF-8',"${COL_GREEN}${reconnect_msg}LAUNCHING${COL_RESET} ${COL_YELL}$title${COL_RESET}") : encode('UTF-8',"${COL_GREEN}${reconnect_msg}CONNECTING WITH${COL_RESET} ${COL_YELL}$title${COL_RESET}");
+    _vteFeed($$self{_GUI}{_VTE},"\r\n$string (" . (localtime(time)) . ")$reconnect_count\r\n\n");
 
     $$self{_PULSE} = 1;
 
@@ -389,9 +402,12 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
-    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {@args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];}
-    else {@args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];}
-    if (! $$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
+    if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
+    } else {
+        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+    }
+    if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
         $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
         $$self{CONNECTING} = 0;
         return 0;
@@ -413,7 +429,9 @@ sub start {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{pb}, 0, 1, 0);
     $$self{_GUI}{pb}->show();
 
-    $$self{_CLUSTER} and $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    if ($$self{_CLUSTER}) {
+        $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
 
     # Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
     defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
@@ -434,8 +452,8 @@ sub start {
     );
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
-    $PACMain::RUNNING{$$self{'_UUID_TMP'}}{terminal}{_GUI}{_VTE}->grab_focus();
-
+    $$self{_GUI}{_VTE}->grab_focus();
+    $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     return 1;
 }
 
@@ -467,7 +485,7 @@ sub stop {
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
-        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
+        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
             return 1;
         }
 
@@ -619,32 +637,11 @@ sub _initGUI {
         $sc->add($$self{_GUI}{_VTE});
     }
 
-    $$self{_GUI}{hbHist} = Gtk3::VBox->new(0, 0);
-
-    # Create a scrolled window for the keypress list
-    $$self{_GUI}{sk} = Gtk3::ScrolledWindow->new();
-    $$self{_GUI}{hbHist}->pack_start($$self{_GUI}{sk}, 1, 1, 0);
-    $$self{_GUI}{sk}->set_policy('automatic', 'automatic');
-    $$self{_GUI}{sk}->set_size_request(120, 100);
-    $$self{_GUI}{treeKeys} = Gtk3::SimpleList->new(' HISTORY' => 'text', 'TIME' => 'hidden');
-    $$self{_GUI}{treeKeys}->get_selection->set_mode('single');
-    $$self{_GUI}{sk}->add($$self{_GUI}{treeKeys});
-    $$self{_GUI}{treeKeys}->set_headers_visible(1);
-    $$self{_GUI}{treeKeys}->set_enable_search(0);
-    eval {$$self{_GUI}{treeKeys}->set_can_focus(0);};
-
-    # Create a button to remove history
-    $$self{_GUI}{btnDelHist} = Gtk3::Button->new('Forget history');
-    $$self{_GUI}{hbHist}->pack_start($$self{_GUI}{btnDelHist}, 0, 0, 0);
-    $$self{_GUI}{btnDelHist}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
-    eval {$$self{_GUI}{btnDelHist}->set_can_focus(0);};
-
     if (!$$self{'EMBED'}) {
         $$self{_GUI}{_VBOX}->pack_start($$self{_GUI}{_HBOX}, 1, 1, 0);
 
         # ... put this scrolled vte in $vbox
         $$self{_GUI}{_HBOX}->pack1($sc, 1, 0);
-        $$self{_GUI}{_HBOX}->pack2($$self{_GUI}{hbHist}, 1, 0);
         $$self{_GUI}{_HBOX}->set_position(3000);
 
         $$self{FOCUS} = $$self{_GUI}{_VTE};
@@ -727,15 +724,6 @@ sub _initGUI {
     if ($$self{_CFG}{defaults}{'terminal show status bar'}) {
         $$self{_GUI}{_VBOX}->pack_end($$self{_GUI}{bottombox}, 0, 1, 0);
     }
-
-    # Create a checkbox to show or not commands history tree
-    $$self{_GUI}{cbShowHist} = Gtk3::ToggleButton->new();
-    $$self{_GUI}{cbShowHist}->set_tooltip_text('Show/Hide command history');
-    $$self{_GUI}{cbShowHist}->set_image(Gtk3::Image->new_from_stock('pac-history', 'GTK_ICON_SIZE_BUTTON'));
-    eval {
-        $$self{_GUI}{cbShowHist}->set_can_focus(0);
-    };
-    $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{cbShowHist}, 0, 1, 4);
 
     # Only in traditional mode, show additional buttons
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
@@ -856,19 +844,24 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
+
         my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
         my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
-        # HPR.20191010
+
         my $conns_per_row = 2;
         if ($self->{_CLUSTER}) {
-            if ($ENV{'NTERMINALES'}>1) {
+            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
                 my $screen = Gtk3::Gdk::Screen::get_default;
                 my $sw = $screen->get_width;
                 my $sh = $screen->get_height-100;
-                $conns_per_row = $ENV{'NTERMINALES'} < 5 ? 2 : 3;
-                my $rows = POSIX::ceil($ENV{'NTERMINALES'} / $conns_per_row) || 1;
-                $hsize=int($sw / (POSIX::ceil($ENV{'NTERMINALES'} / $rows)));
-                $vsize=int($sh / (POSIX::ceil($ENV{'NTERMINALES'} / $rows)));
+                $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
+                my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
+                $hsize=int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
+                    $vsize=int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                } else {
+                    $vsize = $sh;
+                }
             }
         }
         $$self{_WINDOWTERMINAL}->set_default_size($hsize, $vsize);
@@ -878,6 +871,11 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
         $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
+
+        if ((($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'})&&($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0))||($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+            _setWindowPaintable($$self{_WINDOWTERMINAL});
+        }
+
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
         $NPOSX++;
@@ -894,36 +892,6 @@ sub _initGUI {
 
 sub _setupCallbacks {
     my $self = shift;
-
-    # Delete history click
-    $$self{_GUI}{btnDelHist}->signal_connect('clicked', sub {
-        if (_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?")) {
-            @{$$self{_GUI}{treeKeys}{data}} = ();
-        }
-    });
-
-    # Execute saved key command
-    $$self{_GUI}{treeKeys}->signal_connect('row_activated' => sub {
-        my $tree = shift;
-        my ($selected) = $tree->get_selected_indices;
-        if (!(defined $selected && $$self{CONNECTED})) {
-            return 1;
-        }
-        my $cmd = $$tree{data}[$selected][0];
-
-        $$self{_SAVE_KEYS} = 0;
-        $self->_execute('remote', $cmd, 0);
-        $$self{_SAVE_KEYS} = 1;
-    });
-
-    # Access Show History Button
-    $$self{_GUI}{cbShowHist}->signal_connect('toggled', sub {
-        if ($$self{_GUI}{cbShowHist}->get_active) {
-            $$self{_GUI}{hbHist}->show_all();
-        } else {
-            $$self{_GUI}{hbHist}->hide();
-        }
-    });
 
     # Show Bar (if any)
     if ($$self{_GUI}{btnShowButtonBar}) {
@@ -968,6 +936,16 @@ sub _setupCallbacks {
     # ------------------------------
     # Register callbacks from VTE
     # ------------------------------
+
+    # Capture VTE title changes
+    # note: actually raised by the appropriate Xterm escape sequence, see http://www.faqs.org/docs/Linux-mini/Xterm-Title.html#s3
+    $$self{_GUI}{_VTE}->signal_connect('window-title-changed' => sub {
+        my ($terminal, $myself) = @_;
+        my $new_title=$terminal->get_window_title();
+        if ($$self{_CFG}{defaults}{'capture xterm title'}) {
+            $$myself{_TITLE} = $new_title;
+        }
+    }, $self);
 
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
@@ -1035,13 +1013,8 @@ sub _setupCallbacks {
 
         # <Shift><Ctrl><Alt>
         if (($ctrl && $alt && $shift) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'}) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
-            # d --> FULL uplicate connection
-            if (lc $keyval eq 'd') {
-                $self->_wSelectKeypress;
-                return 1;
-            }
             # X --> Reset terminal
-            elsif (lc $keyval eq 'x') {
+            if (lc $keyval eq 'x') {
                 $$self{_GUI}{_VTE}->reset(1, 1);
                 return 1;
             }
@@ -1051,10 +1024,6 @@ sub _setupCallbacks {
             # r --> remove from cluster
             if (lc $keyval eq 'r') {
                 $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
-                return 1;
-            }
-            if (lc $keyval eq 'h') {
-                $$self{_GUI}{cbShowHist}->set_active(! $$self{_GUI}{cbShowHist}->get_active);
                 return 1;
             }
         }
@@ -1145,12 +1114,12 @@ sub _setupCallbacks {
                 return 1;
             }
             # f --> Find in history
-            elsif (lc $keyval eq 'f') {
-                if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    $self->_wHistory;
-                }
-                return 1;
-            }
+            #elsif (lc $keyval eq 'f') {
+                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
+                    #$self->_wHistory;
+                #}
+                #return 1;
+            #}
             # r --> Disconnect and Restart session
             elsif (lc $keyval eq 'r') {
                 $self->_disconnectAndRestartTerminal();
@@ -1209,12 +1178,12 @@ sub _setupCallbacks {
                 return 1;
             }
             # h --> Show command history window
-            if (lc $keyval eq 'h') {
-                if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    $self->_wHistory;
-                }
-                return 1;
-            }
+            #if (lc $keyval eq 'h') {
+                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
+                    #$self->_wHistory;
+                #}
+                #return 1;
+            #}
         }
         return 0;
     });
@@ -1263,9 +1232,6 @@ sub _setupCallbacks {
         return 0;
     });
     $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
-        if ($$self{_CFG}{'defaults'}{'record command history'}) {
-            $self->_saveHistory($_[1]);
-        }
         $self->_clusterCommit(@_);
     });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
@@ -1275,17 +1241,17 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
     $$self{_GUI}{_VTE}->signal_connect('drag_drop' => sub {
         if (!$$self{CONNECTED}) {
-            _wMessage($$self{GUI}{_VBOX}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
             return 0;
         } elsif ($$self{CONNECTING}) {
-            _wMessage($$self{GUI}{_VBOX}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
             return 0;
         } elsif ($$self{CONNECTED} && (scalar @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}} == 1)) {
             my $sel = shift @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}};
             my $name = $$self{_CFG}{environments}{$sel}{name};
             my $title = $$self{_CFG}{environments}{$sel}{title};
             if (!$self->_wSelectChain($sel)) {
-                _wMessage(undef, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
+                _wMessage($$self{_WINDOWTERMINAL}, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
             }
             if ($$self{_FOCUSED}) {
                 $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
@@ -1339,11 +1305,6 @@ sub _setupCallbacks {
             }
         });
     }
-    $$self{_GUI}{hbHist}->signal_connect('map' => sub {
-        if (!$$self{_NO_UPDATE_CFG}) {
-            $self->_updateCFG();
-        }
-    });
 
     # Append VTE's connection finalization with CLOSE event
     $$self{_GUI}{_VTE}->signal_connect ('child_exited' => sub {
@@ -1367,7 +1328,7 @@ sub _setupCallbacks {
 
         my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n ${COL_RED}<-= $string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
 
         # Switch to the message window
@@ -1408,6 +1369,7 @@ sub _setupCallbacks {
         $$self{_PID} = 0;
 
         if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
+            sleep($$self{_RECONNECTS});
             $$self{_RECONNECTS}++;
             $self->start;
         } else {
@@ -1415,7 +1377,7 @@ sub _setupCallbacks {
             $self->_wPrePostExec('local after');
 
             # And close if so is configured
-            if ($$self{_CFG}{'defaults'}{'close terminal on disconnect'} && ! $$self{_BADEXIT}) {
+            if (($$self{_CFG}{'defaults'}{'close terminal on disconnect'}) && (!$$self{_BADEXIT} || $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} !~ /ssh/i)) {
                 $self->stop(undef, 1);
             }
         }
@@ -1454,6 +1416,7 @@ sub _watchConnectionData {
             }
             $$self{_GUI}{pb} = undef;
             $$self{_SCRIPT_STATUS} = 'STOP';
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             $PACMain::FUNCS{_CLUSTER}->_updateGUI();
             $self->_updateCFG();
             $data = $self->_checkSendKeystrokes($data);
@@ -1541,7 +1504,7 @@ sub _watchConnectionData {
             $$self{_TITLE} = $1;
             $self->_updateCFG();
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
-            _wMessage(undef, $1, 1);
+            _wMessage($$self{_WINDOWTERMINAL}, $1, 1);
             next;
         } elsif ($data eq 'RESTART') {
             $$self{_RESTART} = 1;
@@ -1563,7 +1526,7 @@ sub _watchConnectionData {
             select($rin, undef, undef, 2) or return 1;
             $$self{_EXEC}{RECEIVED} = undef;
             eval {$$self{_EXEC}{RECEIVED} = ${fd_retrieve($$self{_SOCKET_CLIENT_EXEC})};};
-            if ($@) {_wMessage(undef, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
+            if ($@) {_wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
             if (defined $$self{_EXEC}{RECEIVED}) {
                 $$self{_EXEC_PROCESS} = Glib::Timeout->add(100, sub {$self->_pipeExecOutput; return 0;});
             }
@@ -1606,6 +1569,12 @@ sub _watchConnectionData {
             $$self{_PID} = $2;
             $$self{CONNECTING} = 1;
             $$self{_RESTART} = 0;
+        } elsif ($data eq 'UNHIDE_TERMINAL') {
+            $$self{_BADEXIT} = 1;
+            $$self{CONNECTING} = 1;
+            if (defined $$self{_WINDOWTERMINAL}) {
+                $$self{_WINDOWTERMINAL}->show();
+            }
         }
 
         $$self{_LAST_STATUS} = $data;
@@ -2085,7 +2054,7 @@ sub _vteMenu {
             shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
-                _copyPASS($$self{_UUID});
+                _copyPass($$self{_UUID});
             }
         });
     };
@@ -2142,9 +2111,6 @@ sub _vteMenu {
     # Add find string
     push(@vte_menu_items, {separator => 1});
     push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '<control>F3', code => sub {$self->_wFindInTerminal; return 1;}});
-
-    # Add show command history
-    push(@vte_menu_items, {label => 'Command History...', shortcut => '<alt>h', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{$self->_wHistory;}});
 
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
@@ -2273,15 +2239,6 @@ sub _vteMenu {
                 shortcut => '<control><shift>d',
                 stockicon => 'gtk-copy',
                 code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]])}
-            },
-            # Full Duplicate connection
-            {
-                label => 'FULL Duplicate connection',
-                stockicon => 'gtk-copy',
-                shortcut => '<control><shift><alt>d',
-                sensitive => $$self{_SAVE_KEYS},
-                tooltip => 'This option lets you choose which recorded commands do you want to reproduce in the Duplicated connection (use with caution!!)',
-                code => sub {$self->_wSelectKeypress;}
             },
             # Restart session
             {
@@ -2469,37 +2426,6 @@ sub _clusterCommit {
     $$self{_LISTEN_COMMIT} = 1;
 
     return 1;
-}
-
-sub _saveHistory {
-    my ($self, $string) = @_;
-    $string //= '';
-    if (!$$self{_SAVE_KEYS}) {
-        return 1;
-    }
-
-# FIXME-VTE
-if (0) {
-    my ($col, $row) = $$self{_GUI}{_VTE}->get_cursor_position;
-    my ($txt) = $$self{_GUI}{_VTE}->get_text_range($row, 0, $row, $$self{_GUI}{_VTE}->get_column_count, sub {1;});
-    $txt =~ s/^(?:(?:\s+)|(?:\s+))$//go;
-    if ((! $$self{_HAVE_PROMPT}) && ($txt !~ /^\s*$/go)) {
-        chomp $txt;
-        $$self{_HAVE_PROMPT} = $txt;
-    } elsif ($$self{_INTRO_PRESS}) {
-        chomp $txt;
-        $txt =~ s/^\Q$$self{_HAVE_PROMPT}\E//g;
-        if ($txt eq '') {
-            $$self{_INTRO_PRESS} = 0;
-            return 1;
-        }
-        $$self{_HAVE_PROMPT} = 0;
-        $$self{_INTRO_PRESS} = 0;
-        push(@{$$self{_GUI}{treeKeys}{'data'}}, [$txt, time]);
-        my $last = $#{$$self{_GUI}{treeKeys}{'data'}};
-        $$self{_GUI}{treeKeys}->set_cursor(Gtk3::TreePath->new_from_string($last), undef, 0);
-    }
-}
 }
 
 sub _tabToWin {
@@ -2827,9 +2753,6 @@ sub _tabMenu {
 
     push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '', code => sub {$self->_wFindInTerminal; return 1;}});
 
-    # Add show command history
-    push(@vte_menu_items, {label => 'Command History...', stockicon => 'gtk-orientation-landscape', sensitive => $$self{_CFG}{'defaults'}{'record command history'}, code => sub{$self->_wHistory;}});
-
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
 
@@ -2867,7 +2790,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
+        if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
             return 1;
         }
         foreach my $uuid (@list) {
@@ -3118,18 +3041,18 @@ sub _saveSessionLog {
     $new_file = $dialog->get_filename;
     $dialog->destroy();
 
-    my $confirm = _wYesNoCancel(undef, 'Do you want to remove escape sequences from the saved log?');
+    my $confirm = _wYesNoCancel($$self{_WINDOWTERMINAL}, 'Do you want to remove escape sequences from the saved log?');
 
     if ($confirm eq 'yes') {
         if (!open(F, "$$self{_LOGFILE}")) {
-            _wMessage(undef, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
             return 1;
         }
         my @lines = <F>;
         close F;
 
         if (!open(F, ">$new_file")) {
-            _wMessage(undef, "ERROR: Could not open file '$new_file' for writting!! ($!)");
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$new_file' for writting!! ($!)");
             return 1;
         }
         print F _removeEscapeSeqs(join('', @lines));
@@ -3152,13 +3075,13 @@ sub _execute {
     my $intro = shift // 1;
 
     # Ask for confirmation
-    if (($confirm) && (!_wConfirm($$self{GUI}{_VBOX}, "Execute <b>'$comm'</b> " . ($where ne 'remote' ? 'LOCALLY' : 'REMOTELY')))) {
+    if (($confirm) && (!_wConfirm($$self{_WINDOWTERMINAL}, "Execute <b>'$comm'</b> " . ($where ne 'remote' ? 'LOCALLY' : 'REMOTELY')))) {
         return 0;
     }
 
     my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID});
     if (!defined $cmd) {
-        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
+        _wMessage($$self{_WINDOWTERMINAL}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
         return 0;
     }
 
@@ -3173,13 +3096,13 @@ sub _execute {
         # Prevent "Remote Executions storms" (half a second between interruptions to spawned processes)
         my $time = join('.', gettimeofday);
         if (($time - $$self{_EXEC_LAST}) <= $EXEC_STORM_TIME) {
-            _wMessage($$self{GUI}{_VBOX}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
             return 0;
         }
         $$self{_EXEC_LAST} = $time;
 
         if (!kill('USR1', $$self{_PID})) {
-            _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
             return 0;
         }
         my %tmp;
@@ -3465,7 +3388,7 @@ sub _wSelectChain {
         if ($ppe{window}{gui}{cbExecInCluster}->get_active) {
             foreach my $cluster_uuid (keys %PACMain::RUNNING) {
                 if (! kill('HUP', $PACMain::RUNNING{$cluster_uuid}{terminal}{_PID})) {
-                    _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                    _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                     return 0;
                 }
 
@@ -3476,7 +3399,7 @@ sub _wSelectChain {
             }
         } else {
             if (! kill('HUP', $$self{_PID})) {
-                _wMessage($$self{GUI}{_VBOX}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                 return 0;
             }
 
@@ -3570,169 +3493,10 @@ sub _wSelectChain {
 
 }
 
-sub _wSelectKeypress {
-    my $self = shift;
-
-    our %w;
-
-    if (defined $w{window}) {
-        return $w{window}{data}->present;
-    }
-
-    # Create the dialog window,
-    $w{window}{data} = Gtk3::Window->new();
-
-    $w{window}{data}->signal_connect('delete_event' => sub {
-        $w{window}{data}->destroy();
-        undef %w;
-        return 1;
-    });
-
-    $w{window}{data}->signal_connect('key_press_event' => sub {
-        my ($widget, $event) = @_;
-        my $keyval = '' . ($event->keyval);
-        if ($keyval != 65307) {
-            return 0;
-        }
-        $w{window}{gui}{btnclose}->activate();
-        return 1;
-    });
-
-    # and setup some dialog properties.
-    $w{window}{data}->set_title("$self->{_TITLE} : $APPNAME : Select keypresses to propagate to Duplicated Connection");
-    $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_from_file($APPICON);
-    $w{window}{data}->set_default_size(600, 480);
-    $w{window}{data}->set_resizable(1);
-    $w{window}{data}->set_modal(1);
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-
-    # Create a vbox
-    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
-    $w{window}{data}->add($w{window}{gui}{vbox});
-
-    $w{window}{gui}{label0} = Gtk3::Label->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{label0}, 0, 1, 0);
-    $w{window}{gui}{label0}->set_justify('center');
-    $w{window}{gui}{label0}->set_markup("<big><b><span foreground=\"#FF0000\">***************** ATTENTION *****************</span></b></big>\nAre you sure you want to duplicate this connection, including <b>every kestroke</b> registered until now?\nThat can be *very dangerous*, specially if you do not remember your keyboard activity in this terminal.\nIf unsure, click 'Cancel' and take a look at this terminals's history");
-
-    # Create frame 1
-    $w{window}{gui}{frame1} = Gtk3::Frame->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{frame1}, 1, 1, 0);
-    $w{window}{gui}{frame1}->set_label(' Command History: ');
-    $w{window}{gui}{frame1}->set_border_width(5);
-
-    # Create a GtkScrolledWindow,
-    my $sctxt = Gtk3::ScrolledWindow->new();
-    $w{window}{gui}{frame1}->add($sctxt);
-    $sctxt->set_shadow_type('none');
-    $sctxt->set_policy('automatic', 'automatic');
-    $sctxt->set_border_width(5);
-
-    # Create tree found
-    $w{window}{gui}{treefound} = Gtk3::SimpleList->new_from_treeview (
-        Gtk3::TreeView->new(),
-        ' Execute ' => 'bool',
-        ' Last Execution ' => 'text',
-        ' Command ' => 'text',
-        ' cmd ' => 'hidden'
-    );
-    $w{window}{gui}{treefound}->set_headers_visible(1);
-    $w{window}{gui}{treefound}->set_grid_lines('both');
-    $w{window}{gui}{treefound}->get_selection->set_mode('single');
-    foreach my $array (@{$$self{_GUI}{treeKeys}{data}}) {
-        my $cmd = $$array[0];
-        my $cmdt = $$array[1];
-
-        push(@{$w{window}{gui}{treefound}{data}},
-            [
-                1,
-                strftime("%Y-%m-%d %H:%M:%S", localtime($cmdt)),
-                _replaceBadChars($cmd),
-                $cmd
-            ]
-        );
-    }
-
-    # Put treefound into scrolledwindow
-    $sctxt->add($w{window}{gui}{treefound});
-
-    # Put a separator
-    $w{window}{gui}{sep} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep}, 0, 1, 5);
-
-    $w{window}{gui}{hbox1} = Gtk3::HBox->new(0, 0);
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbox1}, 0, 1, 0);
-
-    $w{window}{gui}{lblSleep} = Gtk3::Label->new('Time between commands to replicate: ');
-    $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lblSleep}, 0, 1, 0);
-
-    $w{window}{gui}{spSleep} = Gtk3::SpinButton->new_with_range(0, 86400, 1/2);
-    $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{spSleep}, 0, 1, 0);
-    $w{window}{gui}{spSleep}->set_value(1/2);
-
-    # Put a separator
-    $w{window}{gui}{sep2} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep2}, 0, 1, 5);
-
-    # Put a hbox to add exec/close buttons
-    $w{window}{gui}{hbtnbox} = Gtk3::HBox->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbtnbox}, 0, 1, 0);
-    $w{window}{gui}{hbtnbox}->set_border_width(5);
-
-    # Put a 'select all' button
-    $w{window}{gui}{btnselectall} = Gtk3::Button->new_from_stock('gtk-yes');
-    $w{window}{gui}{btnselectall}->set_label('Select all');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnselectall}, 0, 1, 0);
-    $w{window}{gui}{btnselectall}->signal_connect('clicked' => sub {foreach my $line (@{$w{window}{gui}{treefound}{data}}) {$$line[0] = 1;};});
-
-    # Put a 'select all' button
-    $w{window}{gui}{btnselectnone} = Gtk3::Button->new_from_stock('gtk-no');
-    $w{window}{gui}{btnselectnone}->set_label('Select none');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnselectnone}, 0, 1, 0);
-    $w{window}{gui}{btnselectnone}->signal_connect('clicked' => sub {foreach my $line (@{$w{window}{gui}{treefound}{data}}) {$$line[0] = 0;};});
-
-    # Put a button to execute
-    $w{window}{gui}{btnExec} = Gtk3::Button->new_from_stock('gtk-execute');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnExec}, 1, 1, 0);
-    $w{window}{gui}{btnExec}->set_label('Go _FULL Duplicate');
-    $w{window}{gui}{btnExec}->signal_connect('clicked' => sub {
-        my %keys;
-        foreach my $line (@{$w{window}{gui}{treefound}{data}}) {
-            if ($$line[0]) {
-                push(@{$keys{cmd}}, $$line[3]);
-            }
-        }
-        $keys{sleep} = $w{window}{gui}{spSleep}->get_chars(0, -1) // 1/2;
-
-        my $new_terminal = $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]], \%keys);
-
-        $w{window}{data}->destroy();
-        undef %w;
-    });
-
-    # Put a 'close' button
-    $w{window}{gui}{btnclose} = Gtk3::Button->new_from_stock('gtk-cancel');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnclose}, 0, 1, 0);
-    $w{window}{gui}{btnclose}->signal_connect('clicked' => sub {$w{window}{data}->destroy(); undef %w; return 1;});
-
-    $w{window}{data}->show_all();
-
-    return 1;
-}
-
 sub _updateCFG {
     my $self = shift;
 
     $$self{_NO_UPDATE_CFG} = 1;
-
-    if ($$self{_GUI}{hbHist}) {
-        if (($$self{_GUI}{cbShowHist}->get_active) && ($$self{_CFG}{'defaults'}{'record command history'})) {
-            $$self{_GUI}{hbHist}->show_all();
-        } else {
-            $$self{_GUI}{hbHist}->hide;
-        }
-    }
 
     if (defined $$self{_GUI}{_MACROSBOX}) {
         $$self{_GUI}{_MACROSBOX}->hide;
@@ -3943,52 +3707,53 @@ sub _updateCFG {
     _setTabColour($self);
 
     my $colors = [Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color black'} // '#000000000000'),  # black
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
-    Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})]; # light white
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color red'}), # red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color green'}), # green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color yellow'}), # yellow (=brown)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color blue'}), # blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color magenta'}), # magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color cyan'}), # cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color white'}), # white (=light grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright black'}), # light black (=dark grey)
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright red'}), # light red
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright green'}), # light green
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright yellow'}), # light yellow
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright blue'}), # light blue
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright magenta'}), # light magenta
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright cyan'}), # light cyan
+        Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'color bright white'})
+    ]; # light white
     # Update some VTE options
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'});
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'},$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color like text'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'} : $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'cursor shape'});
         $$self{_GUI}{_VTE}->set_encoding($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal character encoding'} // 'UTF-8');
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal backspace'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_emulation($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal emulation'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal select words'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'visible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_transparent($$self{_CFG}{'defaults'}{'terminal transparency'} > 0);
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_background_saturation($$self{_CFG}{'defaults'}{'terminal transparency'});
-        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
+        $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}), $colors);
+        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'},$$self{_CFG}{'defaults'}{'back color'});
+        } else {
+            $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
+        }
         $$self{_GUI}{_VTE}->set_color_foreground(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}));
-        $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
         $$self{_GUI}{_VTE}->set_color_bold(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'bold color like text'} ? $$self{_CFG}{'defaults'}{'text color'} : $$self{_CFG}{'defaults'}{'bold color'}));
         $$self{_GUI}{_VTE}->set_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'terminal font'}));
         $$self{_GUI}{_VTE}->set_property('cursor-shape', $$self{_CFG}{'defaults'}{'cursor shape'});
         $$self{_GUI}{_VTE}->set_encoding($$self{_CFG}{'defaults'}{'terminal character encoding'} // 'UTF-8');
         $$self{_GUI}{_VTE}->set_backspace_binding($$self{_CFG}{'defaults'}{'terminal backspace'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_emulation($$self{_CFG}{'defaults'}{'terminal emulation'});
         $$self{_GUI}{_VTE}->set_word_char_exceptions($$self{_CFG}{'defaults'}{'word characters'});
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{'defaults'}{'audible bell'});
-# FIXME-VTE  $$self{_GUI}{_VTE}->set_visible_bell($$self{_CFG}{'defaults'}{'visible bell'});
     }
 
     if ($$self{_FOCUSED} && $$self{FOCUS}) {
@@ -3997,6 +3762,31 @@ sub _updateCFG {
     $$self{_NO_UPDATE_CFG} = 0;
 
     return 1;
+}
+
+sub _setTransparency {
+    my $self = shift;
+    my $transparency = shift;
+    my $bgcolor = shift;
+    my $alpha = 1 - $transparency;
+    my ($r,$g,$b) = (0,0,0);
+
+    if (length($bgcolor)==13) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})\w{2}(\w{2})\w{2}(\w{2})\w{2}/;
+    } elsif (length($bgcolor) == 7) {
+        ($r,$g,$b) = $bgcolor =~ m/(\w{2})(\w{2})(\w{2})/;
+    }
+    if ($r) {
+        $r = hex($r);
+    }
+    if ($g) {
+        $g = hex($g);
+    }
+    if ($b) {
+        $b = hex($b);
+    }
+    my $color = Gtk3::Gdk::RGBA::parse("rgba($r,$g,$b,$alpha)");
+    $$self{_GUI}{_VTE}->set_color_background($color);
 }
 
 sub _wFindInTerminal {
@@ -4087,7 +3877,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnfind} = Gtk3::Button->new_from_stock('gtk-find');
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{btnfind}, 0, 1, 0);
     $w{window}{gui}{btnfind}->signal_connect('clicked' => sub {
-        if (! $searching) {
+        if (!$searching) {
             $searching = 1;
             $self->_find;
             $searching = 0;
@@ -4281,146 +4071,6 @@ sub _wFindInTerminal {
     return 1;
 }
 
-sub _wHistory {
-    my $self = shift;
-
-    our %w;
-
-    if (defined $w{window}) {
-        return $w{window}{data}->present;
-    }
-
-    # Create the 'windowFind' dialog window,
-    $w{window}{data} = Gtk3::Window->new();
-
-    $w{window}{data}->signal_connect('delete_event' => sub {
-        $w{window}{data}->destroy();
-        undef %w;
-        return 1;
-    });
-
-    $w{window}{data}->signal_connect('key_press_event' => sub {
-        my ($widget, $event) = @_;
-        my $keyval = '' . ($event->keyval);
-        if ($keyval != 65307) {
-            return 0;
-        }
-        $w{window}{gui}{btnclose}->activate();
-        return 1;
-    });
-
-    # and setup some dialog properties.
-    $w{window}{data}->set_title("$self->{_TITLE}  : $APPNAME : Command History");
-    $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_from_file($APPICON);
-    $w{window}{data}->set_default_size(600, 480);
-    $w{window}{data}->set_resizable(1);
-    $w{window}{data}->set_modal(1);
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-
-    # Create a vbox
-    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
-    $w{window}{data}->add($w{window}{gui}{vbox});
-
-    # Create frame 1
-    $w{window}{gui}{frame1} = Gtk3::Frame->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{frame1}, 1, 1, 0);
-    $w{window}{gui}{frame1}->set_label(' Command History: ');
-    $w{window}{gui}{frame1}->set_border_width(5);
-
-    # Create a GtkScrolledWindow,
-    my $sctxt = Gtk3::ScrolledWindow->new();
-    $w{window}{gui}{frame1}->add($sctxt);
-    $sctxt->set_shadow_type('none');
-    $sctxt->set_policy('automatic', 'automatic');
-    $sctxt->set_border_width(5);
-
-    # Create treefound
-    $w{window}{gui}{treefound} = Gtk3::SimpleList->new_from_treeview (
-        Gtk3::TreeView->new(),
-        ' Execution time ' => 'text',
-        ' Command ' => 'text',
-        'cmd' => 'hidden'
-    );
-    $w{window}{gui}{treefound}->set_headers_visible(1);
-    $w{window}{gui}{treefound}->set_grid_lines('both');
-    $w{window}{gui}{treefound}->get_selection->set_mode('single');
-    foreach my $array (@{$$self{_GUI}{treeKeys}{data}}) {
-        my $cmd = $$array[0];
-        my $cmdt = $$array[1];
-        my $pretty_cmd = _replaceBadChars($cmd);
-
-        push(@{$w{window}{gui}{treefound}{data}},
-            [
-                strftime("%Y-%m-%d %H:%M:%S", localtime($cmdt)),
-                $pretty_cmd,
-                $cmd
-            ]
-        );
-    }
-
-    $w{window}{gui}{treefound}->signal_connect('row_activated' => sub {$w{window}{gui}{btnExec}->clicked});
-
-    # Put treefound into scrolled window
-    $sctxt->add($w{window}{gui}{treefound});
-
-    # Put a separator
-    $w{window}{gui}{sep} = Gtk3::HSeparator->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{sep}, 0, 1, 5);
-
-    # Put a hbox to add exec/close buttons
-    $w{window}{gui}{hbtnbox} = Gtk3::HBox->new();
-    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbtnbox}, 0, 1, 0);
-    $w{window}{gui}{hbtnbox}->set_border_width(5);
-
-    # Put a button to execute selected row
-    $w{window}{gui}{btnExec} = Gtk3::Button->new_from_stock('gtk-execute');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnExec}, 1, 1, 0);
-    $w{window}{gui}{btnExec}->signal_connect('clicked' => sub {
-        my ($selected) = $w{window}{gui}{treefound}->get_selected_indices;
-        if (!((defined $selected && $$self{CONNECTED}))) {
-            return 1;
-        }
-        my $cmd = $w{window}{gui}{treefound}{data}[$selected][2];
-
-        $$self{_SAVE_KEYS} = 0;
-        foreach my $cmd (map $w{window}{gui}{treefound}{data}[$_][2], $w{window}{gui}{treefound}->get_selected_indices) {
-            $self->_execute('remote', $cmd, 0);
-        }
-        $$self{_SAVE_KEYS} = 1;
-    });
-
-    # Put a button to copy selected rows to clipboard
-    $w{window}{gui}{btnCopy} = Gtk3::Button->new_from_stock('gtk-copy');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnCopy}, 1, 1, 0);
-    $w{window}{gui}{btnCopy}->signal_connect('clicked' => sub {
-        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->set_text (
-            join("\n", map $w{window}{gui}{treefound}{data}[$_][2], $w{window}{gui}{treefound}->get_selected_indices)
-        );
-    });
-
-    # Put a button to empty the history
-    $w{window}{gui}{btnEmpty} = Gtk3::Button->new('Forget history');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnEmpty}, 1, 1, 0);
-    $w{window}{gui}{btnEmpty}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
-    $w{window}{gui}{btnEmpty}->signal_connect('clicked' => sub {
-        if (!_wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to <b>DELETE ALL</b> commands history?")) {
-            return 1;
-        }
-        @{$w{window}{gui}{treefound}{data}} = ();
-        @{$$self{_GUI}{treeKeys}{data}} = ();
-    });
-
-    # Put a 'close' button
-    $w{window}{gui}{btnclose} = Gtk3::Button->new_from_stock('gtk-close');
-    $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnclose}, 0, 1, 0);
-    $w{window}{gui}{btnclose}->signal_connect('clicked' => sub {$w{window}{data}->destroy(); undef %w; return 1;});
-
-    $w{window}{data}->show_all();
-
-    return 1;
-}
-
 sub _checkSendKeystrokes {
     my $self = shift;
     my $data = shift // '';
@@ -4488,7 +4138,7 @@ sub _closeAllTerminals {
     my $self = shift;
     my @list = keys %PACMain::RUNNING;
 
-    if (!(scalar(@list) && _wConfirm($$self{GUI}{_VBOX}, "Are you sure you want to close <b>all</b> terminals?"))) {
+    if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close <b>all</b> terminals?"))) {
         return 1;
     }
     foreach my $uuid (@list) {
@@ -4718,10 +4368,6 @@ Update status information on Statusbar
 
 Transmit characters to other terminals in the same cluster using the _vteFeedChild routine
 
-=head2 sub _saveHistory
-
-Store the command events in history list
-
 =head2 sub _tabToWin
 
 Move a tabbed terminal to a stand alone window
@@ -4789,10 +4435,6 @@ Documentation pending
 Pending
 
 =head3 sub _chainGUI
-
-Pending
-
-=head2 sub _wSelectKeypress
 
 Pending
 

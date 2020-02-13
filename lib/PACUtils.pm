@@ -107,8 +107,10 @@ require Exporter;
     _vteFeedChild
     _vteFeedChildBinary
     _createBanner
-    _copyPASS
-); # Functions/varibles to export
+    _copyPass
+    _appName
+    _setWindowPaintable
+); # Functions/variables to export
 
 @EXPORT_OK  = qw();
 
@@ -119,7 +121,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.0.5';
+our $APPVERSION = '6.1.0rc1';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -239,6 +241,7 @@ sub __ {
     my $str = shift // '';
 
     $str =~ s/\&/&amp;/go;
+    $str =~ s/\|/&#124;/go;
     $str =~ s/\'/&apos;/go;
     $str =~ s/\"/&quot;/go;
     $str =~ s/</&lt;/go;
@@ -251,6 +254,7 @@ sub __text {
     my $str = shift // '';
 
     $str =~ s/&amp;/\&/go;
+    $str =~ s/&#124;/\|/go;
     $str =~ s/&apos;/\'/go;
     $str =~ s/&quot;/\"/go;
     $str =~ s/&lt;/</go;
@@ -454,7 +458,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -525,7 +529,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -594,7 +598,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_vncviewer.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_vncviewer.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -779,20 +783,13 @@ sub _getMethods {
             my @faults;
 
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
-                push(@faults, 'IP/Hostname');
+                push(@faults, 'IP/Hostname cannot be empty');
             }
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
-                push(@faults, 'Port');
+                push(@faults, 'Port cannot be empty');
             }
-            # TODO : Check if this nested "ifs" can be rewritten
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
-                if (! _($self, 'entryUser')->get_chars(0, -1)) {
-                    push(@faults, 'User (User/Password authentication method selected)');
-                }
-            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
-                if (! _($self, 'fileCfgPublicKey')->get_filename) {
-                    push(@faults, 'Public Key File (Public Key authentication method selected)');
-                }
+            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'cbInferUserPassKPX')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
+                push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
 
             return @faults;
@@ -825,7 +822,6 @@ sub _getMethods {
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
-            _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
@@ -838,7 +834,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive($autossh);
             _($self, 'cbAutossh')->set_active($$cfg{'autossh'});
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ssh.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ssh.svg", 16, 16, 0),
         'escape' => ['~.']
     };
 
@@ -1238,9 +1234,9 @@ sub _registerPACIcons {
         'pac-cluster-manager-off' => "$RES_DIR/asbru_cluster_manager_off.png",
         'pac-favourite-on' => "$RES_DIR/asbru_favourite_on.png",
         'pac-favourite-off' => "$RES_DIR/asbru_favourite_off.png",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.png",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.png",
-        'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.png",
+        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
+        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
+        'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.svg",
         'pac-group' => "$RES_DIR/asbru_group.png",
         'pac-history' => "$RES_DIR/asbru_history.png",
         'pac-keepass' => "$RES_DIR/asbru_keepass.png",
@@ -1250,14 +1246,14 @@ sub _registerPACIcons {
         'pac-method-Serial (cu)' => "$RES_DIR/asbru_method_cu.jpg",
         'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.jpg",
         'pac-method-Generic Command' => "$RES_DIR/asbru_method_generic.jpg",
-        'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.jpg",
-        'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.jpg",
-        'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.jpg",
+        'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.svg",
+        'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.svg",
+        'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.svg",
         'pac-method-Serial (remote-tty)' => "$RES_DIR/asbru_method_remote-tty.jpg",
         'pac-method-SFTP' => "$RES_DIR/asbru_method_sftp.jpg",
-        'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.jpg",
+        'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.svg",
         'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.jpg",
-        'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.jpg",
+        'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.svg",
         'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.png",
         'pac-script' => "$RES_DIR/asbru_script.png",
         'pac-shell' => "$RES_DIR/asbru_shell.png",
@@ -1787,10 +1783,13 @@ sub _wMessage {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1883,11 +1882,14 @@ sub _wConfirm {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1908,11 +1910,14 @@ sub _wYesNoCancel {
         'none',
         ''
     );
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
+    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all;
     my $close = $windowConfirm->run;
@@ -1969,7 +1974,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
     #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
-    $$cfg{'defaults'}{'record command history'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
     $$cfg{'defaults'}{'back color'} //= '#000000000000';
     $$cfg{'defaults'}{'close terminal on disconnect'} //= '';
@@ -2014,7 +2018,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'proxy port'} //= 8080;
     $$cfg{'defaults'}{'proxy user'} //= '';
     $$cfg{'defaults'}{'shell binary'} //= $ENV{'SHELL'} // '/bin/bash';
-    $$cfg{'defaults'}{'shell options'} //= '-login';
+    $$cfg{'defaults'}{'shell options'} //= ($ENV{'SHELL'} ? '' : '-login');
     $$cfg{'defaults'}{'shell directory'} //= $ENV{'HOME'};
     $$cfg{'defaults'}{'tabs position'} //= 'top';
     $$cfg{'defaults'}{'auto save'} //= 1;
@@ -2056,7 +2060,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
     $$cfg{'defaults'}{'sort groups first'} //= 1;
     $$cfg{'defaults'}{'word characters'} //= '-.:_/';
-    $$cfg{'defaults'}{'terminal emulation'} //= 'xterm';
     $$cfg{'defaults'}{'show tray icon'} //= 1;
     $$cfg{'defaults'}{'unsplit disconnected terminals'} //= 0;
     $$cfg{'defaults'}{'confirm chains'} //= 1;
@@ -2089,7 +2092,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'info font'} //= 'monospace';
     $$cfg{'defaults'}{'use login shell to connect'} //= 0;
     $$cfg{'defaults'}{'audible bell'} //= 0;
-    $$cfg{'defaults'}{'visible bell'} //= 0;
     $$cfg{'defaults'}{'ctrl tab'} //= 'last';
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
@@ -2098,6 +2100,8 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
+    $$cfg{'defaults'}{'capture xterm title'} //= 0;
+    $$cfg{'defaults'}{'tree overlay scrolling'} //= 1;
 
     $$cfg{'defaults'}{'global variables'} //= {};
     $$cfg{'defaults'}{'local commands'} //= [];
@@ -2187,7 +2191,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal emulation'} //= 'xterm';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal backspace'} //= 'auto';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal select words'} //= '-.:_/';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
@@ -2205,7 +2208,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable ALT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'audible bell'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'visible bell'} //= 0;
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
         if ($uuid =~ /^HASH/go) {
@@ -2488,7 +2490,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} = '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} = 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} = 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} = 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} = 5000;
@@ -2515,7 +2516,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} //= '-.:_/';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal emulation'} //= 'xterm';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} //= 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} //= 5000;
@@ -2532,7 +2532,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'audible bell'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'visible bell'} //= 0;
         }
     }
 
@@ -3919,7 +3918,7 @@ sub _createBanner {
     return $banner;
 }
 
-sub _copyPASS {
+sub _copyPass {
     my $uuid = shift;
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
     my $clip;
@@ -3932,6 +3931,32 @@ sub _copyPASS {
     }
     use bytes;
     $clipboard->set_text($clip,length($clip));
+}
+
+sub _appName {
+    return "$APPNAME $APPVERSION";
+}
+
+sub _setWindowPaintable {
+    my $win = shift;
+
+    $win->signal_connect("draw" => \&mydraw);
+    my $screen = $win->get_screen();
+    my $visual = $screen->get_rgba_visual();
+    if (($visual) && ($screen->is_composited())) {
+        $win->set_visual($visual);
+    }
+    $win->set_app_paintable(1);
+}
+
+sub mydraw {
+    my ($w,$c) = @_;
+
+    $c->set_source_rgba(240,240,240,1);
+    $c->set_operator('source');
+    $c->paint();
+    $c->set_operator('over');
+    return 0;
 }
 
 1;
@@ -4154,6 +4179,16 @@ Call Vte->vteFeedChildBinary, depending on the version installed
 =head2 sub _createBanner
 
 Create a standard banner to be displayed on all Ásbrú Connection Manager dialogs
+
+=head2 sub _setWindowPaintable
+
+Takes a window object, attaches a general drawing routine and sets the paintable property to true
+
+Hack to make transparent terminals
+
+=head2 sub mydraw
+
+Generic routine to draw a gray background for widgets that do not painted their own.
 
 =head1 Perl particulars
 

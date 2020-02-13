@@ -3,7 +3,7 @@
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -90,6 +90,7 @@ use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 use File::Copy;
 use YAML qw (LoadFile);
 use PACMain;
+use PACUtils qw (_appName);
 
 # Standard
 use strict;
@@ -106,6 +107,7 @@ our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $CFG_DIR_OLD    = "";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
+our $APP_NAME       = PACUtils::_appName();
 our $ASBRU;
 # END: Define GLOBAL variables
 ###################################################################
@@ -114,7 +116,7 @@ our $ASBRU;
 
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
-print "INFO: Ásbrú started ($Script) with PID $$\n";
+print "INFO: $APP_NAME ($Script) started with PID $$\n";
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -170,7 +172,7 @@ if (!($ASBRU = PACMain -> new(@ARGV))) {
 
 $ASBRU->start;
 
-print "INFO: Finished $Script (PID:$$)...\n";
+print "INFO: Finished $APP_NAME ($Script) (PID:$$)...\n";
 exit 0;
 
 # Implemented when necessary

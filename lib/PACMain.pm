@@ -99,9 +99,9 @@ my $APPICON = "$RES_DIR/asbru-logo-64.png";
 my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
 my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.png");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.png");
+my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
+my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -431,6 +431,11 @@ sub _initGUI {
     ##############################################
     $$self{_GUI}{main} = Gtk3::Window->new;
 
+    if (($$self{_CFG}{defaults}{'tabs in main window'})&&($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+        _setWindowPaintable($$self{_GUI}{main});
+    }
+
+
     # Create a vbox1: main, status
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
     $$self{_GUI}{main}->add($$self{_GUI}{vbox1});
@@ -500,9 +505,10 @@ sub _initGUI {
     # FIXME-HOMOGENEOUS     $$self{_GUI}{nbTree}->set('homogeneous', 0);
 
     # Create a scrolled1 scrolled window to contain the connections tree
-    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new();
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{nbTreeTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('pac-treelist', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
@@ -777,12 +783,12 @@ sub _initGUI {
     $nb->append_page($$self{_GUI}{vboxInfo}, $tablbl);
 
     # Create a scrolled2 scrolled window to contain the description textview
-    $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{scrollDescription}, 1, 1, 0);
     $$self{_GUI}{scrollDescription}->set_policy('automatic', 'automatic');
 
     # Create descView as a gtktextview with descBuffer
-    $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new;
+    $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new();
     $$self{_GUI}{descView} = Gtk3::TextView->new_with_buffer($$self{_GUI}{descBuffer});
     $$self{_GUI}{descView}->set_border_width(5);
     $$self{_GUI}{scrollDescription}->add($$self{_GUI}{descView});
@@ -2735,7 +2741,7 @@ sub _treeConnections_menu {
             shortcut => '',
             sensitive => 1,
             code => sub {
-                _copyPASS($sel[0]);
+                _copyPass($sel[0]);
             }
         });
     }
@@ -3129,7 +3135,7 @@ sub _launchTerminals {
 
     my $wtmp;
     scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting '<b><big>". (scalar(@{ $terminals })) . "</big></b>' terminals...", 0);
-    $ENV{'NTERMINALES'} = scalar(@{ $terminals });
+    $$self{_NTERMINALS} = scalar(@{ $terminals });
 
     # Create all selected terminals
     foreach my $sel (@{ $terminals }) {
@@ -3187,9 +3193,7 @@ sub _launchTerminals {
     if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         $self->_showConnectionsList(0);
     }
-    if (@new_terminals && scalar(keys %RUNNING) > 1) {
-        # Makes sure the focus is reset on that terminal if lost during startup process
-        # (This only happens when another terminal is already open)
+    if (@new_terminals) {
         $$self{_HAS_FOCUS} = $new_terminals[ $#new_terminals ]{_GUI}{_VTE};
     }
 
@@ -3434,7 +3438,7 @@ sub _loadTreeConfiguration {
     }
 
     # Select the root path
-    $tree->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
+    $tree->set_cursor($tree->_getPath('__PAC__ROOT__'), undef, 0);
 
     return 1;
 }
@@ -3687,6 +3691,7 @@ sub _updateGUIPreferences {
 
     $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
     $$self{_GUI}{treeConnections}->set_enable_tree_lines($$self{_CFG}{'defaults'}{'enable tree lines'});
+    $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {

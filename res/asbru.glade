@@ -28,35 +28,45 @@ If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-description \303\201sbr\303\272 Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks. https://www.asbru-cm.net/ -->
   <!-- interface-copyright 2017 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <!-- interface-authors \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
-  <object class="GtkAdjustment" id="adjustment1">
+  <object class="GtkAdjustment" id="adjConnPort">
     <property name="lower">1</property>
-    <property name="upper">60</property>
-    <property name="value">1</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment10">
-    <property name="upper">65535</property>
+    <property name="upper">65536</property>
     <property name="value">22</property>
     <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="adjustment11">
-    <property name="upper">2000</property>
-    <property name="value">50</property>
-    <property name="step_increment">50</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment12">
-    <property name="upper">86400</property>
-    <property name="value">60</property>
+  <object class="GtkAdjustment" id="adjFileSave">
+    <property name="upper">100</property>
     <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="adjustment13">
-    <property name="upper">999</property>
+  <object class="GtkAdjustment" id="adjLinesBack">
+    <property name="upper">10000</property>
+    <property name="value">2000</property>
     <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="adjustment14">
+  <object class="GtkAdjustment" id="adjPortJump">
     <property name="lower">1</property>
-    <property name="upper">65535</property>
-    <property name="value">8080</property>
+    <property name="upper">65536</property>
+    <property name="value">22</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjPortProxy">
+    <property name="lower">1</property>
+    <property name="upper">65536</property>
+    <property name="value">5000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjSecWait">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjSecondMsWait">
+    <property name="upper">5000</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -387,9 +397,11 @@ If not, see <http://www.gnu.org/licenses/>.
                                                             <property name="tooltip_text" translatable="yes">Port number to connect to</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="activates_default">True</property>
+                                                            <property name="width_chars">6</property>
+                                                            <property name="text" translatable="yes">22</property>
                                                             <property name="primary_icon_activatable">False</property>
                                                             <property name="secondary_icon_activatable">False</property>
-                                                            <property name="adjustment">adjustment10</property>
+                                                            <property name="adjustment">adjConnPort</property>
                                                             <property name="snap_to_ticks">True</property>
                                                             <property name="numeric">True</property>
                                                           </object>
@@ -577,7 +589,7 @@ Applies to automated actions:
                                                 <property name="activates_default">True</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
-                                                <property name="adjustment">adjustment11</property>
+                                                <property name="adjustment">adjSecondMsWait</property>
                                                 <property name="snap_to_ticks">True</property>
                                                 <property name="numeric">True</property>
                                               </object>
@@ -646,8 +658,6 @@ Applies to automated actions:
                                           <object class="GtkFrame" id="frame6">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Username/password authentication</property>
                                             <property name="label_xalign">0</property>
                                             <child>
                                               <object class="GtkAlignment" id="alignUserPass">
@@ -874,6 +884,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="tooltip_text" translatable="yes">Use a user name and a password to authenticate to the target server.</property>
                                                 <property name="xalign">0.5</property>
                                                 <property name="active">True</property>
                                                 <property name="draw_indicator">True</property>
@@ -890,9 +901,6 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                           <object class="GtkFrame" id="framePublicKey">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Use OpenSSH identity file to connect
-You may also specify an optional passphrase if the key requires so</property>
                                             <property name="border_width">2</property>
                                             <property name="label_xalign">0</property>
                                             <child>
@@ -928,6 +936,9 @@ You may also specify an optional passphrase if the key requires so</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
                                                             <property name="focus_on_click">False</property>
+                                                            <property name="tooltip_text" translatable="yes">The SSH private key to use.  If must be a valid existing file.
+
+If not specified or invalid, the default SSH private key of your system will be used.  Typically ~/.ssh/id_rsa.</property>
                                                             <property name="create_folders">False</property>
                                                             <property name="local_only">False</property>
                                                             <property name="preview_widget_active">False</property>
@@ -937,6 +948,19 @@ You may also specify an optional passphrase if the key requires so</property>
                                                             <property name="expand">True</property>
                                                             <property name="fill">True</property>
                                                             <property name="position">1</property>
+                                                          </packing>
+                                                        </child>
+                                                        <child>
+                                                          <object class="GtkButton" id="btnEditClearPrivateKey">
+                                                            <property name="label" translatable="yes">Clear</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="receives_default">True</property>
+                                                          </object>
+                                                          <packing>
+                                                            <property name="expand">False</property>
+                                                            <property name="fill">True</property>
+                                                            <property name="position">2</property>
                                                           </packing>
                                                         </child>
                                                       </object>
@@ -1059,6 +1083,7 @@ You may also specify an optional passphrase if the key requires so</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="tooltip_text" translatable="yes">Use an SSH private to authenticate on the target server.</property>
                                                 <property name="xalign">0.5</property>
                                                 <property name="draw_indicator">True</property>
                                                 <property name="group">rbCfgAuthUserPass</property>
@@ -1284,9 +1309,10 @@ You may also specify an optional passphrase if the key requires so</property>
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">•</property>
                                         <property name="activates_default">True</property>
+                                        <property name="text" translatable="yes">0</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="adjustment">adjustment12</property>
+                                        <property name="adjustment">adjSecWait</property>
                                         <property name="snap_to_ticks">True</property>
                                         <property name="numeric">True</property>
                                       </object>
@@ -1554,9 +1580,10 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="has_tooltip">True</property>
                                                 <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
                                                 <property name="invisible_char">•</property>
+                                                <property name="text" translatable="yes">0</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
-                                                <property name="adjustment">adjustment13</property>
+                                                <property name="adjustment">adjFileSave</property>
                                                 <property name="numeric">True</property>
                                                 <property name="update_policy">if-valid</property>
                                               </object>
@@ -1747,54 +1774,149 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="frameCfgProxy1">
+                          <object class="GtkBox" id="vboxEditNetworkSettings">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="margin_left">5</property>
-                            <property name="margin_right">5</property>
-                            <property name="margin_top">5</property>
-                            <property name="margin_bottom">5</property>
-                            <property name="border_width">5</property>
-                            <property name="label_xalign">0</property>
+                            <property name="margin_left">12</property>
+                            <property name="margin_right">12</property>
+                            <property name="margin_top">12</property>
+                            <property name="margin_bottom">12</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">11</property>
                             <child>
-                              <object class="GtkAlignment" id="bCfgProxy">
+                              <object class="GtkRadioButton" id="rbUseProxyIfCFG">
+                                <property name="label" translatable="yes">Use global proxy options</property>
                                 <property name="visible">True</property>
-                                <property name="sensitive">False</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkRadioButton" id="rbUseProxyNever">
+                                <property name="label" translatable="yes">Never use any proxy</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                                <property name="group">rbUseProxyIfCFG</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="vboxCfgManualProxyConn">
+                                <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="xscale">0.94999998807907104</property>
-                                <property name="left_padding">12</property>
+                                <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkBox" id="vboxProxy1">
+                                  <object class="GtkRadioButton" id="rbUseProxyAlways">
+                                    <property name="label" translatable="yes">Use a SOCKS proxy:</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="tooltip_text" translatable="yes">SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.</property>
+                                    <property name="xalign">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <property name="group">rbUseProxyIfCFG</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox" id="vboxCfgManualProxyConnOptions">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">12</property>
                                     <child>
-                                      <object class="GtkRadioButton" id="rbUseProxyIfCFG">
-                                        <property name="label" translatable="yes">Use global options to decide</property>
-                                        <property name="use_action_appearance">False</property>
+                                      <object class="GtkFrame" id="frame15">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="xalign">0.5</property>
-                                        <property name="active">True</property>
-                                        <property name="draw_indicator">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="margin_left">21</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment19">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkEntry" id="entryCfgProxyConnIP">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Host name or IP address of the SOCKS proxy</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label101">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">IP / Host:</property>
+                                          </object>
+                                        </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">False</property>
+                                        <property name="expand">True</property>
                                         <property name="fill">True</property>
                                         <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkRadioButton" id="rbUseProxyNever">
-                                        <property name="label" translatable="yes">Never use any proxy for this connection</property>
-                                        <property name="use_action_appearance">False</property>
+                                      <object class="GtkFrame" id="frame16">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="xalign">0.5</property>
-                                        <property name="draw_indicator">True</property>
-                                        <property name="group">rbUseProxyIfCFG</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment21">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkSpinButton" id="entryCfgProxyConnPort">
+                                                <property name="width_request">150</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="invisible_char">●</property>
+                                                <property name="width_chars">6</property>
+                                                <property name="max_width_chars">6</property>
+                                                <property name="text" translatable="yes">22</property>
+                                                <property name="caps_lock_warning">False</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                                <property name="adjustment">adjPortProxy</property>
+                                                <property name="climb_rate">1</property>
+                                                <property name="numeric">True</property>
+                                                <property name="update_policy">if-valid</property>
+                                                <property name="value">22</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label102">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Port:</property>
+                                          </object>
+                                        </child>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -1803,187 +1925,260 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkRadioButton" id="rbUseProxyAlways">
-                                        <property name="label" translatable="yes">Always use next proxy (HTTP / SOCKS) for this connection:</property>
-                                        <property name="use_action_appearance">False</property>
+                                      <object class="GtkFrame" id="frame17">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="xalign">0.5</property>
-                                        <property name="draw_indicator">True</property>
-                                        <property name="group">rbUseProxyIfCFG</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment22">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkEntry" id="entryCfgProxyConnUser">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Proxy user name</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="max_width_chars">10</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label103">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">User:</property>
+                                          </object>
+                                        </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">False</property>
+                                        <property name="expand">True</property>
                                         <property name="fill">True</property>
                                         <property name="position">2</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkBox" id="vboxCfgManualProxyConn">
+                                      <object class="GtkFrame" id="frame18">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="orientation">vertical</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
                                         <child>
-                                          <object class="GtkBox" id="hbox64">
+                                          <object class="GtkAlignment" id="alignment23">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <child>
-                                              <object class="GtkFrame" id="frame15">
+                                              <object class="GtkEntry" id="entryCfgProxyConnPassword">
                                                 <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label_xalign">0</property>
-                                                <property name="shadow_type">none</property>
-                                                <child>
-                                                  <object class="GtkAlignment" id="alignment19">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="left_padding">12</property>
-                                                    <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyConnIP">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Proxy IP</property>
-                                                        <property name="invisible_char">•</property>
-                                                        <property name="primary_icon_activatable">False</property>
-                                                        <property name="secondary_icon_activatable">False</property>
-                                                      </object>
-                                                    </child>
-                                                  </object>
-                                                </child>
-                                                <child type="label">
-                                                  <object class="GtkLabel" id="label101">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">IP / Host:</property>
-                                                  </object>
-                                                </child>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Proxy password</property>
+                                                <property name="visibility">False</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="max_width_chars">10</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
                                               </object>
-                                              <packing>
-                                                <property name="expand">True</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">0</property>
-                                              </packing>
                                             </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label104">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Password:</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="vboxJumpCfg">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkRadioButton" id="rbUseProxyJump">
+                                    <property name="label" translatable="yes">Use Jump Server</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="tooltip_text" translatable="yes">An alternative to SSH tunneling to access internal machines through gateway</property>
+                                    <property name="xalign">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <property name="group">rbUseProxyIfCFG</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox" id="vboxJumpCfgOptions">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="margin_left">21</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">4</property>
+                                    <child>
+                                      <object class="GtkBox" id="hbox38">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="spacing">12</property>
+                                        <child>
+                                          <object class="GtkFrame" id="frame23">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
                                             <child>
-                                              <object class="GtkFrame" id="frame16">
+                                              <object class="GtkAlignment" id="alignment33">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label_xalign">0</property>
-                                                <property name="shadow_type">none</property>
                                                 <child>
-                                                  <object class="GtkAlignment" id="alignment21">
+                                                  <object class="GtkEntry" id="entryCfgJumpConnIP">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="left_padding">12</property>
-                                                    <child>
-                                                      <object class="GtkSpinButton" id="entryCfgProxyConnPort">
-                                                        <property name="width_request">130</property>
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="invisible_char">●</property>
-                                                        <property name="caps_lock_warning">False</property>
-                                                        <property name="primary_icon_activatable">False</property>
-                                                        <property name="secondary_icon_activatable">False</property>
-                                                        <property name="adjustment">adjustment14</property>
-                                                        <property name="numeric">True</property>
-                                                        <property name="update_policy">if-valid</property>
-                                                      </object>
-                                                    </child>
-                                                  </object>
-                                                </child>
-                                                <child type="label">
-                                                  <object class="GtkLabel" id="label102">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">Port:</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="tooltip_text" translatable="yes">Host name or IP address of the jump server</property>
+                                                    <property name="invisible_char">•</property>
+                                                    <property name="primary_icon_activatable">False</property>
+                                                    <property name="secondary_icon_activatable">False</property>
                                                   </object>
                                                 </child>
                                               </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">1</property>
-                                              </packing>
                                             </child>
+                                            <child type="label">
+                                              <object class="GtkLabel" id="label124">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">IP / Host:</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkFrame" id="frame28">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
                                             <child>
-                                              <object class="GtkFrame" id="frame17">
+                                              <object class="GtkAlignment" id="alignment34">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label_xalign">0</property>
-                                                <property name="shadow_type">none</property>
                                                 <child>
-                                                  <object class="GtkAlignment" id="alignment22">
+                                                  <object class="GtkSpinButton" id="entryCfgJumpConnPort">
+                                                    <property name="width_request">150</property>
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="left_padding">12</property>
-                                                    <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyConnUser">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Proxy user</property>
-                                                        <property name="invisible_char">•</property>
-                                                        <property name="primary_icon_activatable">False</property>
-                                                        <property name="secondary_icon_activatable">False</property>
-                                                      </object>
-                                                    </child>
-                                                  </object>
-                                                </child>
-                                                <child type="label">
-                                                  <object class="GtkLabel" id="label103">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">User:</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="invisible_char">●</property>
+                                                    <property name="width_chars">6</property>
+                                                    <property name="text" translatable="yes">22</property>
+                                                    <property name="caps_lock_warning">False</property>
+                                                    <property name="primary_icon_activatable">False</property>
+                                                    <property name="secondary_icon_activatable">False</property>
+                                                    <property name="adjustment">adjPortJump</property>
+                                                    <property name="numeric">True</property>
+                                                    <property name="update_policy">if-valid</property>
+                                                    <property name="value">22</property>
                                                   </object>
                                                 </child>
                                               </object>
-                                              <packing>
-                                                <property name="expand">True</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">2</property>
-                                              </packing>
                                             </child>
+                                            <child type="label">
+                                              <object class="GtkLabel" id="label125">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Port:</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkFrame" id="frame30">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
                                             <child>
-                                              <object class="GtkFrame" id="frame18">
+                                              <object class="GtkAlignment" id="alignment35">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label_xalign">0</property>
-                                                <property name="shadow_type">none</property>
                                                 <child>
-                                                  <object class="GtkAlignment" id="alignment23">
+                                                  <object class="GtkEntry" id="entryCfgJumpConnUser">
                                                     <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="left_padding">12</property>
-                                                    <child>
-                                                      <object class="GtkEntry" id="entryCfgProxyConnPassword">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="has_tooltip">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Proxy password</property>
-                                                        <property name="visibility">False</property>
-                                                        <property name="invisible_char">•</property>
-                                                        <property name="primary_icon_activatable">False</property>
-                                                        <property name="secondary_icon_activatable">False</property>
-                                                      </object>
-                                                    </child>
-                                                  </object>
-                                                </child>
-                                                <child type="label">
-                                                  <object class="GtkLabel" id="label104">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">Password:</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="tooltip_text" translatable="yes">Host server user</property>
+                                                    <property name="invisible_char">•</property>
+                                                    <property name="primary_icon_activatable">False</property>
+                                                    <property name="secondary_icon_activatable">False</property>
                                                   </object>
                                                 </child>
                                               </object>
-                                              <packing>
-                                                <property name="expand">True</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">3</property>
-                                              </packing>
                                             </child>
+                                            <child type="label">
+                                              <object class="GtkLabel" id="label126">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">User:</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">3</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox" id="hbox34">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <child>
+                                          <object class="GtkLabel" id="labelConnKey">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Private key file: </property>
+                                            <property name="use_markup">True</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -1991,23 +2186,57 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                             <property name="position">0</property>
                                           </packing>
                                         </child>
+                                        <child>
+                                          <object class="GtkFileChooserButton" id="entryCfgJumpConnKey">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="focus_on_click">False</property>
+                                            <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump server</property>
+                                            <property name="create_folders">False</property>
+                                            <property name="local_only">False</property>
+                                            <property name="preview_widget_active">False</property>
+                                            <property name="title" translatable="yes">Select an OpenSSH Private Key</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="btnEditClearJumpPrivateKey">
+                                            <property name="label" translatable="yes">Clear</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="tooltip_text" translatable="yes">Remove any selected private key</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">3</property>
+                                        <property name="position">1</property>
                                       </packing>
                                     </child>
                                   </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">3</property>
+                                  </packing>
                                 </child>
                               </object>
-                            </child>
-                            <child type="label">
-                              <object class="GtkLabel" id="label105">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes"> Use Proxy: </property>
-                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">4</property>
+                              </packing>
                             </child>
                           </object>
                           <packing>
@@ -2034,7 +2263,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <object class="GtkLabel" id="label106">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Proxy&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Network Settings&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                               <packing>
@@ -2202,6 +2431,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
             </child>
             <child type="tab">
               <object class="GtkBox" id="labelPreExec">
+                <property name="height_request">45</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -2799,49 +3029,52 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="adjustment2">
-    <property name="upper">999</property>
-    <property name="value">10</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment3">
-    <property name="upper">86400</property>
-    <property name="value">40</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment4">
-    <property name="upper">86400</property>
-    <property name="value">40</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment5">
-    <property name="lower">500</property>
-    <property name="upper">99999</property>
-    <property name="value">5000</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment6">
+  <object class="GtkAdjustment" id="adjTransparency">
     <property name="upper">1</property>
-    <property name="step_increment">0.10000000000000001</property>
-    <property name="page_increment">0.10000000000000001</property>
-    <property name="page_size">0.10000000000000001</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.20000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="adjWindowHeight">
+    <property name="lower">100</property>
+    <property name="upper">5000</property>
+    <property name="value">400</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjWindowWidht">
+    <property name="lower">200</property>
+    <property name="upper">5000</property>
+    <property name="value">600</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment11">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment13">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment14">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment7">
-    <property name="lower">1</property>
-    <property name="upper">4096</property>
-    <property name="value">1</property>
+    <property name="upper">100</property>
     <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment8">
-    <property name="lower">1</property>
-    <property name="upper">4096</property>
-    <property name="value">1</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment9">
-    <property name="lower">1</property>
-    <property name="upper">65535</property>
-    <property name="value">8080</property>
+    <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -2911,13 +3144,17 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
             <property name="can_focus">True</property>
             <property name="tab_pos">left</property>
             <child>
-              <object class="GtkNotebook" id="notebook1">
+              <object class="GtkNotebook" id="notebookMainOptions">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
                   <object class="GtkBox" id="vbox17">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="boxLayout">
@@ -3380,6 +3617,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
@@ -3474,9 +3712,10 @@ connecting (timeout is in seconds)</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">•</property>
+                            <property name="text" translatable="yes">10</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment">adjustment1</property>
+                            <property name="adjustment">adjSecWait</property>
                             <property name="numeric">True</property>
                             <property name="update_policy">if-valid</property>
                           </object>
@@ -3596,6 +3835,10 @@ connecting (timeout is in seconds)</property>
                   <object class="GtkBox" id="vbox28">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="hbox28">
@@ -3822,15 +4065,15 @@ connecting (timeout is in seconds)</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
-                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
+                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
+                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
-                                    <property name="xalign">0.5</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
+                                    <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -3840,14 +4083,15 @@ connecting (timeout is in seconds)</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbCfgButtonBarAutoHide">
-                                    <property name="label" translatable="yes">Auto hide main button bar on Terminal Open</property>
+                                  <object class="GtkCheckButton" id="cbCfgConnectionsAutoHide">
+                                    <property name="label" translatable="yes">Hide connections list (on terminal open)</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">If checked, this option will hide the the button bar when on a terminal tab (increasing the vertical space usable for the terminal)</property>
+                                    <property name="tooltip_text" translatable="yes">If checked, the connections list will be hidden when a new terminal is open.  This can be useful to increase the space usable for the tabbed terminals.</property>
+                                    <property name="xalign">0.5</property>
                                     <property name="draw_indicator">True</property>
                                   </object>
                                   <packing>
@@ -4121,6 +4365,8 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkSeparator" id="vseparator5">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="margin_right">6</property>
                             <property name="orientation">vertical</property>
                           </object>
                           <packing>
@@ -4134,7 +4380,7 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkLabel" id="label41">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Info TAB Font: </property>
+                            <property name="label" translatable="yes">Font for info tab: </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4173,7 +4419,7 @@ connecting (timeout is in seconds)</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkCheckButton" id="cbCfgEnableTreeLines">
-                            <property name="label" translatable="yes">Show  lines in Connections Tree</property>
+                            <property name="label" translatable="yes">Show  lines in connections tree</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -4191,6 +4437,8 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkSeparator" id="vseparator4">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="margin_left">6</property>
+                            <property name="margin_right">6</property>
                             <property name="orientation">vertical</property>
                           </object>
                           <packing>
@@ -4204,7 +4452,7 @@ connecting (timeout is in seconds)</property>
                           <object class="GtkLabel" id="label67">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Connections Tree Font (*): </property>
+                            <property name="label" translatable="yes">Font for the connections tree (*): </property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4238,13 +4486,15 @@ connecting (timeout is in seconds)</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgSaveShowScreenshots">
-                        <property name="label" translatable="yes">Show screenshots</property>
+                      <object class="GtkCheckButton" id="cbCfgEnableOverlayScrolling">
+                        <property name="label" translatable="yes">Enable overlay scrolling for connections tree</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
+                        <property name="tooltip_text" translatable="yes">If enabled, the scrollbars are only added as traditional widgets when a mouse is present. Otherwise, they are overlayed on top of the content, as narrow indicators.</property>
+                        <property name="xalign">0</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
@@ -4254,50 +4504,18 @@ connecting (timeout is in seconds)</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgShowStatistics">
-                        <property name="label" translatable="yes">Show statistics</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">6</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgShowTrayIcon">
-                        <property name="label" translatable="yes">Always show Tray icon</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
-                        <property name="active">True</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">7</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox" id="hbox48">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="spacing">41</property>
                         <child>
-                          <object class="GtkCheckButton" id="cbCfgBWTrayIcon">
-                            <property name="label" translatable="yes">Use Black &amp; White tray icon (*) </property>
+                          <object class="GtkCheckButton" id="cbCfgSaveShowScreenshots">
+                            <property name="label" translatable="yes">Show screenshots</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="xalign">0.5</property>
+                            <property name="xalign">0</property>
                             <property name="draw_indicator">True</property>
                           </object>
                           <packing>
@@ -4307,10 +4525,14 @@ connecting (timeout is in seconds)</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkImage" id="imgTrayIcon">
+                          <object class="GtkCheckButton" id="cbCfgShowStatistics">
+                            <property name="label" translatable="yes">Show statistics</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="stock">gtk-missing-image</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4322,7 +4544,75 @@ connecting (timeout is in seconds)</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">8</property>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">14</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgShowTrayIcon">
+                            <property name="label" translatable="yes">Always show Tray icon</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="xalign">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="hbox48">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkCheckButton" id="cbCfgBWTrayIcon">
+                                <property name="label" translatable="yes">Use Black &amp; White tray icon (*) </property>
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage" id="imgTrayIcon">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="stock">gtk-missing-image</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
                       </packing>
                     </child>
                     <child>
@@ -4414,6 +4704,10 @@ connecting (timeout is in seconds)</property>
                   <object class="GtkBox" id="vbox29">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">5</property>
                     <child>
@@ -4858,13 +5152,17 @@ sudo -p sudo_prompt_string ...</property>
               </packing>
             </child>
             <child>
-              <object class="GtkNotebook" id="notebook2">
+              <object class="GtkNotebook" id="notebookTerminalOptions">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
                   <object class="GtkBox" id="vbox5">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkFrame" id="frameCfgSaveSessionlogs">
@@ -4995,7 +5293,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="invisible_char">•</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="adjustment">adjustment2</property>
+                                        <property name="adjustment">adjustment11</property>
                                         <property name="numeric">True</property>
                                         <property name="update_policy">if-valid</property>
                                       </object>
@@ -5129,7 +5427,7 @@ sudo -p sudo_prompt_string ...</property>
                                     <property name="xalign">1</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="adjustment">adjustment3</property>
+                                    <property name="adjustment">adjustment7</property>
                                     <property name="climb_rate">0.5</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -5164,7 +5462,7 @@ sudo -p sudo_prompt_string ...</property>
                                     <property name="xalign">1</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="adjustment">adjustment4</property>
+                                    <property name="adjustment">adjustment8</property>
                                     <property name="climb_rate">0.5</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -5464,11 +5762,12 @@ sudo -p sudo_prompt_string ...</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">•</property>
-                                            <property name="text" translatable="yes">1</property>
+                                            <property name="max_width_chars">6</property>
+                                            <property name="text" translatable="yes">600</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
-                                            <property name="adjustment">adjustment7</property>
-                                            <property name="value">1</property>
+                                            <property name="adjustment">adjWindowWidht</property>
+                                            <property name="value">600</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -5493,11 +5792,12 @@ sudo -p sudo_prompt_string ...</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">•</property>
-                                            <property name="text" translatable="yes">1</property>
+                                            <property name="max_width_chars">6</property>
+                                            <property name="text" translatable="yes">400</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
-                                            <property name="adjustment">adjustment8</property>
-                                            <property name="value">1</property>
+                                            <property name="adjustment">adjWindowHeight</property>
+                                            <property name="value">400</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -5578,6 +5878,10 @@ sudo -p sudo_prompt_string ...</property>
                   <object class="GtkBox" id="vbox15">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">5</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="hbox20">
@@ -6150,6 +6454,22 @@ sudo -p sudo_prompt_string ...</property>
                                       </packing>
                                     </child>
                                     <child>
+                                      <object class="GtkCheckButton" id="chkBoldIsBrigth">
+                                        <property name="label" translatable="yes">Bold is also bright</property>
+                                        <property name="use_action_appearance">True</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
                                       <object class="GtkFrame" id="frame33">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
@@ -6188,7 +6508,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">1</property>
+                                        <property name="position">2</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -6229,7 +6549,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">2</property>
+                                        <property name="position">3</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -6251,7 +6571,7 @@ sudo -p sudo_prompt_string ...</property>
                                                 <property name="xalign">1</property>
                                                 <property name="primary_icon_stock">gtk-media-rewind</property>
                                                 <property name="secondary_icon_activatable">False</property>
-                                                <property name="adjustment">adjustment5</property>
+                                                <property name="adjustment">adjLinesBack</property>
                                                 <property name="climb_rate">0.5</property>
                                                 <property name="snap_to_ticks">True</property>
                                                 <property name="numeric">True</property>
@@ -6272,7 +6592,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">3</property>
+                                        <property name="position">4</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -6290,9 +6610,12 @@ sudo -p sudo_prompt_string ...</property>
                                               <object class="GtkScale" id="spCfgTerminalTransparency">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
-                                                <property name="adjustment">adjustment6</property>
-                                                <property name="fill_level">0</property>
-                                                <property name="round_digits">1</property>
+                                                <property name="adjustment">adjTransparency</property>
+                                                <property name="show_fill_level">True</property>
+                                                <property name="fill_level">1</property>
+                                                <property name="round_digits">2</property>
+                                                <property name="digits">2</property>
+                                                <property name="value_pos">left</property>
                                               </object>
                                             </child>
                                           </object>
@@ -6309,7 +6632,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">4</property>
+                                        <property name="position">5</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -6551,7 +6874,7 @@ sudo -p sudo_prompt_string ...</property>
                                       <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
-                                        <property name="position">5</property>
+                                        <property name="position">6</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -6718,6 +7041,7 @@ Changes apply to next opened connections, not current</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
                         <property name="tooltip_text" translatable="yes">If checked, main window title takes terminal title</property>
+                        <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
@@ -6725,9 +7049,6 @@ Changes apply to next opened connections, not current</property>
                         <property name="fill">True</property>
                         <property name="position">4</property>
                       </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
                   <packing>
@@ -6773,79 +7094,53 @@ Changes apply to next opened connections, not current</property>
                   <object class="GtkBox" id="vbox30">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
                     <child>
-                      <object class="GtkBox" id="hbox26">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="spacing">8</property>
                         <child>
-                          <object class="GtkBox" id="hbox34">
+                          <object class="GtkLabel" id="label44">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel" id="label48">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Backspace: </property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBoxText" id="cfgComboBackspace">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="active">0</property>
-                                <items>
-                                  <item id="auto" translatable="yes">auto</item>
-                                  <item id="ascii-backspace" translatable="yes">ascii-backspace</item>
-                                  <item id="ascii-delete" translatable="yes">ascii-delete</item>
-                                  <item id="delete-sequence" translatable="yes">delete-sequence</item>
-                                  <item id="tty" translatable="yes">tty</item>
-                                </items>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
+                            <property name="label" translatable="yes">Character encoding: </property>
+                            <property name="use_markup">True</property>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
                             <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox" id="hbox42">
+                          <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="tooltip_text" translatable="yes">Terminal emulation. Better leave it with default value, unless real problems with given connection</property>
+                            <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkLabel" id="label49">
+                              <object class="GtkComboBoxText" id="cfgComboCharEncode">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes"> Term Emulation: </property>
+                                <property name="active">0</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="fill">False</property>
+                                <property name="fill">True</property>
                                 <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="cfgEntryTermEmulation">
-                                <property name="width_request">100</property>
+                              <object class="GtkLabel" id="cfgLblCharEncode">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="text" translatable="yes">xterm</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">encoding description</property>
+                                <property name="selectable">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -6868,84 +7163,46 @@ Changes apply to next opened connections, not current</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFrame" id="frame5">
+                      <object class="GtkBox" id="hbox26">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">Set Terminal data expected encoding</property>
-                        <property name="border_width">2</property>
-                        <property name="label_xalign">0</property>
+                        <property name="spacing">8</property>
                         <child>
-                          <object class="GtkAlignment" id="alignment13">
+                          <object class="GtkLabel" id="label48">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="xscale">0.94999998807907104</property>
-                            <property name="left_padding">12</property>
-                            <child>
-                              <object class="GtkBox" id="vbox8">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="orientation">vertical</property>
-                                <child>
-                                  <object class="GtkComboBoxText" id="cfgComboCharEncode">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="active">0</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="cfgLblCharEncode">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">encoding description</property>
-                                    <property name="selectable">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                            </child>
+                            <property name="label" translatable="yes">Backspace: </property>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
-                        <child type="label">
-                          <object class="GtkLabel" id="label44">
+                        <child>
+                          <object class="GtkComboBoxText" id="cfgComboBackspace">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">  Character encoding: </property>
-                            <property name="use_markup">True</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item id="auto" translatable="yes">auto</item>
+                              <item id="ascii-backspace" translatable="yes">ascii-backspace</item>
+                              <item id="ascii-delete" translatable="yes">ascii-delete</item>
+                              <item id="delete-sequence" translatable="yes">delete-sequence</item>
+                              <item id="tty" translatable="yes">tty</item>
+                            </items>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">2</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="fill">True</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgRecordHistory">
-                        <property name="label" translatable="yes">Record keypresses: record *every* keystroke on terminal (always discarded on program exit)</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_text" translatable="yes">BEWARE!! This will log *all* your keypresses</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -6963,7 +7220,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <child>
@@ -6981,28 +7238,12 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">5</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="cbCfgAudibleBell">
                         <property name="label" translatable="yes">Audible Bell</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="cbCfgVisibleBell">
-                        <property name="label" translatable="yes">Visible Bell</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -7031,7 +7272,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">7</property>
+                        <property name="position">8</property>
                       </packing>
                     </child>
                     <child>
@@ -7049,7 +7290,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">8</property>
+                        <property name="position">9</property>
                       </packing>
                     </child>
                     <child>
@@ -7065,7 +7306,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">9</property>
+                        <property name="position">10</property>
                       </packing>
                     </child>
                     <child>
@@ -7083,7 +7324,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">10</property>
+                        <property name="position">11</property>
                       </packing>
                     </child>
                   </object>
@@ -7168,14 +7409,19 @@ Changes apply to next opened connections, not current</property>
               </packing>
             </child>
             <child>
-              <object class="GtkNotebook" id="notebook3">
+              <object class="GtkNotebook" id="notebookLocalShellOptions">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
                   <object class="GtkBox" id="vbox6">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">8</property>
                     <child>
                       <object class="GtkBox" id="hbox5">
                         <property name="visible">True</property>
@@ -7440,12 +7686,15 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCfgProxy">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">20</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="aCfgProxy">
                     <property name="visible">True</property>
-                    <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
                     <property name="xscale">0.94999998807907104</property>
                     <property name="left_padding">12</property>
@@ -7454,16 +7703,14 @@ Changes apply to next opened connections, not current</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>
+                        <property name="spacing">16</property>
                         <child>
-                          <object class="GtkRadioButton" id="cbCfgProxySystem">
-                            <property name="label" translatable="yes">Use system proxy settings</property>
-                            <property name="use_action_appearance">False</property>
+                          <object class="GtkRadioButton" id="cbCfgProxyNo">
+                            <property name="label" translatable="yes">Do not use proxy</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="has_tooltip">True</property>
-                            <property name="tooltip_text" translatable="yes">Try to use GSettings's configured proxy (if any)</property>
-                            <property name="xalign">0.5</property>
+                            <property name="xalign">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                           </object>
@@ -7474,33 +7721,37 @@ Changes apply to next opened connections, not current</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkRadioButton" id="cbCfgProxyManual">
-                            <property name="label" translatable="yes">Use this proxy (HTTP/SOCKS):</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
-                            <property name="has_tooltip">True</property>
-                            <property name="tooltip_text" translatable="yes">If selected, this option allows you to set a manual proxy for connecting</property>
-                            <property name="xalign">0.5</property>
-                            <property name="draw_indicator">True</property>
-                            <property name="group">cbCfgProxySystem</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkBox" id="vboxCfgManualProxy">
+                          <object class="GtkBox" id="vboxPrefManualProxyConn">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkBox" id="hbox2">
+                              <object class="GtkRadioButton" id="cbCfgProxyManual">
+                                <property name="label" translatable="yes">SOCKS proxy:</property>
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">If selected, use a SOCKS proxy for all connections.
+
+SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.
+</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                                <property name="group">cbCfgProxyNo</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="hboxPrefProxyManualOptions">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="margin_left">21</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkFrame" id="frame24">
                                     <property name="visible">True</property>
@@ -7511,13 +7762,11 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkAlignment" id="alignment26">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="left_padding">12</property>
                                         <child>
                                           <object class="GtkEntry" id="entryCfgProxyIP">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Proxy IP</property>
+                                            <property name="tooltip_text" translatable="yes">Host name or IP address of the SOCKS proxy</property>
                                             <property name="invisible_char">•</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
@@ -7549,15 +7798,18 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkAlignment" id="alignment27">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="left_padding">12</property>
                                         <child>
                                           <object class="GtkSpinButton" id="entryCfgProxyPort">
+                                            <property name="width_request">150</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">●</property>
+                                            <property name="width_chars">6</property>
+                                            <property name="text" translatable="yes">5000</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
-                                            <property name="adjustment">adjustment9</property>
+                                            <property name="adjustment">adjPortProxy</property>
+                                            <property name="value">5000</property>
                                           </object>
                                         </child>
                                       </object>
@@ -7586,13 +7838,11 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkAlignment" id="alignment28">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="left_padding">12</property>
                                         <child>
                                           <object class="GtkEntry" id="entryCfgProxyUser">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Proxy user</property>
+                                            <property name="tooltip_text" translatable="yes">Proxy user name</property>
                                             <property name="max_length">14</property>
                                             <property name="invisible_char">•</property>
                                             <property name="primary_icon_activatable">False</property>
@@ -7625,12 +7875,10 @@ Changes apply to next opened connections, not current</property>
                                       <object class="GtkAlignment" id="alignment29">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="left_padding">12</property>
                                         <child>
                                           <object class="GtkEntry" id="entryCfgProxyPassword">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
-                                            <property name="has_tooltip">True</property>
                                             <property name="tooltip_text" translatable="yes">Proxy password</property>
                                             <property name="visibility">False</property>
                                             <property name="invisible_char">•</property>
@@ -7658,32 +7906,246 @@ Changes apply to next opened connections, not current</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">0</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="vboxPrefJumpCfg">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <child>
+                              <object class="GtkRadioButton" id="cbCfgProxyJump">
+                                <property name="label" translatable="yes">Use Jump Server</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">If selected, use a jump server proxy for all connections.
+
+Jump server is an alternative to SSH tunneling to access internal machines through gateway.</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                                <property name="group">cbCfgProxyNo</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="vboxPrefJumpCfgOptions">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="margin_left">21</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkBox" id="hbox1">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">12</property>
+                                    <child>
+                                      <object class="GtkFrame" id="frame19">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment24">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkEntry" id="entryCfgJumpIP">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Host name or IP address of the jump server</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label120">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">IP / Host:</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkFrame" id="frame20">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment25">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkSpinButton" id="entryCfgJumpPort">
+                                                <property name="width_request">150</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="invisible_char">●</property>
+                                                <property name="width_chars">6</property>
+                                                <property name="text" translatable="yes">22</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                                <property name="adjustment">adjPortJump</property>
+                                                <property name="value">22</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label121">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Port:</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkFrame" id="frame21">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment30">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkEntry" id="entryCfgJumpUser">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Host server user</property>
+                                                <property name="max_length">14</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label122">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">User:</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox" id="hbox42">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel" id="labelConnKey1">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Private key file: </property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkFileChooserButton" id="entryCfgJumpKey">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="focus_on_click">False</property>
+                                        <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump server</property>
+                                        <property name="create_folders">False</property>
+                                        <property name="local_only">False</property>
+                                        <property name="preview_widget_active">False</property>
+                                        <property name="title" translatable="yes">Select an OpenSSH Private Key</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btnConfigClearJumpPrivateKey">
+                                        <property name="label" translatable="yes">Clear</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="tooltip_text" translatable="yes">Remove any selected private key</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">3</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">6</property>
                           </packing>
                         </child>
                       </object>
                     </child>
                   </object>
                 </child>
-                <child type="label">
-                  <object class="GtkCheckButton" id="cbCfgProxyToggle">
-                    <property name="label" translatable="yes"> Use proxy (both HTTP and SOCKS kind of proxies *should* work) </property>
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="has_tooltip">True</property>
-                    <property name="tooltip_text" translatable="yes">If checked, every connection will be established through the proxy server configured below</property>
-                    <property name="xalign">0.5</property>
-                    <property name="draw_indicator">True</property>
-                  </object>
+                <child type="label_item">
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -7713,7 +8175,7 @@ Changes apply to next opened connections, not current</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="has_tooltip">True</property>
-                    <property name="label" translatable="yes">Proxy Configuration</property>
+                    <property name="label" translatable="yes">Network Settings</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -7731,8 +8193,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameGlobalVariables">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignGlobalVar">
                     <property name="visible">True</property>
@@ -7799,8 +8265,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCmdLocal">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignCmdLocal">
                     <property name="visible">True</property>
@@ -7866,8 +8336,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameCmdRemote">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">4</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignCmdRemote">
                     <property name="visible">True</property>
@@ -7933,8 +8407,12 @@ Changes apply to next opened connections, not current</property>
               <object class="GtkFrame" id="frameKeePass">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="border_width">5</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">4</property>
+                <property name="margin_bottom">4</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignKeePass">
                     <property name="visible">True</property>
@@ -8015,7 +8493,7 @@ Changes apply to next opened connections, not current</property>
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="hbox4">
+          <object class="GtkBox" id="configFooter">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
