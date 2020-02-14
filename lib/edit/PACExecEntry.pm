@@ -3,7 +3,7 @@ package PACExecEntry;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -404,7 +404,7 @@ sub _buildExec {
             }
         });
 
-        # Populate with PAC internal variables
+        # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",      code => sub {$w{txt}->insert_text("<UUID>",      -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP", code => sub {$w{txt}->insert_text("<TIMESTAMP>", -1, $w{txt}->get_position());} });
@@ -419,7 +419,7 @@ sub _buildExec {
         push(@int_variables_menu, {label => "IP",        code => sub {$w{txt}->insert_text("<IP>",        -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "USER",      code => sub {$w{txt}->insert_text("<USER>",      -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
-        push(@menu_items, {label => 'PAC internal variables...', submenu => \@int_variables_menu});
+        push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 
         # Populate with <KPX_(title|username|url):*> special string
         if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
