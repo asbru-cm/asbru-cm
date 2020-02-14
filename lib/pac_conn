@@ -70,10 +70,12 @@ my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
 my $SOCKET;
 my $SOCKET_EXEC;
+my $proxy_type = 'socks5';
 my $proxy_ip = '';
 my $proxy_port = '';
 my $proxy_user = '';
 my $proxy_pass = '';
+my $proxy_cmd = '';
 my $proxy_jump = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
@@ -833,8 +835,9 @@ sub _setProxy {
         $proxy_port = $$CFG{'environments'}{$UUID}{'proxy port'};
         $proxy_user = $$CFG{'environments'}{$UUID}{'proxy user'};
         $proxy_pass = $$CFG{'environments'}{$UUID}{'proxy pass'};
+        $proxy_cmd  = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
         if ($method =~ /ssh/i) {
-            $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port %h %p'";
+            $CONNECT_OPTS .= " -o ProxyCommand='$proxy_cmd %h %p'";
         } else {
             _openSocksTunnel();
         }
@@ -895,14 +898,31 @@ sub _setProxy {
             $proxy_port = $$CFG{'defaults'}{'proxy port'};
             $proxy_user = $$CFG{'defaults'}{'proxy user'};
             $proxy_pass = $$CFG{'defaults'}{'proxy pass'};
+            $proxy_cmd  = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
             if ($method =~ /ssh/i) {
-                $CONNECT_OPTS .= " -o ProxyCommand='nc -x $proxy_ip:$proxy_port  %h %p'";
+                $CONNECT_OPTS .= " -o ProxyCommand='$proxy_cmd  %h %p'";
             } else {
                 _openSocksTunnel();
             }
         }
     }
     return 0;
+}
+
+sub _getProxyCmd {
+    my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
+
+    if ($proxy_user ne '') {
+        `which ncat 1>/dev/null 2>&1`;
+        if (! $?) {
+            return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
+        }
+        ctrl("UNHIDE_TERMINAL");
+        print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
+        die();
+    } else {
+        return "nc -x $proxy_ip:$proxy_port";
+    }
 }
 
 sub _openSshTunnel {
@@ -929,10 +949,11 @@ sub _openSocksTunnel {
     my $pipe = "$CFG_DIR/tmp/pipe_$UUID";
 
     $LPORT = _getLocalPort($PORT);
+    $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
 
     unlink($pipe);
     system("mkfifo $pipe");
-    system("nc -l -p $LPORT <$pipe | nc -x $proxy_ip:$proxy_port $IP $PORT >$pipe &");
+    system("nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }

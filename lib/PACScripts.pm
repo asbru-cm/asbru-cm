@@ -3,7 +3,7 @@ package PACScripts;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -104,7 +104,7 @@ our %TERMINAL;    # Command/Prompt manipulation to be used under *CONNECTION* su
 # NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!
 
 $txt = $COMMON{subst}(<text>);
-# Substitute given text with PAC internal variables (<ASK:desc|opt1|opt2|...|optN>, <GV:2>, ...)
+# Substitute given text with internal variables (<ASK:desc|opt1|opt2|...|optN>, <GV:2>, ...)
 # Returns a string
 
 $txt = $COMMON{del_esc}(<text>)
@@ -655,7 +655,7 @@ sub _setupCallbacks {
         push(@comm_menu_items,
         {
             label => 'Var substitution ($COMMON{subst}(<text>) )',
-            tooltip => "Substitute given text with PAC internal variables (<ASK:a>, <GV:2>, ...)",
+            tooltip => "Substitute given text with internal variables (<ASK:a>, <GV:2>, ...)",
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{subst}(<text>) ");}
         });
 
