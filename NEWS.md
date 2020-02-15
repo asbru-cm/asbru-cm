@@ -10,7 +10,7 @@ We have merged the codebase for version 6.1.0 into master. This release will bri
 These new features are:
 
 * Support for SOCKS Proxy (for VNC/RDP/SSH/SFTP today) using [ncat](https://nmap.org/ncat/) for advanced cases
-* Support for Jump Host (for SSH)
+* Support for Jump Host to simplify SSH tunneling for VNC/RDP/SSH connections.
 
 We would be happy if you can test the master snapshots as we would like to release the first official *rc1* build soon.
 
