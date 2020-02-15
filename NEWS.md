@@ -5,14 +5,16 @@ Here you can find important news on the project
 
 Dear testers,
 
-we have recently merged the codebase for version 6.1.0 into master. This release will bring some cleanups and a few new features which requires testing.
+We have merged the codebase for version 6.1.0 into master. This release will bring some cleanups and a few new features which require testing.
 
 These new features are:
 
-* Support for SOCKS Proxy (VNC/RDP) using netcat
-* SSH tunnels
+* Support for SOCKS Proxy (for VNC/RDP/SSH/SFTP today) using [ncat](https://nmap.org/ncat/) for advanced cases
+* Support for Jump Host (for SSH)
 
-We would be happy if you can test the master snapshots as we would like to release the first official rc1 build soon.
+We would be happy if you can test the master snapshots as we would like to release the first official *rc1* build soon.
+
+Attention: please make sure you have a safe copy of your configuration directory (which is ~/.config/pac) by default before proceeding with your tests.
 
 Thanks and happy testing.
 
