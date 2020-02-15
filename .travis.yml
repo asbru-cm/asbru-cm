@@ -60,7 +60,7 @@ deploy:
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
-      branch: legacy-v5
+      branch: legacy/5.2
 
 
 after_deploy:
