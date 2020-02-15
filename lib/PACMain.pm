@@ -533,7 +533,6 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_enable_search(0);
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-
     # Implement a "TreeModelSort" to auto-sort the data
     my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
