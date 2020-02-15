@@ -118,6 +118,12 @@ sub get_cfg {
         $hash{description} = $$w{desc}->get_chars(0, -1);
         $hash{confirm} = $$w{confirm}->get_active() || '0';
         $hash{intro} = $$w{intro}->get_active() || '0';
+        # Force no descriptions equal to command
+        if (!$hash{description}) {
+            $hash{description} = $hash{txt};
+        }
+        # Normalize capitalization of groups
+        $hash{description} =~ s/^(.+?):/\u\L$1\E:/;
         push(@cfg, \%hash) unless $hash{txt} eq '';
     }
 
@@ -251,6 +257,7 @@ sub _buildExec {
     # Build label
     $w{lbl2} = Gtk3::Label->new('Description: ');
     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
+    $w{hbox4}->set_tooltip_markup("<i>Group</i><b>:</b><i>Description</i>\n<b>Group:</b> This value will group all commands with the same name in the menu.\n\nExample <b>Mysql</b>:<i>Show tables</i>");
 
     # Build entry
     $w{desc} = Gtk3::Entry->new();

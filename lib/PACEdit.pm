@@ -63,13 +63,13 @@ use PACTermOpts;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $RES_DIR = $RealBin . '/res';
-my $AUTOSTART_FILE = $RES_DIR . '/pac_start.desktop';
-
-my $GLADE_FILE = $RES_DIR . '/asbru.glade';
-my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
+my $RES_DIR = "$RealBin/res";
+my $AUTOSTART_FILE = "$RES_DIR/pac_start.desktop";
+my $THEME_DIR = "$RES_DIR/themes/defualt";
+my $GLADE_FILE = "$RES_DIR/asbru.glade";
+my $INIT_CFG_FILE = "$RES_DIR/pac.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = $CFG_DIR . '/pac.yml';
+my $CFG_FILE = "$CFG_DIR/pac.yml";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -99,8 +99,12 @@ sub new {
     $self->{_LOCAL_EXEC} = undef;
     $self->{_TXTOPTSBUFFER} = undef;
 
+    if ($$self{_CFG}{defaults}{theme}) {
+        $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{defaults}{theme}";
+    }
+
     # Setup known connection methods
-    %{$$self{_METHODS}} = _getMethods($self);
+    %{$$self{_METHODS}} = _getMethods($self,$THEME_DIR);
 
     # Build the GUI
     _initGUI($self) or return 0;
@@ -171,7 +175,7 @@ sub _initGUI {
     $$self{_WINDOWEDIT} = $$self{_GLADE}->get_object('windowEdit');
     $$self{_WINDOWEDIT}->set_size_request(-1, 550);
 
-    _($self, 'imgBannerEditIcon')->set_from_file($RES_DIR . '/asbru-edit.svg');
+    _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
@@ -229,10 +233,9 @@ sub __checkRBAuth {
             _($self, 'alignExpect')->set_has_tooltip(0);
 
         }
-        _($self, 'rbUseProxyJump')->set_label("Use Jump Server");
         my $status = _($self, 'rbUseProxyJump')->get_active();
         _($self, 'rbUseProxyJump')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_tooltip_text("An alternative to SSH tunneling to access internal machines through gateway");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfgOptions')->set_sensitive($status);
         _($self, 'vboxJumpCfg')->set_visible(1);
@@ -240,8 +243,7 @@ sub __checkRBAuth {
     } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
-        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'vboxCfgManualProxyConn')->set_visible(1);
@@ -252,8 +254,7 @@ sub __checkRBAuth {
         _($self, 'vboxJumpCfg')->set_visible(0);
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
-        _($self, 'rbUseProxyJump')->set_label("User SSH tunnel");
-        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
@@ -626,6 +627,7 @@ sub _updateGUIPreferences {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$ENV{'HOME'}");
         _($self, 'entryCfgJumpConnKey')->unselect_uri("file://$ENV{'HOME'}");
     }
+    _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
 
     _($self, 'cbEditUseSudo')->set_active($$self{_CFG}{'environments'}{$uuid}{'use sudo'});
     _($self, 'cbEditSaveSessionLogs')->set_active($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
@@ -728,28 +730,20 @@ sub _updateGUIPreferences {
         $ssh =~ s/[ \t][ \t]+/ /g;
         if ($ssh =~ /-J /) {
             # Enable Jump Host
-            _($self, 'rbUseProxyJump')->set_label("Use Jump Server");
-            _($self, 'rbUseProxyJump')->set_sensitive(1);
-            _($self, 'rbUseProxyJump')->set_tooltip_text("An alternative to SSH tunneling to access internal machines through gateway");
-            _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
-            _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
+            _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway.");
         } else {
-            # Disable Jump Host
-            _($self, 'rbUseProxyJump')->set_sensitive(0);
-            _($self, 'rbUseProxyJump')->set_tooltip_text("Your system does not support jump hosts");
-            _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
+            # Jump Host cannot be used, will need to create a SSH tunnel to simulate
+            _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         }
-
         _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'rbUseProxyJump')->set_sensitive(1);
+        _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     } elsif ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /VNC|RDP/) {
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'rbUseProxyJump')->set_sensitive(1);
-        _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_label("Use SSH tunnel");
-        _($self, 'rbUseProxyJump')->set_tooltip_text("Open SSH tunnel for this connection");
+        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     } else {
-        _($self, 'vboxJumpCfg')->set_visible(0);
         _($self, 'vboxJumpCfg')->set_visible(0);
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
