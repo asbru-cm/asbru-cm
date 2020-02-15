@@ -2030,7 +2030,7 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
                                     <property name="receives_default">False</property>
                                     <property name="tooltip_text" translatable="yes">If selected, use a jump host for this connection.
 
-An alternative to SSH tunneling to access internal machines through gateway</property>
+An alternative to SSH tunneling to access internal machines through gateway.</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                     <property name="group">rbUseProxyIfCFG</property>
