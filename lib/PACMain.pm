@@ -199,7 +199,7 @@ sub new {
     map({
     if (/^--dump-uuid=(.+)$/) {
         require Data::Dumper;
-        print Data::Dumper::Dumper($$self{_CFG}{environments}{$1 });
+        print Data::Dumper::Dumper($$self{_CFG}{environments}{$1});
         exit 0;
     } } @{ $$self{_OPTS} });
 
@@ -277,11 +277,11 @@ sub new {
             } elsif (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: No more instances allowed!\n";
                 _sendAppMessage($$self{_APP}, 'show-conn');
-                Gtk3::Gdk::notify_startup_complete;
+                Gtk3::Gdk::notify_startup_complete();
                 return 0;
             }
         } else {
-            Gtk3::Gdk::notify_startup_complete;
+            Gtk3::Gdk::notify_startup_complete();
             return 0;
         }
     }
@@ -333,7 +333,7 @@ sub start {
     $self->_loadTreeConfiguration('__PAC__ROOT__');
 
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
@@ -344,13 +344,13 @@ sub start {
     # If version is lower than current, update and save the new one
     if ($APPVERSION gt $$self{_CFG}{defaults}{version}) {
         $$self{_CFG}{defaults}{version} = $APPVERSION;
-        $self->_saveConfiguration;
+        $self->_saveConfiguration();
     }
 
     # Load information about last expanded groups
-    $self->_loadTreeExpanded;
+    $self->_loadTreeExpanded();
 
-    Gtk3::Gdk::notify_startup_complete;
+    Gtk3::Gdk::notify_startup_complete();
     Glib::Idle->add(
         sub {
             _splash(0);
@@ -1268,7 +1268,7 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu;
+        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1310,7 +1310,7 @@ sub _setupCallbacks {
 
         $self->_setCFGChanged(1);
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_updateGUIWithUUID($node_uuid);
         return 1;
@@ -1339,7 +1339,7 @@ sub _setupCallbacks {
         # Delete selected node from the configuration
         $self->_delNodes(@del);
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_setCFGChanged(1);
         return 1;
@@ -1397,7 +1397,7 @@ sub _setupCallbacks {
 
     # Capture 'treeClusters' row activated
     $$self{_GUI}{treeClusters}->signal_connect('row_activated' => sub {
-        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
         $self->_startCluster($sel[0]);
     });
 
@@ -1407,7 +1407,7 @@ sub _setupCallbacks {
 
         my $keyval = '' . ($event->keyval);
         my $state = '' . ($event->state);
-        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
         if (!@sel) {
             return 0;
         }
@@ -1730,7 +1730,7 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu;
+        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1903,7 +1903,7 @@ sub _setupCallbacks {
         } elsif ($$self{_GUI}{nbTree}->get_nth_page($pnum) eq $$self{_GUI}{scroll3}) {
             $tree = $$self{_GUI}{treeHistory};
         } else {
-            my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+            my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
             $self->_startCluster($sel[0]);
             return 1;
         }
@@ -1975,8 +1975,13 @@ sub _setupCallbacks {
             $self->_setCFGChanged(1);
         }
     });
-    $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub { $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]); return 1; });
-    $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show; });
+    $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub {
+        $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]);
+        return 1;
+    });
+    $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub {
+        $$self{_CLUSTER}->show();
+    });
     $$self{_GUI}{connFavourite}->signal_connect('toggled' => sub {
         if ($$self{_NO_PROPAGATE_FAV_TOGGLE}) {
             return 1;
@@ -2001,7 +2006,7 @@ sub _setupCallbacks {
         }
         $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_setCFGChanged(1);
         return 1;
@@ -2011,8 +2016,8 @@ sub _setupCallbacks {
     $$self{_GUI}{quitBtn}->signal_connect('clicked' => sub { $self->_quitProgram(); });
     $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration(); });
     $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow(); });
-    $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan; });
-    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC : $self->_unlockPAC; });
+    $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan(); });
+    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC() : $self->_unlockPAC(); });
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{nodeClose}->signal_connect('clicked' => sub { $$self{_GUI}{main}->close(); });
     }
@@ -3115,7 +3120,7 @@ sub _startCluster {
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClusters;
+    my $clulist = $$self{_CLUSTER}->getCFGClusters();
 
     if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
         my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
@@ -3299,7 +3304,7 @@ sub _quitProgram {
     $$self{_GUI}{_PACTABS}->hide();    # Hide TABs window
 
     if ($$self{_READONLY}) {
-        Gtk3->main_quit;
+        Gtk3->main_quit();
         return 1;
     }
 
@@ -3313,22 +3318,22 @@ sub _quitProgram {
         }
     }
 
-    Gtk3::main_iteration while Gtk3::events_pending;   # Update GUI
+    Gtk3::main_iteration() while Gtk3::events_pending();   # Update GUI
     # Once everything is hidden, we may last any time in our final I/O
     delete $$self{_CFG}{environments}{'__PAC_SHELL__'};    # Delete PACShell environment
     delete $$self{_CFG}{environments}{'__PAC__QUICK__CONNECT__'}; # Delete quick connect environment
-    $self->_saveTreeExpanded;          # Save Tree opened/closed  groups
-    $self->_saveConfiguration if $save;       # Save config, if applies
+    $self->_saveTreeExpanded();                       # Save Tree opened/closed  groups
+    $self->_saveConfiguration() if $save;             # Save config, if applies
     $$self{_GUI}{statistics}->purge($$self{_CFG});    # Purge trash statistics
-    $$self{_GUI}{statistics}->saveStats;       # Save statistics
+    $$self{_GUI}{statistics}->saveStats();            # Save statistics
     unless (grep(/^--no-backup$/, @{ $$self{_OPTS} })) {
-        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);   # Export as YAML file
+        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
         $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
     };
     chdir(${CFG_DIR}) and system("rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
-    Gtk3->main_quit;
+    Gtk3->main_quit();
 
     return 1;
 }
@@ -3347,8 +3352,8 @@ sub _saveConfiguration {
     }
     _decipherCFG($cfg);
 
-    $self->_saveTreeExpanded;
-    $$self{_GUI}{statistics}->saveStats;
+    $self->_saveTreeExpanded();
+    $$self{_GUI}{statistics}->saveStats();
 
     $normal and $self->_setCFGChanged(0);
 
@@ -3826,7 +3831,7 @@ sub _updateGUIHistory {
 sub _updateGUIClusters {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeClusters}->_getSelectedNames;
+    my @sel_uuids = $$self{_GUI}{treeClusters}->_getSelectedNames();
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
@@ -3862,7 +3867,7 @@ sub _updateClustersList {
     foreach my $ac (sort { $a cmp $b } keys %{ $$self{_CFG}{defaults}{'auto cluster'} }) {
         push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $AUTOCLUSTERICON, $ac ]}));
     }
-    foreach my $cluster (sort { $a cmp $b } keys %{ $$self{_CLUSTER}->getCFGClusters }) {
+    foreach my $cluster (sort { $a cmp $b } keys %{ $$self{_CLUSTER}->getCFGClusters() }) {
         push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $CLUSTERICON, $cluster ]}));
     }
 
@@ -4042,7 +4047,7 @@ sub _pasteNodes {
     }
 
     if ($first and $UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     #$$self{_CFG}{tmp}{changed} = 1;
@@ -4118,7 +4123,7 @@ sub __exportNodes {
     }
 
     my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being exported...", 0);
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Make a backup of the original CFG
     my $backup_cfg = dclone($$self{_CFG}{'environments'});
@@ -4181,10 +4186,10 @@ sub __importNodes {
     }
 
     my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file '$file' is being imported...", 0);
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     require YAML;
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
     eval { $$self{_COPY}{'data'} = YAML::LoadFile($file); };
     if ($@) {
         $w->destroy();
@@ -4192,7 +4197,7 @@ sub __importNodes {
         return 1;
     }
 
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Full export file? (including config!)
     if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__FULL__'}) {
@@ -4202,13 +4207,13 @@ sub __importNodes {
             return 1;
         }
 
-        Gtk3::main_iteration while Gtk3::events_pending;
+        Gtk3::main_iteration() while Gtk3::events_pending();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ({
             value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
             children => []
         });
-        Gtk3::main_iteration while Gtk3::events_pending;
+        Gtk3::main_iteration() while Gtk3::events_pending();
 
         copy($file, $CFG_FILE) and unlink $CFG_FILE_NFREEZE;
         delete $$self{_CFG};
@@ -4248,7 +4253,7 @@ sub __importNodes {
     }
 
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     return 1;
