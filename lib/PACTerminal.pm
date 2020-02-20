@@ -196,7 +196,7 @@ sub new {
     # Setup callbacks
     _setupCallbacks($self) or return 0;
     # Load connection methods
-    %{$$self{_METHODS}} = _getMethods($self) or return 0;
+    %{$$self{_METHODS}} = _getMethods($self,$PACMain::FUNCS{_MAIN}{_THEME}) or return 0;
 
     $PACMain::RUNNING{$$self{'_UUID_TMP'}}{'uuid'} = $$self{'_UUID'};
     $PACMain::RUNNING{$$self{'_UUID_TMP'}}{'terminal'} = $self;
@@ -1865,45 +1865,56 @@ sub _vteMenu {
 
     # Show the list of REMOTE commands to execute
     my @cmd_remote_sub_menu;
-    foreach my $hash (@{$self->{_CFG}{'environments'}{$$self{_UUID}}{'macros'}}) {
+    # Organize Remote commands by groups, Join Terminal Macros they are the same
+    my %hgs;
+    my $lg;
+    foreach my $hash (@{$$self{_CFG}{'defaults'}{'remote commands'}},@{$self->{_CFG}{'environments'}{$$self{_UUID}}{'macros'}}) {
         my $cmd = ref($hash) ? $$hash{txt} : $hash;
         my $desc = ref($hash) ? $$hash{description} : $hash;
         my $confirm = ref($hash) ? $$hash{confirm} : 0;
+        my $intro = ref($hash) ? $$hash{intro} : 0;
         if ($cmd eq '') {
             next;
         }
-        push(@cmd_remote_sub_menu,
-        {
-            label => ($confirm ? 'CONFIRM: ' : '') . ($desc ? $desc : $cmd),
-            tooltip => $desc ? $cmd : $desc,
-            sensitive => $$self{CONNECTED},
-            stockicon => $confirm ? 'gtk-dialog-question' : '',
-            code => sub {$self->_execute('remote', $cmd, $confirm)}
-        });
-    }
-    foreach my $hash (@{$$self{_CFG}{'defaults'}{'remote commands'}}) {
-        my $cmd = ref($hash) ? $$hash{txt} : $hash;
-        my $desc = ref($hash) ? $$hash{description} : $hash;
-        my $confirm = ref($hash) ? $$hash{confirm} : 0;
-        if ($cmd eq '') {
-            next;
+        my ($g,$d) = split /:/,$desc,2;
+        if (!$d) {
+            $d = $g;
+            $g = 'Other???';
         }
-        push(@cmd_remote_sub_menu,
-        {
-            label => ($confirm ? 'CONFIRM: ' : '') . ($desc ? $desc : $cmd),
-            tooltip => $desc ? $cmd : $desc,
+        push (@{$hgs{$g}}, {
+            label => $d,
             sensitive => $$self{CONNECTED},
+            tooltip => $cmd,
             stockicon => $confirm ? 'gtk-dialog-question' : '',
             code => sub {
-                my $ok = $self->_execute('remote', $cmd, $confirm);
+                my $ok = $self->_execute('remote', $cmd, $confirm,1,0,$intro);
                 if (($$self{_CLUSTER})&&($ok)) {
-                    $self->_clusterCommit(undef, $cmd . "\n", undef);
+                    if ($intro) {
+                        $intro = "\n";
+                    } else {
+                        $intro = "";
+                    }
+                    $self->_clusterCommit(undef, "$cmd$intro", undef);
                 }
             }
         });
     }
-    push(@vte_menu_items,
-    {
+    # Create submenus except 'Others'
+    foreach my $g (sort keys %hgs) {
+        if ($g eq 'Other???') {
+            next;
+        }
+        push(@cmd_remote_sub_menu, {
+            label => $g,
+            stockicon => 'gtk-execute',
+            submenu => \@{$hgs{$g}},
+        });
+    }
+    # Push Others at the end with no group
+    if ((defined $hgs{'Other???'})&&(@{$hgs{'Other???'}})) {
+        push(@cmd_remote_sub_menu,@{$hgs{'Other???'}});
+    }
+    push(@vte_menu_items, {
         label => 'Remote commands',
         stockicon => 'gtk-execute',
         tooltip => 'Send to this connection the selected command (keypresses)',
