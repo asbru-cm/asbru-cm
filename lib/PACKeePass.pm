@@ -436,7 +436,8 @@ sub _buildKeePassGUI {
     $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassXC ');
     $w{cbUseKeePass}->set_margin_top(10);
     $w{cbUseKeePass}->set_margin_bottom(5);
-    $w{vbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
+    $w{cbUseKeePass}->set_halign('GTK_ALIGN_START');
+    $w{vbox}->pack_start($w{cbUseKeePass}, 0, 0, 0);
 
     $w{hboxkpmain} = Gtk3::HBox->new(0, 4);
     $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
