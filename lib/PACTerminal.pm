@@ -302,6 +302,11 @@ sub start {
         return 1;
     }
 
+    if ($$self{_CFG}{defaults}{keepass}{use_keepass} && !$ENV{'KPXC_MP'} && ($$self{_UUID} ne '__PAC_SHELL__')) {
+        my $kpxc = PACKeePass->new(0,$$self{_CFG}{defaults}{keepass});
+        $kpxc->getMasterPassword();
+    }
+
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};

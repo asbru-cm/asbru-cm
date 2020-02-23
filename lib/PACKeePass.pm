@@ -109,9 +109,6 @@ sub update {
     if ($$self{cfg}{'password'}) {
         $KPXC_MP = $$self{cfg}{'password'};
         $ENV{'KPXC_MP'} = $$self{cfg}{'password'};
-    } elsif (!$KPXC_MP) {
-        # Get Password user
-        getMasterPassword($self);
     }
     return 1;
 }
@@ -278,6 +275,10 @@ sub listEntries {
     my $parent = shift;
     my ($mp,$list,%w,$entry);
 
+    if (!$KPXC_MP) {
+        # Get Password user
+        getMasterPassword($self);
+    }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "KeePassXC Search",

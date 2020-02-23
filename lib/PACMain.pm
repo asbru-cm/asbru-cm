@@ -1979,7 +1979,7 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub {
-        $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]);
+        $self->_launchTerminals([[ '__PAC_SHELL__' ]]);
         return 1;
     });
     $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub {
@@ -3191,7 +3191,7 @@ sub _launchTerminals {
     # Create all selected terminals
     foreach my $sel (@{ $terminals }) {
         my $uuid = $$sel[0];
-        if (! defined $$self{_CFG}{'environments'}{$uuid}) {
+        if (!defined $$self{_CFG}{'environments'}{$uuid}) {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
@@ -3222,7 +3222,7 @@ sub _launchTerminals {
     # Start all created terminals
     foreach my $t (@new_terminals) {
         $$self{_GUI}{_PACTABS}->present if $$t{_TABBED};
-        if (! $t->start($keys_buffer)) {
+        if (!$t->start($keys_buffer)) {
             _wMessage($$self{_GUI}{main}, __("ERROR: Could not start terminal '$$self{_CFG}{environments}{ $$t{_UUID} }{title}':\n$$t{ERROR}"), 1);
             next;
         }
