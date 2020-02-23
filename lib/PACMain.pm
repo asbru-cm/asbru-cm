@@ -2037,21 +2037,18 @@ sub _setupCallbacks {
 
         my $page = $$self{_GUI}{nbTree}->get_nth_page($pnum);
 
-        # Connections
         if ($page eq $$self{_GUI}{scroll1}) {
+            # Connections
             $self->_updateGUIPreferences();
-        }
-        # Favourites
-        elsif ($page eq $$self{_GUI}{scroll2}) {
+        } elsif ($page eq $$self{_GUI}{scroll2}) {
+            # Favourites
             $self->_updateFavouritesList();
             $self->_updateGUIFavourites();
-        }
-        # History
-        elsif ($page eq $$self{_GUI}{scroll3}) {
+        } elsif ($page eq $$self{_GUI}{scroll3}) {
+            # History
             $self->_updateGUIHistory();
-        }
-        # Clusters
-        else {
+        } else {
+            # Clusters
             $self->_updateClustersList();
             $self->_updateGUIClusters();
         }
@@ -2063,7 +2060,7 @@ sub _setupCallbacks {
         if (!defined $$self{_GUI}{_PACTABS}) {
             return 1;
         }
-        if  ($$self{_GUI}{nb}->get_n_pages == 0) {
+        if ($$self{_GUI}{nb}->get_n_pages == 0) {
             $$self{_GUI}{_PACTABS}->hide();
         } elsif ($$self{_GUI}{nb}->get_n_pages == 1) {
             $$self{_GUI}{treeConnections}->grab_focus();
@@ -2071,12 +2068,10 @@ sub _setupCallbacks {
 
             if ($$self{_CFG}{defaults}{'when no more tabs'} == 0) {
                 #nothing
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
                 #quit
                 $self->_quitProgram();
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
                     $$self{_TRAY}{_TRAY}->set_active();
