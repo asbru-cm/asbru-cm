@@ -63,6 +63,7 @@ my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
 my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
+my $THEME_DIR = "$RES_DIR/themes/default";
 
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
@@ -147,7 +148,7 @@ sub _initGUI {
     $$self{_WINDOWCONFIG} = $$self{_GLADE}->get_object ('windowConfig');
     $$self{_WINDOWCONFIG}->set_size_request(-1, -1);
 
-    _($self, 'imgBannerIcon')->set_from_file("$RES_DIR/asbru-preferences.svg");
+    _($self, 'imgBannerIcon')->set_from_file("$THEME_DIR/asbru-preferences.svg");
     _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
@@ -260,7 +261,11 @@ sub _setupCallbacks {
         return 1;
     });
     _($self, 'cfgComboCharEncode')->signal_connect('changed' => sub {
-        _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        my $desc = __($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        if ($desc) {
+            $desc = "<span size='x-small'>$desc</span>";
+        }
+        _($self, 'cfgLblCharEncode')->set_markup($desc);
     });
     _($self, 'cbCfgBWTrayIcon')->signal_connect('toggled' => sub {
         _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'pac-tray-bw' : 'pac-tray', 'menu');
@@ -641,6 +646,7 @@ sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
+    my %theme = ('default',0,'asbru-color',1);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -650,6 +656,12 @@ sub _updateGUIPreferences {
     }
     if (!defined $$cfg{'defaults'}{'bold is brigth'}) {
         $$cfg{'defaults'}{'bold is brigth'} = 0;
+    }
+    if (!defined $$cfg{'defaults'}{'unprotected set'}) {
+        $$cfg{'defaults'}{'unprotected set'} = 'foreground';
+    }
+    if (!defined $$cfg{'defaults'}{'theme'}) {
+        $$cfg{'defaults'}{'theme'} = 'default';
     }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
@@ -680,6 +692,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
+    _($self, 'entryCfgPasswordPrompt')->select_region(0,0);
     _($self, 'entryCfgHostKeyVerification')->set_text($$cfg{'defaults'}{'hostkey changed prompt'});
     _($self, 'entryCfgPressAnyKey')->set_text($$cfg{'defaults'}{'press any key prompt'});
     _($self, 'entryCfgRemoteHostChanged')->set_text($$cfg{'defaults'}{'remote host changed prompt'});
@@ -694,9 +707,15 @@ sub _updateGUIPreferences {
     #_($self, 'cbCfgCheckVersions')->set_active($$cfg{'defaults'}{'check versions at start'});
     #_($self, 'btnCheckVersion')->set_sensitive(! $PACMain::FUNCS{_MAIN}{_UPDATING});
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'});
+
+    _($self, 'rbCfgUnForeground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'foreground');
+    _($self, 'rbCfgUnBackground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'background');
+    _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgUnProtected', 'unprotected color', _($self, 'colorCfgUnProtected')->get_color()->to_string());
+
     _($self, 'rbCfgForeground')->set_active($$cfg{'defaults'}{'protected set'} eq 'foreground');
     _($self, 'rbCfgBackground')->set_active($$cfg{'defaults'}{'protected set'} eq 'background');
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgProtected', 'protected color', _($self, 'colorCfgProtected')->get_color()->to_string());
+
     _($self, 'cbCfgUseGUIPassword')->set_active($$cfg{'defaults'}{'use gui password'});
     _($self, 'hboxCfgPACPassword')->set_sensitive($$cfg{'defaults'}{'use gui password'});
     _($self, 'cbCfgUseGUIPasswordTray')->set_active($$cfg{'defaults'}{'use gui password tray'});
@@ -725,6 +744,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
     _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
+    _($self, 'comboTheme')->set_active($theme{$$cfg{'defaults'}{'theme'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});
@@ -765,12 +785,14 @@ sub _updateGUIPreferences {
     _($self, 'btnCfgSaveSessionLogs')->set_current_folder($$cfg{'defaults'}{'session logs folder'});
     _($self, 'spCfgSaveSessionLogs')->set_value($$cfg{'defaults'}{'session logs amount'});
     _($self, 'cfgComboCharEncode')->set_active($self->{_ENCODINGS_MAP}{$$cfg{'defaults'}{'terminal character encoding'} // 'UTF-8'});
-    _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'} // 'RFC-3629'});
+    my $desc = __($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'}} // 'RFC-3629');
+    _($self, 'cfgLblCharEncode')->set_markup("<span size='x-small'>$desc</span>");
     _($self, 'cfgComboBackspace')->set_active($$self{_BACKSPACE_BINDING}{$$cfg{'defaults'}{'terminal backspace'} // '0'});
     _($self, 'cbCfgUnsplitDisconnected')->set_active($$cfg{'defaults'}{'unsplit disconnected terminals'} // '0');
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
     _($self, 'cbCfgSkip1stChainExpect')->set_active($$cfg{'defaults'}{'skip first chain expect'} // 1);
     _($self, 'cbCfgEnableTreeLines')->set_active($$cfg{'defaults'}{'enable tree lines'} // 0);
+    _($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
     _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
     _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
@@ -966,12 +988,18 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'confirm chains'} = _($self, 'cbCfgConfirmChains')->get_active();
     $$self{_CFG}{'defaults'}{'skip first chain expect'} = _($self, 'cbCfgSkip1stChainExpect')->get_active();
     $$self{_CFG}{'defaults'}{'enable tree lines'} = _($self, 'cbCfgEnableTreeLines')->get_active();
+    $$self{_CFG}{'defaults'}{'show show tree titles'} = _($self, 'cbCfgShowTreeTitles')->get_active();
     $$self{_CFG}{'defaults'}{'tree overlay scrolling'} = _($self, 'cbCfgEnableOverlayScrolling')->get_active();
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} = _($self, 'cbCfgCheckVersions')->get_active();
     $$self{_CFG}{'defaults'}{'show statistics'} = _($self, 'cbCfgShowStatistics')->get_active();
+
+    $$self{_CFG}{'defaults'}{'unprotected set'} = _($self, 'rbCfgUnForeground')->get_active() ? 'foreground' : 'background' ;
+    $$self{_CFG}{'defaults'}{'unprotected color'} = _($self, 'colorCfgUnProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'protected set'} = _($self, 'rbCfgForeground')->get_active() ? 'foreground' : 'background' ;
     $$self{_CFG}{'defaults'}{'protected color'} = _($self, 'colorCfgProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
     $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} = _($self, 'cbCfgCTRLDisable')->get_active();
@@ -998,6 +1026,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active();
     $$self{_CFG}{'defaults'}{'layout'} = _($self, 'comboLayout')->get_active_text();
+    $$self{_CFG}{'defaults'}{'theme'} = _($self, 'comboTheme')->get_active_text();
 
     # Terminal colors
     $$self{_CFG}{'defaults'}{'color black'} = _($self, 'colorBlack')->get_color()->to_string();

@@ -106,7 +106,8 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,jpg,pl,glade,css} %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,pl,glade} %{buildroot}/%{_datadir}/%{name}/res/
+cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
 
 
@@ -137,6 +138,8 @@ fi
 
 
 %changelog
+* Tue Feb 04 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.4
+- 6.0.4 release
 * Fri Jan 17 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.3
 - 6.0.3 release
 * Sat Jan 11 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.0.2

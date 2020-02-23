@@ -82,11 +82,12 @@ my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
 my $RES_DIR = "$RealBin/res";
 
 # Register icons on Gtk
-&_registerPACIcons;
+#&_registerPACIcons;
 
 my $INIT_CFG_FILE = "$RealBin/res/pac.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $THEME_DIR = "$RES_DIR/themes/default";
 our $R_CFG_FILE = '';
 my $CFG_FILE_FREEZE = "$CFG_DIR/pac.freeze";
 my $CFG_FILE_NFREEZE = "$CFG_DIR/pac.nfreeze";
@@ -96,12 +97,12 @@ my $PAC_START_PROGRESS = 0;
 my $PAC_START_TOTAL = 6;
 
 my $APPICON = "$RES_DIR/asbru-logo-64.png";
-my $AUTOCLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_auto.png");
-my $CLUSTERICON = _pixBufFromFile("$RealBin/res/asbru_cluster_manager.png");
-my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/asbru_group.png");
-my $GROUPICON = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONOPEN = _pixBufFromFile("$RealBin/res/asbru_group_open_16x16.svg");
-my $GROUPICONCLOSED = _pixBufFromFile("$RealBin/res/asbru_group_closed_16x16.svg");
+my $AUTOCLUSTERICON;
+my $CLUSTERICON;
+my $GROUPICON_ROOT;
+my $GROUPICON;
+my $GROUPICONOPEN;
+my $GROUPICONCLOSED;
 
 my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
@@ -181,10 +182,24 @@ sub new {
     # Set conflictive layout options as early as possible
     _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
 
+    if ($$self{_CFG}{'defaults'}{'theme'}) {
+        $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
+    }
+    $$self{_THEME} = $THEME_DIR;
+    print STDERR "INFO: theme dir '$$self{_THEME}'\n";
+
+    _registerPACIcons($THEME_DIR);
+    $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
+    $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_connection.svg");
+    $GROUPICON_ROOT = _pixBufFromFile("$THEME_DIR/asbru_group.svg");
+    $GROUPICON = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+    $GROUPICONOPEN = _pixBufFromFile("$THEME_DIR/asbru_group_open_16x16.svg");
+    $GROUPICONCLOSED = _pixBufFromFile("$THEME_DIR/asbru_group_closed_16x16.svg");
+
     map({
     if (/^--dump-uuid=(.+)$/) {
         require Data::Dumper;
-        print Data::Dumper::Dumper($$self{_CFG}{environments}{$1 });
+        print Data::Dumper::Dumper($$self{_CFG}{environments}{$1});
         exit 0;
     } } @{ $$self{_OPTS} });
 
@@ -262,11 +277,11 @@ sub new {
             } elsif (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: No more instances allowed!\n";
                 _sendAppMessage($$self{_APP}, 'show-conn');
-                Gtk3::Gdk::notify_startup_complete;
+                Gtk3::Gdk::notify_startup_complete();
                 return 0;
             }
         } else {
-            Gtk3::Gdk::notify_startup_complete;
+            Gtk3::Gdk::notify_startup_complete();
             return 0;
         }
     }
@@ -282,11 +297,11 @@ sub new {
 
     # Gtk style
     my $css_provider = Gtk3::CssProvider->new;
-    $css_provider->load_from_path("$RES_DIR/asbru.css");
+    $css_provider->load_from_path("$THEME_DIR/asbru.css");
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
 
     # Setup known connection methods
-    %{ $$self{_METHODS} } = _getMethods($self);
+    %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
 
     bless($self, $class);
 
@@ -318,7 +333,7 @@ sub start {
     $self->_loadTreeConfiguration('__PAC__ROOT__');
 
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
@@ -329,13 +344,13 @@ sub start {
     # If version is lower than current, update and save the new one
     if ($APPVERSION gt $$self{_CFG}{defaults}{version}) {
         $$self{_CFG}{defaults}{version} = $APPVERSION;
-        $self->_saveConfiguration;
+        $self->_saveConfiguration();
     }
 
     # Load information about last expanded groups
-    $self->_loadTreeExpanded;
+    $self->_loadTreeExpanded();
 
-    Gtk3::Gdk::notify_startup_complete;
+    Gtk3::Gdk::notify_startup_complete();
     Glib::Idle->add(
         sub {
             _splash(0);
@@ -462,6 +477,7 @@ sub _initGUI {
     $$self{_GUI}{groupAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-group-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{groupAddBtn}, 1, 1, 0);
     $$self{_GUI}{groupAddBtn}->set('can-focus' => 0);
+    $$self{_GUI}{groupAddBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{groupAddBtn}->set_tooltip_text('New GROUP');
 
     # Create connAdd button
@@ -469,6 +485,7 @@ sub _initGUI {
     $$self{_GUI}{connAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-node-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connAddBtn}, 1, 1, 0);
     $$self{_GUI}{connAddBtn}->set('can-focus' => 0);
+    $$self{_GUI}{connAddBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{connAddBtn}->set_tooltip_text('New CONNECTION');
 
     # Create connEditBtn button
@@ -476,6 +493,7 @@ sub _initGUI {
     $$self{_GUI}{connEditBtn}->set_image(Gtk3::Image->new_from_stock('gtk-edit', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connEditBtn}, 1, 1, 0);
     $$self{_GUI}{connEditBtn}->set('can-focus' => 0);
+    $$self{_GUI}{connEditBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{connEditBtn}->set_tooltip_text('Edit this Connection');
 
     # Create nodeRen button
@@ -483,6 +501,7 @@ sub _initGUI {
     $$self{_GUI}{nodeRenBtn}->set_image(Gtk3::Image->new_from_stock('gtk-spell-check', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeRenBtn}, 1, 1, 0);
     $$self{_GUI}{nodeRenBtn}->set('can-focus' => 0);
+    $$self{_GUI}{nodeRenBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{nodeRenBtn}->set_tooltip_text('Rename this node');
 
     # Create nodeDel button
@@ -490,12 +509,22 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeDelBtn}, 1, 1, 0);
     $$self{_GUI}{nodeDelBtn}->set('can-focus' => 0);
+    $$self{_GUI}{nodeDelBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{nodeDelBtn}->set_sensitive(0);
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
     # Put a separator
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    } else {
+        $$self{_GUI}{main}->set_decorated(0);
+        $$self{_GUI}{nodeClose} = Gtk3::Button->new();
+        $$self{_GUI}{nodeClose}->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button'));
+        $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeClose}, 1, 1, 0);
+        $$self{_GUI}{nodeClose}->set('can-focus' => 0);
+        $$self{_GUI}{nodeClose}->set_sensitive(1);
+        $$self{_GUI}{nodeClose}->set_tooltip_text('Close Window');
+        $$self{_GUI}{nodeClose}->get_style_context()->add_class("button-cp");
     }
 
     # Put a notebook for connections, favourites and history
@@ -541,7 +570,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
             children => []
         }
     );
@@ -642,10 +671,12 @@ sub _initGUI {
 
     $$self{_GUI}{vboxclu} = Gtk3::VBox->new(0, 0);
 
-    $$self{_GUI}{btneditclu} = Gtk3::Button->new_with_label(' Manage Clusters');
-    $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{btneditclu}, 0, 1, 0);
-    $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{btneditclu}->set('can-focus', 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{btneditclu} = Gtk3::Button->new_with_label(' Manage Clusters');
+        $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{btneditclu}, 0, 1, 0);
+        $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btneditclu}->set('can-focus', 0);
+    }
 
     # Create a scrolledclu scrolled window to contain the clusters tree
     $$self{_GUI}{scrolledclu} = Gtk3::ScrolledWindow->new;
@@ -720,11 +751,12 @@ sub _initGUI {
     # Create clusterBtn button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{clusterBtn} = Gtk3::Button->new();
+        $$self{_GUI}{clusterBtn}->get_style_context()->add_class("button-cp");
     } else {
         $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{clusterBtn}, 1, 1, 0);
-    $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
+    $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'button'));
     $$self{_GUI}{clusterBtn}->set('can-focus' => 0);
     $$self{_GUI}{clusterBtn}->set_tooltip_text('Open the Clusters Administration Console');
 
@@ -737,11 +769,15 @@ sub _initGUI {
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
     $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('pac-script', 'button'));
     $$self{_GUI}{scriptsBtn}->set('can-focus' => 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{scriptsBtn}->get_style_context()->add_class("button-cp");
+    }
     $$self{_GUI}{scriptsBtn}->set_tooltip_text('Open the Scripts Administration Console');
 
     # Create clusterBtn button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{pccBtn} = Gtk3::Button->new();
+        $$self{_GUI}{pccBtn}->get_style_context()->add_class("button-cp");
     } else {
         $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
     }
@@ -767,7 +803,6 @@ sub _initGUI {
     $$self{_GUI}{vbox5}->pack_start($nb, 1, 1, 0);
     $nb->set_scrollable(1);
     $nb->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
-# FIXME-HOMOGENEOUS     $nb->set('homogeneous', 0);
 
     my $tablbl = Gtk3::HBox->new(0, 0);
     my $eblbl = Gtk3::EventBox->new;
@@ -848,11 +883,15 @@ sub _initGUI {
     }
     $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('pac-shell', 'button'));
     $$self{_GUI}{shellBtn}->set('can-focus' => 0);
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{shellBtn}->get_style_context()->add_class("button-cp");
+    }
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
 
     # Create configBtn button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{configBtn} = Gtk3::Button->new();
+        $$self{_GUI}{configBtn}->get_style_context()->add_class("button-cp");
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     } else {
         $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
@@ -887,6 +926,7 @@ sub _initGUI {
     # Create quitBtn button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{quitBtn} = Gtk3::Button->new();
+        $$self{_GUI}{quitBtn}->get_style_context()->add_class("button-cp");
     } else {
         $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
     }
@@ -1198,7 +1238,7 @@ sub _setupCallbacks {
     $$self{_GUI}{groupAddBtn}->signal_connect('clicked' => sub {
         my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         my $group_uuid = $groups[0];
-        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'AVAILABLE CONNECTIONS';
+        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'My Connections';
         if (!(($group_uuid eq '__PAC__ROOT__') || $$self{_CFG}{'environments'}{$group_uuid}{'_is_group'})) {
             return 1;
         }
@@ -1231,7 +1271,7 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu;
+        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1273,7 +1313,7 @@ sub _setupCallbacks {
 
         $self->_setCFGChanged(1);
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_updateGUIWithUUID($node_uuid);
         return 1;
@@ -1302,7 +1342,7 @@ sub _setupCallbacks {
         # Delete selected node from the configuration
         $self->_delNodes(@del);
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_setCFGChanged(1);
         return 1;
@@ -1354,11 +1394,13 @@ sub _setupCallbacks {
     $$self{_GUI}{treeFavourites}->get_selection->signal_connect('changed' => sub { $self->_updateGUIFavourites(); });
     $$self{_GUI}{treeHistory}->get_selection->signal_connect('changed' => sub { $self->_updateGUIHistory(); });
 
-    $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
+    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+        $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
+    }
 
     # Capture 'treeClusters' row activated
     $$self{_GUI}{treeClusters}->signal_connect('row_activated' => sub {
-        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
         $self->_startCluster($sel[0]);
     });
 
@@ -1368,7 +1410,7 @@ sub _setupCallbacks {
 
         my $keyval = '' . ($event->keyval);
         my $state = '' . ($event->state);
-        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+        my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
         if (!@sel) {
             return 0;
         }
@@ -1691,7 +1733,7 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu;
+        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1864,7 +1906,7 @@ sub _setupCallbacks {
         } elsif ($$self{_GUI}{nbTree}->get_nth_page($pnum) eq $$self{_GUI}{scroll3}) {
             $tree = $$self{_GUI}{treeHistory};
         } else {
-            my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames;
+            my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
             $self->_startCluster($sel[0]);
             return 1;
         }
@@ -1936,8 +1978,13 @@ sub _setupCallbacks {
             $self->_setCFGChanged(1);
         }
     });
-    $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub { $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]); return 1; });
-    $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show; });
+    $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub {
+        $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]);
+        return 1;
+    });
+    $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub {
+        $$self{_CLUSTER}->show();
+    });
     $$self{_GUI}{connFavourite}->signal_connect('toggled' => sub {
         if ($$self{_NO_PROPAGATE_FAV_TOGGLE}) {
             return 1;
@@ -1962,7 +2009,7 @@ sub _setupCallbacks {
         }
         $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
         if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu;
+            $FUNCS{_TRAY}->_setTrayMenu();
         }
         $self->_setCFGChanged(1);
         return 1;
@@ -1972,8 +2019,11 @@ sub _setupCallbacks {
     $$self{_GUI}{quitBtn}->signal_connect('clicked' => sub { $self->_quitProgram(); });
     $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration(); });
     $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow(); });
-    $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan; });
-    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC : $self->_unlockPAC; });
+    $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan(); });
+    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC() : $self->_unlockPAC(); });
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{nodeClose}->signal_connect('clicked' => sub { $$self{_GUI}{main}->close(); });
+    }
 
     # Capture CONN TAB page switching
     $$self{_GUI}{nbTree}->signal_connect('switch_page' => sub {
@@ -2444,7 +2494,9 @@ sub __treeBuildNodeName {
     my $is_group = $$self{_CFG}{'environments'}{$uuid}{'_is_group'} // 0;
     my $protected = ($$self{_CFG}{'environments'}{$uuid}{'_protected'} // 0) || 0;
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
+    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
+    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'} // '#000000';
 
     if ($name) {
         $name = __($name);
@@ -2456,8 +2508,10 @@ sub __treeBuildNodeName {
     }
     if ($protected) {
         $pset = "$p_set='$p_color'";
+    } else {
+        $pset = "$p_unset='$p_uncolor'";
     }
-    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'>$name</span>";
+    $name = "<span $pset$bold font='$$self{_CFG}{defaults}{'tree font'}'> $name</span>";
 
     return $name;
 }
@@ -3037,7 +3091,7 @@ sub _showAboutWindow {
         $$self{_GUI}{main},(
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
-        "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
+        "logo" => _pixBufFromFile("$THEME_DIR/asbru-logo-400.png"),
         "copyright" => "Copyright (C) 2017-2020 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
@@ -3069,7 +3123,7 @@ sub _startCluster {
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClusters;
+    my $clulist = $$self{_CLUSTER}->getCFGClusters();
 
     if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
         my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
@@ -3178,7 +3232,7 @@ sub _launchTerminals {
             next;
         }
         my $uuid = $$t{_UUID};
-        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale($RES_DIR . '/asbru_shell.png', 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
+        my $icon = $uuid eq '__PAC_SHELL__' ? Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_shell.svg", 16, 16, 0) : $$self{_METHODS}{ $$self{_CFG}{'environments'}{$uuid}{'method'} }{'icon'};
         my $name = __($$self{_CFG}{'environments'}{$uuid}{'name'});
         unshift(@{ $$self{_GUI}{treeHistory}{data} }, ({ value => [ $icon, $name, $uuid,  strftime("%H:%M:%S %d-%m-%Y", localtime($FUNCS{_STATS}{statistics}{$uuid}{start})) ] }));
     }
@@ -3253,7 +3307,7 @@ sub _quitProgram {
     $$self{_GUI}{_PACTABS}->hide();    # Hide TABs window
 
     if ($$self{_READONLY}) {
-        Gtk3->main_quit;
+        Gtk3->main_quit();
         return 1;
     }
 
@@ -3267,22 +3321,22 @@ sub _quitProgram {
         }
     }
 
-    Gtk3::main_iteration while Gtk3::events_pending;   # Update GUI
+    Gtk3::main_iteration() while Gtk3::events_pending();   # Update GUI
     # Once everything is hidden, we may last any time in our final I/O
     delete $$self{_CFG}{environments}{'__PAC_SHELL__'};    # Delete PACShell environment
     delete $$self{_CFG}{environments}{'__PAC__QUICK__CONNECT__'}; # Delete quick connect environment
-    $self->_saveTreeExpanded;          # Save Tree opened/closed  groups
-    $self->_saveConfiguration if $save;       # Save config, if applies
+    $self->_saveTreeExpanded();                       # Save Tree opened/closed  groups
+    $self->_saveConfiguration() if $save;             # Save config, if applies
     $$self{_GUI}{statistics}->purge($$self{_CFG});    # Purge trash statistics
-    $$self{_GUI}{statistics}->saveStats;       # Save statistics
+    $$self{_GUI}{statistics}->saveStats();            # Save statistics
     unless (grep(/^--no-backup$/, @{ $$self{_OPTS} })) {
-        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);   # Export as YAML file
+        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
         $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
     };
     chdir(${CFG_DIR}) and system("rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
-    Gtk3->main_quit;
+    Gtk3->main_quit();
 
     return 1;
 }
@@ -3301,8 +3355,8 @@ sub _saveConfiguration {
     }
     _decipherCFG($cfg);
 
-    $self->_saveTreeExpanded;
-    $$self{_GUI}{statistics}->saveStats;
+    $self->_saveTreeExpanded();
+    $$self{_GUI}{statistics}->saveStats();
 
     $normal and $self->_setCFGChanged(0);
 
@@ -3432,7 +3486,7 @@ sub _loadTreeConfiguration {
 
     @{ $$self{_GUI}{treeConnections}{'data'} } =
     ({
-        value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+        value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
         children => []
     });
     foreach my $child (keys %{ $$self{_CFG}{environments}{'__PAC__ROOT__'}{children} }) {
@@ -3615,13 +3669,13 @@ sub _updateGUIWithUUID {
 
  - To create a New GROUP of Connections:
 
-   1- 'click' over 'AVAILABLE CONNECTIONS' (to create it at root) or any other GROUP
+   1- 'click' over 'My Connections' (to create it at root) or any other GROUP
    2- 'click' on the most left icon over the connections tree (or right-click over selected GROUP)
    3- Follow instructions
 
  - To create a New CONNECTION in a selected Group or at root:
 
-   1- Select the container group to create the new connection into (or 'AVAILABLE CONNECTIONS' to create it at root)
+   1- Select the container group to create the new connection into (or 'My Connections' to create it at root)
    2- 'click' on the second most left icon over the connections tree (or right-click over selected GROUP)
    3- Follow instructions
 
@@ -3652,6 +3706,15 @@ sub _updateGUIWithUUID {
     return 1;
 }
 
+sub _clearLeftMenuTabLabels {
+    my $self = shift;
+
+    $$self{_GUI}{nbTreeTabLabel}->set_text('');
+    $$self{_GUI}{nbFavTabLabel}->set_text('');
+    $$self{_GUI}{nbHistTabLabel}->set_text('');
+    $$self{_GUI}{nbCluTabLabel}->set_text('');
+}
+
 sub _updateGUIPreferences {
     my $self = shift;
 
@@ -3670,10 +3733,10 @@ sub _updateGUIPreferences {
         $$self{_CFG}{'environments'}{$uuid}{'_protected'} and $protected = 1;
     }
 
-    $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
-    $$self{_GUI}{nbFavTabLabel}->set_text('');
-    $$self{_GUI}{nbHistTabLabel}->set_text('');
-    $$self{_GUI}{nbCluTabLabel}->set_text('');
+    $self->_clearLeftMenuTabLabels();
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
+    }
 
     $$self{_GUI}{connSearch}->set_sensitive(1);
     $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
@@ -3716,10 +3779,10 @@ sub _updateGUIFavourites {
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
-    $$self{_GUI}{nbTreeTabLabel}->set_text('');
-    $$self{_GUI}{nbFavTabLabel}->set_text(' Favourites');
-    $$self{_GUI}{nbHistTabLabel}->set_text('');
-    $$self{_GUI}{nbCluTabLabel}->set_text('');
+    $self->_clearLeftMenuTabLabels();
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbFavTabLabel}->set_text(' Favourites');
+    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3751,10 +3814,10 @@ sub _updateGUIHistory {
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
-    $$self{_GUI}{nbTreeTabLabel}->set_text('');
-    $$self{_GUI}{nbFavTabLabel}->set_text('');
-    $$self{_GUI}{nbHistTabLabel}->set_text(' History');
-    $$self{_GUI}{nbCluTabLabel}->set_text('');
+    $self->_clearLeftMenuTabLabels();
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbHistTabLabel}->set_text(' History');
+    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3780,14 +3843,14 @@ sub _updateGUIHistory {
 sub _updateGUIClusters {
     my $self = shift;
 
-    my @sel_uuids = $$self{_GUI}{treeClusters}->_getSelectedNames;
+    my @sel_uuids = $$self{_GUI}{treeClusters}->_getSelectedNames();
     my $total = scalar(@sel_uuids);
     my $uuid = $sel_uuids[0];
 
-    $$self{_GUI}{nbTreeTabLabel}->set_text('');
-    $$self{_GUI}{nbFavTabLabel}->set_text('');
-    $$self{_GUI}{nbHistTabLabel}->set_text('');
-    $$self{_GUI}{nbCluTabLabel}->set_text(' Clusters');
+    $self->_clearLeftMenuTabLabels();
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbCluTabLabel}->set_text(' Clusters');
+    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3816,7 +3879,7 @@ sub _updateClustersList {
     foreach my $ac (sort { $a cmp $b } keys %{ $$self{_CFG}{defaults}{'auto cluster'} }) {
         push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $AUTOCLUSTERICON, $ac ]}));
     }
-    foreach my $cluster (sort { $a cmp $b } keys %{ $$self{_CLUSTER}->getCFGClusters }) {
+    foreach my $cluster (sort { $a cmp $b } keys %{ $$self{_CLUSTER}->getCFGClusters() }) {
         push(@{ $$self{_GUI}{treeClusters}{data} }, ({ value => [ $CLUSTERICON, $cluster ]}));
     }
 
@@ -3996,7 +4059,7 @@ sub _pasteNodes {
     }
 
     if ($first and $UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     #$$self{_CFG}{tmp}{changed} = 1;
@@ -4072,7 +4135,7 @@ sub __exportNodes {
     }
 
     my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being exported...", 0);
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Make a backup of the original CFG
     my $backup_cfg = dclone($$self{_CFG}{'environments'});
@@ -4135,10 +4198,10 @@ sub __importNodes {
     }
 
     my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file '$file' is being imported...", 0);
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     require YAML;
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
     eval { $$self{_COPY}{'data'} = YAML::LoadFile($file); };
     if ($@) {
         $w->destroy();
@@ -4146,7 +4209,7 @@ sub __importNodes {
         return 1;
     }
 
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Full export file? (including config!)
     if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__FULL__'}) {
@@ -4156,13 +4219,13 @@ sub __importNodes {
             return 1;
         }
 
-        Gtk3::main_iteration while Gtk3::events_pending;
+        Gtk3::main_iteration() while Gtk3::events_pending();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ({
-            value => [ $GROUPICON_ROOT, '<b>AVAILABLE CONNECTIONS</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
             children => []
         });
-        Gtk3::main_iteration while Gtk3::events_pending;
+        Gtk3::main_iteration() while Gtk3::events_pending();
 
         copy($file, $CFG_FILE) and unlink $CFG_FILE_NFREEZE;
         delete $$self{_CFG};
@@ -4202,7 +4265,7 @@ sub __importNodes {
     }
 
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu;
+        $FUNCS{_TRAY}->_setTrayMenu();
     }
 
     return 1;
@@ -4634,6 +4697,7 @@ sub _ApplyLayout {
             if ($$self{_GUI}{main}->get_visible) {
                 $self->_hideConnectionsList();
             }
+            $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
         $$self{_GUI}{main}->set_default_size(220,600);
         $$self{_GUI}{main}->resize(220,600);

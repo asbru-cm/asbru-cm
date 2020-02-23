@@ -3,7 +3,7 @@ package PACTrayUnity;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -51,7 +51,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $TRAYICON = $RealBin . '/res/asbru-logo-tray.png';
-my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/asbru_group.png');
+my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/themes/default/asbru_group.png');
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
