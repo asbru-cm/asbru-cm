@@ -1753,6 +1753,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="xalign">0</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
+                                <property name="tooltip_text" translatable="yes">If selected, use settings defined in the Preferences > Network Settings.</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1762,13 +1763,14 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                             </child>
                             <child>
                               <object class="GtkRadioButton" id="rbUseProxyNever">
-                                <property name="label" translatable="yes">Never use any proxy</property>
+                                <property name="label" translatable="yes">Use a direct connection</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
+                                <property name="tooltip_text" translatable="yes">If selected, ignore any settings defined in the Preferences > Network Settings and do not use any intermediate proxy or jump host to connect to the destination.</property>
                                 <property name="group">rbUseProxyIfCFG</property>
                               </object>
                               <packing>
@@ -1832,7 +1834,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <object class="GtkLabel" id="label101">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">IP / Host</property>
+                                            <property name="label" translatable="yes">IP / Host:</property>
                                           </object>
                                         </child>
                                       </object>
@@ -1983,12 +1985,15 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="orientation">vertical</property>
                                 <child>
                                   <object class="GtkRadioButton" id="rbUseProxyJump">
-                                    <property name="label" translatable="yes">Use Jump Server</property>
+                                    <property name="label" translatable="yes">Use a Jump Host</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="tooltip_text" translatable="yes">An alternative to SSH tunneling to access internal machines through gateway</property>
                                     <property name="halign">start</property>
+                                    <property name="tooltip_text" translatable="yes">If selected, use a jump host for this connection.
+
+An alternative to SSH tunneling to access internal machines through gateway.</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                     <property name="group">rbUseProxyIfCFG</property>
@@ -2025,7 +2030,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                   <object class="GtkEntry" id="entryCfgJumpConnIP">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
-                                                    <property name="tooltip_text" translatable="yes">Host name or IP address of the jump server</property>
+                                                    <property name="tooltip_text" translatable="yes">Host name or IP address of the jump host</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
@@ -8118,6 +8123,10 @@ Changes apply to next opened connections, not current</property>
                             <property name="xalign">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
+                            <property name="tooltip_text" translatable="yes">If selected, do not use any intermediate proxy or jump host to connect to the destination.
+                            
+For each connection, it is still possible to define a particular proxy or jump host.
+</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8140,6 +8149,8 @@ Changes apply to next opened connections, not current</property>
                                 <property name="tooltip_text" translatable="yes">If selected, use a SOCKS proxy for all connections.
 
 SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.
+
+For all other types of connection, this setting will be ignored.
 </property>
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
@@ -8338,6 +8349,12 @@ SOCKS is an Internet protocol that exchanges network packets between a client an
 
 Jump server is an alternative to SSH tunneling to access internal machines through gateway.</property>
                                 <property name="halign">start</property>
+                                <property name="tooltip_text" translatable="yes">If selected, use a jump host for all SSH connections.
+
+Jump host is an alternative to SSH tunneling to access internal machines through gateway.
+
+For all other types of connection, this setting will be ignored.
+</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">cbCfgProxyNo</property>
@@ -8870,7 +8887,7 @@ Jump server is an alternative to SSH tunneling to access internal machines throu
                   <object class="GtkLabel" id="label17">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">KeePassX Options</property>
+                    <property name="label" translatable="yes">KeePassXC Options</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
