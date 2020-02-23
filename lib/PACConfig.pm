@@ -792,7 +792,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
     _($self, 'cbCfgSkip1stChainExpect')->set_active($$cfg{'defaults'}{'skip first chain expect'} // 1);
     _($self, 'cbCfgEnableTreeLines')->set_active($$cfg{'defaults'}{'enable tree lines'} // 0);
-    _($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
+    #_($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
     _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
     _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
@@ -988,7 +988,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'confirm chains'} = _($self, 'cbCfgConfirmChains')->get_active();
     $$self{_CFG}{'defaults'}{'skip first chain expect'} = _($self, 'cbCfgSkip1stChainExpect')->get_active();
     $$self{_CFG}{'defaults'}{'enable tree lines'} = _($self, 'cbCfgEnableTreeLines')->get_active();
-    $$self{_CFG}{'defaults'}{'show show tree titles'} = _($self, 'cbCfgShowTreeTitles')->get_active();
+    #$$self{_CFG}{'defaults'}{'show show tree titles'} = _($self, 'cbCfgShowTreeTitles')->get_active();
     $$self{_CFG}{'defaults'}{'tree overlay scrolling'} = _($self, 'cbCfgEnableOverlayScrolling')->get_active();
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} = _($self, 'cbCfgCheckVersions')->get_active();

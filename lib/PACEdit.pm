@@ -210,7 +210,7 @@ sub _initGUI {
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
     _($self, 'btnCloseEdit')->set_use_underline(1);
-    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
+    _($self, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
 
 
     return 1;
@@ -665,7 +665,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
-    _($self, 'hboxkpx')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     _($self, 'entryUUID')->set_text($uuid);
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
 
