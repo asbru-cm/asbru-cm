@@ -423,7 +423,6 @@ sub _locateEntries {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            print "keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '/'\n";
             $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '/'");
             print Writer "$KPXC_MP\n";
             close Writer;
