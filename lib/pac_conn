@@ -778,33 +778,6 @@ sub _execScript {
     return 1;
 }
 
-sub findKP {
-    my $kp = shift;
-    my $where = shift // 'title';
-    my $what = shift // qr/.*/;
-
-    my @found;
-    foreach my $hash (@{$kp}) {
-        if (ref($what) eq 'Regexp') {
-            if ($$hash{$where} !~ /^$what$/) {
-                next;
-            }
-        } elsif ($$hash{$where} ne $what) {
-            next;
-        }
-        push(@found, {
-            title => $$hash{title},
-            url => $$hash{url},
-            username => $$hash{username},
-            password => $$hash{password},
-            created => $$hash{created},
-            comment => $$hash{comment}
-        });
-    }
-
-    return wantarray ? @found : scalar(@found);
-}
-
 sub _setProxy {
     my $method = shift;
 
@@ -2247,10 +2220,6 @@ Pipe the command to other terminals if $pipe is active (possibly used in cluster
 =head2 sub _execScript
 
 Parse a user script, run the script.
-
-=head2 sub findKP
-
-Find Keepass user, password
 
 =head2 main
 

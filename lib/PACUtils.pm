@@ -1478,11 +1478,12 @@ sub _wEnterValue {
     }
 
     my %w;
-
     if (defined $WINDOWSPLASH{_GUI}) {
         $parent = $WINDOWSPLASH{_GUI};
     } elsif (undef $parent) {
-        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+        if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
+            $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+        }
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
