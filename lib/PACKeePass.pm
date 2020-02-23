@@ -53,6 +53,8 @@ use PACTree;
 # Define GLOBAL CLASS variables
 
 my $KPXC_MP = $ENV{'KPXC_MP'};
+my @KPXC_LIST;
+my %KPXC_CACHE = ();
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -205,8 +207,13 @@ sub getFieldValue {
     my ($s,$field,$uid) = @_;
     my ($pid,$cfg);
     my $data='';
+    my $flg = 0;
     my @out;
 
+    $field = lc($field);
+    if ($KPXC_CACHE{"$field,$uid"}) {
+        return ($KPXC_CACHE{"$field,$uid"},1);
+    }
     if ($$s{cfg}) {
         $cfg = $$s{cfg};
     } else {
@@ -233,9 +240,14 @@ sub getFieldValue {
     close Reader;
     foreach $data (@out) {
         $data =~ s/\n//g;
-        if ($data =~ s/$field: *//i) {
-            return ($data,1);
+        if ($data =~ /(username|password|url|title): (.*)/i) {
+            my $f = lc ($1);
+            my $v = $2;
+            $KPXC_CACHE{"$f,$uid"} = $v;
         }
+    }
+    if ($KPXC_CACHE{"$field,$uid"}) {
+        return ($KPXC_CACHE{"$field,$uid"},1);
     }
     return ('',0);
 }
@@ -319,7 +331,7 @@ sub listEntries {
         my ($widget, $event) = @_;
         my @list = ();
 
-        if (length($widget->get_text())>2) {
+        if (length($widget->get_text())>0) {
             @{$w{window}{gui}{treelist}{'data'}}=();
             @list = $self->_locateEntries($widget->get_text());
             foreach my $el (@list) {
@@ -401,26 +413,28 @@ sub _locateEntries {
     my ($pid,$cfg);
     my @out;
 
-    $str =~ s/[\'\"]//g;
     if ($$s{cfg}) {
         $cfg = $$s{cfg};
     } else {
         $cfg = $s->get_cfg();
     }
-    {
-        no warnings 'once';
-        open(SAVERR,">&STDERR");
-        open(STDERR,"> /dev/null");
-        $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '$str'");
-        print Writer "$KPXC_MP\n";
-        close Writer;
-        @out = <Reader>;
-        # Wait so we do not create zombies
-        waitpid($pid,0);
-        close Reader;
-        open(STDERR,">&SAVERR");
-    };
-
+    if (!@KPXC_LIST) {
+        {
+            no warnings 'once';
+            open(SAVERR,">&STDERR");
+            open(STDERR,"> /dev/null");
+            print "keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '/'\n";
+            $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            print Writer "$KPXC_MP\n";
+            close Writer;
+            @KPXC_LIST = <Reader>;
+            # Wait so we do not create zombies
+            waitpid($pid,0);
+            close Reader;
+            open(STDERR,">&SAVERR");
+        };
+    }
+    @out = grep(/$str/i,@KPXC_LIST);
     return @out;
 }
 

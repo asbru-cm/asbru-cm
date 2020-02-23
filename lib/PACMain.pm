@@ -3734,9 +3734,9 @@ sub _updateGUIPreferences {
     }
 
     $self->_clearLeftMenuTabLabels();
-    if ($$self{_CFG}{defaults}{'show tree titles'}) {
-        $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
-    }
+    #if ($$self{_CFG}{defaults}{'show tree titles'}) {
+    #    $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
+    #}
 
     $$self{_GUI}{connSearch}->set_sensitive(1);
     $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
