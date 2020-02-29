@@ -106,7 +106,7 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,pl,glade} %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,pl,glade,svg} %{buildroot}/%{_datadir}/%{name}/res/
 cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
 
