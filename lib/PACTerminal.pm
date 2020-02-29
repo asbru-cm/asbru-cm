@@ -363,12 +363,12 @@ sub start {
             _vteFeed($$self{_GUI}{_VTE}, " !! ${COL_RED}ERROR${COL_RESET}: unable to created embedded window.  Terminal will be started in a separated window.\r\n\n");
         }
 
-        $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_SOCKET}->get_allocated_width;
-        $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_SOCKET}->get_allocated_height;
-        if ($$self{_CFG}{'tmp'}{'width'} <= 1) {
-            $$self{_CFG}{'tmp'}{'width'} = $$self{_NOTEBOOK}->get_allocated_width - 10;
-            $$self{_CFG}{'tmp'}{'height'} = $$self{_NOTEBOOK}->get_allocated_height - 85;
-        }
+        # Update GUI before querying the size of the embed window
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        # Get available size for the embed window
+        $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_VBOX}->get_allocated_width();
+        $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_VBOX}->get_allocated_height() - $$self{_GUI}{bottombox}->get_allocated_height();
         eval {
             $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_visible or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_allocated_width;
         };
