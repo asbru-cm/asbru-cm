@@ -422,7 +422,7 @@ sub start {
     #$self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
 
     # Goto GTK's event loop
-    Gtk3->main;
+    Gtk3->main();
 
     return 1;
 }
@@ -444,7 +444,7 @@ sub _initGUI {
     ##############################################
     # Create main window
     ##############################################
-    $$self{_GUI}{main} = Gtk3::Window->new;
+    $$self{_GUI}{main} = Gtk3::Window->new();
 
     if (($$self{_CFG}{defaults}{'tabs in main window'})&&($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
         _setWindowPaintable($$self{_GUI}{main});
@@ -563,10 +563,10 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
     # Implement a "TreeModelSort" to auto-sort the data
-    my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model);
+    my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model());
     $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
     $sort_model_conn->set_default_sort_func(\&__treeSort, $$self{_CFG});
-    $$self{_GUI}{treeConnections}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
+    $$self{_GUI}{treeConnections}->get_selection()->set_mode('GTK_SELECTION_MULTIPLE');
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
@@ -631,7 +631,7 @@ sub _initGUI {
     $$self{_GUI}{scroll2}->add($$self{_GUI}{treeFavourites});
 
     # Implement a "TreeModelSort" to auto-sort the data
-    my $sort_modelfav = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeFavourites}->get_model);
+    my $sort_modelfav = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeFavourites}->get_model());
     $$self{_GUI}{treeFavourites}->set_model($sort_modelfav);
     $sort_modelfav->set_default_sort_func(\&__treeSort, $$self{_CFG});
 
@@ -639,7 +639,7 @@ sub _initGUI {
     $$self{_GUI}{treeFavourites}->set_headers_visible(0);
     $$self{_GUI}{treeFavourites}->set_enable_search(0);
     $$self{_GUI}{treeFavourites}->set_has_tooltip(1);
-    $$self{_GUI}{treeFavourites}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
+    $$self{_GUI}{treeFavourites}->get_selection()->set_mode('GTK_SELECTION_MULTIPLE');
 
     # Create a scrolled3 scrolled window to contain the history tree
     $$self{_GUI}{scroll3} = Gtk3::ScrolledWindow->new;
@@ -965,22 +965,23 @@ sub _initGUI {
         $$self{_GUI}{_PACTABS} = $$self{_GUI}{main};
     } else {
         # Create window
-        $$self{_GUI}{_PACTABS} = Gtk3::Window->new;
+        $$self{_GUI}{_PACTABS} = Gtk3::Window->new();
         # Setup some window properties.
         $$self{_GUI}{_PACTABS}->set_title("Terminals Tabbed Window : $APPNAME (v$APPVERSION)");
         $$self{_GUI}{_PACTABS}->set_position('center');
-        Gtk3::Window::set_default_icon_from_file($APPICON);
         $$self{_GUI}{_PACTABS}->set_size_request(200, 100);
         $$self{_GUI}{_PACTABS}->set_default_size(600, 400);
         $$self{_GUI}{_PACTABS}->set_resizable(1);
-        $$self{_GUI}{_PACTABS}->maximize if $$self{_CFG}{'defaults'}{'start maximized'};
+        $$self{_GUI}{_PACTABS}->maximize() if $$self{_CFG}{'defaults'}{'start maximized'};
+        Gtk3::Window::set_default_icon_from_file($APPICON);
 
         # Create a notebook widget
         $$self{_GUI}{nb} = Gtk3::Notebook->new();
-        $$self{_GUI}{_PACTABS}->add($$self{_GUI}{nb});
         $$self{_GUI}{nb}->set_scrollable(1);
         $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
+        $$self{_GUI}{_PACTABS}->add($$self{_GUI}{nb});
 
+        # Hide tabs on main window
         $nb->set_show_tabs(0);
         $nb->set_property('show_border', 0);
 
@@ -991,7 +992,7 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->grab_focus();
 
     # Load window size/position, and treeconnections size
-    $self->_loadGUIData;
+    $self->_loadGUIData();
     if ($$self{_CFG}{defaults}{'start main maximized'}) {
         $$self{_GUI}{main}->set_position('center');
         $$self{_GUI}{main}->maximize;
@@ -1135,7 +1136,7 @@ sub _setupCallbacks {
             if (!$path) {
                 return 0;
             }
-            my $model = $$self{_GUI}{$what}->get_model;
+            my $model = $$self{_GUI}{$what}->get_model();
             my $uuid = $model->get_value($model->get_iter($path), 2);
 
             if ($$self{_CFG}{environments}{$uuid}{_is_group} || $uuid eq '__PAC__ROOT__') {
@@ -1278,9 +1279,9 @@ sub _setupCallbacks {
 
     # Capture 'rename node' button clicked
     $$self{_GUI}{nodeRenBtn}->signal_connect('clicked' => sub {
-        my $selection = $$self{_GUI}{treeConnections}->get_selection;
-        my $modelsort = $$self{_GUI}{treeConnections}->get_model;
-        my $model = $modelsort->get_model;
+        my $selection = $$self{_GUI}{treeConnections}->get_selection();
+        my $modelsort = $$self{_GUI}{treeConnections}->get_model();
+        my $model = $modelsort->get_model();
         my ($path) = _getSelectedRows($selection);
         if (!defined $path) {
             return 1;
@@ -1391,11 +1392,13 @@ sub _setupCallbacks {
     }
 
     # Capture selected element changed
-    $$self{_GUI}{treeFavourites}->get_selection->signal_connect('changed' => sub { $self->_updateGUIFavourites(); });
-    $$self{_GUI}{treeHistory}->get_selection->signal_connect('changed' => sub { $self->_updateGUIHistory(); });
+    $$self{_GUI}{treeFavourites}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIFavourites(); });
+    $$self{_GUI}{treeHistory}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIHistory(); });
 
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
-        $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub { $$self{_CLUSTER}->show(1); });
+        $$self{_GUI}{btneditclu}->signal_connect('clicked' => sub {
+            $$self{_CLUSTER}->show(1);
+        });
     }
 
     # Capture 'treeClusters' row activated
@@ -1404,7 +1407,7 @@ sub _setupCallbacks {
         $self->_startCluster($sel[0]);
     });
 
-    $$self{_GUI}{treeClusters}->get_selection->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
+    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -1538,8 +1541,8 @@ sub _setupCallbacks {
                 return 0;
             }
             my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection;
-            my $model = $tree->get_model;
+            my $selection = $tree->get_selection();
+            my $model = $tree->get_model();
             my @paths = _getSelectedRows($selection);
             my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
 
@@ -1563,8 +1566,8 @@ sub _setupCallbacks {
                 return 0;
             }
             my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection;
-            my $model = $tree->get_model;
+            my $selection = $tree->get_selection();
+            my $model = $tree->get_model();
             my @paths = _getSelectedRows($selection);
             my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
             if (!(($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
@@ -1575,8 +1578,8 @@ sub _setupCallbacks {
         # Capture 'intro' keypress to expand/collapse row or launch terminals
         elsif ($event->keyval == 65293) {
             my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection;
-            my $model = $tree->get_model;
+            my $selection = $tree->get_selection();
+            my $model = $tree->get_model();
             my @paths = _getSelectedRows($selection);
             my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
 
@@ -1607,7 +1610,7 @@ sub _setupCallbacks {
     });
 
     # Capture 'treeconnections' selected element changed
-    $$self{_GUI}{treeConnections}->get_selection->signal_connect('changed' => sub {
+    $$self{_GUI}{treeConnections}->get_selection()->signal_connect('changed' => sub {
         $self->_updateGUIPreferences();
         });
 
@@ -1622,8 +1625,8 @@ sub _setupCallbacks {
         }
 
         my $tree = $$self{_GUI}{treeConnections};
-        my $selection = $tree->get_selection;
-        my $model = $tree->get_model;
+        my $selection = $tree->get_selection();
+        my $model = $tree->get_model();
         my @paths = _getSelectedRows($selection);
         my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
 
@@ -1641,9 +1644,9 @@ sub _setupCallbacks {
     $$self{_GUI}{treeConnections}->signal_connect('row_collapsed' => sub {
         my ($tree, $iter, $path) = @_;
 
-        my $selection = $$self{_GUI}{treeConnections}->get_selection;
-        my $modelsort = $$self{_GUI}{treeConnections}->get_model;
-        my $model = $modelsort->get_model;
+        my $selection = $$self{_GUI}{treeConnections}->get_selection();
+        my $modelsort = $$self{_GUI}{treeConnections}->get_model();
+        my $model = $modelsort->get_model();
         my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
         $$self{_GUI}{treeConnections}->columns_autosize;
         if ($group_uuid eq '__PAC__ROOT__') {
@@ -1657,9 +1660,9 @@ sub _setupCallbacks {
     $$self{_GUI}{treeConnections}->signal_connect('row_expanded' => sub {
         my ($tree, $iter, $path) = @_;
 
-        my $selection = $$self{_GUI}{treeConnections}->get_selection;
-        my $modelsort = $$self{_GUI}{treeConnections}->get_model;
-        my $model = $modelsort->get_model;
+        my $selection = $$self{_GUI}{treeConnections}->get_selection();
+        my $modelsort = $$self{_GUI}{treeConnections}->get_model();
+        my $model = $modelsort->get_model();
         my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
         if ($group_uuid eq '__PAC__ROOT__') {
             return 0;
@@ -1928,7 +1931,9 @@ sub _setupCallbacks {
         map push(@idx,[$_]),keys %tmp;
         $self->_launchTerminals(\@idx);
     });
-    $$self{_GUI}{configBtn}->signal_connect('clicked' => sub { $$self{_CONFIG}->show; });
+    $$self{_GUI}{configBtn}->signal_connect('clicked' => sub {
+        $$self{_CONFIG}->show();
+    });
     $$self{_GUI}{connEditBtn}->signal_connect('clicked' => sub {
         my $pnum = $$self{_GUI}{nbTree}->get_current_page();
         my $tree;
@@ -2409,7 +2414,9 @@ sub _unlockPAC {
     $$self{_GUI}{aboutBtn}->set_sensitive(1);
     $$self{_GUI}{wolBtn}->set_sensitive(1);
 
-    $$self{_TABSINWINDOW} and $$self{_GUI}{_PACTABS}->set_sensitive(1);
+    if ($$self{_TABSINWINDOW}) {
+        $$self{_GUI}{_PACTABS}->set_sensitive(1);
+    }
     foreach my $tmp_uuid (keys %RUNNING) {
         $RUNNING{$tmp_uuid}{terminal}->unlock;
     }
@@ -2425,7 +2432,7 @@ sub __search {
     my $where = shift // 'name';
 
     my @result;
-    my $model = $tree->get_model;
+    my $model = $tree->get_model();
     $model->foreach(sub {
         my ($store, $path, $iter) = @_;
         my $elem_uuid = $model->get_value($model->get_iter($path), 2);
@@ -2539,9 +2546,9 @@ sub _hasProtectedChildren {
 sub __treeToggleProtection {
     my $self = shift;
 
-    my $selection = $$self{_GUI}{treeConnections}->get_selection;
-    my $modelsort = $$self{_GUI}{treeConnections}->get_model;
-    my $model = $modelsort->get_model;
+    my $selection = $$self{_GUI}{treeConnections}->get_selection();
+    my $modelsort = $$self{_GUI}{treeConnections}->get_model();
+    my $model = $modelsort->get_model();
     my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
     foreach my $uuid (@sel) {
@@ -2816,13 +2823,13 @@ sub _treeConnections_menu {
         sensitive =>  scalar @sel >= 1,
         code => sub {
             if ($sel[0] eq '__PAC__ROOT__') {
-                $$self{_GUI}{treeConnections}->get_selection->unselect_path(Gtk3::TreePath->new_from_string('0'));
+                $$self{_GUI}{treeConnections}->get_selection()->unselect_path(Gtk3::TreePath->new_from_string('0'));
                 for my $i (1 .. 65535) {
-                    $$self{_GUI}{treeConnections}->get_selection->select_path(Gtk3::TreePath->new_from_string("$i"));
+                    $$self{_GUI}{treeConnections}->get_selection()->select_path(Gtk3::TreePath->new_from_string("$i"));
                 }
                 $self->__exportNodes;
                 for my $i (1 .. 65535) {
-                    $$self{_GUI}{treeConnections}->get_selection->unselect_path(Gtk3::TreePath->new_from_string("$i"));
+                    $$self{_GUI}{treeConnections}->get_selection()->unselect_path(Gtk3::TreePath->new_from_string("$i"));
                 }
                 $$self{_GUI}{treeConnections}->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
             } else {
@@ -3221,7 +3228,10 @@ sub _launchTerminals {
 
     # Start all created terminals
     foreach my $t (@new_terminals) {
-        $$self{_GUI}{_PACTABS}->present if $$t{_TABBED};
+        if ($$t{_TABBED}) {
+            $$self{_GUI}{_PACTABS}->present();
+        }
+
         if (!$t->start($keys_buffer)) {
             _wMessage($$self{_GUI}{main}, __("ERROR: Could not start terminal '$$self{_CFG}{environments}{ $$t{_UUID} }{title}':\n$$t{ERROR}"), 1);
             next;
@@ -3524,9 +3534,9 @@ sub _saveTreeExpanded {
     my $self = shift;
     my $tree = shift // $$self{_GUI}{treeConnections};
 
-    my $selection = $tree->get_selection;
-    my $modelsort = $tree->get_model;
-    my $model = $modelsort->get_model;
+    my $selection = $tree->get_selection();
+    my $modelsort = $tree->get_model();
+    my $model = $modelsort->get_model();
 
     open(F,">:utf8","$CFG_FILE.tree") or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
     $modelsort->foreach(sub {

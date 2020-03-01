@@ -131,7 +131,7 @@ sub new {
     $self->{_SCRIPT_NAME} = '';
 
     $self->{_EXEC} = {};
-    $self->{_EXEC_LAST} = join('.', gettimeofday);
+    $self->{_EXEC_LAST} = join('.', gettimeofday());
 
     $self->{_BADEXIT} = 1;
     $self->{_GUILOCKED} = 0;
@@ -221,13 +221,12 @@ sub new {
         Local => $$self{_TMPSOCKETEXEC}
     ) or die "ERROR:$!";
 
-
     # Add a Glib watcher to listen to new connections (in a non-blocking fashion)
     $self->{_SOCKET_WATCH_EXEC} = Glib::IO->add_watch(fileno($self->{_SOCKET_CONN_EXEC}), ['in', 'hup', 'err'], sub {
         my ($fd, $cond, $self) = @_;
 
         my $tmp_client;
-        do {$tmp_client = $self->{_SOCKET_CONN_EXEC}->accept} until defined $tmp_client;
+        do {$tmp_client = $self->{_SOCKET_CONN_EXEC}->accept()} until defined $tmp_client;
 
         $self->{_SOCKET_CLIENT_EXEC} = $tmp_client;
         $self->{_SOCKET_CLIENT_EXEC}->blocking(0);
@@ -250,7 +249,7 @@ sub new {
 
         my $tmp_client;
         do {
-            $tmp_client = $self->{_SOCKET_CONN}->accept
+            $tmp_client = $self->{_SOCKET_CONN}->accept();
         } until defined $tmp_client;
 
         # Make sure that this client is a PAC client:
@@ -357,14 +356,14 @@ sub start {
             _vteFeed($$self{_GUI}{_VTE}, " !! ${COL_RED}ERROR${COL_RESET}: unable to created embedded window.  Terminal will be started in a separated window.\r\n\n");
         }
 
-        $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_SOCKET}->get_allocated_width;
-        $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_SOCKET}->get_allocated_height;
-        if ($$self{_CFG}{'tmp'}{'width'} <= 1) {
-            $$self{_CFG}{'tmp'}{'width'} = $$self{_NOTEBOOK}->get_allocated_width - 10;
-            $$self{_CFG}{'tmp'}{'height'} = $$self{_NOTEBOOK}->get_allocated_height - 85;
-        }
+        # Update GUI before querying the size of the embed window
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        # Get available size for the embed window
+        $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_VBOX}->get_allocated_width();
+        $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_VBOX}->get_allocated_height() - $$self{_GUI}{bottombox}->get_allocated_height();
         eval {
-            $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_visible or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_allocated_width;
+            $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_visible() or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_allocated_width();
         };
     } else {
         delete $$self{_CFG}{'tmp'}{'xid'};
@@ -583,8 +582,6 @@ sub lock {
     my $self = shift;
     $$self{_TABBED} and $$self{_GUI}{_TABLBL}->set_sensitive(0);
     $$self{_GUI}{_VBOX}->set_sensitive(0);
-# FIXME-VTE $$self{_GUI}{_VTE}->set_background_transparent(1);
-# FIXME-VTE $$self{_GUI}{_VTE}->set_background_saturation(1);
     $$self{_GUILOCKED} = 1;
     return 1;
 }
@@ -825,7 +822,7 @@ sub _initGUI {
             }
         }
         if ($$self{_CFG}{'defaults'}{'start maximized'}) {
-            $$self{_NOTEBOOKWINDOW}->maximize;
+            $$self{_NOTEBOOKWINDOW}->maximize();
         }
 
     }
@@ -844,14 +841,14 @@ sub _initGUI {
         my $conns_per_row = 2;
         if ($self->{_CLUSTER}) {
             if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
-                my $screen = Gtk3::Gdk::Screen::get_default;
-                my $sw = $screen->get_width;
-                my $sh = $screen->get_height-100;
+                my $screen = Gtk3::Gdk::Screen::get_default();
+                my $sw = $screen->get_width();
+                my $sh = $screen->get_height() - 100;
                 $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
                 my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
-                $hsize=int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                $hsize = int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
                 if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
-                    $vsize=int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                    $vsize = int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
                 } else {
                     $vsize = $sh;
                 }
@@ -859,7 +856,7 @@ sub _initGUI {
         }
         $$self{_WINDOWTERMINAL}->set_default_size($hsize, $vsize);
         if ($$self{_CFG}{'defaults'}{'start maximized'}) {
-            $$self{_WINDOWTERMINAL}->maximize;
+            $$self{_WINDOWTERMINAL}->maximize();
         }
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
@@ -872,9 +869,9 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
         $NPOSX++;
-        if ($NPOSX==$conns_per_row) {
+        if ($NPOSX == $conns_per_row) {
             $NPOSY++;
-            $NPOSX=0;
+            $NPOSX = 0;
         }
     }
 
@@ -3084,7 +3081,7 @@ sub _execute {
         $$self{_EXEC}{FULL_CMD} = $comm;
 
         # Prevent "Remote Executions storms" (half a second between interruptions to spawned processes)
-        my $time = join('.', gettimeofday);
+        my $time = join('.', gettimeofday());
         if (($time - $$self{_EXEC_LAST}) <= $EXEC_STORM_TIME) {
             _wMessage($$self{_WINDOWTERMINAL}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
             return 0;
@@ -3797,7 +3794,7 @@ sub _wFindInTerminal {
         }
         $w{window}{buffer}->set_text($text // '');
 
-        return $w{window}{data}->present;
+        return $w{window}{data}->present();
     }
 
     # Create the 'windowFind' dialog window,
@@ -3826,7 +3823,7 @@ sub _wFindInTerminal {
     $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_from_file($APPICON);
     $w{window}{data}->set_default_size(600, 400);
-    $w{window}{data}->maximize;
+    $w{window}{data}->maximize();
     $w{window}{data}->set_resizable(1);
 
     # Create an hbox
@@ -4180,7 +4177,9 @@ sub _hideEmbedMessages {
     # Hide messages and show the embed window
     $$self{_GUI}{_VTE}->hide();
     $$self{_GUI}{_SOCKET_PARENT_WINDOW}->show_all();
-    $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
+    if ($$self{FOCUS}) {
+        $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
+    }
     $$self{_GUI}{_BTNFOCUS}->set_sensitive(1);
 
     # Next time we click on the button, it will be to hide messages
