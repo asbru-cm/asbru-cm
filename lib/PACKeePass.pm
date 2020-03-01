@@ -406,7 +406,11 @@ sub setRigthClickMenuEntry {
                 my $pos = $input->get_property('cursor_position');
                 my $selection = $self->listEntries($win);
                 if ($selection) {
-                    $input->insert_text("<$field|$selection>", -1, $input->get_position);
+                    if ($field eq 'url') {
+                        $input->set_text("<$field|$selection>");
+                    } else {
+                        $input->insert_text("<$field|$selection>", -1, $input->get_position);
+                    }
                 }
             }
         });
