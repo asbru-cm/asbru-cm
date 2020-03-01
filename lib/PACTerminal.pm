@@ -301,8 +301,9 @@ sub start {
         return 1;
     }
 
-    if ($$self{_CFG}{defaults}{keepass}{use_keepass} && !$ENV{'KPXC_MP'} && ($$self{_UUID} ne '__PAC_SHELL__')) {
-        my $kpxc = PACKeePass->new(0,$$self{_CFG}{defaults}{keepass});
+    # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
+    if (!$ENV{'KPXC_MP'} && $self->_hasKeePassField()) {
+        my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
         $kpxc->getMasterPassword();
     }
 
@@ -4199,6 +4200,24 @@ sub _showEmbedMessages {
     $$self{_GUI}{_BTNLOG}->set_label('Hide _messages');
 }
 
+sub _hasKeePassField {
+    my $self = shift;
+    my $useKeePass = $$self{_CFG}{defaults}{keepass}{use_keepass} && $$self{_UUID} ne '__PAC_SHELL__';
+    my $kpxc;
+
+    if (!$useKeePass) {
+        return 0;
+    }
+
+    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user') {
+        if (PACKeePass->isKeePassMask($self->{_CFG}{'environments'}{$$self{'_UUID'}}{$fieldName})) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4482,6 +4501,10 @@ For an embed connection, hide the console displaying the messages concerning the
 =head2 sub _showEmbedMessages
 
 For an embed connection, show the console displaying the messages concerning the connection.
+
+=head2 sub _hasKeePassField
+
+Returns true (1) if this terminal has a least on field whose value is kept into a KeePass database file
 
 =head1 Vte::Terminal
 
