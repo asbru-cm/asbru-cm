@@ -1007,6 +1007,7 @@ sub _initGUI {
 
     # Build Config window
     $FUNCS{_CONFIG} = $$self{_CONFIG} = PACConfig->new($$self{_CFG});
+
     # Get the KeePass object from configuration
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
@@ -1155,10 +1156,12 @@ sub _setupCallbacks {
                 }
                 ++$total_exp;
             }
+            $ip =~ s/<.+?\|.+?>/******/;
+            $user =~ s/<.+?\|.+?>/******/;
             my $string = "- <b>Name</b>: @{[__($name)]}\n";
             $string .= "- <b>Method</b>: $method\n";
-            $string .= "- <b>IP / port</b>: $ip / $port\n";
-            $string .= "- <b>User</b>: $user";
+            $string .= "- <b>IP / port</b>: @{[__($ip)]}:$port\n";
+            $string .= "- <b>User</b>: @{[__($user)]}";
             if ($total_exp) {
                 $string .= "- With $total_exp active <b>Expects</b>";
             }
@@ -1981,7 +1984,7 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub {
-        $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]);
+        $self->_launchTerminals([[ '__PAC_SHELL__' ]]);
         return 1;
     });
     $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub {
@@ -2039,21 +2042,18 @@ sub _setupCallbacks {
 
         my $page = $$self{_GUI}{nbTree}->get_nth_page($pnum);
 
-        # Connections
         if ($page eq $$self{_GUI}{scroll1}) {
+            # Connections
             $self->_updateGUIPreferences();
-        }
-        # Favourites
-        elsif ($page eq $$self{_GUI}{scroll2}) {
+        } elsif ($page eq $$self{_GUI}{scroll2}) {
+            # Favourites
             $self->_updateFavouritesList();
             $self->_updateGUIFavourites();
-        }
-        # History
-        elsif ($page eq $$self{_GUI}{scroll3}) {
+        } elsif ($page eq $$self{_GUI}{scroll3}) {
+            # History
             $self->_updateGUIHistory();
-        }
-        # Clusters
-        else {
+        } else {
+            # Clusters
             $self->_updateClustersList();
             $self->_updateGUIClusters();
         }
@@ -2065,7 +2065,7 @@ sub _setupCallbacks {
         if (!defined $$self{_GUI}{_PACTABS}) {
             return 1;
         }
-        if  ($$self{_GUI}{nb}->get_n_pages == 0) {
+        if ($$self{_GUI}{nb}->get_n_pages == 0) {
             $$self{_GUI}{_PACTABS}->hide();
         } elsif ($$self{_GUI}{nb}->get_n_pages == 1) {
             $$self{_GUI}{treeConnections}->grab_focus();
@@ -2073,12 +2073,10 @@ sub _setupCallbacks {
 
             if ($$self{_CFG}{defaults}{'when no more tabs'} == 0) {
                 #nothing
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
                 #quit
                 $self->_quitProgram();
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
                     $$self{_TRAY}{_TRAY}->set_active();
@@ -3234,7 +3232,7 @@ sub _launchTerminals {
             $$self{_GUI}{_PACTABS}->present();
         }
 
-        if (! $t->start($keys_buffer)) {
+        if (!$t->start($keys_buffer)) {
             _wMessage($$self{_GUI}{main}, __("ERROR: Could not start terminal '$$self{_CFG}{environments}{ $$t{_UUID} }{title}':\n$$t{ERROR}"), 1);
             next;
         }
@@ -3741,9 +3739,6 @@ sub _updateGUIPreferences {
     }
 
     $self->_clearLeftMenuTabLabels();
-    if ($$self{_CFG}{defaults}{'show tree titles'}) {
-        $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
-    }
 
     $$self{_GUI}{connSearch}->set_sensitive(1);
     $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
@@ -3787,9 +3782,6 @@ sub _updateGUIFavourites {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
-    if ($$self{_CFG}{defaults}{'show tree titles'}) {
-        $$self{_GUI}{nbFavTabLabel}->set_text(' Favourites');
-    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3822,9 +3814,6 @@ sub _updateGUIHistory {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
-    if ($$self{_CFG}{defaults}{'show tree titles'}) {
-        $$self{_GUI}{nbHistTabLabel}->set_text(' History');
-    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3855,9 +3844,6 @@ sub _updateGUIClusters {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
-    if ($$self{_CFG}{defaults}{'show tree titles'}) {
-        $$self{_GUI}{nbCluTabLabel}->set_text(' Clusters');
-    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);

@@ -186,20 +186,20 @@ my $kpxc;
 # Use keepass ?
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     my ($ok);
-    $kpxc = PACKeePass->new(0,$$CFG{'defaults'}{'keepass'});
-    ($USER,$ok) = $kpxc->getFieldValueFromString($USER);
+    $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});
+    ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
     if (!$ok) {
         die "$USER";
     }
-    ($PASS,$ok) = $kpxc->getFieldValueFromString($PASS);
+    ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
     if (!$ok) {
         die "$PASS";
     }
-    ($PASSPHRASE,$ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
+    ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
     if (!$ok) {
         die "$PASSPHRASE";
     }
-    ($PASSPHRASE_USER,$ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
+    ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
     if (!$ok) {
         die "$PASSPHRASE_USER";
     }

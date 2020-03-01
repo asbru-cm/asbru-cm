@@ -80,6 +80,17 @@ sub new {
     return $self;
 }
 
+sub isKeePassMask {
+    my ($class, $str) = @_;
+    return $str =~ /<.+?\|.+>/;
+}
+
+# END: Public class methods
+###################################################################
+
+###################################################################
+# START: Public object methods
+
 sub update {
     my $self = shift;
     my $cfg = shift;
@@ -124,12 +135,12 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($self, 'KeePassXC Integration', "Please, enter KeePassX MASTER password\nto unlock database file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($self, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
-            my ($msg,$flg) = testMasterKey($self,'a','ASBRUKeePassXCTEST');
-            if ((!$flg)&&($msg !~ /ASBRUKeePassXCTEST/)) {
+            my ($msg, $flg) = testMasterKey($self, 'a', 'ASBRUKeePassXCTEST');
+            if (!$flg && $msg !~ /ASBRUKeePassXCTEST/) {
                 $KPXC_MP='';
                 $mp = '';
             }
@@ -143,18 +154,18 @@ sub getMasterPassword {
 }
 
 sub testMasterKey {
-    my ($s,$field,$uid) = @_;
+    my ($self, $field, $uid) = @_;
     my ($pid,$cfg);
     my $ok = 0;
     my @err;
     my @out;
 
-    if ($$s{cfg}) {
-        $cfg = $$s{cfg};
+    if ($$self{cfg}) {
+        $cfg = $$self{cfg};
     } else {
-        $cfg = $s->get_cfg();
+        $cfg = $self->get_cfg();
     }
-    $pid = open3(*Writer,*Reader,*ErrReader,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open3(*Writer, *Reader, *ErrReader, "keepassxc-cli show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -170,30 +181,30 @@ sub testMasterKey {
 }
 
 sub getFieldValueFromString {
-    my ($s,$str) = @_;
-    my ($ok,$value,$field,$uid,$flg,$cfg);
+    my ($self, $str) = @_;
+    my ($ok, $value, $field, $uid, $flg, $cfg);
 
     if (!$str) {
-        return ($str,1);
+        return ($str, 1);
     }
-    if ($str !~ /<.+?\|.+>/) {
-        return ($str,1);
+    if (!PACKeePass->isKeePassMask($str)) {
+        return ($str, 1);
     }
-    if ($$s{cfg}) {
-        $cfg = $$s{cfg};
+    if ($$self{cfg}) {
+        $cfg = $$self{cfg};
     } else {
-        $cfg = $s->get_cfg();
+        $cfg = $self->get_cfg();
     }
     $str =~ s/[<>]//g;
-    ($field,$uid) = split /\|/,$str;
-    ($value,$flg) = $s->getFieldValue($field,$uid);
-    return ($value,$flg);
+    ($field, $uid) = split /\|/, $str;
+    ($value, $flg) = $self->getFieldValue($field, $uid);
+    return ($value, $flg);
 }
 
 sub regexTransform {
-    my ($s,$field,$uid) = @_;
+    my ($self, $field, $uid) = @_;
 
-    my ($value,$flg) = $s->getFieldValue($field,$uid);
+    my ($value, $flg) = $self->getFieldValue($field, $uid);
     if ($flg) {
         return $value;
     }
@@ -201,39 +212,39 @@ sub regexTransform {
 }
 
 sub getFieldValue {
-    my ($s,$field,$uid) = @_;
-    my ($pid,$cfg);
+    my ($self, $field, $uid) = @_;
+    my ($pid, $cfg);
     my $data='';
     my $flg = 0;
     my @out;
 
     $field = lc($field);
     if ($KPXC_CACHE{"$field,$uid"}) {
-        return ($KPXC_CACHE{"$field,$uid"},1);
+        return ($KPXC_CACHE{"$field,$uid"}, 1);
     }
-    if ($$s{cfg}) {
-        $cfg = $$s{cfg};
+    if ($$self{cfg}) {
+        $cfg = $$self{cfg};
     } else {
-        $cfg = $s->get_cfg();
+        $cfg = $self->get_cfg();
     }
     if (!$KPXC_MP) {
         # Get Password from config file or from user
         if ($$cfg{password}) {
             $KPXC_MP = $$cfg{password};
         } else {
-            $s->getMasterPassword();
+            $self->getMasterPassword();
             if (!$KPXC_MP) {
                 # We could not get a valid password
                 return ('Bad key/master password',0);
             }
         }
     }
-    $pid = open2(*Reader,*Writer,"keepassxc-cli show $$s{kpxc_show_protected} $$s{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open2(*Reader, *Writer, "keepassxc-cli show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
     # Wait so we do not create zombies
-    waitpid($pid,0);
+    waitpid($pid, 0);
     close Reader;
     foreach $data (@out) {
         $data =~ s/\n//g;
@@ -244,9 +255,9 @@ sub getFieldValue {
         }
     }
     if ($KPXC_CACHE{"$field,$uid"}) {
-        return ($KPXC_CACHE{"$field,$uid"},1);
+        return ($KPXC_CACHE{"$field,$uid"}, 1);
     }
-    return ('',0);
+    return ('', 0);
 }
 
 sub get_cfg {
@@ -306,48 +317,48 @@ sub listEntries {
     $w{window}{gui}{hbox}->set_border_width(0);
 
     # Create 1st label
-    $w{window}{gui}{lblsearch} = Gtk3::Label->new('Keywords');
-    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblsearch}, 0, 0, 0);
+    $w{window}{gui}{lblsearch} = Gtk3::Label->new('Search database:');
+    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblsearch}, 0, 0, 5);
 
     # Search Entry
-    $w{window}{gui}{entry} = Gtk3::Entry->new;
+    $w{window}{gui}{entry} = Gtk3::Entry->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{entry}, 0, 0, 0);
     $w{window}{gui}{entry}->set_activates_default(1);
     $w{window}{gui}{entry}->set_visibility(1);
-    $w{window}{gui}{scroll1} = Gtk3::ScrolledWindow->new;
+    $w{window}{gui}{scroll1} = Gtk3::ScrolledWindow->new();
     $w{window}{gui}{scroll1}->set_policy('automatic', 'automatic');
     $w{window}{gui}{vbox}->pack_start($w{window}{gui}{scroll1}, 1, 1, 1);
 
-    $w{window}{gui}{treelist} = PACTree->new('Entry:' => 'markup');
+    $w{window}{gui}{treelist} = PACTree->new('Matching entries:' => 'text');
     $w{window}{gui}{scroll1}->add($w{window}{gui}{treelist});
     $w{window}{gui}{treelist}->set_enable_tree_lines(0);
     $w{window}{gui}{treelist}->set_headers_visible(1);
     $w{window}{gui}{treelist}->set_enable_search(1);
     $w{window}{gui}{treelist}->set_has_tooltip(0);
     $w{window}{gui}{treelist}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
-    $w{window}{gui}{treelist}->get_selection->set_mode('GTK_SELECTION_SINGLE');
-    @{$w{window}{gui}{treelist}{'data'}}=();
+    $w{window}{gui}{treelist}->get_selection()->set_mode('GTK_SELECTION_SINGLE');
+    @{$w{window}{gui}{treelist}{'data'}} = ();
 
     $w{window}{gui}{entry}->signal_connect('key_release_event' => sub {
         my ($widget, $event) = @_;
         my @list = ();
 
         if (length($widget->get_text())>0) {
-            @{$w{window}{gui}{treelist}{'data'}}=();
+            @{$w{window}{gui}{treelist}{'data'}} = ();
             @list = $self->_locateEntries($widget->get_text());
             foreach my $el (@list) {
                 if ($el !~ qw|^/|) {
                     next;
                 }
                 $el =~ s/\n//g;
-                $el = decode('UTF-8',$el);
-                push(@{$w{window}{gui}{treelist}{'data'}},{value => [ $el ],children => []});
+                $el = decode('UTF-8', $el);
+                push(@{$w{window}{gui}{treelist}{'data'}}, {value => [ $el ], children => []});
             }
         }
     });
     $w{window}{gui}{treelist}->signal_connect('row_activated' => sub {
-        my $selection = $w{window}{gui}{treelist}->get_selection;
-        my $model = $w{window}{gui}{treelist}->get_model;
+        my $selection = $w{window}{gui}{treelist}->get_selection();
+        my $model = $w{window}{gui}{treelist}->get_model();
         my @paths = _getSelectedRows($selection);
         $entry = $model->get_value($model->get_iter($paths[0]),0);
         $w{window}{data}->response(0);
@@ -356,31 +367,31 @@ sub listEntries {
 
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($parent);
-    $w{window}{data}->show_all;
+    $w{window}{data}->show_all();
 
-    my $ok = $w{window}{data}->run;
+    my $ok = $w{window}{data}->run();
 
     if ($ok eq 'ok') {
-        my $selection = $w{window}{gui}{treelist}->get_selection;
-        my $model = $w{window}{gui}{treelist}->get_model;
+        my $selection = $w{window}{gui}{treelist}->get_selection();
+        my $model = $w{window}{gui}{treelist}->get_model();
         my @paths = _getSelectedRows($selection);
         $entry = $model->get_value($model->get_iter($paths[0]),0);
     }
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
 
     while (Gtk3::events_pending) {
-        Gtk3::main_iteration;
+        Gtk3::main_iteration();
     }
 
     return $entry;
 }
 
 sub setRigthClickMenuEntry {
-    my ($s,$win,$what,$input,$menu_items) = @_;
+    my ($self, $win, $what, $input, $menu_items) = @_;
     my ($lbl,$field);
 
-    if (!$s->getUseKeePass()) {
+    if (!$self->getUseKeePass()) {
         return 0;
     } elsif (!$what) {
         return 0;
@@ -393,7 +404,7 @@ sub setRigthClickMenuEntry {
             tooltip => "KeePassXC $lbl",
             code => sub {
                 my $pos = $input->get_property('cursor_position');
-                my $selection = $s->listEntries($win);
+                my $selection = $self->listEntries($win);
                 if ($selection) {
                     $input->insert_text("<$field|$selection>", -1, $input->get_position);
                 }
@@ -403,28 +414,28 @@ sub setRigthClickMenuEntry {
     return 1;
 }
 
-# END: Public class methods
+# END: Public object methods
 ###################################################################
 
 ###################################################################
 # START: Private functions definitions
 
 sub _locateEntries {
-    my ($s,$str) = @_;
+    my ($self, $str) = @_;
     my ($pid,$cfg);
     my @out;
 
-    if ($$s{cfg}) {
-        $cfg = $$s{cfg};
+    if ($$self{cfg}) {
+        $cfg = $$self{cfg};
     } else {
-        $cfg = $s->get_cfg();
+        $cfg = $self->get_cfg();
     }
     if (!@KPXC_LIST) {
         {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$s{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
             print Writer "$KPXC_MP\n";
             close Writer;
             @KPXC_LIST = <Reader>;
@@ -447,7 +458,7 @@ sub _buildKeePassGUI {
     # Build a vbox
     $w{vbox} = Gtk3::VBox->new(0,0);
 
-    $w{cbUseKeePass} = Gtk3::CheckButton->new('Use KeePassXC ');
+    $w{cbUseKeePass} = Gtk3::CheckButton->new('Activate use of a KeePass database file');
     $w{cbUseKeePass}->set_margin_top(10);
     $w{cbUseKeePass}->set_margin_bottom(5);
     $w{cbUseKeePass}->set_halign('GTK_ALIGN_START');
@@ -468,9 +479,9 @@ sub _buildKeePassGUI {
     $w{btnClearPassFile} = Gtk3::Button->new('Clear');
     $w{hboxkpmain}->pack_start($w{btnClearPassFile}, 0, 1, 0);
 
-    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password '), 0, 1, 0);
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password'), 0, 1, 0);
     $w{entryKeePassPassword} = Gtk3::Entry->new();
-    $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 0, 1, 0);
+    $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 1, 1, 5);
     $w{entryKeePassPassword}->set_visibility(0);
 
     if ($$self{kpxc_keyfile}) {
@@ -597,6 +608,10 @@ Important object variables
 
 Updates configuration settings from current selections in gui
 
+=head2 sub isKeePassMask
+
+Returns true if the given string is a mask for a KeePass entry
+
 =head2 sub getMasterPassword
 
 Routine to ask for master password to user, infinite retries or cancel to exit
@@ -642,4 +657,3 @@ Allow user to select a row and return the selected key path
 head2 sub _locateEntries
 
 Query the complete database for a search pattern and show the entries found in a listbox
-
