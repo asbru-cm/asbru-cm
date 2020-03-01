@@ -4209,8 +4209,14 @@ sub _hasKeePassField {
         return 0;
     }
 
-    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user') {
+    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
         if (PACKeePass->isKeePassMask($self->{_CFG}{'environments'}{$$self{'_UUID'}}{$fieldName})) {
+            return 1;
+        }
+    }
+
+    foreach my $exp (@{$self->{_CFG}{'environments'}{$$self{'_UUID'}}{'expect'}}) {
+        if (PACKeePass->isKeePassMask($$exp{'send'})) {
             return 1;
         }
     }
