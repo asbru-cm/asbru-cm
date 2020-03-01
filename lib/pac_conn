@@ -22,8 +22,6 @@
 ###############################################################################
 
 use utf8;
-binmode STDOUT,':utf8';
-binmode STDERR,':utf8';
 
 $|++;
 
@@ -46,6 +44,9 @@ use PACKeePass;
 use PACUtils;
 
 use Gtk3 '-init';
+
+binmode STDOUT;
+binmode STDERR;
 
 # END OF : Modules import
 ########################################################
@@ -91,7 +92,7 @@ my %COLOR = (
 
 # Create the Expect object
 $Expect::Multiline_Matching = 1;
-my $EXP = new Expect;
+my $EXP = new Expect();
 eval {
     $EXP->slave->clone_winsize_from(\*STDIN);
 };
@@ -104,7 +105,7 @@ eval {
 sub __disconnect {
     my $signal = shift;
     ctrl("DISCONNECTING");
-    $EXP->hard_close;
+    _hardClose($EXP, $UUID);
     ctrl("DISCONNECTED");
     exit 0;
 }
@@ -515,7 +516,7 @@ sub send_slow {
 
 sub _getPrompt {
     # Delete any data accumulated before launching the command
-    $EXP->clear_accum;
+    $EXP->clear_accum();
     $EXP->restart_timeout_upon_receive(1);
 
     send_slow($EXP, "\n");
@@ -541,7 +542,7 @@ sub _execAndCapture {
     $cmd ||= $$ctrl{cmd};
 
     # Delete any data accumulated before launching the command
-    $EXP->clear_accum;
+    $EXP->clear_accum();
     $EXP->restart_timeout_upon_receive(1);
 
     if ($intro) {
@@ -573,7 +574,7 @@ sub _execAndCapture {
         [eof => sub {
             ctrl("ERROR:Connection ended by remote peer!! " . $EXP->set_accum());
             $CONNECTED = 0;
-            $EXP->hard_close;
+            _hardClose($EXP, $UUID);
         }],
 
         [((! defined $pattern && ($pipe || $tee || $capture || defined $ctrl)) ? '##__PAC__PIPE__##' : (defined $pattern ? $pattern : '')) => sub {$ok = 1;}]
@@ -676,7 +677,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_SEND[NAME:$name][PID:$$][PARAMS:$txt]");
 
-        $EXP->clear_accum;
+        $EXP->clear_accum();
         send_slow($EXP, $txt);
     };
     $TERMINAL{send_get} = sub {
@@ -947,19 +948,23 @@ sub _getLocalPort {
     return $LPORT;
 }
 
-# Place any thing that has to be done before a hard_close
+# Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
-    my ($uuid)  = @_;
+    my ($EXP, $uuid)  = @_;
     my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
+    my $sock = "$CFG_DIR/tmp/$uuid.ctl";
 
-    if ($proxy_jump == 2) {
-        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O exit jumpserver";
+    if ($proxy_jump == 2 && -e $sock) {
+        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $sock -T -O exit jumpserver";
     }
     if (-e $pipe) {
         unlink($pipe);
     }
     if ($IS_CLUSTER && ($RESTART == 2)) {
         ctrl('RESTART');
+    }
+    if ($EXP) {
+        $EXP->hard_close();
     }
     return 0;
 }
@@ -968,13 +973,9 @@ sub _hardClose {
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
 BEGIN{
-    eval("use X11::GUITest qw (GetWindowPos GetRootWindow)");
+    eval("use X11::GUITest qw (GetWindowPos GetWindowName)");
 
-    if ($@) {
-        $module_guitest="N";
-    } else {
-        $module_guitest="Y";
-    }
+    $module_guitest = $@ ? "N" : "Y";
 }
 # END OF : Procedures definition
 ########################################################
@@ -1085,10 +1086,18 @@ if (defined $METHOD) {
         } elsif ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD =~ /^.*freerdp$/)) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
+                my $name = GetWindowName($$CFG{'tmp'}{'xid'});
                 if ($Xwidth > 1 && $Xheight > 1) {
                     $$CFG{'tmp'}{'width'} = $Xwidth;
                     $$CFG{'tmp'}{'height'} = $Xheight;
                 }
+            }
+            # Just in case we end up with impossible values
+            if ($$CFG{'tmp'}{'width'} <= 1) {
+                $$CFG{'tmp'}{'width'} = 1024;
+            }
+            if ($$CFG{'tmp'}{'height'} <= 1) {
+                $$CFG{'tmp'}{'height'} = 768;
             }
             $connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
             $connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'<<hidden_password>>'") . " /v:$IP:$PORT";
@@ -1224,8 +1233,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-            _hardClose($UUID);
-            $EXP->hard_close;
+            _hardClose($EXP, $UUID);
         }],
 
         ['\[ERROR\]', sub {
@@ -1237,7 +1245,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             if ($ACCEPT_KEY) {
                 send_slow($EXP, "Y\n");
                 ctrl("HOSTKEY:accepted by configuration (sent 'Y')");
-                exp_continue;
+                exp_continue();
             } else {
                 $CONNECTED = 0;
                 send_slow($EXP, "N\n");
@@ -1248,22 +1256,20 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
 
         # Found login string
         [$USERNAME_PROMPT, sub {
-
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                _hardClose($UUID);
-                $EXP->hard_close();
+                _hardClose($EXP, $UUID);
             }
             $USER_COUNT++;
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
             send_slow($EXP, "$USER\n");
-            exp_continue;
-            }],
+            exp_continue();
+        }],
+
         # Found password/passphrase string
         [$PASSWORD_PROMPT, sub {
-
-        # First password attempt...
+            # First password attempt...
             if (! $PASSWORD_COUNT) {
                 $PASSWORD_COUNT++;
                 if (($PASS eq '<<ASK_PASS>>') || ($MANUAL)) {
@@ -1276,20 +1282,18 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     send_slow($EXP, "$PASS\n", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
-                    exp_continue;
+                    exp_continue();
                 } else {
                     ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
-                    _hardClose($UUID);
-                    $EXP->hard_close;
+                    _hardClose($EXP, $UUID);
                 }
             }
             # ... second password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
-                _hardClose($UUID);
-                $EXP->hard_close;
+                _hardClose($EXP, $UUID);
             }
         }],
     )
@@ -1305,8 +1309,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
             } else {
                 $CONNECTED = 0;
                 ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-                _hardClose($UUID);
-                $EXP->hard_close;
+                _hardClose($EXP, $UUID);
             }
         }],
 
@@ -1314,8 +1317,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-            _hardClose($UUID);
-            $EXP->hard_close;
+            _hardClose($EXP, $UUID);
         }],
 
         # Found login string
@@ -1341,14 +1343,13 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                _hardClose($UUID);
-                $EXP->hard_close();
+                _hardClose($EXP, $UUID);
             }
             $USER_COUNT++;
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
             send_slow($EXP, "$USER\n");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found password/passphrase string
@@ -1366,11 +1367,10 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
                 send_slow($EXP, "$PASS\n", 'hide');
                 $EXP->log_stdout(1);
                 ctrl("PASSWORD:Sent (not shown)");
-                exp_continue;
+                exp_continue();
             } else {
                 ctrl("CLOSE:PASSWORD:Password input cancelled by user");
-                _hardClose($UUID);
-                $EXP->hard_close;
+                _hardClose($EXP, $UUID);
             }
         }],
 
@@ -1424,7 +1424,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 if ($on_fail == -1) {
                     ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                     $CONNECTED = 0;
-                    $EXP->hard_close;
+                    _hardClose($EXP, $UUID);
                 } elsif ($on_fail == -2) {
                     ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                     $CONNECTED = 1;
@@ -1440,7 +1440,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
 
                 $CONNECTED = 0;
                 ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-                $EXP->hard_close();
+                _hardClose($EXP, $UUID);
             }],
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
@@ -1506,21 +1506,19 @@ elsif (!$MANUAL) {
         [timeout => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CONNECT seconds trying to connect or get prompt!!");
-            _hardClose($UUID);
-            $EXP->hard_close();
+            _hardClose($EXP, $UUID);
         }],
 
         [eof => sub {
             $CONNECTED = 0;
             ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-            _hardClose($UUID);
-            $EXP->hard_close();
+            _hardClose($EXP, $UUID);
         }],
 
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
             if ($CONNECTED) {
-                $EXP->exp_continue;
+                $EXP->exp_continue();
             }
             # First 'sudo' password attempt...
             if (! $SUDO_PASSWORD_COUNT) {
@@ -1535,34 +1533,33 @@ elsif (!$MANUAL) {
                     send_slow($EXP, "$SUDO_PASSWORD\n", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:'sudo' password sent (not shown)");
-                    exp_continue;
+                    exp_continue();
                 } else {
                     ctrl("CLOSE:PASSWORD:Password for 'sudo' input cancelled by user");
-                    $EXP->hard_close;
+                    _hardClose($EXP, $UUID);
                 }
             }
             # ... second 'sudo' password attempt: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided 'sudo' password was rejected");
-                _hardClose($UUID);
-                $EXP->hard_close;
+                _hardClose($EXP, $UUID);
             }
         }],
 
         # Found Host-Key verification string
         [$HOSTCHANGE_PROMPT, sub {
-            my $match = $EXP->match;
+            my $match = $EXP->match();
             $match =~ /$HOSTCHANGE_PROMPT/g;
             my ($yes, $no) = ($1, $2);
             if ($ACCEPT_KEY) {
                 send_slow($EXP, "$yes\n");
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
-                exp_continue;
+                exp_continue();
             } else {
                 my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
-                exp_continue;
+                exp_continue();
             }
         }],
 
@@ -1570,12 +1567,12 @@ elsif (!$MANUAL) {
         [$ANYKEY_PROMPT, sub {
             send_slow($EXP, "\n");
             ctrl("PRESSKEY:sending 'return' to continue connecting");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED
         [$REMOTEHOST_PROMPT, sub {
-            my $match = $EXP->match;
+            my $match = $EXP->match();
             chomp $match;
             $match =~ /$REMOTEHOST_PROMPT/go;
             my ($known_hosts, $line) = ($1, $2);
@@ -1600,13 +1597,13 @@ elsif (!$MANUAL) {
 
             if (($USER eq '') && ($USER_COUNT)) {
                 ctrl("CLOSE:LOGIN:Empty username is not valid to login here");
-                $EXP->hard_close();
+                _hardClose($EXP, $UUID);
             }
             $USER_COUNT++;
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
             send_slow($EXP, "$USER\n");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found password/passphrase string
@@ -1619,7 +1616,7 @@ elsif (!$MANUAL) {
                 if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
-                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match;
+                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
@@ -1633,17 +1630,16 @@ elsif (!$MANUAL) {
                     ctrl("PASSWORD:Sent (not shown)");
                     # Next time we will ask the password since the automatic one did not work
                     $PASS = '<<ASK_PASS>>';
-                    exp_continue;
+                    exp_continue();
                 } else {
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
-                    $EXP->hard_close;
+                    _hardClose($EXP, $UUID);
                 }
             }
             # ... too many password attempts: provided password is no longer valid!!
             else {
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
-                _hardClose($UUID);
-                $EXP->hard_close;
+                _hardClose($EXP, $UUID);
             }
         }],
 
@@ -1689,7 +1685,7 @@ elsif (!$MANUAL) {
                         if ($on_fail == -1) {
                             ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                             $CONNECTED = 0;
-                            $EXP->hard_close;
+                            _hardClose($EXP, $UUID);
                         } elsif ($on_fail == -2) {
                             ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                             $CONNECTED = 1;
@@ -1704,24 +1700,23 @@ elsif (!$MANUAL) {
                     [eof => sub {
                         $CONNECTED = 0;
                         ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-                        _hardClose($UUID);
-                        $EXP->hard_close();
+                        _hardClose($EXP, $UUID);
                     }],
 
                     # Found Host-Key verification string
                     [$HOSTCHANGE_PROMPT, sub {
 
-                        my $match = $EXP->match;
+                        my $match = $EXP->match();
                         $match =~ /$HOSTCHANGE_PROMPT/g;
                         my ($yes, $no) = ($1, $2);
                         if ($ACCEPT_KEY) {
                             send_slow($EXP, "$yes\n");
                             ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
-                            exp_continue;
+                            exp_continue();
                         } else {
                             send_slow($EXP, "$no\n");
                             $CONNECTED = 0;
-                            $EXP->hard_close();
+                            _hardClose($EXP, $UUID);
                             ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
                         }
                     }],
@@ -1825,7 +1820,7 @@ $SIG{'HUP'} = sub {
     my $chain_uuid = '';
     my $CHAIN_CFG;
 
-    _hardClose($UUID);
+    _hardClose(undef, $UUID);
 
     if ($INT) {
         return 1;
@@ -1907,7 +1902,7 @@ $SIG{'HUP'} = sub {
                 if ($on_fail == -1) {
                     ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
                     $CONNECTED = 0;
-                    $EXP->hard_close;
+                    _hardClose($EXP, $UUID);
                 } elsif ($on_fail == -2) {
                     ctrl("CHAIN:EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
                     $CONNECTED = 1;
@@ -1923,23 +1918,23 @@ $SIG{'HUP'} = sub {
 
                 $CONNECTED = 0;
                 ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-                $EXP->hard_close();
+                _hardClose($EXP, $UUID);
             }],
 
             # Found Host-Key verification string
             [$HOSTCHANGE_PROMPT, sub {
 
-                my $match = $EXP->match;
+                my $match = $EXP->match();
                 $match =~ /$HOSTCHANGE_PROMPT/go;
                 my ($yes, $no) = ($1, $2);
                 if ($ACCEPT_KEY) {
                     send_slow($EXP, $yes . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250')) ? "\r\f" : "\n");
                     ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
-                    exp_continue;
+                    exp_continue();
                 } else {
                     send_slow($EXP, $no . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250')) ? "\r\f" : "\n");
                     $CONNECTED = 0;
-                    $EXP->hard_close();
+                    _hardClose($EXP, $UUID);
                     ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
                 }
             }],
@@ -2057,7 +2052,7 @@ if ($CONNECTED) {
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
-_hardClose($UUID);
+_hardClose(undef, $UUID);
 
 my $why = $?;
 
@@ -2069,7 +2064,7 @@ if (($why ne 0) && $RESTART) {
 if (defined $EXP->pid) {
     kill(15, $EXP->pid);
 }
-$EXP->hard_close;
+$EXP->hard_close();
 
 close_log_file();
 
