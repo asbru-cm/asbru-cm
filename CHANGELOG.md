@@ -1,5 +1,58 @@
 # Changelog
 
+## [6.1.0rc1](https://github.com/asbru-cm/asbru-cm/tree/6.1.0rc1) (2020-03-01)
+
+[Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.4...6.1.0rc1)
+
+**Implemented enhancements:**
+
+- Add support for the "jump host" functionality of SSH [\#67](https://github.com/asbru-cm/asbru-cm/issues/67)
+
+**Fixed bugs:**
+
+- UTF8 characters not showing properly [\#423](https://github.com/asbru-cm/asbru-cm/issues/423)
+- asbru-cm 6.1.0 rc1 on EL7 does not start [\#417](https://github.com/asbru-cm/asbru-cm/issues/417)
+- ssh port number field too small [\#410](https://github.com/asbru-cm/asbru-cm/issues/410)
+
+**Closed issues:**
+
+- Installation fails in Arch or Manjaro [\#427](https://github.com/asbru-cm/asbru-cm/issues/427)
+- 6.1.0 rc1 SSH saved connections icon \(EL7\) [\#418](https://github.com/asbru-cm/asbru-cm/issues/418)
+- Debian/Ubuntu 16.04 - Error during installation of package due to unmet dependencies [\#405](https://github.com/asbru-cm/asbru-cm/issues/405)
+- Please add support to KeePass 2 Database File [\#400](https://github.com/asbru-cm/asbru-cm/issues/400)
+- Remove Net::Proxy, replace with ssh option parameters [\#323](https://github.com/asbru-cm/asbru-cm/issues/323)
+
+**Merged pull requests:**
+
+- Vncrdpsocksproxy [\#404](https://github.com/asbru-cm/asbru-cm/pull/404) ([hanspr](https://github.com/hanspr))
+- show hidden connection list on info tab selected [\#401](https://github.com/asbru-cm/asbru-cm/pull/401) ([hanspr](https://github.com/hanspr))
+- Find bug266 [\#398](https://github.com/asbru-cm/asbru-cm/pull/398) ([hanspr](https://github.com/hanspr))
+- Fix focus [\#396](https://github.com/asbru-cm/asbru-cm/pull/396) ([hanspr](https://github.com/hanspr))
+- URGENT REGRESSION MISSING KEY FILE [\#394](https://github.com/asbru-cm/asbru-cm/pull/394) ([hanspr](https://github.com/hanspr))
+- Treeview 2 [\#392](https://github.com/asbru-cm/asbru-cm/pull/392) ([hanspr](https://github.com/hanspr))
+- Cluster windows [\#390](https://github.com/asbru-cm/asbru-cm/pull/390) ([hanspr](https://github.com/hanspr))
+- Fix372 2 [\#388](https://github.com/asbru-cm/asbru-cm/pull/388) ([hanspr](https://github.com/hanspr))
+- Proxyvncrdp1 [\#384](https://github.com/asbru-cm/asbru-cm/pull/384) ([hanspr](https://github.com/hanspr))
+- Fixcompact [\#383](https://github.com/asbru-cm/asbru-cm/pull/383) ([hanspr](https://github.com/hanspr))
+- Fix373 [\#377](https://github.com/asbru-cm/asbru-cm/pull/377) ([hanspr](https://github.com/hanspr))
+- Fix372 [\#376](https://github.com/asbru-cm/asbru-cm/pull/376) ([hanspr](https://github.com/hanspr))
+- Handlepipechar [\#375](https://github.com/asbru-cm/asbru-cm/pull/375) ([hanspr](https://github.com/hanspr))
+- Portforward2 [\#371](https://github.com/asbru-cm/asbru-cm/pull/371) ([hanspr](https://github.com/hanspr))
+- Portforward improvement [\#370](https://github.com/asbru-cm/asbru-cm/pull/370) ([hanspr](https://github.com/hanspr))
+- Rdpvnc [\#368](https://github.com/asbru-cm/asbru-cm/pull/368) ([hanspr](https://github.com/hanspr))
+- Moveproxyssh [\#367](https://github.com/asbru-cm/asbru-cm/pull/367) ([hanspr](https://github.com/hanspr))
+- Transientwindows [\#365](https://github.com/asbru-cm/asbru-cm/pull/365) ([hanspr](https://github.com/hanspr))
+- Fix359 [\#362](https://github.com/asbru-cm/asbru-cm/pull/362) ([hanspr](https://github.com/hanspr))
+- Transparency1 [\#360](https://github.com/asbru-cm/asbru-cm/pull/360) ([hanspr](https://github.com/hanspr))
+- Fix67 2 [\#357](https://github.com/asbru-cm/asbru-cm/pull/357) ([hanspr](https://github.com/hanspr))
+- Fix67 1 [\#356](https://github.com/asbru-cm/asbru-cm/pull/356) ([hanspr](https://github.com/hanspr))
+- Fix323 improvements [\#348](https://github.com/asbru-cm/asbru-cm/pull/348) ([hanspr](https://github.com/hanspr))
+- Fix211 [\#339](https://github.com/asbru-cm/asbru-cm/pull/339) ([hanspr](https://github.com/hanspr))
+- Fix208 [\#338](https://github.com/asbru-cm/asbru-cm/pull/338) ([hanspr](https://github.com/hanspr))
+- Fix210 [\#337](https://github.com/asbru-cm/asbru-cm/pull/337) ([hanspr](https://github.com/hanspr))
+- Netproxy remove [\#336](https://github.com/asbru-cm/asbru-cm/pull/336) ([hanspr](https://github.com/hanspr))
+- Fix323 FOR TESTING [\#335](https://github.com/asbru-cm/asbru-cm/pull/335) ([hanspr](https://github.com/hanspr))
+
 ## [6.0.4](https://github.com/asbru-cm/asbru-cm/tree/6.0.4) (2020-02-04)
 
 [Full Changelog](https://github.com/asbru-cm/asbru-cm/compare/6.0.3...6.0.4)
