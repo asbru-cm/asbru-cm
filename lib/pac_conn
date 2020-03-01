@@ -178,9 +178,6 @@ if (!$RESTART && $IS_CLUSTER) {
     $RESTART = 2;
 }
 
-$IP = subst($IP);
-$PORT = subst($PORT);
-
 my $kpxc;
 
 # Use keepass ?
