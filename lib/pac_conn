@@ -22,8 +22,6 @@
 ###############################################################################
 
 use utf8;
-binmode STDOUT,':utf8';
-binmode STDERR,':utf8';
 
 $|++;
 
@@ -46,6 +44,9 @@ use KeePass;
 use PACUtils;
 
 use Gtk3 '-init';
+
+binmode STDOUT;
+binmode STDERR;
 
 # END OF : Modules import
 ########################################################
@@ -91,7 +92,7 @@ my %COLOR = (
 
 # Create the Expect object
 $Expect::Multiline_Matching = 1;
-my $EXP = new Expect;
+my $EXP = new Expect();
 eval {
     $EXP->slave->clone_winsize_from(\*STDIN);
 };
@@ -573,7 +574,7 @@ sub send_slow {
 
 sub _getPrompt {
     # Delete any data accumulated before launching the command
-    $EXP->clear_accum;
+    $EXP->clear_accum();
     $EXP->restart_timeout_upon_receive(1);
 
     send_slow($EXP, "\n");
@@ -599,7 +600,7 @@ sub _execAndCapture {
     $cmd ||= $$ctrl{cmd};
 
     # Delete any data accumulated before launching the command
-    $EXP->clear_accum;
+    $EXP->clear_accum();
     $EXP->restart_timeout_upon_receive(1);
 
     if ($intro) {
@@ -734,7 +735,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_SEND[NAME:$name][PID:$$][PARAMS:$txt]");
 
-        $EXP->clear_accum;
+        $EXP->clear_accum();
         send_slow($EXP, $txt);
     };
     $TERMINAL{send_get} = sub {
@@ -1329,7 +1330,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             if ($ACCEPT_KEY) {
                 send_slow($EXP, "Y\n");
                 ctrl("HOSTKEY:accepted by configuration (sent 'Y')");
-                exp_continue;
+                exp_continue();
             } else {
                 $CONNECTED = 0;
                 send_slow($EXP, "N\n");
@@ -1433,7 +1434,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
             send_slow($EXP, "$USER\n");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found password/passphrase string
@@ -1451,7 +1452,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
                 send_slow($EXP, "$PASS\n", 'hide');
                 $EXP->log_stdout(1);
                 ctrl("PASSWORD:Sent (not shown)");
-                exp_continue;
+                exp_continue();
             } else {
                 ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                 _hardClose($EXP, $UUID);
@@ -1602,7 +1603,7 @@ elsif (!$MANUAL) {
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
             if ($CONNECTED) {
-                $EXP->exp_continue;
+                $EXP->exp_continue();
             }
             # First 'sudo' password attempt...
             if (! $SUDO_PASSWORD_COUNT) {
@@ -1617,7 +1618,7 @@ elsif (!$MANUAL) {
                     send_slow($EXP, "$SUDO_PASSWORD\n", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:'sudo' password sent (not shown)");
-                    exp_continue;
+                    exp_continue();
                 } else {
                     ctrl("CLOSE:PASSWORD:Password for 'sudo' input cancelled by user");
                     _hardClose($EXP, $UUID);
@@ -1632,18 +1633,18 @@ elsif (!$MANUAL) {
 
         # Found Host-Key verification string
         [$HOSTCHANGE_PROMPT, sub {
-            my $match = $EXP->match;
+            my $match = $EXP->match();
             $match =~ /$HOSTCHANGE_PROMPT/g;
             my ($yes, $no) = ($1, $2);
             if ($ACCEPT_KEY) {
                 send_slow($EXP, "$yes\n");
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
-                exp_continue;
+                exp_continue();
             } else {
                 my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
-                exp_continue;
+                exp_continue();
             }
         }],
 
@@ -1651,12 +1652,12 @@ elsif (!$MANUAL) {
         [$ANYKEY_PROMPT, sub {
             send_slow($EXP, "\n");
             ctrl("PRESSKEY:sending 'return' to continue connecting");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED
         [$REMOTEHOST_PROMPT, sub {
-            my $match = $EXP->match;
+            my $match = $EXP->match();
             chomp $match;
             $match =~ /$REMOTEHOST_PROMPT/go;
             my ($known_hosts, $line) = ($1, $2);
@@ -1687,7 +1688,7 @@ elsif (!$MANUAL) {
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
             send_slow($EXP, "$USER\n");
-            exp_continue;
+            exp_continue();
         }],
 
         # Found password/passphrase string
@@ -1700,7 +1701,7 @@ elsif (!$MANUAL) {
                 if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
-                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match;
+                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
@@ -1714,7 +1715,7 @@ elsif (!$MANUAL) {
                     ctrl("PASSWORD:Sent (not shown)");
                     # Next time we will ask the password since the automatic one did not work
                     $PASS = '<<ASK_PASS>>';
-                    exp_continue;
+                    exp_continue();
                 } else {
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     _hardClose($EXP, $UUID);
@@ -1790,13 +1791,13 @@ elsif (!$MANUAL) {
                     # Found Host-Key verification string
                     [$HOSTCHANGE_PROMPT, sub {
 
-                        my $match = $EXP->match;
+                        my $match = $EXP->match();
                         $match =~ /$HOSTCHANGE_PROMPT/g;
                         my ($yes, $no) = ($1, $2);
                         if ($ACCEPT_KEY) {
                             send_slow($EXP, "$yes\n");
                             ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
-                            exp_continue;
+                            exp_continue();
                         } else {
                             send_slow($EXP, "$no\n");
                             $CONNECTED = 0;
@@ -2008,13 +2009,13 @@ $SIG{'HUP'} = sub {
             # Found Host-Key verification string
             [$HOSTCHANGE_PROMPT, sub {
 
-                my $match = $EXP->match;
+                my $match = $EXP->match();
                 $match =~ /$HOSTCHANGE_PROMPT/go;
                 my ($yes, $no) = ($1, $2);
                 if ($ACCEPT_KEY) {
                     send_slow($EXP, $yes . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250')) ? "\r\f" : "\n");
                     ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
-                    exp_continue;
+                    exp_continue();
                 } else {
                     send_slow($EXP, $no . (($METHOD =~ /^.*3270.*$/) || ($METHOD eq 'IBM 3270/5250')) ? "\r\f" : "\n");
                     $CONNECTED = 0;
