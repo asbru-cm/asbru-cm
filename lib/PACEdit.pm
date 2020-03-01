@@ -565,7 +565,9 @@ sub _setupCallbacks {
                 }
             });
 
-            $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
+            if ($w eq 'IP') {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
+            }
 
             _wPopUpMenu(\@menu_items, $event);
 
