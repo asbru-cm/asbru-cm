@@ -22,8 +22,6 @@
 ###############################################################################
 
 use utf8;
-binmode STDOUT,':utf8';
-binmode STDERR,':utf8';
 
 $|++;
 
@@ -46,6 +44,9 @@ use KeePass;
 use PACUtils;
 
 use Gtk3 '-init';
+
+binmode STDOUT;
+binmode STDERR;
 
 # END OF : Modules import
 ########################################################
