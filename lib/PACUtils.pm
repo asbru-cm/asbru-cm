@@ -1359,12 +1359,16 @@ sub _menuFavouriteConnections {
                 submenu => [
                     {label => 'Start',
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
-                        code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);}
+                        code => sub {
+                            $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
+                        }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
                         stockicon => $PACMain::UNITY ? '' : 'pac-chain',
                         sensitive => $$terminal{CONNECTED},
-                        code => sub {$terminal->_wSelectChain($uuid);}
+                        code => sub {
+                            $terminal->_wSelectChain($uuid);
+                        }
                     }
                 ]
             });
@@ -1373,7 +1377,9 @@ sub _menuFavouriteConnections {
                 label => $name,
                 stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
-                code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);}
+                code => sub {
+                    $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
+                }
             });
         }
     }
@@ -1438,12 +1444,16 @@ sub _menuAvailableConnections {
                 submenu => [{
                         label => 'Start',
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
-                        code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);}
+                        code => sub {
+                            $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
+                        }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
                         stockicon => $PACMain::UNITY ? '' : 'pac-chain',
                         sensitive => $$terminal{CONNECTED},
-                        code => sub {$terminal->_wSelectChain($this_uuid);}
+                        code => sub {
+                            $terminal->_wSelectChain($this_uuid);
+                        }
                     }
                 ]
             });
@@ -1452,7 +1462,9 @@ sub _menuAvailableConnections {
                 label => $this_name,
                 stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
-                code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);}
+                code => sub {
+                    $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
+                }
             });
         }
     }
