@@ -3286,7 +3286,7 @@ sub _quitProgram {
                 return 1;
             }
         };
-        if ($changed && (! $$self{_CFG}{defaults}{'save on exit'})) {
+        if ($changed && (!$$self{_CFG}{defaults}{'save on exit'})) {
             my $opt = _wYesNoCancel($$self{_GUI}{main}, "<b>Configuration has changed.</b>\n\nSave changes?");
             $save = $opt eq 'yes';
             if ($opt eq 'cancel') {
@@ -4707,7 +4707,7 @@ sub _setCFGChanged {
     if ($$self{_READONLY}) {
         $$self{_GUI}{saveBtn}->set_label('READ ONLY INSTANCE');
         $$self{_GUI}{saveBtn}->set_sensitive(0);
-    } elsif ($$self{_CFG}{defaults}{'auto save'}) {
+    } elsif ($$self{_CFG}{defaults}{'save on exit'}) {
         $$self{_GUI}{saveBtn}->set_label('Auto saving ACTIVE');
         $$self{_GUI}{saveBtn}->set_tooltip_text('Every configuration change will be saved automatically.  You can disable this feature in Preferences > Main Options.');
         $$self{_GUI}{saveBtn}->set_sensitive(0);
