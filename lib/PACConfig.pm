@@ -907,7 +907,7 @@ sub _updateGUIPreferences {
     }
 
     if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
-        _($self, 'lblRestartRequired')->set_text("(*) Requires restarting PAC for the change(s) to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text() // '') );
+        _($self, 'lblRestartRequired')->set_text("(*) Requires restart to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text() // '') );
     }
 
     # Hide show options not available on choosen layout
