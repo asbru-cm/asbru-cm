@@ -126,7 +126,8 @@ sub new {
 
     my $self = {};
 
-    print STDERR "INFO: Using config directory '$CFG_DIR'\n";
+    print STDERR "INFO: VTE version is " . Vte::get_major_version() . "." . Vte::get_minor_version() . "\n";
+    print STDERR "INFO: Config directory is '$CFG_DIR'\n";
     # Setup some signal handling
     $SIG{'USR1'} = sub {
         #DevNote: option currently disabled
@@ -186,7 +187,7 @@ sub new {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
     }
     $$self{_THEME} = $THEME_DIR;
-    print STDERR "INFO: theme dir '$$self{_THEME}'\n";
+    print STDERR "INFO: Theme directory is '$$self{_THEME}'\n";
 
     _registerPACIcons($THEME_DIR);
     $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");

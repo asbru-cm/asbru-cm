@@ -3133,7 +3133,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                           <object class="GtkLabel" id="lblLayout">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;Main Window Layout *&lt;/b&gt;</property>
+                            <property name="label" translatable="yes">&lt;b&gt;Main Window Layout (*)&lt;/b&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="track_visited_links">False</property>
                           </object>
@@ -3164,7 +3164,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                           <object class="GtkLabel" id="lblLayout1">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;Icons Theme *&lt;/b&gt;</property>
+                            <property name="label" translatable="yes">&lt;b&gt;Icons Theme (*)&lt;/b&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="track_visited_links">False</property>
                           </object>
@@ -4372,7 +4372,7 @@ connecting (timeout is in seconds)</property>
                               <object class="GtkLabel" id="label49">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Unprotected nodes</property>
+                                <property name="label" translatable="yes">Unprotected nodes (*)</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
@@ -4472,7 +4472,7 @@ connecting (timeout is in seconds)</property>
                               <object class="GtkLabel" id="label55">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Protected nodes</property>
+                                <property name="label" translatable="yes">Protected nodes (*)</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
