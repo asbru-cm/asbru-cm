@@ -125,6 +125,7 @@ sub new {
 
     my $self = {};
 
+    print STDERR "INFO: VTE version is " . Vte::get_major_version() . "." . Vte::get_minor_version() . "\n";
     print STDERR "INFO: Using config directory '$CFG_DIR'\n";
     # Setup some signal handling
     $SIG{'USR1'} = sub {
