@@ -453,7 +453,9 @@ sub start {
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
     $$self{_GUI}{_VTE}->grab_focus();
-    $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
+    if (Vte::get_major_version() >= 1 || Vte::get_minor_version() >= 52) {
+        $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
+    }
     return 1;
 }
 
