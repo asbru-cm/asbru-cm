@@ -4797,6 +4797,8 @@ sub _setVteCapabilities {
     my $vte = Vte::Terminal->new();
 
     local $SIG{__WARN__} = sub {};
+    $$self{_Vte}{mayor_version} = Vte::get_major_version();
+    $$self{_Vte}{minor_version} = Vte::get_minor_version();
     eval {
         $vte->set_bold_is_bright(0);
     };
@@ -4813,10 +4815,10 @@ sub _setVteCapabilities {
         $$self{_Vte}{vte_feed_child} = 1;
     };
     $$self{_Vte}{vte_feed_binary} = 0;
-    if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
+    if ($$self{_Vte}{mayor_version} >= 1 or $$self{_Vte}{minor_version} >= 46) {
         $$self{_Vte}{vte_feed_binary} = 1;
     }
-    print STDERR "VTE Capabilities detected\n";
+    print STDERR "VTE Capabilities detected in: $$self{_Vte}{mayor_version}.$$self{_Vte}{minor_version}\n";
     foreach my $k (sort keys %{$$self{_Vte}}) {
         print STDERR "    $k = $$self{_Vte}{$k}\n";
     }
