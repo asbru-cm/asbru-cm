@@ -4838,10 +4838,10 @@ sub _setVteCapabilities {
     }
 
     # Tell the world what we found out
-    print STDERR "VTE $$self{_Vte}{major_version}.$$self{_Vte}{minor_version}\n";
+    print STDERR "INFO: Virtual terminal emulator (VTE) version is $$self{_Vte}{major_version}.$$self{_Vte}{minor_version}\n";
     if ($$self{_VERBOSE}) {
         foreach my $k (sort keys %{$$self{_Vte}}) {
-            print STDERR "    $k = $$self{_Vte}{$k}\n";
+            print STDERR "       - $k = $$self{_Vte}{$k}\n";
         }
     }
 }
