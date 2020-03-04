@@ -545,7 +545,7 @@ sub _exporter {
         $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
     } elsif ($format eq 'debug') {
         $name = 'debug';
-        $suffix = '.txt';
+        $suffix = '.yml';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
         my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
         if (!$answ) {
@@ -573,7 +573,6 @@ sub _exporter {
         if ($out ne 'accept') {
             return 1;
         }
-
         $$self{_WINDOWCONFIG}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
         $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
         while (Gtk3::events_pending) {
@@ -610,7 +609,9 @@ sub _exporter {
 sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
-    $out =~ s/debug\.txt/debug.yml/;
+
+    system "mv -f $file $file.txt";
+    $file .= ".txt";
 
     $SIG{__WARN__} = sub{};
     print STDERR "SAVED IN : $file\nOUT: $out\n";
@@ -620,7 +621,7 @@ sub cleanUpPersonalData {
     my $C = 0;
     while (my $line = <F>) {
         my $next = 0;
-        foreach my $key ('name','send','ip','user','jump ip','jump config') {
+        foreach my $key ('name','send','ip','user','use gui password','prepend command','database','gui password','sudo password') {
             if ($line =~ /^[\t ]+$key:/) {
                 $line =~ s/$key:.+/$key: 'removed'/;
                 $next = 1;
@@ -637,42 +638,46 @@ sub cleanUpPersonalData {
                 $C++;
             }
             $line =~ s/$p:.+/$p: '$p $C'/;
-        } elsif ($line =~ /^[\t ]+global variables:/) {
+        } elsif (($line =~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected):/) && ($line !~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected): \[\]/)) {
+            my $global = 0;
+            my $indent = '';
+            if ($line =~ /global variables/) {
+                $global = 1;
+            }
+            if ($line =~ /^([\t ]+)/) {
+                $indent = $1;
+            }
             print D $line;
             while (my $l = <F>) {
-                if ($l =~ /^(\t|  )\w/) {
+                if ($l =~ /^${indent}\w/) {
                     print D $l;
                     last;
-                } else {
+                } elsif ($global) {
                     next;
+                } elsif ($l =~ /description|expect|send|txt/) {
+                    $l =~ s|(.+?):.+|$1: 'removed'|;
                 }
+                print D $l;
             }
             next;
         } elsif ($line =~ /^[\t ]+options:/) {
-            $line =~ s/\/(d|drive):.+/$1: removed'/;
+            $line =~ s/\/drive:.+?( |\')/\/drive: removed$1/;
+            $line =~ s/\/d:.+?( |\')/\/d: removed$1/;
             if ($line =~ / -(D|L|R)/) {
                 $line =~ s/(^[\t ]+options):.+/$1: 'removed'/;
             }
-        } elsif ($line =~ /^[\t ]+proxy.+?:/) {
+        } elsif (($line =~ /^[\t ]+proxy (ip|pass|user):/)&&($line !~ /^[\t ]+proxy (ip|pass|user): \'\'/)) {
             $line =~ s/(proxy.+?):.+/$1: 'removed'/;
+        } elsif (($line =~ /^[\t ]+jump (config|ip|pass|user|key):/)&&($line !~ /^[\t ]+jump (config|ip|pass|user|key): \'\'/)) {
+            $line =~ s/(jump.+?):.+/$1: 'removed'/;
         } elsif ($line =~ /^[\t ]+description:/) {
             $line =~ s/description:.+/description: 'Description'/;
         } elsif ($line =~ /^[\t ]+public key: (.+)/) {
             $line =~ s/public key:.+/public key: 'uses public key'/;
         } elsif ($line =~ /^[\t ]+pass(word|phrase)?:/) {
             $line =~ s/pass(word|phrase)?:.+/pass$1: 'removed'/;
-        } elsif ($line =~ /^[\t ]+sudo password:/) {
-            $line =~ s/sudo password:.+/sudo password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+gui password:/) {
-            $line =~ s/gui password:.+/gui password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+use gui password:/) {
-            $line =~ s/use gui password:.+/use gui password: 0/;
-        } elsif ($line =~ /^[\t ]+(passphrase|proxy) user:/) {
-            $line =~ s/(passphrase|proxy|jump) user:.+/$1 user: 'removed'/;
-        } elsif ($line =~ /^[\t ]+prepend command:/) {
-            $line =~ s/prepend command:.+/prepend command: 'removed'/;
-        } elsif ($line =~ /^[\t ]+database:/) {
-            $line =~ s/database:.+/database: 'removed'/;
+        } elsif ($line =~ /^[\t ]+passphrase user:/) {
+            $line =~ s/passphrase user:.+/$1 user: 'removed'/;
         }
         $line =~ s|/home/.+|/home/PATH|;
         print D $line;
