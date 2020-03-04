@@ -638,7 +638,7 @@ sub cleanUpPersonalData {
                 $C++;
             }
             $line =~ s/$p:.+/$p: '$p $C'/;
-        } elsif (($line =~ /^[\t ]+(global variables|remote commands|local commands|expect):/) && ($line !~ /^[\t ]+(global variables|remote commands|local commands|expect): \[\]/)) {
+        } elsif (($line =~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected):/) && ($line !~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected): \[\]/)) {
             my $global = 0;
             my $indent = '';
             if ($line =~ /global variables/) {
