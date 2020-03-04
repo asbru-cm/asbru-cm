@@ -45,6 +45,7 @@ use OSSP::uuid;
 use POSIX ":sys_wait_h";
 use POSIX qw (strftime);
 use Crypt::CBC;
+use Vte;
 
 # GTK
 use Gtk3 -init;
@@ -126,7 +127,6 @@ sub new {
 
     my $self = {};
 
-    print STDERR "INFO: VTE version is " . Vte::get_major_version() . "." . Vte::get_minor_version() . "\n";
     print STDERR "INFO: Config directory is '$CFG_DIR'\n";
     # Setup some signal handling
     $SIG{'USR1'} = sub {
@@ -155,6 +155,8 @@ sub new {
     $self->{_SHOWFINDTREE} = 0;
     $self->{_READONLY} = 0;
     $self->{_HAS_FOCUS} = '';
+    $self->{_VERBOSE} = 0;
+    $self->{_Vte} = undef;
 
     @{ $self->{_UNDO} } = ();
     $$self{_GUILOCKED} = 0;
@@ -176,12 +178,19 @@ sub new {
     $self->{_PING} = Net::Ping->new('tcp');
     $self->{_PING}->tcp_service_check(1);
 
+    if (grep({ /^--verbose$/ } @{ $$self{_OPTS} })) {
+        $$self{_VERBOSE} = 1;
+    }
+
     # Read the config/connections file...
     PACUtils::_splash(1, "Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     _readConfiguration($self);
 
     # Set conflictive layout options as early as possible
     _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
+
+    # Test Vte Capabilities
+    _setVteCapabilities($self);
 
     if ($$self{_CFG}{'defaults'}{'theme'}) {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
@@ -3284,7 +3293,7 @@ sub _quitProgram {
                 return 1;
             }
         };
-        if ($changed && (! $$self{_CFG}{defaults}{'save on exit'})) {
+        if ($changed && (!$$self{_CFG}{defaults}{'save on exit'})) {
             my $opt = _wYesNoCancel($$self{_GUI}{main}, "<b>Configuration has changed.</b>\n\nSave changes?");
             $save = $opt eq 'yes';
             if ($opt eq 'cancel') {
@@ -4695,6 +4704,55 @@ sub _ApplyLayout {
         }
         $$self{_GUI}{main}->set_default_size(220,600);
         $$self{_GUI}{main}->resize(220,600);
+    }
+}
+
+# Test various options supported by the VTE library
+# to centralize all tests concerning VTE into a single function
+sub _setVteCapabilities {
+    my $self = shift;
+    my $vte = Vte::Terminal->new();
+
+    local $SIG{__WARN__} = sub {};
+    $$self{_Vte}{major_version} = Vte::get_major_version();
+    $$self{_Vte}{minor_version} = Vte::get_minor_version();
+
+    # Does VTE supports 'set_bold_is_bright'
+    # (supposingly added in v0.52)
+    eval {
+        $vte->set_bold_is_bright(0);
+    };
+    if ($@) {
+        $$self{_Vte}{has_bright} = 0;
+    } else {
+        $$self{_Vte}{has_bright} = 1;
+    }
+
+    # Does VTE supports 1 or 2 parameters for 'feed_child'
+    # (supposingly 1 parameter as of v0.52 but some distros have a special patched version of v0.52 that
+    #  still requires 2 parameters; so let's discover this by trying ;
+    #  See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501)
+    $$self{_Vte}{vte_feed_child} = 0;
+    eval {
+        $vte->feed_child('abc', 3);
+        1;
+    } or do {
+        $$self{_Vte}{vte_feed_child} = 1;
+    };
+
+    # Does VTE supports 1 or 2 parameters for 'feed_child_binary'
+    # (1 parameter as of v0.46)
+    $$self{_Vte}{vte_feed_binary} = 0;
+    if ($$self{_Vte}{major_version} >= 1 or $$self{_Vte}{minor_version} >= 46) {
+        $$self{_Vte}{vte_feed_binary} = 1;
+    }
+
+    # Tell the world what we found out
+    print STDERR "INFO: Virtual terminal emulator (VTE) version is $$self{_Vte}{major_version}.$$self{_Vte}{minor_version}\n";
+    if ($$self{_VERBOSE}) {
+        foreach my $k (sort keys %{$$self{_Vte}}) {
+            print STDERR "       - $k = $$self{_Vte}{$k}\n";
+        }
     }
 }
 

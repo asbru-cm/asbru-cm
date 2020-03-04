@@ -49,6 +49,7 @@ BEGIN {
         print "\t--no-splash : no splash screen on startup\n";
         print "\t--iconified : go to tray once started\n";
         print "\t--readonly : start in read only mode (no config changes allowed)\n";
+        print "\t--verbose : display more debugging information\n";
         print "\n";
         print "See 'man asbru' for additional information.\n";
         print "\n";

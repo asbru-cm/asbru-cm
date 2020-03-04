@@ -273,6 +273,9 @@ sub _setupCallbacks {
     _($self, 'cbCfgShowSudoPassword')->signal_connect('toggled' => sub {
         _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
     });
+    _($self, 'cbCfgAutoSave')->signal_connect('toggled' => sub {
+        _updateSaveOnExit($self);
+    });
 
     #DevNote: option currently disabled
     #_($self, 'btnCheckVersion')->signal_connect('clicked' => sub {
@@ -508,7 +511,7 @@ sub _exporter {
         $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
     } elsif ($format eq 'debug') {
         $name = 'debug';
-        $suffix = '.txt';
+        $suffix = '.yml';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
         my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
         if (!$answ) {
@@ -523,8 +526,8 @@ sub _exporter {
             "$APPNAME (v.$APPVERSION) Choose file to Export configuration as '$format'",
             $$self{_WINDOWCONFIG},
             'GTK_FILE_CHOOSER_ACTION_SAVE',
-            'Export' , 'GTK_RESPONSE_ACCEPT',
             'Cancel' , 'GTK_RESPONSE_CANCEL',
+            'Export' , 'GTK_RESPONSE_ACCEPT',
         );
         $choose->set_do_overwrite_confirmation(1);
         $choose->set_current_folder($ENV{'HOME'} // '/tmp');
@@ -536,7 +539,6 @@ sub _exporter {
         if ($out ne 'accept') {
             return 1;
         }
-
         $$self{_WINDOWCONFIG}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
         $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
         while (Gtk3::events_pending) {
@@ -573,7 +575,9 @@ sub _exporter {
 sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
-    $out =~ s/debug\.txt/debug.yml/;
+
+    system "mv -f $file $file.txt";
+    $file .= ".txt";
 
     $SIG{__WARN__} = sub{};
     print STDERR "SAVED IN : $file\nOUT: $out\n";
@@ -582,41 +586,73 @@ sub cleanUpPersonalData {
     open(D,">:utf8",$out);
     my $C = 0;
     while (my $line = <F>) {
+        my $next = 0;
+        foreach my $key ('name','send','ip','user','use gui password','prepend command','database','gui password','sudo password') {
+            if ($line =~ /^[\t ]+$key:/) {
+                $line =~ s/$key:.+/$key: 'removed'/;
+                $next = 1;
+            }
+            if ($next) {
+                next;
+            }
+        }
         if ($line =~ /KPX title regexp/) {
             $line =~ s/KPX title regexp:.+/KPX title regexp: ''/;
-        } elsif ($line =~ /^[\t ]+(send|ip|user):/) {
-            my $p = $1;
-            $line =~ s/$p:.+/$p: 'removed'/;
         } elsif ($line =~ /^[\t ]+(title|name):/) {
             my $p = $1;
             if ($p eq 'name') {
                 $C++;
             }
             $line =~ s/$p:.+/$p: '$p $C'/;
+        } elsif (($line =~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected):/) && ($line !~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected): \[\]/)) {
+            my $global = 0;
+            my $indent = '';
+            if ($line =~ /global variables/) {
+                $global = 1;
+            }
+            if ($line =~ /^([\t ]+)/) {
+                $indent = $1;
+            }
+            print D $line;
+            while (my $l = <F>) {
+                if ($l =~ /^${indent}\w/) {
+                    print D $l;
+                    last;
+                } elsif ($global) {
+                    next;
+                } elsif ($l =~ /description|expect|send|txt/) {
+                    $l =~ s|(.+?):.+|$1: 'removed'|;
+                }
+                print D $l;
+            }
+            next;
+        } elsif ($line =~ /^[\t ]+options:/) {
+            $line =~ s/\/drive:.+?( |\')/\/drive: removed$1/;
+            $line =~ s/\/d:.+?( |\')/\/d: removed$1/;
+            if ($line =~ / -(D|L|R)/) {
+                $line =~ s/(^[\t ]+options):.+/$1: 'removed'/;
+            }
+        } elsif (($line =~ /^[\t ]+proxy (ip|pass|user):/)&&($line !~ /^[\t ]+proxy (ip|pass|user): \'\'/)) {
+            $line =~ s/(proxy.+?):.+/$1: 'removed'/;
+        } elsif (($line =~ /^[\t ]+jump (config|ip|pass|user|key):/)&&($line !~ /^[\t ]+jump (config|ip|pass|user|key): \'\'/)) {
+            $line =~ s/(jump.+?):.+/$1: 'removed'/;
         } elsif ($line =~ /^[\t ]+description:/) {
             $line =~ s/description:.+/description: 'Description'/;
         } elsif ($line =~ /^[\t ]+public key: (.+)/) {
             $line =~ s/public key:.+/public key: 'uses public key'/;
         } elsif ($line =~ /^[\t ]+pass(word|phrase)?:/) {
             $line =~ s/pass(word|phrase)?:.+/pass$1: 'removed'/;
-        } elsif ($line =~ /^[\t ]+sudo password:/) {
-            $line =~ s/sudo password:.+/sudo password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+gui password:/) {
-            $line =~ s/gui password:.+/gui password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+use gui password:/) {
-            $line =~ s/use gui password:.+/use gui password: 0/;
         } elsif ($line =~ /^[\t ]+passphrase user:/) {
-            $line =~ s/passphrase user:.+/passphrase user: 'removed'/;
-        } else {
-            $line =~ s|/home/(\w+)|/home/USER|;
+            $line =~ s/passphrase user:.+/$1 user: 'removed'/;
         }
+        $line =~ s|/home/.+|/home/PATH|;
         print D $line;
     }
     # Add runtime information
     print D "\n\n#$APPNAME : $APPVERSION\n\n# ENV Data\n";
     my $user = $ENV{USER} ? $ENV{USER} : $ENV{LOGNAME};
     foreach my $k (sort keys %ENV) {
-        if ($ENV{$k} =~ /token|KPXC|PRIVATE/i) {
+        if ($k =~ /token|hostname|startup|KPXC|AUTH/i) {
             next;
         }
         my $str = $ENV{$k};
@@ -880,6 +916,9 @@ sub _updateGUIPreferences {
         }
     }
 
+    # Disable "save on exit" if "auto save" is enabled
+    _updateSaveOnExit($self);
+
     return 1;
 }
 
@@ -1106,6 +1145,12 @@ sub _saveConfiguration {
     map {eval {$$_{'terminal'}->_updateCFG;};} (values %PACMain::RUNNING);
 
     return 1;
+}
+
+sub _updateSaveOnExit {
+    my $self = shift;
+
+    _($self, 'cbCfgSaveOnExit')->set_sensitive(!_($self, 'cbCfgAutoSave')->get_active());
 }
 
 # END: Define PRIVATE CLASS functions
