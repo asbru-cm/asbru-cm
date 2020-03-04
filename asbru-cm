@@ -194,7 +194,7 @@ sub getDesktopEnvironment {
             last;
         }
     }
-    if ($ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
+    if (defined($ENV{'XDG_SESSION_DESKTOP'}) && $ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
         $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
     }
     if (!$ENV{'ASBRU_DESKTOP'}) {
