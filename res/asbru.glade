@@ -3413,6 +3413,8 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">If checked, always ask confirmation before quiting the application.</property>
                                         <property name="receives_default">False</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
@@ -3425,10 +3427,14 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                     </child>
                                     <child>
                                       <object class="GtkCheckButton" id="cbCfgSaveOnExit">
-                                        <property name="label" translatable="yes">Auto save config changes</property>
+                                        <property name="label" translatable="yes">Auto save on exit</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">If checked, any configuration changes will be automatically saved before stopping the application.
+
+If you have the option "Automatically save every configuration change" checked, this option is not relevant.</property>
                                         <property name="receives_default">False</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>

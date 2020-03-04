@@ -273,6 +273,9 @@ sub _setupCallbacks {
     _($self, 'cbCfgShowSudoPassword')->signal_connect('toggled' => sub {
         _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
     });
+    _($self, 'cbCfgAutoSave')->signal_connect('toggled' => sub {
+        _updateSaveOnExit($self);
+    });
 
     #DevNote: option currently disabled
     #_($self, 'btnCheckVersion')->signal_connect('clicked' => sub {
@@ -955,6 +958,9 @@ sub _updateGUIPreferences {
         }
     }
 
+    # Disable "save on exit" if "auto save" is enabled
+    _updateSaveOnExit($self);
+
     return 1;
 }
 
@@ -1182,6 +1188,12 @@ sub _saveConfiguration {
     map {eval {$$_{'terminal'}->_updateCFG;};} (values %PACMain::RUNNING);
 
     return 1;
+}
+
+sub _updateSaveOnExit {
+    my $self = shift;
+
+    _($self, 'cbCfgSaveOnExit')->set_sensitive(!_($self, 'cbCfgAutoSave')->get_active());
 }
 
 # END: Define PRIVATE CLASS functions
