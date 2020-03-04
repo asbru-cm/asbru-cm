@@ -681,7 +681,7 @@ sub cleanUpPersonalData {
     print D "\n\n#$APPNAME : $APPVERSION\n\n# ENV Data\n";
     my $user = $ENV{USER} ? $ENV{USER} : $ENV{LOGNAME};
     foreach my $k (sort keys %ENV) {
-        if ($k =~ /token|hostname|startup/i) {
+        if ($k =~ /token|hostname|startup|KPXC|AUTH/i) {
             next;
         }
         my $str = $ENV{$k};
