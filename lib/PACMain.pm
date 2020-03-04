@@ -155,6 +155,7 @@ sub new {
     $self->{_SHOWFINDTREE} = 0;
     $self->{_READONLY} = 0;
     $self->{_HAS_FOCUS} = '';
+    $self->{_VERBOSE} = 0;
     $self->{_Vte} = undef;
 
     @{ $self->{_UNDO} } = ();
@@ -176,6 +177,10 @@ sub new {
 
     $self->{_PING} = Net::Ping->new('tcp');
     $self->{_PING}->tcp_service_check(1);
+
+    if (grep({ /^--verbose$/ } @{ $$self{_OPTS} })) {
+        $$self{_VERBOSE} = 1;
+    }
 
     # Read the config/connections file...
     PACUtils::_splash(1, "Reading config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
@@ -4818,9 +4823,11 @@ sub _setVteCapabilities {
     if ($$self{_Vte}{mayor_version} >= 1 or $$self{_Vte}{minor_version} >= 46) {
         $$self{_Vte}{vte_feed_binary} = 1;
     }
-    print STDERR "VTE Capabilities detected in: $$self{_Vte}{mayor_version}.$$self{_Vte}{minor_version}\n";
-    foreach my $k (sort keys %{$$self{_Vte}}) {
-        print STDERR "    $k = $$self{_Vte}{$k}\n";
+    print STDERR "VTE $$self{_Vte}{mayor_version}.$$self{_Vte}{minor_version}\n";
+    if ($$self{_VERBOSE}) {
+        foreach my $k (sort keys %{$$self{_Vte}}) {
+            print STDERR "    $k = $$self{_Vte}{$k}\n";
+        }
     }
 }
 
