@@ -10,7 +10,7 @@ env:
   matrix:
     - OS=debian DIST=jessie PACKAGE=deb
     - OS=debian DIST=stretch PACKAGE=deb
-    - OS=debian DIST=buster PACKAGE=deb
+    - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true
     - OS=ubuntu DIST=xenial PACKAGE=deb
     - OS=ubuntu DIST=bionic PACKAGE=deb
     - OS=ubuntu DIST=disco PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
@@ -29,7 +29,10 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
-script: ./build.sh
+    - sudo pip install mkdocs
+script:
+    - ./build.sh
+    - bash scripts/deploy_docs.sh
 deploy:
   - provider: packagecloud
     skip_cleanup: true

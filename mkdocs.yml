@@ -1,0 +1,18 @@
+site_name: Ásbrú Connection Manager - Docs
+docs_dir: doc
+site_dir: out
+site_url: http://docs.librenms.org
+site_author: Ásbrú Connection Manager
+site_description: Ásbrú Connection Manager user and developer documentation
+repo_url: https://github.com/asbru-cm/asbru-cm
+edit_uri: edit/master/doc
+repo_name: GitHub
+theme:
+    name: readthedocs
+nav:
+  - Home: 'index.md'
+  - 1. General:
+      - News: General/NEWS.md
+      - Changelog: General/Changelog.md
+      - Coding standards: General/CODING_STANDARD.md
+      - Code of conduct: General/CODE_OF_CONDUCT.md
