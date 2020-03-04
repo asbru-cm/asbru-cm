@@ -12,4 +12,7 @@ theme:
 nav:
   - Home: 'index.md'
   - 1. General:
+      - News: General/NEWS.md
       - Changelog: General/Changelog.md
+      - Coding standards: General/CODING_STANDARD.md
+      - Code of conduct: General/CODE_OF_CONDUCT.md
