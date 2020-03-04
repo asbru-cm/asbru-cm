@@ -10,5 +10,6 @@ repo_name: GitHub
 theme:
     name: readthedocs
 nav:
+  - Home: 'index.md'
   - 1. General:
       - Changelog: General/Changelog.md
