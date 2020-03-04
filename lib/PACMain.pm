@@ -1,4 +1,5 @@
 package PACMain;
+package PACMain;
 
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
@@ -45,6 +46,7 @@ use OSSP::uuid;
 use POSIX ":sys_wait_h";
 use POSIX qw (strftime);
 use Crypt::CBC;
+use Vte;
 
 # GTK
 use Gtk3 -init;
@@ -126,7 +128,6 @@ sub new {
 
     my $self = {};
 
-    print STDERR "INFO: VTE version is " . Vte::get_major_version() . "." . Vte::get_minor_version() . "\n";
     print STDERR "INFO: Config directory is '$CFG_DIR'\n";
     # Setup some signal handling
     $SIG{'USR1'} = sub {
@@ -155,6 +156,7 @@ sub new {
     $self->{_SHOWFINDTREE} = 0;
     $self->{_READONLY} = 0;
     $self->{_HAS_FOCUS} = '';
+    $self->{_Vte} = undef;
 
     @{ $self->{_UNDO} } = ();
     $$self{_GUILOCKED} = 0;
@@ -182,6 +184,9 @@ sub new {
 
     # Set conflictive layout options as early as possible
     _setSafeLayoutOptions($self,$$self{_CFG}{'defaults'}{'layout'});
+
+    # Test Vte Capabilities
+    _setVteCapabilities($self);
 
     if ($$self{_CFG}{'defaults'}{'theme'}) {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
@@ -4785,6 +4790,36 @@ sub _ApplyLayout {
         }
         $$self{_GUI}{main}->set_default_size(220,600);
         $$self{_GUI}{main}->resize(220,600);
+    }
+}
+
+sub _setVteCapabilities {
+    my $self = shift;
+    my $vte = Vte::Terminal->new();
+
+    local $SIG{__WARN__} = sub {};
+    eval {
+        $vte->set_bold_is_bright(0);
+    };
+    if ($@) {
+        $$self{_Vte}{has_bright} = 0;
+    } else {
+        $$self{_Vte}{has_bright} = 1;
+    }
+    $$self{_Vte}{vte_feed_child} = 0;
+    eval {
+        $vte->feed_child('abc', 3);
+        1;
+    } or do {
+        $$self{_Vte}{vte_feed_child} = 1;
+    };
+    $$self{_Vte}{vte_feed_binary} = 0;
+    if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
+        $$self{_Vte}{vte_feed_binary} = 1;
+    }
+    print STDERR "VTE Capabilities detected\n";
+    foreach my $k (sort keys %{$$self{_Vte}}) {
+        print STDERR "    $k = $$self{_Vte}{$k}\n";
     }
 }
 
