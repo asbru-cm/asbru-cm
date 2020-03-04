@@ -1,5 +1,4 @@
 package PACMain;
-package PACMain;
 
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
