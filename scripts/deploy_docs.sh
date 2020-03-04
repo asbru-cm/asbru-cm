@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
-FULL_REPO="https://${GH_TOKEN}$GH_REPO"
+FULL_REPO="https://${GITHUB_API_KEY}$GH_REPO"
 
 if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     echo "Doc build skipped"
@@ -39,6 +39,12 @@ git config user.email "travis@asbru-cm.net"
 git checkout master
 
 cd ../
+
+gem install rack -v 1.6.4
+gem install github_changelog_generator
+
+github_changelog_generator --token ${GITHUB_API_KEY} --release-branch master --user asbru-cm --project asbru-cm --output doc/General/Changelog.md
+
 mkdocs build --clean
 build_result=$?
 
