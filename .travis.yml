@@ -31,7 +31,7 @@ install:
     - sudo apt-get install git devscripts debhelper quilt
 script:
     - ./build.sh
-    - bash scripts/deploy-docs.sh
+    - bash scripts/deploy_docs.sh
 deploy:
   - provider: packagecloud
     skip_cleanup: true
