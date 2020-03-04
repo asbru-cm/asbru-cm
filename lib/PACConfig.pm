@@ -560,8 +560,8 @@ sub _exporter {
             "$APPNAME (v.$APPVERSION) Choose file to Export configuration as '$format'",
             $$self{_WINDOWCONFIG},
             'GTK_FILE_CHOOSER_ACTION_SAVE',
-            'Export' , 'GTK_RESPONSE_ACCEPT',
             'Cancel' , 'GTK_RESPONSE_CANCEL',
+            'Export' , 'GTK_RESPONSE_ACCEPT',
         );
         $choose->set_do_overwrite_confirmation(1);
         $choose->set_current_folder($ENV{'HOME'} // '/tmp');
@@ -619,17 +619,42 @@ sub cleanUpPersonalData {
     open(D,">:utf8",$out);
     my $C = 0;
     while (my $line = <F>) {
+        my $next = 0;
+        foreach my $key ('name','send','ip','user','jump ip','jump config') {
+            if ($line =~ /^[\t ]+$key:/) {
+                $line =~ s/$key:.+/$key: 'removed'/;
+                $next = 1;
+            }
+            if ($next) {
+                next;
+            }
+        }
         if ($line =~ /KPX title regexp/) {
             $line =~ s/KPX title regexp:.+/KPX title regexp: ''/;
-        } elsif ($line =~ /^[\t ]+(send|ip|user):/) {
-            my $p = $1;
-            $line =~ s/$p:.+/$p: 'removed'/;
         } elsif ($line =~ /^[\t ]+(title|name):/) {
             my $p = $1;
             if ($p eq 'name') {
                 $C++;
             }
             $line =~ s/$p:.+/$p: '$p $C'/;
+        } elsif ($line =~ /^[\t ]+global variables:/) {
+            print D $line;
+            while (my $l = <F>) {
+                if ($l =~ /^(\t|  )\w/) {
+                    print D $l;
+                    last;
+                } else {
+                    next;
+                }
+            }
+            next;
+        } elsif ($line =~ /^[\t ]+options:/) {
+            $line =~ s/\/(d|drive):.+/$1: removed'/;
+            if ($line =~ / -(D|L|R)/) {
+                $line =~ s/(^[\t ]+options):.+/$1: 'removed'/;
+            }
+        } elsif ($line =~ /^[\t ]+proxy.+?:/) {
+            $line =~ s/(proxy.+?):.+/$1: 'removed'/;
         } elsif ($line =~ /^[\t ]+description:/) {
             $line =~ s/description:.+/description: 'Description'/;
         } elsif ($line =~ /^[\t ]+public key: (.+)/) {
@@ -642,18 +667,21 @@ sub cleanUpPersonalData {
             $line =~ s/gui password:.+/gui password: 'removed'/;
         } elsif ($line =~ /^[\t ]+use gui password:/) {
             $line =~ s/use gui password:.+/use gui password: 0/;
-        } elsif ($line =~ /^[\t ]+passphrase user:/) {
-            $line =~ s/passphrase user:.+/passphrase user: 'removed'/;
-        } else {
-            $line =~ s|/home/(\w+)|/home/USER|;
+        } elsif ($line =~ /^[\t ]+(passphrase|proxy) user:/) {
+            $line =~ s/(passphrase|proxy|jump) user:.+/$1 user: 'removed'/;
+        } elsif ($line =~ /^[\t ]+prepend command:/) {
+            $line =~ s/prepend command:.+/prepend command: 'removed'/;
+        } elsif ($line =~ /^[\t ]+database:/) {
+            $line =~ s/database:.+/database: 'removed'/;
         }
+        $line =~ s|/home/.+|/home/PATH|;
         print D $line;
     }
     # Add runtime information
     print D "\n\n#$APPNAME : $APPVERSION\n\n# ENV Data\n";
     my $user = $ENV{USER} ? $ENV{USER} : $ENV{LOGNAME};
     foreach my $k (sort keys %ENV) {
-        if ($ENV{$k} =~ /token/i) {
+        if ($k =~ /token|hostname|startup/i) {
             next;
         }
         my $str = $ENV{$k};
