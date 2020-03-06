@@ -3749,7 +3749,9 @@ sub _updateGUIPreferences {
     }
 
     $self->_clearLeftMenuTabLabels();
-
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
+    }
     $$self{_GUI}{connSearch}->set_sensitive(1);
     $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
     $$self{_GUI}{connAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
@@ -3792,6 +3794,9 @@ sub _updateGUIFavourites {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbFavTabLabel}->set_text(' Favourites');
+    }
 
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
@@ -3824,7 +3829,9 @@ sub _updateGUIHistory {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
-
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbHistTabLabel}->set_text(' History');
+    }
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
     $$self{_GUI}{connAddBtn}->set_sensitive(0);
@@ -3854,7 +3861,9 @@ sub _updateGUIClusters {
     my $uuid = $sel_uuids[0];
 
     $self->_clearLeftMenuTabLabels();
-
+    if ($$self{_CFG}{defaults}{'show tree titles'}) {
+        $$self{_GUI}{nbCluTabLabel}->set_text(' Clusters');
+    }
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
     $$self{_GUI}{connAddBtn}->set_sensitive(0);
