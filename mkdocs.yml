@@ -17,6 +17,7 @@ nav:
       - Installation: General/Installation.md
   - 2. Managing:
       - Clusters: Managing/Clusters.md
-  - 3. Contributing: 'Contributing/index.md'
+  - 3. Contributing: 
+      - Contributing: Contributing/index.md 
       - Coding standards: Contributing/CODING_STANDARD.md
       - Code of conduct: Contributing/CODE_OF_CONDUCT.md
