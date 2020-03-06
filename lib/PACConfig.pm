@@ -665,7 +665,7 @@ sub cleanUpPersonalData {
             next;
         } elsif ($line =~ /^[\t ]+options:/) {
             $line =~ s/\/drive:.+?( |\')/\/drive: removed$1/;
-            $line =~ s/-r disk:.+?( |\')/-r disk: removed$1/;
+            $line =~ s/ disk:.+?( |\')/ disk: removed$1/;
             $line =~ s/\/d:.+?( |\')/\/d: removed$1/;
             $line =~ s/-d .+?( |\')/-d removed$1/;
             if ($line =~ / -(D|L|R)/) {
