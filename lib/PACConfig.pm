@@ -624,7 +624,7 @@ sub cleanUpPersonalData {
     my $C = 0;
     while (my $line = <F>) {
         my $next = 0;
-        foreach my $key ('name','send','ip','user','use gui password','prepend command','database','gui password','sudo password') {
+        foreach my $key ('name','send','ip','user','prepend command','database','gui password','sudo password') {
             if ($line =~ /^[\t ]+$key:/) {
                 $line =~ s/$key:.+/$key: 'removed'/;
                 $next = 1;
@@ -665,7 +665,9 @@ sub cleanUpPersonalData {
             next;
         } elsif ($line =~ /^[\t ]+options:/) {
             $line =~ s/\/drive:.+?( |\')/\/drive: removed$1/;
+            $line =~ s/-r disk:.+?( |\')/-r disk: removed$1/;
             $line =~ s/\/d:.+?( |\')/\/d: removed$1/;
+            $line =~ s/-d .+?( |\')/-d removed$1/;
             if ($line =~ / -(D|L|R)/) {
                 $line =~ s/(^[\t ]+options):.+/$1: 'removed'/;
             }
@@ -679,6 +681,8 @@ sub cleanUpPersonalData {
             $line =~ s/public key:.+/public key: 'uses public key'/;
         } elsif ($line =~ /^[\t ]+pass(word|phrase)?:/) {
             $line =~ s/pass(word|phrase)?:.+/pass$1: 'removed'/;
+        } elsif ($line =~ /^[\t ]+use gui password( tray)?:/) {
+            $line =~ s/use gui password( tray)?:.+/use gui password$1: \'\'/;
         } elsif ($line =~ /^[\t ]+passphrase user:/) {
             $line =~ s/passphrase user:.+/$1 user: 'removed'/;
         }
