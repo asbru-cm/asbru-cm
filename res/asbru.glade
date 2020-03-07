@@ -3,7 +3,7 @@
 
 This file is part of Ásbrú Connection Manager.
 
-Copyright (C) 2017-2019 Ásbrú Connection Manager team (https://asbru-cm.net)
+Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
 Copyright (C) 2010-2016 David Torrejon Vaquerizas
 
 Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -26,7 +26,7 @@ If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-license-type gplv3 -->
   <!-- interface-name \303\201sbr\303\272 Connection Manager -->
   <!-- interface-description \303\201sbr\303\272 Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks. https://www.asbru-cm.net/ -->
-  <!-- interface-copyright 2017 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
+  <!-- interface-copyright 2017-2020 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <!-- interface-authors \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <object class="GtkAdjustment" id="adjConnPort">
     <property name="lower">1</property>
@@ -434,6 +434,21 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         <property name="position">1</property>
                                                       </packing>
                                                     </child>
+                                                    <child>
+                                                      <object class="GtkButton" id="btnCheckKPX">
+                                                        <property name="use_action_appearance">False</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="receives_default">True</property>
+                                                        <property name="tooltip_markup" translatable="yes">Search KeePass Database</property>
+                                                        <property name="margin_left">12</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="position">3</property>
+                                                      </packing>
+                                                    </child>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
@@ -667,85 +682,6 @@ Applies to automated actions:
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="orientation">vertical</property>
-                                                    <child>
-                                                      <object class="GtkBox" id="hboxKeePass">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
-                                                        <property name="tooltip_text" translatable="yes">Activate KeePassX integration from "Preferences" -&gt; "KeePassX Options"</property>
-                                                        <child>
-                                                          <object class="GtkCheckButton" id="cbInferUserPassKPX">
-                                                            <property name="label" translatable="yes">Infer 'User / Password' from KeePassX where:</property>
-                                                            <property name="use_action_appearance">False</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">False</property>
-                                                            <property name="xalign">0.5</property>
-                                                            <property name="draw_indicator">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">0</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkComboBoxText" id="comboKPXWhere">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">1</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkLabel" id="label92">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes"> matches Perl RegExp </property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">2</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkEntry" id="entryKPXRE">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">●</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">3</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkButton" id="btnCheckKPX">
-                                                            <property name="label" translatable="yes">Check</property>
-                                                            <property name="use_action_appearance">False</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">False</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">4</property>
-                                                          </packing>
-                                                        </child>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">True</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">0</property>
-                                                      </packing>
-                                                    </child>
                                                     <child>
                                                       <object class="GtkBox" id="hboxCfgAuthUserPass">
                                                         <property name="visible">True</property>
@@ -1110,6 +1046,8 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <object class="GtkSeparator" id="hseparator4">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -1125,7 +1063,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                             <property name="tooltip_text" translatable="yes">Do no automate any password (anyway, if a username is provided, it will be passed as well)</property>
                                             <child>
                                               <object class="GtkRadioButton" id="rbCfgAuthManual">
-                                                <property name="label" translatable="yes">Manual:</property>
+                                                <property name="label" translatable="yes">Manual</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
@@ -1144,7 +1082,9 @@ If not specified or invalid, the default SSH private key of your system will be 
                                               <object class="GtkLabel" id="alignManual">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Do not auto-login nor check for EXPECT. Manual user and/or password enter.</property>
+                                                <property name="margin_left">9</property>
+                                                <property name="label" translatable="yes">&lt;i&gt;Do not auto-login nor check for EXPECT. Manual user and/or password enter.&lt;/i&gt;</property>
+                                                <property name="use_markup">True</property>
                                                 <property name="xalign">0</property>
                                               </object>
                                               <packing>
@@ -1170,6 +1110,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                             <property name="has_tooltip">True</property>
                                             <property name="tooltip_text" translatable="yes">Checking this may improve login speed on some systems, but may break compatibility with SSH agent, Seahorse, ...</property>
                                             <property name="halign">start</property>
+                                            <property name="margin_top">7</property>
                                             <property name="xalign">0.5</property>
                                             <property name="draw_indicator">True</property>
                                           </object>
@@ -1804,15 +1745,15 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                             <property name="spacing">11</property>
                             <child>
                               <object class="GtkRadioButton" id="rbUseProxyIfCFG">
-                                <property name="label" translatable="yes">Use the global network settings</property>
+                                <property name="label" translatable="yes">Use global proxy options</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">If selected, use settings defined in the Preferences &gt; Network Settings.</property>
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
-                                <property name="tooltip_text" translatable="yes">If selected, use settings defined in the Preferences > Network Settings.</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1826,10 +1767,10 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">If selected, ignore any settings defined in the Preferences &gt; Network Settings and do not use any intermediate proxy or jump host to connect to the destination.</property>
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
-                                <property name="tooltip_text" translatable="yes">If selected, ignore any settings defined in the Preferences > Network Settings and do not use any intermediate proxy or jump host to connect to the destination.</property>
                                 <property name="group">rbUseProxyIfCFG</property>
                               </object>
                               <packing>
@@ -1849,6 +1790,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
+                                    <property name="tooltip_text" translatable="yes">SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.</property>
                                     <property name="halign">start</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
@@ -2047,10 +1989,10 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
-                                    <property name="halign">start</property>
                                     <property name="tooltip_text" translatable="yes">If selected, use a jump host for this connection.
 
 An alternative to SSH tunneling to access internal machines through gateway.</property>
+                                    <property name="halign">start</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
                                     <property name="group">rbUseProxyIfCFG</property>
@@ -2099,7 +2041,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                               <object class="GtkLabel" id="label124">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">IP / Host:</property>
+                                                <property name="label" translatable="yes">IP / Host</property>
                                               </object>
                                             </child>
                                           </object>
@@ -2217,7 +2159,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="focus_on_click">False</property>
-                                            <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump host</property>
+                                            <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump server</property>
                                             <property name="create_folders">False</property>
                                             <property name="local_only">False</property>
                                             <property name="preview_widget_active">False</property>
@@ -2254,7 +2196,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">3</property>
+                                    <property name="position">1</property>
                                   </packing>
                                 </child>
                               </object>
@@ -3413,9 +3355,9 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text" translatable="yes">If checked, always ask confirmation before quiting the application.</property>
-                                        <property name="receives_default">False</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -3431,11 +3373,11 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text" translatable="yes">If checked, any configuration changes will be automatically saved before stopping the application.
 
 If you have the option "Automatically save every configuration change" checked, this option is not relevant.</property>
-                                        <property name="receives_default">False</property>
                                         <property name="xalign">0.5</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -4355,7 +4297,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">7</property>
+                        <property name="position">8</property>
                       </packing>
                     </child>
                     <child>
@@ -4584,7 +4526,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">8</property>
+                        <property name="position">9</property>
                       </packing>
                     </child>
                     <child>
@@ -4597,7 +4539,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">9</property>
+                        <property name="position">10</property>
                       </packing>
                     </child>
                     <child>
@@ -4804,7 +4746,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">10</property>
+                        <property name="position">11</property>
                       </packing>
                     </child>
                     <child>
@@ -4816,7 +4758,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="position">11</property>
+                        <property name="position">12</property>
                       </packing>
                     </child>
                   </object>
@@ -8201,8 +8143,8 @@ Changes apply to next opened connections, not current</property>
                   <object class="GtkAlignment" id="aCfgProxy">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xscale">0.94999998807907104</property>
-                    <property name="left_padding">4</property>
+                    <property name="top_padding">12</property>
+                    <property name="left_padding">12</property>
                     <child>
                       <object class="GtkBox" id="vboxProxy">
                         <property name="visible">True</property>
@@ -8211,18 +8153,18 @@ Changes apply to next opened connections, not current</property>
                         <property name="spacing">8</property>
                         <child>
                           <object class="GtkRadioButton" id="cbCfgProxyNo">
-                            <property name="label" translatable="yes">Use a direct connection</property>
+                            <property name="label" translatable="yes">Do not use proxy</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="halign">start</property>
-                            <property name="xalign">0</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
                             <property name="tooltip_text" translatable="yes">If selected, do not use any intermediate proxy or jump host to connect to the destination.
                             
 For each connection, it is still possible to define a particular proxy or jump host.
 </property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8237,12 +8179,12 @@ For each connection, it is still possible to define a particular proxy or jump h
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkRadioButton" id="cbCfgProxyManual">
-                                <property name="label" translatable="yes">Use a SOCKS proxy</property>
+                                <property name="label" translatable="yes">SOCKS proxy</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">If selected, use a SOCKS proxy for all SSH/RDP/VNC/SFTP connections.
+                                <property name="tooltip_text" translatable="yes">If selected, use a SOCKS proxy for all connections.
 
 SOCKS is an Internet protocol that exchanges network packets between a client and server through a proxy server.
 
@@ -8437,17 +8379,17 @@ For all other types of connection, this setting will be ignored.
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkRadioButton" id="cbCfgProxyJump">
-                                <property name="label" translatable="yes">Use a Jump Host</property>
+                                <property name="label" translatable="yes">Use Jump Server</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="halign">start</property>
                                 <property name="tooltip_text" translatable="yes">If selected, use a jump host for all SSH connections.
 
 Jump host is an alternative to SSH tunneling to access internal machines through gateway.
 
 For all other types of connection, this setting will be ignored.
 </property>
+                                <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">cbCfgProxyNo</property>
@@ -8483,7 +8425,7 @@ For all other types of connection, this setting will be ignored.
                                               <object class="GtkEntry" id="entryCfgJumpIP">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
-                                                <property name="tooltip_text" translatable="yes">Host name or IP address of the jump host</property>
+                                                <property name="tooltip_text" translatable="yes">Host name or IP address of the jump server</property>
                                                 <property name="invisible_char">•</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
@@ -8611,7 +8553,7 @@ For all other types of connection, this setting will be ignored.
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="focus_on_click">False</property>
-                                        <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump host</property>
+                                        <property name="tooltip_text" translatable="yes">SSH private key to use to connect to the jump server</property>
                                         <property name="create_folders">False</property>
                                         <property name="local_only">False</property>
                                         <property name="preview_widget_active">False</property>
@@ -8949,7 +8891,11 @@ For all other types of connection, this setting will be ignored.
                   <object class="GtkLabel" id="label75">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">&lt;b&gt; KeePass Options&lt;/b&gt;</property>
+                    <property name="margin_bottom">8</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Integration of a KeePass database file&lt;/b&gt;
+&lt;small&gt;
+Ásbrú is using the command line interface of &lt;a href="https://keepassxc.org"&gt;KeePassXC&lt;/a&gt;
+to read any KeePass database file and use any entry to automate connection inside Ásbrú.&lt;/small&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -8980,7 +8926,7 @@ For all other types of connection, this setting will be ignored.
                   <object class="GtkLabel" id="label17">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">KeePassX Options</property>
+                    <property name="label" translatable="yes">KeePass Integration</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
