@@ -3105,7 +3105,7 @@ sub _showAboutWindow {
         $$self{_GUI}{main},(
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
-        "logo" => _pixBufFromFile("$THEME_DIR/asbru-logo-400.png"),
+        "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
         "copyright" => "Copyright (C) 2017-2020 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
