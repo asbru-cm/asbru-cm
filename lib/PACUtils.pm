@@ -439,7 +439,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
@@ -510,7 +510,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
@@ -575,7 +575,7 @@ sub _getMethods {
             _($self, 'labelIP')->set_text('Host: ');
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -643,7 +643,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'rbCfgAuthManual')->set_active(1);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -703,7 +703,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -754,7 +754,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_text('');
             _($self, 'entryPassword')->set_text('');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
@@ -820,7 +820,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -884,7 +884,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -949,7 +949,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1017,7 +1017,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1086,7 +1086,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1151,7 +1151,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');

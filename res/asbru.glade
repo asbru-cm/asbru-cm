@@ -434,21 +434,6 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         <property name="position">1</property>
                                                       </packing>
                                                     </child>
-                                                    <child>
-                                                      <object class="GtkButton" id="btnCheckKPX">
-                                                        <property name="use_action_appearance">False</property>
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="receives_default">True</property>
-                                                        <property name="tooltip_markup" translatable="yes">Search KeePass Database</property>
-                                                        <property name="margin_left">12</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">3</property>
-                                                      </packing>
-                                                    </child>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
@@ -650,17 +635,56 @@ Applies to automated actions:
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkFrame" id="frameAuthMethod">
+                              <object class="GtkBox" id="vboxAuthMethod">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="border_width">2</property>
-                                <property name="label_xalign">0</property>
-                                <property name="shadow_type">none</property>
+                                <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkAlignment" id="alignAuthMethod">
+                                  <object class="GtkBox" id="hboxAuthMethodTitle">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="xscale">0.94999998807907104</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label94">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xpad">0</property>
+                                        <property name="label" translatable="yes"> &lt;b&gt;Authentication&lt;/b&gt; </property>
+                                        <property name="use_markup">True</property>
+                                        <property name="wrap">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btnCheckKPX">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="tooltip_markup" translatable="yes">Search KeePass Database</property>
+                                        <property name="halign">end</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">12</property>
+                                        <property name="pack_type">end</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkAlignment" id="alignAuthMethod">
+                                    <property name="can_focus">False</property>
                                     <child>
                                       <object class="GtkBox" id="vbox32">
                                         <property name="visible">True</property>
@@ -776,7 +800,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                             <property name="receives_default">False</property>
                                                             <property name="has_tooltip">True</property>
                                                             <property name="tooltip_text" translatable="yes">Show/hide password</property>
-                                                            <property name="xalign">0.5</property>
+                                                            <property name="xalign">0</property>
                                                             <property name="draw_indicator">True</property>
                                                             </object>
                                                             <packing>
@@ -818,7 +842,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="tooltip_text" translatable="yes">Use a user name and a password to authenticate to the target server.</property>
-                                                <property name="xalign">0.5</property>
+                                                <property name="xalign">0</property>
                                                 <property name="active">True</property>
                                                 <property name="draw_indicator">True</property>
                                               </object>
@@ -1002,7 +1026,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                                             <property name="receives_default">False</property>
                                                             <property name="has_tooltip">True</property>
                                                             <property name="tooltip_text" translatable="yes">Show/hide password</property>
-                                                            <property name="xalign">0.5</property>
+                                                            <property name="xalign">0</property>
                                                             <property name="draw_indicator">True</property>
                                                           </object>
                                                           <packing>
@@ -1030,7 +1054,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="tooltip_text" translatable="yes">Use an SSH private to authenticate on the target server.</property>
-                                                <property name="xalign">0.5</property>
+                                                <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                                 <property name="group">rbCfgAuthUserPass</property>
                                               </object>
@@ -1068,7 +1092,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
-                                                <property name="xalign">0.5</property>
+                                                <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                                 <property name="group">rbCfgAuthUserPass</property>
                                               </object>
@@ -1082,7 +1106,6 @@ If not specified or invalid, the default SSH private key of your system will be 
                                               <object class="GtkLabel" id="alignManual">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="margin_left">9</property>
                                                 <property name="label" translatable="yes">&lt;i&gt;Do not auto-login nor check for EXPECT. Manual user and/or password enter.&lt;/i&gt;</property>
                                                 <property name="use_markup">True</property>
                                                 <property name="xalign">0</property>
@@ -1111,7 +1134,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                             <property name="tooltip_text" translatable="yes">Checking this may improve login speed on some systems, but may break compatibility with SSH agent, Seahorse, ...</property>
                                             <property name="halign">start</property>
                                             <property name="margin_top">7</property>
-                                            <property name="xalign">0.5</property>
+                                            <property name="xalign">0</property>
                                             <property name="draw_indicator">True</property>
                                           </object>
                                           <packing>
@@ -1123,20 +1146,17 @@ If not specified or invalid, the default SSH private key of your system will be 
                                       </object>
                                     </child>
                                   </object>
-                                </child>
-                                <child type="label">
-                                  <object class="GtkLabel" id="label94">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes"> &lt;b&gt;Authentication&lt;/b&gt; </property>
-                                    <property name="use_markup">True</property>
-                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
                                 </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                           </object>
