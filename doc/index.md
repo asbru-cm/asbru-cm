@@ -1,14 +1,6 @@
-# Ásbrú Connection Manager
-
-[![Travis][travis-badge]][travis-url]
-[![License][license-badge]][license-url]
-[![RPM Packages][rpm-badge]][rpm-url]
-[![Debian Packages][deb-badge]][deb-url]
-[![Liberapay][liberapay-badge]][liberapay-url]
-
 [<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
 
-## A free and open-source connection manager
+### A free and open-source connection manager
 
 **Ásbrú Connection Manager** is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 
@@ -34,34 +26,6 @@
 - Seamless Gnome/Gtk integration
 - Tray icon for 'right button' quick launching of managed connections. Screenshots and statistics.
 - DEB, RPM and .TAR.GZ packages available
-
-### Installation
-
-We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [packagecould.io](https://packagecloud.io/).
-
-To do so, execute the following commands:
-
-- Debian / Ubuntu
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
-  ````
-
-- Fedora
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
-  ````
-
-- Arch / Manjaro
-
-  ````
-  yaourt -S asbru-cm-git
-  ````
-
-Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
 ### Testing new features
 
@@ -116,12 +80,6 @@ You are welcome to contribute and test by checking out "loki" or by installing o
   As [David Torrejon Vaquerizas](https://github.com/perseo22), the author of PAC Manager, could not find time, for some reasons that we respect, to continue the work on his project and was not open for external contributions ([see this](https://github.com/perseo22/pacmanager/issues/57)), a fork was needed to ensure the future and give the opportunity to the community to take over.
 
 More questions can be found on the [dedicated project wiki page](https://github.com/asbru-cm/asbru-cm/wiki/Frequently-Asked-Questions).
-
-### Contributing
-
-If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
-
-Before contributing, please review our [contributing doc](https://github.com/asbru-cm/asbru-cm/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/asbru-cm/blob/master/CODE_OF_CONDUCT.md).
 
 ### License
 
