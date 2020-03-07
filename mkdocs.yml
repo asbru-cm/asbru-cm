@@ -14,5 +14,10 @@ nav:
   - 1. General:
       - News: General/NEWS.md
       - Changelog: General/Changelog.md
-      - Coding standards: General/CODING_STANDARD.md
-      - Code of conduct: General/CODE_OF_CONDUCT.md
+      - Installation: General/Installation.md
+  - 2. Managing:
+      - Clusters: Managing/Clusters.md
+  - 3. Contributing: 
+      - Contributing: Contributing/index.md 
+      - Coding standards: Contributing/CODING_STANDARD.md
+      - Code of conduct: Contributing/CODE_OF_CONDUCT.md
