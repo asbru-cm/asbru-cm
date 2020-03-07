@@ -1017,6 +1017,7 @@ sub _initGUI {
 
     # Build Config window
     $FUNCS{_CONFIG} = $$self{_CONFIG} = PACConfig->new($$self{_CFG});
+
     # Get the KeePass object from configuration
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
@@ -1165,10 +1166,12 @@ sub _setupCallbacks {
                 }
                 ++$total_exp;
             }
+            $ip =~ s/<.+?\|.+?>/******/;
+            $user =~ s/<.+?\|.+?>/******/;
             my $string = "- <b>Name</b>: @{[__($name)]}\n";
             $string .= "- <b>Method</b>: $method\n";
-            $string .= "- <b>IP / port</b>: $ip / $port\n";
-            $string .= "- <b>User</b>: $user";
+            $string .= "- <b>IP / port</b>: @{[__($ip)]}:$port\n";
+            $string .= "- <b>User</b>: @{[__($user)]}";
             if ($total_exp) {
                 $string .= "- With $total_exp active <b>Expects</b>";
             }
@@ -1991,7 +1994,7 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{shellBtn}->signal_connect('clicked' => sub {
-        $self->_launchTerminals([ [ '__PAC_SHELL__' ] ]);
+        $self->_launchTerminals([[ '__PAC_SHELL__' ]]);
         return 1;
     });
     $$self{_GUI}{clusterBtn}->signal_connect('clicked' => sub {
@@ -2049,21 +2052,18 @@ sub _setupCallbacks {
 
         my $page = $$self{_GUI}{nbTree}->get_nth_page($pnum);
 
-        # Connections
         if ($page eq $$self{_GUI}{scroll1}) {
+            # Connections
             $self->_updateGUIPreferences();
-        }
-        # Favourites
-        elsif ($page eq $$self{_GUI}{scroll2}) {
+        } elsif ($page eq $$self{_GUI}{scroll2}) {
+            # Favourites
             $self->_updateFavouritesList();
             $self->_updateGUIFavourites();
-        }
-        # History
-        elsif ($page eq $$self{_GUI}{scroll3}) {
+        } elsif ($page eq $$self{_GUI}{scroll3}) {
+            # History
             $self->_updateGUIHistory();
-        }
-        # Clusters
-        else {
+        } else {
+            # Clusters
             $self->_updateClustersList();
             $self->_updateGUIClusters();
         }
@@ -2075,7 +2075,7 @@ sub _setupCallbacks {
         if (!defined $$self{_GUI}{_PACTABS}) {
             return 1;
         }
-        if  ($$self{_GUI}{nb}->get_n_pages == 0) {
+        if ($$self{_GUI}{nb}->get_n_pages == 0) {
             $$self{_GUI}{_PACTABS}->hide();
         } elsif ($$self{_GUI}{nb}->get_n_pages == 1) {
             $$self{_GUI}{treeConnections}->grab_focus();
@@ -2083,12 +2083,10 @@ sub _setupCallbacks {
 
             if ($$self{_CFG}{defaults}{'when no more tabs'} == 0) {
                 #nothing
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 1) {
                 #quit
                 $self->_quitProgram();
-            }
-            elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
+            } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
                     $$self{_TRAY}{_TRAY}->set_active();
@@ -3105,7 +3103,7 @@ sub _showAboutWindow {
         $$self{_GUI}{main},(
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
-        "logo" => _pixBufFromFile("$THEME_DIR/asbru-logo-400.png"),
+        "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
         "copyright" => "Copyright (C) 2017-2020 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
@@ -3210,7 +3208,7 @@ sub _launchTerminals {
     # Create all selected terminals
     foreach my $sel (@{ $terminals }) {
         my $uuid = $$sel[0];
-        if (! defined $$self{_CFG}{'environments'}{$uuid}) {
+        if (!defined $$self{_CFG}{'environments'}{$uuid}) {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
@@ -3244,7 +3242,7 @@ sub _launchTerminals {
             $$self{_GUI}{_PACTABS}->present();
         }
 
-        if (! $t->start($keys_buffer)) {
+        if (!$t->start($keys_buffer)) {
             _wMessage($$self{_GUI}{main}, __("ERROR: Could not start terminal '$$self{_CFG}{environments}{ $$t{_UUID} }{title}':\n$$t{ERROR}"), 1);
             next;
         }
@@ -3754,7 +3752,6 @@ sub _updateGUIPreferences {
     if ($$self{_CFG}{defaults}{'show tree titles'}) {
         $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
     }
-
     $$self{_GUI}{connSearch}->set_sensitive(1);
     $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
     $$self{_GUI}{connAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
@@ -3835,7 +3832,6 @@ sub _updateGUIHistory {
     if ($$self{_CFG}{defaults}{'show tree titles'}) {
         $$self{_GUI}{nbHistTabLabel}->set_text(' History');
     }
-
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
     $$self{_GUI}{connAddBtn}->set_sensitive(0);
@@ -3868,7 +3864,6 @@ sub _updateGUIClusters {
     if ($$self{_CFG}{defaults}{'show tree titles'}) {
         $$self{_GUI}{nbCluTabLabel}->set_text(' Clusters');
     }
-
     $$self{_GUI}{connSearch}->set_sensitive(0);
     $$self{_GUI}{groupAddBtn}->set_sensitive(0);
     $$self{_GUI}{connAddBtn}->set_sensitive(0);
@@ -4421,6 +4416,10 @@ sub _bulkEdit {
                 # Populate with environment variables
                 my @environment_menu;
                 foreach my $key (sort { $a cmp $b } keys %ENV) {
+                    # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+                    if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                        next;
+                    }
                     my $value = $ENV{$key};
                     push(@environment_menu, {
                         label => "<ENV:$key>",
@@ -4461,47 +4460,6 @@ sub _bulkEdit {
                         $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                     }
                 });
-                # Populate with <KPX_(title|username|url):*> special string
-                if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                    my (@titles, @usernames, @urls);
-                    foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                        push(@titles, {
-                            label => "<KPX_title:$$hash{title}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                        push(@usernames, {
-                            label => "<KPX_username:$$hash{username}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                        push(@urls, {
-                            label => "<KPX_url:$$hash{url}>",
-                            tooltip => "$$hash{password}",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        });
-                    }
-                    push(@menu_items, {
-                        label => 'KeePassX',
-                        stockicon => 'pac-keepass',
-                        submenu => [
-                            {
-                                label => 'KeePassX title values',
-                                submenu => \@titles
-                            }, {
-                                label => 'KeePassX username values',
-                                submenu => \@usernames
-                            }, {
-                                label => 'KeePassX URL values',
-                                submenu => \@urls
-                            }, {
-                                label => "KeePass Extended Query",
-                                tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                                code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
-                            }
-                        ]
-                    });
-                }
 
                 _wPopUpMenu(\@menu_items, $event);
 
@@ -4581,6 +4539,10 @@ sub _bulkEdit {
             # Populate with environment variables
             my @environment_menu;
             foreach my $key (sort { $a cmp $b } keys %ENV) {
+                # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+                if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                    next;
+                }
                 my $value = $ENV{$key};
                 push(@environment_menu, {
                     label => "<ENV:$key>",
@@ -4624,49 +4586,6 @@ sub _bulkEdit {
                     $w{gui}{"entry$key"}->select_region($pos + 5, $pos + 22);
                 }
             });
-
-            # Populate with <KPX_(title|username|url):*> special string
-            if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                my (@titles, @usernames, @urls);
-                foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                    push(@titles, {
-                        label => "<KPX_title:$$hash{title}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_title:$$hash{title}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                    push(@usernames, {
-                        label => "<KPX_username:$$hash{username}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_username:$$hash{username}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                    push(@urls, {
-                        label => "<KPX_url:$$hash{url}>",
-                        tooltip => "$$hash{password}",
-                        code => sub { $w{gui}{"entry$key"}->insert_text("<KPX_url:$$hash{url}>", -1, $w{gui}{"entry$key"}->get_position()); }
-                    });
-                }
-
-                push(@menu_items, {
-                    label => 'KeePassX',
-                    stockicon => 'pac-keepass',
-                    submenu => [
-                        {
-                            label => 'KeePassX title values',
-                            submenu => \@titles
-                        }, {
-                            label => 'KeePassX username values',
-                            submenu => \@usernames
-                        }, {
-                            label => 'KeePassX URL values',
-                            submenu => \@urls
-                        }, {
-                            label => "KeePass Extended Query",
-                            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub { $w{gui}{"entry$key"}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{gui}{"entry$key"}->get_position()); }
-                        }
-                    ]
-                });
-            }
 
             _wPopUpMenu(\@menu_items, $event);
 
