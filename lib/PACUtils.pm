@@ -303,7 +303,7 @@ sub _splash {
     }
 
     if (!defined $WINDOWSPLASH{_GUI}) {
-        $WINDOWSPLASH{_GUI} = Gtk3::Window->new;
+        $WINDOWSPLASH{_GUI} = Gtk3::Window->new();
         $WINDOWSPLASH{_GUI}->set_type_hint('splashscreen');
         $WINDOWSPLASH{_GUI}->set_position('center');
         $WINDOWSPLASH{_GUI}->set_keep_above(1);
@@ -314,7 +314,7 @@ sub _splash {
         $WINDOWSPLASH{_IMG} = Gtk3::Image->new_from_file($SPLASH_IMG);
         $WINDOWSPLASH{_VBOX}->pack_start($WINDOWSPLASH{_IMG}, 1, 1, 0);
 
-        $WINDOWSPLASH{_LBL} = Gtk3::ProgressBar->new;
+        $WINDOWSPLASH{_LBL} = Gtk3::ProgressBar->new();
         $WINDOWSPLASH{_VBOX}->pack_start($WINDOWSPLASH{_LBL}, 1, 1, 5);
     }
 
@@ -323,14 +323,14 @@ sub _splash {
     $WINDOWSPLASH{_LBL}->set_fraction($partial / $total);
 
     if ($show) {
-        $WINDOWSPLASH{_GUI}->show_all;
-        $WINDOWSPLASH{_GUI}->present;
+        $WINDOWSPLASH{_GUI}->show_all();
+        $WINDOWSPLASH{_GUI}->present();
         while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+            Gtk3::main_iteration();
         }
     } else {
-        $WINDOWSPLASH{_GUI}->hide;
-        $WINDOWSPLASH{_GUI}->destroy;
+        $WINDOWSPLASH{_GUI}->hide();
+        $WINDOWSPLASH{_GUI}->destroy();
     }
 
     return 1;
@@ -410,7 +410,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -439,14 +439,14 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
@@ -481,7 +481,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -510,14 +510,14 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
@@ -555,7 +555,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (_($self, 'entryPassword')->get_chars(0, -1) eq '')) {
+            if ((_($self, 'rbCfgAuthUserPass')->get_active()) && (_($self, 'entryPassword')->get_chars(0, -1) eq '')) {
                 push(@faults, "Password (User/Password authentication method selected)");
             }
 
@@ -575,7 +575,7 @@ sub _getMethods {
             _($self, 'labelIP')->set_text('Host: ');
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -586,7 +586,7 @@ sub _getMethods {
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
@@ -641,9 +641,9 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'rbCfgAuthManual')->set_active(1);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -669,7 +669,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'TTY Socket');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -703,7 +703,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -711,7 +711,7 @@ sub _getMethods {
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -754,11 +754,11 @@ sub _getMethods {
             _($self, 'entryUser')->set_text('');
             _($self, 'entryPassword')->set_text('');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
@@ -820,7 +820,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -854,7 +854,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -884,7 +884,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -919,7 +919,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -949,7 +949,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -986,7 +986,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1017,7 +1017,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1025,7 +1025,7 @@ sub _getMethods {
             _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -1052,12 +1052,12 @@ sub _getMethods {
                 push(@faults, 'Port');
             }
             # TODO : Check if this nested "ifs" can be rewritten
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
-            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
-                if (! _($self, 'fileCfgPublicKey')->get_filename) {
+            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active()) {
+                if (! _($self, 'fileCfgPublicKey')->get_filename()) {
                     push(@faults, 'Public Key File (Public Key authentication method selected)');
                 }
             }
@@ -1086,7 +1086,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1121,7 +1121,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1151,13 +1151,13 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
@@ -1204,11 +1204,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, '  ')->set_sensitive(0);
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
@@ -1286,19 +1286,19 @@ sub _registerPACIcons {
         'pac-buttonbar-hide' => "$THEME_DIR/asbru_buttonbar_hide.png",
     );
 
-    my $icon_factory = Gtk3::IconFactory->new;
+    my $icon_factory = Gtk3::IconFactory->new();
 
     foreach my $icon (keys %icons) {
-        my $icon_source = Gtk3::IconSource->new;
+        my $icon_source = Gtk3::IconSource->new();
         $icon_source->set_filename($icons{$icon});
 
-        my $icon_set = Gtk3::IconSet->new;
+        my $icon_set = Gtk3::IconSet->new();
         $icon_set->add_source($icon_source);
 
         $icon_factory->add($icon, $icon_set);
     }
 
-    $icon_factory->add_default;
+    $icon_factory->add_default();
 
     return 1;
 }
@@ -1523,18 +1523,18 @@ sub _wEnterValue {
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{img}, 0, 1, 5);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 5);
     $w{window}{gui}{lblup}->set_markup($lblup);
 
     # Create 2nd label
-    $w{window}{gui}{lbldwn} = Gtk3::Label->new;
+    $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
     $w{window}{gui}{lbldwn}->set_text($lbldown // '');
 
     if (@list) {
         # Create combobox widget
-        $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new;
+        $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new();
         $w{window}{data}->get_content_area->pack_start($w{window}{gui}{comboList}, 0, 1, 0);
         $w{window}{gui}{comboList}->set_property('can_focus', 0);
         foreach my $text (@list) {
@@ -1543,7 +1543,7 @@ sub _wEnterValue {
         $w{window}{gui}{comboList}->set_active(0);
     } else {
         # Create the entry widget
-        $w{window}{gui}{entry} = Gtk3::Entry->new;
+        $w{window}{gui}{entry} = Gtk3::Entry->new();
         $w{window}{data}->get_content_area->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
         $w{window}{gui}{entry}->set_activates_default(1);
@@ -1552,22 +1552,22 @@ sub _wEnterValue {
 
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($parent);
-    $w{window}{data}->show_all;
-    my $ok = $w{window}{data}->run;
+    $w{window}{data}->show_all();
+    my $ok = $w{window}{data}->run();
 
     my $val = undef;
     if (@list) {
         if ($ok eq 'ok') {
-            $val = $w{window}{gui}{comboList}->get_active_text;
+            $val = $w{window}{gui}{comboList}->get_active_text();
         }
-        $pos = $w{window}{gui}{comboList}->get_active;
+        $pos = $w{window}{gui}{comboList}->get_active();
     } else {
         if ($ok eq 'ok') {
             $val = $w{window}{gui}{entry}->get_chars(0, -1);
         }
     }
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
@@ -1624,7 +1624,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{img}, 0, 1, 0);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
     $w{window}{gui}{lblup}->set_markup($lblup);
 
@@ -1634,12 +1634,12 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox1}->set_border_width(5);
 
     # Create label
-    $w{window}{gui}{lbl1} = Gtk3::Label->new;
+    $w{window}{gui}{lbl1} = Gtk3::Label->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lbl1}, 0, 1, 0);
     $w{window}{gui}{lbl1}->set_text('Enter new NAME: ');
 
     # Create the entry widget
-    $w{window}{gui}{entry1} = Gtk3::Entry->new;
+    $w{window}{gui}{entry1} = Gtk3::Entry->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{entry1}, 1, 1, 0);
     $w{window}{gui}{entry1}->set_text($name);
     $w{window}{gui}{entry1}->set_activates_default(1);
@@ -1653,20 +1653,20 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox2}->set_border_width(5);
 
     # Create label
-    $w{window}{gui}{lbl2} = Gtk3::Label->new;
+    $w{window}{gui}{lbl2} = Gtk3::Label->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{lbl2}, 0, 1, 0);
     $w{window}{gui}{lbl2}->set_text('Enter new TITLE: ');
 
     # Create the entry widget
-    $w{window}{gui}{entry2} = Gtk3::Entry->new;
+    $w{window}{gui}{entry2} = Gtk3::Entry->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{entry2}, 1, 1, 0);
     $w{window}{gui}{entry2}->set_text($title);
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-    $w{window}{data}->show_all;
-    my $ok = $w{window}{data}->run;
+    $w{window}{data}->show_all();
+    my $ok = $w{window}{data}->run();
 
     if ($ok eq 'ok') {
         $new_name = $w{window}{gui}{entry1}->get_chars(0, -1);
@@ -1675,7 +1675,7 @@ sub _wAddRenameNode {
         $new_title = $w{window}{gui}{entry2}->get_chars(0, -1);
     }
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
@@ -1704,7 +1704,7 @@ sub _wPopUpMenu {
     my $actions = Gtk3::ActionGroup->new('Actions');
     $actions->add_actions(\@array, undef);
 
-    my $ui = Gtk3::UIManager->new;
+    my $ui = Gtk3::UIManager->new();
     $ui->set_add_tearoffs(1);
     $ui->insert_action_group($actions, 0);
 
@@ -1717,7 +1717,7 @@ sub _wPopUpMenu {
     }
 
     $WIDGET_POPUP = $ui->get_widget('/Menu');
-    $WIDGET_POPUP->show_all;
+    $WIDGET_POPUP->show_all();
     if ($ref) {
         return $WIDGET_POPUP;
     }
@@ -1783,9 +1783,9 @@ sub _wPopUpMenu {
 
     sub _pos {
         my $h = $_[0]->size_request->height;
-        my $ymax = $event->get_screen->get_height;
-        my ($x, $y) = $event->window->get_origin;
-        my $dy = $event->window->get_height;
+        my $ymax = $event->get_screen->get_height();
+        my ($x, $y) = $event->window->get_origin();
+        my $dy = $event->window->get_height();
 
         # Over the event widget
         if ($dy + $y + $h > $ymax) {
@@ -1825,11 +1825,11 @@ sub _wMessage {
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
-        $windowConfirm->show_all;
-        my $close = $windowConfirm->run;
-        $windowConfirm->destroy;
+        $windowConfirm->show_all();
+        my $close = $windowConfirm->run();
+        $windowConfirm->destroy();
     } else {
-        $windowConfirm->show_all;
+        $windowConfirm->show_all();
         while (Gtk3::events_pending) {
             Gtk3::main_iteration;
         }
@@ -1847,7 +1847,7 @@ sub _wProgress {
     $WINDOWPROGRESS{_RET} = 1;
 
     if (! defined $WINDOWPROGRESS{_GUI}) {
-        $WINDOWPROGRESS{_GUI} = Gtk3::Window->new;
+        $WINDOWPROGRESS{_GUI} = Gtk3::Window->new();
 
         $WINDOWPROGRESS{_GUI}->set_position('center');
         $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
@@ -1861,13 +1861,13 @@ sub _wProgress {
         $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
         $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
 
-        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
+        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
 
-        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
+        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
 
-        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
+        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
 
         $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
@@ -1876,7 +1876,7 @@ sub _wProgress {
         $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
         $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
             $WINDOWPROGRESS{_RET} = 0;
-            $WINDOWPROGRESS{_GUI}->hide;
+            $WINDOWPROGRESS{_GUI}->hide();
             return 1;
         });
     }
@@ -1891,12 +1891,12 @@ sub _wProgress {
         $WINDOWPROGRESS{pb}->set_text($msg);
         $WINDOWPROGRESS{pb}->set_fraction($partial / $total);
 
-        $WINDOWPROGRESS{_GUI}->show_all;
+        $WINDOWPROGRESS{_GUI}->show_all();
         while (Gtk3::events_pending) {
             Gtk3::main_iteration;
         }
     } else {
-        $WINDOWPROGRESS{_GUI}->hide;
+        $WINDOWPROGRESS{_GUI}->hide();
     }
 
     return $WINDOWPROGRESS{_RET};
@@ -1923,9 +1923,9 @@ sub _wConfirm {
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
 
-    $windowConfirm->show_all;
-    my $close = $windowConfirm->run;
-    $windowConfirm->destroy;
+    $windowConfirm->show_all();
+    my $close = $windowConfirm->run();
+    $windowConfirm->destroy();
 
     return ($close eq 'yes');
 }
@@ -1951,9 +1951,9 @@ sub _wYesNoCancel {
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
 
-    $windowConfirm->show_all;
-    my $close = $windowConfirm->run;
-    $windowConfirm->destroy;
+    $windowConfirm->show_all();
+    my $close = $windowConfirm->run();
+    $windowConfirm->destroy();
 
     return (($close eq 'delete-event') || ($close eq 'cancel')) ? 'cancel' : $close;
 }
@@ -3040,7 +3040,7 @@ sub _wakeOnLan {
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox}, 1, 1, 0);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
     $w{window}{gui}{lblup}->set_markup("<b>Enter the following data and press 'OK' to send Magic Packet:</b>");
 
@@ -3050,28 +3050,28 @@ sub _wakeOnLan {
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{table}, 1, 1, 0);
 
     # Create MAC label
-    $w{window}{gui}{lblmac} = Gtk3::Label->new;
+    $w{window}{gui}{lblmac} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblmac}, 0, 1, 0, 1);
     $w{window}{gui}{lblmac}->set_text('MAC Address: ');
 
     # Create MAC entry widget
-    $w{window}{gui}{entrymac} = Gtk3::Entry->new;
+    $w{window}{gui}{entrymac} = Gtk3::Entry->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{entrymac}, 1, 2, 0, 1);
     $w{window}{gui}{entrymac}->set_text($mac);
     $w{window}{gui}{entrymac}->set_activates_default(1);
-    $w{window}{gui}{entrymac}->grab_focus;
+    $w{window}{gui}{entrymac}->grab_focus();
 
     # Create MAC icon widget
     $w{window}{gui}{iconmac} = Gtk3::Image->new_from_stock('gtk-no', 'menu');
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{iconmac}, 2, 3, 0, 1);
 
     # Create HOST label
-    $w{window}{gui}{lblip} = Gtk3::Label->new;
+    $w{window}{gui}{lblip} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblip}, 0, 1, 1, 2);
     $w{window}{gui}{lblip}->set_text('Host: ');
 
     # Create HOST entry widget
-    $w{window}{gui}{entryip} = Gtk3::Entry->new;
+    $w{window}{gui}{entryip} = Gtk3::Entry->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{entryip}, 1, 2, 1, 2);
     $w{window}{gui}{entryip}->set_text($ip);
     $w{window}{gui}{entryip}->set_sensitive(0);
@@ -3082,7 +3082,7 @@ sub _wakeOnLan {
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{iconip}, 2, 3, 1, 2);
 
     # Create PORT label
-    $w{window}{gui}{lblport} = Gtk3::Label->new;
+    $w{window}{gui}{lblport} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblport}, 0, 1, 2, 3);
     $w{window}{gui}{lblport}->set_text('Port Number: ');
 
@@ -3103,16 +3103,16 @@ sub _wakeOnLan {
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{cbbroadcast}, 1, 1, 0);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox2}, 0, 1, 0);
 
-    $w{window}{gui}{lblstatus} = Gtk3::Label->new;
+    $w{window}{gui}{lblstatus} = Gtk3::Label->new();
     $w{window}{gui}{lblstatus}->set_margin_bottom(20);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lblstatus}, 0, 1, 0);
     $w{window}{gui}{lblstatus}->set_text("Checking MAC for '$ip' ...");
 
     # Show the window
-    $w{window}{data}->show_all;
+    $w{window}{data}->show_all();
 
     # Setup some callbacks...
-    $w{window}{gui}{cbbroadcast}->signal_connect('toggled' => sub {$w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active); return 0;});
+    $w{window}{gui}{cbbroadcast}->signal_connect('toggled' => sub {$w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active()); return 0;});
 
     $w{window}{gui}{entrymac}->signal_connect('event' => sub {
         $w{window}{data}->get_action_area->foreach(sub {
@@ -3147,7 +3147,7 @@ sub _wakeOnLan {
         $w{window}{gui}{entrymac}->select_region(0, length($mac));
         $w{window}{gui}{lblstatus}->set_text("'$ip' TCP port $ping_port seems to be " . ($up ? 'REACHABLE' : 'UNREACHABLE'));
         $w{window}{gui}{table}->set_sensitive(1);
-        $w{window}{gui}{entrymac}->grab_focus;
+        $w{window}{gui}{entrymac}->grab_focus();
         $w{window}{data}->get_action_area->foreach(sub {
             if ($_[0]->get_label ne 'gtk-ok') {
                 return 1;
@@ -3169,12 +3169,12 @@ sub _wakeOnLan {
 
     ##########################################################
 
-    $w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active);
+    $w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active());
 
-    my $ok = $w{window}{data}->run;
+    my $ok = $w{window}{data}->run();
     $mac = $w{window}{gui}{entrymac}->get_chars(0, -1);
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
 
     if ($ok ne 'ok') {
         return 0;
@@ -3182,7 +3182,7 @@ sub _wakeOnLan {
 
     $$cfg{mac} = $mac;
 
-    my $broadcast = $w{window}{gui}{cbbroadcast}->get_active;
+    my $broadcast = $w{window}{gui}{cbbroadcast}->get_active();
 
     # Prepare UDP socket
     socket(S, PF_INET, SOCK_DGRAM, getprotobyname('udp')) || die "ERROR: Can't create socket ($!)";
@@ -3360,11 +3360,11 @@ sub _getXWindowsList {
     my %list;
 
     my $s = Wnck::Screen::get_default() or die print $!;
-    $s->force_update;
+    $s->force_update();
 
     foreach my $w (@{$s->get_windows}) {
-        my $xid = $w->get_xid or next;
-        my $data_name = $w->get_name;
+        my $xid = $w->get_xid() or next;
+        my $data_name = $w->get_name();
 
         $list{'by_xid'}{$xid}{'title'} = $data_name;
         $list{'by_xid'}{$xid}{'window'} = $w;
@@ -3425,7 +3425,7 @@ sub _showUpdate {
         'gtk-ok' => 'ok',
     );
 
-    my $lbl = Gtk3::Label->new;
+    my $lbl = Gtk3::Label->new();
     $windowConfirm->get_content_area->pack_start($lbl, 0, 0, 5);
 
     my $lbl2 = Gtk3::LinkButton->new_with_label('http://sourceforge.net/projects/pacmanager');
@@ -3434,15 +3434,15 @@ sub _showUpdate {
 
     if ((! $NEW_VERSION) || ($APPVERSION ge $NEW_VERSION)) {
         $lbl->set_markup("There is <b>NO</b> new version available");
-        $windowConfirm->signal_connect('response', sub {$windowConfirm->destroy;});
+        $windowConfirm->signal_connect('response', sub {$windowConfirm->destroy();});
     } else {
         $lbl->set_markup("There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>");
 
         # Create a scrolled window to contain the textview
-        my $scrollDescription = Gtk3::ScrolledWindow->new;
+        my $scrollDescription = Gtk3::ScrolledWindow->new();
         $windowConfirm->get_content_area->pack_start($scrollDescription, 1, 1, 0);
         $scrollDescription->set_policy('automatic', 'automatic');
-        my $tb = Gtk3::TextBuffer->new;
+        my $tb = Gtk3::TextBuffer->new();
         $tb->set_text(join("\n", @{$NEW_CHANGES}));
         my $tv = Gtk3::TextView->new_with_buffer($tb);
         $tv->set_editable(0);
@@ -3451,7 +3451,7 @@ sub _showUpdate {
         $cb->set_active(! $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'check versions at start'});
         $windowConfirm->get_content_area->pack_start($cb, 0, 0, 5);
 
-        $windowConfirm->signal_connect('response', sub {$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb->get_active; $PACMain::FUNCS{_MAIN}->_saveConfiguration; $windowConfirm->destroy;});
+        $windowConfirm->signal_connect('response', sub {$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb->get_active(); $PACMain::FUNCS{_MAIN}->_saveConfiguration(); $windowConfirm->destroy();});
         $windowConfirm->set_size_request(640, 480);
         $windowConfirm->set_resizable(1);
     }
@@ -3459,7 +3459,7 @@ sub _showUpdate {
     $windowConfirm->set_position('center_always');
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_border_width(5);
-    $windowConfirm->show_all;
+    $windowConfirm->show_all();
 
     return 1;
 }
@@ -3800,7 +3800,7 @@ sub _getSelectedRows {
     # https://metacpan.org/pod/Gtk3
     # "Gtk3::TreeSelection: get_selected_rows() now returns two values: an array ref containing the selected paths, and the model."
     # Go back to the Gtk2 behavior: drop the model, return the selected paths as array.
-    my ($aref, $model) = $treeSelection->get_selected_rows;
+    my ($aref, $model) = $treeSelection->get_selected_rows();
     if (!$aref) {
         return ();
     }
