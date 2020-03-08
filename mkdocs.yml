@@ -15,9 +15,19 @@ nav:
       - News: General/NEWS.md
       - Changelog: General/Changelog.md
       - Installation: General/Installation.md
-  - 2. Managing:
+  - 2. Contributed Articles:
       - Clusters: Managing/Clusters.md
-  - 3. Contributing: 
-      - Contributing: Contributing/index.md 
+  - 3. Contributing:
+      - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md
       - Code of conduct: Contributing/CODE_OF_CONDUCT.md
+  - 4. User's Manual:
+      - Quick Start: Manual/QuickStart.md
+      - Preferences: Manual/Preferences/Preferences.md
+      - Main Options Behaviour: Manual/Preferences/MainOptions.md
+      - Main Options Look&Feel: Manual/Preferences/LookAndFeel.md
+      - Main Options Advanced: Manual/Preferences/MOAdvanced.md
+
+markdown_extensions:
+  - admonition
+
