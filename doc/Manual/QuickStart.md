@@ -118,16 +118,16 @@ __Example of a connections tree after several connections have been added__
 ### To move a connection or full group from one place in the tree to another.
 
 1. Select a connection or full group
-1. <Ctrl-X> to cut the node (or right click Cut)
-1. <Ctrl-V> to paste the node in the new location
+1. `<Ctrl-X>` to cut the node (or right click Cut)
+1. `<Ctrl-V>` to paste the node in the new location
 
 ### To copy an existing connection so you can replace some parameters
 
 1. Select a connection
-1. <Ctrl-C> to copy the node (or right click Copy)
-1. <Ctrl-V> to paste the node in the new location
+1. `<Ctrl-C>` to copy the node (or right click Copy)
+1. `<Ctrl-V>` to paste the node in the new location
 
 ### To clone an existing connection
 
 1. Select a connection
-1. <Ctrl-D> to duplicate connection (or right click Clone Connection)
+1. `<Ctrl-D>` to duplicate connection (or right click Clone Connection)
