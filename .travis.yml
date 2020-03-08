@@ -29,7 +29,7 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install git devscripts debhelper quilt
-    - sudo pip install mkdocs
+    - sudo pip install mkdocs mkdocs-material
 script:
     - ./build.sh
     - bash scripts/deploy_docs.sh
