@@ -2,31 +2,10 @@
 GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
 FULL_REPO="https://${GITHUB_API_KEY}$GH_REPO"
 
-if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
+if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
     echo "Doc build skipped"
     exit 0
 fi
-
-#pip install --upgrade pip
-#pip install --user --requirement <(cat <<EOF
-#Click==7.0
-#future==0.18.2
-#Jinja2==2.11.1
-#livereload==2.6.1
-#lunr==0.5.6
-#Markdown==3.2.1
-#MarkupSafe==1.1.1
-#mkdocs==1.1
-#mkdocs-material==4.6.3
-#nltk==3.4.5
-#Pygments==2.5.2
-#pymdown-extensions==6.3
-#PyYAML==5.3
-#six==1.14.0
-#tornado==6.0.3
-#EOF
-#)
-
 
 mkdir -p out
 cd out
@@ -42,14 +21,15 @@ cd ../
 
 gem install rack -v 1.6.4
 gem install github_changelog_generator
-
 github_changelog_generator --token ${GITHUB_API_KEY} --release-branch master --user asbru-cm --project asbru-cm --output doc/General/Changelog.md
 
 mkdocs build --clean
+	
 build_result=$?
 
 # Only deploy after merging to master
 if [ "$build_result" == "0" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+
     cd out/
     touch .
     git add -A .

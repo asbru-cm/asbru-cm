@@ -1,7 +1,5 @@
 [<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
 
-### A free and open-source connection manager
-
 **Ásbrú Connection Manager** is a user interface that helps organizing remote terminal sessions and automating repetitive tasks.
 
 ### Features
@@ -26,46 +24,6 @@
 - Seamless Gnome/Gtk integration
 - Tray icon for 'right button' quick launching of managed connections. Screenshots and statistics.
 - DEB, RPM and .TAR.GZ packages available
-
-### Testing new features
-
-Our master and the snapshots are being kept as stable as possible. New features for new major releases are being developed inside the "loki" branch.
-
-Beware that Loki can sometimes behave in a malicious manner to you. You might think of "sid"
-
-You are welcome to contribute and test by checking out "loki" or by installing our builds.
-
-- Debian / Ubuntu
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
-  ````
-
-- Fedora
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
-  ````
-
-
-### Installation of legacy 5.x
-
-- Debian / Ubuntu
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
-  ````
-
-- Fedora
-
-  ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/v5/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
-  ````
-
 
 ### Frequenty Asked Questions
 
