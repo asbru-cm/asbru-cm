@@ -7,8 +7,8 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
     exit 0
 fi
 
-sudo pip install --upgrade pip
-sudo pip install --user --requirement <(cat <<EOF
+sudo pip3 install --upgrade pip
+sudo pip3 install --user --requirement <(cat <<EOF
 Click==7.0
 future==0.18.2
 Jinja2==2.11.1
