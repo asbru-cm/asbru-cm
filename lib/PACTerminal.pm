@@ -41,7 +41,7 @@ use File::Copy;
 use Encode qw (encode decode);
 use IO::Socket::INET;
 use Time::HiRes qw (gettimeofday);
-use KeePass;
+use PACKeePass;
 
 # GTK
 use Gtk3 '-init';
@@ -267,17 +267,6 @@ sub new {
 
     }, $self);
 
-    # If KeePass is selected, load it's database and prepare submenu for VTE right-click
-    if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-        foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find()) {
-            push(@KPX,
-            {
-                label => "Title: '$$hash{title}', Username: '$$hash{username}'",
-                tooltip => "$$hash{password}",
-                code => sub {_vteFeedChild($$self{_GUI}{_VTE}, $$hash{password});}
-            });
-        }
-    }
     #Accessability shortcuts
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
@@ -310,6 +299,12 @@ sub start {
 
     if ($$self{CONNECTED} || $$self{CONNECTING}) {
         return 1;
+    }
+
+    # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
+    if (!$ENV{'KPXC_MP'} && $self->_hasKeePassField()) {
+        my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+        $kpxc->getMasterPassword();
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
@@ -382,7 +377,6 @@ sub start {
     $new_cfg{'defaults'} = dclone($$self{_CFG}{'defaults'});
     $new_cfg{'environments'}{$$self{_UUID}} = dclone($$self{_CFG}{'environments'}{$$self{_UUID}});
     $new_cfg{'tmp'} = dclone($$self{_CFG}{'tmp'});
-    @{$new_cfg{'keepass'}} = $PACMain::FUNCS{_KEEPASS}->find();
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
@@ -2006,6 +2000,10 @@ sub _vteMenu {
     # Populate with environment variables
     my @environment_menu;
     foreach my $key (sort {$a cmp $b} keys %ENV) {
+        # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+        if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+            next;
+        }
         my $value = $ENV{$key};
         push(@environment_menu,
         {
@@ -2020,24 +2018,6 @@ sub _vteMenu {
         submenu => \@environment_menu
     });
 
-    # Populate with KeePass entries
-    if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-        my @kpx;
-        foreach my $entry ($PACMain::FUNCS{_KEEPASS}->find()) {
-            push(@kpx,
-            {
-                label => "Title:$$entry{title},User:$$entry{username}",
-                tooltip => "Password:$$entry{password}",
-                code => sub {_vteFeedChild($$self{_GUI}{_VTE}, $$entry{password});}
-            });
-        }
-        push(@insert_menu_items,
-        {
-            label => 'KeePassX',
-            stockicon => 'pac-keepass',
-            submenu => \@kpx
-        });
-    }
     push(@vte_menu_items,
     {
         label => 'Insert value',
@@ -4222,6 +4202,30 @@ sub _showEmbedMessages {
     $$self{_GUI}{_BTNLOG}->set_label('Hide _messages');
 }
 
+sub _hasKeePassField {
+    my $self = shift;
+    my $useKeePass = $$self{_CFG}{defaults}{keepass}{use_keepass} && $$self{_UUID} ne '__PAC_SHELL__';
+    my $kpxc;
+
+    if (!$useKeePass) {
+        return 0;
+    }
+
+    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
+        if (PACKeePass->isKeePassMask($self->{_CFG}{'environments'}{$$self{'_UUID'}}{$fieldName})) {
+            return 1;
+        }
+    }
+
+    foreach my $exp (@{$self->{_CFG}{'environments'}{$$self{'_UUID'}}{'expect'}}) {
+        if (PACKeePass->isKeePassMask($$exp{'send'})) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4505,6 +4509,10 @@ For an embed connection, hide the console displaying the messages concerning the
 =head2 sub _showEmbedMessages
 
 For an embed connection, show the console displaying the messages concerning the connection.
+
+=head2 sub _hasKeePassField
+
+Returns true (1) if this terminal has a least on field whose value is kept into a KeePass database file
 
 =head1 Vte::Terminal
 

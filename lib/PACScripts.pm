@@ -912,6 +912,10 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         my @environment_menu;
         foreach my $key (sort {$a cmp $b} keys %ENV)
         {
+            # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+            if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                next;
+            }
             my $value = $ENV{$key};
             push(@environment_menu,
             {
@@ -948,56 +952,6 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
             tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST('<CMD:command_to_launch>')");}
         });
-
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'})
-        {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find)
-            {
-                push(@titles,
-                {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_title:$$hash{title}>)");}
-                });
-                push(@usernames,
-                {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_username:$$hash{username}>)");}
-                });
-                push(@urls,
-                {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_url:$$hash{url}>)");}
-                });
-            }
-
-            push(@menu_items,
-            {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                    }
-                ]
-            });
-        }
 
         _wPopUpMenu(\@menu_items, $event);
 

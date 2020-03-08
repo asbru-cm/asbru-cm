@@ -271,7 +271,6 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
-    #$options{useCompression} = 1;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
