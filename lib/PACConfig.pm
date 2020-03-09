@@ -159,8 +159,12 @@ sub _initGUI {
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
-    _($self, 'linkHelpMainOptions')->set_label('');
-    _($self, 'linkHelpMainOptions')->set_image(Gtk3::Image->new_from_stock('gtk-dialog-question', 'button'));
+    foreach my $o ('MO','TO') {
+        foreach my $t ('BE','LF','AD') {
+            _($self, "linkHelp$o$t")->set_label('');
+            _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('gtk-dialog-question', 'button'));
+        }
+    }
 
     # Option currently disabled
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
