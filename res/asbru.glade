@@ -8056,7 +8056,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermOptions/</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/ShellOptions/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8373,7 +8373,7 @@ For each connection, it is still possible to define a particular proxy or jump h
                                 <property name="receives_default">True</property>
                                 <property name="tooltip_text" translatable="yes">Open Online Help</property>
                                 <property name="relief">none</property>
-                                <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermOptions/</property>
+                                <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
