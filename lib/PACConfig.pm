@@ -165,6 +165,10 @@ sub _initGUI {
             _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('gtk-dialog-question', 'button'));
         }
     }
+    foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
+        _($self,$t)->set_label('');
+        _($self,$t)->set_image(Gtk3::Image->new_from_stock('gtk-dialog-question', 'button'));
+    }
 
     # Option currently disabled
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
