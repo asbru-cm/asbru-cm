@@ -2,12 +2,14 @@ This article has been written by [Hans Peyrot](https://github.com/hanspr)
 
 # Why do you need a cluster ?
 
-This is more an admin tool than programmers, you can use it to type common commands to servers that are identical or at least very similar, this allows to:
+This is more an admin tool than programmers, you can use it to type common commands to servers that are identical or at least very similar, this allows you to:
 
 * update several servers
 * edit a config file on all of them at the same time
 
-As an example, I program remote Raspeberri Pi that are connected to electronic scales, etc. And have very unique code that is similar across them but I do not have a development environment because I do not have the interest in buying expensive scales or robot arms, to be able to develop. So I connect to all of them simultaneously, they all have exactly the same code and I edit the code on one terminal and I'm patching on real time the others. Of course I could work on one and then copy the file to the others, but for small adjustments this has been always more practical.
+__From a programmer point of view__
+
+As an example, I program remote Raspeberri Pi that are connected to electronic scales, etc. And have a very unique code that is similar across them, but I do not have a development environment because I do not have the interest in buying expensive scales or robot arms, to be able to develop. So I connect to all of them simultaneously, they all have exactly the same code; then I edit the code on one terminal and I'm patching on real time the others. Of course I could work on one and then copy the file to the others, but for small adjustments this has been always more practical.
 
 And there are some other more complicated uses when add to the terminals tunnels, expect, etc. All those tunnels will open simultaneously too.
 
