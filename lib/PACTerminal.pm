@@ -1143,6 +1143,27 @@ sub _setupCallbacks {
                 $$self{_GUI}{_VTE}->copy_clipboard;
                 return 1;
             }
+
+            # Test Zooming actions
+            my $zoom = 0;
+            my $scale = $$self{_GUI}{_VTE}->get_font_scale();
+
+            if ($keyval eq 'plus' || $keyval eq 'KP_Add') {
+                $zoom = 1;
+                $scale += 0.1;
+            }
+            if ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
+                $zoom = 1;
+                $scale -= 0.1;
+            }
+            if ($keyval eq '0' || $keyval eq 'KP_0') {
+                $zoom = 1;
+                $scale = 1;
+            }
+            if ($zoom) {
+                $$self{_GUI}{_VTE}->set_font_scale($scale);
+                return 1;
+            }
         }
         # <Shift>
         elsif ($shift && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
@@ -1153,7 +1174,7 @@ sub _setupCallbacks {
             }
         }
         # <Alt>
-        elsif ($alt && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'})) {
+        elsif ($alt && (!$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'})) {
             # c | n --> Show main connections window
             if ((lc $keyval eq 'c') || (lc $keyval eq 'n')) {
                 if (! $$self{_TABBED} || ! $$self{_CFG}{defaults}{'tabs in main window'}) {
