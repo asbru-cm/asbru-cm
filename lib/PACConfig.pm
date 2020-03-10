@@ -162,8 +162,12 @@ sub _initGUI {
     foreach my $o ('MO','TO') {
         foreach my $t ('BE','LF','AD') {
             _($self, "linkHelp$o$t")->set_label('');
-            _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('gtk-dialog-question', 'button'));
+            _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
         }
+    }
+    foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
+        _($self,$t)->set_label('');
+        _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 
     # Option currently disabled
