@@ -1232,6 +1232,7 @@ sub _registerPACIcons {
     }
 
     my %icons = (
+        'asbru-help' => "$THEME_DIR/asbru-help.svg",
         'gtk-edit' => "$THEME_DIR/gtk-edit.svg",
         'gtk-delete' => "$THEME_DIR/gtk-delete.svg",
         'gtk-find' => "$THEME_DIR/gtk-find.svg",
