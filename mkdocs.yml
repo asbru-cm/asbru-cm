@@ -26,6 +26,8 @@ nav:
         - Behaviour: Manual/Preferences/TermOptions.md
         - Look&Feel: Manual/Preferences/TermLookAndFeel.md
         - Advanced: Manual/Preferences/TermAdvanced.md
+      - Shell Options: Manual/Preferences/ShellOptions.md
+      - Networking: Manual/Preferences/Networking.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
   - 4. Contributing:

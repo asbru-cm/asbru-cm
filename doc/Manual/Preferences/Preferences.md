@@ -2,13 +2,19 @@
 
 The first thing that you would like to customize is the application so it fits better to your way to work.
 
-We'll begin by clicking in the "Preferences" button located at the button of the Standard Interface.
+We'll begin by clicking in the "Preferences" button located at the bottom of the Standard Interface.
 
-This will open a window similar to the following image.
+!!! note " "
+
+    The first time you access the Preferences, will begin at : Main Options > Behaviour
+
+    Subsequent access will open on the last Section > Tab you were editing previously.
+
+The __Preferences__ window will be similar to the following image.
 
 ![](images/pref1.png)
 
-## Buttons
+## Lower Buttons
 
 + __Reset to DEFAULT values__ : Will reset all configuration settings to there original state
 + __Export config__
