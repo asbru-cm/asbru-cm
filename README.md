@@ -127,6 +127,10 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 
 Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
 
+### Sponsors
+
+<a title="Cloudflare" href="https://cloudflare.com/"><img height="105" width="230" alt="Cloudflare" src="https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg" /></a>
+
 ### Packages
 
 The repositories for our RPM and DEB builds are thankfully sponsored by [packagecloud](https://packagecloud.io/). A great thanks to them.
