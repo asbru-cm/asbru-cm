@@ -1151,12 +1151,10 @@ sub _setupCallbacks {
             if ($keyval eq 'plus' || $keyval eq 'KP_Add') {
                 $zoom = 1;
                 $scale += 0.1;
-            }
-            if ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
+            } elsif ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
                 $zoom = 1;
                 $scale -= 0.1;
-            }
-            if ($keyval eq '0' || $keyval eq 'KP_0') {
+            } elsif ($keyval eq '0' || $keyval eq 'KP_0') {
                 $zoom = 1;
                 $scale = 1;
             }
