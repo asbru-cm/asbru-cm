@@ -8027,15 +8027,44 @@ Changes apply to next opened connections, not current</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">8</property>
                     <child>
-                      <object class="GtkCheckButton" id="cbCfgAutoStartShell">
-                        <property name="label" translatable="yes">Start a shell upon startup</property>
-                        <property name="use_action_appearance">False</property>
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="halign">start</property>
-                        <property name="xalign">0.5</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgAutoStartShell">
+                            <property name="label" translatable="yes">Start a shell upon startup</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLinkButton" id="linkHelpLocalShell">
+                            <property name="label" translatable="yes">button</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="focus_on_click">False</property>
+                            <property name="receives_default">True</property>
+                            <property name="tooltip_text" translatable="yes">Open Online Help</property>
+                            <property name="relief">none</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/ShellOptions/</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -8124,7 +8153,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -8304,8 +8333,6 @@ Changes apply to next opened connections, not current</property>
                   <object class="GtkAlignment" id="aCfgProxy">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="top_padding">12</property>
-                    <property name="left_padding">12</property>
                     <child>
                       <object class="GtkBox" id="vboxProxy">
                         <property name="visible">True</property>
@@ -8313,24 +8340,53 @@ Changes apply to next opened connections, not current</property>
                         <property name="orientation">vertical</property>
                         <property name="spacing">8</property>
                         <child>
-                          <object class="GtkRadioButton" id="cbCfgProxyNo">
-                            <property name="label" translatable="yes">Do not use proxy</property>
+                          <object class="GtkBox">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
-                            <property name="tooltip_text" translatable="yes">If selected, do not use any intermediate proxy or jump host to connect to the destination.
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkRadioButton" id="cbCfgProxyNo">
+                                <property name="label" translatable="yes">Do not use proxy</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">If selected, do not use any intermediate proxy or jump host to connect to the destination.
                             
 For each connection, it is still possible to define a particular proxy or jump host.
 </property>
-                            <property name="halign">start</property>
-                            <property name="xalign">0</property>
-                            <property name="active">True</property>
-                            <property name="draw_indicator">True</property>
+                                <property name="halign">start</property>
+                                <property name="xalign">0</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLinkButton" id="linkHelpGlobalNetwork">
+                                <property name="label" translatable="yes">button</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="focus_on_click">False</property>
+                                <property name="receives_default">True</property>
+                                <property name="tooltip_text" translatable="yes">Open Online Help</property>
+                                <property name="relief">none</property>
+                                <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="pack_type">end</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">0</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
@@ -8354,7 +8410,6 @@ For all other types of connection, this setting will be ignored.
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
-                                <property name="group">cbCfgProxyNo</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -8553,7 +8608,6 @@ For all other types of connection, this setting will be ignored.
                                 <property name="halign">start</property>
                                 <property name="xalign">0</property>
                                 <property name="draw_indicator">True</property>
-                                <property name="group">cbCfgProxyNo</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
