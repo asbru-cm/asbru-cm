@@ -1,4 +1,4 @@
-# Prferences : Global Variables
+# Global Variables
 
 ![](images/gv1.png)
 
@@ -9,6 +9,8 @@ Global variables, allow you to define variable name and a value assigned to that
 + Expect definition
 
 To add a new entry click on the "Add" Button.
+
+## Fields
 
 + __Variable__ : The name you want to assign to you variable.
 + __Value__ : The value of your variable. It can be any text.
