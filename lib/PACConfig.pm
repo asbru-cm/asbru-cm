@@ -185,8 +185,8 @@ sub _initGUI {
     _($self, 'btnExportYAML')->set_label('Export config...');
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
-    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new())->{container});
-    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new())->{container});
+    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef,undef,'remote'))->{container});
+    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef,undef,'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1))->{container});
     _($self, 'nbPreferences')->show_all();
 
