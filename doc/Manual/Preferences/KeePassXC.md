@@ -30,7 +30,7 @@
 
 ### Enter Master Password
 
-If you decided not to save the Master Password, when access to the database is needed you will se a prompt similar to this one.
+If you decided not to save the Master Password, when access to the database is needed you will see a prompt similar to this one.
 
 ![](images/kpxc2.png)
 
@@ -68,7 +68,7 @@ Some fields gives you access to keepass list search to add an entry to : expects
 ![](images/kpxc7.png)
 
 
-## Known restriction of limitations of the current model.
+## Known restriction or limitations of the current model.
 
 This are known limitations of the current model.
 
@@ -83,10 +83,10 @@ This are known limitations of the current model.
 
 !!! note "Why don't you implement the browser integration?"
 
-    Perhaps in the future could be possible. And the current implementation would be ready to do so.
+    Perhaps in the future it could be possible. And the current implementation would be ready to do so.
 
     But as of this date (2020-03-12), the Ásbrú project, is still recovering from the hard migration to gkt3 and there are many features and stability issues that need to be addressed.
-    
+
     This was the must balanced path to deliver a good integration and attend all other issues.
 
 ## Why did you have to rewrite and brake compatibility?
@@ -102,7 +102,7 @@ __Current Implementation__
     - No unencrypted passwords, users, database are retained in memory or files any more.
     - User name and passwords are references now.
     - KeePass Url entry, can be used as a reference to get the host to connect to.
-    - User has complete control over what Ásbrú should access and not more.
+    - User has complete control over what Ásbrú should access and not.
 + User can migrate databases versions freely without any need to wait for Ásbrú to catch up.
 + Users can use a keyfile to unlock the database.
 + Linking keepass users and password to entry paths guaranties a 1 to 1 match.
