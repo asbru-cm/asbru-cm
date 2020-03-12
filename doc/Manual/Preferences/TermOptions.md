@@ -22,6 +22,6 @@
         - Set the key combination to switch tabs.
         - Set the action to perform when closing the last tab.
     - __Windows__
-        - Set predefined With and Height.
+        - Set predefined Width and Height.
 
 

@@ -28,8 +28,12 @@ nav:
         - Advanced: Manual/Preferences/TermAdvanced.md
       - Shell Options: Manual/Preferences/ShellOptions.md
       - Networking: Manual/Preferences/Networking.md
+      - Global Variables: Manual/Preferences/GlobalVariables.md
+      - Local Commands: Manual/Preferences/LocalCommands.md
+      - Remote Commands: Manual/Preferences/RemoteCommands.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
+      - Templates: Managing/Templates.md
   - 4. Contributing:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md

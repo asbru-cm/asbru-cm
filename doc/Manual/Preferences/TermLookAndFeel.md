@@ -48,8 +48,8 @@ Example macros as list
 + __Font__ : Set the font and size for all terminals.
 + __Cursor shape__ : Cursor shape to use in the terminal.
 + __Scrollback lines__ : How many lines of history to store to scroll back.
-+ __Transparency__ : Set transparency background for the terminal.
-+ __Colors__ : Set your predefined colors to override the basic 16 color terminal standard.
++ __Transparency__ : Set background transparency for the terminal.
++ __Colors__ : Set your predefined colors to override the basic 16 terminal colors.
     - Top row are the normal text colors.
     - Bottom row are the bold text colors.
 
