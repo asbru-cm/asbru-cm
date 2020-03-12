@@ -461,12 +461,21 @@ sub _buildKeePassGUI {
 
     # Build a vbox
     $w{vbox} = Gtk3::VBox->new(0,0);
+    $w{hbox} = Gtk3::HBox->new(1,0);
 
     $w{cbUseKeePass} = Gtk3::CheckButton->new('Activate use of a KeePass database file');
     $w{cbUseKeePass}->set_margin_top(10);
     $w{cbUseKeePass}->set_margin_bottom(5);
     $w{cbUseKeePass}->set_halign('GTK_ALIGN_START');
-    $w{vbox}->pack_start($w{cbUseKeePass}, 0, 0, 0);
+    $w{vbox}->pack_start($w{hbox}, 0, 0, 0);
+    $w{hbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
+
+    # Build 'help' button
+    $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeePassXC/');
+    $w{hbox}->pack_start($w{help},0,1,0);
+    $w{help}->set_halign('GTK_ALIGN_END');
+    $w{help}->set_label('Help');
+    $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
     $w{hboxkpmain} = Gtk3::HBox->new(0, 4);
     $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
