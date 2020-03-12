@@ -212,7 +212,6 @@ sub _initGUI {
     _($self, 'btnCloseEdit')->set_use_underline(1);
     _($self, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
 
-
     return 1;
 }
 
