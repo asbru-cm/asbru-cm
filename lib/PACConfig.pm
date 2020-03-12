@@ -161,12 +161,12 @@ sub _initGUI {
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
     foreach my $o ('MO','TO') {
         foreach my $t ('BE','LF','AD') {
-            _($self, "linkHelp$o$t")->set_label('');
+            _($self, "linkHelp$o$t")->set_label('Help');
             _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
         }
     }
     foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
-        _($self,$t)->set_label('');
+        _($self,$t)->set_label('Help');
         _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 
@@ -185,8 +185,8 @@ sub _initGUI {
     _($self, 'btnExportYAML')->set_label('Export config...');
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
-    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new())->{container});
-    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new())->{container});
+    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef,undef,'remote'))->{container});
+    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef,undef,'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1))->{container});
     _($self, 'nbPreferences')->show_all();
 
