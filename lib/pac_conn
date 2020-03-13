@@ -778,10 +778,14 @@ sub _execScript {
 
 sub _setProxy {
     my $method = shift;
+    my $user = $USER;
 
     # Set variables in case they are used in function : sub subst()
     my $ssh_config = '';
     if (($$CFG{'environments'}{$UUID}{'use proxy'} == 3) || ($$CFG{'environments'}{$UUID}{'use proxy'} == 0)) {
+        if ($AUTH eq 'publickey') {
+            $user = $PASSPHRASE_USER;
+        }
         if (-e "/etc/ssh/ssh_config") {
             open (SSHC,"<:utf8","/etc/ssh/ssh_config");
             while (my $l = <SSHC>) {
@@ -827,7 +831,7 @@ sub _setProxy {
         }
         if ($method =~ /ssh/i) {
             # Second server is only important for SSH JumpHost
-            print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+            print CFG qq“\nHost server\nHostName $IP\nUser $user\nPort $PORT\n“;
             if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
                 print CFG "IdentityFile $PUBKEY\n";
             }
@@ -853,7 +857,7 @@ sub _setProxy {
             }
             if ($method =~ /ssh/i) {
                 # Second server is only important for SSH JumpHost
-                print CFG qq“\nHost server\nHostName $IP\nUser $PASSPHRASE_USER\nPort $PORT\n“;
+                print CFG qq“\nHost server\nHostName $IP\nUser $user\nPort $PORT\n“;
                 if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
                     print CFG "IdentityFile $PUBKEY\n";
                 }
