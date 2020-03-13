@@ -1238,7 +1238,10 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('selection_changed' => sub {
         if ($$self{_CFG}{defaults}{'selection to clipboard'}) {
             if ($$self{_GUI}{_VTE}->get_has_selection) {
-                $$self{_GUI}{_VTE}->copy_clipboard;
+                $$self{_GUI}{_VTE}->copy_clipboard();
+                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text;
+                $txt =~ s/ +$//gm;
+                Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD',0))->set_text($txt,length($txt));
             }
         }
         return 0;
