@@ -660,6 +660,7 @@ Applies to automated actions:
                                     </child>
                                     <child>
                                       <object class="GtkButton" id="btnCheckKPX">
+                                        <property name="label" translatable="yes">KeePass</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
