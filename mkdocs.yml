@@ -31,6 +31,8 @@ nav:
       - Global Variables: Manual/Preferences/GlobalVariables.md
       - Local Commands: Manual/Preferences/LocalCommands.md
       - Remote Commands: Manual/Preferences/RemoteCommands.md
+      - KeePass: Manual/Preferences/KeePassXC.md
+      - Command Line: Manual/CommandLine.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md
