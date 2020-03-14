@@ -914,6 +914,9 @@ sub _updateGUIPreferences {
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
     $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
+    if (defined $PACMain::FUNCS{_EDIT}) {
+        _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
+    }
 
     if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
         _($self, 'lblRestartRequired')->set_text("(*) Requires restart to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text() // '') );
