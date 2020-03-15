@@ -209,8 +209,6 @@ sub _initGUI {
 
 sub _setupCallbacks {
     my $self = shift;
-    my $tabs_on_main =  _($self,'cbCfgTabsInMain')->get_active();
-
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
@@ -249,7 +247,14 @@ sub _setupCallbacks {
         _($self, 'colorBold')->set_sensitive(! _($self, 'cbBoldAsText')->get_active());
     });
     _($self, 'cbCfgTabsInMain')->signal_connect('toggled' => sub {
-        _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active()); _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        if (!_($self, 'cbCfgTabsInMain')->get_active()) {
+            # Set safe values other wise options would be unaccesible
+            _($self, 'cbCfgConnectionsAutoHide')->set_active(0);
+            _($self, 'cbCfgButtonBarAutoHide')->set_active(0);
+        }
     });
     _($self, 'cbCfgNewInTab')->signal_connect('toggled' => sub {
         _($self, 'vboxCfgTabsOptions')->set_sensitive(_($self, 'cbCfgNewInTab')->get_active());
@@ -473,11 +478,17 @@ sub _setupCallbacks {
             _($self,'cbCfgSaveOnExit')->show();
             _($self,'cbCfgStartIconified')->show();
             _($self,'cbCfgCloseToTray')->show();
+            _($self,'cbCfgShowTreeTitles')->show();
+            _($self,'cbCfgShowTreeTitles')->set_active(1);
         } else {
             _($self,'frameTabsInMainWindow')->hide();
             _($self,'cbCfgStartMainMaximized')->hide();
             _($self,'cbCfgRememberSize')->hide();
             _($self,'cbCfgSaveOnExit')->hide();
+            _($self,'cbCfgSaveOnExit')->set_active(1);
+            _($self,'cbCfgAutoSave')->set_active(1);
+            _($self,'cbCfgShowTreeTitles')->hide();
+            _($self,'cbCfgShowTreeTitles')->set_active(0);
             if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
                 _($self,'cbCfgStartIconified')->hide();
                 _($self,'cbCfgCloseToTray')->hide();
@@ -739,6 +750,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'cbCfgButtonBarAutoHide')->set_active($$cfg{'defaults'}{'auto hide button bar'});
     _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+    _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
@@ -775,7 +787,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAutoStartShell')->set_active($$cfg{'defaults'}{'autostart shell upon PAC start'});
     _($self, 'cbCfgTreeOnRight')->set_active($$cfg{'defaults'}{'tree on right side'});
     _($self, 'cbCfgTreeOnLeft')->set_active(! $$cfg{'defaults'}{'tree on right side'});
-    _($self, 'cbCfgPreventMOShowTree')->set_active(! $$cfg{'defaults'}{'prevent mouse over show tree'});
+    _($self, 'cbCfgPreventMOShowTree')->set_active(!$$cfg{'defaults'}{'prevent mouse over show tree'});
     _($self, 'rbCfgStartTreeConn')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'connections');
     _($self, 'rbCfgStartTreeFavs')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'favourites');
     _($self, 'rbCfgStartTreeHist')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'history');
