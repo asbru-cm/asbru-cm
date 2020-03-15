@@ -45,17 +45,17 @@ In the above example, the expression expects that immediately after the "passwor
 
 Below is a more general regular expression (but not complete)
 
-`(?mi)(pass(word|phrase)|contraseña).*?:.*$`
+`(?mi)(pass(word|phrase)|contraseña).*?:\s*$`
 
 But this expression is limited to English and Spanish. You may need to edit the Spanish word _contraseña_ or add more words in different languages to the regular expression.
 
 For example:
 
-`(?mi)(pass(word|phrase)|contraseña|passwort).*?:.*$`
+`(?mi)(pass(word|phrase)|contraseña|passwort).*?:\s*$`
 
 or
 
-`(?mi)(pass(wor[dt]|phrase)|contraseña).*?:.*$`
+`(?mi)(pass(wor[dt]|phrase)|contraseña).*?:\s*$`
 
 !!! tip "Recommended Password prompt"
-    `(?mi)(pass(wor[dt]|phrase)|contraseña).*?:.*$`
+    `(?mi)(pass(word|phrase)|contraseña).*?:\s*$`
