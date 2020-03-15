@@ -3883,6 +3883,10 @@ sub _copyPass {
     } else {
         $clip = $$cfg{environments}{$uuid}{'pass'};
     }
+    if ($$cfg{'defaults'}{'keepass'}{'use_keepass'} && ($clip =~ /<.\w+\|.+?>/)) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $clip =~ s/<(\w+)\|(.+?)>/$kpxc->regexTransform($1,$2)/eg;
+    }
     use bytes;
     $clipboard->set_text($clip,length($clip));
 }
