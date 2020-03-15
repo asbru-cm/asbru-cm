@@ -3214,7 +3214,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpMOBE">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -3222,6 +3222,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MainOptions/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -3999,7 +4000,7 @@ connecting (timeout is in seconds)</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpMOLF">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -4007,6 +4008,7 @@ connecting (timeout is in seconds)</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/LookAndFeel/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4891,7 +4893,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpMOAD">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -4899,6 +4901,7 @@ Otherwise, only the icon will be shown and save screen space.</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MOAdvanced/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -5451,7 +5454,7 @@ sudo -p sudo_prompt_string ...</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpTOBE">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -5459,6 +5462,7 @@ sudo -p sudo_prompt_string ...</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermOptions/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -6237,7 +6241,7 @@ sudo -p sudo_prompt_string ...</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpTOLF">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -6245,6 +6249,7 @@ sudo -p sudo_prompt_string ...</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermLookAndFeel/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -7611,7 +7616,7 @@ Changes apply to next opened connections, not current</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpTOAD">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -7619,6 +7624,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermAdvanced/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8050,7 +8056,7 @@ Changes apply to next opened connections, not current</property>
                         </child>
                         <child>
                           <object class="GtkLinkButton" id="linkHelpLocalShell">
-                            <property name="label" translatable="yes">button</property>
+                            <property name="label" translatable="yes">Help</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="focus_on_click">False</property>
@@ -8058,6 +8064,7 @@ Changes apply to next opened connections, not current</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
                             <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/ShellOptions/</property>
+                            <property name="always_show_image">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8367,7 +8374,7 @@ For each connection, it is still possible to define a particular proxy or jump h
                             </child>
                             <child>
                               <object class="GtkLinkButton" id="linkHelpGlobalNetwork">
-                                <property name="label" translatable="yes">button</property>
+                                <property name="label" translatable="yes">Help</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="focus_on_click">False</property>
@@ -8375,6 +8382,7 @@ For each connection, it is still possible to define a particular proxy or jump h
                                 <property name="tooltip_text" translatable="yes">Open Online Help</property>
                                 <property name="relief">none</property>
                                 <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
+                                <property name="always_show_image">True</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
