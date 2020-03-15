@@ -161,12 +161,12 @@ sub _initGUI {
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
     foreach my $o ('MO','TO') {
         foreach my $t ('BE','LF','AD') {
-            _($self, "linkHelp$o$t")->set_label('Help');
+            _($self, "linkHelp$o$t")->set_label('');
             _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
         }
     }
     foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
-        _($self,$t)->set_label('Help');
+        _($self,$t)->set_label('');
         _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 
