@@ -2088,7 +2088,6 @@ sub _vteMenu {
         {
             label => 'Paste Connection Password',
             stockicon => 'gtk-paste',
-            sensitive => $$self{CONNECTED},
             shortcut => '<control><shift>p',
             code => sub {
                 if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {

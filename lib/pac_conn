@@ -417,9 +417,17 @@ sub wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-
+    my $on_terminal = shift;
     my @list;
     my $pos = -1;
+
+    if ($on_terminal) {
+        my $val;
+        system "stty -echo";
+        chomp($val = <STDIN>);
+        system "stty echo";
+        return $val;
+    }
 
     if (! defined $default) {
         $default = '';
@@ -1614,14 +1622,14 @@ elsif (!$MANUAL) {
             if ($PASSWORD_COUNT < 6) {
                 $PASSWORD_COUNT++;
                 $WAS_ASK_PASS = 0;
-                if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
+                if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || (!defined $PASS || $PASS eq '')) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
                     my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0);
+                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0, 1);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
