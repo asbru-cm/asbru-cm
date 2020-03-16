@@ -417,17 +417,8 @@ sub wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-    my $on_terminal = shift;
     my @list;
     my $pos = -1;
-
-    if ($on_terminal) {
-        my $val;
-        system "stty -echo";
-        chomp($val = <STDIN>);
-        system "stty echo";
-        return $val;
-    }
 
     if (! defined $default) {
         $default = '';
@@ -1629,7 +1620,7 @@ elsif (!$MANUAL) {
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0, 1);
+                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
