@@ -36,6 +36,7 @@ nav:
       - Command Line: Manual/CommandLine.md
       - Connections:
         - SSH: Manual/Connections/SSH.md
+        - RDP: Manual/Connections/RDP.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md
