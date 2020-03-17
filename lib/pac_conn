@@ -135,12 +135,12 @@ my $autossh_bin = ! $?;
 
 # Shorten some variables
 my $DEBUG = $$CFG{'defaults'}{'debug'};
-my $COMMAND_PROMPT = $$CFG{'defaults'}{'command prompt'};
-my $USERNAME_PROMPT = $$CFG{'defaults'}{'username prompt'};
-my $PASSWORD_PROMPT = $$CFG{'defaults'}{'password prompt'};
-my $HOSTCHANGE_PROMPT = $$CFG{'defaults'}{'hostkey changed prompt'};
-my $ANYKEY_PROMPT = $$CFG{'defaults'}{'press any key prompt'};
-my $REMOTEHOST_PROMPT = $$CFG{'defaults'}{'remote host changed prompt'};
+my $COMMAND_PROMPT = encode('utf8',$$CFG{'defaults'}{'command prompt'});
+my $USERNAME_PROMPT = encode('utf8',$$CFG{'defaults'}{'username prompt'});
+my $PASSWORD_PROMPT = encode('utf8',$$CFG{'defaults'}{'password prompt'});
+my $HOSTCHANGE_PROMPT = encode('utf8',$$CFG{'defaults'}{'hostkey changed prompt'});
+my $ANYKEY_PROMPT = encode('utf8',$$CFG{'defaults'}{'press any key prompt'});
+my $REMOTEHOST_PROMPT = encode('utf8',$$CFG{'defaults'}{'remote host changed prompt'});
 my $ACCEPT_KEY = $$CFG{'defaults'}{'auto accept key'};
 my $TIMEOUT_CONNECT = $$CFG{'defaults'}{'timeout connect'} || undef;
 my $TIMEOUT_CMD = $$CFG{'defaults'}{'timeout command'} || undef;
@@ -417,7 +417,6 @@ sub wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-
     my @list;
     my $pos = -1;
 
