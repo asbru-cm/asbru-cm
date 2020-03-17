@@ -665,8 +665,9 @@ Applies to automated actions:
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">True</property>
-                                        <property name="tooltip_markup" translatable="yes">Search KeePass Database</property>
+                                        <property name="tooltip_markup" translatable="yes">Search KeePass database</property>
                                         <property name="halign">end</property>
+                                        <property name="always_show_image">True</property>
                                       </object>
                                       <packing>
                                         <property name="expand">True</property>
@@ -3221,8 +3222,8 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MainOptions/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MainOptions/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4007,8 +4008,8 @@ connecting (timeout is in seconds)</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/LookAndFeel/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/LookAndFeel/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4900,8 +4901,8 @@ Otherwise, only the icon will be shown and save screen space.</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MOAdvanced/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/MOAdvanced/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -5461,8 +5462,8 @@ sudo -p sudo_prompt_string ...</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermOptions/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermOptions/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -6248,8 +6249,8 @@ sudo -p sudo_prompt_string ...</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermLookAndFeel/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermLookAndFeel/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -7623,8 +7624,8 @@ Changes apply to next opened connections, not current</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermAdvanced/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/TermAdvanced/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8063,8 +8064,8 @@ Changes apply to next opened connections, not current</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Open Online Help</property>
                             <property name="relief">none</property>
-                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/ShellOptions/</property>
                             <property name="always_show_image">True</property>
+                            <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/ShellOptions/</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -8381,8 +8382,8 @@ For each connection, it is still possible to define a particular proxy or jump h
                                 <property name="receives_default">True</property>
                                 <property name="tooltip_text" translatable="yes">Open Online Help</property>
                                 <property name="relief">none</property>
-                                <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
                                 <property name="always_show_image">True</property>
+                                <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

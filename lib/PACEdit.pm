@@ -207,6 +207,7 @@ sub _initGUI {
     _($self, 'btnEditSaveSessionLogs')->set_extra_widget($$self{cbLogsShowHidden});
 
     _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('pac-keepass', 'button') );
+    _($self, 'btnCheckKPX')->set_label('');
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
     _($self, 'btnCloseEdit')->set_use_underline(1);

@@ -2987,7 +2987,7 @@ sub _subst {
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
         my $kpxc = $PACMain::FUNCS{_KEEPASS};
-        $string =~ s/<(\w+)\|(.+?)>/$kpxc->regexTransform($1,$2)/eg;
+        $string = $kpxc->applyMask($string);
     }
 
     $out{'pos'} = $pos;
@@ -3882,6 +3882,10 @@ sub _copyPass {
         $clip = $$cfg{environments}{$uuid}{'passphrase'};
     } else {
         $clip = $$cfg{environments}{$uuid}{'pass'};
+    }
+    if ($$cfg{'defaults'}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($clip)) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $clip = $kpxc->applyMask($clip);
     }
     use bytes;
     $clipboard->set_text($clip,length($clip));

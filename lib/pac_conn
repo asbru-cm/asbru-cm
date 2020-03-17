@@ -405,7 +405,7 @@ sub subst {
 
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        $string =~ s/<(\w+)\|(.+?)>/$kpxc->regexTransform($1,$2)/eg;
+        $string = $kpxc->applyMask($string);
     }
 
     return wantarray ? ($string, $pos) : $string;
