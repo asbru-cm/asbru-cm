@@ -17,22 +17,26 @@ nav:
       - Changelog: General/Changelog.md
   - 2. User's Manual:
       - Quick Start: Manual/QuickStart.md
-      - Preferences: Manual/Preferences/Preferences.md
-      - Main Options:
-        - Behaviour: Manual/Preferences/MainOptions.md
-        - Look&Feel: Manual/Preferences/LookAndFeel.md
-        - Advanced: Manual/Preferences/MOAdvanced.md
-      - Terminal Options:
-        - Behaviour: Manual/Preferences/TermOptions.md
-        - Look&Feel: Manual/Preferences/TermLookAndFeel.md
-        - Advanced: Manual/Preferences/TermAdvanced.md
-      - Shell Options: Manual/Preferences/ShellOptions.md
-      - Networking: Manual/Preferences/Networking.md
-      - Global Variables: Manual/Preferences/GlobalVariables.md
-      - Local Commands: Manual/Preferences/LocalCommands.md
-      - Remote Commands: Manual/Preferences/RemoteCommands.md
-      - KeePass: Manual/Preferences/KeePassXC.md
+      - Preferences:
+        - General: Manual/Preferences/Preferences.md
+        - Main Options:
+          - Behaviour: Manual/Preferences/MainOptions.md
+          - Look&Feel: Manual/Preferences/LookAndFeel.md
+          - Advanced: Manual/Preferences/MOAdvanced.md
+        - Terminal Options:
+          - Behaviour: Manual/Preferences/TermOptions.md
+          - Look&Feel: Manual/Preferences/TermLookAndFeel.md
+          - Advanced: Manual/Preferences/TermAdvanced.md
+        - Shell Options: Manual/Preferences/ShellOptions.md
+        - Networking: Manual/Preferences/Networking.md
+        - Global Variables: Manual/Preferences/GlobalVariables.md
+        - Local Commands: Manual/Preferences/LocalCommands.md
+        - Remote Commands: Manual/Preferences/RemoteCommands.md
+        - KeePass: Manual/Preferences/KeePassXC.md
       - Command Line: Manual/CommandLine.md
+      - Connections:
+        - SSH: Manual/Connections/SSH.md
+        - RDP: Manual/Connections/RDP.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md

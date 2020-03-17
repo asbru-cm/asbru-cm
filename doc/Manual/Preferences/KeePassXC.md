@@ -51,7 +51,7 @@ After the double click the link to your username and password will be assigned t
 ![](images/kpxc4.png)
 
 !!! tip "Recommendations"
-    __KeyPass pattern__ : The pattern is formed as : `<[keepass property|keepass entry path>`. You can edit and change the text to any valid property and path if your need.
+    __KeyPass pattern__ : The pattern is formed as : `<keepass_property|keepass entry path>`. You can edit and change the text to any valid property and path if your need.
 
     Current properties available from keepassxc-cli : username, password, title, url, notes
 
