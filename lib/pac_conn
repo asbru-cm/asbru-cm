@@ -420,7 +420,7 @@ sub wEnterValue {
     my @list;
     my $pos = -1;
 
-    if (! defined $default) {
+    if (!defined $default) {
         $default = '';
     } elsif (ref($default)) {
         @list = @{$default};
@@ -482,24 +482,38 @@ sub wEnterValue {
     }
 
     # Show the window (in a modal fashion)
-    $_W{window}{data}->show_all;
-    my $ok = $_W{window}{data}->run;
+    ctrl('UNFOCUS');
+    _hideSTDERR();
+    $_W{window}{data}->show_all();
+    $_W{window}{data}->present();
+    _showSTDERR();
+    ctrl('REFOCUS');
+    my $ok = $_W{window}{data}->run();
 
     my $val;
     if (@list) {
-        $val = ($ok eq 'ok') ? $_W{window}{gui}{comboList}->get_active_text : undef;
-        $pos = $_W{window}{gui}{comboList}->get_active;
+        $val = ($ok eq 'ok') ? $_W{window}{gui}{comboList}->get_active_text() : undef;
+        $pos = $_W{window}{gui}{comboList}->get_active();
     } else {
         $val = ($ok eq 'ok') ? $_W{window}{gui}{entry}->get_chars(0, -1) : undef;
     }
 
-    $_W{window}{data}->destroy;
+    $_W{window}{data}->destroy();
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
     undef %_W;
 
     return wantarray ? ($val, $pos) : $val;
+}
+
+sub _hideSTDERR {
+    open OLDERR, ">&STDERR";
+    open STDERR, ">/dev/null";
+}
+
+sub _showSTDERR {
+    open STDERR, ">&OLDERR";
 }
 
 sub send_slow {
