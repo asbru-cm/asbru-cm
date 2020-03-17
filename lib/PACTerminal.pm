@@ -2096,9 +2096,9 @@ sub _vteMenu {
                 } else {
                     $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
                 }
-                if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && ($pass =~ /<.\w+\|.+?>/)) {
+                if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
                     my $kpxc = $PACMain::FUNCS{_KEEPASS};
-                    $pass =~ s/<(\w+)\|(.+?)>/$kpxc->regexTransform($1,$2)/eg;
+                    $pass = $kpxc->applyMask($pass);
                 }
                 $self->_pasteToVte($pass, 1);
             }

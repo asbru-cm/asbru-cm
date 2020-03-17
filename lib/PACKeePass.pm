@@ -82,7 +82,7 @@ sub new {
 
 sub isKeePassMask {
     my ($class, $str) = @_;
-    return $str =~ /<.+?\|.+>/;
+    return $str =~ /<.\w+\|.+?>/;
 }
 
 # END: Public class methods
@@ -209,6 +209,12 @@ sub regexTransform {
         return $value;
     }
     return '';
+}
+
+sub applyMask {
+    my ($self, $value) = @_;
+    $value =~ s/<(\w+)\|(.+?)>/$self->regexTransform($1, $2)/eg;
+    return $value;
 }
 
 sub getFieldValue {
