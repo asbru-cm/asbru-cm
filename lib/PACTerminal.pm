@@ -2088,14 +2088,19 @@ sub _vteMenu {
         {
             label => 'Paste Connection Password',
             stockicon => 'gtk-paste',
-            sensitive => $$self{CONNECTED},
             shortcut => '<control><shift>p',
             code => sub {
+                my $pass = '';
                 if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
-                    $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'}, 1);
+                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
                 } else {
-                    $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
                 }
+                if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
+                    my $kpxc = $PACMain::FUNCS{_KEEPASS};
+                    $pass = $kpxc->applyMask($pass);
+                }
+                $self->_pasteToVte($pass, 1);
             }
         });
     };

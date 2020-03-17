@@ -167,7 +167,8 @@ sub _buildExecGUI {
         $w{hbox}->pack_start($w{help},0,1,0);
 
         $w{help}->set_halign('GTK_ALIGN_END');
-        $w{help}->set_label('Help');
+        $w{help}->set_label('');
+        $w{help}->set_always_show_image(1);
         $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 

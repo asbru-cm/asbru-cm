@@ -82,7 +82,7 @@ sub new {
 
 sub isKeePassMask {
     my ($class, $str) = @_;
-    return $str =~ /<.+?\|.+>/;
+    return $str =~ /<.\w+\|.+?>/;
 }
 
 # END: Public class methods
@@ -209,6 +209,12 @@ sub regexTransform {
         return $value;
     }
     return '';
+}
+
+sub applyMask {
+    my ($self, $value) = @_;
+    $value =~ s/<(\w+)\|(.+?)>/$self->regexTransform($1, $2)/eg;
+    return $value;
 }
 
 sub getFieldValue {
@@ -474,7 +480,8 @@ sub _buildKeePassGUI {
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeePassXC/');
     $w{hbox}->pack_start($w{help},0,1,0);
     $w{help}->set_halign('GTK_ALIGN_END');
-    $w{help}->set_label('Help');
+    $w{help}->set_label('');
+    $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
     $w{hboxkpmain} = Gtk3::HBox->new(0, 4);

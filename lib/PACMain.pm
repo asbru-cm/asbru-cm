@@ -1194,7 +1194,7 @@ sub _setupCallbacks {
 
             $$self{'DND'}{'text'} = "<b> - Start / Chain(drop over connected Terminal):</b>";
             foreach my $uuid (@sel) {
-                $$self{'DND'}{'text'} .= "\n" . ($$self{_CFG}{'environments'}{$uuid}{'_is_group'} ? '<b>Group:</b> ' : '<b>Connection:</b> ') . $$self{_CFG}{'environments'}{$uuid}{'name'};
+                $$self{'DND'}{'text'} .= "\n" . ($$self{_CFG}{'environments'}{$uuid}{'_is_group'} ? '<b>Group:</b> ' : '<b>Connection:</b> ') . __($$self{_CFG}{'environments'}{$uuid}{'name'});
             }
             my $icon_window = Gtk3::Window->new;
             my $icon_label = Gtk3::Label->new;
