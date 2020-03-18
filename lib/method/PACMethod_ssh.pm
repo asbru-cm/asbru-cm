@@ -394,6 +394,12 @@ sub _buildGUI
     my $hb123 = Gtk3::HBox->new(0, 5);
     $w{vboxipv}->pack_start($hb123, 1, 1, 0);
 
+    $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/');
+    $w{help}->set_halign('GTK_ALIGN_END');
+    $w{help}->set_label('');
+    $w{help}->set_always_show_image(1);
+    $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+
     my $lblsshv = Gtk3::Label->new('SSH Version ');
     $lblsshv->set_alignment(1, 0.5);
     $hb123->pack_start($lblsshv, 1, 1, 0);
@@ -446,6 +452,7 @@ sub _buildGUI
     $w{chForwardAgent} = Gtk3::CheckButton->new_with_label('Forward Agent');
     $hbox1->pack_start($w{chForwardAgent}, 1, 1, 0);
     $w{chForwardAgent}->set_tooltip_text('[-A] : Forward or not the SSH authentication agent');
+    $hbox1->pack_start($w{help}, 0, 1, 0);
 
     my $hbox2 = Gtk3::HBox->new(0, 0);
     $vboxother->add($hbox2);
