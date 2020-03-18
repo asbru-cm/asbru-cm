@@ -394,7 +394,7 @@ sub _buildGUI
     my $hb123 = Gtk3::HBox->new(0, 5);
     $w{vboxipv}->pack_start($hb123, 1, 1, 0);
 
-    my $lblsshv = Gtk3::Label->new('SSH Version: ');
+    my $lblsshv = Gtk3::Label->new('SSH Version ');
     $lblsshv->set_alignment(1, 0.5);
     $hb123->pack_start($lblsshv, 1, 1, 0);
     $hb123->set_tooltip_text('-(1|2|any) : Use SSH v1, v2 or any  of them');
@@ -408,7 +408,7 @@ sub _buildGUI
     my $hb456 = Gtk3::HBox->new(0, 5);
     $w{vboxipv}->pack_start($hb456, 1, 1, 0);
 
-    my $lblipv = Gtk3::Label->new('IP Protocol: ');
+    my $lblipv = Gtk3::Label->new('IP Protocol  ');
     $lblipv->set_alignment(1, 0.5);
     $hb456->pack_start($lblipv, 1, 1, 0);
     $hb456->set_tooltip_text('-(4|6) : Uses IPv4, IPv6 or no specification (ip based)');
@@ -419,11 +419,12 @@ sub _buildGUI
         $w{cbSSHProtocol}->append_text($ip_protocol);
     }
 
-    $w{frSSHOther} = Gtk3::Frame->new(' Other Options: ');
+    $w{frSSHOther} = Gtk3::Frame->new(' Other Options  ');
     $w{hbox1}->pack_start($w{frSSHOther}, 1, 1, 0);
 
     my $vboxother = Gtk3::VBox->new(0, 0);
     $w{frSSHOther}->add($vboxother);
+    $w{frSSHOther}->set_shadow_type('GTK_SHADOW_NONE');
 
     my $hbox1 = Gtk3::HBox->new(0, 0);
     #$w{frSSHOther}->add($hbox1);
@@ -469,7 +470,7 @@ sub _buildGUI
     $w{hboxorder} = Gtk3::HBox->new(0, 0);
     $w{vbox2}->pack_start($w{hboxorder}, 0, 1, 0);
 
-    $w{lblOrder} = Gtk3::Label->new('Show ordered by: ');
+    $w{lblOrder} = Gtk3::Label->new('Show ordered by  ');
     $w{hboxorder}->pack_start($w{lblOrder}, 0, 1, 0);
 
     # Build the "order" radiobuttons
@@ -514,7 +515,7 @@ sub _buildGUI
     $w{hboxorder2} = Gtk3::HBox->new(0, 0);
     $w{vbox3}->pack_start($w{hboxorder2}, 0, 1, 0);
 
-    $w{lblOrder2} = Gtk3::Label->new('Show ordered by: ');
+    $w{lblOrder2} = Gtk3::Label->new('Show ordered by  ');
     $w{hboxorder2}->pack_start($w{lblOrder2}, 0, 1, 0);
 
     # Build the "order" radiobuttons
@@ -559,7 +560,7 @@ sub _buildGUI
     $w{hboxorder3} = Gtk3::HBox->new(0, 0);
     $w{vbox33}->pack_start($w{hboxorder3}, 0, 1, 0);
 
-    $w{lblOrder3} = Gtk3::Label->new('Show ordered by: ');
+    $w{lblOrder3} = Gtk3::Label->new('Show ordered by  ');
     $w{hboxorder3}->pack_start($w{lblOrder3}, 0, 1, 0);
 
     # Build the "order" radiobuttons
@@ -702,7 +703,7 @@ sub _buildForward
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Local Address:');
+    $w{frPFLocalIP} = Gtk3::Frame->new('Local Address ');
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -711,7 +712,7 @@ sub _buildForward
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Port:');
+    $w{frPFLocalPort} = Gtk3::Frame->new('Port ');
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -720,7 +721,7 @@ sub _buildForward
     $w{spinPFLocalPort}->set_size_request(30, 20);
     $w{spinPFLocalPort}->set_value($localPort);
 
-    $w{frPFRemoteIP} = Gtk3::Frame->new('Remote Address:');
+    $w{frPFRemoteIP} = Gtk3::Frame->new('Remote Address ');
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -729,7 +730,7 @@ sub _buildForward
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Port:');
+    $w{frPFRemotePort} = Gtk3::Frame->new('Port ');
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -820,7 +821,7 @@ sub _buildRemote
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Remote Address:');
+    $w{frPFLocalIP} = Gtk3::Frame->new('Remote Address ');
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -829,7 +830,7 @@ sub _buildRemote
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Port:');
+    $w{frPFLocalPort} = Gtk3::Frame->new('Port ');
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -838,7 +839,7 @@ sub _buildRemote
     $w{spinPFLocalPort}->set_size_request(30, 20);
     $w{spinPFLocalPort}->set_value($localPort);
 
-    $w{frPFRemoteIP} = Gtk3::Frame->new('Local Address:');
+    $w{frPFRemoteIP} = Gtk3::Frame->new('Local Address ');
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -847,7 +848,7 @@ sub _buildRemote
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Port:');
+    $w{frPFRemotePort} = Gtk3::Frame->new('Port ');
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -939,7 +940,7 @@ sub _buildDynamic
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Bind Address:');
+    $w{frPFLocalIP} = Gtk3::Frame->new('Bind Address ');
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -949,7 +950,7 @@ sub _buildDynamic
     $w{entryPFLocalIP}->set_text($localIP);
     $w{entryPFLocalIP}->set_tooltip_text('Leave blank to bind to any interface');
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Local Port:');
+    $w{frPFLocalPort} = Gtk3::Frame->new('Local Port ');
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -1022,7 +1023,7 @@ sub _buildAdvOpt
     # Make an HBox to contain option, value and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frAdvOptOption} = Gtk3::Frame->new('Option:');
+    $w{frAdvOptOption} = Gtk3::Frame->new('Option ');
     $w{hbox}->pack_start($w{frAdvOptOption}, 1, 1, 0);
     $w{frAdvOptOption}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -1031,7 +1032,7 @@ sub _buildAdvOpt
     $w{entryAdvOptOption}->set_size_request(30, 20);
     $w{entryAdvOptOption}->set_text($option);
 
-    $w{frAdvOptValue} = Gtk3::Frame->new('Value:');
+    $w{frAdvOptValue} = Gtk3::Frame->new('Value ');
     $w{hbox}->pack_start($w{frAdvOptValue}, 1, 1, 0);
     $w{frAdvOptValue}->set_shadow_type('GTK_SHADOW_NONE');
 
