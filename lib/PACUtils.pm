@@ -458,7 +458,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -529,7 +529,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -598,7 +598,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(0);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -649,7 +649,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -717,7 +717,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -765,7 +765,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -834,7 +834,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive($autossh);
             _($self, 'cbAutossh')->set_active($$cfg{'autossh'});
         },
@@ -899,7 +899,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -964,7 +964,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1031,7 +1031,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1101,7 +1101,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1165,7 +1165,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1215,7 +1215,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
