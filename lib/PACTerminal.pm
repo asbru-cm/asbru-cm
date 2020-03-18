@@ -1594,6 +1594,7 @@ sub _watchConnectionData {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
         } elsif ($data eq 'REFOCUS') {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
+            $$self{_WINDOWTERMINAL}->grab_focus();
         }
 
         $$self{_LAST_STATUS} = $data;
