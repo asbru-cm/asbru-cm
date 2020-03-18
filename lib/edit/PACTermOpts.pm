@@ -96,7 +96,6 @@ sub update {
     $$self{gui}{cbSHIFTDisable}->set_active($$cfg{'disable SHIFT key bindings'} // 0);
 
     $$self{gui}{cbAudibleBell}->set_active($$cfg{'audible bell'} // 0);
-    $$self{gui}{cbVisibleBell}->set_active($$cfg{'visible bell'} // 0);
 
     $$self{gui}{cbUsePersonal}->set_active(1); # Just to force 'toggled' signal to trigger that callback and update GUI
     $$self{gui}{cbUsePersonal}->set_active($$cfg{'use personal settings'} // 0);
@@ -145,7 +144,6 @@ sub get_cfg {
     $options{'disable SHIFT key bindings'} = $$self{gui}{cbSHIFTDisable}->get_active;
 
     $options{'audible bell'} = $$self{gui}{cbAudibleBell}->get_active;
-    $options{'visible bell'} = $$self{gui}{cbVisibleBell}->get_active;
 
     $options{'use personal settings'} = $$self{gui}{cbUsePersonal}->get_active // 0;
 
@@ -226,10 +224,6 @@ sub _buildTermOptsGUI {
 
     $w{cbAudibleBell} = Gtk3::CheckButton->new_with_label('Audible bell');
     $w{hboxbell}->pack_start($w{cbAudibleBell}, 0, 1, 0);
-
-    $w{cbVisibleBell} = Gtk3::CheckButton->new_with_label('Visible bell');
-    $w{hboxbell}->pack_start($w{cbVisibleBell}, 0, 1, 0);
-
 
     $w{frameSuper} = Gtk3::Frame->new;
     $w{vbox}->pack_start($w{frameSuper}, 1, 1, 0);
