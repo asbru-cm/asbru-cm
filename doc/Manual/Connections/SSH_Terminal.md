@@ -66,6 +66,8 @@ __`<Shift + Ctrl>` + drag__ : Will create a square selection from the starting d
 
     To paste text from your local clipboard into the terminal. `<Shift + Insert>` or `right clic and "Paste"`.
 
+    You can imagine that the "Paste action", is similar to sending all the characters in the buffer to the terminal. So they will be sent with all the existing tabs, new line characters, etc.
+
 !!! danger "The terminal is a canvas"
     The terminal has no knowledge of the remote application, so when selecting and copying, it selects the text that finds on the visible area, and treats it as a canvas (a paintable area).
 
@@ -115,7 +117,28 @@ __Actions__
 
 This is the list of existing Ásbrú key bindings.
 
-|Key binding|Action|
-|-----------|------|
-|`<Ctrl-A>`|Does this|
+|Key binding     |Action                                        |
+|----------------|----------------------------------------------|
+|`F11`           |Toggle Full screen mode                       |
+|`<Ctrl+Alt-r>`  |Remove terminal from cluster                  |
+|`<Ctrl+Shift+C>`|Copy                                          |
+|`<Ctrl+Shift+V>`|Paste                                         |
+|`<Ctrl+Shift+P>`|Paste connection password                     |
+|`<Ctrl+Shift+B>`|Apply a regex to clipboard and then Paste     |
+|`<Ctrl+Shift+X>`|Reset terminal                                |
+|`<Ctrl+Shift+G>`|Guess hostname and set terminal title         |
+|`<Ctrl+Shift+W>`|Close terminal                                |
+|`<Ctrl+Shift+Q>`|Quit Ásbrú                                    |
+|`<Ctrl+Shift+F>`|Find node in the tree view                    |
+|`F4`            |Close all tabs                                |
+|`<Ctrl+Shift+N>`|Close all disconnected session windows or tabs|
+|`<Ctrl+Shift+D>`|Duplicate connection                          |
+|`<Ctrl+Shift+R>`|Disconnect and restart session                |
+|`<Ctrl-F4>`     |Close current tab                             |
+|`<Ctrl-F3>`     |Find text in the text buffer                  |
+|`<Ctrl-Insert>` |Copy selection to clipboard                   |
+|`<Shift-Insert>`|Insert text into the current cursor position  |
+|`<Alt-c>`       |Show main connection window                   |
+|`<Alt-n>`       |Show main connection window                   |
+|`<Alt-e>`       |Show main edit connection window              |
 
