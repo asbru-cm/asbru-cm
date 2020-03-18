@@ -74,8 +74,8 @@ This are known limitations of the current model.
 
 + The cli access will not allow to have an "unlocked" state.
     - It could be accomplished by opening an interactive session.
-    - But this would introduce the need to recode most of the logic in keepassxc-browser integration (create a service). Which is quite extensive, and in this case would make no sense to replicate existing work, would be better to implement the browser integration client.
-    - The cli, offers a very clean, easy and safe access that decouples Ásbrú from becoming a security target for command injections etc.
+    - But this would introduce the need to replicate most of the logic in keepassxc-browser integration (create a service). Which is quite extensive, and in this case would make no sense to replicate existing work, would be better to implement the browser integration client.
+    - The `cli`, offers a very clean, easy and safe access that decouples Ásbrú from becoming a security target for command injections, etc.
 + The main impact is visible if you decide to setup a keepass database with version 4+ and add a very strong encryption. This will create a delay of up to 5 seconds to unlock the database on every connection.
 
 !!! note "Is your decision to balance the time to unlock and level of encryption"
