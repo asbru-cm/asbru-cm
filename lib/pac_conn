@@ -1591,7 +1591,7 @@ elsif (!$MANUAL) {
             if ($PASSWORD_COUNT < 6) {
                 $PASSWORD_COUNT++;
                 $WAS_ASK_PASS = 0;
-                if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
+                if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || (!$PASS)) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
                     my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
