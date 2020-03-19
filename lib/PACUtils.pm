@@ -1556,8 +1556,8 @@ sub _wEnterValue {
     $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
+    my $val = '';
 
-    my $val = undef;
     if (@list) {
         if ($ok eq 'ok') {
             $val = $w{window}{gui}{comboList}->get_active_text();
