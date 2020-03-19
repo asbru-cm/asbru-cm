@@ -1507,7 +1507,9 @@ sub _wEnterValue {
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
-    #$w{window}{data}->set_position('center');
+    if (!$parent) {
+        $w{window}{data}->set_position('center');
+    }
     $w{window}{data}->set_icon_name('pac-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
@@ -1553,7 +1555,6 @@ sub _wEnterValue {
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
-    #$w{window}{data}->present();
     my $ok = $w{window}{data}->run();
 
     my $val = undef;
