@@ -1479,10 +1479,10 @@ sub _wEnterValue {
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-    my $parent = shift;
-
+    my $parent = undef;
     my @list;
     my $pos = -1;
+    my %w;
 
     if (!defined $default) {
         $default = '';
@@ -1490,11 +1490,10 @@ sub _wEnterValue {
         @list = @{$default};
     }
 
-    my %w;
-    if (defined $WINDOWSPLASH{_GUI}) {
-        $parent = $WINDOWSPLASH{_GUI};
-    } elsif (defined $self) {
+    if (defined $self) {
         $parent = $self;
+    } elsif (defined $WINDOWSPLASH{_GUI}) {
+        $parent = $WINDOWSPLASH{_GUI};
     } elsif (undef $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};

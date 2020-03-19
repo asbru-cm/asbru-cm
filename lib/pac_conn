@@ -401,7 +401,7 @@ sub subst {
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
     while ($string =~ /<ASK:(\d+?)>/go) {
         my $var = $1;
-        my $val = wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
+        my $val = wEnterValue("<b>Variable substitution '$var'</b>" , $string) // return undef;
         if (!defined $val) {
             last;
         }
@@ -415,7 +415,7 @@ sub subst {
         @list = split('\|', $var);
         my $desc = shift @list;
         my $ret;
-        ($ret, $pos) = wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
+        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, \@list);
         defined $ret or return undef;
         $string =~ s/<ASK:(.+\|.+?)>/$ret/g;
     }
@@ -423,7 +423,7 @@ sub subst {
     # Replace '<ASK:*>' with user provided data for 'cmd' execution
     while ($string =~ /<ASK:(.+?)>/go) {
         my $var = $1;
-        my $val = wEnterValue(undef, "<b>Variable substitution</b>" , $var) // return undef;
+        my $val = wEnterValue("<b>Variable substitution</b>" , $var) // return undef;
         if (!defined $val) {
             last;
         }
@@ -447,7 +447,6 @@ sub subst {
 }
 
 sub wEnterValue {
-    my $self = shift;
     my $lblup = shift // '';
     my $lbldown = shift // '';
     my $default = shift // '';
@@ -633,7 +632,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_ASK[NAME:$name][PID:$$][PARAMS:$txt, $visible]");
 
-        return wEnterValue(undef, "<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
+        return wEnterValue("<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
     };
     $TERMINAL{msg} = sub {msg(subst(shift));};
     $TERMINAL{log} = sub {
@@ -1101,7 +1100,7 @@ if (defined $METHOD) {
         $METHOD = 'vncviewer';
         if (($PASS eq '<<ASK_PASS>>') || ($MANUAL)) {
             ctrl("PASSWORD:Asking user for password...");
-            $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
+            $PASS = wEnterValue('<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
         my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
@@ -1253,7 +1252,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                 $PASSWORD_COUNT++;
                 if (($PASS eq '<<ASK_PASS>>') || ($MANUAL)) {
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Please, enter Password", '', 0);
+                    $PASS = wEnterValue('<b>Manual Password requested</b>', "Please, enter Password", '', 0);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
@@ -1338,7 +1337,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
             $user =~ s/^(.+?)@.+/$1/go;
 
             ctrl("PASSWORD:Asking user for gateway's password...");
-            $PASS = wEnterValue(undef, "<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0);
+            $PASS = wEnterValue("<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0);
 
             if (defined $PASS) {
                 $EXP->log_stdout(0);
@@ -1504,7 +1503,7 @@ elsif (!$MANUAL) {
                 $SUDO_PASSWORD_COUNT++;
                 if ((defined $SUDO_PASSWORD) && ($SUDO_PASSWORD eq '<<ASK_PASS>>')) {
                     ctrl("PASSWORD:Asking user '$ENV{'USER'}' for 'sudo' password...");
-                    $SUDO_PASSWORD = wEnterValue(undef, '<b>Password requested</b>', "Enter 'sudo' password for '$ENV{'USER'}'", '', 0);
+                    $SUDO_PASSWORD = wEnterValue('<b>Password requested</b>', "Enter 'sudo' password for '$ENV{'USER'}'", '', 0);
                 }
                 if (defined $SUDO_PASSWORD) {
                     $EXP->log_stdout(0);
@@ -1535,7 +1534,7 @@ elsif (!$MANUAL) {
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
                 exp_continue();
             } else {
-                my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
+                my $val = wEnterValue($match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
                 exp_continue();
@@ -1599,7 +1598,7 @@ elsif (!$MANUAL) {
 
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0);
+                    $PASS = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
