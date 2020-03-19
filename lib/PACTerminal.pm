@@ -1590,6 +1590,11 @@ sub _watchConnectionData {
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->show();
             }
+        } elsif ($data eq 'UNFOCUS') {
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
+        } elsif ($data eq 'REFOCUS') {
+            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
+            $$self{_WINDOWTERMINAL}->grab_focus();
         }
 
         $$self{_LAST_STATUS} = $data;
