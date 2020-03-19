@@ -2316,6 +2316,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignSpecific">
                     <property name="visible">True</property>
@@ -2330,7 +2331,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="labelCmdLineOptions">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Connection specific options: </property>
+                    <property name="label" translatable="yes"> Connection specific options</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2396,6 +2397,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignPreExec">
                     <property name="visible">True</property>
@@ -2410,7 +2412,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label108">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Pre-connections execute: </property>
+                    <property name="label" translatable="yes"> Pre-connections execute</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2464,6 +2466,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignPostExec">
                     <property name="visible">True</property>
@@ -2478,7 +2481,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label109">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Post-connections execute: </property>
+                    <property name="label" translatable="yes"> Post-connections execute</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2531,6 +2534,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignExpect">
                     <property name="visible">True</property>
@@ -2545,7 +2549,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="asdfasdfs">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Expect and Execute: </property>
+                    <property name="label" translatable="yes"> Expect and Execute</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2597,6 +2601,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignMacros">
                     <property name="visible">True</property>
@@ -2611,7 +2616,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label110">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Remote commands list: </property>
+                    <property name="label" translatable="yes"> Remote commands list</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2664,6 +2669,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignLocal">
                     <property name="visible">True</property>
@@ -2678,7 +2684,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label112">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Local commands list: </property>
+                    <property name="label" translatable="yes"> Local commands list</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2731,6 +2737,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignVar">
                     <property name="visible">True</property>
@@ -2745,7 +2752,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label114">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> User defined Variables: </property>
+                    <property name="label" translatable="yes"> User defined Variables</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -2796,6 +2803,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
                 <property name="label_xalign">0</property>
+                <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignTermOpts_">
                     <property name="visible">True</property>
@@ -2824,7 +2832,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label116">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Terminal Options: </property>
+                    <property name="label" translatable="yes"> Terminal Options</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
