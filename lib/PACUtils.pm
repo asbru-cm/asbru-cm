@@ -2813,83 +2813,32 @@ sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
+    my $pac_conn = shift;
+    my $kpxc = shift;
     my $ret = $string;
+    my %V = ();
     my %out;
     my $pos = -1;
+    my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
 
-    my $tstamp = time;
-    my ($dy, $dm, $dd, $th, $tm, $ts) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
-    my ($name, $title, $ip, $port, $user, $pass);
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
-            return;
+            return $string;
         }
+        $V{'UUID'}  = $uuid;
+        $V{'NAME'}  = $$CFG{'environments'}{$uuid}{name};
+        $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
+        $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
+        $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
+        $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
+        $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+    }
+    $V{'TIMESTAMP'} = time;
+    ($V{'DATE_Y'},$V{'DATE_M'},$V{'DATE_D'},$V{'TIME_H'},$V{'TIME_M'},$V{'TIME_S'}) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
 
-        $name = $$CFG{'environments'}{$uuid}{name};
-        $title = $$CFG{'environments'}{$uuid}{title};
-        $ip = $$CFG{'environments'}{$uuid}{ip};
-        $port = $$CFG{'environments'}{$uuid}{port};
-        $user = $$CFG{'environments'}{$uuid}{user};
-        $pass = $$CFG{'environments'}{$uuid}{pass};
-    }
-
-    if (defined $uuid) {
-        while ($string =~ /<UUID>/go) {
-            $string =~ s/<UUID>/$uuid/g;
-            $ret = $string;
-        }
-    }
-    while ($string =~ /<TIMESTAMP>/go) {
-        $string =~ s/<TIMESTAMP>/$tstamp/g;
-        $ret = $string;
-    }
-    while ($string =~ /<DATE_Y>/go) {
-        $string =~ s/<DATE_Y>/$dy/g;
-        $ret = $string;
-    }
-    while ($string =~ /<DATE_M>/go) {
-        $string =~ s/<DATE_M>/$dm/g;
-        $ret = $string;
-    }
-    while ($string =~ /<DATE_D>/go) {
-        $string =~ s/<DATE_D>/$dd/g;
-        $ret = $string;
-    }
-    while ($string =~ /<TIME_H>/go) {
-        $string =~ s/<TIME_H>/$th/g;
-        $ret = $string;
-    }
-    while ($string =~ /<TIME_M>/go) {
-        $string =~ s/<TIME_M>/$tm/g;
-        $ret = $string;
-    }
-    while ($string =~ /<TIME_S>/go) {
-        $string =~ s/<TIME_S>/$ts/g;
-        $ret = $string;
-    }
-    if (defined $uuid) {
-        while ($string =~ /<NAME>/go) {
-            $string =~ s/<NAME>/$name/g;
-            $ret = $string;
-        }
-        while ($string =~ /<TITLE>/go) {
-            $string =~ s/<TITLE>/$title/g;
-            $ret = $string;
-        }
-        while ($string =~ /<IP>/go) {
-            $string =~ s/<IP>/$ip/g;
-            $ret = $string;
-        }
-        while ($string =~ /<PORT>/go) {
-            $string =~ s/<PORT>/$port/g;
-            $ret = $string;
-        }
-        while ($string =~ /<USER>/go) {
-            $string =~ s/<USER>/$user/g;
-            $ret = $string;
-        }
-        while ($string =~ /<PASS>/go) {
-            $string =~ s/<PASS>/$pass/g;
+    foreach my $var (@LOCAL_VARS) {
+        if (defined $V{$var}) {
+            while ($string =~ s/<$var>/$V{$var}/g) {}
             $ret = $string;
         }
     }
@@ -2926,85 +2875,95 @@ sub _subst {
         }
     }
 
-    # Replace '<ASK:#>' with user provided data for 'cmd' execution
-    while ($string =~ /<ASK:(\d+?)>/go) {
-        my $var = $1;
-        my $val = _wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
-        $string =~ s/<ASK:$var>/$val/g;
-        $ret = $string;
-    }
-
-    # Replace '<ASK:description|opt1|opt2|...|optN>' with user provided data for 'cmd' execution
-    #while ($string =~ /<ASK:(.+\|.+?)>/go) {
-    while ($string =~ /<ASK:(.+?)\|(.+?)>/go) {
-        my $desc = $1;
-        my $var = $2;
-        my @list = split('\|', $var);
-        ($ret, $pos) = _wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
-        $string =~ s/<ASK:(.+?)\|(.+?)>/$ret/;
-        $ret = $string;
-    }
-
-    # Replace '<ASK:*>' with user provided data for 'cmd' execution
-    while ($string =~ /<ASK:(.+?)>/go) {
-        my $var = $1;
-        my $val = _wEnterValue(undef, "<b>Variable substitution</b>" , "Please, enter a value for:'$var'") // return undef;
-        $string =~ s/<ASK:$var>/$val/g;
-        $ret = $string;
-    }
-
-    # Replace '<CMD:.+>' with the result of executing 'cmd'
-    while ($string =~ /<CMD:(.+?)>/go) {
-        my $var = $1;
-        my $output = `$var`;
-        chomp $output;
-        if ($output =~ /\R/go) {
-            $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
-        } else {
-            $string =~ s/<CMD:\Q$var\E>/$output/g;
+    if (!$pac_conn) {
+        # Execute when not from pac_conn
+        # Replace '<ASK:#>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(\d+?)>/go) {
+            my $var = $1;
+            my $val = _wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
+            $string =~ s/<ASK:$var>/$val/g;
+            $ret = $string;
         }
-        $ret = $string;
-    }
 
-    # Delete '<CTRL_.+:.+>' and save it's value (output)
-    while ($string =~ /<CTRL_(.+?):(.+?)>/go) {
-        my $ctrl = $1;
-        my $cmd = $2;
-        $out{'ctrl'}{'ctrl'} = $ctrl;
-        $out{'ctrl'}{'cmd'} = $cmd;
-        $string =~ s/<CTRL_$ctrl:$cmd>//g;
-        $ret = $string;
-    }
+        # Replace '<ASK:description|opt1|opt2|...|optN>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(.+?)\|(.+?)>/go) {
+            my $desc = $1;
+            my $var = $2;
+            my @list = split('\|', $var);
+            ($ret, $pos) = _wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
+            $string =~ s/<ASK:(.+?)\|(.+?)>/$ret/;
+            $ret = $string;
+        }
 
-    # Delete '<TEE:.+>' and save it's value (output)
-    while ($string =~ /<TEE:(.+)>/go) {
-        my $var = $1;
-        $out{'tee'} = $var;
-        $string =~ s/<TEE:$var>//g;
-        $ret = $string;
-    }
+        # Replace '<ASK:*>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(.+?)>/go) {
+            my $var = $1;
+            my $val = _wEnterValue(undef, "<b>Variable substitution</b>" , "Please, enter a value for:'$var'") // return undef;
+            $string =~ s/<ASK:$var>/$val/g;
+            $ret = $string;
+        }
 
-    # Delete '<PIPE:.+:.+>' and save it's value (command to pipe the result through)
-    while ($string =~ /<PIPE:(.+?):(.+?)>/go) {
-        my $pipe = $1;
-        my $prompt = $2;
-        push(@{$out{'pipe'}}, $pipe);
-        $out{'prompt'} = $prompt;
-        $string =~ s/<PIPE:\Q$pipe\E:\Q$prompt>\E//g;
-        $ret = $string;
-    }
-    # Delete '<PIPE:.+>' and save it's value (command to pipe the result through)
-    while ($string =~ /<PIPE:(.+?)>/go) {
-        my $var = $1;
-        push(@{$out{'pipe'}}, $var);
-        $string =~ s/<PIPE:$var>//g;
-        $ret = $string;
+        # Replace '<CMD:.+>' with the result of executing 'cmd'
+        while ($string =~ /<CMD:(.+?)>/go) {
+            my $var = $1;
+            my $output = `$var`;
+            chomp $output;
+            if ($output =~ /\R/go) {
+                $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
+            } else {
+                $string =~ s/<CMD:\Q$var\E>/$output/g;
+            }
+            $ret = $string;
+        }
+
+        # Delete '<CTRL_.+:.+>' and save it's value (output)
+        while ($string =~ /<CTRL_(.+?):(.+?)>/go) {
+            my $ctrl = $1;
+            my $cmd = $2;
+            $out{'ctrl'}{'ctrl'} = $ctrl;
+            $out{'ctrl'}{'cmd'} = $cmd;
+            $string =~ s/<CTRL_$ctrl:$cmd>//g;
+            $ret = $string;
+        }
+
+        # Delete '<TEE:.+>' and save it's value (output)
+        while ($string =~ /<TEE:(.+)>/go) {
+            my $var = $1;
+            $out{'tee'} = $var;
+            $string =~ s/<TEE:$var>//g;
+            $ret = $string;
+        }
+
+        # Delete '<PIPE:.+:.+>' and save it's value (command to pipe the result through)
+        while ($string =~ /<PIPE:(.+?):(.+?)>/go) {
+            my $pipe = $1;
+            my $prompt = $2;
+            push(@{$out{'pipe'}}, $pipe);
+            $out{'prompt'} = $prompt;
+            $string =~ s/<PIPE:\Q$pipe\E:\Q$prompt>\E//g;
+            $ret = $string;
+        }
+        # Delete '<PIPE:.+>' and save it's value (command to pipe the result through)
+        while ($string =~ /<PIPE:(.+?)>/go) {
+            my $var = $1;
+            push(@{$out{'pipe'}}, $var);
+            $string =~ s/<PIPE:$var>//g;
+            $ret = $string;
+        }
     }
 
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        my $kpxc = $PACMain::FUNCS{_KEEPASS};
-        $ret = $kpxc->applyMask($ret);
+        if (!defined $kpxc && defined $PACMain::FUNCS{_KEEPASS}) {
+            $kpxc = $PACMain::FUNCS{_KEEPASS};
+        }
+        if (defined $kpxc) {
+            $ret = $kpxc->applyMask($ret);
+        }
+    }
+
+    if ($pac_conn) {
+        return $ret;
     }
 
     $out{'pos'} = $pos;

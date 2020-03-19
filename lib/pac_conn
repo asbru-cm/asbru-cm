@@ -271,8 +271,7 @@ sub auth {
 
 sub subst {
     my $string = shift // '';
-
-    my $pos = -1;
+    my ($pos);
 
     if (!defined $$CFG{'environments'}{$UUID}) {
         return $string;
@@ -282,91 +281,16 @@ sub subst {
     $string =~ s/\<\<(proxy|jump)_port\>\>/$proxy_port/g;
     $string =~ s/\<\<(proxy|jump)_user\>\>/$proxy_user/g;
     $string =~ s/\<\<(proxy|jump)_pass\>\>/$proxy_pass/g;
-    #$string =~ s/\<\<jump_key\>\>/$proxy_key/g;
-
-    my $tstamp = time;
-    my ($dy, $dm, $dd, $th, $tm, $ts) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
-    my $name = $$CFG{'environments'}{$UUID}{name};
-    my $title = $$CFG{'environments'}{$UUID}{title};
-    my $ip = $$CFG{'environments'}{$UUID}{ip};
-    my $port = $$CFG{'environments'}{$UUID}{port};
-    my $user = $$CFG{'environments'}{$UUID}{user};
-    my $pass = $$CFG{'environments'}{$UUID}{pass};
-
-    while ($string =~ /<UUID>/go) {
-        $string =~ s/<UUID>/$UUID/g;
-    }
-    while ($string =~ /<TIMESTAMP>/go) {
-        $string =~ s/<TIMESTAMP>/$tstamp/g;
-    }
-    while ($string =~ /<DATE_Y>/go) {
-        $string =~ s/<DATE_Y>/$dy/g;
-    }
-    while ($string =~ /<DATE_M>/go) {
-        $string =~ s/<DATE_M>/$dm/g;
-    }
-    while ($string =~ /<DATE_D>/go) {
-        $string =~ s/<DATE_D>/$dd/g;
-    }
-    while ($string =~ /<TIME_H>/go) {
-        $string =~ s/<TIME_H>/$th/g;
-    }
-    while ($string =~ /<TIME_M>/go) {
-        $string =~ s/<TIME_M>/$tm/g;
-    }
-    while ($string =~ /<TIME_S>/go) {
-        $string =~ s/<TIME_S>/$ts/g;
-    }
-    while ($string =~ /<NAME>/go) {
-        $string =~ s/<NAME>/$name/g;
-    }
-    while ($string =~ /<TITLE>/go) {
-        $string =~ s/<TITLE>/$title/g;
-    }
-    while ($string =~ /<IP>/go) {
-        $string =~ s/<IP>/$ip/g;
-    }
-    while ($string =~ /<PORT>/go) {
-        $string =~ s/<PORT>/$port/g;
-    }
-    while ($string =~ /<USER>/go) {
-        $string =~ s/<USER>/$user/g;
-    }
-    while ($string =~ /<PASS>/go) {
-        $string =~ s/<PASS>/$pass/g;
-    }
 
     # Replace '<command prompt>' with user defined value for command prompt
     while ($string =~ /<command prompt>/go) {
         $string = $COMMAND_PROMPT;
     }
 
-    # Replace '<GV:.+>' with user saved global variables for '$connection_cmd' execution
-    while ($string =~ /<GV:(.+?)>/go) {
-        my $var = $1;
-        if (defined $$CFG{'defaults'}{'global variables'}{$var}) {
-            my $val = $$CFG{'defaults'}{'global variables'}{$var}{'value'} // '';
-            $string =~ s/<GV:$var>/$val/g;
-        }
-    }
+    # Reuse most of the implementation in PACUtils.pm
+    $string = _subst($string,$CFG,$UUID,1,$kpxc);
 
-    # Replace '<V:#>' with user saved variables for '$connection_cmd'
-    while ($string =~ /<V:(\d+?)>/go) {
-        my $var = $1;
-        if (defined $$CFG{'environments'}{$UUID}{'variables'}[$var]) {
-            my $val = $$CFG{'environments'}{$UUID}{'variables'}[$var]{txt} // '';
-            $string =~ s/<V:$var>/$val/g;
-        }
-    }
-
-    # Replace '<ENV:#>' with environment variables for '$connection_cmd'
-    while ($string =~ /<ENV:(.+?)>/go) {
-        my $var = $1;
-        if (defined $ENV{$var}) {
-            $string =~ s/<ENV:\Q$var\E>/$ENV{$var}/g;
-        }
-    }
-
+    # Use local wEnterValue routine
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
     while ($string =~ /<ASK:(\d+?)>/go) {
         my $var = $1;
@@ -399,17 +323,14 @@ sub subst {
         $string =~ s/<ASK:\Q$var\E>/$val/g;
     }
 
+    # Different from PACUtils implementation
+
     # Replace '<CMD:#>' with the result of executing 'cmd'
     while ($string =~ /<CMD:(.+?)>/go) {
         my $var = $1;
         my $output = `$var 2>&1`;
         chomp $output;
         $string =~ s/<CMD:\Q$var\E>/$output/g;
-    }
-
-    # KeePassXC
-    if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        $string = $kpxc->applyMask($string);
     }
 
     return wantarray ? ($string, $pos) : $string;
