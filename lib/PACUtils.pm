@@ -1493,6 +1493,8 @@ sub _wEnterValue {
     my %w;
     if (defined $WINDOWSPLASH{_GUI}) {
         $parent = $WINDOWSPLASH{_GUI};
+    } elsif (defined $self) {
+        $parent = $self;
     } elsif (undef $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};

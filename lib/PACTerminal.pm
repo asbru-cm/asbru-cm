@@ -1590,11 +1590,13 @@ sub _watchConnectionData {
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->show();
             }
-        } elsif ($data eq 'UNFOCUS') {
+        } elsif ($data =~ /^WENTER\|/) {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
-        } elsif ($data eq 'REFOCUS') {
+            my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
+            my ($val,$pos) = _wEnterValue($$self{_WINDOWTERMINAL},$lblup,$lbldown,$default,$visible,'');
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             $$self{_WINDOWTERMINAL}->grab_focus();
+            $self->_sendData("WENTER|:|$val|:|$pos");
         }
 
         $$self{_LAST_STATUS} = $data;
@@ -1642,6 +1644,15 @@ sub _receiveData {
     } until $bytes < 1024;
 
     return 1;
+}
+
+sub _sendData {
+    my $self = shift;
+    my $msg = shift // '';
+    my $socket = shift // $$self{_SOCKET_CLIENT};
+
+    $msg = encode('UTF-16', $msg);
+    $socket->send("PAC_MSG_START[$msg]PAC_MSG_END");
 }
 
 sub _authClient {
