@@ -162,7 +162,7 @@ sub _buildExecGUI {
         if ($$self{where} eq 'local') {
             $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/LocalCommands/');
         } else {
-            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/RemoreCommands/');
+            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/RemoteCommands/');
         }
         $w{hbox}->pack_start($w{help},0,1,0);
 
