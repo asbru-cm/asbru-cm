@@ -289,6 +289,7 @@ sub subst {
     my $name = $$CFG{'environments'}{$UUID}{name};
     my $title = $$CFG{'environments'}{$UUID}{title};
     my $ip = $$CFG{'environments'}{$UUID}{ip};
+    my $port = $$CFG{'environments'}{$UUID}{port};
     my $user = $$CFG{'environments'}{$UUID}{user};
     my $pass = $$CFG{'environments'}{$UUID}{pass};
 
@@ -324,6 +325,9 @@ sub subst {
     }
     while ($string =~ /<IP>/go) {
         $string =~ s/<IP>/$ip/g;
+    }
+    while ($string =~ /<PORT>/go) {
+        $string =~ s/<PORT>/$port/g;
     }
     while ($string =~ /<USER>/go) {
         $string =~ s/<USER>/$user/g;
