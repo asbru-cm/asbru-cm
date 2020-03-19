@@ -2808,7 +2808,6 @@ sub _substCFG {
     return 1;
 }
 
-# TODO : Looks like duplicate from pac_conn, can be reused?
 sub _subst {
     my $string = shift;
     my $CFG = shift;
