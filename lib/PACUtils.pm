@@ -2813,14 +2813,13 @@ sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
-
     my $ret = $string;
     my %out;
     my $pos = -1;
 
     my $tstamp = time;
     my ($dy, $dm, $dd, $th, $tm, $ts) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
-    my ($name, $title, $ip, $user, $pass);
+    my ($name, $title, $ip, $port, $user, $pass);
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
             return;
@@ -2829,51 +2828,69 @@ sub _subst {
         $name = $$CFG{'environments'}{$uuid}{name};
         $title = $$CFG{'environments'}{$uuid}{title};
         $ip = $$CFG{'environments'}{$uuid}{ip};
+        $port = $$CFG{'environments'}{$uuid}{port};
         $user = $$CFG{'environments'}{$uuid}{user};
         $pass = $$CFG{'environments'}{$uuid}{pass};
     }
 
     if (defined $uuid) {
         while ($string =~ /<UUID>/go) {
-            $string =~ s/<UUID>/$uuid/g; $ret = $string;
+            $string =~ s/<UUID>/$uuid/g;
+            $ret = $string;
         }
     }
     while ($string =~ /<TIMESTAMP>/go) {
-        $string =~ s/<TIMESTAMP>/$tstamp/g; $ret = $string;
+        $string =~ s/<TIMESTAMP>/$tstamp/g;
+        $ret = $string;
     }
     while ($string =~ /<DATE_Y>/go) {
-        $string =~ s/<DATE_Y>/$dy/g; $ret = $string;
+        $string =~ s/<DATE_Y>/$dy/g;
+        $ret = $string;
     }
     while ($string =~ /<DATE_M>/go) {
-        $string =~ s/<DATE_M>/$dm/g; $ret = $string;
+        $string =~ s/<DATE_M>/$dm/g;
+        $ret = $string;
     }
     while ($string =~ /<DATE_D>/go) {
-        $string =~ s/<DATE_D>/$dd/g; $ret = $string;
+        $string =~ s/<DATE_D>/$dd/g;
+        $ret = $string;
     }
     while ($string =~ /<TIME_H>/go) {
-        $string =~ s/<TIME_H>/$th/g; $ret = $string;
+        $string =~ s/<TIME_H>/$th/g;
+        $ret = $string;
     }
     while ($string =~ /<TIME_M>/go) {
-        $string =~ s/<TIME_M>/$tm/g; $ret = $string;
+        $string =~ s/<TIME_M>/$tm/g;
+        $ret = $string;
     }
     while ($string =~ /<TIME_S>/go) {
-        $string =~ s/<TIME_S>/$ts/g; $ret = $string;
+        $string =~ s/<TIME_S>/$ts/g;
+        $ret = $string;
     }
     if (defined $uuid) {
         while ($string =~ /<NAME>/go) {
-            $string =~ s/<NAME>/$name/g; $ret = $string;
+            $string =~ s/<NAME>/$name/g;
+            $ret = $string;
         }
         while ($string =~ /<TITLE>/go) {
-            $string =~ s/<TITLE>/$title/g; $ret = $string;
+            $string =~ s/<TITLE>/$title/g;
+            $ret = $string;
         }
         while ($string =~ /<IP>/go) {
-            $string =~ s/<IP>/$ip/g; $ret = $string;
+            $string =~ s/<IP>/$ip/g;
+            $ret = $string;
+        }
+        while ($string =~ /<PORT>/go) {
+            $string =~ s/<PORT>/$port/g;
+            $ret = $string;
         }
         while ($string =~ /<USER>/go) {
-            $string =~ s/<USER>/$user/g; $ret = $string;
+            $string =~ s/<USER>/$user/g;
+            $ret = $string;
         }
         while ($string =~ /<PASS>/go) {
-            $string =~ s/<PASS>/$pass/g; $ret = $string;
+            $string =~ s/<PASS>/$pass/g;
+            $ret = $string;
         }
     }
 
@@ -2987,7 +3004,7 @@ sub _subst {
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
         my $kpxc = $PACMain::FUNCS{_KEEPASS};
-        $string = $kpxc->applyMask($string);
+        $ret = $kpxc->applyMask($ret);
     }
 
     $out{'pos'} = $pos;
