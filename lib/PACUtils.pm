@@ -2953,7 +2953,7 @@ sub _subst {
 
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        if (!defined $kpxc && defined $PACMain::FUNCS{_KEEPASS}) {
+        if (!$pac_conn) {
             $kpxc = $PACMain::FUNCS{_KEEPASS};
         }
         if (defined $kpxc) {
