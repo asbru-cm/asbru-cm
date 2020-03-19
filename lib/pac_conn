@@ -448,9 +448,9 @@ sub subst {
 
 sub wEnterValue {
     my $self = shift;
-    my $lblup = shift;
-    my $lbldown = shift;
-    my $default = shift;
+    my $lblup = shift // '';
+    my $lbldown = shift // '';
+    my $default = shift // '';
     my $visible = shift // 1;
     my $warray = wantarray;
     my $val = '';
