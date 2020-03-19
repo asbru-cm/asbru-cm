@@ -119,6 +119,7 @@ This is the list of existing Ásbrú key bindings.
 
 |Key binding     |Action                                        |
 |----------------|----------------------------------------------|
+|`F4`            |Close all tabs                                |
 |`F11`           |Toggle Full screen mode                       |
 |`<Ctrl+Alt-r>`  |Remove terminal from cluster                  |
 |`<Ctrl+Shift+C>`|Copy                                          |
@@ -130,7 +131,6 @@ This is the list of existing Ásbrú key bindings.
 |`<Ctrl+Shift+W>`|Close terminal                                |
 |`<Ctrl+Shift+Q>`|Quit Ásbrú                                    |
 |`<Ctrl+Shift+F>`|Find node in the tree view                    |
-|`F4`            |Close all tabs                                |
 |`<Ctrl+Shift+N>`|Close all disconnected session windows or tabs|
 |`<Ctrl+Shift+D>`|Duplicate connection                          |
 |`<Ctrl+Shift+R>`|Disconnect and restart session                |
@@ -141,4 +141,7 @@ This is the list of existing Ásbrú key bindings.
 |`<Alt-c>`       |Show main connection window                   |
 |`<Alt-n>`       |Show main connection window                   |
 |`<Alt-e>`       |Show main edit connection window              |
+|`<Ctrl++>`      |Zoom in : increase terminal font size         |
+|`<Ctrl+->`      |Zoom out: decrease terminal font size         |
+|`<Ctrl+0>`      |Zoom reset: set font size to default size     |
 
