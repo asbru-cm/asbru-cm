@@ -1646,6 +1646,7 @@ sub _receiveData {
     return 1;
 }
 
+# Send data back to the terminal or the defined socket
 sub _sendData {
     my $self = shift;
     my $msg = shift // '';
@@ -4313,7 +4314,7 @@ Create new terminal object
     CONNECTING = 0
     Calls _initGUI
     Calls _setupCallbacks
-        _watchConnectionData : receive connection data on signals : in, hup, err
+        _watchConnectionData : receive connection from forked connectin
 
 =head2 sub DESTROY
 
@@ -4378,8 +4379,8 @@ Attaches different event signals from Gui elements and the terminal to routines 
 
     Ignore 'hup','err' signals
     _receiveData    : load data into _SOCKET_BUFFER
-    Process command received
-        CONNECTED
+    Process command received from attached connection
+        CONNECTED              : inform the user we are connected, set icons messages
         EXPLORER
         PIPE_WAIT
         SCRIPT_(START|STOP)
@@ -4389,14 +4390,20 @@ Attaches different event signals from Gui elements and the terminal to routines 
         CHAIN
         EXEC:RECEIVE_OUT
         SENDSLOW
-        DISCONNECTED
+        DISCONNECTED           : inform user we got disconnected
         EXPECT:WAIT
         SPAWNED
+        UNHIDE_TERMINAL        : in window mode, unhide terminals that open rdp, vnc connections
+        WENTER                 : request user to enter data and return to the forked connection
 
 
 =head2 sub _receiveData
 
 Read data from socket and save into _SOCKET_BUFFER
+
+=head2 sub _sendData
+
+Send a message to the de defined socket or the attached connection
 
 =head2 sub _authClient
 

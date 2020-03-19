@@ -2065,6 +2065,10 @@ prints a message to the terminal screen using I<log color>
 
 Sends a internal message to the terminal associated with this connection. Using a UNIX socket
 
+=head2 sub receiveData
+
+Read data comming from the socket, used to prompt data to the user
+
 =head2 sub auth (socket)
 
 Check that socket is a PAC socket and not other
@@ -2078,6 +2082,8 @@ B<line> string
         password
         username
         uuid
+        global and local variables
+        kepass masks
         etc
 
 =head2 sub wEnterValue(undef,title,label,default,visible)
@@ -2118,6 +2124,12 @@ Pipe the command to other terminals if $pipe is active (possibly used in cluster
 =head2 sub _execScript
 
 Parse a user script, run the script.
+
+=head2 sub _setProxy
+
+Preparse proxy connections depending on the type of proxy used, currently : SOCKS and JumpHost (-J)
+
+Is uses a local config file to preconfigure the parameters.
 
 =head2 main
 
