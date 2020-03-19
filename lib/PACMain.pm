@@ -3052,7 +3052,7 @@ sub _treeConnections_menu {
     my @submenu_cluster;
     my %clusters;
     foreach my $uuid_tmp (keys %RUNNING) {
-        if ($RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (!$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
             next;
         }
         $clusters{$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;

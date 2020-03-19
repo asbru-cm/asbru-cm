@@ -1479,10 +1479,10 @@ sub _wEnterValue {
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-    my $parent = shift;
-
+    my $parent = undef;
     my @list;
     my $pos = -1;
+    my %w;
 
     if (!defined $default) {
         $default = '';
@@ -1490,13 +1490,12 @@ sub _wEnterValue {
         @list = @{$default};
     }
 
-    my %w;
-    if (defined $WINDOWSPLASH{_GUI}) {
+    if (defined $self) {
+        $parent = $self;
+    } elsif (defined $WINDOWSPLASH{_GUI}) {
         $parent = $WINDOWSPLASH{_GUI};
-    } elsif (undef $parent) {
-        if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
-            $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-        }
+    } elsif (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
+        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
@@ -1508,7 +1507,9 @@ sub _wEnterValue {
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
+    if (!$parent) {
+        $w{window}{data}->set_position('center');
+    }
     $w{window}{data}->set_icon_name('pac-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
@@ -1555,8 +1556,8 @@ sub _wEnterValue {
     $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
+    my $val = '';
 
-    my $val = undef;
     if (@list) {
         if ($ok eq 'ok') {
             $val = $w{window}{gui}{comboList}->get_active_text();
