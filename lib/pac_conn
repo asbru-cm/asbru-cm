@@ -1596,7 +1596,6 @@ elsif (!$MANUAL) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
                     my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
-
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
                     $PASS = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
