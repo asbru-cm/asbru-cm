@@ -456,7 +456,9 @@ sub wEnterValue {
     my $val = '';
     my $pos = 0;
 
+    # Request a value to the PACTerminal object
     ctrl("WENTER|:|$lblup|:|$lbldown|:|$default|:|$visible");
+    # Wait for data to arrive
     while (1) {
         my @data = receiveData($SOCKET);
         foreach my $data (@data) {
