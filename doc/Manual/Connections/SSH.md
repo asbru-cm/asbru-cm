@@ -22,6 +22,20 @@
         - User / Passphrase : The user and passphrase that will be used to automate your login.
     - __Manual__ : Do not automate login, let me do all the authentication sequence.
 
+!!! danger "Important information about passwords"
+    The password / passphrase fields can have 3 possible values.
+
+    + Password field
+        - Empty : During the login process you will be requested to type your password
+        - Value : The value saved in the field will be used as the password to automate your login.
+    + Passphrase field
+        - Empty : During the login process the passphrase will not be asked. It asumes your have configured a passwordless key.
+        - Value = `<<ASK_PASSS>>`: If you type this keyword, the Ásbrú will prompt for the passphrase when it detects that has been requested by the login process. This is useful if you do not want to store the passphrase in its configuration file.
+        - Value : Any other value will be stored in Ásbrú's configuration file. And it will be used to automate the login process.
+            - The value can be the password, or a KeePass mask (see below).
+
+    If you are aiming for the highest level of security and automation at the same time, you need to use [KeePass Integration](../Preferences/KeePassXC.md)
+
 ### Advanced Parameters
 
 ![](images/ssh2.png)
@@ -119,7 +133,7 @@ Local Macros have the same principle as the [Global Local Commands](../Preferenc
 
 ## User Variables
 
-This have the same principle as the [Global Variables](../Preferences/Global Variables.md)
+This have the same principle as the [Global Variables](../Preferences/GlobalVariables.md)
 
 But will be available only for this particular connection.
 
