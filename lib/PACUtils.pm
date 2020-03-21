@@ -2814,7 +2814,7 @@ sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
-    my $pac_conn = shift;
+    my $asbru_conn = shift;
     my $kpxc = shift;
     my $ret = $string;
     my %V = ();
@@ -2876,7 +2876,7 @@ sub _subst {
         }
     }
 
-    if (!$pac_conn) {
+    if (!$asbru_conn) {
         # Execute when not from pac_conn
         # Replace '<ASK:#>' with user provided data for 'cmd' execution
         while ($string =~ /<ASK:(\d+?)>/go) {
@@ -2955,7 +2955,7 @@ sub _subst {
 
     # KeePassXC
     if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-        if (!$pac_conn) {
+        if (!$asbru_conn) {
             $kpxc = $PACMain::FUNCS{_KEEPASS};
         }
         if (defined $kpxc) {
@@ -2963,7 +2963,7 @@ sub _subst {
         }
     }
 
-    if ($pac_conn) {
+    if ($asbru_conn) {
         return $ret;
     }
 
