@@ -21,6 +21,8 @@
     - If provided, the password will be stored in the pac.yml file for convenience so you do not need to type it.
     - If left blank. Ásbrú will ask for the password the first time is needed, and then retain in memory for the remaining of the Ásbrú session.
 + __Key file__ : If your version of keypassxc-cli supports it, and you have configured your database to use a keyfile, then selected here.
++ __keepassxc-cli binary__ : you can choose a different `keepassxc-cli` binary to use. In case you have installed for your user only or want to use a different version available in your system.
+    - On every change the application will validate the existence and capabilities of the selected version.
 + __Clear buttons__ : Remove any previously selected file.
 + __Info__ : Ásbrú, will show the current keepassxc-cli version and the capabilities detected in your current version.
     - If no keepassxc-cli detected, install keepassxc package to have it available.
