@@ -256,10 +256,45 @@ sub ctrl {
     my $wout = '';
     vec($wout, fileno($SOCKET), 1) = 1;
     select(undef, $wout, undef, 5) or die "ERROR: Could not write to PACMain SOCKET at $SOCK_FILE: $!";
-
     $SOCKET->send('PAC_MSG_START[' . encode('UTF-16', $msg) . ']PAC_MSG_END');
     return 1;
 }
+
+sub receiveData {
+    my $socket = shift;
+    my @data = ();
+    my $buffer = '';
+    my $data = '';
+    my $bytes;
+
+    if (!$socket) {
+        die "Error, bad call to receiveData no socket!!!!";
+    }
+    # At least one read should be done
+    do {
+        $bytes = sysread($socket, $data, 1024) // 0;
+        if (!defined $bytes) {
+            last;
+        }
+        $buffer .= $data;
+        chomp $buffer;
+        $buffer =~ s/\R/ /go;
+        my $empty_buffer = 0;
+        while ($buffer =~ s/PAC_MSG_START\[(.+?)\]PAC_MSG_END/$1/o) {
+            my $buffer = $1;
+            if (!$buffer) {
+                next;
+            }
+            push(@data,$buffer);
+            $empty_buffer = 1;
+        }
+        $empty_buffer and $buffer = '';
+
+    } until $bytes < 1024;
+
+    return @data;
+}
+
 sub auth {
     my $socket = shift;
 
@@ -370,7 +405,7 @@ sub subst {
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
     while ($string =~ /<ASK:(\d+?)>/go) {
         my $var = $1;
-        my $val = wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
+        my $val = wEnterValue("<b>Variable substitution '$var'</b>" , $string) // return undef;
         if (!defined $val) {
             last;
         }
@@ -384,7 +419,7 @@ sub subst {
         @list = split('\|', $var);
         my $desc = shift @list;
         my $ret;
-        ($ret, $pos) = wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
+        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, \@list);
         defined $ret or return undef;
         $string =~ s/<ASK:(.+\|.+?)>/$ret/g;
     }
@@ -392,7 +427,7 @@ sub subst {
     # Replace '<ASK:*>' with user provided data for 'cmd' execution
     while ($string =~ /<ASK:(.+?)>/go) {
         my $var = $1;
-        my $val = wEnterValue(undef, "<b>Variable substitution</b>" , $var) // return undef;
+        my $val = wEnterValue("<b>Variable substitution</b>" , $var) // return undef;
         if (!defined $val) {
             last;
         }
@@ -416,94 +451,37 @@ sub subst {
 }
 
 sub wEnterValue {
-    my $self = shift;
-    my $lblup = shift;
-    my $lbldown = shift;
-    my $default = shift;
+    my $lblup = shift // '';
+    my $lbldown = shift // '';
+    my $default = shift // '';
     my $visible = shift // 1;
-    my @list;
-    my $pos = -1;
+    my $warray = wantarray;
+    my $val = '';
+    my $pos = 0;
 
-    if (! defined $default) {
-        $default = '';
-    } elsif (ref($default)) {
-        @list = @{$default};
+    # Request a value to the PACTerminal object
+    ctrl("WENTER|:|$lblup|:|$lbldown|:|$default|:|$visible");
+    # Wait for data to arrive
+    while (1) {
+        my @data = receiveData($SOCKET);
+        foreach my $data (@data) {
+            $data = decode('UTF-16', $data);
+            if ($data =~ /^WENTER/) {
+                my ($cmd,$val,$pos) = split /\|:\|/, $data;
+                return $warray ? ($val, $pos) : $val;
+            }
+        }
     }
+    return $warray ? ($val, $pos) : $val;
+}
 
-    # Create the dialog window,
-    $_W{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME : Enter data",
-        undef,
-        'modal',
-        'gtk-cancel' => 'cancel',
-        'gtk-ok' => 'ok'
-    );
-    # and setup some dialog properties.
-    $_W{window}{data}->set_default_response('ok');
-    $_W{window}{data}->set_position('center');
-    $_W{window}{data}->set_icon_from_file($APPICON);
-    $_W{window}{data}->set_size_request(-1, -1);
-    $_W{window}{data}->set_resizable(0);
-    $_W{window}{data}->set_border_width(5);
+sub _hideSTDERR {
+    open OLDERR, ">&STDERR";
+    open STDERR, ">/dev/null";
+}
 
-    # Create an HBox to contain a picture and a label
-    $_W{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
-    $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{hbox}, 1, 1, 5);
-    $_W{window}{gui}{hbox}->set_border_width(5);
-
-    # Create image
-    $_W{window}{gui}{img} = Gtk3::Image->new_from_stock('gtk-edit', 'dialog');
-    $_W{window}{gui}{hbox}->pack_start($_W{window}{gui}{img}, 0, 1, 5);
-
-    # Create 1st label
-    $_W{window}{gui}{lblup} = Gtk3::Label->new;
-    $_W{window}{gui}{hbox}->pack_start($_W{window}{gui}{lblup}, 1, 1, 5);
-    $_W{window}{gui}{lblup}->set_markup($lblup);
-
-    if (defined $lbldown) {
-        # Create 2nd label
-        $_W{window}{gui}{lbldwn} = Gtk3::Label->new;
-        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{lbldwn}, 1, 1, 5);
-        $_W{window}{gui}{lbldwn}->set_text($lbldown);
-    }
-
-    if (@list) {
-        # Create combobox widget
-        $_W{window}{gui}{comboList} = Gtk3::ComboBoxText->new;
-        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{comboList}, 0, 1, 0);
-        $_W{window}{gui}{comboList}->set_property('can_focus', 0);
-        foreach my $text (@list) {
-            $_W{window}{gui}{comboList}->append_text($text)
-        };
-        $_W{window}{gui}{comboList}->set_active(0);
-    } else {
-        # Create the entry widget
-        $_W{window}{gui}{entry} = Gtk3::Entry->new;
-        $_W{window}{data}->get_content_area->pack_start($_W{window}{gui}{entry}, 0, 1, 5);
-        $_W{window}{gui}{entry}->set_text($default);
-        $_W{window}{gui}{entry}->set_activates_default(1);
-        $_W{window}{gui}{entry}->set_visibility($visible);
-    }
-
-    # Show the window (in a modal fashion)
-    $_W{window}{data}->show_all;
-    my $ok = $_W{window}{data}->run;
-
-    my $val;
-    if (@list) {
-        $val = ($ok eq 'ok') ? $_W{window}{gui}{comboList}->get_active_text : undef;
-        $pos = $_W{window}{gui}{comboList}->get_active;
-    } else {
-        $val = ($ok eq 'ok') ? $_W{window}{gui}{entry}->get_chars(0, -1) : undef;
-    }
-
-    $_W{window}{data}->destroy;
-    while (Gtk3::events_pending) {
-        Gtk3::main_iteration;
-    }
-    undef %_W;
-
-    return wantarray ? ($val, $pos) : $val;
+sub _showSTDERR {
+    open STDERR, ">&OLDERR";
 }
 
 sub send_slow {
@@ -658,7 +636,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_ASK[NAME:$name][PID:$$][PARAMS:$txt, $visible]");
 
-        return wEnterValue(undef, "<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
+        return wEnterValue("<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
     };
     $TERMINAL{msg} = sub {msg(subst(shift));};
     $TERMINAL{log} = sub {
@@ -1130,7 +1108,7 @@ if (defined $METHOD) {
         $METHOD = 'vncviewer';
         if (($PASS eq '<<ASK_PASS>>') || ($MANUAL)) {
             ctrl("PASSWORD:Asking user for password...");
-            $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
+            $PASS = wEnterValue('<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
         my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
@@ -1282,7 +1260,7 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                 $PASSWORD_COUNT++;
                 if (($PASS eq '<<ASK_PASS>>') || ($MANUAL)) {
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', "Please, enter Password", '', 0);
+                    $PASS = wEnterValue('<b>Manual Password requested</b>', "Please, enter Password", '', 0);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
@@ -1367,7 +1345,7 @@ elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
             $user =~ s/^(.+?)@.+/$1/go;
 
             ctrl("PASSWORD:Asking user for gateway's password...");
-            $PASS = wEnterValue(undef, "<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0);
+            $PASS = wEnterValue("<b>Gateway Password requested</b>", "Enter Password for gateway's user '$user'", '', 0);
 
             if (defined $PASS) {
                 $EXP->log_stdout(0);
@@ -1533,7 +1511,7 @@ elsif (!$MANUAL) {
                 $SUDO_PASSWORD_COUNT++;
                 if ((defined $SUDO_PASSWORD) && ($SUDO_PASSWORD eq '<<ASK_PASS>>')) {
                     ctrl("PASSWORD:Asking user '$ENV{'USER'}' for 'sudo' password...");
-                    $SUDO_PASSWORD = wEnterValue(undef, '<b>Password requested</b>', "Enter 'sudo' password for '$ENV{'USER'}'", '', 0);
+                    $SUDO_PASSWORD = wEnterValue('<b>Password requested</b>', "Enter 'sudo' password for '$ENV{'USER'}'", '', 0);
                 }
                 if (defined $SUDO_PASSWORD) {
                     $EXP->log_stdout(0);
@@ -1564,7 +1542,7 @@ elsif (!$MANUAL) {
                 ctrl("HOSTKEY:accepted by configuration (sent '$yes')");
                 exp_continue();
             } else {
-                my $val = wEnterValue(undef, $match, "Answer yes/no") // return undef;
+                my $val = wEnterValue($match, "Answer yes/no") // return undef;
                 send_slow($EXP, "$val\n");
                 ctrl("HOSTKEY:user value sent '$val')");
                 exp_continue();
@@ -1621,14 +1599,14 @@ elsif (!$MANUAL) {
             if ($PASSWORD_COUNT < 6) {
                 $PASSWORD_COUNT++;
                 $WAS_ASK_PASS = 0;
-                if ((defined $PASS && $PASS eq '<<ASK_PASS>>') || ((!defined $PASS || $PASS eq '') && $AUTH eq 'publickey')) {
+
+                if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
                     my @before = split /\n/, $EXP->before;
                     # Extract the last line and use it is as prompt for the request password dialog
                     my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
-
                     $WAS_ASK_PASS = 1;
                     ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue(undef, '<b>Manual Password requested</b>', $real_prompt, '', 0);
+                    $PASS = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
                 }
                 if (defined $PASS) {
                     $EXP->log_stdout(0);
@@ -2170,6 +2148,10 @@ prints a message to the terminal screen using I<log color>
 
 Sends a internal message to the terminal associated with this connection. Using a UNIX socket
 
+=head2 sub receiveData
+
+Read data comming from the socket, used to prompt data to the user
+
 =head2 sub auth (socket)
 
 Check that socket is a PAC socket and not other
@@ -2183,6 +2165,8 @@ B<line> string
         password
         username
         uuid
+        global and local variables
+        kepass masks
         etc
 
 =head2 sub wEnterValue(undef,title,label,default,visible)
@@ -2223,6 +2207,12 @@ Pipe the command to other terminals if $pipe is active (possibly used in cluster
 =head2 sub _execScript
 
 Parse a user script, run the script.
+
+=head2 sub _setProxy
+
+Preparse proxy connections depending on the type of proxy used, currently : SOCKS and JumpHost (-J)
+
+Is uses a local config file to preconfigure the parameters.
 
 =head2 main
 

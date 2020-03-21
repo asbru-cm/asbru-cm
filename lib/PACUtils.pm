@@ -1473,16 +1473,15 @@ sub _menuAvailableConnections {
 }
 
 sub _wEnterValue {
-    my $self = shift;
+    my $parent = shift;
     my $lblup = shift;
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-    my $parent = shift;
-
     my @list;
     my $pos = -1;
+    my %w;
 
     if (!defined $default) {
         $default = '';
@@ -1490,14 +1489,15 @@ sub _wEnterValue {
         @list = @{$default};
     }
 
-    my %w;
-    if (defined $WINDOWSPLASH{_GUI}) {
-        $parent = $WINDOWSPLASH{_GUI};
-    } elsif (undef $parent) {
+    # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (!defined $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+        } elsif (defined $WINDOWSPLASH{_GUI}) {
+            $parent = $WINDOWSPLASH{_GUI};
         }
     }
+
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
@@ -1508,7 +1508,9 @@ sub _wEnterValue {
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
+    if (!$parent) {
+        $w{window}{data}->set_position('center');
+    }
     $w{window}{data}->set_icon_name('pac-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
@@ -1555,8 +1557,8 @@ sub _wEnterValue {
     $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
+    my $val = '';
 
-    my $val = undef;
     if (@list) {
         if ($ok eq 'ok') {
             $val = $w{window}{gui}{comboList}->get_active_text();
@@ -1570,7 +1572,7 @@ sub _wEnterValue {
 
     $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
-        Gtk3::main_iteration;
+        Gtk3::main_iteration();
     }
 
     return wantarray ? ($val, $pos) : $val;
