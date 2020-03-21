@@ -1595,7 +1595,9 @@ sub _watchConnectionData {
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
             my ($val,$pos) = _wEnterValue($$self{_WINDOWTERMINAL},$lblup,$lbldown,$default,$visible,'');
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
-            $$self{_WINDOWTERMINAL}->grab_focus();
+            if (defined $$self{_WINDOWTERMINAL}) {
+                $$self{_WINDOWTERMINAL}->grab_focus();
+            }
             $self->_sendData("WENTER|:|$val|:|$pos");
         }
 
