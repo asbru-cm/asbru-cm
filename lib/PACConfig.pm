@@ -155,7 +155,7 @@ sub _initGUI {
     _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/asbru_start.desktop');
 
     # Initialize main window
-    $$self{_WINDOWCONFIG}->set_icon_name('pac-app-big');
+    $$self{_WINDOWCONFIG}->set_icon_name('asbru-app-big');
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
@@ -174,12 +174,12 @@ sub _initGUI {
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
     #_($self, 'btnCheckVersion')->set_label('Check _now');
 
-    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('pac-treelist', 'button'));
-    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'));
-    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('pac-history', 'button'));
-    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
-    _($self, 'imgKeePassOpts')->set_from_stock('pac-keepass', 'button');
-    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('pac-protected', 'button'));
+    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'button'));
+    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'));
+    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('asbru-history', 'button'));
+    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button'));
+    _($self, 'imgKeePassOpts')->set_from_stock('asbru-keepass', 'button');
+    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'button'));
     _($self, 'btnCfgSetGUIPassword')->set_label('Set...');
     _($self, 'btnExportYAML')->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button'));
     _($self, 'btnExportYAML')->set_label('Export config...');
@@ -283,7 +283,7 @@ sub _setupCallbacks {
         _($self, 'cfgLblCharEncode')->set_markup($desc);
     });
     _($self, 'cbCfgBWTrayIcon')->signal_connect('toggled' => sub {
-        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'pac-tray-bw' : 'pac-tray', 'menu');
+        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     });
     _($self, 'cbCfgShowSudoPassword')->signal_connect('toggled' => sub {
         _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
@@ -330,7 +330,7 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
-            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
+            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'asbru-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
@@ -797,7 +797,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgCtrlTabLast')->set_active($$cfg{'defaults'}{'ctrl tab'} eq 'last');
     _($self, 'rbCfgCtrlTabNext')->set_active($$cfg{'defaults'}{'ctrl tab'} ne 'last');
     _($self, 'cbCfgAutoAppendGroupName')->set_active($$cfg{'defaults'}{'append group name'});
-    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'pac-tray-bw' : 'pac-tray', 'menu');
+    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     _($self, 'rbOnNoTabsNothing')->set_active($$cfg{'defaults'}{'when no more tabs'} == 0);
     _($self, 'rbOnNoTabsClose')->set_active($$cfg{'defaults'}{'when no more tabs'} == 1);
     _($self, 'rbOnNoTabsHide')->set_active($$cfg{'defaults'}{'when no more tabs'} == 2);

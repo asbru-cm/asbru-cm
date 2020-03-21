@@ -246,7 +246,7 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
+            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
         }
         if (!defined $pass) {
             exit 0;
@@ -484,7 +484,7 @@ sub _initGUI {
 
     # Create groupAdd button
     $$self{_GUI}{groupAddBtn} = Gtk3::Button->new();
-    $$self{_GUI}{groupAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-group-add', 'button'));
+    $$self{_GUI}{groupAddBtn}->set_image(Gtk3::Image->new_from_stock('asbru-group-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{groupAddBtn}, 1, 1, 0);
     $$self{_GUI}{groupAddBtn}->set('can-focus' => 0);
     $$self{_GUI}{groupAddBtn}->get_style_context()->add_class("button-cp");
@@ -492,7 +492,7 @@ sub _initGUI {
 
     # Create connAdd button
     $$self{_GUI}{connAddBtn} = Gtk3::Button->new();
-    $$self{_GUI}{connAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-node-add', 'button'));
+    $$self{_GUI}{connAddBtn}->set_image(Gtk3::Image->new_from_stock('asbru-node-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connAddBtn}, 1, 1, 0);
     $$self{_GUI}{connAddBtn}->set('can-focus' => 0);
     $$self{_GUI}{connAddBtn}->get_style_context()->add_class("button-cp");
@@ -548,7 +548,7 @@ sub _initGUI {
     $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{nbTreeTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbTreeTabLabel} = Gtk3::Label->new();
-    $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('pac-treelist', 'button'), 0, 1, 0);
+    $$self{_GUI}{nbTreeTab}->pack_start(Gtk3::Image->new_from_stock('asbru-treelist', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbTreeTab}->pack_start($$self{_GUI}{nbTreeTabLabel}, 0, 1, 0);
     }
@@ -621,7 +621,7 @@ sub _initGUI {
     $$self{_GUI}{scroll2} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbFavTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbFavTabLabel} = Gtk3::Label->new();
-    $$self{_GUI}{nbFavTab}->pack_start(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'), 0, 1, 0);
+    $$self{_GUI}{nbFavTab}->pack_start(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
     }
@@ -655,7 +655,7 @@ sub _initGUI {
     $$self{_GUI}{scroll3} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbHistTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbHistTabLabel} = Gtk3::Label->new();
-    $$self{_GUI}{nbHistTab}->pack_start(Gtk3::Image->new_from_stock('pac-history', 'button'), 0, 1, 0);
+    $$self{_GUI}{nbHistTab}->pack_start(Gtk3::Image->new_from_stock('asbru-history', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
     }
@@ -684,7 +684,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{btneditclu} = Gtk3::Button->new_with_label(' Manage Clusters');
         $$self{_GUI}{vboxclu}->pack_start($$self{_GUI}{btneditclu}, 0, 1, 0);
-        $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btneditclu}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager2', 'GTK_ICON_SIZE_BUTTON'));
         $$self{_GUI}{btneditclu}->set('can-focus', 0);
     }
 
@@ -692,7 +692,7 @@ sub _initGUI {
     $$self{_GUI}{scrolledclu} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbCluTab} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{nbCluTabLabel} = Gtk3::Label->new();
-    $$self{_GUI}{nbCluTab}->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'), 0, 1, 0);
+    $$self{_GUI}{nbCluTab}->pack_start(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbCluTab}->pack_start($$self{_GUI}{nbCluTabLabel}, 0, 1, 0);
     }
@@ -744,7 +744,7 @@ sub _initGUI {
     # Create connQuickBtn button
     $$self{_GUI}{connQuickBtn} = Gtk3::Button->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connQuickBtn}, 0, 1, 0);
-    $$self{_GUI}{connQuickBtn}->set_image(Gtk3::Image->new_from_stock('pac-quick-connect', 'button'));
+    $$self{_GUI}{connQuickBtn}->set_image(Gtk3::Image->new_from_stock('asbru-quick-connect', 'button'));
     $$self{_GUI}{connQuickBtn}->set('can-focus' => 0);
     $$self{_GUI}{connQuickBtn}->set_tooltip_text('Start a new connection, without saving it');
 
@@ -766,7 +766,7 @@ sub _initGUI {
         $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{clusterBtn}, 1, 1, 0);
-    $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'button'));
+    $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager2', 'button'));
     $$self{_GUI}{clusterBtn}->set('can-focus' => 0);
     $$self{_GUI}{clusterBtn}->set_tooltip_text('Open the Clusters Administration Console');
 
@@ -777,7 +777,7 @@ sub _initGUI {
         $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
-    $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('pac-script', 'button'));
+    $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('asbru-script', 'button'));
     $$self{_GUI}{scriptsBtn}->set('can-focus' => 0);
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{scriptsBtn}->get_style_context()->add_class("button-cp");
@@ -871,7 +871,7 @@ sub _initGUI {
 
     # Create hideConn button
     $$self{_GUI}{showConnBtn} = Gtk3::ToggleButton->new();
-    $$self{_GUI}{showConnBtn}->set_image(Gtk3::Image->new_from_stock('pac-treelist', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{showConnBtn}->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{showConnBtn}->set_active(1);
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 1, 1, 0);
     $$self{_GUI}{showConnBtn}->set('can-focus' => 0);
@@ -879,7 +879,7 @@ sub _initGUI {
 
     # Create WakeOnLan button
     $$self{_GUI}{wolBtn} = Gtk3::Button->new_with_mnemonic('Wake On Lan');
-    $$self{_GUI}{wolBtn}->set_image(Gtk3::Image->new_from_stock('pac-wol', 'button'));
+    $$self{_GUI}{wolBtn}->set_image(Gtk3::Image->new_from_stock('asbru-wol', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{wolBtn}, 1, 1, 0);
     $$self{_GUI}{wolBtn}->set('can-focus' => 0);
     $$self{_GUI}{wolBtn}->set_tooltip_text('Start the Wake On Lan utility window');
@@ -891,7 +891,7 @@ sub _initGUI {
     } else {
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
     }
-    $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('pac-shell', 'button'));
+    $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('asbru-shell', 'button'));
     $$self{_GUI}{shellBtn}->set('can-focus' => 0);
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{shellBtn}->get_style_context()->add_class("button-cp");
@@ -920,7 +920,7 @@ sub _initGUI {
 
     # Create [un]lockBtn button
     $$self{_GUI}{lockPACBtn} = Gtk3::ToggleButton->new();
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('pac-unprotected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{lockPACBtn}->set_active(0);
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{lockPACBtn}, 0, 1, 0);
     $$self{_GUI}{lockPACBtn}->set('can-focus' => 0);
@@ -2022,7 +2022,7 @@ sub _setupCallbacks {
             $self->_updateGUIFavourites();
             $self->_updateGUIPreferences();
         }
-        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
+        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
         if ($UNITY) {
             $FUNCS{_TRAY}->_setTrayMenu();
         }
@@ -2047,7 +2047,7 @@ sub _setupCallbacks {
         $$self{_NO_PROPAGATE_FAV_TOGGLE} = 1;
         $$self{_GUI}{connFavourite}->set_active(0);
         $$self{_GUI}{connFavourite}->set_sensitive(0);
-        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-off', 'button'));
+        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-off', 'button'));
         $$self{_NO_PROPAGATE_FAV_TOGGLE} = 0;
 
         my $page = $$self{_GUI}{nbTree}->get_nth_page($pnum);
@@ -2381,7 +2381,7 @@ sub _setupCallbacks {
 sub _lockPAC {
     my $self = shift;
 
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('pac-protected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{lockPACBtn}->set_active(1);
     $$self{_GUI}{vbox3}->set_sensitive(0);
     $$self{_GUI}{showConnBtn}->set_sensitive(0);
@@ -2406,14 +2406,14 @@ sub _lockPAC {
 sub _unlockPAC {
     my $self = shift;
 
-    my $pass = _wEnterValue($self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
+    my $pass = _wEnterValue($self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
         $$self{_GUI}{lockPACBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
     }
 
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('pac-unprotected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{lockPACBtn}->set_active(0);
     $$self{_GUI}{vbox3}->set_sensitive(1);
     $$self{_GUI}{showConnBtn}->set_sensitive(1);
@@ -2641,7 +2641,7 @@ sub _treeConnections_menu_lite {
     if ($sel[0] ne '__PAC_SHELL__') {
         push(@tree_menu_items, {
             label => 'Wake On LAN...' . ($$self{_CFG}{'environments'}{$sel[0]}{'use proxy'} || $$self{_CFG}{'defaults'}{'use proxy'} ? '(can\'t, PROXY configured!!)' : ''),
-            stockicon => 'pac-wol',
+            stockicon => 'asbru-wol',
             sensitive => ! ($$self{_CFG}{'environments'}{$sel[0]}{'use proxy'} || $$self{_CFG}{'defaults'}{'use proxy'}) && (scalar(@sel) >= 1) && (scalar(@sel) == 1) && (! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
             code => sub { $self->_setCFGChanged(_wakeOnLan($$self{_CFG}{'environments'}{$sel[0]}, $sel[0])); }
         });
@@ -2783,7 +2783,7 @@ sub _treeConnections_menu {
     if (scalar(@sel) >= 1 && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {
             label => scalar(@sel) > 1 ? ('Toggle Protected state') : (($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'Un-' : '') . 'Protect'),
-            stockicon => 'pac-' . ($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'un' : '') . 'protected',
+            stockicon => 'asbru-' . ($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'un' : '') . 'protected',
             shortcut => '<alt>r',
             tooltip => "Protect or not this node, in order to avoid any changes (Edit, Delete, Rename, ...)",
             sensitive => 1,
@@ -2904,14 +2904,14 @@ sub _treeConnections_menu {
         # Add Connection
         push(@tree_menu_items, {
             label => 'Add Connection',
-            stockicon => 'pac-node-add',
+            stockicon => 'asbru-node-add',
             tooltip => "Create a new CONNECTION under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
             code => sub{ $$self{_GUI}{connAddBtn}->clicked(); }
         });
         # Add Group
         push(@tree_menu_items, {
             label => 'Add Group',
-            stockicon => 'pac-group-add',
+            stockicon => 'asbru-group-add',
             tooltip => "Create a new GROUP under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
             code => sub{ $$self{_GUI}{groupAddBtn}->clicked(); }
         });
@@ -2988,7 +2988,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
 
         label => 'Wake On LAN...' . ($$self{_CFG}{'environments'}{$sel[0]}{'use proxy'} || $$self{_CFG}{'defaults'}{'use proxy'} ? '(can\'t, PROXY configured!!)' : ''),
-        stockicon => 'pac-wol',
+        stockicon => 'asbru-wol',
         sensitive => ! ($$self{_CFG}{'environments'}{$sel[0]}{'use proxy'} || $$self{_CFG}{'defaults'}{'use proxy'}) && (scalar(@sel) >= 1) && (scalar(@sel) == 1) && (! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
         code => sub { $self->_setCFGChanged(_wakeOnLan($$self{_CFG}{'environments'}{$sel[0]}, $sel[0])); }
     });
@@ -3765,7 +3765,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{connFavourite}->set_sensitive($total >= 1 && ! ($is_root || $is_group));
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 1;
     $$self{_GUI}{connFavourite}->set_active($total eq 1 && ! ($is_root || $is_group) && $$self{_CFG}{'environments'}{$uuid}{'favourite'});
-    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_CFG}{'environments'}{$uuid}{'favourite'} ? 'on' : 'off'), 'button'));
+    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($$self{_CFG}{'environments'}{$uuid}{'favourite'} ? 'on' : 'off'), 'button'));
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 0;
 
     $$self{_GUI}{nb}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
@@ -3811,7 +3811,7 @@ sub _updateGUIFavourites {
     $$self{_GUI}{connFavourite}->set_sensitive(1 && $uuid ne '__PAC__ROOT__');
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 1;
     $$self{_GUI}{connFavourite}->set_active($uuid ne '__PAC__ROOT__');
-    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'));
+    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'));
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 0;
 
     if ($total == 1) {
@@ -3845,7 +3845,7 @@ sub _updateGUIHistory {
     $$self{_GUI}{connFavourite}->set_sensitive(0);
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 1;
     $$self{_GUI}{connFavourite}->set_active($$self{_CFG}{'environments'}{$uuid}{'favourite'});
-    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('pac-favourite-' . ($$self{_CFG}{'environments'}{$uuid}{'favourite'} ? 'on' : 'off'), 'button'));
+    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($$self{_CFG}{'environments'}{$uuid}{'favourite'} ? 'on' : 'off'), 'button'));
     $$self{_NO_PROPAGATE_FAV_TOGGLE} = 0;
 
     $self->_updateGUIWithUUID($sel_uuids[0]) if $total == 1;

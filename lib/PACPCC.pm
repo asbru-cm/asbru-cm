@@ -380,7 +380,7 @@ sub _initGUI {
     $$self{_WINDOWPCC}{btnClose}->set('can_focus', 0);
     $$self{_WINDOWPCC}{btnClusterAdmin} = Gtk3::Button->new_with_mnemonic('Cl_usters');
     $$self{_WINDOWPCC}{btnClusterAdmin}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnClusterAdmin}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button') );
+    $$self{_WINDOWPCC}{btnClusterAdmin}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button') );
     $$self{_WINDOWPCC}{btnSeparate} = Gtk3::Button->new_with_mnemonic('_Explode');
     $$self{_WINDOWPCC}{btnSeparate}->set('can_focus', 0);
     $$self{_WINDOWPCC}{btnSeparate}->set_tooltip_text("Separate and resize clustered windows to fit screen");

@@ -136,7 +136,7 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'asbru-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
@@ -308,7 +308,7 @@ sub listEntries {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_resizable(1);
     $w{window}{data}->set_default_size(600,400);
     $w{window}{data}->set_resizable(0);
