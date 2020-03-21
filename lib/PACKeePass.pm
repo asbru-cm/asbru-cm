@@ -574,6 +574,7 @@ sub _buildKeePassGUI {
         $w{hboxkpmain}->set_sensitive(0);
     } else {
         my $capabilities;
+        $capabilities .= "<b>binary</b> $CLI\n";
         if ($$self{kpxc_keyfile}) {
             $capabilities .= "<b>Use Key File</b> Enabled\n";
         } else {
