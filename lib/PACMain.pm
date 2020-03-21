@@ -4697,6 +4697,13 @@ sub _ApplyLayout {
     my ($self,$layout) = @_;
 
     if ($layout eq 'Compact') {
+        my $H = Gtk3::Gdk::Screen::get_default()->get_height()-100;
+        $$self{wheight} = 600;
+
+        if ($H < $$self{wheight}) {
+            # Set a good height on smaller screens
+            $$self{wheight} = int($H*0.8);
+        }
         # This layout to work implies some configuration settings to work correctly
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
@@ -4711,8 +4718,8 @@ sub _ApplyLayout {
             }
             $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
-        $$self{_GUI}{main}->set_default_size(220,600);
-        $$self{_GUI}{main}->resize(220,600);
+        $$self{_GUI}{main}->set_default_size(220,$$self{wheight});
+        $$self{_GUI}{main}->resize(220,$$self{wheight});
     }
 }
 
