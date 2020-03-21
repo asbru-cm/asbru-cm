@@ -67,9 +67,9 @@ my $RES_DIR = "$RealBin/res";
 my $AUTOSTART_FILE = "$RES_DIR/pac_start.desktop";
 my $THEME_DIR = "$RES_DIR/themes/defualt";
 my $GLADE_FILE = "$RES_DIR/asbru.glade";
-my $INIT_CFG_FILE = "$RES_DIR/pac.yml";
+my $INIT_CFG_FILE = "$RES_DIR/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -331,7 +331,7 @@ sub _setupCallbacks {
 
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
-        my $cmd = `$RealBin/lib/pac_conn $CFG_DIR/pac.nfreeze $$self{_UUID} 1`;
+        my $cmd = `$RealBin/lib/pac_conn $CFG_DIR/asbru.nfreeze $$self{_UUID} 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
 

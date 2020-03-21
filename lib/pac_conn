@@ -1040,7 +1040,7 @@ if (defined $METHOD) {
         }
         _setProxy($method);
         if ($method eq 'TigerVNC') {
-            my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
+            my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";

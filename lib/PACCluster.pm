@@ -57,7 +57,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CLUSTERS_FILE = "$CFG_DIR/pac_clusters.nfreeze";
+my $CLUSTERS_FILE = "$CFG_DIR/asbru_clusters.nfreeze";
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR;
 my $GROUPICONOPEN;

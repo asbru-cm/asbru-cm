@@ -58,7 +58,7 @@ use PACKeePass;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
+my $AUTOSTART_FILE = "$RealBin/res/asbru_start.desktop";
 
 my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
@@ -152,7 +152,7 @@ sub _initGUI {
     _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
-    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
+    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/asbru_start.desktop');
 
     # Initialize main window
     $$self{_WINDOWCONFIG}->set_icon_name('pac-app-big');
@@ -212,13 +212,13 @@ sub _setupCallbacks {
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
-        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop") ) {
+        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop") ) {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
-                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
                 1;
             };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active()) {
-            unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+            unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
         }
         return 1;
@@ -764,7 +764,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
     _($self, 'entryCfgSelectByWordChars')->set_text($$cfg{'defaults'}{'word characters'});
     _($self, 'cbCfgShowTrayIcon')->set_active($$cfg{'defaults'}{'show tray icon'});
-    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     #DevNote: option currently disabled
     #_($self, 'cbCfgCheckVersions')->set_active($$cfg{'defaults'}{'check versions at start'});
     #_($self, 'btnCheckVersion')->set_sensitive(! $PACMain::FUNCS{_MAIN}{_UPDATING});
@@ -1146,11 +1146,11 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
     }
 
-    unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
         $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open(F, ">:utf8","$ENV{HOME}/.config/autostart/pac_start.desktop");
+        open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;
         $$self{_CFG}{'defaults'}{'start at session startup'} = 1;

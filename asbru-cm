@@ -192,10 +192,17 @@ sub config_migration {
     print "MIGRAR !!!!\n";
     print "mv $old_dir $new_dir\n";
     #system "mv $old_dir $new_dir";
-    foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree') {
+    foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_clusters.nfreeze','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree','pac_start.desktop') {
         my $n = $f;
         $n =~ s/pac/asbru/;
         print "mv -f $new_dir/$f $new_dir/$n\n";
+        #system "mv -f $new_dir/$f $new_dir/$n";
+    }
+    foreach my $f ('pac_start.desktop') {
+        my $n = $f;
+        $n =~ s/pac/asbru/;
+        print "mv -f $new_dir/res/$f $new_dir/res/$n\n";
+        print "mv -f $new_dir/autostart/$f $new_dir/autostart/$n\n";
         #system "mv -f $new_dir/$f $new_dir/$n";
     }
     return 0;

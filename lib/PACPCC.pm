@@ -98,10 +98,10 @@ sub new {
     _setupCallbacks($self);
 
     # Autoload any text
-    #if (($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) && (open(F, "$CFG_DIR/pac.pcc") ))
+    #if (($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) && (open(F, "$CFG_DIR/asbru.pcc") ))
 
     my @content;
-    if (open(F,"<:utf8","$CFG_DIR/pac.pcc") ) {
+    if (open(F,"<:utf8","$CFG_DIR/asbru.pcc") ) {
         @content = <F>;
         close F;
 
@@ -894,7 +894,7 @@ sub _setupCallbacks {
                 $$self{_RUNNING}{$uuid}{'terminal'}{_PROPAGATE} = 1;
             }
         }
-        open(F,">:utf8","$CFG_DIR/pac.pcc");
+        open(F,">:utf8","$CFG_DIR/asbru.pcc");
         my ($x, $y) = $$self{_WINDOWPCC}{main}->get_position;
         my ($w, $h) = $$self{_WINDOWPCC}{main}->get_size;
         ($$self{_W}, $$self{_H}) = ($w, $h) if $$self{_WINDOWPCC}{cbShowMultiText}->get_active;

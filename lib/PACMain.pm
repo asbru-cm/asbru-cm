@@ -85,14 +85,14 @@ my $RES_DIR = "$RealBin/res";
 # Register icons on Gtk
 #&_registerPACIcons;
 
-my $INIT_CFG_FILE = "$RealBin/res/pac.yml";
+my $INIT_CFG_FILE = "$RealBin/res/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $THEME_DIR = "$RES_DIR/themes/default";
 our $R_CFG_FILE = '';
-my $CFG_FILE_FREEZE = "$CFG_DIR/pac.freeze";
-my $CFG_FILE_NFREEZE = "$CFG_DIR/pac.nfreeze";
-my $CFG_FILE_DUMPER = "$CFG_DIR/pac.dumper";
+my $CFG_FILE_FREEZE = "$CFG_DIR/asbru.freeze";
+my $CFG_FILE_NFREEZE = "$CFG_DIR/asbru.nfreeze";
+my $CFG_FILE_DUMPER = "$CFG_DIR/asbru.dumper";
 
 my $PAC_START_PROGRESS = 0;
 my $PAC_START_TOTAL = 6;

@@ -139,7 +139,7 @@ my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
 my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
@@ -3747,11 +3747,11 @@ sub _makeDesktopFile {
 #        $da .= "Exec=asbru-cm --start-uuid=$uuid\n";
 #    }
 
-    if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/pac.desktop")) {
+    if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/asbru.desktop")) {
         return 0;
     }
 
-    open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
+    open F, ">$ENV{HOME}/.local/share/applications/asbru.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
     system('/usr/bin/xdg-desktop-menu forceupdate &');
@@ -4089,7 +4089,7 @@ Get hash (table, dictionary list) or encoders
 
 =head2 sub _makeDesktopFile
 
-Creates a pac.desktop file to launch application
+Creates a asbru.desktop file to launch application
 
 =head2 sub _updateWidgetColor
 
