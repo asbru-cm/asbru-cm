@@ -605,7 +605,7 @@ sub _testCapabilities {
     my $self = shift;
     my ($c);
 
-    if ((defined $$self{cfg})&&($$self{pathcli})&&(-e $$self{cfg}{pathcli})) {
+    if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
     $$self{kpxc_keyfile} = '';
