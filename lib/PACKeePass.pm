@@ -589,7 +589,6 @@ sub _buildKeePassGUI {
         $CLI = 'keepassxc-cli';
         $self->_testCapabilities();
         $self->_updateUsage();
-        print "B\n";
     });
 
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
