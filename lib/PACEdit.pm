@@ -724,7 +724,7 @@ sub _updateGUIPreferences {
     }
 
     # Show Jump options in network settings (only for SSH method)
-    if ($$self{_CFG}{'environments'}{$uuid}{'method'} eq "SSH") {
+    if ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /SSH|SFTP/i) {
         # Control SSH capabilities
         my $ssh = `ssh 2>&1`;
         $ssh =~ s/\n//g;
