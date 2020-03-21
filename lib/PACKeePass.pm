@@ -106,7 +106,6 @@ sub update {
     }
     if (!-e $pathcli) {
         $pathcli = '';
-        return 0;
     }
     if ($$self{disable_keepassxc}) {
         $$self{cfg}{use_keepass} = 0;
@@ -584,6 +583,9 @@ sub _buildKeePassGUI {
     $w{btnClearclifile}->signal_connect('clicked' => sub {
         $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
+        $CLI = 'keepassxc-cli';
+        $self->_testCapabilities();
+        $self->_updateUsage();
     });
 
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
@@ -592,6 +594,10 @@ sub _buildKeePassGUI {
             $CLI = $fc->get_filename();
             $self->_testCapabilities();
             $self->_updateUsage();
+            if ($CLI ne $fc->get_filename()) {
+                $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
+                $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
+            }
         }
     });
 
