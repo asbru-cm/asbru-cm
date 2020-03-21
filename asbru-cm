@@ -29,6 +29,7 @@ $|++;
 
 # Execute this code before anything else, even loading modules
 BEGIN {
+    $ENV{'USER_DIR_SET'} = 0;
     if (grep({ /^-{1,2}(help|h)$/gi } @ARGV)) {
         print "\n";
         print "Usage: $0 [options]\n";
@@ -68,6 +69,7 @@ BEGIN {
                 # Relative path to ~./config
                 $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/$path";
             }
+            $ENV{'USER_DIR_SET'} = 1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
             print STDERR "INFO: bad start up parameter $arg\n";
         }
@@ -76,7 +78,7 @@ BEGIN {
         ###################################################################
         # DEFAULT CONFIG DIR SHOULD BE DEFINED HERE
         ###################################################################
-        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/pac";
+        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/asbru";
     }
     # Workaround to unexpected SSH disconnections due to wrong handling of the WINCH event in some Gnome versions
     # See https://www.perlmonks.org/?node_id=11109454
@@ -102,10 +104,10 @@ use warnings;
 
 ###################################################################
 # START: Define GLOBAL variables
-our $CFG_FILE_NAME  = "pac.yml";
+our $CFG_FILE_NAME  = "asbru.yml";
 our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
-our $CFG_DIR_OLD    = "";
+our $CFG_DIR_OLD    = "$ENV{'HOME'}/.config/pac";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
@@ -137,9 +139,13 @@ if (!-d "$ENV{'HOME'}/.config") {
 }
 
 # Code for future configuration migrations when needed
-if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
+if ((!$ENV{'USER_DIR_SET'}) && ($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     config_migration($CFG_DIR_OLD,$CFG_DIR);
 }
+
+delete $ENV{'USER_DIR_SET'};
+
+exit 0;
 
 # Create Asbru config dir if necessary
 if (!-d $CFG_DIR) {
@@ -180,6 +186,17 @@ exit 0;
 sub config_migration {
     my ($old_dir,$new_dir) = @_;
 
+    if (-e $new_dir) {
+        return 0;
+    }
+    print "MIGRAR !!!!\n";
+    #system "mv $old_dir $new_dir";
+    foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree') {
+        my $n = $f;
+        $n =~ s/pac/asbru/;
+        print "mv -f $new_dir/$f $new_dir/$n\n";
+        #system "mv -f $new_dir/$f $new_dir/$n";
+    }
     return 0;
 }
 
@@ -212,7 +229,7 @@ sub getDesktopEnvironment {
 sub CheckConfigurationFile {
     use POSIX qw(strftime);
 
-    my $nfreeze = "$CFG_DIR/pac.nfreeze";
+    my $nfreeze = "$CFG_DIR/asbru.nfreeze";
     my $now = strftime "%Y%m%d%H%M%S", localtime;
     my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME";
     my $MAX_BACKUP_FILES = 10;
