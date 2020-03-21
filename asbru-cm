@@ -190,6 +190,7 @@ sub config_migration {
         return 0;
     }
     print "MIGRAR !!!!\n";
+    print "mv $old_dir $new_dir\n";
     #system "mv $old_dir $new_dir";
     foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree') {
         my $n = $f;
