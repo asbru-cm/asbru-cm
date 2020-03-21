@@ -1473,13 +1473,12 @@ sub _menuAvailableConnections {
 }
 
 sub _wEnterValue {
-    my $self = shift;
+    my $parent = shift;
     my $lblup = shift;
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-    my $parent = undef;
     my @list;
     my $pos = -1;
     my %w;
@@ -1490,13 +1489,15 @@ sub _wEnterValue {
         @list = @{$default};
     }
 
-    if (defined $self) {
-        $parent = $self;
-    } elsif (defined $WINDOWSPLASH{_GUI}) {
-        $parent = $WINDOWSPLASH{_GUI};
-    } elsif (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
-        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (!defined $parent) {
+        if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
+            $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+        } elsif (defined $WINDOWSPLASH{_GUI}) {
+            $parent = $WINDOWSPLASH{_GUI};
+        }
     }
+
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
@@ -1571,7 +1572,7 @@ sub _wEnterValue {
 
     $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
-        Gtk3::main_iteration;
+        Gtk3::main_iteration();
     }
 
     return wantarray ? ($val, $pos) : $val;

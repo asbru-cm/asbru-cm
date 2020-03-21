@@ -132,10 +132,11 @@ sub getUseKeePass {
 
 sub getMasterPassword {
     my $self = shift;
+    my $parent = shift;
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($self, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
@@ -294,7 +295,7 @@ sub listEntries {
 
     if (!$KPXC_MP) {
         # Get Password user
-        getMasterPassword($self);
+        getMasterPassword($self, $parent);
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
