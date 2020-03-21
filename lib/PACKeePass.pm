@@ -583,9 +583,11 @@ sub _buildKeePassGUI {
     $w{btnClearclifile}->signal_connect('clicked' => sub {
         $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
+        $$cfg{pathcli} = '';
         $CLI = 'keepassxc-cli';
         $self->_testCapabilities();
         $self->_updateUsage();
+        print "B\n";
     });
 
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
