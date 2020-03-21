@@ -253,7 +253,7 @@ sub __ {
 sub __text {
     my $str = shift // '';
 
-    $str =~ s/&amp;/\&/go;
+    while ($str =~ s/&amp;/\&/g) {}
     $str =~ s/&#124;/\|/go;
     $str =~ s/&apos;/\'/go;
     $str =~ s/&quot;/\"/go;
