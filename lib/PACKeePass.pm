@@ -153,6 +153,7 @@ sub getMasterPassword {
             if (!$flg && $msg !~ /ASBRUKeePassXCTEST/) {
                 $KPXC_MP='';
                 $mp = '';
+                _wMessage($parent,"<b>keepassxc-cli message</b>\n\n$msg");
             }
         } else {
             last;
@@ -185,7 +186,7 @@ sub testMasterKey {
     close Reader;
     close ErrReader;
     if ($?) {
-        return ($err[0],0);
+        return (decode('utf8',$err[0]),0);
     }
     return ('',1);
 }
