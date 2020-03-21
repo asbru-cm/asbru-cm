@@ -203,7 +203,8 @@ sub config_migration {
         $n =~ s/pac/asbru/;
         print "mv -f $new_dir/res/$f $new_dir/res/$n\n";
         print "mv -f $new_dir/autostart/$f $new_dir/autostart/$n\n";
-        #system "mv -f $new_dir/$f $new_dir/$n";
+        #system "mv -f $new_dir/res/$f $new_dir/res/$n";
+        #system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
     }
     return 0;
 }

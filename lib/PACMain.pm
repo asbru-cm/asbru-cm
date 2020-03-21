@@ -79,7 +79,7 @@ use PACScripts;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
+my $AUTOSTART_FILE = "$RealBin/res/asbru_start.desktop";
 my $RES_DIR = "$RealBin/res";
 
 # Register icons on Gtk
@@ -4134,7 +4134,7 @@ sub __exportNodes {
     );
     $choose->set_do_overwrite_confirmation(1);
     $choose->set_current_folder($ENV{'HOME'} // '/tmp');
-    $choose->set_current_name("pac_export.yml");
+    $choose->set_current_name("asbru_export.yml");
 
     my $out = $choose->run();
     my $file = $choose->get_filename();
@@ -4799,7 +4799,7 @@ B<@ARGV> : List of command line parameters (perldoc asbru-cm)
     %RUNNING :  Table of PACTerminal Objects. $RUNNING{UUID}
                 For a description of Terminal objects (perldoc PACTerminal.pm)
 
-B<UUID> = 'pac_PID' + I<pid number> + '_n' + I<Counter>
+B<UUID> = 'asbru_PID' + I<pid number> + '_n' + I<Counter>
 
 =head2 PACMain Internal Variables
 

@@ -64,7 +64,7 @@ use PACTermOpts;
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $RES_DIR = "$RealBin/res";
-my $AUTOSTART_FILE = "$RES_DIR/pac_start.desktop";
+my $AUTOSTART_FILE = "$RES_DIR/asbru_start.desktop";
 my $THEME_DIR = "$RES_DIR/themes/defualt";
 my $GLADE_FILE = "$RES_DIR/asbru.glade";
 my $INIT_CFG_FILE = "$RES_DIR/asbru.yml";
