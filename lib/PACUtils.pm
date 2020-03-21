@@ -1479,7 +1479,6 @@ sub _wEnterValue {
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-    my $parent = undef;
     my @list;
     my $pos = -1;
     my %w;
