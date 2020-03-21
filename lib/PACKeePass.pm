@@ -185,9 +185,9 @@ sub testMasterKey {
     waitpid($pid,0);
     close Reader;
     close ErrReader;
-    print "ERR?:$#err\n";
-    if ($?) {
-        return (decode('utf8',$err[0]),0);
+    if (@err) {
+        my $msg = join('',@err);
+        return (decode('utf8',$msg),0);
     }
     return ('',1);
 }
