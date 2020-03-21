@@ -4700,7 +4700,7 @@ sub _ApplyLayout {
         my $H = Gtk3::Gdk::Screen::get_default()->get_height()-100;
         $$self{wheight} = 600;
 
-        if ($H-100 < $$self{wheight}) {
+        if ($H < $$self{wheight}) {
             # Set a good height on smaller screens
             $$self{wheight} = int($H*0.8);
         }
