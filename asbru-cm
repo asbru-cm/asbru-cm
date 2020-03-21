@@ -145,7 +145,7 @@ if ((!$ENV{'USER_DIR_SET'}) && ($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
 
 delete $ENV{'USER_DIR_SET'};
 
-#exit 0;
+exit 0;
 
 # Create Asbru config dir if necessary
 if (!-d $CFG_DIR) {
@@ -191,7 +191,7 @@ sub config_migration {
         return 0;
     }
     print "MIGRAR !!!!\n";
-    system "cp -rfp $old_dir $new_dir";
+    #system "cp -rfp $old_dir $old_dir.old";
     print "mv $old_dir $new_dir\n";
     #system "mv $old_dir $new_dir";
     foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_clusters.nfreeze','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree','pac_start.desktop') {
@@ -215,13 +215,14 @@ sub config_migration {
         #system "cp -fp $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
     }
     # Rename screenshost
-    opendir($ss,"$new_dir/screenshots");
+    opendir($ss,"$old_dir/screenshots");
+    #opendir($ss,"$new_dir/screenshots");
     while (my $f = readdir($ss)) {
         if ($f =~ /\.png/) {
             my $n = $f;
-            $f =~ s/pac/asbru/;
-            print "mv -f $new_dir/screenshots/$n $new_dir/screenshots/$n\n";
-            #system "mv -f $new_dir/screenshots/$n $new_dir/screenshots/$n";
+            $n =~ s/pac/asbru/;
+            print "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n\n";
+            #system "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
         }
     }
     return 0;
