@@ -206,6 +206,7 @@ sub config_migration {
         #system "mv -f $new_dir/res/$f $new_dir/res/$n";
         #system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
     }
+    # Rename screenshost
     return 0;
 }
 
