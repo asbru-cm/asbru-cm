@@ -146,7 +146,7 @@ sub new {
     $self->{EMBED} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'embed'};
 
     ++$_C;
-    $self->{_UUID_TMP} = "pac_PID{$$}_n$_C";
+    $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
 
     if ($self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'} . '/';
@@ -159,24 +159,24 @@ sub new {
     }
     $self->{_TMPCFG} = "$CFG_DIR/tmp/$$self{_UUID_TMP}freeze";
 
-    $self->{_TMPPIPE} = "$CFG_DIR/tmp/pac_PID{$$}_n$_C.pipe";
+    $self->{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
     while (-f $$self{_TMPPIPE}) {
         ++$_C;
-        $$self{_TMPPIPE} = "$CFG_DIR/tmp/pac_PID{$$}_n$_C.pipe";
+        $$self{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
     }
     unlink $$self{_TMPPIPE};
 
-    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.socket";
+    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
     while (-f $$self{_TMPSOCKET}) {
         ++$_C;
-        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.socket";
+        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
     }
     unlink $$self{_TMPSOCKET};
 
-    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.exec.socket";
+    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
     while (-f $$self{_TMPSOCKETEXEC}) {
         ++$_C;
-        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.exec.socket";
+        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
     }
     unlink $$self{_TMPSOCKETEXEC};
 
@@ -2177,9 +2177,9 @@ sub _vteMenu {
     # Add take screenshot
     push(@vte_menu_items, {label => 'Take Screenshot', stockicon => 'gtk-media-record', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub {
         my $screenshot_file = '';
-        $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
+        $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
         while(-f $screenshot_file) {
-            $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
+            $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
         }
         select(undef, undef, undef, 0.5);
         _screenshot($$self{_GUI}{_VBOX}, $screenshot_file);
@@ -2362,8 +2362,8 @@ sub _setTabColour {
                 }
 
                 my $screenshot_file = '';
-                $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
-                while(-f $screenshot_file) {$screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';}
+                $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
+                while(-f $screenshot_file) {$screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';}
                 _screenshot($$self{EMBED} ? $$self{FOCUS} : $$self{_GUI}{_VBOX}, $screenshot_file);
                 $PACMain::FUNCS{_MAIN}{_GUI}{screenshots}->add($screenshot_file, $$self{_CFG}{'environments'}{$$self{_UUID}});
                 $PACMain::FUNCS{_MAIN}->_updateGUIPreferences();
@@ -4306,7 +4306,7 @@ Package to create a terminal object with its own windows, event handlers and men
     _FOCUS              0 No , 1 Yes
     _GUILOCKED          0 No , 1 Yes
     _FOCUSED            0 No , 1 Yes
-    _UUID_TMP           Current UUID assigned to this terminal : pac_PID{pidnumber}_n$COUNT
+    _UUID_TMP           Current UUID assigned to this terminal : asbru_PID{pidnumber}_n$COUNT
 
 =head2 sub new
 
