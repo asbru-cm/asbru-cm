@@ -548,14 +548,9 @@ sub _buildKeePassGUI {
     $w{btnClearclifile} = Gtk3::Button->new('Clear');
     $w{hboxkpclifile}->pack_start($w{btnClearclifile}, 0, 1, 0);
 
-    $w{btnClearclifile}->signal_connect('clicked' => sub {
-        $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
-        $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
-    });
-
-    my $usage =  Gtk3::Label->new();
-    $usage->set_halign('start');
-    $w{vbox}->pack_start($usage, 0, 1, 0);
+    $w{usage} =  Gtk3::Label->new();
+    $w{usage}->set_halign('start');
+    $w{vbox}->pack_start($w{usage}, 0, 1, 0);
 
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
@@ -568,24 +563,12 @@ sub _buildKeePassGUI {
         }
     });
     if ($$self{disable_keepassxc}) {
-        $usage->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
+        $w{usage}->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
         $w{cbUseKeePass}->set_sensitive(0);
         $w{cbUseKeePass}->set_active(0);
         $w{hboxkpmain}->set_sensitive(0);
     } else {
-        my $capabilities;
-        $capabilities .= "<b>Location</b> $CLI\n";
-        if ($$self{kpxc_keyfile}) {
-            $capabilities .= "<b>Use Key File</b> Enabled\n";
-        } else {
-            $capabilities .= "<b>Use Key File</b> Disabled (update to latest version)\n";
-        }
-        if ($$self{kpxc_show_protected}) {
-            $capabilities .= "<b>Protected passwords</b> Yes\n";
-        } else {
-            $capabilities .= "<b>Protected passwords</b> No\n";
-        }
-        $usage->set_markup("\n\n<b>keepassxc-cli</b> Version $$self{kpxc_version}\n\n$capabilities");
+        _updateUsage($self);
     }
     $w{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
     $w{hboxkpclifile}->set_sensitive($$self{cfg}{use_keepass});
@@ -598,7 +581,39 @@ sub _buildKeePassGUI {
         $w{fcbKeePassFile}->unselect_uri("file://$ENV{'HOME'}");
     });
 
+    $w{btnClearclifile}->signal_connect('clicked' => sub {
+        $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
+        $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
+    });
+
+    $w{fcbCliFile}->signal_connect('selection-changed' => sub {
+        my ($fc) = @_;
+        if (defined $fc->get_filename()) {
+            $CLI = $fc->get_filename();
+            $self->_testCapabilities();
+            $self->_updateUsage();
+        }
+    });
+
     return 1;
+}
+
+sub _updateUsage {
+    my $self = shift;
+    my $capabilities;
+
+    $capabilities .= "<b>Location</b> $CLI\n";
+    if ($$self{kpxc_keyfile}) {
+        $capabilities .= "<b>Use Key File</b> Enabled\n";
+    } else {
+        $capabilities .= "<b>Use Key File</b> Disabled (update to latest version)\n";
+    }
+    if ($$self{kpxc_show_protected}) {
+        $capabilities .= "<b>Protected passwords</b> Yes\n";
+    } else {
+        $capabilities .= "<b>Protected passwords</b> No\n";
+    }
+    $$self{frame}{usage}->set_markup("\n\n<b>keepassxc-cli</b> Version $$self{kpxc_version}\n\n$capabilities");
 }
 
 sub _testCapabilities {
