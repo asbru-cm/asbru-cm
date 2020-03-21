@@ -190,6 +190,7 @@ sub config_migration {
         return 0;
     }
     print "MIGRAR !!!!\n";
+    system "cp -rfp $old_dir $new_dir";
     print "mv $old_dir $new_dir\n";
     #system "mv $old_dir $new_dir";
     foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_clusters.nfreeze','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree','pac_start.desktop') {
@@ -205,6 +206,12 @@ sub config_migration {
         print "mv -f $new_dir/autostart/$f $new_dir/autostart/$n\n";
         #system "mv -f $new_dir/res/$f $new_dir/res/$n";
         #system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
+    }
+    # Rename BackUps
+    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/pac.yml";
+    for (my $n=0; $n < 10; $n++) {
+        print "cp -fp $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n\n";
+        #system "cp -fp $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
     }
     # Rename screenshost
     return 0;
