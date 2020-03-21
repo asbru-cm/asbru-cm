@@ -306,7 +306,7 @@ sub new {
     #$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME($$);
 
     # Gtk style
-    my $css_provider = Gtk3::CssProvider->new;
+    my $css_provider = Gtk3::CssProvider->new();
     $css_provider->load_from_path("$THEME_DIR/asbru.css");
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
 
@@ -349,7 +349,7 @@ sub start {
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
 
     # Setup callbacks
-    $self->_setupCallbacks;
+    $self->_setupCallbacks();
 
     # If version is lower than current, update and save the new one
     if ($APPVERSION gt $$self{_CFG}{defaults}{version}) {
@@ -393,7 +393,7 @@ sub start {
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
-        $$self{_GUI}{main}->present;
+        $$self{_GUI}{main}->present();
     } else {
         $self->_hideConnectionsList();
     }
@@ -465,7 +465,7 @@ sub _initGUI {
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
     $$self{_GUI}{main}->add($$self{_GUI}{vbox1});
 
-    $$self{_GUI}{hpane} = Gtk3::HPaned->new;
+    $$self{_GUI}{hpane} = Gtk3::HPaned->new();
     $$self{_GUI}{vbox1}->add($$self{_GUI}{hpane});
 
     # Create a vbox3: actions, connections and other tools
@@ -483,7 +483,7 @@ sub _initGUI {
     $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
 
     # Create groupAdd button
-    $$self{_GUI}{groupAddBtn} = Gtk3::Button->new;
+    $$self{_GUI}{groupAddBtn} = Gtk3::Button->new();
     $$self{_GUI}{groupAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-group-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{groupAddBtn}, 1, 1, 0);
     $$self{_GUI}{groupAddBtn}->set('can-focus' => 0);
@@ -491,7 +491,7 @@ sub _initGUI {
     $$self{_GUI}{groupAddBtn}->set_tooltip_text('New GROUP');
 
     # Create connAdd button
-    $$self{_GUI}{connAddBtn} = Gtk3::Button->new;
+    $$self{_GUI}{connAddBtn} = Gtk3::Button->new();
     $$self{_GUI}{connAddBtn}->set_image(Gtk3::Image->new_from_stock('pac-node-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connAddBtn}, 1, 1, 0);
     $$self{_GUI}{connAddBtn}->set('can-focus' => 0);
@@ -499,7 +499,7 @@ sub _initGUI {
     $$self{_GUI}{connAddBtn}->set_tooltip_text('New CONNECTION');
 
     # Create connEditBtn button
-    $$self{_GUI}{connEditBtn} = Gtk3::Button->new;
+    $$self{_GUI}{connEditBtn} = Gtk3::Button->new();
     $$self{_GUI}{connEditBtn}->set_image(Gtk3::Image->new_from_stock('gtk-edit', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connEditBtn}, 1, 1, 0);
     $$self{_GUI}{connEditBtn}->set('can-focus' => 0);
@@ -507,7 +507,7 @@ sub _initGUI {
     $$self{_GUI}{connEditBtn}->set_tooltip_text('Edit this Connection');
 
     # Create nodeRen button
-    $$self{_GUI}{nodeRenBtn} = Gtk3::Button->new;
+    $$self{_GUI}{nodeRenBtn} = Gtk3::Button->new();
     $$self{_GUI}{nodeRenBtn}->set_image(Gtk3::Image->new_from_stock('gtk-spell-check', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeRenBtn}, 1, 1, 0);
     $$self{_GUI}{nodeRenBtn}->set('can-focus' => 0);
@@ -515,7 +515,7 @@ sub _initGUI {
     $$self{_GUI}{nodeRenBtn}->set_tooltip_text('Rename this node');
 
     # Create nodeDel button
-    $$self{_GUI}{nodeDelBtn} = Gtk3::Button->new;
+    $$self{_GUI}{nodeDelBtn} = Gtk3::Button->new();
     $$self{_GUI}{nodeDelBtn}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeDelBtn}, 1, 1, 0);
     $$self{_GUI}{nodeDelBtn}->set('can-focus' => 0);
@@ -538,7 +538,7 @@ sub _initGUI {
     }
 
     # Put a notebook for connections, favourites and history
-    $$self{_GUI}{nbTree} = Gtk3::Notebook->new;
+    $$self{_GUI}{nbTree} = Gtk3::Notebook->new();
     $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{nbTree}, 1, 1, 0);
     $$self{_GUI}{nbTree}->set_scrollable(1);
     # FIXME-HOMOGENEOUS     $$self{_GUI}{nbTree}->set('homogeneous', 0);
@@ -588,7 +588,7 @@ sub _initGUI {
     $$self{_GUI}{_vboxSearch} = Gtk3::VBox->new(0, 0);
     $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{_vboxSearch}, 0, 1, 0);
 
-    $$self{_GUI}{_entrySearch} = Gtk3::Entry->new;
+    $$self{_GUI}{_entrySearch} = Gtk3::Entry->new();
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_entrySearch}, 0, 1, 0);
     $$self{_GUI}{_entrySearch}->grab_focus();
 
@@ -618,9 +618,9 @@ sub _initGUI {
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchDesc}, 0, 1, 0);
 
     # Create a scrolled2 scrolled window to contain the favourites tree
-    $$self{_GUI}{scroll2} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scroll2} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbFavTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbFavTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbFavTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbFavTab}->pack_start(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbFavTab}->pack_start($$self{_GUI}{nbFavTabLabel}, 0, 1, 0);
@@ -652,9 +652,9 @@ sub _initGUI {
     $$self{_GUI}{treeFavourites}->get_selection()->set_mode('GTK_SELECTION_MULTIPLE');
 
     # Create a scrolled3 scrolled window to contain the history tree
-    $$self{_GUI}{scroll3} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scroll3} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbHistTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbHistTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbHistTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbHistTab}->pack_start(Gtk3::Image->new_from_stock('pac-history', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbHistTab}->pack_start($$self{_GUI}{nbHistTabLabel}, 0, 1, 0);
@@ -689,9 +689,9 @@ sub _initGUI {
     }
 
     # Create a scrolledclu scrolled window to contain the clusters tree
-    $$self{_GUI}{scrolledclu} = Gtk3::ScrolledWindow->new;
+    $$self{_GUI}{scrolledclu} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbCluTab} = Gtk3::HBox->new(0, 0);
-    $$self{_GUI}{nbCluTabLabel} = Gtk3::Label->new;
+    $$self{_GUI}{nbCluTabLabel} = Gtk3::Label->new();
     $$self{_GUI}{nbCluTab}->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'), 0, 1, 0);
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{nbCluTab}->pack_start($$self{_GUI}{nbCluTabLabel}, 0, 1, 0);
@@ -728,7 +728,7 @@ sub _initGUI {
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxsearchstart}, 0, 1, 0);
 
     # Create a connSearch button
-    $$self{_GUI}{connSearch} = Gtk3::Button->new;
+    $$self{_GUI}{connSearch} = Gtk3::Button->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connSearch}, 0, 1, 0);
     $$self{_GUI}{connSearch}->set_image(Gtk3::Image->new_from_stock('gtk-find', 'button'));
     $$self{_GUI}{connSearch}->set('can-focus' => 0);
@@ -742,14 +742,14 @@ sub _initGUI {
     $$self{_GUI}{connExecBtn}->set_tooltip_text('Start selected terminals/groups');
 
     # Create connQuickBtn button
-    $$self{_GUI}{connQuickBtn} = Gtk3::Button->new;
+    $$self{_GUI}{connQuickBtn} = Gtk3::Button->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connQuickBtn}, 0, 1, 0);
     $$self{_GUI}{connQuickBtn}->set_image(Gtk3::Image->new_from_stock('pac-quick-connect', 'button'));
     $$self{_GUI}{connQuickBtn}->set('can-focus' => 0);
     $$self{_GUI}{connQuickBtn}->set_tooltip_text('Start a new connection, without saving it');
 
     # Create connFavourite button
-    $$self{_GUI}{connFavourite} = Gtk3::ToggleButton->new;
+    $$self{_GUI}{connFavourite} = Gtk3::ToggleButton->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connFavourite}, 1, 1, 0);
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'button'));
     $$self{_GUI}{connFavourite}->set('can-focus' => 0);
@@ -815,7 +815,7 @@ sub _initGUI {
     $nb->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
 
     my $tablbl = Gtk3::HBox->new(0, 0);
-    my $eblbl = Gtk3::EventBox->new;
+    my $eblbl = Gtk3::EventBox->new();
     $eblbl->add(Gtk3::Label->new('Info '));
     $tablbl->pack_start($eblbl, 0, 1, 0);
     $$self{_GUI}{_TABIMG} = Gtk3::Image->new_from_stock('gtk-info', 'menu');
@@ -838,7 +838,7 @@ sub _initGUI {
     $$self{_GUI}{scrollDescription}->add($$self{_GUI}{descView});
     $$self{_GUI}{descView}->set_wrap_mode('GTK_WRAP_WORD');
     $$self{_GUI}{descView}->set_sensitive(1);
-    $$self{_GUI}{descView}->drag_dest_unset;
+    $$self{_GUI}{descView}->drag_dest_unset();
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string('monospace'));
 
     # Create a frameStatistics for statistics
@@ -846,11 +846,11 @@ sub _initGUI {
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameStatistics}, 0, 1, 0);
     $$self{_GUI}{frameStatistics}->set_border_width(5);
 
-    $$self{_GUI}{frameStatisticslbl} = Gtk3::Label->new;
+    $$self{_GUI}{frameStatisticslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameStatisticslbl}->set_markup(' <b>STATISTICS:</b> ');
     $$self{_GUI}{frameStatistics}->set_label_widget($$self{_GUI}{frameStatisticslbl});
 
-    $$self{_GUI}{statistics} = $$self{_SCREENSHOTS} = PACStatistics->new;
+    $$self{_GUI}{statistics} = $$self{_SCREENSHOTS} = PACStatistics->new();
     $$self{_GUI}{frameStatistics}->add($$self{_GUI}{statistics}->{container});
 
     # Create a frameScreenshot for screenshot
@@ -858,19 +858,19 @@ sub _initGUI {
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameScreenshots}, 0, 1, 0);
     $$self{_GUI}{frameScreenshots}->set_border_width(5);
 
-    $$self{_GUI}{frameScreenshotslbl} = Gtk3::Label->new;
+    $$self{_GUI}{frameScreenshotslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameScreenshotslbl}->set_markup(' <b>SCREENSHOTS:</b> ');
     $$self{_GUI}{frameScreenshots}->set_label_widget($$self{_GUI}{frameScreenshotslbl});
 
-    $$self{_GUI}{screenshots} = $$self{_SCREENSHOTS} = PACScreenshots->new;
+    $$self{_GUI}{screenshots} = $$self{_SCREENSHOTS} = PACScreenshots->new();
     $$self{_GUI}{frameScreenshots}->add($$self{_GUI}{screenshots}->{container});
 
     # Create a hbuttonbox1: show/hide, WOL, Shell, Preferences, etc...
-    $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new;
+    $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new();
     $$self{_GUI}{vbox5}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
 
     # Create hideConn button
-    $$self{_GUI}{showConnBtn} = Gtk3::ToggleButton->new;
+    $$self{_GUI}{showConnBtn} = Gtk3::ToggleButton->new();
     $$self{_GUI}{showConnBtn}->set_image(Gtk3::Image->new_from_stock('pac-treelist', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{showConnBtn}->set_active(1);
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 1, 1, 0);
@@ -885,7 +885,7 @@ sub _initGUI {
     $$self{_GUI}{wolBtn}->set_tooltip_text('Start the Wake On Lan utility window');
 
     # Create shellBtn button
-    $$self{_GUI}{shellBtn} = Gtk3::Button->new;
+    $$self{_GUI}{shellBtn} = Gtk3::Button->new();
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
     } else {
@@ -919,7 +919,7 @@ sub _initGUI {
     $$self{_GUI}{saveBtn}->set_sensitive(0);
 
     # Create [un]lockBtn button
-    $$self{_GUI}{lockPACBtn} = Gtk3::ToggleButton->new;
+    $$self{_GUI}{lockPACBtn} = Gtk3::ToggleButton->new();
     $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('pac-unprotected', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{lockPACBtn}->set_active(0);
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{lockPACBtn}, 0, 1, 0);
@@ -927,7 +927,7 @@ sub _initGUI {
     $$self{_GUI}{lockPACBtn}->set_tooltip_text('Password [un]lock GUI. In order to use this functionality, check the "Protect with password" field under "Preferences"->"Main Options"');
 
     # Create aboutBtn button
-    $$self{_GUI}{aboutBtn} = Gtk3::Button->new;
+    $$self{_GUI}{aboutBtn} = Gtk3::Button->new();
     $$self{_GUI}{aboutBtn}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{aboutBtn}, 1, 1, 0);
     $$self{_GUI}{aboutBtn}->set('can-focus' => 0);
@@ -957,11 +957,11 @@ sub _initGUI {
 
     # Set treeviews font
     foreach my $tree ('Connections','Favourites','History') {
-        my @col = $$self{_GUI}{"tree$tree"}->get_columns;
+        my @col = $$self{_GUI}{"tree$tree"}->get_columns();
         if ($tree eq 'Connections') {
             $col[0]->set_visible(0);
         } else {
-            my ($c) = $col[1]->get_cells;
+            my ($c) = $col[1]->get_cells();
             $c->set('font',$$self{_CFG}{defaults}{'tree font'});
         }
     }
@@ -1005,10 +1005,10 @@ sub _initGUI {
     $self->_loadGUIData();
     if ($$self{_CFG}{defaults}{'start main maximized'}) {
         $$self{_GUI}{main}->set_position('center');
-        $$self{_GUI}{main}->maximize;
+        $$self{_GUI}{main}->maximize();
     } else {
         if (defined $$self{_GUI}{posx} && ($$self{_GUI}{posx} eq 'maximized')) {
-            $$self{_GUI}{main}->maximize;
+            $$self{_GUI}{main}->maximize();
         } else {
             $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
             $$self{_GUI}{main}->resize($$self{_GUI}{sw} // 1024, $$self{_GUI}{sh} // 768);
@@ -1039,7 +1039,7 @@ sub _initGUI {
     $FUNCS{_PIPE} = $$self{_PIPE} = PACPipe->new(\%RUNNING);
 
     # Build SCRIPTS object
-    $FUNCS{_SCRIPTS} = $$self{_SCRIPTS} = PACScripts->new;
+    $FUNCS{_SCRIPTS} = $$self{_SCRIPTS} = PACScripts->new();
 
     # Build the STATISTICS object
     $FUNCS{_STATS} = $$self{_GUI}{statistics};
@@ -1084,7 +1084,7 @@ sub _setupCallbacks {
         } elsif ($command eq 'start-uuid') {
             $self->_launchTerminals([ [ $message ] ]);
         } elsif ($command eq'show-conn') {
-            $self->_showConnectionsList;
+            $self->_showConnectionsList();
         } elsif ($command eq 'edit-uuid') {
             my $uuid = $message;
             my $path = $$self{_GUI}{treeConnections}->_getPath($uuid) or next;
@@ -1108,7 +1108,7 @@ sub _setupCallbacks {
 
     my @targets = (Gtk3::TargetEntry->new('Connect', [], 0));
     $drag_dest->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, [ 'copy', 'move' ]);
-    $drag_dest->signal_connect('drag_motion' => sub { $_[0]->get_parent_window->raise; return 1; });
+    $drag_dest->signal_connect('drag_motion' => sub { $_[0]->get_parent_window->raise(); return 1; });
     $drag_dest->signal_connect('drag_drop' => sub {
         my ($me, $context, $x, $y, $data, $info, $time) = @_;
 
@@ -1196,8 +1196,8 @@ sub _setupCallbacks {
             foreach my $uuid (@sel) {
                 $$self{'DND'}{'text'} .= "\n" . ($$self{_CFG}{'environments'}{$uuid}{'_is_group'} ? '<b>Group:</b> ' : '<b>Connection:</b> ') . __($$self{_CFG}{'environments'}{$uuid}{'name'});
             }
-            my $icon_window = Gtk3::Window->new;
-            my $icon_label = Gtk3::Label->new;
+            my $icon_window = Gtk3::Window->new();
+            my $icon_label = Gtk3::Label->new();
             $icon_label->set_markup($$self{'DND'}{'text'});
             $icon_label->set_margin_start(3);
             $icon_label->set_margin_end(3);
@@ -1260,7 +1260,7 @@ sub _setupCallbacks {
         }
 
         # Generate the UUID for the new Group
-        my $uuid = OSSP::uuid->new; $uuid->make("v4");
+        my $uuid = OSSP::uuid->new(); $uuid->make("v4");
         my $txt_uuid = $uuid->export("str");
         undef $uuid;
 
@@ -1442,7 +1442,7 @@ sub _setupCallbacks {
 
         my $keyval = '' . ($event->keyval);
         my $state = '' . ($event->state);
-        my $stateb = $event->get_state;
+        my $stateb = $event->get_state();
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
         my $shift = $stateb * ['shift-mask'];
         my $ctrl = $stateb * ['control-mask'];
@@ -1471,17 +1471,17 @@ sub _setupCallbacks {
             # <Ctrl>f --> FIND in treeView
             if ($keyval == 102) {
                 $$self{_SHOWFINDTREE} = 1;
-                $$self{_GUI}{_vboxSearch}->show;
+                $$self{_GUI}{_vboxSearch}->show();
                 $$self{_GUI}{_entrySearch}->grab_focus();
                 return 1;
             }
             # r --> Expand all
             elsif (chr($keyval) eq 'r') {
-                $$self{_GUI}{treeConnections}->expand_all;
+                $$self{_GUI}{treeConnections}->expand_all();
             }
             # t --> Collapse all
             elsif (chr($keyval) eq 't') {
-                $$self{_GUI}{treeConnections}->collapse_all;
+                $$self{_GUI}{treeConnections}->collapse_all();
             }
             if (scalar(@sel)==0) {
                 return 0;
@@ -1489,7 +1489,7 @@ sub _setupCallbacks {
 
             # <Ctrl>d --> CLONE current connection
             if (chr($keyval) eq 'd') {
-                $self->_copyNodes;
+                $self->_copyNodes();
                 foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
                     $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
                     $$self{_COPY}{'data'} = {};
@@ -1497,11 +1497,11 @@ sub _setupCallbacks {
             }
             # <Ctrl>c --> COPY current CONNECTION
             elsif ($keyval == 99) {
-                $self->_copyNodes; return 1;
+                $self->_copyNodes(); return 1;
             }
             # <Ctrl>x --> CUT current CONNECTION
             elsif ($keyval == 120) {
-                $self->_cutNodes;
+                $self->_cutNodes();
                 return 1;
             }
             # <Ctrl>v --> PASTE cut/copied CONNECTION
@@ -1608,7 +1608,7 @@ sub _setupCallbacks {
         # Capture 'standard ascii characters' to start custom interactive search
         elsif (($event->keyval >= 32) && ($event->keyval <= 126)) {
             $$self{_SHOWFINDTREE} = 1;
-            $$self{_GUI}{_vboxSearch}->show;
+            $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
             $$self{_GUI}{_entrySearch}->insert_text(chr($event->keyval), -1, 0);
             $$self{_GUI}{_entrySearch}->set_position(-1);
@@ -1658,7 +1658,7 @@ sub _setupCallbacks {
         my $modelsort = $$self{_GUI}{treeConnections}->get_model();
         my $model = $modelsort->get_model();
         my $group_uuid = $model->get_value($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)), 2);
-        $$self{_GUI}{treeConnections}->columns_autosize;
+        $$self{_GUI}{treeConnections}->columns_autosize();
         if ($group_uuid eq '__PAC__ROOT__') {
             return 0;
         }
@@ -1709,7 +1709,7 @@ sub _setupCallbacks {
         if ((! defined $new_conn) || ($new_conn =~ /^\s*$/go) || ($new_conn eq '__PAC__ROOT__')) {
             return 1;
         }
-        my $uuid = OSSP::uuid->new; $uuid->make("v4");
+        my $uuid = OSSP::uuid->new(); $uuid->make("v4");
         my $txt_uuid = $uuid->export("str");
         undef $uuid;
 
@@ -1789,11 +1789,11 @@ sub _setupCallbacks {
     $$self{_GUI}{connSearch}->signal_connect('clicked' => sub {
         if (!$$self{_GUI}{_vboxSearch}->get_visible) {
             $$self{_SHOWFINDTREE} = 1;
-            $$self{_GUI}{_vboxSearch}->show;
+            $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
         } else {
             $$self{_SHOWFINDTREE} = 0;
-            $$self{_GUI}{_vboxSearch}->hide;
+            $$self{_GUI}{_vboxSearch}->hide();
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('key_press_event' => sub {
@@ -1801,7 +1801,7 @@ sub _setupCallbacks {
         if ($_[1]->keyval == 65307) {
             $$self{_SHOWFINDTREE} = 0;
             $$self{_GUI}{_entrySearch}->set_text('');
-            $$self{_GUI}{_vboxSearch}->hide;
+            $$self{_GUI}{_vboxSearch}->hide();
             $$self{_GUI}{treeConnections}->grab_focus();
             return 1;
         }
@@ -1826,7 +1826,7 @@ sub _setupCallbacks {
     });
     $$self{_GUI}{_entrySearch}->signal_connect('focus_out_event' => sub {
         $$self{_SHOWFINDTREE} = 0;
-        $$self{_GUI}{_vboxSearch}->hide;
+        $$self{_GUI}{_vboxSearch}->hide();
         $$self{_GUI}{_entrySearch}->set_text('');
     });
     foreach my $what ('Name', 'Host', 'Desc') {
@@ -1901,7 +1901,7 @@ sub _setupCallbacks {
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vbox3}->show : $$self{_GUI}{vbox3}->hide;
+        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vbox3}->show() : $$self{_GUI}{vbox3}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
             $$self{_GUI}{treeConnections}->grab_focus();
         }
@@ -2106,7 +2106,7 @@ sub _setupCallbacks {
     $$self{_GUI}{nb}->signal_connect('page_added' => sub {
         if (defined $$self{_GUI}{_PACTABS}) {
             if ($$self{_GUI}{nb}->get_n_pages) {
-                $$self{_GUI}{_PACTABS}->show;
+                $$self{_GUI}{_PACTABS}->show();
             }
         }
         return 1;
@@ -2136,7 +2136,7 @@ sub _setupCallbacks {
 
         my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state;
+        my $state = $event->get_state();
         my $ctrl = $state * ['control-mask'];
         my $shift = $state * ['shift-mask'];
         my $alt = $state * ['mod1-mask'];
@@ -2327,7 +2327,7 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('destroy' => sub { exit 0; });
 
     # Save GUI size/position/... *before* it hides
-    $$self{_GUI}{main}->signal_connect('unmap_event' => sub { $self->_saveGUIData; return 0; });
+    $$self{_GUI}{main}->signal_connect('unmap_event' => sub { $self->_saveGUIData(); return 0; });
 
     $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide() unless $$self{_SHOWFINDTREE}; });
 
@@ -2337,7 +2337,7 @@ sub _setupCallbacks {
 
         my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state;
+        my $state = $event->get_state();
         my $shift = $state * ['shift-mask'];
         my $ctrl = $state * ['control-mask'];
         my $alt = $state * ['mod1-mask'];
@@ -2355,7 +2355,7 @@ sub _setupCallbacks {
         # F --> FIND in treeView
         if($_[1]->keyval == 102)  {
             $$self{_SHOWFINDTREE} = 1;
-            $$self{_GUI}{_vboxSearch}->show;
+            $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
             return 1;
         }
@@ -2396,7 +2396,7 @@ sub _lockPAC {
         $$self{_GUI}{_PACTABS}->set_sensitive(0);
     }
     foreach my $tmp_uuid (keys %RUNNING) {
-        $RUNNING{$tmp_uuid}{terminal}->lock;
+        $RUNNING{$tmp_uuid}{terminal}->lock();
     }
     $$self{_GUILOCKED} = 1;
 
@@ -2428,7 +2428,7 @@ sub _unlockPAC {
         $$self{_GUI}{_PACTABS}->set_sensitive(1);
     }
     foreach my $tmp_uuid (keys %RUNNING) {
-        $RUNNING{$tmp_uuid}{terminal}->unlock;
+        $RUNNING{$tmp_uuid}{terminal}->unlock();
     }
     $$self{_GUILOCKED} = 0;
 
@@ -2767,7 +2767,7 @@ sub _treeConnections_menu {
         shortcut => '<ctrl>r',
         tooltip => 'Expand ALL (including sub-nodes)',
         sensitive => 1,
-        code => sub { $$self{_GUI}{treeConnections}->expand_all; }
+        code => sub { $$self{_GUI}{treeConnections}->expand_all(); }
     });
     # Collapse All
     push(@tree_menu_items, {
@@ -2776,7 +2776,7 @@ sub _treeConnections_menu {
         shortcut => '<ctrl>t',
         tooltip => 'Collapse ALL (including sub-nodes)',
         sensitive => 1,
-        code => sub { $$self{_GUI}{treeConnections}->collapse_all; }
+        code => sub { $$self{_GUI}{treeConnections}->collapse_all(); }
     });
     push(@tree_menu_items, { separator => 1 });
     # Toggle Protect
@@ -2837,13 +2837,13 @@ sub _treeConnections_menu {
                 for my $i (1 .. 65535) {
                     $$self{_GUI}{treeConnections}->get_selection()->select_path(Gtk3::TreePath->new_from_string("$i"));
                 }
-                $self->__exportNodes;
+                $self->__exportNodes();
                 for my $i (1 .. 65535) {
                     $$self{_GUI}{treeConnections}->get_selection()->unselect_path(Gtk3::TreePath->new_from_string("$i"));
                 }
                 $$self{_GUI}{treeConnections}->set_cursor(Gtk3::TreePath->new_from_string('0'), undef, 0);
             } else {
-                $self->__exportNodes;
+                $self->__exportNodes();
             }
         }
     });
@@ -2940,7 +2940,7 @@ sub _treeConnections_menu {
         shortcut => '<control>d',
         sensitive => ((scalar(@sel) == 1) && ! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
         code => sub {
-            $self->_copyNodes;
+            $self->_copyNodes();
             foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
                 $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
             }
@@ -2954,7 +2954,7 @@ sub _treeConnections_menu {
         shortcut => '<control>c',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub{
-            $self->_copyNodes;
+            $self->_copyNodes();
             # Unselect nodes after copy
             $$self{_GUI}{treeConnections}->get_selection()->unselect_all();
         }
@@ -2965,7 +2965,7 @@ sub _treeConnections_menu {
         stockicon => 'gtk-cut',
         shortcut => '<control>x',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__') && (! $with_protected)),
-        code => sub{  $self->_cutNodes; }
+        code => sub{  $self->_cutNodes(); }
     });
     push(@tree_menu_items, {
         label => "Paste node$p",
@@ -3311,7 +3311,7 @@ sub _quitProgram {
 
     # Hide every GUI component has already finished
     if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_passive;
+        $$self{_TRAY}{_TRAY}->set_passive();
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
     }
@@ -3706,7 +3706,7 @@ sub _updateGUIWithUUID {
 
     if ($$self{_CFG}{'defaults'}{'show statistics'}) {
         $$self{_GUI}{statistics}->update($uuid, $$self{_CFG});
-        $$self{_GUI}{frameStatistics}->show;
+        $$self{_GUI}{frameStatistics}->show();
     } else {
         $$self{_GUI}{frameStatistics}->hide();
     }
@@ -3956,9 +3956,8 @@ sub _showConnectionsList {
     my $self = shift;
     my $move = shift // 1;
 
-    $$self{_GUI}{main}->show;
-    #$$self{_GUI}{main}->present_with_time(time);
-    $$self{_GUI}{main}->present;
+    $$self{_GUI}{main}->show();
+    $$self{_GUI}{main}->present();
 
     if ($move) {
         $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
@@ -4087,7 +4086,7 @@ sub __dupNodes {
     my $cut = shift // '0';
 
     # Generate a new UUID for the copied element
-    my $new_uuid = OSSP::uuid->new; $new_uuid->make("v4");
+    my $new_uuid = OSSP::uuid->new(); $new_uuid->make("v4");
     my $new_txt_uuid = $new_uuid->export("str");
     undef $new_uuid;
 
@@ -4137,8 +4136,8 @@ sub __exportNodes {
     $choose->set_current_folder($ENV{'HOME'} // '/tmp');
     $choose->set_current_name("pac_export.yml");
 
-    my $out = $choose->run;
-    my $file = $choose->get_filename;
+    my $out = $choose->run();
+    my $file = $choose->get_filename();
     $file =~ /^(.+)\.yml$/ or $file .= '.yml';
     $choose->destroy();
 
@@ -4197,13 +4196,13 @@ sub __importNodes {
     );
     $choose->set_do_overwrite_confirmation(1);
     $choose->set_current_folder($ENV{'HOME'} // '/tmp');
-    my $filter = Gtk3::FileFilter->new;
+    my $filter = Gtk3::FileFilter->new();
     $filter->set_name('YAML Files');
     $filter->add_pattern('*.yml');
     $choose->add_filter($filter);
 
-    my $out = $choose->run;
-    my $file = $choose->get_filename;
+    my $out = $choose->run();
+    my $file = $choose->get_filename();
     $choose->destroy();
     if (($out ne 'accept') || (!-f $file) || ($file !~ /^(.+)\.yml$/go)) {
         return 1;
@@ -4320,15 +4319,15 @@ sub _bulkEdit {
     $w{gui}{imgUP} = Gtk3::Image-> new_from_stock('gtk-edit', 'dialog');
     $w{gui}{hboxIconLabel}->pack_start($w{gui}{imgUP}, 0, 1, 0);
 
-    $w{gui}{lblUP} = Gtk3::Label->new;
+    $w{gui}{lblUP} = Gtk3::Label->new();
     $w{gui}{lblUP}->set_markup($label);
     $w{gui}{hboxIconLabel}->pack_start($w{gui}{lblUP}, 0, 1, 0);
 
     $w{data}->get_content_area->pack_start(Gtk3::HSeparator->new, 0, 1, 0);
 
     #$w{gui}{frameAffect} = Gtk3::Frame->new(' There are GROUP(S) in the selection. Apply to: ');
-    $w{gui}{frameAffect} = Gtk3::Frame->new;
-    my $lblaffect = Gtk3::Label->new;
+    $w{gui}{frameAffect} = Gtk3::Frame->new();
+    my $lblaffect = Gtk3::Label->new();
     $lblaffect->set_markup(' There are <b>GROUP(S)</b> in the selection. Apply to: ');
     $w{gui}{frameAffect}->set_label_widget($lblaffect);
     $w{data}->get_content_area->pack_start($w{gui}{frameAffect}, 0, 1, 0);
@@ -4345,8 +4344,8 @@ sub _bulkEdit {
     $w{gui}{vboxlist} = Gtk3::VBox->new(0, 0);
     $w{data}->get_content_area->pack_start($w{gui}{vboxlist}, 1, 1, 0);
 
-    $w{gui}{framecommon} = Gtk3::Frame->new;
-    my $lblcom = Gtk3::Label->new;
+    $w{gui}{framecommon} = Gtk3::Frame->new();
+    my $lblcom = Gtk3::Label->new();
     $lblcom->set_markup(' <b><span foreground="orange">COMMON</span></b> entries: ');
     $w{gui}{framecommon}->set_label_widget($lblcom);
     $w{data}->get_content_area->pack_start($w{gui}{framecommon}, 0, 1, 0);
@@ -4368,14 +4367,14 @@ sub _bulkEdit {
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new('change '), 0, 1, 0);
 
-        $w{gui}{"entryWhat$key"} = Gtk3::Entry->new;
+        $w{gui}{"entryWhat$key"} = Gtk3::Entry->new();
         $w{gui}{"hboxre$key"}->pack_start($w{gui}{"entryWhat$key"}, 1, 1, 0);
         $w{gui}{"entryWhat$key"}->set_activates_default(1);
         $w{gui}{"entryWhat$key"}->hide();
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new(' with '), 0, 1, 0);
 
-        $w{gui}{"entry$key"} = Gtk3::Entry->new;
+        $w{gui}{"entry$key"} = Gtk3::Entry->new();
         $w{gui}{"hb$key"}->pack_start($w{gui}{"entry$key"}, 1, 1, 0);
         $w{gui}{"entry$key"}->set_activates_default(1);
 
@@ -4390,7 +4389,7 @@ sub _bulkEdit {
         # And setup some signals
         $w{gui}{"entry$key"}->signal_connect('changed', sub { $w{gui}{"cb$key"}->set_active($w{gui}{"entry$key"}->get_chars(0, -1) ne ''); });
         $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active() ? 'gtk-ok' : 'gtk-edit'), 'button'); });
-        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide(); });
+        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show() : $w{gui}{"hboxre$key"}->hide(); });
 
         # Asign a callback to populate this entry with its own context menu
         $w{gui}{"entry$key"}->signal_connect('button_press_event' => sub {
@@ -4467,8 +4466,8 @@ sub _bulkEdit {
         });
     }
 
-    $w{gui}{frameExpect} = Gtk3::Frame->new;
-    my $lblexp = Gtk3::Label->new;
+    $w{gui}{frameExpect} = Gtk3::Frame->new();
+    my $lblexp = Gtk3::Label->new();
     $lblexp->set_markup(' <b><span foreground="orange">EXPECT</span></b> entries: ');
     $w{gui}{frameExpect}->set_label_widget($lblexp);
     $w{data}->get_content_area->pack_start($w{gui}{frameExpect}, 0, 1, 0);
@@ -4490,14 +4489,14 @@ sub _bulkEdit {
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new('change '), 0, 1, 0);
 
-        $w{gui}{"entryWhat$key"} = Gtk3::Entry->new;
+        $w{gui}{"entryWhat$key"} = Gtk3::Entry->new();
         $w{gui}{"hboxre$key"}->pack_start($w{gui}{"entryWhat$key"}, 1, 1, 0);
         $w{gui}{"entryWhat$key"}->set_activates_default(1);
         $w{gui}{"entryWhat$key"}->hide();
 
         $w{gui}{"hboxre$key"}->pack_start(Gtk3::Label->new(' with '), 0, 1, 0);
 
-        $w{gui}{"entry$key"} = Gtk3::Entry->new;
+        $w{gui}{"entry$key"} = Gtk3::Entry->new();
         $w{gui}{"hb$key"}->pack_start($w{gui}{"entry$key"}, 1, 1, 0);
         $w{gui}{"entry$key"}->set_activates_default(1);
 
@@ -4512,7 +4511,7 @@ sub _bulkEdit {
         # And setup some signals
         $w{gui}{"entry$key"}->signal_connect('changed', sub { $w{gui}{"cb$key"}->set_active($w{gui}{"entry$key"}->get_chars(0, -1) ne ''); });
         $w{gui}{"cb$key"}->signal_connect('toggled', sub { $w{gui}{"image$key"}->set_from_stock(($w{gui}{"cb$key"}->get_active() ? 'gtk-ok' : 'gtk-edit'), 'button'); });
-        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show : $w{gui}{"hboxre$key"}->hide(); });
+        $w{gui}{"cbRE$key"}->signal_connect('toggled', sub { $w{gui}{"cbRE$key"}->get_active() ? $w{gui}{"hboxre$key"}->show() : $w{gui}{"hboxre$key"}->hide(); });
 
         # Asign a callback to populate this entry with its own context menu
         $w{gui}{"entry$key"}->signal_connect('button_press_event' => sub {
@@ -4710,7 +4709,7 @@ sub _ApplyLayout {
         }
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             if (!$$self{_GUI}{main}->get_visible) {
-                $self->_showConnectionsList;
+                $self->_showConnectionsList();
             }
         } else {
             if ($$self{_GUI}{main}->get_visible) {
