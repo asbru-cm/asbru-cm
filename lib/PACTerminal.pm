@@ -68,7 +68,7 @@ my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
 my $PERL_BIN = '/usr/bin/perl';
-my $PAC_CONN = "$RealBin/lib/pac_conn";
+my $PAC_CONN = "$RealBin/lib/asbru_conn";
 
 my $SHELL_BIN = -x '/bin/sh' ? '/bin/sh' : '/bin/bash';
 my $SHELL_NAME = -x '/bin/sh' ? 'sh' : 'bash';
@@ -372,7 +372,7 @@ sub start {
         delete $$self{_CFG}{'tmp'}{'height'};
     }
 
-    # Duplicate and dump non-persistent configuration into temporal file for 'pac_conn'
+    # Duplicate and dump non-persistent configuration into temporal file for 'asbru_conn'
     my %new_cfg;
     $new_cfg{'defaults'} = dclone($$self{_CFG}{'defaults'});
     $new_cfg{'environments'}{$$self{_UUID}} = dclone($$self{_CFG}{'environments'}{$$self{_UUID}});
@@ -531,7 +531,7 @@ sub stop {
         undef($$self{_WINDOWTERMINAL});
     }
 
-    # Try to ensure we leave no background "pac_conn" processes running after closing the terminal
+    # Try to ensure we leave no background "asbru_conn" processes running after closing the terminal
     if ($$self{_PID}) {
         kill(15, $$self{_PID});
     }
@@ -4326,7 +4326,7 @@ Destroys object on exit
 
 Create the connection
 
-    Create connection using lib/pac_conn
+    Create connection using lib/asbru_conn
     Update progressbar
     CONNECTED=1
     Execute Startup scripts

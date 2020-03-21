@@ -2877,7 +2877,7 @@ sub _subst {
     }
 
     if (!$asbru_conn) {
-        # Execute when not from pac_conn
+        # Execute when not from asbru_conn
         # Replace '<ASK:#>' with user provided data for 'cmd' execution
         while ($string =~ /<ASK:(\d+?)>/go) {
             my $var = $1;

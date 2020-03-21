@@ -1598,7 +1598,7 @@ sub _execScript {
     # Save the list of started connections in $SHARED{_list_}
     $SHARED{_list_} = $PAC{list};
 
-    # CONNECTION execution (pac_conn)
+    # CONNECTION execution (asbru_conn)
     foreach my $tmp_uuid (keys %{$PAC{list}}) {
         next unless defined $PACMain::RUNNING{$tmp_uuid};
         if ($PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_STATUS} ne 'STOP') {
@@ -1614,7 +1614,7 @@ sub _execScript {
             # Skip if this tmp_uuid was not properly connected (for some reason)
             return 0 unless $PACMain::RUNNING{$tmp_uuid}{terminal}{CONNECTED};
 
-            # Advise pac_conn to receive script name
+            # Advise asbru_conn to receive script name
             kill(12, $PACMain::RUNNING{$tmp_uuid}{terminal}{_PID});
             my %tmp;
             $tmp{name} = $name;
