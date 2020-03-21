@@ -939,7 +939,11 @@ if (defined $METHOD) {
         } elsif (! $AUTHFALLBACK) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
-        $connection_cmd = "$METHOD $key -P $PORT $CONNECT_OPTS " . ($USER ? "$USER@" : '') . "$IP";
+        if ($proxy_jump) {
+            $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -o Proxyjump=jumpserver " . ($USER ? "$USER@" : '') . "$IP";
+        } else {
+            $connection_cmd = "$METHOD $key -P $PORT $CONNECT_OPTS " . ($USER ? "$USER@" : '') . "$IP";
+        }
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*telnet.*$/) || ($METHOD eq 'Telnet')) {
         $METHOD = 'telnet';
