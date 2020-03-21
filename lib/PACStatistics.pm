@@ -54,7 +54,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $STATS_FILE = $CFG_DIR . '/pac_stats.nfreeze';
+my $STATS_FILE = $CFG_DIR . '/asbru_stats.nfreeze';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
