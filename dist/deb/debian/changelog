@@ -1,3 +1,9 @@
+asbru-cm (6.1.0rc2-1) stable; urgency=medium
+
+  * Upstream 6.1.0rc2 release
+
+ -- Ásbrú Project Team <contact@asbru-cm.net> Sat, 14 Mar 2020 09:00:00 +0200
+
 asbru-cm (6.1.0rc1-1) stable; urgency=medium
 
   * Upstream 6.1.0rc1 release

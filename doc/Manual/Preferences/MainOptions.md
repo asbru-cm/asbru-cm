@@ -1,3 +1,7 @@
+## Main Options
+
+![](images/pref1.png)
+
 ## Main Window Layout
 
 Ásbrú offers two interface options to interact.
@@ -81,6 +85,7 @@ Starting with Ásbru 6.2 the applications offer 2 themes for icons.
 + __Hide to tray instead of closing__ : When clicking in the "Window close button", Ásbrú will hide to the system tray (if available) instead of closing the application.
 + __Confirm Exit__ : Will ask if you really want to close the application
 + __Auto save on exit__ : If there are any settings changes unsaved, will ask if you want to save them permanently before exit the application.
++ __Automatically save configurations on every change__ : This will save your configuration changes on every change you make to your settings.
 
 ### Control TAB Goes to
 
@@ -96,5 +101,4 @@ Starting with Ásbru 6.2 the applications offer 2 themes for icons.
 + __Auto accept remove offending SSH keys__ : Will add, remove, replace your local ssh known hosts keys when they have changed on the remote server.
 + __Check port status at connect__ : Set a timeout and port reachability before trying to connect.
 + __Automatically append group names to new connection names__ : (recommended) when connecting Ásbrú will display a connection message in your terminal, if you use the same name on different connections, this will give you a better hint of where you have connected.
-+ __Automatically save configurations on every change__ : This will save your configuration changes on every change you make to your settings.
 

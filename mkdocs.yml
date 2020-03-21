@@ -1,7 +1,7 @@
 site_name: Ásbrú Connection Manager - Docs
 docs_dir: doc
 site_dir: out
-site_url: http://docs.librenms.org
+site_url: https://docs.asbru-cm.net
 site_author: Ásbrú Connection Manager
 site_description: Ásbrú Connection Manager user and developer documentation
 repo_url: https://github.com/asbru-cm/asbru-cm
@@ -17,19 +17,31 @@ nav:
       - Changelog: General/Changelog.md
   - 2. User's Manual:
       - Quick Start: Manual/QuickStart.md
-      - Preferences: Manual/Preferences/Preferences.md
-      - Main Options:
-        - Behaviour: Manual/Preferences/MainOptions.md
-        - Look&Feel: Manual/Preferences/LookAndFeel.md
-        - Advanced: Manual/Preferences/MOAdvanced.md
-      - Terminal Options:
-        - Behaviour: Manual/Preferences/TermOptions.md
-        - Look&Feel: Manual/Preferences/TermLookAndFeel.md
-        - Advanced: Manual/Preferences/TermAdvanced.md
-      - Shell Options: Manual/Preferences/ShellOptions.md
-      - Networking: Manual/Preferences/Networking.md
+      - Preferences:
+        - General: Manual/Preferences/Preferences.md
+        - Main Options:
+          - Behaviour: Manual/Preferences/MainOptions.md
+          - Look&Feel: Manual/Preferences/LookAndFeel.md
+          - Advanced: Manual/Preferences/MOAdvanced.md
+        - Terminal Options:
+          - Behaviour: Manual/Preferences/TermOptions.md
+          - Look&Feel: Manual/Preferences/TermLookAndFeel.md
+          - Advanced: Manual/Preferences/TermAdvanced.md
+        - Shell Options: Manual/Preferences/ShellOptions.md
+        - Networking: Manual/Preferences/Networking.md
+        - Global Variables: Manual/Preferences/GlobalVariables.md
+        - Local Commands: Manual/Preferences/LocalCommands.md
+        - Remote Commands: Manual/Preferences/RemoteCommands.md
+        - KeePass: Manual/Preferences/KeePassXC.md
+      - Command Line: Manual/CommandLine.md
+      - Connections:
+        - SSH:
+          - Configure: Manual/Connections/SSH.md
+          - Terminal: Manual/Connections/SSH_Terminal.md
+        - RDP: Manual/Connections/RDP.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
+      - Templates: Managing/Templates.md
   - 4. Contributing:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md
