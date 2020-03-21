@@ -156,7 +156,7 @@ sub _setupCallbacks {
 
 sub _pos {
     my ($self,$event) = @_;
-    my $h = $$self{_MAIN}{_GUI}{main}->size_request->height;
+    my $h = $$self{_MAIN}{wheight};
     my $w = $$self{_MAIN}{_GUI}{main}->size_request->width/2;
     my $ymax = $event->get_screen->get_height;
     my $dy = $event->window->get_height;

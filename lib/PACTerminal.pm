@@ -1075,7 +1075,7 @@ sub _setupCallbacks {
             # f --> FIND in treeView
             elsif (lc $keyval eq 'f')
             {
-                $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+                $PACMain::FUNCS{_MAIN}->_showConnectionsList(0);
                 $PACMain::FUNCS{_MAIN}{_GUI}{_vboxSearch}->show();
                 $PACMain::FUNCS{_MAIN}{_GUI}{_entrySearch}->grab_focus();
                 return 1;
