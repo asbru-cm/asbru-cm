@@ -722,7 +722,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         # Create a checkbox to show/hide the button bar
         $$self{_GUI}{btnShowButtonBar} = Gtk3::ToggleButton->new();
-        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'pac-buttonbar-show' : 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
         $$self{_GUI}{btnShowButtonBar}->set('can-focus' => 0);
         $$self{_GUI}{btnShowButtonBar}->set_tooltip_text('Show/Hide button bar');
         $$self{_GUI}{btnShowButtonBar}->set_active($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1);
@@ -755,7 +755,7 @@ sub _initGUI {
     $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{status}, 1, 1, 4);
 
     # Create a status icon
-    $$self{_GUI}{statusIcon} = Gtk3::Image->new_from_stock('pac-terminal-ko-small', 'button');
+    $$self{_GUI}{statusIcon} = Gtk3::Image->new_from_stock('asbru-terminal-ko-small', 'button');
     $$self{_GUI}{statusIcon}->set_tooltip_text('Disconnected');
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusIcon}, 0, 0, 4);
 
@@ -765,7 +765,7 @@ sub _initGUI {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusExpect}, 0, 0, 4);
 
     # Create a cluster icon
-    $$self{_GUI}{statusCluster} = Gtk3::Image->new_from_stock('pac-cluster-manager-off', 'button');
+    $$self{_GUI}{statusCluster} = Gtk3::Image->new_from_stock('asbru-cluster-manager-off', 'button');
     $$self{_GUI}{statusCluster}->set_tooltip_text('Unclustered');
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusCluster}, 0, 0, 4);
 
@@ -890,10 +890,10 @@ sub _setupCallbacks {
     if ($$self{_GUI}{btnShowButtonBar}) {
         $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
             if ($$self{_GUI}{btnShowButtonBar}->get_active()) {
-                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->show();
             } else {
-                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->hide();
             };
         });
@@ -1324,7 +1324,7 @@ sub _setupCallbacks {
     # Append VTE's connection finalization with CLOSE event
     $$self{_GUI}{_VTE}->signal_connect ('child_exited' => sub {
         if (defined $$self{_GUI}{statusIcon}) {
-            $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ko-small', 'button');
+            $$self{_GUI}{statusIcon}->set_from_stock('asbru-terminal-ko-small', 'button');
         }
         if (defined $$self{_GUI}{statusIcon}) {
             $$self{_GUI}{statusIcon}->set_tooltip_text('Disconnected');
@@ -1419,7 +1419,7 @@ sub _watchConnectionData {
         $data = decode('UTF-16', $data);
 
         if ($data eq 'CONNECTED') {
-            $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ok-small', 'button');
+            $$self{_GUI}{statusIcon}->set_from_stock('asbru-terminal-ok-small', 'button');
             $$self{_GUI}{statusIcon}->set_tooltip_text('Connected');
             $$self{_GUI}{statusExpect}->clear;
             $$self{CONNECTED} = 1;
@@ -1700,17 +1700,17 @@ sub _vteMenu {
         # Add a submenu with available connections (including: LOCAL SHELL) and chaining connections
         push(@vte_menu_items, {
             label => 'Connection',
-            stockicon => 'pac-group',
+            stockicon => 'asbru-group',
             submenu =>
             [
                 {
                     label => 'Favourites',
-                    stockicon => 'pac-favourite-on',
+                    stockicon => 'asbru-favourite-on',
                     submenu => _menuFavouriteConnections($self)
                 },
                 {
                     label => 'All',
-                    stockicon => 'pac-treelist',
+                    stockicon => 'asbru-treelist',
                     submenu =>
                     [
                         {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;}},
@@ -1892,7 +1892,7 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Execute Script',
-        stockicon => 'pac-script',
+        stockicon => 'asbru-script',
         tooltip => 'Execute selected PAC Script in this connection',
         submenu => \@scripts_sub_menu,
     });
@@ -2193,7 +2193,7 @@ sub _vteMenu {
         # Open SFTP to this connection if it is SSH
         push(@vte_menu_items, {
             label => 'Open new SFTP window',
-            stockicon => 'pac-method-SFTP',
+            stockicon => 'asbru-method-SFTP',
             sensitive => 1,
             code => sub {
                 my @idx;
@@ -2213,7 +2213,7 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Terminal',
-        stockicon => 'pac-shell',
+        stockicon => 'asbru-shell',
         sensitive => 1,
         submenu =>
         [
@@ -2238,7 +2238,7 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Session',
-        stockicon => 'pac-method-' . $$self{_CFG}{environments}{$$self{_UUID}}{method},
+        stockicon => 'asbru-method-' . $$self{_CFG}{environments}{$$self{_UUID}}{method},
         sensitive => 1,
         submenu =>
         [

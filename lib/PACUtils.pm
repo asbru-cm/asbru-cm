@@ -1237,54 +1237,54 @@ sub _registerPACIcons {
         'gtk-delete' => "$THEME_DIR/gtk-delete.svg",
         'gtk-find' => "$THEME_DIR/gtk-find.svg",
         'gtk-spell-check' => "$THEME_DIR/gtk-spell-check.svg",
-        'pac-app-big' => "$RES_DIR/asbru-logo-64.png",
-        'pac-group-add' => "$THEME_DIR/asbru_group_add_16x16.svg",
-        'pac-node-add' => "$THEME_DIR/asbru_node_add_16x16.svg",
-        'pac-node-del' => "$THEME_DIR/asbru_node_del_16x16.png",
-        'pac-chain' => "$THEME_DIR/asbru_chain.png",
-        'pac-cluster-auto' => "$THEME_DIR/asbru_cluster_auto.png",
-        'pac-cluster-manager2' => "$THEME_DIR/asbru_cluster_manager2.png",
-        'pac-cluster-manager' => "$THEME_DIR/asbru_cluster_manager.svg",
-        'pac-cluster-manager-off' => "$THEME_DIR/asbru_cluster_manager_off.svg",
-        'pac-favourite-on' => "$THEME_DIR/asbru_favourite_on.svg",
-        'pac-favourite-off' => "$THEME_DIR/asbru_favourite_off.svg",
-        'pac-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
-        'pac-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
-        'pac-group-open' => "$THEME_DIR/asbru_group_open_16x16.svg",
-        'pac-group' => "$THEME_DIR/asbru_group.svg",
-        'pac-history' => "$THEME_DIR/asbru_history.svg",
-        'pac-keepass' => "$THEME_DIR/asbru_keepass.png",
-        'pac-method-WebDAV' => "$THEME_DIR/asbru_method_cadaver.png",
-        'pac-method-MOSH' => "$THEME_DIR/asbru_method_mosh.svg",
-        'pac-method-IBM 3270/5250' => "$THEME_DIR/asbru_method_3270.jpg",
-        'pac-method-Serial (cu)' => "$THEME_DIR/asbru_method_cu.jpg",
-        'pac-method-FTP' => "$THEME_DIR/asbru_method_ftp.svg",
-        'pac-method-Generic Command' => "$THEME_DIR/asbru_method_generic.svg",
-        'pac-method-RDP (Windows)' => "$THEME_DIR/asbru_method_rdesktop.svg",
-        'pac-method-RDP (rdesktop)' => "$THEME_DIR/asbru_method_rdesktop.svg",
-        'pac-method-RDP (xfreerdp)' => "$THEME_DIR/asbru_method_rdesktop.svg",
-        'pac-method-Serial (remote-tty)' => "$THEME_DIR/asbru_method_remote-tty.jpg",
-        'pac-method-SFTP' => "$THEME_DIR/asbru_method_sftp.svg",
-        'pac-method-SSH' => "$THEME_DIR/asbru_method_ssh.svg",
-        'pac-method-Telnet' => "$THEME_DIR/asbru_method_telnet.svg",
-        'pac-method-VNC' => "$THEME_DIR/asbru_method_vncviewer.svg",
-        'pac-quick-connect' => "$THEME_DIR/asbru_quick_connect.svg",
-        'pac-script' => "$THEME_DIR/asbru_script.png",
-        'pac-shell' => "$THEME_DIR/asbru_shell.svg",
-        'pac-tab' => "$THEME_DIR/asbru_tab.png",
-        'pac-terminal-ok-small' => "$RES_DIR/asbru_terminal16x16.png",
-        'pac-terminal-ok-big' => "$RES_DIR/asbru_terminal64x64.png",
-        'pac-terminal-ko-small' => "$RES_DIR/asbru_terminal_x16x16.png",
-        'pac-terminal-ko-big' => "$RES_DIR/asbru_terminal_x64x64.png",
-        'pac-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
-        'pac-tray' => "$RES_DIR/asbru-logo-tray.png",
-        'pac-treelist' => "$THEME_DIR/asbru_treelist.svg",
-        'pac-wol' => "$THEME_DIR/asbru_wol.svg",
-        'pac-prompt' => "$THEME_DIR/asbru_prompt.png",
-        'pac-protected' => "$THEME_DIR/asbru_protected.png",
-        'pac-unprotected' => "$THEME_DIR/asbru_unprotected.png",
-        'pac-buttonbar-show' => "$THEME_DIR/asbru_buttonbar_show.png",
-        'pac-buttonbar-hide' => "$THEME_DIR/asbru_buttonbar_hide.png",
+        'asbru-app-big' => "$RES_DIR/asbru-logo-64.png",
+        'asbru-group-add' => "$THEME_DIR/asbru_group_add_16x16.svg",
+        'asbru-node-add' => "$THEME_DIR/asbru_node_add_16x16.svg",
+        'asbru-node-del' => "$THEME_DIR/asbru_node_del_16x16.png",
+        'asbru-chain' => "$THEME_DIR/asbru_chain.png",
+        'asbru-cluster-auto' => "$THEME_DIR/asbru_cluster_auto.png",
+        'asbru-cluster-manager2' => "$THEME_DIR/asbru_cluster_manager2.png",
+        'asbru-cluster-manager' => "$THEME_DIR/asbru_cluster_manager.svg",
+        'asbru-cluster-manager-off' => "$THEME_DIR/asbru_cluster_manager_off.svg",
+        'asbru-favourite-on' => "$THEME_DIR/asbru_favourite_on.svg",
+        'asbru-favourite-off' => "$THEME_DIR/asbru_favourite_off.svg",
+        'asbru-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
+        'asbru-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
+        'asbru-group-open' => "$THEME_DIR/asbru_group_open_16x16.svg",
+        'asbru-group' => "$THEME_DIR/asbru_group.svg",
+        'asbru-history' => "$THEME_DIR/asbru_history.svg",
+        'asbru-keepass' => "$THEME_DIR/asbru_keepass.png",
+        'asbru-method-WebDAV' => "$THEME_DIR/asbru_method_cadaver.png",
+        'asbru-method-MOSH' => "$THEME_DIR/asbru_method_mosh.svg",
+        'asbru-method-IBM 3270/5250' => "$THEME_DIR/asbru_method_3270.jpg",
+        'asbru-method-Serial (cu)' => "$THEME_DIR/asbru_method_cu.jpg",
+        'asbru-method-FTP' => "$THEME_DIR/asbru_method_ftp.svg",
+        'asbru-method-Generic Command' => "$THEME_DIR/asbru_method_generic.svg",
+        'asbru-method-RDP (Windows)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-RDP (rdesktop)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-RDP (xfreerdp)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-Serial (remote-tty)' => "$THEME_DIR/asbru_method_remote-tty.jpg",
+        'asbru-method-SFTP' => "$THEME_DIR/asbru_method_sftp.svg",
+        'asbru-method-SSH' => "$THEME_DIR/asbru_method_ssh.svg",
+        'asbru-method-Telnet' => "$THEME_DIR/asbru_method_telnet.svg",
+        'asbru-method-VNC' => "$THEME_DIR/asbru_method_vncviewer.svg",
+        'asbru-quick-connect' => "$THEME_DIR/asbru_quick_connect.svg",
+        'asbru-script' => "$THEME_DIR/asbru_script.png",
+        'asbru-shell' => "$THEME_DIR/asbru_shell.svg",
+        'asbru-tab' => "$THEME_DIR/asbru_tab.png",
+        'asbru-terminal-ok-small' => "$RES_DIR/asbru_terminal16x16.png",
+        'asbru-terminal-ok-big' => "$RES_DIR/asbru_terminal64x64.png",
+        'asbru-terminal-ko-small' => "$RES_DIR/asbru_terminal_x16x16.png",
+        'asbru-terminal-ko-big' => "$RES_DIR/asbru_terminal_x64x64.png",
+        'asbru-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
+        'asbru-tray' => "$RES_DIR/asbru-logo-tray.png",
+        'asbru-treelist' => "$THEME_DIR/asbru_treelist.svg",
+        'asbru-wol' => "$THEME_DIR/asbru_wol.svg",
+        'asbru-prompt' => "$THEME_DIR/asbru_prompt.png",
+        'asbru-protected' => "$THEME_DIR/asbru_protected.png",
+        'asbru-unprotected' => "$THEME_DIR/asbru_unprotected.png",
+        'asbru-buttonbar-show' => "$THEME_DIR/asbru_buttonbar_show.png",
+        'asbru-buttonbar-hide' => "$THEME_DIR/asbru_buttonbar_hide.png",
     );
 
     my $icon_factory = Gtk3::IconFactory->new();
@@ -1354,7 +1354,7 @@ sub _menuFavouriteConnections {
         if ($terminal) {
             push(@fav, {
                 label => $name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
                 submenu => [
                     {label => 'Start',
@@ -1364,7 +1364,7 @@ sub _menuFavouriteConnections {
                         }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
-                        stockicon => $PACMain::UNITY ? '' : 'pac-chain',
+                        stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
                         code => sub {
                             $terminal->_wSelectChain($uuid);
@@ -1375,7 +1375,7 @@ sub _menuFavouriteConnections {
         } else {
             push(@fav, {
                 label => $name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
                 code => sub {
                     $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
@@ -1394,7 +1394,7 @@ sub _menuClusterConnections {
     foreach my $ac (sort {lc($a) cmp lc($b)} keys %{$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}}) {
         push(@fav, {
             label => $ac,
-            stockicon => $PACMain::UNITY ? '' : 'pac-cluster-auto',
+            stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-auto',
             code => sub {$PACMain::FUNCS{_MAIN}->_startCluster($ac);}
         });
     }
@@ -1402,7 +1402,7 @@ sub _menuClusterConnections {
     foreach my $cluster (sort {lc($a) cmp lc($b)} keys %{$PACMain::FUNCS{_MAIN}{_CLUSTER}->getCFGClusters}) {
         push(@fav, {
             label => $cluster,
-            stockicon => $PACMain::UNITY ? '' : 'pac-cluster-manager2',
+            stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-manager2',
             code => sub {$PACMain::FUNCS{_MAIN}->_startCluster($cluster);}
         });
     }
@@ -1432,14 +1432,14 @@ sub _menuAvailableConnections {
         if (scalar(@{$$elem_hash{'children'}})) {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : 'pac-group-closed',
+                stockicon => $PACMain::UNITY ? '' : 'asbru-group-closed',
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'} // '',
                 submenu => _menuAvailableConnections($$elem_hash{'children'}, $terminal)
             });
         } elsif ($terminal) {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$this_uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
                 submenu => [{
                         label => 'Start',
@@ -1449,7 +1449,7 @@ sub _menuAvailableConnections {
                         }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
-                        stockicon => $PACMain::UNITY ? '' : 'pac-chain',
+                        stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
                         code => sub {
                             $terminal->_wSelectChain($this_uuid);
@@ -1460,7 +1460,7 @@ sub _menuAvailableConnections {
         } else {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$this_uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
                 code => sub {
                     $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
@@ -1511,7 +1511,7 @@ sub _wEnterValue {
     if (!$parent) {
         $w{window}{data}->set_position('center');
     }
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
@@ -1612,7 +1612,7 @@ sub _wAddRenameNode {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
@@ -1822,7 +1822,7 @@ sub _wMessage {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
     $windowConfirm->set_markup($msg);
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
     $windowConfirm->set_transient_for($window);
 
@@ -1853,7 +1853,7 @@ sub _wProgress {
         $WINDOWPROGRESS{_GUI} = Gtk3::Window->new();
 
         $WINDOWPROGRESS{_GUI}->set_position('center');
-        $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+        $WINDOWPROGRESS{_GUI}->set_icon_name('asbru-app-big');
         $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
         $WINDOWPROGRESS{_GUI}->set_resizable(0);
         if (defined $window) {
@@ -1884,7 +1884,7 @@ sub _wProgress {
         });
     }
 
-    $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+    $WINDOWPROGRESS{_GUI}->set_icon_name('asbru-app-big');
     $WINDOWPROGRESS{_GUI}->set_title("$APPNAME (v$APPVERSION) : $title");
 
     if ($progress) {
@@ -1922,7 +1922,7 @@ sub _wConfirm {
     }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
 
@@ -1950,7 +1950,7 @@ sub _wYesNoCancel {
     }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
 
@@ -1967,7 +1967,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected');
+        my $old_pass = _wEnterValue($self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'asbru-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1979,13 +1979,13 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass1 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass2 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass2) {
         return 0;
     }
@@ -3002,7 +3002,7 @@ sub _wakeOnLan {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(480, 0);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
@@ -3435,7 +3435,7 @@ sub _showUpdate {
     }
 
     $windowConfirm->set_position('center_always');
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_border_width(5);
     $windowConfirm->show_all();
 

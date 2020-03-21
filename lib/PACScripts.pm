@@ -435,7 +435,7 @@ sub _initGUI {
 
                     my $tablbl = Gtk3::HBox->new(0, 0);
                     $tablbl->pack_start(Gtk3::Label->new(' Script Editor '), 1, 1, 0);
-                    $tablbl->pack_start(Gtk3::Image->new_from_stock('pac-script', 'menu'), 0, 1, 0);
+                    $tablbl->pack_start(Gtk3::Image->new_from_stock('asbru-script', 'menu'), 0, 1, 0);
                     $tablbl->show_all;
 
                     $$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} = Gtk3::HPaned->new;
@@ -678,7 +678,7 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
         push(@menu_items,
         {
             label => 'COMMON methods',
-            stockicon => 'pac-script',
+            stockicon => 'asbru-script',
             submenu => \@comm_menu_items
         });
 
@@ -785,7 +785,7 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
         push(@menu_items,
         {
             label => 'PAC methods',
-            stockicon => 'pac-tab',
+            stockicon => 'asbru-tab',
             submenu => \@session_menu_items
         });
 
@@ -884,7 +884,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         push(@menu_items,
         {
             label => 'TERMINAL methods',
-            stockicon => 'pac-shell',
+            stockicon => 'asbru-shell',
             submenu => \@connection_menu_items
         });
 
