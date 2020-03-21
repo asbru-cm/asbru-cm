@@ -1122,13 +1122,13 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'when no more tabs'} = 2;
     }
 
-    #my $new_cfg_location = _($self, 'btnCfgLocation')->get_uri // "$ENV{HOME}/.config/pac";
+    #my $new_cfg_location = _($self, 'btnCfgLocation')->get_uri // "$ENV{HOME}/.config/asrbu";
     #$new_cfg_location =~ s/^file:\/\///go;
     #if ($new_cfg_location ne $$self{_CFG}{'defaults'}{'config location'}) {
     #    system("mv $$self{_CFG}{'defaults'}{'config location'} $new_cfg_location");
     #    if (-d $new_cfg_location) {
-    #        system("rm -rf $ENV{HOME}/.config/pac");
-    #        system("ln -s $new_cfg_location/pac $ENV{HOME}/.config/pac");
+    #        system("rm -rf $ENV{HOME}/.config/asrbu");
+    #        system("ln -s $new_cfg_location/asrbu $ENV{HOME}/.config/asrbu");
     #}
     #}
     #$$self{_CFG}{'defaults'}{'config location'} = $new_cfg_location;
@@ -1149,7 +1149,7 @@ sub _saveConfiguration {
     unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
-        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
+        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asrbu --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
         open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;

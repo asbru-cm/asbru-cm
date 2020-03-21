@@ -128,13 +128,7 @@ sub new {
     my $self = {};
 
     print STDERR "INFO: Config directory is '$CFG_DIR'\n";
-    # Setup some signal handling
-    $SIG{'USR1'} = sub {
-        #DevNote: option currently disabled
-        #_showUpdate(&_checkREADME);
-        #$$self{_UPDATING} = 0;
-        #defined $$self{_CONFIG} and _($$self{_CONFIG}, 'btnCheckVersion')->set_sensitive(1);
-    };
+
     $SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
         print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
         _quitProgram($self, 'force');
@@ -300,10 +294,6 @@ sub new {
         print "INFO: Starting '$0' in READ ONLY mode!\n";
         $$self{_READONLY} = 1;
     }
-
-    # Check for updates in a child process
-    #DevNote: option currently disabled
-    #$$self{_CFG}{'defaults'}{'check versions at start'} and $$self{_UPDATING} = 1 and PACUtils::_getREADME($$);
 
     # Gtk style
     my $css_provider = Gtk3::CssProvider->new();

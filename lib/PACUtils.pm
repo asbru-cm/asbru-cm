@@ -94,9 +94,7 @@ require Exporter;
     _purgeMissingScreenshots
     _splash
     _getXWindowsList
-    _getREADME
     _checkREADME
-    _showUpdate
     _getEncodings
     _findKP
     _makeDesktopFile
@@ -2089,7 +2087,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
     $$cfg{'defaults'}{'session logs folder'} //= "$CFG_DIR/session_logs";
     # TODO : Remove, this is from a previous migration path
-    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
     $$cfg{'defaults'}{'session logs amount'} //= 10;
     $$cfg{'defaults'}{'screenshots external viewer'} //= '/usr/bin/xdg-open';
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
@@ -2261,7 +2259,7 @@ sub _cfgSanityCheck {
 
             # TODO : Remove, this is from a previous migration path
             #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #    $_ =~ s/\/\.pac\//\/\.config\/asbru\//g;
             #}
 
             next;
@@ -2339,7 +2337,7 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
         $$cfg{'environments'}{$uuid}{'session logs folder'} //= "$CFG_DIR/session_logs";
         # TODO : Remove, this is from a previous migration path
-        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
@@ -2388,7 +2386,7 @@ sub _cfgSanityCheck {
         } else {
             # TODO : Remove, this is from a previous migration path
             #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #    $_ =~ s/\/\.pac\//\/\.config\/asbru\//g;
             #}
             if (defined $$cfg{'environments'}{$uuid}{'screenshot'}) {
                 delete $$cfg{'environments'}{$uuid}{'screenshot'};
@@ -3356,15 +3354,6 @@ sub _getXWindowsList {
     return \%list;
 }
 
-# TODO: Should be changed to github or removed
-sub _getREADME {
-    my $pid = shift // 0;
-
-    my $readme_file = "$CFG_DIR/tmp/latest_README";
-    system("(/usr/bin/wget http://sourceforge.net/projects/pacmanager/files/README -O $readme_file 1>&2 2>/dev/null; kill -10 $pid) &");
-    return 1;
-}
-
 sub _checkREADME {
     my $readme_file = "$CFG_DIR/tmp/latest_README";
     if (!open(F,"<:utf8",$readme_file)) {
@@ -3386,60 +3375,6 @@ sub _checkREADME {
     unlink $readme_file;
 
     return $version, \@changes;
-}
-
-sub _showUpdate {
-    my $NEW_VERSION = shift;
-    my $NEW_CHANGES = shift;
-    my $notify_no_updates = shift // 0;
-
-    if (((! $NEW_VERSION) || ($APPVERSION ge $NEW_VERSION)) && (! $notify_no_updates)) {
-        return 0;
-    }
-    my $windowConfirm = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Check new version availability",
-        undef,
-        'modal',
-        'gtk-ok' => 'ok',
-    );
-
-    my $lbl = Gtk3::Label->new();
-    $windowConfirm->get_content_area->pack_start($lbl, 0, 0, 5);
-
-    my $lbl2 = Gtk3::LinkButton->new_with_label('http://sourceforge.net/projects/pacmanager');
-    $windowConfirm->get_content_area->pack_start($lbl2, 0, 0, 5);
-    $lbl2->set('relief', 'none');
-
-    if ((! $NEW_VERSION) || ($APPVERSION ge $NEW_VERSION)) {
-        $lbl->set_markup("There is <b>NO</b> new version available");
-        $windowConfirm->signal_connect('response', sub {$windowConfirm->destroy();});
-    } else {
-        $lbl->set_markup("There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>");
-
-        # Create a scrolled window to contain the textview
-        my $scrollDescription = Gtk3::ScrolledWindow->new();
-        $windowConfirm->get_content_area->pack_start($scrollDescription, 1, 1, 0);
-        $scrollDescription->set_policy('automatic', 'automatic');
-        my $tb = Gtk3::TextBuffer->new();
-        $tb->set_text(join("\n", @{$NEW_CHANGES}));
-        my $tv = Gtk3::TextView->new_with_buffer($tb);
-        $tv->set_editable(0);
-        $scrollDescription->add($tv);
-        my $cb = Gtk3::CheckButton->new('Do not check for updates anymore (also configurable under "Preferences")');
-        $cb->set_active(! $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'check versions at start'});
-        $windowConfirm->get_content_area->pack_start($cb, 0, 0, 5);
-
-        $windowConfirm->signal_connect('response', sub {$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb->get_active(); $PACMain::FUNCS{_MAIN}->_saveConfiguration(); $windowConfirm->destroy();});
-        $windowConfirm->set_size_request(640, 480);
-        $windowConfirm->set_resizable(1);
-    }
-
-    $windowConfirm->set_position('center_always');
-    $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_border_width(5);
-    $windowConfirm->show_all();
-
-    return 1;
 }
 
 sub _getEncodings {
