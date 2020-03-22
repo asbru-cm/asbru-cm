@@ -29,7 +29,6 @@ $|++;
 
 # Execute this code before anything else, even loading modules
 BEGIN {
-    $ENV{'USER_DIR_SET'} = 0;
     if (grep({ /^-{1,2}(help|h)$/gi } @ARGV)) {
         print "\n";
         print "Usage: $0 [options]\n";
@@ -69,7 +68,6 @@ BEGIN {
                 # Relative path to ~./config
                 $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/$path";
             }
-            $ENV{'USER_DIR_SET'} = 1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
             print STDERR "INFO: bad start up parameter $arg\n";
         }
@@ -108,6 +106,7 @@ our $CFG_FILE_NAME  = "asbru.yml";
 our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $CFG_DIR_OLD    = "$ENV{'HOME'}/.config/pac";
+our $CFG_FILE_OLD   = "pac.yml";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
@@ -139,11 +138,16 @@ if (!-d "$ENV{'HOME'}/.config") {
 }
 
 # Code for future configuration migrations when needed
-if ((!$ENV{'USER_DIR_SET'}) && ($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
+if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR) && (!-e $CFG_DIR)) {
+    # Production user data
+    config_migration($CFG_DIR_OLD,$CFG_DIR);
+} elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
+    # Alternate configuration directory
+    $CFG_DIR_OLD = "$CFG_DIR.migration";
+    system "rm -Rf $CFG_DIR_OLD";
+    system "mv -f $CFG_DIR $CFG_DIR.migration";
     config_migration($CFG_DIR_OLD,$CFG_DIR);
 }
-
-delete $ENV{'USER_DIR_SET'};
 
 # Create Asbru config dir if necessary
 if (!-d $CFG_DIR) {
