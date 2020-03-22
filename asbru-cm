@@ -198,18 +198,26 @@ sub config_migration {
     foreach my $f ('pac.yml','pac_notray.notified','pac.pcc',,'pac.yml.gui','pac.yml.tree','pac_start.desktop','pac.dumper') {
         my $n = $f;
         $n =~ s/pac/asbru/;
-        system "mv -f $new_dir/$f $new_dir/$n";
+        if (-e "$new_dir/$f") {
+            system "mv -f $new_dir/$f $new_dir/$n";
+        }
     }
     foreach my $f ('pac.yml','pac_start.desktop') {
         my $n = $f;
         $n =~ s/pac/asbru/;
-        system "mv -f $new_dir/res/$f $new_dir/res/$n";
-        system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
+        if (-e "$new_dir/res/$f") {
+            system "mv -f $new_dir/res/$f $new_dir/res/$n";
+        }
+        if (-e "$new_dir/autostart/$f") {
+            system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
+        }
     }
     # Rename BackUps
     my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/pac.yml";
     for (my $n=0; $n < 10; $n++) {
-        system "mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
+        if (-e "$BACKUP_CFG_FILE.$n") {
+            system "mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
+        }
     }
     # Rename screenshost
     #opendir($ss,"$old_dir/screenshots");
