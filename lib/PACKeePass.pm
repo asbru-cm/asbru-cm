@@ -648,7 +648,6 @@ sub _testCapabilities {
     $$self{kpxc_keyfile_opt} = '';
     $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
-    print("V=[$$self{kpxc_version}]\n");
     if ($$self{kpxc_version} =~ /keepassxc/i) {
         # The GUI file was selected instead of cli ; try to add 'cli'
         $CLI .= " cli";
