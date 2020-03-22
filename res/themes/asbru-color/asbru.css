@@ -23,6 +23,7 @@ spinbutton {
     border-radius: 0px;
     padding: 0px;
     margin: 0px;
+    caret-color: #000000;
 }
 spinbutton:hover {
     border: 1px solid #555555;
