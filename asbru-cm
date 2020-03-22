@@ -202,12 +202,9 @@ sub config_migration {
             system "mv -f $new_dir/$f $new_dir/$n";
         }
     }
-    foreach my $f ('pac.yml','pac_start.desktop') {
+    foreach my $f ('pac_start.desktop') {
         my $n = $f;
         $n =~ s/pac/asbru/;
-        if (-e "$new_dir/res/$f") {
-            system "mv -f $new_dir/res/$f $new_dir/res/$n";
-        }
         if (-e "$new_dir/autostart/$f") {
             system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
         }
