@@ -380,7 +380,7 @@ sub start {
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
-    nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save PAC config file '$$self{_TMPCFG}': $!";
+    nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save Ásbrú config file '$$self{_TMPCFG}': $!";
     undef %new_cfg;
 
     # Delete the oldest auto-saved session log
@@ -1252,7 +1252,7 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
 
     # Capture Drag and Drop events
-    my @targets = (Gtk3::TargetEntry->new('PAC Connect', [], 0));
+    my @targets = (Gtk3::TargetEntry->new('Ásbrú Connect', [], 0));
     $$self{_GUI}{_VTE}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
     $$self{_GUI}{_VTE}->signal_connect('drag_drop' => sub {
         if (!$$self{CONNECTED}) {
@@ -1514,7 +1514,7 @@ sub _watchConnectionData {
             }
         } elsif ($data =~ /^SCRIPT_SUB_(.+)\[NAME:(.+)\]\[PARAMS:(.*)\]/go) {
             my ($func, $name, $params) = ($1, $2, $3);
-            $data = "PAC Script '$name' --> $func($params)";
+            $data = "Ásbrú Script '$name' --> $func($params)";
         } elsif ($data =~ /^TITLE:(.+)/go) {
             $$self{_TITLE} = $1;
             $self->_updateCFG();
@@ -1893,7 +1893,7 @@ sub _vteMenu {
     {
         label => 'Execute Script',
         stockicon => 'asbru-script',
-        tooltip => 'Execute selected PAC Script in this connection',
+        tooltip => 'Execute selected Ásbrú Script in this connection',
         submenu => \@scripts_sub_menu,
     });
 
@@ -3026,7 +3026,7 @@ sub _setupTabDND {
     my $self = shift;
     my $widget = shift // $$self{_GUI}{_VBOX};
 
-    my @targets = (Gtk3::TargetEntry->new('PAC Tabbed', [], 0));
+    my @targets = (Gtk3::TargetEntry->new('Ásbrú Tabbed', [], 0));
     $$self{_GUI}{_TABLBL}->drag_source_set('GDK_BUTTON1_MASK', \@targets, ['move']);
     $$self{_GUI}{_TABLBL}->signal_connect('drag_begin' => sub {
         # Does not work anymore on Gtk3
