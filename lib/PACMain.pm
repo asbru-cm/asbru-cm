@@ -1010,7 +1010,9 @@ sub _initGUI {
         if (defined $$self{_GUI}{posx} && ($$self{_GUI}{posx} eq 'maximized')) {
             $$self{_GUI}{main}->maximize();
         } else {
-            $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
+            # DevNote: there's no reliable way to restore the position, do only resize
+            #          (see https://wiki.gnome.org/HowDoI/SaveWindowState and https://developer.gnome.org/gtk3/stable/GtkWindow.html#gtk-window-get-position)
+            # $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
             $$self{_GUI}{main}->resize($$self{_GUI}{sw} // 1024, $$self{_GUI}{sh} // 768);
         }
     }
@@ -3634,6 +3636,10 @@ sub _saveGUIData {
         my ($x, $y) = $$self{_GUI}{main}->get_position();
         my ($w, $h) = $$self{_GUI}{main}->get_size();
         print F $x . ':' . $y . ':' . $w . ':' . $h;
+
+        if ($$self{_VERBOSE}) {
+            print STDERR "DEBUG: Saving window position = ($x, $y) ; window size ($w, $h)\n";
+        }
     }
     print F "\n";
 
@@ -3663,6 +3669,10 @@ sub _loadGUIData {
         $win eq 'maximized'
         ? ('maximized', 'maximized', 'maximized', 'maximized')
         : split(':', $win);
+
+    if ($$self{_VERBOSE}) {
+        print STDERR "DEBUG: Starting window position = ($$self{_GUI}{posx}, $$self{_GUI}{posy}} ; window size ($$self{_GUI}{sw}, $$self{_GUI}{sh})\n";
+    }
 
     # Read connections list width
     my $tree = <F> // '-1';
