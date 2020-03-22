@@ -214,8 +214,8 @@ sub config_migration {
     # Rename BackUps
     my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/pac.yml";
     for (my $n=0; $n < 10; $n++) {
-        print  "cp -fp $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n\n";
-        system "cp -fp $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
+        print  "mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n\n";
+        system "mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
     }
     # Rename screenshost
     #opendir($ss,"$old_dir/screenshots");
@@ -234,6 +234,8 @@ sub config_migration {
     while (my $l = <YMLO>) {
         if ($l =~ m|$old_dir|) {
             $l =~ s|$old_dir|$new_dir|;
+        } elsif ($l =~ /pac_/) {
+            $l =~ s|pac_|asbru_|g;
         }
         print YMLN $l;
     }
