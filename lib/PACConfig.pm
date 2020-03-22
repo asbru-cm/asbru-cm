@@ -330,7 +330,7 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
-            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'asbru-protected');
+            my $pass = _wEnterValue($self, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
@@ -580,7 +580,7 @@ sub _exporter {
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save PAC Config file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save Ásrbú Config file '$file':\n\n$@");
     }
     delete $$self{_CFG}{'__PAC__EXPORTED__'};
     delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};

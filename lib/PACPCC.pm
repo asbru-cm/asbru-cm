@@ -365,8 +365,8 @@ sub _initGUI {
     $$self{_WINDOWPCC}{btnSelection}->set_image(Gtk3::Image->new_from_stock('gtk-select-all', 'button') );
     $$self{_WINDOWPCC}{btnSelection}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{btnSelection}, 0, 1, 0);
-    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label('Use PAC variables');
-    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text('Allow PAC to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)');
+    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label('Use Ásbrú variables');
+    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text('Allow Ásbrú to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)');
     $$self{_WINDOWPCC}{cbSubstitute}->set_active(1);
     $$self{_WINDOWPCC}{cbSubstitute}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{cbSubstitute}, 0, 1, 0);
