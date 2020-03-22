@@ -557,7 +557,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_ASK[NAME:$name][PID:$$][PARAMS:$txt, $visible]");
 
-        return wEnterValue("<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
+        return wEnterValue("<b>Ásbrú SCRIPT USER INPUT</b>" , $txt, undef, $visible);
     };
     $TERMINAL{msg} = sub {msg(subst(shift));};
     $TERMINAL{log} = sub {
@@ -659,7 +659,7 @@ sub _execScript {
     eval {
         local $SIG{'TERM'} = sub {
             ctrl("SCRIPT_STOPPED_MANUALLY[NAME:$name]");
-            msg("PAC Script '$name' terminated by user request (TERM(15) signal)");
+            msg("Ásbrú Script '$name' terminated by user request (TERM(15) signal)");
             if (defined $_W{window}{data}){
                 $_W{window}{data}->destroy;
             }
