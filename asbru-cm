@@ -140,7 +140,7 @@ if (!-d "$ENV{'HOME'}/.config") {
 # Code for future configuration migrations when needed
 if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR) && (!-e $CFG_DIR)) {
     # Production user data
-    config_migration($CFG_DIR_OLD,$CFG_DIR);
+    config_migration($CFG_DIR_OLD,$CFG_DIR,1);
 } elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
     # Alternate configuration directory
     $CFG_DIR_OLD = "$CFG_DIR.migration";
@@ -193,7 +193,10 @@ sub config_migration {
         # Migrate only once
         return 0;
     }
-    system "cp -rfp $old_dir $old_dir.old";
+    if (!-e "$old_dir.old") {
+        # Write only once to avoid a disaster if user has moved things manually and this is rerun
+        system "cp -rfp $old_dir $old_dir.old";
+    }
     system "mv $old_dir $new_dir";
     foreach my $f ('pac.yml','pac_notray.notified','pac.pcc',,'pac.yml.gui','pac.yml.tree','pac_start.desktop','pac.dumper') {
         my $n = $f;
