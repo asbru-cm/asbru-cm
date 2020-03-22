@@ -140,7 +140,7 @@ if (!-d "$ENV{'HOME'}/.config") {
 # Code for future configuration migrations when needed
 if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR) && (!-e $CFG_DIR)) {
     # Production user data
-    config_migration($CFG_DIR_OLD,$CFG_DIR,1);
+    config_migration($CFG_DIR_OLD,$CFG_DIR);
 } elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
     # Alternate configuration directory
     $CFG_DIR_OLD = "$CFG_DIR.migration";
