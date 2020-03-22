@@ -1017,13 +1017,16 @@ sub _initGUI {
 
     # Build Config window
     $FUNCS{_CONFIG} = $$self{_CONFIG} = PACConfig->new($$self{_CFG});
+    # Set parent
+    $$self{_CONFIG}{_WINDOWCONFIG}->set_transient_for($$self{_GUI}{main});
 
     # Get the KeePass object from configuration
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
     # Build Edit window
-    $$self{_EDIT} = PACEdit->new($$self{_CFG});
-    $FUNCS{_EDIT} = $$self{_EDIT};
+    $FUNCS{_EDIT} = $$self{_EDIT} = PACEdit->new($$self{_CFG});
+    # Set parent
+    $$self{_EDIT}{_WINDOWEDIT}->set_transient_for($$self{_GUI}{main});
 
     # Build Cluster Administration window
     $$self{_CLUSTER} = PACCluster->new(\%RUNNING);
