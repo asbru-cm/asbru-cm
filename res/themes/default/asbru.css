@@ -17,6 +17,7 @@ entry:focus {
     caret-color: #000000;
 }
 spinbutton {
+    color: #000000;
     font-size: 0.9em;
     border: 1px solid #dddddd;
     background-color: #dddddd;
