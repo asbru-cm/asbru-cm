@@ -197,7 +197,7 @@ sub config_migration {
     system "cp -rfp $old_dir $old_dir.old";
     print  "mv $old_dir $new_dir\n";
     system "mv $old_dir $new_dir";
-    foreach my $f ('pac.yml','pac.nfreeze','pac_notray.notified','pac.pcc','pac_clusters.nfreeze','pac_stats.nfreeze','pac.yml.gui','pac.yml.tree','pac_start.desktop','pac.dumper') {
+    foreach my $f ('pac.yml','pac_notray.notified','pac.pcc',,'pac.yml.gui','pac.yml.tree','pac_start.desktop','pac.dumper') {
         my $n = $f;
         $n =~ s/pac/asbru/;
         print  "mv -f $new_dir/$f $new_dir/$n\n";
@@ -228,6 +228,20 @@ sub config_migration {
             system "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
         }
     }
+    # Process pac.yml
+    open(YMLO,"<:utf8","$new_dir/asbru.yml");
+    open(YMLN,">:utf8","$new_dir/asbru.yml.new");
+    while (my $l = <YMLO>) {
+        if ($l =~ m|$old_dir|) {
+            $l =~ s|$old_dir|$new_dir|;
+        }
+        print YMLN $l;
+    }
+    close YMLO;
+    close YMLN;
+    system "mv -f $new_dir/asbru.yml.new $new_dir/asbru.yml";
+    # Remove nfreeze
+    system "rm -f $new_dir/*.nfreeze";
     return 0;
 }
 
