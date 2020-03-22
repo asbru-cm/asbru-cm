@@ -139,7 +139,6 @@ sub show {
 
 sub _initGUI {
     my $self = shift;
-    my $opt = shift;
 
     # Load XML Glade file
     defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder->new_from_file($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
@@ -185,9 +184,9 @@ sub _initGUI {
     _($self, 'btnExportYAML')->set_label('Export config...');
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
-    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef,undef,'remote'))->{container});
-    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef,undef,'local'))->{container});
-    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1,$$self{_CFG}{defaults}{keepass}))->{container});
+    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
+    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
+    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -202,6 +201,7 @@ sub _initGUI {
         $$self{_ENCODINGS_MAP}{$enc} = ++$i;
     }
 
+    # Show preferences
     _updateGUIPreferences($self);
 
     return 1;
