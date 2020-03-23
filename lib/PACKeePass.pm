@@ -645,8 +645,8 @@ sub _testCapabilities {
     }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
-        if (!$$self{kpxc_cli} && $$self{kpxc_pathcli} =~ /appimage/i) {
-            $$self{kpxc_cli} = ' cli';
+        if (!$$self{kpxc_cli} && $$self{kpxc_pathcli} !~ /keepassxc-cli/i) {
+            $$self{kpxc_cli} = 'cli';
         }
     }
     $$self{kpxc_keyfile} = '';
