@@ -177,7 +177,7 @@ sub testMasterKey {
     } else {
         $cfg = $self->get_cfg();
     }
-    $pid = open3(*Writer, *Reader, *ErrReader, "$CLI show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open3(*Writer, *Reader, *ErrReader, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -258,7 +258,7 @@ sub getFieldValue {
             }
         }
     }
-    $pid = open2(*Reader, *Writer, "$CLI show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open2(*Reader, *Writer, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -459,7 +459,7 @@ sub _locateEntries {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            $pid = open2(*Reader,*Writer,"$CLI locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
             print Writer "$KPXC_MP\n";
             close Writer;
             @KPXC_LIST = <Reader>;
@@ -640,32 +640,33 @@ sub _testCapabilities {
     my $self = shift;
     my ($c);
 
+    if (!defined $$self{kpxc_cli}) {
+        $$self{kpxc_cli} = '';
+    }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
+        if (!$$self{kpxc_cli} && $$self{kpxc_pathcli} =~ /appimage/i) {
+            $$self{kpxc_cli} = ' cli';
+        }
     }
     $$self{kpxc_keyfile} = '';
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
-    $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
+    $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
-    if ($$self{kpxc_version} =~ /keepassxc/i) {
-        # The GUI file was selected instead of cli ; try to add 'cli'
-        $CLI .= " cli";
-        # Try again
-        $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
-        $$self{kpxc_version} =~ s/\n//g;
-    }
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
-        $$self{kpxc_version} = 0;
+        $$self{kpxc_version} = '';
     }
     if (!$$self{kpxc_version}) {
         if ($CLI eq 'keepassxc-cli') {
             # We do not have keepassxc-cli available
             $$self{disable_keepassxc} = 1;
+            $$self{kpxc_cli} = '';
             return 0;
         } else {
             # Test if we have a system wide installation
+            $$self{kpxc_cli} = '';
             $CLI = 'keepassxc-cli';
             $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
             $$self{kpxc_version} =~ s/\n//g;
@@ -677,7 +678,7 @@ sub _testCapabilities {
             }
         }
     }
-    $c = `$CLI -h show 2>&1`;
+    $c = `$CLI $$self{kpxc_cli} -h show 2>&1`;
     $$self{disable_keepassxc} = 0;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
