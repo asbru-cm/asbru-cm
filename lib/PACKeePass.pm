@@ -634,7 +634,7 @@ sub _updateUsage {
     my $self = shift;
     my $capabilities;
 
-    $capabilities  = "<b>Location</b>\t\t$CLI\n";
+    $capabilities  = "<b>Location</b>\t\t\t$CLI\n";
     $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
     $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
     $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
@@ -649,25 +649,17 @@ sub _testCapabilities {
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
     $$self{kpxc_version} = '';
-    print "ENABLED?$$self{cfg}{use_keepass}\n";
+    $$self{kpxc_cli} = '';
     if (!$$self{cfg}{use_keepass}) {
         return 0;
     }
-    if (!defined $$self{kpxc_cli}) {
-        $$self{kpxc_cli} = '';
-    }
-    print "TEST?:(defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})\n";
-
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
-        print "OK??\n";
         $CLI = $$self{cfg}{pathcli};
-        my $ft = `file $CLI`;
-        print "FILE:$ft\n";
-        if ((!$$self{kpxc_cli}) && ($$self{kpxc_pathcli} !~ /keepassxc-cli/i) && ($ft =~ /LSB executable/)) {
-            $$self{kpxc_cli} = 'cli';
-        }
     }
-    print "$CLI $$self{kpxc_cli} -v 2>/dev/null\n";
+    my $ft = `file $CLI`;
+    if (($CLI !~ /keepassxc-cli/i) && ($ft =~ /LSB executable/)) {
+        $$self{kpxc_cli} = 'cli';
+    }
     $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
@@ -704,6 +696,9 @@ sub _testCapabilities {
     }
     if ((defined $$self{cfg})&&($$self{kpxc_keyfile})&&($$self{cfg}{keyfile})&&(-e $$self{cfg}{keyfile})) {
         $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$$self{cfg}{keyfile}'";
+    }
+    if ($$self{kpxc_cli} && $$self{disable_keepassxc}==0) {
+        _wMessage('WINDOWEDIT',"<b>Warning</b>\n\nAppImages run slower than keepassxc-cli");
     }
 }
 

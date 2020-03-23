@@ -304,7 +304,7 @@ sub start {
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $self->_hasKeePassField()) {
         my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-        $kpxc->getMasterPassword();
+        $kpxc->getMasterPassword($$self{_WINDOWTERMINAL});
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
