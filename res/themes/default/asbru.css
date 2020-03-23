@@ -14,14 +14,17 @@ button:hover {
 entry:focus {
     color: #000000;
     background-color:#FFEBBB;
+    caret-color: #000000;
 }
 spinbutton {
+    color: #000000;
     font-size: 0.9em;
     border: 1px solid #dddddd;
     background-color: #dddddd;
     border-radius: 0px;
     padding: 0px;
     margin: 0px;
+    caret-color: #000000;
 }
 spinbutton:hover {
     border: 1px solid #555555;
