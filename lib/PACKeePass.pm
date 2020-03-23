@@ -588,10 +588,15 @@ sub _buildKeePassGUI {
 
     # Register callbacks
     $w{cbUseKeePass}->signal_connect('toggled', sub {
-        $w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active);
-        $w{hboxkpclifile}->set_sensitive($w{cbUseKeePass}->get_active);
+        $w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active());
+        $w{hboxkpclifile}->set_sensitive($w{cbUseKeePass}->get_active());
         if ($$self{kpxc_keyfile}) {
-            $w{hboxkpkeyfile}->set_sensitive($w{cbUseKeePass}->get_active);
+            $w{hboxkpkeyfile}->set_sensitive($w{cbUseKeePass}->get_active());
+        }
+        if ($w{cbUseKeePass}->get_active()) {
+            $$cfg{'use_keepass'} = 1;
+            $self->_testCapabilities();
+            $self->_updateUsage();
         }
     });
 
@@ -644,6 +649,7 @@ sub _testCapabilities {
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
     $$self{kpxc_version} = '';
+    print "ENABLED?$$self{cfg}{use_keepass}\n";
     if (!$$self{cfg}{use_keepass}) {
         return 0;
     }
