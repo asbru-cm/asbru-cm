@@ -1,4 +1,5 @@
 button {
+    border: 1px solid rgba(1,1,1,0);
     margin: 1px;
 }
 radiobutton, checkbutton {
