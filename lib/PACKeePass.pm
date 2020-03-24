@@ -66,14 +66,16 @@ my $CLI = 'keepassxc-cli';
 sub new {
     my $class = shift;
     my $buildgui = shift;
+    my $verbose = shift;
     my $self;
 
     $self->{cfg} = shift;
     $self->{container} = undef;
     $self->{frame} = {};
+    $self->{_VERBOSE} = $verbose;
 
-    _testCapabilities($self);
     if ($buildgui) {
+        _testCapabilities($self);
         _buildKeePassGUI($self);
     }
 
@@ -104,7 +106,7 @@ sub update {
     if ((!defined $file)||(-d $file)||(!-e $file)) {
         return 0;
     }
-    if (!-e ($pathcli =~ s/( cli)$//r)) {
+    if (!-e $pathcli) {
         $pathcli = '';
     }
     if ($$self{disable_keepassxc}) {
@@ -113,7 +115,7 @@ sub update {
     $$self{frame}{fcbKeePassFile}->set_filename($file);
 
     if ($pathcli) {
-        $$self{frame}{fcbCliFile}->set_filename($pathcli =~ s/( cli)$//r);
+        $$self{frame}{fcbCliFile}->set_filename($pathcli);
         $CLI = $pathcli;
     }
     if ($key) {
@@ -624,10 +626,6 @@ sub _buildKeePassGUI {
             $CLI = $fc->get_filename();
             $self->_testCapabilities();
             $self->_updateUsage();
-            if (($CLI =~ s/( cli)$//r) ne $fc->get_filename()) {
-                $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
-                $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
-            }
         }
     });
 
@@ -659,6 +657,14 @@ sub _testCapabilities {
     my $self = shift;
     my ($c);
 
+    if (ref($self) eq 'PACKeePass') {
+        if (!$$self{frame}{cbUseKeePass}->is_visible()) {
+            return 0;
+        }
+    }
+    if ($$self{'_VERBOSE'}) {
+        print "DEBUG: KeePassXC : testing capabilities\n";
+    }
     $$self{kpxc_keyfile} = '';
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
@@ -710,9 +716,6 @@ sub _testCapabilities {
     }
     if ((defined $$self{cfg})&&($$self{kpxc_keyfile})&&($$self{cfg}{keyfile})&&(-e $$self{cfg}{keyfile})) {
         $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$$self{cfg}{keyfile}'";
-    }
-    if ($$self{kpxc_cli} && $$self{disable_keepassxc}==0) {
-        _wMessage('WINDOWEDIT',"<b>Warning</b>\n\nAppImages run slower than keepassxc-cli");
     }
 }
 

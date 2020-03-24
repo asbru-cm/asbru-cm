@@ -1813,8 +1813,6 @@ sub _wMessage {
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    } elsif ($window eq 'WINDOWEDIT') {
-        $window = $PACMain::FUNCS{_EDIT}{_WINDOWEDIT};
     }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
@@ -1911,6 +1909,9 @@ sub _wConfirm {
     my $window = shift;
     my $msg = shift;
 
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
@@ -1919,9 +1920,6 @@ sub _wConfirm {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
