@@ -657,7 +657,7 @@ sub _updateUsage {
 
 sub _testCapabilities {
     my $self = shift;
-    my ($c,$magic,$appimage);
+    my ($c);
 
     if (ref($self) eq 'PACKeePass') {
         if (!$$self{frame}{cbUseKeePass}->is_visible()) {
@@ -679,19 +679,7 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
-    $magic = _getMagicBytes($CLI);
-    if ($$self{_VERBOSE}) {
-        print "KEYPASS: Magic bytes = $magic\n";
-    }
-    if ($magic && $magic eq '41490200') {
-        $appimage = 1;
-    } else {
-        $magic = `file $CLI`;
-        if ($magic =~ /LSB executable/) {
-            $appimage = 1;
-        }
-    }
-    if ($appimage) {
+    if (_getMagicBytes($CLI) eq '41490200') {
         $$self{kpxc_cli} = 'cli';
     }
     if ($$self{_VERBOSE}) {
