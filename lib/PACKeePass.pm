@@ -72,7 +72,6 @@ sub new {
     $self->{cfg} = shift;
     $self->{container} = undef;
     $self->{frame} = {};
-    $self->{_VERBOSE} = $verbose;
 
     if ($buildgui) {
         _testCapabilities($self);
@@ -612,10 +611,10 @@ sub _buildKeePassGUI {
     });
 
     $w{btnClearclifile}->signal_connect('clicked' => sub {
+        $$self{cfg}{pathcli} = '';
+        $CLI = 'keepassxc-cli';
         $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
-        $$cfg{pathcli} = '';
-        $CLI = 'keepassxc-cli';
         $self->_testCapabilities();
         $self->_updateUsage();
     });
@@ -623,6 +622,7 @@ sub _buildKeePassGUI {
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
         my ($fc) = @_;
         if (defined $fc->get_filename()) {
+            $$self{cfg}{pathcli} = $fc->get_filename();
             $CLI = $fc->get_filename();
             $self->_testCapabilities();
             $self->_updateUsage();
@@ -637,6 +637,9 @@ sub _updateUsage {
     my $capabilities;
     my $w = $$self{frame};
 
+    if ($$self{_VERBOSE}) {
+        print "KEEPASS: Update\n";
+    }
     if ($$self{disable_keepassxc}) {
         $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
     } else {
@@ -662,9 +665,6 @@ sub _testCapabilities {
             return 0;
         }
     }
-    if ($$self{'_VERBOSE'}) {
-        print "DEBUG: KeePassXC : testing capabilities\n";
-    }
     $$self{kpxc_keyfile} = '';
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
@@ -674,12 +674,18 @@ sub _testCapabilities {
     if (!$$self{cfg}{use_keepass}) {
         return 0;
     }
+    if ($$self{_VERBOSE}) {
+        print "KEYPASS: testCapabilities\n";
+    }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
     my $ft = `file $CLI`;
     if (($CLI !~ /keepassxc-cli/i) && ($ft =~ /LSB executable/)) {
         $$self{kpxc_cli} = 'cli';
+    }
+    if ($$self{_VERBOSE}) {
+        print "KEEPASS: $CLI\n";
     }
     $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
