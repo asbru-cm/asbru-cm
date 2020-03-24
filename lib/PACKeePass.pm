@@ -642,7 +642,7 @@ sub _updateUsage {
     if ($$self{disable_keepassxc}) {
         $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
     } else {
-        $capabilities  = "<b>Location</b>\t\t$CLI\n";
+        $capabilities  = "<b>Location</b>\t\t$CLI  $$self{kpxc_cli}\n";
         $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
         $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
         $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
@@ -657,7 +657,7 @@ sub _updateUsage {
 
 sub _testCapabilities {
     my $self = shift;
-    my ($c);
+    my ($c,$magic,$appimage);
 
     if (ref($self) eq 'PACKeePass') {
         if (!$$self{frame}{cbUseKeePass}->is_visible()) {
@@ -679,12 +679,25 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
-    my $ft = `file $CLI`;
-    if (($CLI !~ /keepassxc-cli/i) && ($ft =~ /LSB executable/)) {
+    if ($CLI !~ /keepassxc-cli/) {
+        $magic = `xxd $CLI 2>/dev/null | head -1`;
+        if ($magic) {
+            my @m = split / /,$magic;
+            if ($m[5] eq '4149' && $m[6] eq '0200') {
+                $appimage = 1;
+            }
+        } else {
+            $magic = `file $CLI`;
+            if ($magic =~ /LSB executable/) {
+                $appimage = 1;
+            }
+        }
+    }
+    if ($appimage) {
         $$self{kpxc_cli} = 'cli';
     }
     if ($$self{_VERBOSE}) {
-        print "KEEPASS: $CLI\n";
+        print "KEEPASS: $CLI $$self{kpxc_cli}\n";
     }
     $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
