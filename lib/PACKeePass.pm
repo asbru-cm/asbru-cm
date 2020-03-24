@@ -679,20 +679,18 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
-    #if ($CLI !~ /keepassxc-cli/) {
-        $magic = _getMagicBytes($CLI);
-        if ($$self{_VERBOSE}) {
-            print "KEYPASS: Magic bytes = $magic\n";
-        }
-        if ($magic && $magic eq '41490200') {
+    $magic = _getMagicBytes($CLI);
+    if ($$self{_VERBOSE}) {
+        print "KEYPASS: Magic bytes = $magic\n";
+    }
+    if ($magic && $magic eq '41490200') {
+        $appimage = 1;
+    } else {
+        $magic = `file $CLI`;
+        if ($magic =~ /LSB executable/) {
             $appimage = 1;
-        } else {
-            $magic = `file $CLI`;
-            if ($magic =~ /LSB executable/) {
-                $appimage = 1;
-            }
         }
-    #}
+    }
     if ($appimage) {
         $$self{kpxc_cli} = 'cli';
     }
