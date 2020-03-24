@@ -66,7 +66,6 @@ my $CLI = 'keepassxc-cli';
 sub new {
     my $class = shift;
     my $buildgui = shift;
-    my $verbose = shift;
     my $self;
 
     $self->{cfg} = shift;
@@ -638,7 +637,7 @@ sub _updateUsage {
     my $w = $$self{frame};
 
     if ($$self{_VERBOSE}) {
-        print "KEEPASS: Update\n";
+        print "KEEPASS: Update usage\n";
     }
     if ($$self{disable_keepassxc}) {
         $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
