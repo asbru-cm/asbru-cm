@@ -55,7 +55,7 @@ use PACTree;
 my $KPXC_MP = $ENV{'KPXC_MP'};
 my @KPXC_LIST;
 my %KPXC_CACHE = ();
-my $CLI = 'keepassxc-cli-x';
+my $CLI = 'keepassxc-cli';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -613,7 +613,7 @@ sub _buildKeePassGUI {
         $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
         $$cfg{pathcli} = '';
-        $CLI = 'keepassxc-cli-x';
+        $CLI = 'keepassxc-cli';
         $self->_testCapabilities();
         $self->_updateUsage();
     });
@@ -682,7 +682,7 @@ sub _testCapabilities {
         $$self{kpxc_version} = '';
     }
     if (!$$self{kpxc_version}) {
-        if ($CLI eq 'keepassxc-cli-x') {
+        if ($CLI eq 'keepassxc-cli') {
             # We do not have keepassxc-cli available
             $$self{disable_keepassxc} = 1;
             $$self{kpxc_cli} = '';
@@ -690,7 +690,7 @@ sub _testCapabilities {
         } else {
             # Test if we have a system wide installation
             $$self{kpxc_cli} = '';
-            $CLI = 'keepassxc-cli-x';
+            $CLI = 'keepassxc-cli';
             $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
             $$self{kpxc_version} =~ s/\n//g;
             if (!$$self{kpxc_version}) {
