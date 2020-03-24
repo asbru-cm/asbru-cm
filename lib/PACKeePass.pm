@@ -679,20 +679,20 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
     }
-    if ($CLI !~ /keepassxc-cli/) {
-        $magic = `xxd $CLI 2>/dev/null | head -1`;
-        if ($magic) {
-            my @m = split / /,$magic;
-            if ($m[5] eq '4149' && $m[6] eq '0200') {
-                $appimage = 1;
-            }
+    #if ($CLI !~ /keepassxc-cli/) {
+        $magic = _getMagicBytes($CLI);
+        if ($$self{_VERBOSE}) {
+            print "KEYPASS: Magic bytes = $magic\n";
+        }
+        if ($magic && $magic eq '41490200') {
+            $appimage = 1;
         } else {
             $magic = `file $CLI`;
             if ($magic =~ /LSB executable/) {
                 $appimage = 1;
             }
         }
-    }
+    #}
     if ($appimage) {
         $$self{kpxc_cli} = 'cli';
     }
@@ -735,6 +735,20 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{kpxc_keyfile})&&($$self{cfg}{keyfile})&&(-e $$self{cfg}{keyfile})) {
         $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$$self{cfg}{keyfile}'";
     }
+}
+
+sub _getMagicBytes {
+    my $file = shift;
+    my ($fh,$magic_bytes,$n);
+
+    if (!$file || !-e $file) {
+        return '';
+    }
+    open ($fh, '<:raw', $file) or return '';
+    $n = read($fh, $magic_bytes, 32);
+    close $fh;
+    my $data = unpack("H*",$magic_bytes);
+    return substr($data,16,8);
 }
 
 # END: Private functions definitions
