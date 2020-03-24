@@ -34,7 +34,7 @@ __Tabbed interface hidden__
 
 ![](images/pref3.png)
 
-__Tabbed and interface shown__ 
+__Tabbed and interface shown__
 
 ![](images/pref4.png)
 
@@ -58,10 +58,12 @@ __Separate windows simultaneous views side by side__
 
 ## Icons Theme
 
-Starting with Ásbru 6.2 the applications offer 2 themes for icons.
+Starting with Ásbru 6.2 the applications offer 4 themes for icons.
 
-+ Default : Set of grey icons
++ default : Set of grey icons
 + asbru-color : Set of color icons
++ asbru-dark : Theme for system dark themes, with color icons
++ system : Nuetral theme with color icons. This options should have no conflicts with any system theme.
 
 ![](images/pref6.png)
 
