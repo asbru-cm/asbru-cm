@@ -634,7 +634,7 @@ sub _updateUsage {
     my $self = shift;
     my $capabilities;
 
-    $capabilities  = "<b>Location</b>\t\t\t$CLI\n";
+    $capabilities  = "<b>Location</b>\t\t$CLI\n";
     $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
     $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
     $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
