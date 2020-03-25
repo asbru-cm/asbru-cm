@@ -231,7 +231,7 @@ sub applyMask {
 
 sub getFieldValue {
     my ($self, $field, $uid) = @_;
-    my ($pid, $cfg);
+    my ($pid, $cfg,@err);
     my $data='';
     my $flg = 0;
     my @out;
@@ -257,13 +257,15 @@ sub getFieldValue {
             }
         }
     }
-    $pid = open2(*Reader, *Writer, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open3(*Writer, *Reader, *ErrReader, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
+    @err = <ErrReader>;
     # Wait so we do not create zombies
     waitpid($pid, 0);
     close Reader;
+    close ErrReader;
     foreach $data (@out) {
         $data =~ s/\n//g;
         if ($data =~ /(username|password|url|title): (.*)/i) {
