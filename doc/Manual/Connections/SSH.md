@@ -74,7 +74,7 @@ It can be a default public key, or a personal private key that you were assigned
 
 ![](images/ssh6.png)
 
-Select any aditional SSH options.
+Select any additional SSH options.
 
 ### Local / Remote Port Forwarding
 
@@ -107,15 +107,27 @@ This commands are executed in the local computer.
 
 ![](images/ssh7.png)
 
-You can create and execute a sequence of automated actions that will be executed after you have logged in.
+You can create and execute a sequence of automated actions that will be executed during your login process.
 
 + __Expect__ : Regular expression that defines what patter to wait from the terminal.
     - __Timeout__ : How long to wait for the pattern and abort if it does not presents.
-+ __Send__ : When the pattern has a match, send the next secuence of characters.
++ __Send__ : When the pattern has a match, send the next sequence of characters.
     - __Return__ : Add a CR at the end of the string.
     - __Hide__ : If the content of this box should be treated as a password field. Hide visual information for peering eyes.
 + __On MATCH / Fail__ : Execute the next Expect #number in case of MATCH or Fail.
 + __Delete__ : Remove the selected rule.
+
+!!! danger "Executed during the login process only"
+    This expect actions take place only during the login process.
+
+    It helps you to automate a login sequence and a continuous set of actions.
+
+    But they do not work after the complete login sequence ends.
+
+    Ásbrú is not constantly monitoring your typing, so as soon as the login process ends, and the last expect is executed, there will be no more expect detection an execution.
+
+!!! tip "More detailed information"
+    For a more detailed information on Expect read : [Introduction to Expect](../../Managing/Expect.md)
 
 ## Remote Macros
 
