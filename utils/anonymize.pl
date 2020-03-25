@@ -12,7 +12,7 @@ cleanUpPersonalData($ARGV[0]);
 
 sub cleanUpPersonalData {
 	my $file = shift;
-	my $out = 'debug.txt';
+	my $out = 'debug.yml';
 
 	$SIG{__WARN__} = sub{};
 	print STDERR "SAVED IN : $file\nOUT: $out\n";
