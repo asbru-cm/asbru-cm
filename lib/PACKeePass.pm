@@ -282,6 +282,8 @@ sub getFieldValue {
 
 sub get_cfg {
     my $self = shift;
+    my $from_pref = shift;
+    my $disabled = $$self{disable_keepassxc};
 
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
@@ -306,7 +308,10 @@ sub get_cfg {
         $hash{keyfile} = '';
         $hash{password} = '';
         $$self{kpxc_keyfile_opt} = '';
-        $self->_updateUsage();
+        $self->_updateUsage(1);
+        if ($from_pref && !$disabled && $$self{disable_keepassxc}==1) {
+            _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"KeePassXC was disabled, information was incomplete");
+        }
     }
     return \%hash;
 }
@@ -583,22 +588,18 @@ sub _buildKeePassGUI {
     $w{vbox}->pack_start($w{intro_usage}, 0, 1, 0);
     $w{vbox}->pack_start($w{usage}, 0, 1, 0);
 
-    if ($$self{disable_keepassxc}) {
-        $w{usage}->set_markup("<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>");
-        $$self{cfg}{use_keepass} = 0;
-    } else {
-        _updateUsage($self);
-    }
     $w{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
     $w{hboxkpclifile}->set_sensitive($$self{cfg}{use_keepass});
     if ($$self{kpxc_keyfile}) {
         $w{hboxkpkeyfile}->set_sensitive($$self{cfg}{use_keepass});
     }
 
+    _updateUsage($self);
+
     # Register callbacks
     $w{cbUseKeePass}->signal_connect('toggled', sub {
         if ($w{cbUseKeePass}->get_active()) {
-            $$cfg{'use_keepass'} = 1;
+            $$self{cfg}{use_keepass} = 1;
             $self->_setCapabilities();
         }
         $self->_updateUsage();
@@ -638,6 +639,7 @@ sub _buildKeePassGUI {
 
 sub _updateUsage {
     my $self = shift;
+    my $uncheck = shift;
     my $capabilities;
     my $w = $$self{frame};
 
@@ -651,12 +653,19 @@ sub _updateUsage {
     if ($$self{disable_keepassxc}) {
         $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
     } else {
-        $capabilities  = "<b>Location</b>\t\t$CLI  $$self{kpxc_cli}\n";
+        my $warn = '';
+        if ($$self{kpxc_cli}) {
+            $warn = "\t\t\t<span color='orange'><b>Be aware</b> that AppImages are slower than keepassxc-cli</span>\n";
+        }
+        $capabilities  = "<b>Location</b>\t\t$CLI  $$self{kpxc_cli}\n$warn";
         $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
         $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
         $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
     }
-
+    if ($uncheck) {
+        # Remove checkbox if there is not an available keepassxc-cli
+        $$w{cbUseKeePass}->set_active(0);
+    }
     $$w{usage}->set_markup($capabilities);
     $$w{hboxkpmain}->set_sensitive($$w{cbUseKeePass}->get_active());
     $$w{hboxkpclifile}->set_sensitive($$w{cbUseKeePass}->get_active());

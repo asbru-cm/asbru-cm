@@ -1165,7 +1165,7 @@ sub _saveConfiguration {
     # Save the global remote commands tab options
     $$self{_CFG}{'defaults'}{'remote commands'} = $$self{_CMD_REMOTE}->get_cfg();
     # Save KeePass options
-    $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg();
+    $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg(1);
 
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
     $self->_updateGUIPreferences();
