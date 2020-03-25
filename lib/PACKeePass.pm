@@ -70,10 +70,9 @@ sub new {
 
     $self->{cfg} = shift;
     $self->{container} = undef;
-    $self->{frame} = {};
 
+    _setCapabilities($self);
     if ($buildgui) {
-        _testCapabilities($self);
         _buildKeePassGUI($self);
     }
 
@@ -305,8 +304,10 @@ sub get_cfg {
         $hash{keyfile} = '';
         $hash{password} = '';
         $$self{kpxc_keyfile_opt} = '';
-        $$self{frame}{cbUseKeePass}->set_active(0);
-        $self->_updateUsage();
+        if (defined $$self{frame}) {
+            $$self{frame}{cbUseKeePass}->set_active(0);
+            $self->_updateUsage();
+        }
     }
     return \%hash;
 }
@@ -599,7 +600,7 @@ sub _buildKeePassGUI {
     $w{cbUseKeePass}->signal_connect('toggled', sub {
         if ($w{cbUseKeePass}->get_active()) {
             $$cfg{'use_keepass'} = 1;
-            $self->_testCapabilities();
+            $self->_setCapabilities();
         }
         $self->_updateUsage();
     });
@@ -614,7 +615,7 @@ sub _buildKeePassGUI {
         $CLI = 'keepassxc-cli';
         $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
-        $self->_testCapabilities();
+        $self->_setCapabilities();
         $self->_updateUsage();
     });
 
@@ -623,7 +624,7 @@ sub _buildKeePassGUI {
         if (defined $fc->get_filename()) {
             $$self{cfg}{pathcli} = $fc->get_filename();
             $CLI = $fc->get_filename();
-            $self->_testCapabilities();
+            $self->_setCapabilities();
             $self->_updateUsage();
         }
     });
@@ -636,6 +637,10 @@ sub _updateUsage {
     my $capabilities;
     my $w = $$self{frame};
 
+    # Lets make sure there is an UI to update (asrbu_conn does not creates an UI)
+    if (!defined $w) {
+        return 0;
+    }
     if ($$self{_VERBOSE}) {
         print "KEEPASS: Update usage\n";
     }
@@ -655,15 +660,18 @@ sub _updateUsage {
     }
 }
 
-sub _testCapabilities {
+sub _setCapabilities {
     my $self = shift;
     my ($c);
 
+    # Test the UI exists and is visible
     if (ref($self) eq 'PACKeePass') {
+        # Ignore this call
         if (!$$self{frame}{cbUseKeePass}->is_visible()) {
             return 0;
         }
     }
+    # Is start up or preferences are visible
     $$self{kpxc_keyfile} = '';
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
@@ -723,6 +731,7 @@ sub _testCapabilities {
     }
 }
 
+# Check magic bytes, AppImage magic bytes : 41490200
 sub _getMagicBytes {
     my $file = shift;
     my ($fh,$magic_bytes,$n);
@@ -754,10 +763,11 @@ PACKeePass.pm
 
 Handles integration to KeePassXC using : keepassxc-cli
 
-    $kpxc = PACKeePass->new(OPT_BG);
+    $kpxc = PACKeePass->new(OPT_BG,CFG);
     OPT_BG = [0|1]
-             1 : Create object and Build GUI to configure
-             0 : Create object to access available methods
+            1 : Create object and Build GUI to configure
+            0 : Create object to access available methods
+    CFG    = Pointer to a valid PACConfig configuration
 
 =head1 DESCRIPTION
 
@@ -766,6 +776,11 @@ Handles integration to KeePassXC using : keepassxc-cli
 Important object variables
 
     $KPXC_MP : holds the current database master password
+
+B<Warning>
+
+    asbru_conn does not creates an UI, the code must not execute UI actions
+    test that the UI object $$self{'frame'} exists, before
 
 =head2 sub update
 
@@ -809,7 +824,7 @@ Connect to database and query field value, return value or empty if not found
 
 Recover settings from current GUI configuration
 
-head2 sub listEntries
+=head2 sub listEntries
 
 Build a window with a search entry and a listbox, show results from search entry in the listbox
 
@@ -820,3 +835,19 @@ Allow user to select a row and return the selected key path
 head2 sub _locateEntries
 
 Query the complete database for a search pattern and show the entries found in a listbox
+
+=head2 sub _updateUsage
+
+Update capabilities lables, and update the UIs preferences
+
+=head2 sub _setCapabilities
+
+Get keepassxc-cli version numbers and list of available parameters
+
+    --show-protected        Older versions of keepassxc-cli showed by default clear passwords
+                            when the show command is called. Later versions requiere this option
+    --key-file              This version is capable to use a key-file
+
+=head2 sub _getMagicBytes
+
+Read first 32 bytes from binary and return the position for the magic bytes for AppImages
