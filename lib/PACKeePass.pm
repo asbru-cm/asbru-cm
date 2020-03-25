@@ -304,10 +304,7 @@ sub get_cfg {
         $hash{keyfile} = '';
         $hash{password} = '';
         $$self{kpxc_keyfile_opt} = '';
-        if (defined $$self{frame}) {
-            $$self{frame}{cbUseKeePass}->set_active(0);
-            $self->_updateUsage();
-        }
+        $self->_updateUsage();
     }
     return \%hash;
 }
@@ -626,6 +623,11 @@ sub _buildKeePassGUI {
             $CLI = $fc->get_filename();
             $self->_setCapabilities();
             $self->_updateUsage();
+            if ($CLI ne $fc->get_filename()) {
+                # Remove selected file name, setCapabilities failed with this file
+                $fc->set_uri("file://$ENV{'HOME'}");
+                $fc->unselect_uri("file://$ENV{'HOME'}");
+            }
         }
     });
 
@@ -652,6 +654,7 @@ sub _updateUsage {
         $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
         $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
     }
+
     $$w{usage}->set_markup($capabilities);
     $$w{hboxkpmain}->set_sensitive($$w{cbUseKeePass}->get_active());
     $$w{hboxkpclifile}->set_sensitive($$w{cbUseKeePass}->get_active());
