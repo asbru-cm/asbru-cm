@@ -943,6 +943,10 @@ sub _updateGUIPreferences {
         if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
             _($self,'cbCfgStartIconified')->hide();
             _($self,'cbCfgCloseToTray')->hide();
+            if ($$cfg{'defaults'}{'close to tray'} == 0) {
+                # Force close to tray on Compact mode
+                _($self, 'cbCfgCloseToTray')->set_active(1);
+            }
         }
     }
 
