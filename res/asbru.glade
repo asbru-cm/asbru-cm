@@ -3213,6 +3213,8 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                             <items>
                               <item id="default" translatable="yes">default</item>
                               <item id="asbru-color" translatable="yes">asbru-color</item>
+                              <item id="asbru-dark" translatable="yes">asbru-dark</item>
+                              <item id="system" translatable="yes">system</item>
                             </items>
                           </object>
                           <packing>

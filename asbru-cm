@@ -260,15 +260,18 @@ sub getDesktopEnvironment {
             last;
         }
     }
-    if (defined($ENV{'XDG_SESSION_DESKTOP'}) && $ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
-        $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
-    }
     if (!$ENV{'ASBRU_DESKTOP'}) {
         $ENV{'ASBRU_DESKTOP'} = 'other';
     } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
         # Test to see it has the unite extension installed
-        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
-            $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+        if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
+            $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
+        }
+        foreach my $extension ('unite@hardpixel.eu','top-icons@gnome-shell-extensions.gcampax.github.com') {
+            if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/$extension" || -e "/usr/share/gnome-shell/extensions/$extension") {
+                $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+                last;
+            }
         }
     }
     print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
