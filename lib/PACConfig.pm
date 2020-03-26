@@ -668,9 +668,10 @@ sub cleanUpPersonalData {
         } elsif ($line =~ /^[\t ]+use gui password( tray)?:/) {
             $line =~ s/use gui password( tray)?:.+/use gui password$1: \'\'/;
         } elsif ($line =~ /^[\t ]+passphrase user:/) {
-            $line =~ s/passphrase user:.+/$1 user: 'removed'/;
+            $line =~ s/passphrase user:.+/passphrase user: 'removed'/;
         }
-        $line =~ s|/home/.+|/home/PATH|;
+        $line =~ s|/home/.+?/|/home/PATH/|;
+        $line =~ s|$ENV{USER}|USER|;
         print D $line;
     }
     # Add runtime information
