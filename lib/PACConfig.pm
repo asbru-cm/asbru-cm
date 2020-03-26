@@ -489,7 +489,7 @@ sub _setupCallbacks {
             _($self,'cbCfgAutoSave')->set_active(1);
             _($self,'cbCfgShowTreeTitles')->hide();
             _($self,'cbCfgShowTreeTitles')->set_active(0);
-            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            if (!$PACMain::STRAY) {
                 _($self,'cbCfgStartIconified')->hide();
                 _($self,'cbCfgCloseToTray')->hide();
             }
@@ -946,7 +946,7 @@ sub _updateGUIPreferences {
             _($self, 'cbCfgCloseToTray')->set_active(1);
             $$cfg{'defaults'}{'close to tray'} = 1;
         }
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$PACMain::STRAY) {
             _($self,'cbCfgStartIconified')->hide();
         }
     }
