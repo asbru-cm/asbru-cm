@@ -87,6 +87,14 @@ Starting with Ásbru 6.2 the applications offer 2 themes for icons.
 + __Auto save on exit__ : If there are any settings changes unsaved, will ask if you want to save them permanently before exit the application.
 + __Automatically save configurations on every change__ : This will save your configuration changes on every change you make to your settings.
 
+!!! danger "Important notes"
+    gnome-shell requires that a tray extension be installed to be able to show the icon on the tray.
+
+    If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
+
+    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    
+
 ### Control TAB Goes to
 
 + Last focused TAB
