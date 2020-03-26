@@ -74,3 +74,5 @@ Example
 
 `<title|/banks/tdc/0000>`
 
+For a full reference on how to use [KeePass Integration ](Preferences/KeePassXC.md)
+
