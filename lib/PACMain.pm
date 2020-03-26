@@ -60,15 +60,11 @@ eval {
 };
 if ($@) {
     $UNITY = 0;
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell:ubuntu') {
+    eval {
+        require 'PACTray.pm';
+    };
+    if ($@) {
         $STRAY = 0;
-    } else {
-        eval {
-            require 'PACTray.pm';
-        };
-        if ($@) {
-            $STRAY = 0;
-        }
     }
 }
 use PACTerminal;
@@ -341,6 +337,14 @@ sub start {
 
     #_makeDesktopFile($$self{_CFG});
 
+    # Reset system tray we do not have one in gnome-shell:ubuntu
+    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell:ubuntu') {
+        $STRAY = 0;
+        print "INFO: No tray available\n";
+    } else {
+        print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
+    }
+
     # Build the GUI
     PACUtils::_splash(1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     if (!$self->_initGUI) {
@@ -406,10 +410,6 @@ sub start {
         $$self{_GUI}{main}->present();
     } else {
         $self->_hideConnectionsList();
-    }
-
-    if ($STRAY) {
-        print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
     }
 
     # Auto open "Edit" dialog
