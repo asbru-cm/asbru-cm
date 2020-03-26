@@ -63,7 +63,7 @@ Starting with Ásbru 6.2 the applications offer 4 themes for icons.
 + default : Set of grey icons
 + asbru-color : Set of color icons
 + asbru-dark : Theme for system dark themes, with color icons
-+ system : Nuetral theme with color icons. This options should have no conflicts with any system theme.
++ system : Neutral theme with color icons. This options should have no conflicts with any system theme.
 
 ![](images/pref6.png)
 
