@@ -1,5 +1,5 @@
 button {
-    border: 1px solid #dddddd;
+    border: 1px solid rgba(1,1,1,0);
     margin: 1px;
 }
 radiobutton, checkbutton {
@@ -12,14 +12,11 @@ button:hover {
     background-color: #ffffff;
 }
 entry:focus {
-    color: #000000;
-    background-color:#FFEBBB;
+    background-color:#555555;
 }
 spinbutton {
-    color: #000000;
+    border: 1px solid rgba(1,1,1,0);
     font-size: 0.9em;
-    border: 1px solid #dddddd;
-    background-color: #dddddd;
     border-radius: 0px;
     padding: 0px;
     margin: 0px;
@@ -29,7 +26,7 @@ spinbutton:hover {
     background-color: #ffffff;
 }
 checkbutton:hover, radiobutton:hover {
-    border: 1px solid #555555;
+    border: 1px solid #aaaaaa;
 }
 .button-cp {
     border: 1px solid rgba(1,1,1,0);

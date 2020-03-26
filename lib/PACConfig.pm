@@ -489,7 +489,7 @@ sub _setupCallbacks {
             _($self,'cbCfgAutoSave')->set_active(1);
             _($self,'cbCfgShowTreeTitles')->hide();
             _($self,'cbCfgShowTreeTitles')->set_active(0);
-            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            if (!$PACMain::STRAY) {
                 _($self,'cbCfgStartIconified')->hide();
                 _($self,'cbCfgCloseToTray')->hide();
             }
@@ -708,7 +708,7 @@ sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
-    my %theme = ('default',0,'asbru-color',1);
+    my %theme = ('default',0,'asbru-color',1,'asbru-dark',2,'system',3);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -941,9 +941,14 @@ sub _updateGUIPreferences {
         _($self,'cbCfgStartMainMaximized')->hide();
         _($self,'cbCfgRememberSize')->hide();
         _($self,'cbCfgSaveOnExit')->hide();
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        _($self, 'cbCfgCloseToTray')->hide();
+        if ($$cfg{'defaults'}{'close to tray'} == 0) {
+            # Force close to tray on Compact mode
+            _($self, 'cbCfgCloseToTray')->set_active(1);
+            $$cfg{'defaults'}{'close to tray'} = 1;
+        }
+        if (!$PACMain::STRAY) {
             _($self,'cbCfgStartIconified')->hide();
-            _($self,'cbCfgCloseToTray')->hide();
         }
     }
 
