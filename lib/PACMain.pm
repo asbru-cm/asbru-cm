@@ -60,11 +60,15 @@ eval {
 };
 if ($@) {
     $UNITY = 0;
-    eval {
-        require 'PACTray.pm';
-    };
-    if ($@) {
+    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell:ubuntu') {
         $STRAY = 0;
+    } else {
+        eval {
+            require 'PACTray.pm';
+        };
+        if ($@) {
+            $STRAY = 0;
+        }
     }
 }
 use PACTerminal;
