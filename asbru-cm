@@ -186,7 +186,7 @@ sub config_migration {
 sub getDesktopEnvironment {
     my $c;
     # An attempt to find desktop environment
-    foreach my $d ('gnome-shell','cinnamon','lxde','xfce') {
+    foreach my $d ('gnome-shell','cinnamon','lxde','xfce','ubuntu') {
         $c = `pgrep -c '$d'`;
         chop $c;
         #print STDERR "TEST: pgrep -c '$d' = $c\n";
@@ -195,13 +195,13 @@ sub getDesktopEnvironment {
             last;
         }
     }
-    if (defined($ENV{'XDG_SESSION_DESKTOP'}) && $ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
-        $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
-    }
     if (!$ENV{'ASBRU_DESKTOP'}) {
         $ENV{'ASBRU_DESKTOP'} = 'other';
     } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
         # Test to see it has the unite extension installed
+        if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
+            $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
+        }
         if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
             $ENV{'ASBRU_DESKTOP'} .= '-withtray';
         }
