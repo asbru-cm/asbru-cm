@@ -131,3 +131,11 @@ __Example of a connections tree after several connections have been added__
 
 1. Select a connection
 1. `<Ctrl-D>` to duplicate connection (or right click Clone Connection)
+
+!!! danger "Important notes"
+    gnome-shell requires that a tray extension be installed to be able to show the icon on the tray.
+
+    If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
+
+    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    
