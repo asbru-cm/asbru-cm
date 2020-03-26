@@ -44,6 +44,7 @@ nav:
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md
+      - Expect: Managing/Expect.md
   - 4. Contributing:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md
