@@ -202,8 +202,11 @@ sub getDesktopEnvironment {
         if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
             $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
         }
-        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
-            $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+        foreach my $extension ('unite@hardpixel.eu','top-icons@gnome-shell-extensions.gcampax.github.com') {
+            if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/$extension" || -e "/usr/share/gnome-shell/extensions/$extension") {
+                $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+                last;
+            }
         }
     }
     print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";

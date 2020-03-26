@@ -338,7 +338,7 @@ sub start {
     #_makeDesktopFile($$self{_CFG});
 
     # Reset system tray we do not have one in gnome-shell:ubuntu
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell:ubuntu' && !$UNITY) {
+    if ($ENV{'ASBRU_DESKTOP'} =~ /gnome-shell/ && $ENV{'ASBRU_DESKTOP'} !~ /withtray/ && !$UNITY) {
         $STRAY = 0;
         print "INFO: No tray available\n";
     } else {
