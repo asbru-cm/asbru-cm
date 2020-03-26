@@ -186,7 +186,7 @@ sub config_migration {
 sub getDesktopEnvironment {
     my $c;
     # An attempt to find desktop environment
-    foreach my $d ('gnome-shell','cinnamon','lxde','xfce','ubuntu') {
+    foreach my $d ('gnome-shell','cinnamon','lxde','xfce') {
         $c = `pgrep -c '$d'`;
         chop $c;
         #print STDERR "TEST: pgrep -c '$d' = $c\n";
