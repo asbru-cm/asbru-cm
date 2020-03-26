@@ -14,7 +14,6 @@ button:hover {
 entry:focus {
     color: #000000;
     background-color:#FFEBBB;
-    caret-color: #000000;
 }
 spinbutton {
     color: #000000;
@@ -24,7 +23,6 @@ spinbutton {
     border-radius: 0px;
     padding: 0px;
     margin: 0px;
-    caret-color: #000000;
 }
 spinbutton:hover {
     border: 1px solid #555555;

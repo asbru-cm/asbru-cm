@@ -708,7 +708,7 @@ sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
-    my %theme = ('default',0,'asbru-color',1);
+    my %theme = ('default',0,'asbru-color',1,'asbru-dark',2,'system',3);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
