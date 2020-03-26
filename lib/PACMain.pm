@@ -2867,17 +2867,6 @@ sub _treeConnections_menu {
         sensitive =>  (scalar(@sel) == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__'),
         code => sub { $self->__importNodes }
     });
-    if (!$STRAY && $$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        # Display settings options in gnome-shell, there is no tray icon to access it
-        push(@tree_menu_items, {
-            label => 'Settings...',
-            stockicon => 'gtk-preferences',
-            shortcut => '',
-            tooltip => 'Settings',
-            sensitive =>  1,
-            code => sub { $$self{_GUI}{configBtn}->clicked(); }
-        });
-    }
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
