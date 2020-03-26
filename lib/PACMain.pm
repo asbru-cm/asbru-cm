@@ -53,13 +53,19 @@ use Gtk3 -init;
 # PAC modules
 use PACUtils;
 our $UNITY = 1;
+our $STRAY = 1;
 $@ = '';
 eval {
     require 'PACTrayUnity.pm';
 };
 if ($@) {
-    eval { require 'PACTray.pm'; };
     $UNITY = 0;
+    eval {
+        require 'PACTray.pm';
+    };
+    if ($@) {
+        $STRAY = 0;
+    }
 }
 use PACTerminal;
 use PACEdit;
@@ -331,6 +337,14 @@ sub start {
 
     #_makeDesktopFile($$self{_CFG});
 
+    # Reset system tray we do not have one in gnome-shell:ubuntu
+    if ($ENV{'ASBRU_DESKTOP'} =~ /gnome-shell/ && $ENV{'ASBRU_DESKTOP'} !~ /withtray/ && !$UNITY) {
+        $STRAY = 0;
+        print "INFO: No tray available\n";
+    } else {
+        print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
+    }
+
     # Build the GUI
     PACUtils::_splash(1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     if (!$self->_initGUI) {
@@ -388,7 +402,7 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+    if (!$UNITY) {
         _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("WARNING: Tray icon may not be available: Install Unite Extension is recomended.\nhttps://extensions.gnome.org/extension/1287/unite/");
     }
 
@@ -397,8 +411,6 @@ sub start {
     } else {
         $self->_hideConnectionsList();
     }
-
-    print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
 
     # Auto open "Edit" dialog
     foreach my $arg (@{ $$self{_OPTS} }) {
@@ -2319,7 +2331,7 @@ sub _setupCallbacks {
                 $$self{_GUI}{lockPACBtn}->set_active(1);
             }
             # Hide main window
-            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            if (!$STRAY) {
                 $$self{_GUI}{main}->iconify();
             } else {
                 $self->_hideConnectionsList();
@@ -2861,17 +2873,6 @@ sub _treeConnections_menu {
         sensitive =>  (scalar(@sel) == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__'),
         code => sub { $self->__importNodes }
     });
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-        # Display settings options in gnome-shell, there is no tray icon to access it
-        push(@tree_menu_items, {
-            label => 'Settings...',
-            stockicon => 'gtk-preferences',
-            shortcut => '',
-            tooltip => 'Settings',
-            sensitive =>  1,
-            code => sub { $$self{_GUI}{configBtn}->clicked(); }
-        });
-    }
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
@@ -3193,7 +3194,7 @@ sub _launchTerminals {
 
     # Check if user wants main window to be close when a terminal comes up
     if ($$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'}) {
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             $$self{_GUI}{main}->iconify();
         } else {
             $self->_hideConnectionsList();
@@ -4679,7 +4680,7 @@ sub _setSafeLayoutOptions {
         # This layout to work implies some configuration settings to work correctly
         $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
@@ -4720,7 +4721,7 @@ sub _ApplyLayout {
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             if (!$$self{_GUI}{main}->get_visible) {
                 $self->_showConnectionsList();
             }
