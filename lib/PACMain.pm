@@ -408,7 +408,9 @@ sub start {
         $self->_hideConnectionsList();
     }
 
-    print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
+    if ($STRAY) {
+        print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
+    }
 
     # Auto open "Edit" dialog
     foreach my $arg (@{ $$self{_OPTS} }) {
