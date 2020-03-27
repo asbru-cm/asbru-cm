@@ -252,7 +252,7 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
+            $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
         }
         if (!defined $pass) {
             exit 0;
@@ -2423,7 +2423,7 @@ sub _lockPAC {
 sub _unlockPAC {
     my $self = shift;
 
-    my $pass = _wEnterValue($self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
+    my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
         $$self{_GUI}{lockPACBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
@@ -2699,7 +2699,7 @@ sub _treeConnections_menu_lite {
         shortcut => '',
         sensitive => scalar @sel >= 1,
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go)){
                 return 1;
             }
@@ -3032,7 +3032,7 @@ sub _treeConnections_menu {
         shortcut => '',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }
