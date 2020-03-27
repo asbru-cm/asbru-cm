@@ -2690,7 +2690,7 @@ sub _treeConnections_menu_lite {
         shortcut => '',
         sensitive => scalar @sel >= 1,
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go)){
                 return 1;
             }
@@ -3023,7 +3023,7 @@ sub _treeConnections_menu {
         shortcut => '',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }

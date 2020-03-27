@@ -1488,6 +1488,10 @@ sub _wEnterValue {
     }
 
     # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (ref $parent ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wEnterValue ",ref $parent,"\n";
+        undef $parent;
+    }
     if (!defined $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
@@ -1531,7 +1535,7 @@ sub _wEnterValue {
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
-    $w{window}{gui}{lbldwn}->set_text($lbldown // '');
+    $w{window}{gui}{lbldwn}->set_markup($lbldown // '');
 
     if (@list) {
         # Create combobox widget
@@ -1809,6 +1813,10 @@ sub _wMessage {
     my $modal = shift // 1;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
