@@ -34,7 +34,7 @@ __Tabbed interface hidden__
 
 ![](images/pref3.png)
 
-__Tabbed and interface shown__ 
+__Tabbed and interface shown__
 
 ![](images/pref4.png)
 
@@ -58,10 +58,12 @@ __Separate windows simultaneous views side by side__
 
 ## Icons Theme
 
-Starting with Ásbru 6.2 the applications offer 2 themes for icons.
+Starting with Ásbru 6.2 the applications offer 4 themes for icons.
 
-+ Default : Set of grey icons
++ default : Set of grey icons
 + asbru-color : Set of color icons
++ asbru-dark : Theme for system dark themes, with color icons
++ system : Neutral theme with color icons. This options should have no conflicts with any system theme.
 
 ![](images/pref6.png)
 
@@ -86,6 +88,14 @@ Starting with Ásbru 6.2 the applications offer 2 themes for icons.
 + __Confirm Exit__ : Will ask if you really want to close the application
 + __Auto save on exit__ : If there are any settings changes unsaved, will ask if you want to save them permanently before exit the application.
 + __Automatically save configurations on every change__ : This will save your configuration changes on every change you make to your settings.
+
+!!! danger "Important notes"
+    gnome-shell requires that a tray extension be installed to be able to show the icon on the tray.
+
+    If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
+
+    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    
 
 ### Control TAB Goes to
 

@@ -1488,6 +1488,10 @@ sub _wEnterValue {
     }
 
     # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (ref $parent ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wEnterValue ",ref $parent,"\n";
+        undef $parent;
+    }
     if (!defined $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
@@ -1587,12 +1591,12 @@ sub _wAddRenameNode {
         $name = $$cfg{'environments'}{$uuid}{'name'};
         $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
-        $lblup = "<b>Renaming node ' @{[__($name)]}'</b>";
+        $lblup = "Renaming node <b>@{[__($name)]}</b>";
     } elsif ($action eq 'add') {
         $name = '';
         $parent_name = $$cfg{'environments'}{$uuid}{'name'};
         $title = $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : " - $parent_name");
-        $lblup = "<b>Adding new node into '" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "'</b>";
+        $lblup = "Adding new node into <b>" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "</b>";
     }
 
     my %w;
@@ -1637,7 +1641,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl1} = Gtk3::Label->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lbl1}, 0, 1, 0);
-    $w{window}{gui}{lbl1}->set_text('Enter new NAME: ');
+    $w{window}{gui}{lbl1}->set_text('Enter new NAME ');
 
     # Create the entry widget
     $w{window}{gui}{entry1} = Gtk3::Entry->new();
@@ -1656,7 +1660,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl2} = Gtk3::Label->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{lbl2}, 0, 1, 0);
-    $w{window}{gui}{lbl2}->set_text('Enter new TITLE: ');
+    $w{window}{gui}{lbl2}->set_text('Enter new TITLE ');
 
     # Create the entry widget
     $w{window}{gui}{entry2} = Gtk3::Entry->new();
@@ -1809,6 +1813,13 @@ sub _wMessage {
     my $modal = shift // 1;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1816,9 +1827,6 @@ sub _wMessage {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
@@ -1908,6 +1916,13 @@ sub _wConfirm {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1915,9 +1930,6 @@ sub _wConfirm {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
@@ -1965,7 +1977,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'asbru-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'pac-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1977,19 +1989,19 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'asbru-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'asbru-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass2) {
         return 0;
     }
 
     if ($new_pass1 ne $new_pass2) {
-        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span foreground="red"><b>DO NOT MATCH</b></span>!!!');
+        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!');
         return 0;
     }
 
