@@ -246,13 +246,13 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
+            $pass = _wEnterValue(undef, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
         }
         if (!defined $pass) {
             exit 0;
         }
         if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
-            _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
+            _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
     }
