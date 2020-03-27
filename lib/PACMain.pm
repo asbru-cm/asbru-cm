@@ -402,8 +402,8 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if (!$UNITY) {
-        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("WARNING: Tray icon may not be available: Install Unite Extension is recomended.\nhttps://extensions.gnome.org/extension/1287/unite/");
+    if (!$STRAY) {
+        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not be available. Install an extension for tray functionality.");
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
