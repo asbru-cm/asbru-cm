@@ -331,7 +331,7 @@ sub _setupCallbacks {
 
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
-        my $cmd = `$RealBin/lib/asbru_conn $CFG_DIR/asbru.nfreeze $$self{_UUID} 1`;
+        my $cmd = `$RealBin/lib/asbru_conn $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
 
