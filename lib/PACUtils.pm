@@ -1593,12 +1593,12 @@ sub _wAddRenameNode {
         $name = $$cfg{'environments'}{$uuid}{'name'};
         $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
-        $lblup = "<b>Renaming node ' @{[__($name)]}'</b>";
+        $lblup = "<b>Renaming node</b> @{[__($name)]}";
     } elsif ($action eq 'add') {
         $name = '';
         $parent_name = $$cfg{'environments'}{$uuid}{'name'};
         $title = $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : " - $parent_name");
-        $lblup = "<b>Adding new node into '" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "'</b>";
+        $lblup = "<b>Adding new node into</b> " . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name));
     }
 
     my %w;
@@ -1643,7 +1643,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl1} = Gtk3::Label->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lbl1}, 0, 1, 0);
-    $w{window}{gui}{lbl1}->set_text('Enter new NAME: ');
+    $w{window}{gui}{lbl1}->set_text('Enter new NAME ');
 
     # Create the entry widget
     $w{window}{gui}{entry1} = Gtk3::Entry->new();
@@ -1662,7 +1662,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl2} = Gtk3::Label->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{lbl2}, 0, 1, 0);
-    $w{window}{gui}{lbl2}->set_text('Enter new TITLE: ');
+    $w{window}{gui}{lbl2}->set_text('Enter new TITLE ');
 
     # Create the entry widget
     $w{window}{gui}{entry2} = Gtk3::Entry->new();

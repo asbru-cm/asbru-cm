@@ -1317,12 +1317,12 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>'Protected'</b>");
+            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_is_group'}) {
-            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group '$node'", $node);
+            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group <b>$node</b>", $node);
             $new_title = 'x';
         } else {
             ($new_name, $new_title) = _wAddRenameNode('rename', $$self{_CFG}, $node_uuid);
@@ -1359,10 +1359,10 @@ sub _setupCallbacks {
         }
 
         if (scalar(@del) > 1) {
-            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>'" . (scalar(@del)) . "'</b> nodes and ALL of their contents?")) {
+            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>" . (scalar(@del)) . "</b> nodes and ALL of their contents?")) {
                 return 1;
             }
-        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>'" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "'</b> and ALL of its contents?")) {
+        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "</b> and ALL of its contents?")) {
             return 1;
         }
         # Delete selected nodes from treeConnections
