@@ -1490,6 +1490,10 @@ sub _wEnterValue {
     }
 
     # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (ref $parent ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wEnterValue ",ref $parent,"\n";
+        undef $parent;
+    }
     if (!defined $parent) {
         if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
             $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
@@ -1967,7 +1971,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1979,13 +1983,13 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass2) {
         return 0;
     }
