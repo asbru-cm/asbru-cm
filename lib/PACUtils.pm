@@ -1537,7 +1537,7 @@ sub _wEnterValue {
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
-    $w{window}{gui}{lbldwn}->set_text($lbldown // '');
+    $w{window}{gui}{lbldwn}->set_markup($lbldown // '');
 
     if (@list) {
         # Create combobox widget
@@ -1822,6 +1822,10 @@ sub _wMessage {
         'none',
         ''
     );
+    if (ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
@@ -1971,7 +1975,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'pac-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1983,19 +1987,19 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'pac-protected');
     if (!defined $new_pass2) {
         return 0;
     }
 
     if ($new_pass1 ne $new_pass2) {
-        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span foreground="red"><b>DO NOT MATCH</b></span>!!!');
+        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!');
         return 0;
     }
 
