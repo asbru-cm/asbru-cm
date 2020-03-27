@@ -1593,12 +1593,12 @@ sub _wAddRenameNode {
         $name = $$cfg{'environments'}{$uuid}{'name'};
         $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
-        $lblup = "<b>Renaming node</b> @{[__($name)]}";
+        $lblup = "Renaming node <b>@{[__($name)]}</b>";
     } elsif ($action eq 'add') {
         $name = '';
         $parent_name = $$cfg{'environments'}{$uuid}{'name'};
         $title = $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : " - $parent_name");
-        $lblup = "<b>Adding new node into</b> " . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name));
+        $lblup = "Adding new node into <b>" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "</b>";
     }
 
     my %w;
