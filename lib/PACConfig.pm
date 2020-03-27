@@ -330,7 +330,7 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
-            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
+            my $pass = _wEnterValue($$self{_WINDOWCONFIG}, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
