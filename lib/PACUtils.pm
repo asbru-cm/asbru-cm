@@ -1815,13 +1815,6 @@ sub _wMessage {
     my $modal = shift // 1;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
-    my $windowConfirm = Gtk3::MessageDialog->new(
-        $window,
-        'GTK_DIALOG_DESTROY_WITH_PARENT',
-        'GTK_MESSAGE_INFO',
-        'none',
-        ''
-    );
     if (ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
@@ -1829,6 +1822,13 @@ sub _wMessage {
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
+    my $windowConfirm = Gtk3::MessageDialog->new(
+        $window,
+        'GTK_DIALOG_DESTROY_WITH_PARENT',
+        'GTK_MESSAGE_INFO',
+        'none',
+        ''
+    );
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('pac-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
@@ -1918,6 +1918,13 @@ sub _wConfirm {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1925,9 +1932,6 @@ sub _wConfirm {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('pac-app-big');
