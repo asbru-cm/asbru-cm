@@ -252,7 +252,7 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
+            $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
         }
         if (!defined $pass) {
             exit 0;
@@ -1317,12 +1317,12 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>'Protected'</b>");
+            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_is_group'}) {
-            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group '$node'", $node);
+            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group <b>$node</b>", $node);
             $new_title = 'x';
         } else {
             ($new_name, $new_title) = _wAddRenameNode('rename', $$self{_CFG}, $node_uuid);
@@ -1359,10 +1359,10 @@ sub _setupCallbacks {
         }
 
         if (scalar(@del) > 1) {
-            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>'" . (scalar(@del)) . "'</b> nodes and ALL of their contents?")) {
+            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>" . (scalar(@del)) . "</b> nodes and ALL of their contents?")) {
                 return 1;
             }
-        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>'" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "'</b> and ALL of its contents?")) {
+        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "</b> and ALL of its contents?")) {
             return 1;
         }
         # Delete selected nodes from treeConnections
@@ -2423,7 +2423,7 @@ sub _lockPAC {
 sub _unlockPAC {
     my $self = shift;
 
-    my $pass = _wEnterValue($self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
+    my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
         $$self{_GUI}{lockPACBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
@@ -2699,7 +2699,7 @@ sub _treeConnections_menu_lite {
         shortcut => '',
         sensitive => scalar @sel >= 1,
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go)){
                 return 1;
             }
@@ -3032,7 +3032,7 @@ sub _treeConnections_menu {
         shortcut => '',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }

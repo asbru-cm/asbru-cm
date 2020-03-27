@@ -39,9 +39,12 @@ nav:
           - Configure: Manual/Connections/SSH.md
           - Terminal: Manual/Connections/SSH_Terminal.md
         - RDP: Manual/Connections/RDP.md
+      - References:
+        - Substitution: Manual/Substitutions.md
   - 3. Contributed Articles:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md
+      - Expect: Managing/Expect.md
   - 4. Contributing:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md
