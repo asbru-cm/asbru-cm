@@ -120,10 +120,10 @@ sub add {
 
     my $screenshot_file = '';
     my $rn = rand(123456789);
-    $screenshot_file = "$CFG_DIR/screenshots/pac_screenshot_$rn.png";
+    $screenshot_file = "$CFG_DIR/screenshots/asbru_screenshot_$rn.png";
     while(-f $screenshot_file) {
         $rn = rand(123456789);
-        $screenshot_file = "$CFG_DIR/screenshots/pac_screenshot_$rn.png";
+        $screenshot_file = "$CFG_DIR/screenshots/asbru_screenshot_$rn.png";
     }
 
     copy($file, $screenshot_file);
@@ -211,8 +211,8 @@ sub _buildScreenshotsGUI {
         my $file = $self->_chooseScreenshot;
         if ($file) {
             my $screenshot_file = '';
-            $screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand(123456789). '.png';
-            while(-f $screenshot_file) {$screenshot_file = $CFG_DIR . '/screenshots/pac_screenshot_' . rand(123456789). '.png';}
+            $screenshot_file = $CFG_DIR . '/screenshots/asbru_screenshot_' . rand(123456789). '.png';
+            while(-f $screenshot_file) {$screenshot_file = $CFG_DIR . '/screenshots/asbru_screenshot_' . rand(123456789). '.png';}
             _pixBufFromFile($file)->save($screenshot_file, 'png');
 
             push(@{$$self{cfg}{screenshots}}, $screenshot_file) and $self->update();

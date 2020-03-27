@@ -561,7 +561,7 @@ sub _execScript {
 
         ctrl("SCRIPT_SUB_ASK[NAME:$name][PID:$$][PARAMS:$txt, $visible]");
 
-        return wEnterValue("<b>PAC SCRIPT USER INPUT</b>" , $txt, undef, $visible);
+        return wEnterValue("<b>Ásbrú SCRIPT USER INPUT</b>" , $txt, undef, $visible);
     };
     $TERMINAL{msg} = sub {msg(subst(shift));};
     $TERMINAL{log} = sub {
@@ -663,7 +663,7 @@ sub _execScript {
     eval {
         local $SIG{'TERM'} = sub {
             ctrl("SCRIPT_STOPPED_MANUALLY[NAME:$name]");
-            msg("PAC Script '$name' terminated by user request (TERM(15) signal)");
+            msg("Ásbrú Script '$name' terminated by user request (TERM(15) signal)");
             if (defined $_W{window}{data}){
                 $_W{window}{data}->destroy;
             }
@@ -1044,7 +1044,7 @@ if (defined $METHOD) {
         }
         _setProxy($method);
         if ($method eq 'TigerVNC') {
-            my $pfile = "$CFG_DIR/tmp/pac_conn_{$$}_$UUID";
+            my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
             system("echo \"$PASS\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
@@ -2035,7 +2035,7 @@ __END__
 
 =head1 NAME
 
-pac_conn
+asbru_conn
 
 =head1 SYNOPSIS
 

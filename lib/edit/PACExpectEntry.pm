@@ -259,7 +259,7 @@ sub _buildExpect {
     $w{expect} = Gtk3::Entry->new;
     $w{hboxExpect}->pack_start($w{expect}, 1, 1, 0);
     $w{expect}->set_text($exp);
-    $w{expect}->set_icon_from_stock('primary', 'pac-prompt');
+    $w{expect}->set_icon_from_stock('primary', 'asbru-prompt');
 
     $w{cbTimeOut} = Gtk3::CheckButton->new('Time out (seconds): ');
     $w{cbTimeOut}->set_active($time_out != -1);
@@ -626,7 +626,7 @@ sub _buildExpect {
         push(@menu_items, {
             label => '<command prompt>',
             tooltip => 'Expect for a sting matching a COMMAND PROMPT (as defined under "Preferences")',
-            stockicon => 'pac-prompt',
+            stockicon => 'asbru-prompt',
             code => sub {$w{expect}->insert_text('<command prompt>', -1, $w{expect}->get_position);}
         });
 

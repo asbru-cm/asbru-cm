@@ -64,12 +64,12 @@ use PACTermOpts;
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $RES_DIR = "$RealBin/res";
-my $AUTOSTART_FILE = "$RES_DIR/pac_start.desktop";
+my $AUTOSTART_FILE = "$RES_DIR/asbru_start.desktop";
 my $THEME_DIR = "$RES_DIR/themes/defualt";
 my $GLADE_FILE = "$RES_DIR/asbru.glade";
-my $INIT_CFG_FILE = "$RES_DIR/pac.yml";
+my $INIT_CFG_FILE = "$RES_DIR/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -134,7 +134,7 @@ sub show {
     my $title;
     if ($$self{_IS_NEW} eq 'quick') {
         _($self, 'btnSaveEdit')->set_label('_Start Connection');
-        _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('pac-quick-connect', 'button') );
+        _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('asbru-quick-connect', 'button') );
         _($self, 'btnCloseEdit')->set_label('_Cancel Quick connect');
         _($self, 'btnCloseEdit')->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button') );
         $title = "Quick Connect : $APPNAME (v$APPVERSION)";
@@ -180,7 +180,7 @@ sub _initGUI {
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
     _($self, 'alignTermOpts')->add(($$self{_TERMOPTS} = PACTermOpts->new())->{container});
-    _($self, 'imgTermOpts')->set_from_stock('pac-terminal-ok-small', 'button');
+    _($self, 'imgTermOpts')->set_from_stock('asbru-terminal-ok-small', 'button');
     _($self, 'alignVar')->add(($$self{_VARIABLES} = PACVarEntry->new())->{container});
     _($self, 'alignPreExec')->add(($$self{_PRE_EXEC} = PACPrePostEntry->new())->{container});
     _($self, 'alignPostExec')->add(($$self{_POST_EXEC} = PACPrePostEntry->new())->{container});
@@ -197,7 +197,7 @@ sub _initGUI {
     }
 
     # Initialize main window
-    $$self{_WINDOWEDIT}->set_icon_name('pac-app-big');
+    $$self{_WINDOWEDIT}->set_icon_name('asbru-app-big');
     $$self{_WINDOWEDIT}->set_position('center');
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -206,7 +206,7 @@ sub _initGUI {
     $$self{cbLogsShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
     _($self, 'btnEditSaveSessionLogs')->set_extra_widget($$self{cbLogsShowHidden});
 
-    _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('pac-keepass', 'button') );
+    _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
     _($self, 'btnCheckKPX')->set_label('');
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
@@ -331,7 +331,7 @@ sub _setupCallbacks {
 
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
-        my $cmd = `$RealBin/lib/pac_conn $CFG_DIR/pac.nfreeze $$self{_UUID} 1`;
+        my $cmd = `$RealBin/lib/asbru_conn $CFG_DIR/asbru.nfreeze $$self{_UUID} 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
 
@@ -656,7 +656,7 @@ sub _updateGUIPreferences {
     _($self, 'entryPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'pass'});
     _($self, 'cbCfgAuthFallback')->set_active(! $$self{_CFG}{'environments'}{$uuid}{'auth fallback'});
     _($self, 'comboMethod')->set_active($$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'position'} // 4);
-    _($self, 'imageMethod')->set_from_stock('pac-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
+    _($self, 'imageMethod')->set_from_stock('asbru-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
     _($self, 'entryTabWindowTitle')->set_text($$self{_CFG}{'environments'}{$uuid}{'title'} || "$$self{_CFG}{'environments'}{$uuid}{'name'} ");
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
@@ -714,11 +714,11 @@ sub _updateGUIPreferences {
     $self->__checkRBAuth;
 
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
-        _($self, 'imgProtectedEdit')->set_from_stock('pac-protected', 'button');
+        _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(0);
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#E60023">PROTECTED</span></b> against changes. You <b>can not</b> save changes.');
     } else {
-        _($self, 'imgProtectedEdit')->set_from_stock('pac-unprotected', 'button');
+        _($self, 'imgProtectedEdit')->set_from_stock('asbru-unprotected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(1);
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.');
     }

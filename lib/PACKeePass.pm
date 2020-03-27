@@ -55,6 +55,7 @@ use PACTree;
 my $KPXC_MP = $ENV{'KPXC_MP'};
 my @KPXC_LIST;
 my %KPXC_CACHE = ();
+my $CLI = 'keepassxc-cli';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -71,8 +72,8 @@ sub new {
     $self->{container} = undef;
     $self->{frame} = {};
 
-    _testCapabilities($self);
     if ($buildgui) {
+        _testCapabilities($self);
         _buildKeePassGUI($self);
     }
 
@@ -98,14 +99,23 @@ sub update {
     defined $cfg and $$self{cfg} = $cfg;
 
     my $file = $$self{cfg}{'database'};
+    my $pathcli = $$self{cfg}{'pathcli'} // '';
     my $key = $$self{cfg}{'keyfile'};
     if ((!defined $file)||(-d $file)||(!-e $file)) {
         return 0;
+    }
+    if (!-e $pathcli) {
+        $pathcli = '';
     }
     if ($$self{disable_keepassxc}) {
         $$self{cfg}{use_keepass} = 0;
     }
     $$self{frame}{fcbKeePassFile}->set_filename($file);
+
+    if ($pathcli) {
+        $$self{frame}{fcbCliFile}->set_filename($pathcli);
+        $CLI = $pathcli;
+    }
     if ($key) {
         $$self{frame}{fcbKeePassKeyFile}->set_filename($key);
         $$self{kpxc_keyfile_opt} = "--key-file '$key'";
@@ -136,7 +146,7 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'asbru-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
@@ -144,6 +154,7 @@ sub getMasterPassword {
             if (!$flg && $msg !~ /ASBRUKeePassXCTEST/) {
                 $KPXC_MP='';
                 $mp = '';
+                _wMessage($parent,"<b>keepassxc-cli message</b>\n\n$msg");
             }
         } else {
             last;
@@ -166,7 +177,7 @@ sub testMasterKey {
     } else {
         $cfg = $self->get_cfg();
     }
-    $pid = open3(*Writer, *Reader, *ErrReader, "keepassxc-cli show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open3(*Writer, *Reader, *ErrReader, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -175,8 +186,9 @@ sub testMasterKey {
     waitpid($pid,0);
     close Reader;
     close ErrReader;
-    if ($?) {
-        return ($err[0],0);
+    if (@err) {
+        my $msg = join('',@err);
+        return (decode('utf8',$msg),0);
     }
     return ('',1);
 }
@@ -246,7 +258,7 @@ sub getFieldValue {
             }
         }
     }
-    $pid = open2(*Reader, *Writer, "keepassxc-cli show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
+    $pid = open2(*Reader, *Writer, "$CLI $$self{kpxc_cli} show $$self{kpxc_show_protected} $$self{kpxc_keyfile_opt} '$$cfg{database}' '$uid'");
     print Writer "$KPXC_MP\n";
     close Writer;
     @out = <Reader>;
@@ -273,18 +285,29 @@ sub get_cfg {
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
     $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename();
+    $hash{pathcli} = $$self{frame}{'fcbCliFile'}->get_filename();
+    $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
     if ((!defined $hash{database})||(-d $hash{database})||(!-e $hash{database})) {
         $hash{database} = '';
+        $$self{disable_keepassxc} = 1;
     }
-    if (defined $$self{frame}{'fcbKeePassKeyFile'}) {
-        $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
-        if (($$self{kpxc_keyfile})&&($hash{keyfile})&&(-e $hash{keyfile})) {
-            $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$hash{keyfile}'";
-        } else {
-            $$self{kpxc_keyfile_opt} = '';
-        }
+    if (($$self{kpxc_keyfile})&&($hash{keyfile})&&(-e $hash{keyfile})) {
+        $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$hash{keyfile}'";
+    } else {
+        $$self{kpxc_keyfile_opt} = '';
     }
     $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active()) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
+    if ($$self{disable_keepassxc}) {
+        # Avoid saving information that will not work
+        $hash{use_keepass} = 0;
+        $hash{database} = '';
+        $hash{pathcli} = '';
+        $hash{keyfile} = '';
+        $hash{password} = '';
+        $$self{kpxc_keyfile_opt} = '';
+        $$self{frame}{cbUseKeePass}->set_active(0);
+        $self->_updateUsage();
+    }
     return \%hash;
 }
 
@@ -308,7 +331,7 @@ sub listEntries {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_resizable(1);
     $w{window}{data}->set_default_size(600,400);
     $w{window}{data}->set_resizable(0);
@@ -446,7 +469,7 @@ sub _locateEntries {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            $pid = open2(*Reader,*Writer,"keepassxc-cli locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
             print Writer "$KPXC_MP\n";
             close Writer;
             @KPXC_LIST = <Reader>;
@@ -462,35 +485,42 @@ sub _locateEntries {
 
 sub _buildKeePassGUI {
     my $self = shift;
-
     my $cfg = $self->{cfg};
     my %w;
+    my $width = 150;
 
     # Build a vbox
     $w{vbox} = Gtk3::VBox->new(0,0);
-    $w{hbox} = Gtk3::HBox->new(1,0);
 
+    # Attach to class attribute
+    $$self{container} = $w{vbox};
+    $$self{frame} = \%w;
+
+    # Option to activate KeePass use (or not)
     $w{cbUseKeePass} = Gtk3::CheckButton->new('Activate use of a KeePass database file');
     $w{cbUseKeePass}->set_margin_top(10);
     $w{cbUseKeePass}->set_margin_bottom(5);
     $w{cbUseKeePass}->set_halign('GTK_ALIGN_START');
-    $w{vbox}->pack_start($w{hbox}, 0, 0, 0);
-    $w{hbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
 
     # Build 'help' button
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeePassXC/');
-    $w{hbox}->pack_start($w{help},0,1,0);
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
     $w{help}->set_tooltip_text('Open Online Help');
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
+    # Hbox to arrange first
+    $w{hbox} = Gtk3::HBox->new(1,0);
+    $w{hbox}->pack_start($w{cbUseKeePass}, 0, 1, 0);
+    $w{hbox}->pack_start($w{help},0,1,0);
+    $w{vbox}->pack_start($w{hbox}, 0, 0, 0);
+
     $w{hboxkpmain} = Gtk3::HBox->new(0, 4);
     $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
 
     $w{dblabel} = Gtk3::Label->new('Database file');
-    $w{dblabel}->set_size_request(100,-1);
+    $w{dblabel}->set_size_request($width,-1);
     $w{dblabel}->set_xalign(0);
     $w{hboxkpmain}->pack_start($w{dblabel}, 0, 0, 0);
 
@@ -506,85 +536,183 @@ sub _buildKeePassGUI {
     $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 1, 1, 5);
     $w{entryKeePassPassword}->set_visibility(0);
 
-    if ($$self{kpxc_keyfile}) {
-        $w{hboxkpkeyfile} = Gtk3::HBox->new(0, 3);
-        $w{keylabel} = Gtk3::Label->new('Key file');
-        $w{vbox}->pack_start($w{hboxkpkeyfile}, 0, 1, 0);
-        $w{hboxkpkeyfile}->pack_start($w{keylabel}, 0, 0, 0);
-        $w{keylabel}->set_size_request(100,-1);
-        $w{keylabel}->set_xalign(0);
-        $w{fcbKeePassKeyFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
-        $w{fcbKeePassKeyFile}->set_show_hidden(0);
-        $w{hboxkpkeyfile}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
+    # Key file selection
+    $w{hboxkpkeyfile} = Gtk3::HBox->new(0, 3);
+    $w{keylabel} = Gtk3::Label->new('Key file');
+    $w{vbox}->pack_start($w{hboxkpkeyfile}, 0, 1, 0);
+    $w{hboxkpkeyfile}->pack_start($w{keylabel}, 0, 0, 0);
+    $w{keylabel}->set_size_request($width,-1);
+    $w{keylabel}->set_xalign(0);
+    $w{fcbKeePassKeyFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
+    $w{fcbKeePassKeyFile}->set_show_hidden(0);
+    $w{hboxkpkeyfile}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
 
-        $w{btnClearkeyfile} = Gtk3::Button->new('Clear');
-        $w{hboxkpkeyfile}->pack_start($w{btnClearkeyfile}, 0, 1, 0);
+    $w{btnClearkeyfile} = Gtk3::Button->new('Clear');
+    $w{hboxkpkeyfile}->pack_start($w{btnClearkeyfile}, 0, 1, 0);
 
-        $w{btnClearkeyfile}->signal_connect('clicked' => sub {
-            $w{fcbKeePassKeyFile}->set_uri("file://$ENV{'HOME'}");
-            $w{fcbKeePassKeyFile}->unselect_uri("file://$ENV{'HOME'}");
-        });
-    }
-    my $usage =  Gtk3::Label->new();
-    $usage->set_halign('start');
-    $w{vbox}->pack_start($usage, 0, 1, 0);
-
-    $$self{container} = $w{vbox};
-    $$self{frame} = \%w;
-
-    $w{cbUseKeePass}->signal_connect('toggled', sub {
-        $w{hboxkpmain}->set_sensitive($w{cbUseKeePass}->get_active);
-        if ($$self{kpxc_keyfile}) {
-            $w{hboxkpkeyfile}->set_sensitive($w{cbUseKeePass}->get_active);
-        }
+    $w{btnClearkeyfile}->signal_connect('clicked' => sub {
+        $w{fcbKeePassKeyFile}->set_uri("file://$ENV{'HOME'}");
+        $w{fcbKeePassKeyFile}->unselect_uri("file://$ENV{'HOME'}");
     });
+    if (!$$self{kpxc_keyfile}) {
+        $w{hboxkpkeyfile}->set_sensitive(0);
+    }
+
+    # CLI binary selection
+    $w{clilabel} = Gtk3::Label->new('keepassxc-cli binary');
+    $w{clilabel}->set_size_request($width,-1);
+    $w{clilabel}->set_xalign(0);
+    $w{clilabel}->set_tooltip_text("Specify the keepassxc-cli binary file to use.\nIf not specified, the system wide keepassxc-cli will be used.");
+    $w{fcbCliFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
+    $w{fcbCliFile}->set_show_hidden(0);
+    $w{btnClearclifile} = Gtk3::Button->new('Clear');
+    $w{hboxkpclifile} = Gtk3::HBox->new(0, 3);
+    $w{hboxkpclifile}->pack_start($w{clilabel}, 0, 0, 0);
+    $w{hboxkpclifile}->pack_start($w{fcbCliFile}, 0, 1, 0);
+    $w{hboxkpclifile}->pack_start($w{btnClearclifile}, 0, 1, 0);
+    $w{vbox}->pack_start($w{hboxkpclifile}, 0, 1, 2);
+
+    # Information about the selected keepassxc-cli
+    $w{intro_usage} = Gtk3::Label->new();
+    $w{intro_usage}->set_markup("Information about <i>keepassxc-cli</i> currently in use:");
+    $w{intro_usage}->set_halign('start');
+    $w{intro_usage}->set_margin_top(24);
+    $w{usage} = Gtk3::Label->new();
+    $w{usage}->set_halign('start');
+    $w{usage}->set_margin_top(4);
+    $w{usage}->set_margin_left(8);
+    $w{vbox}->pack_start($w{intro_usage}, 0, 1, 0);
+    $w{vbox}->pack_start($w{usage}, 0, 1, 0);
+
     if ($$self{disable_keepassxc}) {
-        $usage->set_markup("\n\n<b>keepassxc-cli</b> Not installed, integration disabled");
-        $w{cbUseKeePass}->set_sensitive(0);
-        $w{cbUseKeePass}->set_active(0);
-        $w{hboxkpmain}->set_sensitive(0);
+        $w{usage}->set_markup("<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>");
+        $$self{cfg}{use_keepass} = 0;
     } else {
-        my $capabilities;
-        if ($$self{kpxc_keyfile}) {
-            $capabilities .= "<b>Use Key File</b> Enabled\n";
-        } else {
-            $capabilities .= "<b>Use Key File</b> Disabled (update to latest version)\n";
-        }
-        if ($$self{kpxc_show_protected}) {
-            $capabilities .= "<b>Protected passwords</b> Yes\n";
-        } else {
-            $capabilities .= "<b>Protected passwords</b> No\n";
-        }
-        $usage->set_markup("\n\n<b>keepassxc-cli</b> Version $$self{kpxc_version}\n\n$capabilities");
+        _updateUsage($self);
     }
     $w{hboxkpmain}->set_sensitive($$self{cfg}{use_keepass});
+    $w{hboxkpclifile}->set_sensitive($$self{cfg}{use_keepass});
     if ($$self{kpxc_keyfile}) {
         $w{hboxkpkeyfile}->set_sensitive($$self{cfg}{use_keepass});
     }
+
+    # Register callbacks
+    $w{cbUseKeePass}->signal_connect('toggled', sub {
+        if ($w{cbUseKeePass}->get_active()) {
+            $$cfg{'use_keepass'} = 1;
+            $self->_testCapabilities();
+        }
+        $self->_updateUsage();
+    });
 
     $w{btnClearPassFile}->signal_connect('clicked' => sub {
         $w{fcbKeePassFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbKeePassFile}->unselect_uri("file://$ENV{'HOME'}");
     });
 
+    $w{btnClearclifile}->signal_connect('clicked' => sub {
+        $$self{cfg}{pathcli} = '';
+        $CLI = 'keepassxc-cli';
+        $w{fcbCliFile}->set_uri("file://$ENV{'HOME'}");
+        $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
+        $self->_testCapabilities();
+        $self->_updateUsage();
+    });
+
+    $w{fcbCliFile}->signal_connect('selection-changed' => sub {
+        my ($fc) = @_;
+        if (defined $fc->get_filename()) {
+            $$self{cfg}{pathcli} = $fc->get_filename();
+            $CLI = $fc->get_filename();
+            $self->_testCapabilities();
+            $self->_updateUsage();
+        }
+    });
+
     return 1;
+}
+
+sub _updateUsage {
+    my $self = shift;
+    my $capabilities;
+    my $w = $$self{frame};
+
+    if ($$self{_VERBOSE}) {
+        print "KEEPASS: Update usage\n";
+    }
+    if ($$self{disable_keepassxc}) {
+        $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
+    } else {
+        $capabilities  = "<b>Location</b>\t\t$CLI  $$self{kpxc_cli}\n";
+        $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
+        $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
+        $capabilities .= "<b>Show protected</b>\t" . ($$self{kpxc_show_protected} ? "Yes" : "No") . "\n";
+    }
+    $$w{usage}->set_markup($capabilities);
+    $$w{hboxkpmain}->set_sensitive($$w{cbUseKeePass}->get_active());
+    $$w{hboxkpclifile}->set_sensitive($$w{cbUseKeePass}->get_active());
+    if ($$self{kpxc_keyfile} || $$w{cbUseKeePass}->get_active()==0 || $$self{disable_keepassxc}) {
+        $$w{hboxkpkeyfile}->set_sensitive($$w{cbUseKeePass}->get_active());
+    }
 }
 
 sub _testCapabilities {
     my $self = shift;
     my ($c);
 
+    if (ref($self) eq 'PACKeePass') {
+        if (!$$self{frame}{cbUseKeePass}->is_visible()) {
+            return 0;
+        }
+    }
     $$self{kpxc_keyfile} = '';
     $$self{kpxc_show_protected} = '';
     $$self{kpxc_keyfile_opt} = '';
-    $$self{kpxc_version} = `keepassxc-cli -v 2>/dev/null`;
-    $$self{kpxc_version} =~ s/\n//g;
-    if (!$$self{kpxc_version}) {
-        $$self{disable_keepassxc} = 1;
+    $$self{kpxc_version} = '';
+    $$self{kpxc_cli} = '';
+    $$self{disable_keepassxc} = 0;
+    if (!$$self{cfg}{use_keepass}) {
         return 0;
     }
-    $c = `keepassxc-cli -h show 2>&1`;
-    $$self{disable_keepassxc} = 0;
+    if ($$self{_VERBOSE}) {
+        print "KEYPASS: testCapabilities\n";
+    }
+    if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
+        $CLI = $$self{cfg}{pathcli};
+    }
+    if (_getMagicBytes($CLI) eq '41490200') {
+        $$self{kpxc_cli} = 'cli';
+    }
+    if ($$self{_VERBOSE}) {
+        print "KEEPASS: $CLI $$self{kpxc_cli}\n";
+    }
+    $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
+    $$self{kpxc_version} =~ s/\n//g;
+    if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
+        # Invalid version number, user did not select a valid KeePassXC file
+        $$self{kpxc_version} = '';
+    }
+    if (!$$self{kpxc_version}) {
+        if ($CLI eq 'keepassxc-cli') {
+            # We do not have keepassxc-cli available
+            $$self{disable_keepassxc} = 1;
+            $$self{kpxc_cli} = '';
+            return 0;
+        } else {
+            # Test if we have a system wide installation
+            $$self{kpxc_cli} = '';
+            $CLI = 'keepassxc-cli';
+            $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
+            $$self{kpxc_version} =~ s/\n//g;
+            if (!$$self{kpxc_version}) {
+                # We do not have keepassxc-cli available, the user defined is not working
+                $$self{cfg}{pathcli} = '';
+                $$self{disable_keepassxc} = 1;
+                return 0;
+            }
+        }
+    }
+    $c = `$CLI $$self{kpxc_cli} -h show 2>&1`;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
     }
@@ -594,6 +722,20 @@ sub _testCapabilities {
     if ((defined $$self{cfg})&&($$self{kpxc_keyfile})&&($$self{cfg}{keyfile})&&(-e $$self{cfg}{keyfile})) {
         $$self{kpxc_keyfile_opt} = "$$self{kpxc_keyfile} '$$self{cfg}{keyfile}'";
     }
+}
+
+sub _getMagicBytes {
+    my $file = shift;
+    my ($fh,$magic_bytes,$n);
+
+    if (!$file || !-e $file) {
+        return '';
+    }
+    open ($fh, '<:raw', $file) or return '';
+    $n = read($fh, $magic_bytes, 32);
+    close $fh;
+    my $data = unpack("H*",$magic_bytes);
+    return substr($data,16,8);
 }
 
 # END: Private functions definitions

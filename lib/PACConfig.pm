@@ -58,7 +58,7 @@ use PACKeePass;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
+my $AUTOSTART_FILE = "$RealBin/res/asbru_start.desktop";
 
 my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
@@ -139,7 +139,6 @@ sub show {
 
 sub _initGUI {
     my $self = shift;
-    my $opt = shift;
 
     # Load XML Glade file
     defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder->new_from_file($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
@@ -152,10 +151,10 @@ sub _initGUI {
     _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
-    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
+    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/asbru_start.desktop');
 
     # Initialize main window
-    $$self{_WINDOWCONFIG}->set_icon_name('pac-app-big');
+    $$self{_WINDOWCONFIG}->set_icon_name('asbru-app-big');
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
@@ -174,20 +173,20 @@ sub _initGUI {
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
     #_($self, 'btnCheckVersion')->set_label('Check _now');
 
-    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('pac-treelist', 'button'));
-    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'));
-    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('pac-history', 'button'));
-    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
-    _($self, 'imgKeePassOpts')->set_from_stock('pac-keepass', 'button');
-    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('pac-protected', 'button'));
+    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'button'));
+    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'));
+    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('asbru-history', 'button'));
+    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button'));
+    _($self, 'imgKeePassOpts')->set_from_stock('asbru-keepass', 'button');
+    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'button'));
     _($self, 'btnCfgSetGUIPassword')->set_label('Set...');
     _($self, 'btnExportYAML')->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button'));
     _($self, 'btnExportYAML')->set_label('Export config...');
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
-    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef,undef,'remote'))->{container});
-    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef,undef,'local'))->{container});
-    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1))->{container});
+    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
+    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
+    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -202,6 +201,7 @@ sub _initGUI {
         $$self{_ENCODINGS_MAP}{$enc} = ++$i;
     }
 
+    # Show preferences
     _updateGUIPreferences($self);
 
     return 1;
@@ -212,13 +212,13 @@ sub _setupCallbacks {
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
-        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop") ) {
+        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop") ) {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
-                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
                 1;
             };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active()) {
-            unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+            unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
         }
         return 1;
@@ -283,7 +283,7 @@ sub _setupCallbacks {
         _($self, 'cfgLblCharEncode')->set_markup($desc);
     });
     _($self, 'cbCfgBWTrayIcon')->signal_connect('toggled' => sub {
-        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'pac-tray-bw' : 'pac-tray', 'menu');
+        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     });
     _($self, 'cbCfgShowSudoPassword')->signal_connect('toggled' => sub {
         _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
@@ -330,7 +330,7 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
-            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
+            my $pass = _wEnterValue($self, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
@@ -580,7 +580,7 @@ sub _exporter {
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save PAC Config file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save Ásrbú Config file '$file':\n\n$@");
     }
     delete $$self{_CFG}{'__PAC__EXPORTED__'};
     delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
@@ -765,7 +765,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
     _($self, 'entryCfgSelectByWordChars')->set_text($$cfg{'defaults'}{'word characters'});
     _($self, 'cbCfgShowTrayIcon')->set_active($$cfg{'defaults'}{'show tray icon'});
-    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     #DevNote: option currently disabled
     #_($self, 'cbCfgCheckVersions')->set_active($$cfg{'defaults'}{'check versions at start'});
     #_($self, 'btnCheckVersion')->set_sensitive(! $PACMain::FUNCS{_MAIN}{_UPDATING});
@@ -798,7 +798,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgCtrlTabLast')->set_active($$cfg{'defaults'}{'ctrl tab'} eq 'last');
     _($self, 'rbCfgCtrlTabNext')->set_active($$cfg{'defaults'}{'ctrl tab'} ne 'last');
     _($self, 'cbCfgAutoAppendGroupName')->set_active($$cfg{'defaults'}{'append group name'});
-    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'pac-tray-bw' : 'pac-tray', 'menu');
+    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     _($self, 'rbOnNoTabsNothing')->set_active($$cfg{'defaults'}{'when no more tabs'} == 0);
     _($self, 'rbOnNoTabsClose')->set_active($$cfg{'defaults'}{'when no more tabs'} == 1);
     _($self, 'rbOnNoTabsHide')->set_active($$cfg{'defaults'}{'when no more tabs'} == 2);
@@ -1128,17 +1128,6 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'when no more tabs'} = 2;
     }
 
-    #my $new_cfg_location = _($self, 'btnCfgLocation')->get_uri // "$ENV{HOME}/.config/pac";
-    #$new_cfg_location =~ s/^file:\/\///go;
-    #if ($new_cfg_location ne $$self{_CFG}{'defaults'}{'config location'}) {
-    #    system("mv $$self{_CFG}{'defaults'}{'config location'} $new_cfg_location");
-    #    if (-d $new_cfg_location) {
-    #        system("rm -rf $ENV{HOME}/.config/pac");
-    #        system("ln -s $new_cfg_location/pac $ENV{HOME}/.config/pac");
-    #}
-    #}
-    #$$self{_CFG}{'defaults'}{'config location'} = $new_cfg_location;
-
     if (_($self, 'rbCfgStartTreeConn')->get_active()) {
         $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'connections';
     }
@@ -1152,11 +1141,11 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
     }
 
-    unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
-        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open(F, ">:utf8","$ENV{HOME}/.config/autostart/pac_start.desktop");
+        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
+        open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;
         $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
