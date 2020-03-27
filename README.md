@@ -60,7 +60,15 @@ To do so, execute the following commands:
   ````
   yaourt -S asbru-cm-git
   ````
+  
+- MX Linux
 
+  Ásbrú Connection Manager can be installed through the MX Package Installer under the Test Repo tab
+  or by enabling the Test Repo and running
+  ````
+  $ sudo apt-get install asbru-cm
+  ````
+  
 Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
 
 ### Testing new features
