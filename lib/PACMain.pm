@@ -246,7 +246,7 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue(undef, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
+            $pass = _wEnterValue(undef, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
         }
         if (!defined $pass) {
             exit 0;
@@ -393,7 +393,7 @@ sub start {
 
     # Is tray available (Gnome or Unity)?
     if (!$STRAY) {
-        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not available. Install an extension for tray functionality.");
+        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not available.  Install an extension for tray functionality, see online help for more details.");
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {

@@ -1535,7 +1535,7 @@ sub _wEnterValue {
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
-    $w{window}{gui}{lbldwn}->set_markup($lbldown // '');
+    $w{window}{gui}{lbldwn}->set_text($lbldown // '');
 
     if (@list) {
         # Create combobox widget
