@@ -331,7 +331,8 @@ sub _setupCallbacks {
 
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
-        my $cmd = `$RealBin/lib/pac_conn $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
+        # DevNote: please make sure to keep double quotes in "$RealBin/lib/pac_conn" since it might be replaced by packagers (see RPM spec)
+        my $cmd = `"$RealBin/lib/pac_conn" $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
 
