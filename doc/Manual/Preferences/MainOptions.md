@@ -58,7 +58,7 @@ __Separate windows simultaneous views side by side__
 
 ## Icons Theme
 
-Starting with Ásbru 6.2 the applications offer 4 themes for icons.
+Starting with Ásbru 6.2 the applications offers 4 themes for icons.
 
 + default : Set of grey icons
 + asbru-color : Set of color icons
@@ -94,7 +94,7 @@ Starting with Ásbru 6.2 the applications offer 4 themes for icons.
 
     If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
 
-    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    Ásrbú know about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
 
     Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)
     

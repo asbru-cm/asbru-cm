@@ -74,11 +74,12 @@ When you start Ásbrú for the first time, you'll see a standard interface simil
 
     + Connection Type (ssh,vnc,rdp) > Client (client names) > Locations (locations if exist)
     + Client > Service Type (ssh, sqlserver, etc)
+    + Project Name > Client Name > Services
 
 ## Create a group
 
 1. Click on an existing group or _My Connections_ (root level).
-1. Click on add group button or right click on selected group
+1. Click on `add group` button or right click on selected group
 1. Add a name to your group
 1. Click "Accept"
 
@@ -137,5 +138,6 @@ __Example of a connections tree after several connections have been added__
 
     If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
 
-    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    Ásrbú knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
     
+    Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)

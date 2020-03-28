@@ -2,11 +2,11 @@
 
 ![](images/gv1.png)
 
-Global variables, allow you to define variable name and a value assigned to that variable. That variable can be later used in any:
+Global variables, allows you to define variable names and assign value. That variable can be latter used in any:
 
-+ Local Command
-+ Global Command
-+ Expect definition
++ Local Commands
++ Global Commands
++ Expect definitions
 
 To add a new entry click on the "Add" Button.
 
