@@ -1446,7 +1446,7 @@ sub _wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-    my $stock_icon = shift // 'gtk-edit';
+    my $stock_icon = shift // 'asbru-help';
     my @list;
     my $pos = -1;
     my %w;
@@ -1482,6 +1482,7 @@ sub _wEnterValue {
     );
     # and setup some dialog properties.
     $w{window}{data}->set_decorated(0);
+    $w{window}{data}->get_style_context()->add_class('w-entervalue');
     $w{window}{data}->set_default_response('ok');
     if (!$parent) {
         $w{window}{data}->set_position('center');
@@ -1490,10 +1491,14 @@ sub _wEnterValue {
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(0);
 
+    # Create a VBox to avoid vertical expansions
+    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{vbox}, 0, 0, 0);
+
     # Create an HBox to contain a picture and a label
     $w{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox}, 1, 1, 5);
-    $w{window}{gui}{hbox}->set_border_width(5);
+    $w{window}{gui}{hbox}->set_border_width(0);
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbox}, 0, 0, 5);
 
     # Create image
     $w{window}{gui}{img} = Gtk3::Image->new_from_stock($stock_icon, 'dialog');
@@ -1506,13 +1511,13 @@ sub _wEnterValue {
 
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 0, 0, 0);
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{lbldwn}, 0, 0, 5);
     $w{window}{gui}{lbldwn}->set_text($lbldown // '');
 
     if (@list) {
         # Create combobox widget
         $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{comboList}, 0, 1, 0);
+        $w{window}{gui}{vbox}->pack_start($w{window}{gui}{comboList}, 0, 1, 5);
         $w{window}{gui}{comboList}->set_property('can_focus', 0);
         foreach my $text (@list) {
             $w{window}{gui}{comboList}->append_text($text)
@@ -1521,7 +1526,7 @@ sub _wEnterValue {
     } else {
         # Create the entry widget
         $w{window}{gui}{entry} = Gtk3::Entry->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{entry}, 0, 1, 5);
+        $w{window}{gui}{vbox}->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
         $w{window}{gui}{entry}->set_activates_default(1);
         $w{window}{gui}{entry}->set_visibility($visible);
@@ -1577,12 +1582,14 @@ sub _wAddRenameNode {
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
-        undef,
+        $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'modal',
         'gtk-cancel' => 'cancel',
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
+    $w{window}{data}->set_decorated(0);
+    $w{window}{data}->get_style_context()->add_class('w-renamenode');
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('asbru-app-big');
@@ -1640,7 +1647,6 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
 
@@ -1782,6 +1788,7 @@ sub _wMessage {
     my $window = shift;
     my $msg = shift;
     my $modal = shift // 1;
+    my $msg_type = shift // 'GTK_MESSAGE_ERROR';
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (ref $window ne 'Gtk3::Window') {
@@ -1794,14 +1801,15 @@ sub _wMessage {
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
-        'GTK_MESSAGE_INFO',
+        $msg_type,
         'none',
         ''
     );
+    $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class('w-warning');
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($window);
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1901,11 +1909,11 @@ sub _wConfirm {
         'none',
         ''
     );
+    $windowConfirm->set_decorated(0);
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -1919,6 +1927,9 @@ sub _wYesNoCancel {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1926,14 +1937,11 @@ sub _wYesNoCancel {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
+    $windowConfirm->set_decorated(0);
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($window);
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
