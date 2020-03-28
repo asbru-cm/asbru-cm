@@ -1475,20 +1475,20 @@ sub _wEnterValue {
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
-        undef,
+        $parent,
         'modal',
         'gtk-cancel' => 'cancel',
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
+    $w{window}{data}->set_decorated(0);
     $w{window}{data}->set_default_response('ok');
     if (!$parent) {
         $w{window}{data}->set_position('center');
     }
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
-    $w{window}{data}->set_border_width(5);
+    $w{window}{data}->set_border_width(0);
 
     # Create an HBox to contain a picture and a label
     $w{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
@@ -1501,12 +1501,12 @@ sub _wEnterValue {
 
     # Create 1st label
     $w{window}{gui}{lblup} = Gtk3::Label->new();
-    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 5);
-    $w{window}{gui}{lblup}->set_markup($lblup);
+    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 0, 0, 0);
+    $w{window}{gui}{lblup}->set_markup($lblup // '');
 
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 0, 0, 0);
     $w{window}{gui}{lbldwn}->set_text($lbldown // '');
 
     if (@list) {
@@ -1528,7 +1528,6 @@ sub _wEnterValue {
     }
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
     my $val = '';
