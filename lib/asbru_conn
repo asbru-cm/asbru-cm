@@ -230,9 +230,9 @@ sub open_socket {
     ) or die "ERROR: Could not open SOCKET file '$SOCK_FILE' for connecting: $!";
     $SOCKET->autoflush;
 
-    if (!auth($SOCKET)) {
-        die "ERROR: Service listening at file '$SOCK_FILE' is not PAC";
-    }
+        if (!auth($SOCKET)) {
+            die "ERROR: Service listening at file '$SOCK_FILE' is not Ásbrú";
+        }
 
     $SOCKET_EXEC = IO::Socket::UNIX->new(
         Type => SOCK_STREAM,
