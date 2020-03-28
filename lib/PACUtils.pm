@@ -1483,10 +1483,13 @@ sub _wEnterValue {
     my $pos = -1;
     my %w;
 
+    print "$parent : $lblup : $lbldown : $default : $visible\n";
     if (!defined $default) {
         $default = '';
     } elsif (ref($default)) {
         @list = @{$default};
+    } elsif ($default =~ /.+?\|.+?\|/) {
+        @list = split /\|/,$default;
     }
 
     # If no parent given, try to use an existing "global" window (main window or splash screen)
