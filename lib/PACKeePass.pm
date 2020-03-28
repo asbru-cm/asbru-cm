@@ -736,6 +736,7 @@ sub _setCapabilities {
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
         $$self{kpxc_version} = '';
+        $$self{cfg}{pathcli} = '';
         _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"File is not a valid keepassxc-cli binary.");
     }
     if (!$$self{kpxc_version}) {
