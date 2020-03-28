@@ -272,7 +272,7 @@ sub _setupCallbacks {
         $self->_resetDefaults();
     });
     _($self, 'btnCfgSetGUIPassword')->signal_connect('clicked' => sub {
-        _wSetPACPassword($$self{_WINDOWCONFIG}, 1);
+        _wSetPACPassword($self, 1);
         return 1;
     });
     _($self, 'cfgComboCharEncode')->signal_connect('changed' => sub {

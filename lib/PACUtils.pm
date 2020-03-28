@@ -2004,7 +2004,7 @@ sub _wSetPACPassword {
     }
 
     if ($new_pass1 ne $new_pass2) {
-        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span foreground="red"><b>DO NOT MATCH</b></span>!!!');
+        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!');
         return 0;
     }
 
