@@ -345,10 +345,11 @@ sub subst {
     while ($string =~ /<ASK:(.+\|.+?)>/go) {
         my $var = $1;
         my @list;
+        my $ret;
         @list = split('\|', $var);
         my $desc = shift @list;
-        my $ret;
-        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, \@list);
+        $var =~ s/$desc\|//;
+        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, $var);
         defined $ret or return undef;
         $string =~ s/<ASK:(.+\|.+?)>/$ret/g;
     }
