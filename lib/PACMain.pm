@@ -1022,6 +1022,7 @@ sub _initGUI {
     $$self{_CONFIG}{_WINDOWCONFIG}->set_transient_for($$self{_GUI}{main});
 
     # Get the KeePass object from configuration
+    $$self{_CONFIG}{_KEEPASS}{_VERBOSE} = $$self{_VERBOSE};
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
     # Build Edit window
