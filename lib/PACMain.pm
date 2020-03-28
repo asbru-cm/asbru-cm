@@ -53,13 +53,19 @@ use Gtk3 -init;
 # PAC modules
 use PACUtils;
 our $UNITY = 1;
+our $STRAY = 1;
 $@ = '';
 eval {
     require 'PACTrayUnity.pm';
 };
 if ($@) {
-    eval { require 'PACTray.pm'; };
     $UNITY = 0;
+    eval {
+        require 'PACTray.pm';
+    };
+    if ($@) {
+        $STRAY = 0;
+    }
 }
 use PACTerminal;
 use PACEdit;
@@ -246,7 +252,7 @@ sub new {
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
         if (! defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
-            $pass = _wEnterValue($self, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
+            $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'pac-protected');
         }
         if (!defined $pass) {
             exit 0;
@@ -331,6 +337,14 @@ sub start {
 
     #_makeDesktopFile($$self{_CFG});
 
+    # Reset system tray we do not have one in gnome-shell:ubuntu
+    if ($ENV{'ASBRU_DESKTOP'} =~ /gnome-shell/ && $ENV{'ASBRU_DESKTOP'} !~ /withtray/ && !$UNITY) {
+        $STRAY = 0;
+        print "INFO: No tray available\n";
+    } else {
+        print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
+    }
+
     # Build the GUI
     PACUtils::_splash(1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     if (!$self->_initGUI) {
@@ -388,8 +402,8 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("WARNING: Tray icon may not be available: Install Unite Extension is recomended.\nhttps://extensions.gnome.org/extension/1287/unite/");
+    if (!$STRAY) {
+        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not available.  Install an extension for tray functionality, see online help for more details.");
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
@@ -397,8 +411,6 @@ sub start {
     } else {
         $self->_hideConnectionsList();
     }
-
-    print "INFO: Using " . ($UNITY ? 'Unity' : 'Gnome') . " tray icon\n";
 
     # Auto open "Edit" dialog
     foreach my $arg (@{ $$self{_OPTS} }) {
@@ -1306,12 +1318,12 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>'Protected'</b>");
+            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_is_group'}) {
-            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group '$node'", $node);
+            $new_name = _wEnterValue($$self{_GUI}{main}, "<b>Renaming Group</b>", "Enter a new name for Group <b>$node</b>", $node);
             $new_title = 'x';
         } else {
             ($new_name, $new_title) = _wAddRenameNode('rename', $$self{_CFG}, $node_uuid);
@@ -1348,10 +1360,10 @@ sub _setupCallbacks {
         }
 
         if (scalar(@del) > 1) {
-            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>'" . (scalar(@del)) . "'</b> nodes and ALL of their contents?")) {
+            if (!_wConfirm($$self{_GUI}{main}, "Delete <b>" . (scalar(@del)) . "</b> nodes and ALL of their contents?")) {
                 return 1;
             }
-        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>'" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "'</b> and ALL of its contents?")) {
+        } elsif (!_wConfirm($$self{_GUI}{main}, "Delete node <b>" . __($$self{_CFG}{'environments'}{ $del[0] }{'name'}) . "</b> and ALL of its contents?")) {
             return 1;
         }
         # Delete selected nodes from treeConnections
@@ -2320,7 +2332,7 @@ sub _setupCallbacks {
                 $$self{_GUI}{lockPACBtn}->set_active(1);
             }
             # Hide main window
-            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            if (!$STRAY) {
                 $$self{_GUI}{main}->iconify();
             } else {
                 $self->_hideConnectionsList();
@@ -2412,7 +2424,7 @@ sub _lockPAC {
 sub _unlockPAC {
     my $self = shift;
 
-    my $pass = _wEnterValue($self, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
+    my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
         $$self{_GUI}{lockPACBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
@@ -2688,7 +2700,7 @@ sub _treeConnections_menu_lite {
         shortcut => '',
         sensitive => scalar @sel >= 1,
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go)){
                 return 1;
             }
@@ -2862,17 +2874,6 @@ sub _treeConnections_menu {
         sensitive =>  (scalar(@sel) == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__'),
         code => sub { $self->__importNodes }
     });
-    if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
-        # Display settings options in gnome-shell, there is no tray icon to access it
-        push(@tree_menu_items, {
-            label => 'Settings...',
-            stockicon => 'gtk-preferences',
-            shortcut => '',
-            tooltip => 'Settings',
-            sensitive =>  1,
-            code => sub { $$self{_GUI}{configBtn}->clicked(); }
-        });
-    }
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
@@ -3032,7 +3033,7 @@ sub _treeConnections_menu {
         shortcut => '',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }
@@ -3194,7 +3195,7 @@ sub _launchTerminals {
 
     # Check if user wants main window to be close when a terminal comes up
     if ($$self{_CFG}{'defaults'}{'hide on connect'} && ! $$self{_CFG}{'defaults'}{'tabs in main window'}) {
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             $$self{_GUI}{main}->iconify();
         } else {
             $self->_hideConnectionsList();
@@ -4680,7 +4681,7 @@ sub _setSafeLayoutOptions {
         # This layout to work implies some configuration settings to work correctly
         $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
             $$self{_CFG}{'defaults'}{'close to tray'} = 1;
@@ -4721,7 +4722,7 @@ sub _ApplyLayout {
         foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        if (!$STRAY) {
             if (!$$self{_GUI}{main}->get_visible) {
                 $self->_showConnectionsList();
             }
