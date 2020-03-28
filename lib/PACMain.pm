@@ -403,7 +403,7 @@ sub start {
 
     # Is tray available (Gnome or Unity)?
     if (!$STRAY) {
-        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not be available. Install an extension for tray functionality.");
+        _($$self{_CONFIG}, 'cbCfgStartIconified')->set_tooltip_text("Tray icon not available. Install an extension for tray functionality.");
     }
 
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
