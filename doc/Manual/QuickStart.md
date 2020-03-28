@@ -74,11 +74,12 @@ When you start Ásbrú for the first time, you'll see a standard interface simil
 
     + Connection Type (ssh,vnc,rdp) > Client (client names) > Locations (locations if exist)
     + Client > Service Type (ssh, sqlserver, etc)
+    + Project Name > Client Name > Services
 
 ## Create a group
 
 1. Click on an existing group or _My Connections_ (root level).
-1. Click on add group button or right click on selected group
+1. Click on `add group` button or right click on selected group
 1. Add a name to your group
 1. Click "Accept"
 

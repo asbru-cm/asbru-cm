@@ -1,12 +1,10 @@
 # Substitutions
 
-Inside many fields values can be represented as masks and this masks will be substituted by there real value at the time of a connection.
+Inside many fields, values can be represented as masks. And this masks will be substituted by their real value at the time of a connection.
 
-These masks can be included in : Global variables, local or remote commands, expects, some connection fields.
+These masks can be included in fields like : Global variables, local or remote commands, expects, some connection parameters.
 
-The geneal format of the mask is
-
-`<[(Name|Type):]VALUE>`
+The general format of the mask is `<[(Name|Type):]VALUE>`
 
 ## Internal Variables
 
@@ -48,11 +46,11 @@ Will prompt user to enter data and use that data for substitution
 
 `<ASK:parameters>`
 
-|Parameters                    |Action                               |
-|------------------------------|-------------------------------------|
-|description|opt1|opt2|opt3|.. |select box with options (opt1,..)    |
-|description|value             |textbox with predefined value        |
-|description                   |textbox empty                        |
+|Parameters                      |Action                               |
+|--------------------------------|-------------------------------------|
+|`description|opt1|opt2|opt3|..` |select box with options (opt1,..)    |
+|description|value               |textbox with predefined value        |
+|description                     |textbox empty                        |
 
 ## CMD
 
