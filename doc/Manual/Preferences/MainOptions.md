@@ -22,7 +22,7 @@ __Image example__
 
 __Compact__
 
-This mode is for "Windows", "Minimalist" driven users. The main window interface will be hidden in your taksbar. And you will launch all sessions in separate windows, or inside a single window with tabs. You will have the minimum amount of buttons to interact with the application.
+This mode is for "Windows", "Minimalist" driven users. The main window interface will be hidden in your taskbar. And you will launch all sessions in separate windows, or inside a single window with tabs. You will have the minimum amount of buttons to interact with the application.
 
 + Recommended for
     - Having multiple windows and arranged to have simultaneous multiple views, without size restrictions and overlapping
@@ -95,6 +95,8 @@ Starting with Ásbru 6.2 the applications offer 4 themes for icons.
     If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
 
     Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+
+    Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)
     
 
 ### Control TAB Goes to
