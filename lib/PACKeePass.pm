@@ -425,6 +425,32 @@ sub setRigthClickMenuEntry {
     return 1;
 }
 
+sub hasKeePassField {
+    my $self = shift;
+    my $cfg = shift;
+    my $uuid = shift;
+    my $useKeePass = $$cfg{defaults}{keepass}{use_keepass} && $uuid ne '__PAC_SHELL__';
+    my $kpxc;
+
+    if (!$useKeePass) {
+        return 0;
+    }
+
+    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
+        if ($self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
+            return 1;
+        }
+    }
+
+    foreach my $exp (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
+        if ($self->isKeePassMask($$exp{'send'})) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 # END: Public object methods
 ###################################################################
 
