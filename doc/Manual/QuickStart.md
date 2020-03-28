@@ -138,5 +138,6 @@ __Example of a connections tree after several connections have been added__
 
     If you do not install the extension, and activate "hide to tray on close", your will have no access to the main window anymore.
 
-    Ásrbú will knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
+    Ásrbú knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
     
+    Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)
