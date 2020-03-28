@@ -231,7 +231,7 @@ sub open_socket {
     $SOCKET->autoflush;
 
     if (!auth($SOCKET)) {
-        die "ERROR: Service listening at file '$SOCK_FILE' is not PAC";
+        die "ERROR: Service listening at file '$SOCK_FILE' is not Ásbrú";
     }
 
     $SOCKET_EXEC = IO::Socket::UNIX->new(
@@ -345,10 +345,11 @@ sub subst {
     while ($string =~ /<ASK:(.+\|.+?)>/go) {
         my $var = $1;
         my @list;
+        my $ret;
         @list = split('\|', $var);
         my $desc = shift @list;
-        my $ret;
-        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, \@list);
+        $var =~ s/$desc\|//;
+        ($ret, $pos) = wEnterValue("<b>Choose variable value:</b>" , $desc, $var);
         defined $ret or return undef;
         $string =~ s/<ASK:(.+\|.+?)>/$ret/g;
     }
