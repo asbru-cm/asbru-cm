@@ -54,6 +54,7 @@ use PACExecEntry;
 use PACPrePostEntry;
 use PACVarEntry;
 use PACTermOpts;
+use PACKeePass;
 
 # END: Import Modules
 ###################################################################
@@ -332,6 +333,10 @@ sub _setupCallbacks {
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
         # DevNote: please make sure to keep double quotes in "$RealBin/lib/pac_conn" since it might be replaced by packagers (see RPM spec)
+        if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
+            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+            $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+        }
         my $cmd = `"$RealBin/lib/pac_conn" $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
