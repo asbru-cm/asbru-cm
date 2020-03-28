@@ -302,7 +302,7 @@ sub start {
     }
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
-    if (!$ENV{'KPXC_MP'} && $self->_hasKeePassField()) {
+    if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
         my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
         $kpxc->getMasterPassword($$self{_WINDOWTERMINAL});
     }
@@ -4246,30 +4246,6 @@ sub _showEmbedMessages {
 
     # Next time we click on the button, it will be to hide messages
     $$self{_GUI}{_BTNLOG}->set_label('Hide _messages');
-}
-
-sub _hasKeePassField {
-    my $self = shift;
-    my $useKeePass = $$self{_CFG}{defaults}{keepass}{use_keepass} && $$self{_UUID} ne '__PAC_SHELL__';
-    my $kpxc;
-
-    if (!$useKeePass) {
-        return 0;
-    }
-
-    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
-        if (PACKeePass->isKeePassMask($self->{_CFG}{'environments'}{$$self{'_UUID'}}{$fieldName})) {
-            return 1;
-        }
-    }
-
-    foreach my $exp (@{$self->{_CFG}{'environments'}{$$self{'_UUID'}}{'expect'}}) {
-        if (PACKeePass->isKeePassMask($$exp{'send'})) {
-            return 1;
-        }
-    }
-
-    return 0;
 }
 
 # END: Private functions definitions
