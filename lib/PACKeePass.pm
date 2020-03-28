@@ -675,15 +675,12 @@ sub _updateUsage {
         return 0;
     }
     if ($$self{_VERBOSE}) {
-        print "KEEPASS: Update usage\n";
+        print "DEBUG:KEEPASS: Update usage\n";
     }
     if ($$self{disable_keepassxc}) {
         $capabilities = "<span color='red'><b>keepassxc-cli</b> Not installed, choose a working keepassxc-cli or AppImage</span>";
     } else {
         my $warn = '';
-        if ($$self{kpxc_cli}) {
-            $warn = "\t\t\t<span color='orange'><b>Be aware</b> that AppImages are slower than keepassxc-cli</span>\n";
-        }
         $capabilities  = "<b>Location</b>\t\t$CLI  $$self{kpxc_cli}\n$warn";
         $capabilities .= "<b>Version</b>\t\t\t$$self{kpxc_version}\n";
         $capabilities .= "<b>Support key file</b>\t" . ($$self{kpxc_keyfile} ? "Yes" : "No (update to latest version)") . "\n";
@@ -723,7 +720,7 @@ sub _setCapabilities {
         return 0;
     }
     if ($$self{_VERBOSE}) {
-        print "KEYPASS: testCapabilities\n";
+        print "DEBUG:KEYPASS: testCapabilities\n";
     }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
@@ -732,13 +729,14 @@ sub _setCapabilities {
         $$self{kpxc_cli} = 'cli';
     }
     if ($$self{_VERBOSE}) {
-        print "KEEPASS: $CLI $$self{kpxc_cli}\n";
+        print "DEBUG:KEEPASS: $CLI $$self{kpxc_cli}\n";
     }
     $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
         $$self{kpxc_version} = '';
+        _wMessage(undef,"File is not a valid keepassxc-cli binary.");
     }
     if (!$$self{kpxc_version}) {
         if ($CLI eq 'keepassxc-cli') {
