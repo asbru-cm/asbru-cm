@@ -40,6 +40,12 @@ Examples
 |DISPLAY |:0         |
 |HOME    |/home/user |
 
+## Global Variables
+
+These are created in you General Preferences > Global Variables
+
+`<GV:variable name>`
+
 ## ASK
 
 Will prompt user to enter data and use that data for substitution
@@ -51,6 +57,21 @@ Will prompt user to enter data and use that data for substitution
 |`description|opt1|opt2|opt3|..` |select box with options (opt1,..)    |
 |description|value               |textbox with predefined value        |
 |description                     |textbox empty                        |
+
+__Example:__
+
+Lets say that you want to use a connection configuration with 2 different servers, but you do not want to have 2 separate configurations for this.
+
+The only thing that changes is the IP
+
+Create an ASK Mask in your Host entry like this : `<ASK:Select host|destination1.com|destination2.com|...>`
+
+![](images/subst1.png)
+
+
+When you connect the terminal will prompt you to select an IP from the previous list that you created.
+
+![](images/subst2.png)
 
 ## CMD
 
