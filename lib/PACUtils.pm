@@ -1483,7 +1483,6 @@ sub _wEnterValue {
     my $pos = -1;
     my %w;
 
-    print "$parent : $lblup : $lbldown : $default : $visible\n";
     if (!defined $default) {
         $default = '';
     } elsif (ref($default)) {
