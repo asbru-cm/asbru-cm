@@ -202,7 +202,7 @@ sub _initGUI {
         $$self{_ENCODINGS_MAP}{$enc} = ++$i;
     }
 
-    if ($PACMain::STRAY) {
+    if (!$PACMain::STRAY) {
         _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\nTray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>.");
     }
 
