@@ -96,7 +96,6 @@ require Exporter;
     _getXWindowsList
     _checkREADME
     _getEncodings
-    _findKP
     _makeDesktopFile
     _updateWidgetColor
     _getSelectedRows
@@ -260,35 +259,6 @@ sub __text {
 
     return $str;
 };
-
-sub _findKP {
-    my $list = shift;
-    my $where = shift // 'title';
-    my $what = shift // qr/.*/;
-
-    my @kpx = ();
-    foreach my $hash (@{$list}) {
-        if (ref($what) eq 'Regexp') {
-            if ($$hash{$where} !~ /^$what$/) {
-                next;
-            }
-        # TODO : This should be elsif
-        } else {
-            if ($$hash{$where} ne $what) {
-                next;
-            }
-        }
-        push(@kpx, {
-            title => $$hash{title},
-            url => $$hash{url},
-            username => $$hash{username},
-            password => $$hash{password},
-            created => $$hash{created},
-            comment => $$hash{comment}
-        });
-    }
-    return wantarray ? @kpx : scalar(@kpx);
-}
 
 sub _splash {
     my $show = shift;
@@ -3881,14 +3851,6 @@ Prepare string to be included in a HTML TAG
 =head2 sub __text(string)
 
 Inverse of __(string)
-
-=head2 sub _findKP (list,where,what)
-
-    Search inside Keepass the list of elements that match
-    where : a field of Keypass database (title, username, ...)
-    what  : How to compare
-        'Regexp': using a regular expression
-        empty   : string equal
 
 =head2 sub _splash
 
