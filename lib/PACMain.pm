@@ -464,11 +464,9 @@ sub _initGUI {
     # Create main window
     ##############################################
     $$self{_GUI}{main} = Gtk3::Window->new();
-
-    if (($$self{_CFG}{defaults}{'tabs in main window'})&&($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+    if ($$self{_CFG}{defaults}{'tabs in main window'} && $$self{_CFG}{defaults}{'terminal support transparency'}) {
         _setWindowPaintable($$self{_GUI}{main});
     }
-
 
     # Create a vbox1: main, status
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
@@ -985,7 +983,7 @@ sub _initGUI {
     } else {
         # Create window
         $$self{_GUI}{_PACTABS} = Gtk3::Window->new();
-        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+        if ($$self{_CFG}{defaults}{'terminal support transparency'}) {
             _setWindowPaintable($$self{_GUI}{_PACTABS});
         }
         # Setup some window properties.
