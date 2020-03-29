@@ -139,6 +139,10 @@ if (!-d "$ENV{'HOME'}/.config") {
 # Code for future configuration migrations when needed
 if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     config_migration($CFG_DIR_OLD,$CFG_DIR);
+} elsif (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
+    # Downgrade
+    print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
+    system "mv -f $CFG_DIR.old $CFG_DIR";
 }
 
 # Create Asbru config dir if necessary
