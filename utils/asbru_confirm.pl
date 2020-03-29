@@ -4,12 +4,15 @@ use strict;
 
 use Gtk3 '-init';
 use utf8;
+use Encode;
 
 our (%window,%opt);
 
-($opt{type},$opt{msg}) = ($ARGV[0],$ARGV[1]);
+($opt{type},$opt{msg}) = ($ARGV[0],decode('utf8',$ARGV[1]));
 
-$opt{msg} =~ s/#N/\n/g;
+$opt{msg} =~ s/&cr;/\n/g;
+$opt{msg} =~ s/&squot;/\'/g;
+$opt{msg} =~ s/&dquot;/\"/g;
 
 $window{main} = Gtk3::Window->new('GTK_WINDOW_TOPLEVEL');
 $window{main}->set_title("Ásbrú $opt{'type'}");
