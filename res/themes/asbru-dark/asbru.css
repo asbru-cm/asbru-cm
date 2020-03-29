@@ -57,12 +57,10 @@ tooltip {
     border: 1px solid #dddddd;
 }
 .w-warning {
-    color: #ffffff;
     background-color: #616124;
     border: 1px solid #dddddd;
 }
 .w-error {
-    color: #ffffff;
     background-color: #42050A;
     border: 1px solid #dddddd;
 }
