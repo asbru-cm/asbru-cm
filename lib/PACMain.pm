@@ -244,7 +244,7 @@ sub new {
     if ($$self{_CFG}{'defaults'}{'use gui password'}) {
         my $pass;
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
-        if (! defined $pass) {
+        if (!defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
             $pass = _wEnterValue(undef, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
         }
@@ -1305,7 +1305,7 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>Protected</b>");
+            return _wMessage($$self{_GUI}{main}, "Can not rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
@@ -1343,7 +1343,7 @@ sub _setupCallbacks {
             return 1;
         }
         if ($self->_hasProtectedChildren(\@del)) {
-            return _wMessage(undef, "Can not delete selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not delete selection:\nThere are <b>Protected</b> nodes selected");
         }
 
         if (scalar(@del) > 1) {
@@ -1976,7 +1976,7 @@ sub _setupCallbacks {
             }
         }
         if (((scalar(@sel)>1) || ((scalar(@sel)==1) && $is_group)) && ($self->_hasProtectedChildren(\@sel))) {
-            return _wMessage(undef, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>Protected</b> nodes selected");
         }
 
         if ((scalar(@sel) == 1) && (! $is_group)) {
@@ -2411,7 +2411,7 @@ sub _lockPAC {
 sub _unlockPAC {
     my $self = shift;
 
-    my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'pac-protected');
+    my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
         $$self{_GUI}{lockPACBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
@@ -3196,7 +3196,7 @@ sub _launchTerminals {
     }
 
     my $wtmp;
-    scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting '<b><big>". (scalar(@{ $terminals })) . "</big></b>' terminals...", 0);
+    scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting <b><big>". (scalar(@{ $terminals })) . "</big></b> terminals...", 0);
     $$self{_NTERMINALS} = scalar(@{ $terminals });
 
     # Create all selected terminals
@@ -4009,7 +4009,7 @@ sub _cutNodes {
         return 1;
     }
     if ($self->_hasProtectedChildren(\@sel_uuids)) {
-        return _wMessage(undef, "Can not CUT selection:\nThere are <b>'Protected'</b> nodes selected");
+        return _wMessage($$self{_GUI}{main}, "Can not CUT selection:\nThere are <b>Protected</b> nodes selected");
     }
 
     # Copy the selected nodes
@@ -4147,7 +4147,7 @@ sub __exportNodes {
         return 1;
     }
 
-    my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being exported...", 0);
+    my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file <b>$file</b> is being exported...", 0);
     Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Make a backup of the original CFG
@@ -4175,7 +4175,7 @@ sub __exportNodes {
         _wMessage($$self{_WINDOWCONFIG}, "Connection(s) succesfully exported to:\n\n$file");
     } else {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file '$file':\n\n$!");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file <b>$file</b>:\n\n$!");
     }
 
     return 1;
@@ -4210,7 +4210,7 @@ sub __importNodes {
         return 1;
     }
 
-    my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file '$file' is being imported...", 0);
+    my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file <b>$file</b> is being imported...", 0);
     Gtk3::main_iteration() while Gtk3::events_pending();
 
     require YAML;
@@ -4218,7 +4218,7 @@ sub __importNodes {
     eval { $$self{_COPY}{'data'} = YAML::LoadFile($file); };
     if ($@) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file <b>$file</b>:\n\n$@");
         return 1;
     }
 
@@ -4249,7 +4249,7 @@ sub __importNodes {
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        _wMessage($$self{_WINDOWCONFIG}, "File '$file' succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
         system("(sleep 3; $0) &");
         sleep 2;
         exit 0;
@@ -4258,7 +4258,7 @@ sub __importNodes {
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
         delete $$self{_COPY}{'data'}{'children'};
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "File '$file' does not look like a valid exported connection!");
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> does not look like a valid exported connection!");
         return 1;
 
     # Correct partial export file
@@ -4271,7 +4271,7 @@ sub __importNodes {
         $$self{_COPY}{'data'} = {};
         _decipherCFG($$self{_CFG});
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "File '<b>$file</b>' succesfully imported:\n<b>$i</b> element(s) added");
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported:\n<b>$i</b> element(s) added");
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
         $self->_setCFGChanged(1);
