@@ -975,6 +975,9 @@ sub _initGUI {
     } else {
         # Create window
         $$self{_GUI}{_PACTABS} = Gtk3::Window->new();
+        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+            _setWindowPaintable($$self{_GUI}{_PACTABS});
+        }
         # Setup some window properties.
         $$self{_GUI}{_PACTABS}->set_title("Terminals Tabbed Window : $APPNAME (v$APPVERSION)");
         $$self{_GUI}{_PACTABS}->set_position('center');
