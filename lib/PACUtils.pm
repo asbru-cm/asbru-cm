@@ -2049,6 +2049,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'show global commands box'} //= 0;
     $$cfg{'defaults'}{'terminal backspace'} //= 'auto';
     $$cfg{'defaults'}{'terminal transparency'} //= 0;
+    $$cfg{'defaults'}{'terminal support transparency'} //= $$cfg{'defaults'}{'terminal transparency'} > 0;
     $$cfg{'defaults'}{'terminal font'} //= 'Monospace 9';
     $$cfg{'defaults'}{'terminal character encoding'} //= 'UTF-8';
     $$cfg{'defaults'}{'terminal scrollback lines'} //= 5000;
