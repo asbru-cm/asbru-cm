@@ -1489,7 +1489,7 @@ sub _wEnterValue {
     }
     $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_resizable(0);
-    $w{window}{data}->set_border_width(0);
+    $w{window}{data}->set_border_width(5);
 
     # Create a VBox to avoid vertical expansions
     $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
@@ -1788,15 +1788,19 @@ sub _wMessage {
     my $window = shift;
     my $msg = shift;
     my $modal = shift // 1;
-    my $msg_type = shift // 'GTK_MESSAGE_ERROR';
+    my $msg_type = shift // 'GTK_MESSAGE_WARNING';
+    my $class = 'w-warning';
 
-    # Why no Gtk3::MessageDialog->new_with_markup() available??
-    if (ref $window ne 'Gtk3::Window') {
+    if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
     }
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
+    if ($msg =~ /error/i) {
+        $msg_type = 'GTK_MESSAGE_ERROR';
+        $class = 'w-error';
     }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
@@ -1806,7 +1810,7 @@ sub _wMessage {
         ''
     );
     $windowConfirm->set_decorated(0);
-    $windowConfirm->get_style_context()->add_class('w-warning');
+    $windowConfirm->get_style_context()->add_class($class);
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
@@ -1910,6 +1914,7 @@ sub _wConfirm {
         ''
     );
     $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class('w-confirm');
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
@@ -1938,6 +1943,7 @@ sub _wYesNoCancel {
         ''
     );
     $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class('w-confirm');
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');

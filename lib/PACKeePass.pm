@@ -153,7 +153,7 @@ sub getMasterPassword {
             if (!$flg && $msg !~ /ASBRUKeePassXCTEST/) {
                 $KPXC_MP='';
                 $mp = '';
-                _wMessage($parent,"<b>keepassxc-cli message</b>\n\n$msg");
+                _wMessage($parent,"<b>Error keepassxc-cli message</b>\n\n$msg");
             }
         } else {
             last;
@@ -328,16 +328,16 @@ sub listEntries {
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "KeePassXC Search",
-        undef,
+        $parent,
         'modal',
         'gtk-cancel' => 'cancel',
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_resizable(1);
+    $w{window}{data}->set_decorated(0);
+    $w{window}{data}->get_style_context()->add_class('w-entervalue');
     $w{window}{data}->set_default_size(600,400);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
@@ -401,7 +401,6 @@ sub listEntries {
     });
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($parent);
     $w{window}{data}->show_all();
 
     my $ok = $w{window}{data}->run();
@@ -737,7 +736,7 @@ sub _setCapabilities {
         # Invalid version number, user did not select a valid KeePassXC file
         $$self{kpxc_version} = '';
         $$self{cfg}{pathcli} = '';
-        _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"File is not a valid keepassxc-cli binary.");
+        _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"<b>Error</b>\n\nFile is not a valid keepassxc-cli binary.");
     }
     if (!$$self{kpxc_version}) {
         if ($CLI eq 'keepassxc-cli') {
