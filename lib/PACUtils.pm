@@ -108,6 +108,7 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
+    _setWindowBackgorundColor
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -3858,12 +3859,13 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
+sub _setWindowBackgorundColor {
+    ($R,$G,$B,$A) = @_;
+}
+
 sub _setWindowPaintable {
     my $win = shift;
 
-    ($R,$G,$B,$A) = split /,/,$win->get_style_context()->get_background_color('normal')->to_string();
-    $R =~ s/\D//g;
-    $A =~ s/\D//g;
     $win->signal_connect("draw" => \&mydraw);
     my $screen = $win->get_screen();
     my $visual = $screen->get_rgba_visual();
@@ -3875,7 +3877,11 @@ sub _setWindowPaintable {
 
 sub mydraw {
     my ($w,$c) = @_;
+    my $x;
 
+    if (!defined $R) {
+        return 0;
+    }
     $c->set_source_rgba($R,$G,$B,$A);
     $c->set_operator('source');
     $c->paint();
