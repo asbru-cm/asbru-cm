@@ -1785,7 +1785,7 @@ sub _wMessage {
     my $modal = shift // 1;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
-    if (ref $window ne 'Gtk3::Window') {
+    if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
     }
@@ -1888,7 +1888,7 @@ sub _wConfirm {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
-    if (ref $window ne 'Gtk3::Window') {
+    if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
     }
