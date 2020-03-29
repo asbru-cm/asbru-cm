@@ -865,7 +865,7 @@ sub _initGUI {
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
         $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3),5+($NPOSY*$vsize+($NPOSY*50)));
 
-        if ((($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'})&&($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0))||($$self{_CFG}{defaults}{'terminal transparency'} > 0)) {
+        if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) || $$self{_CFG}{defaults}{'terminal support transparency'}) {
             _setWindowPaintable($$self{_WINDOWTERMINAL});
         }
 
@@ -3762,8 +3762,8 @@ sub _updateCFG {
     # Update some VTE options
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'}) && (defined $$self{_GUI}{_VTE})) {
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}), $colors);
-        if ($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
-            _setTransparency($self,$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'},$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
+        if ($$self{_CFG}{defaults}{'terminal support transparency'} && $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) {
+            _setTransparency($self, $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'}, $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'back color'}));
         }
@@ -3777,8 +3777,8 @@ sub _updateCFG {
         $$self{_GUI}{_VTE}->set_audible_bell($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'audible bell'});
     } elsif (defined $$self{_GUI}{_VTE}) {
         $$self{_GUI}{_VTE}->set_colors(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'text color'}), scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}), $colors);
-        if ($$self{_CFG}{defaults}{'terminal transparency'} > 0) {
-            _setTransparency($self,$$self{_CFG}{defaults}{'terminal transparency'},$$self{_CFG}{'defaults'}{'back color'});
+        if ($$self{_CFG}{defaults}{'terminal support transparency'} && $$self{_CFG}{defaults}{'terminal transparency'} > 0) {
+            _setTransparency($self, $$self{_CFG}{defaults}{'terminal transparency'}, $$self{_CFG}{'defaults'}{'back color'});
         } else {
             $$self{_GUI}{_VTE}->set_color_background(scalar Gtk3::Gdk::RGBA::parse($$self{_CFG}{'defaults'}{'back color'}));
         }
