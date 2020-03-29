@@ -284,6 +284,8 @@ sub config_migration {
     system "rm -f $new_dir/*.nfreeze";
     return 0;
 
+    # Set warning message, do not worrie about tabs, spaces at the beggining
+    # Pango markup is OK
     sub setMessage {
         my $msg = qq”This Version will migrate your configuration file.
 
@@ -291,11 +293,10 @@ sub config_migration {
 
         You can downgrade from your package manager if the migration fails.
 
-        You may cancel now, and run : <i>asbru --verbose</i>
+        You may <b>Cancel</b> now, and run in terminal : <b><i>asbru --verbose</i></b>
+        To see detailed messages of the migration process.
 
-        To see the complete messages of the migration process.
-
-        Or continue to start Ásbrú now.
+        Or <b>Continue</b> to start Ásbrú now.
         ”;
     }
 }
@@ -393,8 +394,9 @@ sub CheckConfigurationFile {
 
 sub _wPopUP {
     my ($type,$msg) = @_;
+    my $PATH = "$RealBin/";
 
-    if (!-e "utils/asbru_confirm.pl") {
+    if (!-e "$PATH/utils/asbru_confirm.pl") {
         return "NOT AVAILABLE";
     }
     $msg =~ s/\t//mg;
@@ -402,7 +404,7 @@ sub _wPopUP {
     $msg =~ s/\n/&cr;/g;
     $msg =~ s/\"/&dquot;/g;
     $msg =~ s/\'/&squot;/g;
-    return `utils/asbru_confirm.pl '$type' '$msg' `;
+    return `$PATH/utils/asbru_confirm.pl '$type' '$msg' `;
 }
 
 END {
