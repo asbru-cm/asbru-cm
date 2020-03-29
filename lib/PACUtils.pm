@@ -1460,7 +1460,7 @@ sub _wEnterValue {
     }
 
     # If no parent given, try to use an existing "global" window (main window or splash screen)
-    if (ref $parent ne 'Gtk3::Window') {
+    if (defined $parent && ref $parent ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wEnterValue ",ref $parent,"\n";
         undef $parent;
     }
@@ -1901,7 +1901,7 @@ sub _wConfirm {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
-    if (ref $window ne 'Gtk3::Window') {
+    if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
     }
