@@ -1593,9 +1593,7 @@ sub _wAddRenameNode {
     $w{window}{data}->set_decorated(0);
     $w{window}{data}->get_style_context()->add_class('w-renamenode');
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
 
