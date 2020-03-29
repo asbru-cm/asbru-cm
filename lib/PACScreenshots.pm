@@ -428,7 +428,7 @@ sub _showImage {
 
     my $window = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Screenshot '$file'",
-        undef,
+        $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'GTK_DIALOG_DESTROY_WITH_PARENT',
         'gtk-close' => 'close',
     );

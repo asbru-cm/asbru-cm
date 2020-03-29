@@ -1530,6 +1530,7 @@ sub _wEnterValue {
         $w{window}{gui}{entry} = Gtk3::Entry->new();
         $w{window}{gui}{vbox}->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
+        $w{window}{gui}{entry}->set_width_chars(30);
         $w{window}{gui}{entry}->set_activates_default(1);
         $w{window}{gui}{entry}->set_visibility($visible);
     }
@@ -1593,9 +1594,7 @@ sub _wAddRenameNode {
     $w{window}{data}->set_decorated(0);
     $w{window}{data}->get_style_context()->add_class('w-renamenode');
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
 
@@ -1627,6 +1626,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry1} = Gtk3::Entry->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{entry1}, 1, 1, 0);
     $w{window}{gui}{entry1}->set_text($name);
+    $w{window}{gui}{entry1}->set_width_chars(30);
     $w{window}{gui}{entry1}->set_activates_default(1);
     $w{window}{gui}{entry1}->signal_connect('changed', sub {
         $w{window}{gui}{entry2}->set_text($w{window}{gui}{entry1}->get_chars(0, -1) . ($uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' :  " - $parent_name")));
@@ -1646,6 +1646,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry2} = Gtk3::Entry->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{entry2}, 1, 1, 0);
     $w{window}{gui}{entry2}->set_text($title);
+    $w{window}{gui}{entry2}->set_width_chars(30);
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
