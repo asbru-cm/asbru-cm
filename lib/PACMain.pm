@@ -252,7 +252,7 @@ sub new {
             exit 0;
         }
         if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
-            _wMessage(undef, 'ERROR: Wrong password!!');
+            _wMessage($$self{_GUI}{main}, 'ERROR: Wrong password!!');
             exit 0;
         }
     }
@@ -1305,7 +1305,7 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage(undef, "Can not rename selection:\nSelected node is <b>Protected</b>");
+            return _wMessage($$self{_GUI}{main}, "Can not rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
@@ -1343,7 +1343,7 @@ sub _setupCallbacks {
             return 1;
         }
         if ($self->_hasProtectedChildren(\@del)) {
-            return _wMessage(undef, "Can not delete selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not delete selection:\nThere are <b>'Protected'</b> nodes selected");
         }
 
         if (scalar(@del) > 1) {
@@ -1976,7 +1976,7 @@ sub _setupCallbacks {
             }
         }
         if (((scalar(@sel)>1) || ((scalar(@sel)==1) && $is_group)) && ($self->_hasProtectedChildren(\@sel))) {
-            return _wMessage(undef, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>'Protected'</b> nodes selected");
         }
 
         if ((scalar(@sel) == 1) && (! $is_group)) {
@@ -4009,7 +4009,7 @@ sub _cutNodes {
         return 1;
     }
     if ($self->_hasProtectedChildren(\@sel_uuids)) {
-        return _wMessage(undef, "Can not CUT selection:\nThere are <b>'Protected'</b> nodes selected");
+        return _wMessage($$self{_GUI}{main}, "Can not CUT selection:\nThere are <b>'Protected'</b> nodes selected");
     }
 
     # Copy the selected nodes
