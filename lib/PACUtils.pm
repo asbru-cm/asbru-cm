@@ -1471,7 +1471,9 @@ sub _wEnterValue {
             $parent = $WINDOWSPLASH{_GUI};
         }
     }
-
+    if (!$stock_icon) {
+        $stock_icon = 'asbru-help';
+    }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Enter data",
@@ -1512,7 +1514,7 @@ sub _wEnterValue {
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{gui}{vbox}->pack_start($w{window}{gui}{lbldwn}, 0, 0, 5);
-    $w{window}{gui}{lbldwn}->set_text($lbldown // '');
+    $w{window}{gui}{lbldwn}->set_markup($lbldown // '');
 
     if (@list) {
         # Create combobox widget
@@ -1962,7 +1964,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'pac-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'asbru-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1974,13 +1976,13 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass2) {
         return 0;
     }
