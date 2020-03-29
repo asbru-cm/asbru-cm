@@ -252,7 +252,7 @@ sub new {
             exit 0;
         }
         if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
-            _wMessage($$self{_GUI}{main}, 'ERROR: Wrong password!!');
+            _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
     }
