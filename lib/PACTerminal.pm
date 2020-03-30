@@ -464,6 +464,9 @@ sub stop {
     # First of all, save THIS page's widget (to prevent closing a not selected tab)
     my $p_widget = $$self{_GUI}{_VBOX};
 
+    # Set mouse pointer in case a postexec was executed
+    $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+
     if ($NPOSX>0) {
         $NPOSX--;
         if (($NPOSY>0)&&($NPOSX==0)) {
@@ -3320,9 +3323,14 @@ sub _wPrePostExec {
 
         $w{window}{data}->signal_connect('response' => sub {
             my ($me, $response) = @_;
-            $response eq '1' and _execLocalPPE($self, \%w);
+            if ($response eq '1') {
+                _execLocalPPE($self, \%w);
+            }
             $w{window}{data}->destroy();
-            $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+            if (defined $$self{_GUI}{_VBOX}) {
+                # Change mouse pointer when pre exec, on post exec, the window might be gone already
+                $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+            }
             undef %w;
         });
 
