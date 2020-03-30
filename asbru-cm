@@ -139,9 +139,15 @@ if (!-d "$ENV{'HOME'}/.config") {
 if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     config_migration($CFG_DIR_OLD,$CFG_DIR);
 } elsif (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
-    # Downgrade
+    # Downgrade default user data only
     print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
     system "mv -f $CFG_DIR.old $CFG_DIR";
+    # We should remove unsuccesful migration to be able to do a new one after any fix.
+    my $asbru_dir = $CFG_DIR;
+    $asbru_dir =~ s/pac$/asbru/;
+    if (-e $asbru_dir) {
+        system "rm -Rf $asbru_dir";
+    }
 }
 
 # Create Asbru config dir if necessary
