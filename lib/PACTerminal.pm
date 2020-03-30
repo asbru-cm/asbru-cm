@@ -303,8 +303,9 @@ sub start {
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
+        my $win = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
         my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-        $kpxc->getMasterPassword($$self{_WINDOWTERMINAL});
+        $kpxc->getMasterPassword($win);
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
@@ -1591,9 +1592,11 @@ sub _watchConnectionData {
                 $$self{_WINDOWTERMINAL}->show();
             }
         } elsif ($data =~ /^WENTER\|/) {
+            my $win = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
+
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
-            my ($val,$pos) = _wEnterValue($$self{_WINDOWTERMINAL},$lblup,$lbldown,$default,$visible);
+            my ($val,$pos) = _wEnterValue($win,$lblup,$lbldown,$default,$visible);
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->grab_focus();
