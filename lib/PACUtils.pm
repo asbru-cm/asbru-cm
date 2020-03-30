@@ -106,6 +106,7 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
+    _setWindowBackgorundColor
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -139,6 +140,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my ($R,$G,$B,$A);
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -1476,7 +1478,7 @@ sub _wEnterValue {
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Enter data",
+        "$APPNAME : Enter data",
         $parent,
         'modal',
         'gtk-cancel' => 'cancel',
@@ -1584,7 +1586,7 @@ sub _wAddRenameNode {
 
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Enter data",
+        "$APPNAME : Enter data",
         $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'modal',
         'gtk-cancel' => 'cancel',
@@ -1816,7 +1818,7 @@ sub _wMessage {
     $windowConfirm->get_style_context()->add_class($class);
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
+    $windowConfirm->set_title("$APPNAME : Message");
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1924,7 +1926,7 @@ sub _wConfirm {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_title("Confirm action : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -1953,7 +1955,7 @@ sub _wYesNoCancel {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_title("Confirm action : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -2068,6 +2070,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'show global commands box'} //= 0;
     $$cfg{'defaults'}{'terminal backspace'} //= 'auto';
     $$cfg{'defaults'}{'terminal transparency'} //= 0;
+    $$cfg{'defaults'}{'terminal support transparency'} //= $$cfg{'defaults'}{'terminal transparency'} > 0;
     $$cfg{'defaults'}{'terminal font'} //= 'Monospace 9';
     $$cfg{'defaults'}{'terminal character encoding'} //= 'UTF-8';
     $$cfg{'defaults'}{'terminal scrollback lines'} //= 5000;
@@ -3810,6 +3813,10 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
+sub _setWindowBackgorundColor {
+    ($R,$G,$B,$A) = @_;
+}
+
 sub _setWindowPaintable {
     my $win = shift;
 
@@ -3824,8 +3831,12 @@ sub _setWindowPaintable {
 
 sub mydraw {
     my ($w,$c) = @_;
+    my $x;
 
-    $c->set_source_rgba(240,240,240,1);
+    if (!defined $R) {
+        return 0;
+    }
+    $c->set_source_rgba($R,$G,$B,$A);
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');
