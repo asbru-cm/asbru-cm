@@ -3285,12 +3285,11 @@ sub _wPrePostExec {
         # Create the dialog window,
         $w{window}{data} = Gtk3::Dialog->new_with_buttons(
             $self->{_NAME} . " : $APPNAME : Local execution",
-            undef,
+            $self->{_PARENTWINDOW},
             'modal',
         );
         # and setup some dialog properties.
         $w{window}{data}->set_default_response('ok');
-        $w{window}{data}->set_position('center');
         $w{window}{data}->set_icon_from_file($APPICON);
         $w{window}{data}->set_size_request(400, 300);
         $w{window}{data}->set_resizable(1);
