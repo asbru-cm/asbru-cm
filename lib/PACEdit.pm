@@ -337,7 +337,7 @@ sub _setupCallbacks {
             my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
             $kpxc->getMasterPassword($$self{_WINDOWEDIT});
         }
-        my $cmd = `"$RealBin/lib/pac_conn" $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
+        my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
     });
 
