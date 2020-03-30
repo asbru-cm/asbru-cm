@@ -118,7 +118,6 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPNAME_SHORT = 'Ásbrú CM';
 our $APPVERSION = '6.2.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
@@ -1479,7 +1478,7 @@ sub _wEnterValue {
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME_SHORT : Enter data",
+        "$APPNAME : Enter data",
         $parent,
         'modal',
         'gtk-cancel' => 'cancel',
@@ -1587,7 +1586,7 @@ sub _wAddRenameNode {
 
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME_SHORT : Enter data",
+        "$APPNAME : Enter data",
         $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'modal',
         'gtk-cancel' => 'cancel',
@@ -1819,7 +1818,7 @@ sub _wMessage {
     $windowConfirm->get_style_context()->add_class($class);
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("$APPNAME_SHORT : Message");
+    $windowConfirm->set_title("$APPNAME : Message");
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1924,7 +1923,7 @@ sub _wConfirm {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME_SHORT");
+    $windowConfirm->set_title("Confirm action : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -1953,7 +1952,7 @@ sub _wYesNoCancel {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME_SHORT");
+    $windowConfirm->set_title("Confirm action : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
