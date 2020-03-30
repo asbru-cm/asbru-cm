@@ -293,7 +293,7 @@ sub config_migration {
 
         You can downgrade from your package manager if the migration fails.
 
-        You may <b>Cancel</b> now, and run in terminal : <b><i>asbru --verbose</i></b>
+        You may <b>Cancel</b> now, and run in terminal : <b><i>asbru-cm --verbose</i></b>
         To see detailed messages of the migration process.
 
         Or <b>Continue</b> to start Ásbrú now.
