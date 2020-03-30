@@ -144,6 +144,7 @@ sub new {
     $self->{_FOCUSED} = 0;
     $self->{FOCUS} = 0;
     $self->{EMBED} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'embed'};
+    $self->{_PARENTWINDOW} = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
 
     ++$_C;
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
@@ -243,7 +244,7 @@ sub new {
             if (defined $self->{_SOCKET_CONN}) {
                 $self->{_SOCKET_CONN}->close();
             }
-            _wMessage($$self{_WINDOWTERMINAL}, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
+            _wMessage($$self{_PARENTWINDOW}, 'Master socket at port ' . $self->{_SOCKET_PORT} . ' was closed !!');
             return 0;
         }
 
@@ -303,9 +304,8 @@ sub start {
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
-        my $win = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
         my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-        $kpxc->getMasterPassword($win);
+        $kpxc->getMasterPassword($$self{_PARENTWINDOW});
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
@@ -1044,7 +1044,7 @@ sub _setupCallbacks {
             {
                 my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
                 my $delete = _wEnterValue(
-                    $$self{_GUI},
+                    $$self{_PARENTWINDOW},
                     "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
                     'Use string or Perl RegExps (ex: \n means "carriage return")',
                     '\n|\f|\r'
@@ -1257,17 +1257,17 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
     $$self{_GUI}{_VTE}->signal_connect('drag_drop' => sub {
         if (!$$self{CONNECTED}) {
-            _wMessage($$self{_WINDOWTERMINAL}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
+            _wMessage($$self{_PARENTWINDOW}, "This terminal is <b>DISCONNECTED</b>.\nPlease, start the connection before trying to <b>chain</b>.", 1);
             return 0;
         } elsif ($$self{CONNECTING}) {
-            _wMessage($$self{_WINDOWTERMINAL}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
+            _wMessage($$self{_PARENTWINDOW}, "Please, <b>WAIT for current chain to finish</b> before starting a new one.", 1);
             return 0;
         } elsif ($$self{CONNECTED} && (scalar @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}} == 1)) {
             my $sel = shift @{$PACMain::{FUNCS}{_MAIN}{'DND'}{'selection'}};
             my $name = $$self{_CFG}{environments}{$sel}{name};
             my $title = $$self{_CFG}{environments}{$sel}{title};
             if (!$self->_wSelectChain($sel)) {
-                _wMessage($$self{_WINDOWTERMINAL}, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
+                _wMessage($$self{_PARENTWINDOW}, "No '<b>Expect/Send</b>' data available in:\n<b>$name ($title)</b>\nSo, there are <b>no commands to chain</b>");
             }
             if ($$self{_FOCUSED}) {
                 $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
@@ -1520,7 +1520,7 @@ sub _watchConnectionData {
             $$self{_TITLE} = $1;
             $self->_updateCFG();
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
-            _wMessage($$self{_WINDOWTERMINAL}, $1, 1);
+            _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
         } elsif ($data eq 'RESTART') {
             $$self{_RESTART} = 1;
@@ -1542,7 +1542,7 @@ sub _watchConnectionData {
             select($rin, undef, undef, 2) or return 1;
             $$self{_EXEC}{RECEIVED} = undef;
             eval {$$self{_EXEC}{RECEIVED} = ${fd_retrieve($$self{_SOCKET_CLIENT_EXEC})};};
-            if ($@) {_wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
+            if ($@) {_wMessage($$self{_PARENTWINDOW}, "ERROR: Could not retrieve output from command execution:\n$@"); return 1;}
             if (defined $$self{_EXEC}{RECEIVED}) {
                 $$self{_EXEC_PROCESS} = Glib::Timeout->add(100, sub {$self->_pipeExecOutput; return 0;});
             }
@@ -1592,11 +1592,9 @@ sub _watchConnectionData {
                 $$self{_WINDOWTERMINAL}->show();
             }
         } elsif ($data =~ /^WENTER\|/) {
-            my $win = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
-
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
-            my ($val,$pos) = _wEnterValue($win,$lblup,$lbldown,$default,$visible);
+            my ($val,$pos) = _wEnterValue($$self{_PARENTWINDOW},$lblup,$lbldown,$default,$visible);
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->grab_focus();
@@ -1825,7 +1823,7 @@ sub _vteMenu {
         shortcut => '',
         tooltip => 'Create a new cluster and put this connection in it',
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_PARENTWINDOW}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }
@@ -2137,7 +2135,7 @@ sub _vteMenu {
         code => sub {
             my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
             my $delete = _wEnterValue(
-                $$self{_GUI},
+                $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
                 'Use string or Perl RegExps (ex: \n means "carriage return")',
                 '\n|\f|\r'
@@ -2161,7 +2159,7 @@ sub _vteMenu {
     push(@vte_menu_items, {label => 'Temporary TAB Label change...', stockicon => 'gtk-edit', code => sub {
         # Prepare the input window
         my $new_label = _wEnterValue(
-            $PACMain::FUNCS{_MAIN}{_GUI}{main},
+            $$self{_PARENTWINDOW},
             "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
             'Enter the new temporal label:', $$self{_TITLE}
         );
@@ -2739,7 +2737,7 @@ sub _tabMenu {
         stockicon => 'gtk-new',
         shortcut => '',
         code => sub {
-            my $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            my $cluster = _wEnterValue($$self{_PARENTWINDOW}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
                 return 1;
             }
@@ -2802,7 +2800,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Temporary TAB Label change...', stockicon => 'gtk-edit', code => sub {
         # Prepare the input window
         my $new_label = _wEnterValue(
-            $PACMain::FUNCS{_MAIN}{_GUI}{main},
+            $$self{_PARENTWINDOW},
             "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
             'Enter the new temporal label:',
             $$self{_TITLE}
@@ -2829,7 +2827,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
+        if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
             return 1;
         }
         foreach my $uuid (@list) {
@@ -3080,18 +3078,18 @@ sub _saveSessionLog {
     $new_file = $dialog->get_filename;
     $dialog->destroy();
 
-    my $confirm = _wYesNoCancel($$self{_WINDOWTERMINAL}, 'Do you want to remove escape sequences from the saved log?');
+    my $confirm = _wYesNoCancel($$self{_PARENTWINDOW}, 'Do you want to remove escape sequences from the saved log?');
 
     if ($confirm eq 'yes') {
         if (!open(F, "$$self{_LOGFILE}")) {
-            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
+            _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
             return 1;
         }
         my @lines = <F>;
         close F;
 
         if (!open(F, ">$new_file")) {
-            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not open file '$new_file' for writting!! ($!)");
+            _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not open file '$new_file' for writting!! ($!)");
             return 1;
         }
         print F _removeEscapeSeqs(join('', @lines));
@@ -3120,7 +3118,7 @@ sub _execute {
 
     my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID});
     if (!defined $cmd) {
-        _wMessage($$self{_WINDOWTERMINAL}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
+        _wMessage($$self{_PARENTWINDOW}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
         return 0;
     }
 
@@ -3135,13 +3133,13 @@ sub _execute {
         # Prevent "Remote Executions storms" (half a second between interruptions to spawned processes)
         my $time = join('.', gettimeofday());
         if (($time - $$self{_EXEC_LAST}) <= $EXEC_STORM_TIME) {
-            _wMessage($$self{_WINDOWTERMINAL}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
+            _wMessage($$self{_PARENTWINDOW}, "Please, wait at least <b>$EXEC_STORM_TIME</b> seconds between Remote Commands Executions", 1);
             return 0;
         }
         $$self{_EXEC_LAST} = $time;
 
         if (!kill('USR1', $$self{_PID})) {
-            _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+            _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
             return 0;
         }
         my %tmp;
@@ -3427,7 +3425,7 @@ sub _wSelectChain {
         if ($ppe{window}{gui}{cbExecInCluster}->get_active) {
             foreach my $cluster_uuid (keys %PACMain::RUNNING) {
                 if (! kill('HUP', $PACMain::RUNNING{$cluster_uuid}{terminal}{_PID})) {
-                    _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                    _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not signal process '$PACMain::RUNNING{$cluster_uuid}{terminal}{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                     return 0;
                 }
 
@@ -3438,7 +3436,7 @@ sub _wSelectChain {
             }
         } else {
             if (! kill('HUP', $$self{_PID})) {
-                _wMessage($$self{_WINDOWTERMINAL}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
+                _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not signal process '$$self{_PID}'\nInconsistent state!\nPlease, restart PAC!!", 1);
                 return 0;
             }
 
@@ -4177,7 +4175,7 @@ sub _closeAllTerminals {
     my $self = shift;
     my @list = keys %PACMain::RUNNING;
 
-    if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close <b>all</b> terminals?"))) {
+    if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to close <b>all</b> terminals?"))) {
         return 1;
     }
     foreach my $uuid (@list) {

@@ -2112,7 +2112,7 @@ sub _setupCallbacks {
 
     # Capture TABs window closing
     ! $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_PACTABS}->signal_connect('delete_event' => sub {
-        if ($$self{_GUILOCKED} || ! _wConfirm(undef, "Close <b>TABBED TERMINALS</b> Window ?")) {
+        if ($$self{_GUILOCKED} || ! _wConfirm($$self{_GUI}{_PACTABS}, "Close <b>TABBED TERMINALS</b> Window ?")) {
             return 1;
         }
         foreach my $uuid (keys %RUNNING) {
