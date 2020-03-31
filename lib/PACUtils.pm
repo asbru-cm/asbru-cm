@@ -3860,7 +3860,8 @@ sub _appName {
 }
 
 sub _setWindowBackgorundColor {
-    ($R,$G,$B,$A) = @_;
+    my ($r,$g,$b,$a) = @_;
+    ($R,$G,$B,$A) = ($r/255,$g/255,$b/255,$a);
 }
 
 sub _setWindowPaintable {
@@ -3879,9 +3880,6 @@ sub mydraw {
     my ($w,$c) = @_;
     my $x;
 
-    if (!defined $R) {
-        return 0;
-    }
     $c->set_source_rgba($R,$G,$B,$A);
     $c->set_operator('source');
     $c->paint();
