@@ -79,6 +79,7 @@ my $proxy_user = '';
 my $proxy_pass = '';
 my $proxy_cmd = '';
 my $proxy_jump = 0;
+my $proxy_get = '';
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
@@ -692,9 +693,6 @@ sub _setProxy {
     my $method = shift;
     my $user = $USER;
 
-    if ($GETCMD) {
-        return 0;
-    }
     # Set variables in case they are used in function : sub subst()
     my $ssh_config = '';
     if (($$CFG{'environments'}{$UUID}{'use proxy'} == 3) || ($$CFG{'environments'}{$UUID}{'use proxy'} == 0)) {
@@ -817,6 +815,10 @@ sub _getProxyCmd {
 sub _openSshTunnel {
     my ($uuid) = @_;
 
+    if ($GETCMD) {
+        $proxy_get .= "\nssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        return 0;
+    }
     $proxy_jump = 2;
 
     if (-e "$CFG_DIR/tmp/$uuid.ctl") {
@@ -838,6 +840,10 @@ sub _openSocksTunnel {
 
     $LPORT = _getLocalPort($PORT);
     $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
+    if ($GETCMD) {
+        $proxy_get .= "\nnc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &";
+        return 0;
+    }
 
     unlink($pipe);
     system("mkfifo $pipe");
@@ -1128,7 +1134,7 @@ if ($$CFG{'environments'}{$UUID}{'terminal options'}{'use personal settings'}) {
 
 $connection_cmd = subst($connection_cmd);
 if ($GETCMD) {
-    print $connection_cmd;
+    print "$connection_cmd\n\n<b>Proxy Configs</b>$proxy_get";
     exit 0;
 }
 
