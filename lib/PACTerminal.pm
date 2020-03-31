@@ -272,7 +272,7 @@ sub new {
     $$self{variables}=$$self{_CFG}{environments}{$$self{_UUID}}{variables};
 
     # Autohide non tabbed help terminals
-    if ((defined $$self{_WINDOWTERMINAL})&&(!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /freerdp|rdesktop|vnc/i)) {
+    if ((defined $$self{_WINDOWTERMINAL})&&(!$$self{_CFG}{'defaults'}{'debug'})&&(!$$self{EMBED})&&($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /vnc/i)) {
         $$self{_WINDOWTERMINAL}->hide();
     }
 
@@ -1588,12 +1588,8 @@ sub _watchConnectionData {
             $$self{_PID} = $2;
             $$self{CONNECTING} = 1;
             $$self{_RESTART} = 0;
-        } elsif ($data eq 'UNHIDE_TERMINAL') {
-            $$self{_BADEXIT} = 1;
-            $$self{CONNECTING} = 1;
-            if (defined $$self{_WINDOWTERMINAL}) {
-                $$self{_WINDOWTERMINAL}->show();
-            }
+        } elsif ($data eq 'HIDE_TERMINAL') {
+            $$self{_WINDOWTERMINAL}->hide();
         } elsif ($data =~ /^WENTER\|/) {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
