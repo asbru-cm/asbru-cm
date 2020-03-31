@@ -3871,7 +3871,6 @@ sub _setWindowPaintable {
 
 sub mydraw {
     my ($w,$c) = @_;
-    my $x;
 
     my $C = $w->get_style_context()->get_background_color('normal');
     $c->set_source_rgba($C->red(),$C->green(),$C->blue(),$C->alpha());
