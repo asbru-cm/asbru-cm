@@ -69,6 +69,7 @@ my $PASSWORD_COUNT = 0;
 my $WAS_ASK_PASS = 0;
 my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
+my $HIDE_TERMINAL = 0;
 my $SOCKET;
 my $SOCKET_EXEC;
 my $proxy_type = 'socks5';
@@ -803,7 +804,6 @@ sub _getProxyCmd {
         if (! $?) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
-        ctrl("UNHIDE_TERMINAL");
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
         die();
     } else {
@@ -820,7 +820,6 @@ sub _openSshTunnel {
         # Avoid open a second terminal with the same UUID
         my $check = `ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
-            ctrl("UNHIDE_TERMINAL");
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
@@ -987,6 +986,7 @@ if (defined $METHOD) {
     # TERMINAL DESKTOP METHODS (rdp, vnc, etc)
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
+        $HIDE_TERMINAL = 1;
         $METHOD = $1;
         _setProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
@@ -1153,7 +1153,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
         }],
 
         ['\[ERROR\]', sub {
-            ctrl("UNHIDE_TERMINAL");
         }],
 
         # Found certificate verification string
@@ -1165,7 +1164,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             } else {
                 $CONNECTED = 0;
                 send_slow($EXP, "N\n");
-                ctrl("UNHIDE_TERMINAL");
                 ctrl("CLOSE:HOSTKEY:rejected by configuration (sent 'N')");
             }
         }],
@@ -1200,7 +1198,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     ctrl("PASSWORD:Sent (not shown)");
                     exp_continue();
                 } else {
-                    ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
                     _hardClose($EXP, $UUID);
@@ -1962,6 +1959,9 @@ $SIG{'USR2'} = sub {
 
 if ($CONNECTED) {
     # Restart only when connecting at startup connection
+    if ($HIDE_TERMINAL) {
+        ctrl("HIDE_TERMINAL");
+    }
     if ($IS_CLUSTER && ($RESTART == 2)) {
         $RESTART = 0;
     }
