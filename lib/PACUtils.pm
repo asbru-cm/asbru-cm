@@ -106,7 +106,6 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
-    _setWindowBackgorundColor
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -140,7 +139,6 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
-my ($R,$G,$B,$A);
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -3810,10 +3808,6 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
-sub _setWindowBackgorundColor {
-    ($R,$G,$B,$A) = @_;
-}
-
 sub _setWindowPaintable {
     my $win = shift;
 
@@ -3828,12 +3822,9 @@ sub _setWindowPaintable {
 
 sub mydraw {
     my ($w,$c) = @_;
-    my $x;
 
-    if (!defined $R) {
-        return 0;
-    }
-    $c->set_source_rgba($R,$G,$B,$A);
+    my $C = $w->get_style_context()->get_background_color('normal');
+    $c->set_source_rgba($C->red(),$C->green(),$C->blue(),$C->alpha());
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');
