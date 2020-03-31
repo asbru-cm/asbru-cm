@@ -3807,7 +3807,8 @@ sub _setWindowPaintable {
 sub mydraw {
     my ($w,$c) = @_;
 
-    $c->set_source_rgba(240,240,240,1);
+    my $C = $w->get_style_context()->get_background_color('normal');
+    $c->set_source_rgba($C->red(),$C->green(),$C->blue(),$C->alpha());
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');

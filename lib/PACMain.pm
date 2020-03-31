@@ -473,7 +473,6 @@ sub _initGUI {
     } else {
         $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox3}, 0, 0);
     }
-    $$self{_GUI}{vbox3}->set_border_width(5);
 
     # Create a hbuttonbox1: add, rename, delete, etc...
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new(1, 0);
@@ -520,10 +519,7 @@ sub _initGUI {
     $$self{_GUI}{nodeDelBtn}->set_sensitive(0);
     $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
 
-    # Put a separator
-    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
-        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
-    } else {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{main}->set_decorated(0);
         $$self{_GUI}{nodeClose} = Gtk3::Button->new();
         $$self{_GUI}{nodeClose}->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button'));
@@ -538,7 +534,6 @@ sub _initGUI {
     $$self{_GUI}{nbTree} = Gtk3::Notebook->new();
     $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{nbTree}, 1, 1, 0);
     $$self{_GUI}{nbTree}->set_scrollable(1);
-    # FIXME-HOMOGENEOUS     $$self{_GUI}{nbTree}->set('homogeneous', 0);
 
     # Create a scrolled1 scrolled window to contain the connections tree
     $$self{_GUI}{scroll1} = Gtk3::ScrolledWindow->new();
@@ -554,7 +549,6 @@ sub _initGUI {
     $$self{_GUI}{nbTree}->append_page($$self{_GUI}{scroll1}, $$self{_GUI}{nbTreeTab});
     $$self{_GUI}{nbTree}->set_tab_reorderable($$self{_GUI}{scroll1}, 1);
     $$self{_GUI}{scroll1}->set_policy('automatic', 'automatic');
-    $$self{_GUI}{vbox3}->set_border_width(5);
 
     # Create a treeConnections treeview for connections
     $$self{_GUI}{treeConnections} = PACTree->new (
@@ -712,11 +706,6 @@ sub _initGUI {
     $$self{_GUI}{treeClusters}->set_enable_search(0);
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
 
-    # Put a separator
-    if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
-        $$self{_GUI}{vbox3}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
-    }
-
     # Create a hbox0: exec and clusters
     $$self{_GUI}{hbox0} = Gtk3::VBox->new(0, 0);
     $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{hbox0}, 0, 1, 0);
@@ -795,9 +784,6 @@ sub _initGUI {
 
     # Create a vbox5: description
     $$self{_GUI}{vbox5} = Gtk3::VBox->new(0, 0);
-    if ($$self{_CFG}{defaults}{'tabs in main window'}) {
-        $$self{_GUI}{vbox5}->set_border_width(5);
-    }
     $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 1, 0);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
         $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox5}, 0, 0);
