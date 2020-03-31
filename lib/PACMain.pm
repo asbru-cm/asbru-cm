@@ -457,6 +457,11 @@ sub _initGUI {
     if ($$self{_CFG}{defaults}{'tabs in main window'} && $$self{_CFG}{defaults}{'terminal support transparency'}) {
         _setWindowPaintable($$self{_GUI}{main});
     }
+    if ($$self{_THEME} =~ /dark/) {
+        _setDefaultRGBA($$self{_GUI}{main},56,56,56,1);
+    } else {
+        _setDefaultRGBA($$self{_GUI}{main},240,0,0,1);
+    }
 
     # Create a vbox1: main, status
     $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
