@@ -692,6 +692,9 @@ sub _setProxy {
     my $method = shift;
     my $user = $USER;
 
+    if ($GETCMD) {
+        return 0;
+    }
     # Set variables in case they are used in function : sub subst()
     my $ssh_config = '';
     if (($$CFG{'environments'}{$UUID}{'use proxy'} == 3) || ($$CFG{'environments'}{$UUID}{'use proxy'} == 0)) {
