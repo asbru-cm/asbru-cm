@@ -6292,7 +6292,7 @@ sudo -p sudo_prompt_string ...</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
@@ -6311,7 +6311,7 @@ sudo -p sudo_prompt_string ...</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -6405,7 +6405,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -6418,7 +6418,7 @@ Changes apply to next opened connections, not current</property>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <child>
@@ -7162,7 +7162,7 @@ Changes apply to next opened connections, not current</property>
                                           <object class="GtkLabel" id="label72">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Transparency</property>
+                                            <property name="label" translatable="yes">Transparency (*)</property>
                                             <property name="use_markup">True</property>
                                             <property name="width_chars">14</property>
                                             <property name="xalign">0</property>
@@ -7171,6 +7171,28 @@ Changes apply to next opened connections, not current</property>
                                             <property name="expand">False</property>
                                             <property name="fill">True</property>
                                             <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkCheckButton" id="cbCfgTerminalSupportTransparency">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">False</property>
+                                            <property name="tooltip_text" translatable="yes">If checked, transparency is supported for any terminals and you can specify here the default transparency level.
+
+When checked for the first time, a restart of the application is required to take effect.
+
+If unchecked, transparency is not supported.
+
+If you don't use transparency, leave ths option unchecked as it will slightly improve rendering performances.</property>
+                                            <property name="use_stock">True</property>
+                                            <property name="active">True</property>
+                                            <property name="draw_indicator">True</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -7187,7 +7209,7 @@ Changes apply to next opened connections, not current</property>
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">1</property>
+                                            <property name="position">2</property>
                                           </packing>
                                         </child>
                                       </object>
@@ -7514,6 +7536,19 @@ Changes apply to next opened connections, not current</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lblRestartRequired2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">&lt;i&gt;(*) Requires restart to take effect&lt;/i&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">6</property>
                       </packing>

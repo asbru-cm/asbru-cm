@@ -79,7 +79,9 @@ sub new {
     $self->{gui} = undef;
 
     _buildTermOptsGUI($self);
-    defined $$self{cfg} and PACTermOpts::update($$self{cfg});
+    if (defined $$self{cfg}) {
+        PACTermOpts::update($$self{cfg});
+    }
 
     bless($self, $class);
     return $self;
@@ -89,7 +91,9 @@ sub update {
     my $self = shift;
     my $cfg = shift;
 
-    defined $cfg and $$self{cfg} = $cfg;
+    if (defined $cfg) {
+        $$self{cfg} = $cfg;
+    }
 
     $$self{gui}{cbCTRLDisable}->set_active($$cfg{'disable CTRL key bindings'} // 0);
     $$self{gui}{cbALTDisable}->set_active($$cfg{'disable ALT key bindings'} // 0);
@@ -116,6 +120,14 @@ sub update {
     $$self{gui}{comboCursorShape}->set_active($CURSOR_SHAPE{$$cfg{'cursor shape'} // 'block'});
     $$self{gui}{spCfgTerminalScrollback}->set_value($$cfg{'terminal scrollback lines'} // 5000);
     $$self{gui}{spCfgTerminalTransparency}->set_value($$cfg{'terminal transparency'} // 0);
+    if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'terminal support transparency'}) {
+        $$self{gui}{spCfgTerminalTransparency}->set_sensitive(1);
+        $$self{gui}{spCfgTerminalTransparency}->set_tooltip_text("");
+    } else {
+        $$self{gui}{spCfgTerminalTransparency}->set_sensitive(0);
+        $$self{gui}{spCfgTerminalTransparency}->set_tooltip_text("Transparency has been disabled globally.  See your global preferences to activate transparency.");
+    }
+
     $$self{gui}{entrySelectWords}->set_text($$cfg{'terminal select words'} // '-.:_/');
 
     $$self{gui}{spCfgTmoutConnect}->set_value($$cfg{'timeout connect'} // 40);
@@ -160,7 +172,7 @@ sub get_cfg {
     $options{'terminal font'} = $$self{gui}{fontTerminal}->get_font_name;
     $options{'cursor shape'} = $$self{gui}{comboCursorShape}->get_active_text;
     $options{'terminal scrollback lines'} = $$self{gui}{spCfgTerminalScrollback}->get_chars(0, -1);
-    $options{'terminal transparency'} = $$self{gui}{spCfgTerminalTransparency}->get_value;
+    $options{'terminal transparency'} = $$self{gui}{spCfgTerminalTransparency}->get_value();
     $options{'terminal transparency'} =~ s/,/\./go;
     $options{'terminal select words'} = $$self{gui}{entrySelectWords}->get_chars(0, -1);
 
