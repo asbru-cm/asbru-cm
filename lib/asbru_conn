@@ -69,6 +69,7 @@ my $PASSWORD_COUNT = 0;
 my $WAS_ASK_PASS = 0;
 my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
+my $HIDE_TERMINAL = 0;
 my $SOCKET;
 my $SOCKET_EXEC;
 my $proxy_type = 'socks5';
@@ -78,6 +79,7 @@ my $proxy_user = '';
 my $proxy_pass = '';
 my $proxy_cmd = '';
 my $proxy_jump = 0;
+my $proxy_get = '';
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
@@ -803,7 +805,6 @@ sub _getProxyCmd {
         if (! $?) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
-        ctrl("UNHIDE_TERMINAL");
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
         die();
     } else {
@@ -814,13 +815,16 @@ sub _getProxyCmd {
 sub _openSshTunnel {
     my ($uuid) = @_;
 
+    if ($GETCMD) {
+        $proxy_get .= "\nssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        return 0;
+    }
     $proxy_jump = 2;
 
     if (-e "$CFG_DIR/tmp/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
         my $check = `ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
-            ctrl("UNHIDE_TERMINAL");
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
@@ -836,6 +840,10 @@ sub _openSocksTunnel {
 
     $LPORT = _getLocalPort($PORT);
     $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
+    if ($GETCMD) {
+        $proxy_get .= "\nnc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &";
+        return 0;
+    }
 
     unlink($pipe);
     system("mkfifo $pipe");
@@ -987,6 +995,7 @@ if (defined $METHOD) {
     # TERMINAL DESKTOP METHODS (rdp, vnc, etc)
     ##############################################
     elsif ($METHOD =~ /^.*RDP \((.+)\).*$/) {
+        $HIDE_TERMINAL = 1;
         $METHOD = $1;
         _setProxy('RDP');
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
@@ -1125,7 +1134,7 @@ if ($$CFG{'environments'}{$UUID}{'terminal options'}{'use personal settings'}) {
 
 $connection_cmd = subst($connection_cmd);
 if ($GETCMD) {
-    print $connection_cmd;
+    print "$connection_cmd\n\n<b>Proxy Configs</b>$proxy_get";
     exit 0;
 }
 
@@ -1153,7 +1162,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
         }],
 
         ['\[ERROR\]', sub {
-            ctrl("UNHIDE_TERMINAL");
         }],
 
         # Found certificate verification string
@@ -1165,7 +1173,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
             } else {
                 $CONNECTED = 0;
                 send_slow($EXP, "N\n");
-                ctrl("UNHIDE_TERMINAL");
                 ctrl("CLOSE:HOSTKEY:rejected by configuration (sent 'N')");
             }
         }],
@@ -1200,7 +1207,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                     ctrl("PASSWORD:Sent (not shown)");
                     exp_continue();
                 } else {
-                    ctrl("UNHIDE_TERMINAL");
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     $CONNECTED = 0;
                     _hardClose($EXP, $UUID);
@@ -1962,6 +1968,9 @@ $SIG{'USR2'} = sub {
 
 if ($CONNECTED) {
     # Restart only when connecting at startup connection
+    if ($HIDE_TERMINAL) {
+        ctrl("HIDE_TERMINAL");
+    }
     if ($IS_CLUSTER && ($RESTART == 2)) {
         $RESTART = 0;
     }
