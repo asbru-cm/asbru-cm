@@ -108,6 +108,7 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
+    _setDefaultRGBA
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -145,6 +146,8 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
+my ($R,$G,$B,$A);
+my $USE_GB = 0;
 
 our @DONATORS_LIST = (
     'Angelo Maria Lambiasi',
@@ -3857,6 +3860,19 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
+sub _setDefaultRGBA {
+    my $c;
+    my $w = shift;
+    ($R,$G,$B,$A) = ($_[0]/255,$_[1]/255,$_[2]/255,$_[3]);
+
+    eval {
+        $c = $w->get_style_context()->get_background_color('normal');
+    };
+    if (defined $c && defined $c->red) {
+        $USE_GB = 1;
+    }
+}
+
 sub _setWindowPaintable {
     my $win = shift;
 
@@ -3871,9 +3887,13 @@ sub _setWindowPaintable {
 
 sub mydraw {
     my ($w,$c) = @_;
+    my ($r,$g,$b,$a) = ($R,$G,$B,$A);
 
-    my $C = $w->get_style_context()->get_background_color('normal');
-    $c->set_source_rgba($C->red(),$C->green(),$C->blue(),$C->alpha());
+    if ($USE_GB) {
+        my $C = $w->get_style_context()->get_background_color('normal');
+        ($r,$g,$b,$a) = ($C->red(),$C->green(),$C->blue(),$C->alpha());
+    }
+    $c->set_source_rgba($r,$g,$b,$a);
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');
