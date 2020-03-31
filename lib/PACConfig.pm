@@ -516,6 +516,11 @@ sub _setupCallbacks {
         _($self, 'entryCfgJumpKey')->unselect_uri("file://$ENV{'HOME'}");
     });
 
+    # Capture support transparency change
+    _($self, 'cbCfgTerminalSupportTransparency')->signal_connect('toggled' => sub {
+        _($self, 'spCfgTerminalTransparency')->set_sensitive(_($self, 'cbCfgTerminalSupportTransparency')->get_active());
+    });
+
     return 1;
 }
 
@@ -823,6 +828,8 @@ sub _updateGUIPreferences {
     #_($self, 'hboxOnNoMoreTabs')->set_sensitive(_($self, 'cbCfgNewInTab')->get_active());
     _($self, 'spCfgTerminalScrollback')->set_value($$cfg{'defaults'}{'terminal scrollback lines'} // 5000);
     _($self, 'spCfgTerminalTransparency')->set_value($$cfg{'defaults'}{'terminal transparency'});
+    _($self, 'cbCfgTerminalSupportTransparency')->set_active($$cfg{'defaults'}{'terminal support transparency'} // ($$cfg{'defaults'}{'terminal transparency'} > 0));
+    _($self, 'spCfgTerminalTransparency')->set_sensitive(_($self, 'cbCfgTerminalSupportTransparency')->get_active());
     _($self, 'cbCfgExpectDebug')->set_active($$cfg{'defaults'}{'debug'});
     _($self, 'cbCfgStartMaximized')->set_active($$cfg{'defaults'}{'start maximized'});
     _($self, 'radioCfgTabsTop')->set_active($$cfg{'defaults'}{'tabs position'} eq 'top');
@@ -983,6 +990,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'terminal scrollback lines'} = _($self, 'spCfgTerminalScrollback')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'terminal transparency'} = _($self, 'spCfgTerminalTransparency')->get_value();
     $$self{_CFG}{'defaults'}{'terminal transparency'} =~ s/,/\./go;
+    $$self{_CFG}{'defaults'}{'terminal support transparency'} = _($self, 'cbCfgTerminalSupportTransparency')->get_active();
     $$self{_CFG}{'defaults'}{'terminal backspace'} = _($self, 'cfgComboBackspace')->get_active_text();
     $$self{_CFG}{'defaults'}{'auto accept key'} = _($self, 'cbCfgAutoAcceptKeys')->get_active();
     $$self{_CFG}{'defaults'}{'debug'} = _($self, 'cbCfgExpectDebug')->get_active();
