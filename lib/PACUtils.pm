@@ -3859,11 +3859,6 @@ sub _appName {
     return "$APPNAME $APPVERSION";
 }
 
-sub _setWindowBackgorundColor {
-    my ($r,$g,$b,$a) = @_;
-    ($R,$G,$B,$A) = ($r/255,$g/255,$b/255,$a);
-}
-
 sub _setWindowPaintable {
     my $win = shift;
 
@@ -3880,6 +3875,10 @@ sub mydraw {
     my ($w,$c) = @_;
     my $x;
 
+    my ($r,$g,$b,$a) = split /,/,$w->get_style_context()->get_background_color('normal')->to_string();
+    $r =~ s/\D//g;
+    $a =~ s/\D//g;
+    my ($R,$G,$B,$A) = ($r/255,$g/255,$b/255,$a);
     $c->set_source_rgba($R,$G,$B,$A);
     $c->set_operator('source');
     $c->paint();
