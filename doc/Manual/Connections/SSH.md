@@ -94,9 +94,36 @@ The command field allows you to right click and have access to known SSH options
 
 ## (Pre / Post) Exec
 
-This commands will be executed immediately before (Pre) the connection is launched. And after (Post) the connection has been established.
+This commands will be executed immediately __before__ (Pre) the connection is launched. And after (Post) the connection has been __closed__.
 
-This commands are executed in the local computer.
+This commands are executed in the local computer, not on the remote terminal.
+
+You may add many commands, and configure which command will be the default, and if Ásbrú should ask before executing it.
+
+!!! danger "Important"
+    The terminal interaction and login will be frozen until the external application is finished. Or is demonized.
+
+Example, before launching the terminal start a __local__ apache server
+
+![](images/exec9.png)
+
+After closing the terminal, execute pdfshufler
+
+![](images/exec10.png)
+
+Execution examples, with a gtk application to see the results.
+
+Pre exec is configured to ask, is waiting for you to execute an available command from the list.
+
+![](images/exec11.png)
+
+Application is launched and the terminal waits for the end of the execution.
+
+![](images/exec12.png)
+
+We exit the terminal, the terminal is closed and the post exec command is executed.
+
+![](images/exec13.png)
 
 !!! tip "Possible uses"
     Launch : an IDE, a Database Client (DBeaver), start a local scripts that uploads or downloads files, etc.
