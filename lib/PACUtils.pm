@@ -108,7 +108,6 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
-    _setWindowBackgorundColor
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
