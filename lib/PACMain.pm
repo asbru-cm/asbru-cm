@@ -198,12 +198,6 @@ sub new {
     $$self{_THEME} = $THEME_DIR;
     print STDERR "INFO: Theme directory is '$$self{_THEME}'\n";
 
-    if ($$self{_THEME} =~ /dark/) {
-        _setWindowBackgorundColor(0,0,0,1);
-    } else {
-        _setWindowBackgorundColor(240,240,240,1);
-    }
-
     _registerPACIcons($THEME_DIR);
     $AUTOCLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_auto.png");
     $CLUSTERICON = _pixBufFromFile("$THEME_DIR/asbru_cluster_connection.svg");
