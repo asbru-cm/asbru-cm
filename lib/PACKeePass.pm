@@ -283,7 +283,6 @@ sub getFieldValue {
 sub get_cfg {
     my $self = shift;
     my $from_pref = shift;
-    my $disabled = $$self{disable_keepassxc};
 
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
@@ -302,7 +301,7 @@ sub get_cfg {
     $hash{password} = ($$self{frame}{'cbUseKeePass'}->get_active()) ? $$self{frame}{'entryKeePassPassword'}->get_chars(0, -1) : '';
     if ($$self{disable_keepassxc}) {
         # Avoid saving information that will not work
-        if ($from_pref && !$disabled && $hash{use_keepass}) {
+        if ($from_pref && $hash{use_keepass}) {
             _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"KeePassXC was disabled, information was incomplete");
         }
         $hash{use_keepass} = 0;
