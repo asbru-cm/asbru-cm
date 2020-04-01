@@ -458,9 +458,9 @@ sub _initGUI {
         _setWindowPaintable($$self{_GUI}{main});
     }
     if ($$self{_THEME} =~ /dark/) {
-        _setDefaultRGBA($$self{_GUI}{main},56,56,56,1);
+        _setDefaultRGBA(56,56,56,1);
     } else {
-        _setDefaultRGBA($$self{_GUI}{main},240,240,240,1);
+        _setDefaultRGBA(240,240,240,1);
     }
 
     # Create a vbox1: main, status

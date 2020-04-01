@@ -348,7 +348,8 @@ sub _buildTermOptsGUI {
     $hboxTermUI2->pack_start($frameTransparency, 1, 1, 0);
     $frameTransparency->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{spCfgTerminalTransparency} = Gtk3::HScale->new(Gtk3::Adjustment->new(0, 0, 1, 0.1, 0.1, 0.1) );
+    $w{spCfgTerminalTransparency} = Gtk3::HScale->new(Gtk3::Adjustment->new(0, 0, 1, 0.01, 0.2, 0.01));
+    $w{spCfgTerminalTransparency}->set_digits(2);
     $frameTransparency->add($w{spCfgTerminalTransparency});
 
     my $frameSelectWords = Gtk3::Frame->new(' Select Word CHARS  ');
