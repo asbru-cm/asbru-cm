@@ -1525,6 +1525,8 @@ sub _watchConnectionData {
                 $$self{_TITLE} = $t;
                 $self->_updateCFG();
             }
+        } elsif ($data =~ /^GET_TITLE:/go) {
+            $self->_sendData("GET_TITLE|:|$$self{_TITLE}");
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
             _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
