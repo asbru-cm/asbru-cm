@@ -445,7 +445,7 @@ sub start {
         }
     );
 
-    $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
+    $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'},$self->{_PARENTWINDOW},$$self{_UUID_TMP});
     $$self{_GUI}{_VTE}->grab_focus();
     if ($PACMain::FUNCS{_MAIN}{_Vte}{has_bright}) {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
@@ -1886,7 +1886,7 @@ sub _vteMenu {
             stockicon => 'gtk-execute',
             sensitive => $$self{CONNECTED},
             tooltip => "Exec the CONNECTIONS part of '$name' in this connection",
-            code => sub {$PACMain::FUNCS{_SCRIPTS}->_execScript($name, $$self{_UUID_TMP});}
+            code => sub {$PACMain::FUNCS{_SCRIPTS}->_execScript($name,$self->{_PARENTWINDOW},$$self{_UUID_TMP});}
         });
     }
     push(@vte_menu_items,
