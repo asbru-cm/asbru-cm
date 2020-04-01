@@ -3190,7 +3190,7 @@ sub _wakeOnLan {
     }
 
     if (! send(S, $MAGIC, $SIZE, $paddr)) {
-        _wMessage(undef, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
         return $mac;
     } else {
         send(S, $MAGIC, $SIZE, $paddr);
@@ -3207,7 +3207,7 @@ sub _wakeOnLan {
             send(S, $MAGIC, $SIZE, sockaddr_in(9, $ipaddr));
         }
 
-        _wMessage(undef, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
     }
 
     return $mac;
