@@ -309,7 +309,7 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
+    my $title = $$self{_TITLE};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
     my $reconnect_msg = '';
     my $reconnect_count = '';
@@ -445,7 +445,7 @@ sub start {
         }
     );
 
-    $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $$self{_UUID_TMP});
+    $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'},$self->{_PARENTWINDOW},$$self{_UUID_TMP});
     $$self{_GUI}{_VTE}->grab_focus();
     if ($PACMain::FUNCS{_MAIN}{_Vte}{has_bright}) {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
@@ -1520,8 +1520,13 @@ sub _watchConnectionData {
             my ($func, $name, $params) = ($1, $2, $3);
             $data = "Ásbrú Script '$name' --> $func($params)";
         } elsif ($data =~ /^TITLE:(.+)/go) {
-            $$self{_TITLE} = $1;
-            $self->_updateCFG();
+            my $t = $1;
+            if ($t !~ /<\w+:.+?>/) {
+                $$self{_TITLE} = $t;
+                $self->_updateCFG();
+            }
+        } elsif ($data =~ /^GET_TITLE:/go) {
+            $self->_sendData("GET_TITLE|:|$$self{_TITLE}");
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
             _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
@@ -1886,7 +1891,7 @@ sub _vteMenu {
             stockicon => 'gtk-execute',
             sensitive => $$self{CONNECTED},
             tooltip => "Exec the CONNECTIONS part of '$name' in this connection",
-            code => sub {$PACMain::FUNCS{_SCRIPTS}->_execScript($name, $$self{_UUID_TMP});}
+            code => sub {$PACMain::FUNCS{_SCRIPTS}->_execScript($name,$self->{_PARENTWINDOW},$$self{_UUID_TMP});}
         });
     }
     push(@vte_menu_items,

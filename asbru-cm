@@ -204,7 +204,7 @@ sub config_migration {
     my ($ss);
 
     if ($VERBOSE) {print "INFO:MIGRATION Messages\n";}
-    my $resp = _wPopUP('Confirm',setMessage());
+    my $resp = _wPopUP('Confirm',setMessage("$old_dir.old"));
     if ($resp ne 'OK') {
         if ($resp eq 'NOT AVAILABLE') {
             print "WARN: Continue without gtk3 warning\n";
@@ -287,9 +287,10 @@ sub config_migration {
     # Set warning message, do not worrie about tabs, spaces at the beggining
     # Pango markup is OK
     sub setMessage {
+        my $dir = shift;
         my $msg = qq”This Version will migrate your configuration file.
 
-        A backup copy of your original configuration will be created at : <b>$old_dir.old</b>
+        A backup copy of your original configuration will be created at : <b>$dir</b>
 
         You can downgrade from your package manager if the migration fails.
 

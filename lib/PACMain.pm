@@ -414,7 +414,7 @@ sub start {
     }
 
     # Auto start scripts
-    grep({ /^--start-script=(.+)$/ and $$self{_SCRIPTS}->_execScript($1); } @{ $$self{_OPTS} });
+    grep({ /^--start-script=(.+)$/ and $$self{_SCRIPTS}->_execScript($1,$$self{_GUI}{main}); } @{ $$self{_OPTS} });
 
     # Auto start Shell
     grep({ /^--start-shell$/ and $$self{_GUI}{shellBtn}->clicked(); } @{ $$self{_OPTS} });
@@ -460,7 +460,7 @@ sub _initGUI {
     if ($$self{_THEME} =~ /dark/) {
         _setDefaultRGBA($$self{_GUI}{main},56,56,56,1);
     } else {
-        _setDefaultRGBA($$self{_GUI}{main},240,0,0,1);
+        _setDefaultRGBA($$self{_GUI}{main},240,240,240,1);
     }
 
     # Create a vbox1: main, status

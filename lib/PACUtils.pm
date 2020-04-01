@@ -2826,7 +2826,15 @@ sub _subst {
     my %out;
     my $pos = -1;
     my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
+    my $parent;
 
+    if ($uuid) {
+        if (defined $PACMain::RUNNING{$uuid}{_PARENTWINDOW}) {
+            $parent = $PACMain::RUNNING{$uuid}{_PARENTWINDOW};
+        }
+    } else {
+        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
             return $string;
@@ -3193,7 +3201,7 @@ sub _wakeOnLan {
     }
 
     if (! send(S, $MAGIC, $SIZE, $paddr)) {
-        _wMessage(undef, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
         return $mac;
     } else {
         send(S, $MAGIC, $SIZE, $paddr);
@@ -3210,7 +3218,7 @@ sub _wakeOnLan {
             send(S, $MAGIC, $SIZE, sockaddr_in(9, $ipaddr));
         }
 
-        _wMessage(undef, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
     }
 
     return $mac;
