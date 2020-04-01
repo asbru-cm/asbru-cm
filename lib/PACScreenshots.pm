@@ -114,7 +114,7 @@ sub add {
     }
 
     if (! _pixBufFromFile($file) ) {
-        _wMessage(undef, "File '$file' could not be loaded as a screenshot file");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "File '$file' could not be loaded as a screenshot file");
         return 0;
     }
 
