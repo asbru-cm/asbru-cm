@@ -288,7 +288,6 @@ sub config_migration {
     # Pango markup is OK
     sub setMessage {
         my $dir = shift;
-
         my $msg = qq”This Version will migrate your configuration file.
 
         A backup copy of your original configuration will be created at : <b>$dir</b>
