@@ -58,7 +58,7 @@ Example macros as list
 
     And to provide the so desired __visual effect__, a __hack__ into the code had to be applied to make it work.
 
-    The conclusion of this is that it will consume more CPU resources. The reason is that the full window is made transparent, and the the visible areas that have to be visible, repainted.
+    The conclusion is that it will consume more CPU resources. The reason is that the full window is made transparent, and the the visible areas that have to be visible, repainted.
 
     Depending on your environment, the impact could be minimal or high.
 
