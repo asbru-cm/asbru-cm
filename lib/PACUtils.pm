@@ -2823,7 +2823,15 @@ sub _subst {
     my %out;
     my $pos = -1;
     my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
+    my $parent;
 
+    if ($uuid) {
+        if (defined $PACMain::RUNNING{$uuid}{_PARENTWINDOW}) {
+            $parent = $PACMain::RUNNING{$uuid}{_PARENTWINDOW};
+        }
+    } else {
+        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
             return $string;

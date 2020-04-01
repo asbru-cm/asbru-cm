@@ -208,6 +208,7 @@ if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     $USER = subst($USER);
     $PASS = subst($PASS);
 }
+
 $IP = subst($IP);
 $PORT = subst($PORT);
 $PASSPHRASE = subst($PASSPHRASE);

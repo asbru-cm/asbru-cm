@@ -309,7 +309,7 @@ sub start {
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
+    my $title = $$self{_TITLE};
     my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
     my $reconnect_msg = '';
     my $reconnect_count = '';
@@ -1520,8 +1520,11 @@ sub _watchConnectionData {
             my ($func, $name, $params) = ($1, $2, $3);
             $data = "Ásbrú Script '$name' --> $func($params)";
         } elsif ($data =~ /^TITLE:(.+)/go) {
-            $$self{_TITLE} = $1;
-            $self->_updateCFG();
+            my $t = $1;
+            if ($t !~ /<ASK:/) {
+                $$self{_TITLE} = $t;
+                $self->_updateCFG();
+            }
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
             _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
