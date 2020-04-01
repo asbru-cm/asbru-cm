@@ -1521,7 +1521,7 @@ sub _watchConnectionData {
             $data = "Ásbrú Script '$name' --> $func($params)";
         } elsif ($data =~ /^TITLE:(.+)/go) {
             my $t = $1;
-            if ($t !~ /<ASK:/) {
+            if ($t !~ /<\w+:.+?>/) {
                 $$self{_TITLE} = $t;
                 $self->_updateCFG();
             }
