@@ -634,6 +634,10 @@ sub _buildKeePassGUI {
     $w{btnClearPassFile}->signal_connect('clicked' => sub {
         $w{fcbKeePassFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbKeePassFile}->unselect_uri("file://$ENV{'HOME'}");
+        if ($KPXC_MP || $ENV{'KPXC_MP'}) {
+            $KPXC_MP = '';
+            $ENV{'KPXC_MP'} = '';
+        }
     });
 
     $w{btnClearclifile}->signal_connect('clicked' => sub {
@@ -643,6 +647,13 @@ sub _buildKeePassGUI {
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
         $self->_setCapabilities();
         $self->_updateUsage();
+    });
+
+    $w{fcbKeePassFile}->signal_connect('selection-changed' => sub {
+        if ($KPXC_MP || $ENV{'KPXC_MP'}) {
+            $KPXC_MP = '';
+            $ENV{'KPXC_MP'} = '';
+        }
     });
 
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
