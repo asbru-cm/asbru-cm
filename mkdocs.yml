@@ -50,12 +50,6 @@ nav:
       - Coding standards: Contributing/CODING_STANDARD.md
       - Code of conduct: Contributing/CODE_OF_CONDUCT.md
 
-theme:
-    name: material
-    language: es
-    palette:
-        primary: 'deep orange'
-        accent: 'orange'
 markdown_extensions:
   - admonition
 
