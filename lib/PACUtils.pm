@@ -2007,6 +2007,7 @@ sub _cfgSanityCheck {
     defined $$cfg{'defaults'} or $$cfg{'defaults'} = {};
 
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
+    $$cfg{'defaults'}{'config version'} //= '1.0.0';
     #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
