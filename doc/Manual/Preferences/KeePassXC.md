@@ -10,6 +10,60 @@
 
     To see the reasons for this hard changes, please read at the end of this documentation page.
 
+## KeePass Organization
+
+It is very important to prepare your KeePass database to work with this integration. The database access is done using the command line tool `keepassxc-cli`
+
+And by design this tool imposes certain restrictions.
+
+* All paths must be unique to be able to retrieve the correct user name and password at the time of the connection
+* The cli will not allow to search by `uuid`, so the only search pattern that guaranties unique entries is the full path to the key
+
+This means that you must organize your data in groups and subgroups to guaranty unique paths at the time of configuration.
+
+To explain this better, lets look at the following images.
+
+__You have this password organization__
+
+In keepass, you can visually tell what is the entry you are interested in, by looking at the relationship of Group:Title:Username
+
+![](images/kpxcc1.png)
+
+But when using the CLI, we only have access to Group:Title, and a listing of entries would look like this.
+
+![](images/kpxcc2.png)
+
+This brings 2 problems
+
+* We do not know which entry we want.
+* Later when Ásbrú wants to pull the user name and password during a connection, keepassxc-cli will pull the first entry found, it will not return all the entries. So the CLI will not know which entry we want either.
+
+__So, you must make sure all your entries are unique : Group:Subgroup:..:Title__
+
+You can use any technique you like, this are some recommendations of organizations that can produce unique paths.
+
+* /Group/hostname
+* /Group/Subgroup/hostname
+* /Group/Service/hostname
+* /Group/Location/hostname
+
+
+__Example of unique titles__
+
+![](images/kpxcc3.png)
+
+
+__Search result.__
+
+![](images/kpxcc4.png)
+
+__Another alternative, with subgroups__
+
+![](images/kpxcc5.png)
+
+__List__
+
+![](images/kpxcc6.png)
 
 ## Configure
 
@@ -51,6 +105,7 @@ Locate the entry you want to use as a reference and then double click on that en
 After the double click the link to your username and password will be assigned to the active authentication method selected in the configuration tab.
 
 ![](images/kpxc4.png)
+
 
 !!! tip "Recommendations"
     __KeyPass pattern__ : The pattern is formed as : `<keepass_property|keepass entry path>`. You can edit and change the text to any valid property and path if your need.
