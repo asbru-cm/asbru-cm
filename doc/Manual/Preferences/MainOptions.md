@@ -16,17 +16,17 @@ __Image example__
 
 ![](images/pref2.png)
 
-+ Recommended for
-    - Have all options accesible in a single interface
-    - Do not deal with moving, resizing and arranging windows
++ Recommended for users that
+    - Want to have all options accesible in a single interface
+    - Do not want to deal with moving, resizing and arranging windows
 
 __Compact__
 
-This mode is for "Windows", "Minimalist" driven users. The main window interface will be hidden in your taskbar. And you will launch all sessions in separate windows, or inside a single window with tabs. You will have the minimum amount of buttons to interact with the application.
+This mode is for "Windows", "Minimalist" driven users. The main window interface will be hidden in your system tray. And you will launch all sessions in separate windows, or inside a single window with tabs. You will have the minimum amount of buttons to interact with the application.
 
-+ Recommended for
-    - Having multiple windows and arranged to have simultaneous multiple views, without size restrictions and overlapping
-    - Have the cleanest interface possible when working with your projects
++ Recommended for users that
+    - Like having multiple windows and arranged them to have simultaneous multiple views, without size restrictions and overlapping
+    - Like to have the cleanest interface possible when working with your projects
 
 __Image examples__
 
@@ -60,10 +60,10 @@ __Separate windows simultaneous views side by side__
 
 Starting with Ásbru 6.2 the applications offers 4 themes for icons.
 
-+ default : Set of grey icons
-+ asbru-color : Set of color icons
-+ asbru-dark : Theme for system dark themes, with color icons
-+ system : Neutral theme with color icons. This options should have no conflicts with any system theme.
++ __default__ : Set of grey icons
++ __asbru-color__ : Set of color icons
++ __asbru-dark__ : Theme for system dark themes, with color icons
++ __system__ : Neutral theme with color icons. This options should have no conflicts with any system theme.
 
 ![](images/pref6.png)
 
@@ -78,7 +78,7 @@ Starting with Ásbru 6.2 the applications offers 4 themes for icons.
 + __Iconified in system tray__ : Will start minimized to system tray
 + __Start at start up__ : Will add an entry to your start up applications configuration to launch Ásbrú on your session start.
 
-!!! warning " "
+!!! warning "Window managers"
     Some window related options could be overridden by the window manager.
 
 

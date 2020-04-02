@@ -21,8 +21,8 @@ You need to have a public key installed in your __Jump Server__  to be able to u
 
 It can be a default public key, or a personal private key that you were assigned.
 
-!!! note " "
-    The keys have to be "passwordless", without password.
+!!! note "Note about Keys"
+    At the moment, the keys have to be "passwordless", without password.
 
 + __IP/Host__ : Address of your Jump Server
 + __Port__ : Port to use to connect.
@@ -30,8 +30,6 @@ It can be a default public key, or a personal private key that you were assigned
 + __Private Key__
     - If you are assigned a private key, select the private key.
     - If you leave it blank, that it will default to your public local key.
-
----
 
 !!! danger "Important"
     When you activate any of this options, the default exit for all your connections will be using the selected technology.
