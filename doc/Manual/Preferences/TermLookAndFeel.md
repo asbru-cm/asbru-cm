@@ -1,6 +1,6 @@
 # Look & Feel
 
-!!! note " "
+!!! note "Global Settings"
     This options apply to all terminals. If you need a particular terminal to behave differently is best to configure the look and feel options at the connection level.
 
 
@@ -49,6 +49,7 @@ Example macros as list
 + __Cursor shape__ : Cursor shape to use in the terminal.
 + __Scrollback lines__ : How many lines of history to store to scroll back.
 + __Transparency__ : Set background transparency for the terminal.
+    - You must enable transparency first to activate the transparency feature.
 + __Colors__ : Set your predefined colors to override the basic 16 terminal colors.
     - Top row are the normal text colors.
     - Bottom row are the bold text colors.
@@ -65,7 +66,7 @@ Example macros as list
     There are too many things in an environment to list, but this are some of them:
     
     + screen resolution (the higher the resolution, more pixels to repaint)
-    + desktop environment performance : gnome-shell, gnome-clasic, cinnamon, xfce, etc.
+    + desktop environment performance : gnome-shell, gnome-classic, cinnamon, xfce, etc.
     + Additional visual effects used in Ásbrú: show tooltips.
     + Number of CPUs, amount of ram, graphics card, etc.
 
