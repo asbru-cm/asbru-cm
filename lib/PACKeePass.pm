@@ -70,6 +70,7 @@ sub new {
 
     $self->{cfg} = shift;
     $self->{container} = undef;
+    $self->{'last_timestamp'} = '';
 
     _setCapabilities($self);
     if ($buildgui) {
@@ -486,6 +487,7 @@ sub hasKeePassField {
 sub _locateEntries {
     my ($self, $str) = @_;
     my ($pid,$cfg);
+    my $timestamp;
     my @out;
 
     if ($$self{cfg}) {
@@ -493,7 +495,10 @@ sub _locateEntries {
     } else {
         $cfg = $self->get_cfg();
     }
-    if (!@KPXC_LIST) {
+    $timestamp = (stat($$cfg{database}))[9];
+    if (!@KPXC_LIST || $$self{'last_timestamp'} != $timestamp) {
+        @KPXC_LIST = ();
+        $$self{'last_timestamp'} = $timestamp;
         {
             no warnings 'once';
             open(SAVERR,">&STDERR");
@@ -508,7 +513,7 @@ sub _locateEntries {
             open(STDERR,">&SAVERR");
         };
     }
-    @out = grep(/$str/i,@KPXC_LIST);
+    @out = sort grep(/$str/i,@KPXC_LIST);
     return @out;
 }
 
@@ -633,6 +638,10 @@ sub _buildKeePassGUI {
     $w{btnClearPassFile}->signal_connect('clicked' => sub {
         $w{fcbKeePassFile}->set_uri("file://$ENV{'HOME'}");
         $w{fcbKeePassFile}->unselect_uri("file://$ENV{'HOME'}");
+        if ($KPXC_MP || $ENV{'KPXC_MP'}) {
+            $KPXC_MP = '';
+            $ENV{'KPXC_MP'} = '';
+        }
     });
 
     $w{btnClearclifile}->signal_connect('clicked' => sub {
@@ -642,6 +651,13 @@ sub _buildKeePassGUI {
         $w{fcbCliFile}->unselect_uri("file://$ENV{'HOME'}");
         $self->_setCapabilities();
         $self->_updateUsage();
+    });
+
+    $w{fcbKeePassFile}->signal_connect('selection-changed' => sub {
+        if ($KPXC_MP || $ENV{'KPXC_MP'}) {
+            $KPXC_MP = '';
+            $ENV{'KPXC_MP'} = '';
+        }
     });
 
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
