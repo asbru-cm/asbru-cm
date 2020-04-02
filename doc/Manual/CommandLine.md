@@ -55,15 +55,15 @@ Example usage:
 
 Start asbru-cm with test connections
 
-`perl asbru-cm --config-dir=pac.test`
+`perl asbru-cm --config-dir=asbru.test`
 
-Will open or create a complete config directory in : `/home/user/.config/pac.test`
+Will open or create a complete config directory in : `/home/user/.config/asbru.test`
 
 Start asru-cm with a set of completely new settings
 
-`perl asbru-cm --config-dir=/home/user/pac.new`
+`perl asbru-cm --config-dir=/home/user/asbru.new`
 
-Will open or create a complete config directory in : `/home/user/pac.new`
+Will open or create a complete config directory in : `/home/user/asbru.new`
 
 ### --start-shell
 
@@ -86,8 +86,8 @@ perl asbru-cm
 
 INFO: Ásbrú Connection Manager 6.2.0 (asbru-cm) started with PID 2247
 INFO: Desktop environment detected : cinnamon
-INFO: Config directory is '/home/xxxx/.config/pac'
-INFO: Used config file '/home/xxxx/.config/pac/pac.nfreeze'
+INFO: Config directory is '/home/xxxx/.config/asbru'
+INFO: Used config file '/home/xxxx/.config/asbru/asbru.nfreeze'
 INFO: Virtual terminal emulator (VTE) version is 0.52
 INFO: Theme directory is '/home/xxxx/asbru-cm/res/themes/default'
 INFO: Using Gnome tray icon
@@ -96,12 +96,12 @@ INFO: Using Gnome tray icon
 __Use test configuration__
 
 ```
-perl asbru-cm --verbose --config-dir=pac.test
+perl asbru-cm --verbose --config-dir=asbru.test
 
 INFO: Ásbrú Connection Manager 6.2.0 (asbru-cm) started with PID 4522
 INFO: Desktop environment detected : cinnamon
-INFO: Config directory is '/home/xxxx/.config/pac.test'
-INFO: Used config file '/home/xxxx/.config/pac.test/pac.nfreeze'
+INFO: Config directory is '/home/xxxx/.config/asbru.test'
+INFO: Used config file '/home/xxxx/.config/asbru.test/asbru.nfreeze'
 INFO: Virtual terminal emulator (VTE) version is 0.52
        - has_bright = 1
        - major_version = 0
