@@ -70,6 +70,7 @@ sub new {
 
     $self->{cfg} = shift;
     $self->{container} = undef;
+    $self->{'last_timestamp'} = '';
 
     _setCapabilities($self);
     if ($buildgui) {
@@ -487,6 +488,7 @@ sub hasKeePassField {
 sub _locateEntries {
     my ($self, $str) = @_;
     my ($pid,$cfg);
+    my $timestamp;
     my @out;
 
     if ($$self{cfg}) {
@@ -494,7 +496,10 @@ sub _locateEntries {
     } else {
         $cfg = $self->get_cfg();
     }
-    if (!@KPXC_LIST) {
+    $timestamp = (stat($$cfg{database}))[9];
+    if (!@KPXC_LIST || $$self{'last_timestamp'} != $timestamp) {
+        @KPXC_LIST = ();
+        $$self{'last_timestamp'} = $timestamp;
         {
             no warnings 'once';
             open(SAVERR,">&STDERR");
@@ -509,7 +514,7 @@ sub _locateEntries {
             open(STDERR,">&SAVERR");
         };
     }
-    @out = grep(/$str/i,@KPXC_LIST);
+    @out = sort grep(/$str/i,@KPXC_LIST);
     return @out;
 }
 
