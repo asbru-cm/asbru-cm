@@ -140,4 +140,4 @@ __Example of a connections tree after several connections have been added__
 
     Ásrbú knows about some of this extensions and will try to detect them. If they are not available, the close to tray icon option, will minimize the Window instead of hide it.
     
-    Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)
+    Check [System Tray Extensions for some recommendations](Preferences/SytemTrayExtensions.md)
