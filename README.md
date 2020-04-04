@@ -75,7 +75,7 @@ Once installed on your system, type ````asbru-cm```` in your terminal.
 
 Our master and the snapshots are being kept as stable as possible. New features for new major releases are being developed inside the "loki" branch.
 
-Beware that Loki can sometimes behave in an unexpected manner to you.  This is somehow the same concept as the "[Debian sid](https://www.debian.org/releases/sid/)" release.
+Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in an unexpected manner to you.  This is somehow the same concept as the "[Debian sid](https://www.debian.org/releases/sid/)" release.
 
 You are welcome to contribute and test by checking out "loki" or by installing our builds.
 
