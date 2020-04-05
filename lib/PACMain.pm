@@ -1457,8 +1457,9 @@ sub _setupCallbacks {
         my $alt2 = $stateb * ['mod2-mask'];
         my $alt5 = $stateb * ['mod5-mask'];
 
-        #print "TREECONNECTIONS KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
-        #print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+        if ($$self{_VERBOSE}) {
+            print STDERR "DEBUG:TREECONNECTIONS:KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+        }
 
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
@@ -2148,13 +2149,22 @@ sub _setupCallbacks {
         my $shift = $state * ['shift-mask'];
         my $alt = $state * ['mod1-mask'];
 
-        #print "TABBED WINDOW KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
+        if ($$self{_VERBOSE}) {
+            print STDERR "DEBUG:TABBEDWINDOW:KEYPRESS:*$state*$keyval*$unicode*\n";
+        }
 
         # Get current page's tab number
         my $curr_page = $$self{_GUI}{nb}->get_current_page();
 
         # Continue checking keypress only if <Ctrl> is pushed
         if ($ctrl && $shift && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'}) && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'})) {
+            # Capture <Ctrl>number --> select number tab
+            if ($keyval =~ /^\d$/go) {
+                $$self{_GUI}{nb}->set_current_page($keyval - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
+                return 1;
+            }
+
+            # If not a tab key, skip
             if ($keyval !~ /^.*_?Tab/go) {
                 return 0;
             }
@@ -2338,7 +2348,7 @@ sub _setupCallbacks {
 
     $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide() unless $$self{_SHOWFINDTREE}; });
 
-    # Capture 'treeconnections' keypress
+    # Capture 'main' keypress
     $$self{_GUI}{main}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -2351,8 +2361,9 @@ sub _setupCallbacks {
         my $alt2 = $state * ['mod2-mask'];
         my $alt5 = $state * ['mod5-mask'];
 
-        #print "TERMINAL KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*\n";
-        #print "*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+        if ($$self{_VERBOSE}) {
+            print STDERR "DEBUG:MAIN:KEYPRESS:*$state*$keyval*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+        }
 
         # <Ctrl><Shift>
         if (!(($ctrl && $shift) && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'}))) {
