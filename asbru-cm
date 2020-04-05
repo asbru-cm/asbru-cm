@@ -162,8 +162,6 @@ if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR) && (!-e $CFG_DIR) && ($CFG_DIR 
     system "mv -f $CFG_DIR.old $CFG_DIR";
 }
 
-print "???????\n"; exit 0;
-
 # Create Asbru config dir if necessary
 if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
