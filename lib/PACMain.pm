@@ -1701,7 +1701,7 @@ sub _setupCallbacks {
             return 0;
         }
         $self->_treeConnections_menu($event);
-        return 1;
+        return 0;
     });
 
     # Capture 'add connection' button clicked
