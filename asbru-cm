@@ -192,7 +192,7 @@ if (!($ASBRU = PACMain -> new(@ARGV))) {
     exit 0
 }
 
-$ASBRU->start;
+$ASBRU->start();
 
 print "INFO: Finished $APP_NAME ($Script) (PID:$$)...\n";
 exit 0;
@@ -206,7 +206,7 @@ sub config_migration {
 
     if (-e "$PATH/utils/pac2asbru.pl") {
         if ($status = system("$PATH/utils/pac2asbru.pl",$old_dir,$new_dir,$VERBOSE)) {
-            print "INFO: Migration errors ocured, execute with --verbose to see messages ($status)\n";
+            print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }
     }
