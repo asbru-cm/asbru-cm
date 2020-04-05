@@ -338,7 +338,7 @@ sub _setupCallbacks {
             $kpxc->getMasterPassword($$self{_WINDOWEDIT});
         }
         my $cmd = `"$RealBin/lib/pac_conn" $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
-        _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
+        _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1);
     });
 
     # Capture "Save session logs" checkbox
