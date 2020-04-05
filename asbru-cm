@@ -140,6 +140,11 @@ if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     config_migration($CFG_DIR_OLD,$CFG_DIR);
 } elsif (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
     # Downgrade default user data only
+    my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
+    if ($resp ne 'OK') {
+        print "INFO: Downgrade canceled.\n";
+        exit 0;
+    }
     print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
     system "mv -f $CFG_DIR.old $CFG_DIR";
     # We should remove unsuccesful migration to be able to do a new one after any fix.
@@ -147,6 +152,19 @@ if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     $asbru_dir =~ s/pac$/asbru/;
     if (-e $asbru_dir) {
         system "rm -Rf $asbru_dir";
+    }
+
+    sub setMessage {
+        my $msg = qq”Your config file has been migrated to a new version of Ásbrú CM.
+
+        If you decide to continue, we will restore the previous configurations backup and
+        any new changes that you did to the current configuration file will be lost.
+
+        If you want to save your current settings make a backup of: <b>~/.config/asbru</b>
+
+        Do you want to continue ?
+        ”;
+        return $msg;
     }
 }
 
@@ -278,6 +296,18 @@ sub CheckConfigurationFile {
     }
     # Save current known configuration
     system "cp -fp $CFG_FILE $BACKUP_CFG_FILE.0";
+}
+
+sub _wPopUP {
+    my ($type, $title, $msg) = @_;
+    my $PATH = "$RealBin";
+
+    $msg =~ s/\t//mg;
+    $msg =~ s/^ +//mg;
+    $msg =~ s/\n/&cr;/g;
+    $msg =~ s/\"/&dquot;/g;
+    $msg =~ s/\'/&squot;/g;
+    return `$PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
 }
 
 END {
