@@ -969,12 +969,16 @@ sub _setupCallbacks {
 
         my $keyval = Gtk3::Gdk::keyval_name($event->keyval) // '';
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state;
+        my $state = $event->get_state();
         my $shift = $state * ['shift-mask'];
         my $ctrl = $state * ['control-mask'];
         my $alt = $state * ['mod1-mask'];
         my $alt2 = $state * ['mod2-mask'];
         my $alt5 = $state * ['mod5-mask'];
+
+        if ($$self{_VERBOSE}) {
+            print STDERR "DEBUG:TERMINAL:KEYPRESS:*$state*$keyval*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
+        }
 
         if (defined $$self{_KEYS_RECEIVE}) {
             return 1;
@@ -4250,7 +4254,7 @@ sub _zoomHandler {
     } elsif ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
         $zoom = 1;
         $scale -= 0.1;
-    } elsif ($keyval eq '0' || $keyval eq 'KP_0') {
+    } elsif ($keyval eq 'period' || $keyval eq 'KP_Decimal') {
         $zoom = 1;
         $scale = 1;
     }
