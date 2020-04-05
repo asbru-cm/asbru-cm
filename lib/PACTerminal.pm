@@ -1127,6 +1127,11 @@ sub _setupCallbacks {
                 $self->_showInfoTab();
                 return 1;
             }
+
+            # Test Zooming actions
+            if ($self->_zoomHandler($keyval)) {
+                return 1;
+            }
         }
         # <Ctrl>
         elsif ($ctrl && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})) {
@@ -1149,21 +1154,7 @@ sub _setupCallbacks {
             }
 
             # Test Zooming actions
-            my $zoom = 0;
-            my $scale = $$self{_GUI}{_VTE}->get_font_scale();
-
-            if ($keyval eq 'plus' || $keyval eq 'KP_Add') {
-                $zoom = 1;
-                $scale += 0.1;
-            } elsif ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
-                $zoom = 1;
-                $scale -= 0.1;
-            } elsif ($keyval eq '0' || $keyval eq 'KP_0') {
-                $zoom = 1;
-                $scale = 1;
-            }
-            if ($zoom) {
-                $$self{_GUI}{_VTE}->set_font_scale($scale);
+            if ($self->_zoomHandler($keyval)) {
                 return 1;
             }
         }
@@ -4246,6 +4237,31 @@ sub _showEmbedMessages {
     $$self{_GUI}{_BTNLOG}->set_label('Hide _messages');
 }
 
+sub _zoomHandler {
+    my $self = shift;
+    my $keyval = shift;
+
+    my $zoom = 0;
+    my $scale = $$self{_GUI}{_VTE}->get_font_scale();
+
+    if ($keyval eq 'plus' || $keyval eq 'KP_Add') {
+        $zoom = 1;
+        $scale += 0.1;
+    } elsif ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
+        $zoom = 1;
+        $scale -= 0.1;
+    } elsif ($keyval eq '0' || $keyval eq 'KP_0') {
+        $zoom = 1;
+        $scale = 1;
+    }
+    if ($zoom) {
+        $$self{_GUI}{_VTE}->set_font_scale($scale);
+        return 1;
+    }
+
+    return 0;
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4535,6 +4551,10 @@ For an embed connection, hide the console displaying the messages concerning the
 =head2 sub _showEmbedMessages
 
 For an embed connection, show the console displaying the messages concerning the connection.
+
+=head2 sub _zoomHandler
+
+On a keypress, check if zoom factor of the terminal should be changed.
 
 =head2 sub _hasKeePassField
 
