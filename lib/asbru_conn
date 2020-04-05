@@ -1134,7 +1134,12 @@ if ($$CFG{'environments'}{$UUID}{'terminal options'}{'use personal settings'}) {
 
 $connection_cmd = subst($connection_cmd);
 if ($GETCMD) {
-    print "$connection_cmd\n\n<b>Proxy Configs</b>$proxy_get";
+    print "<b>Command line:</b>\n";
+    print Glib::Markup::escape_text($connection_cmd);
+    if ($proxy_get ne '') {
+        print "\n\n<b>Proxy setup:</b>";
+        print Glib::Markup::escape_text($proxy_get);
+    }
     exit 0;
 }
 

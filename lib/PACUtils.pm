@@ -1785,6 +1785,7 @@ sub _wMessage {
     my $window = shift;
     my $msg = shift;
     my $modal = shift // 1;
+    my $selectable = shift // 0;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (defined $window && ref $window ne 'Gtk3::Window') {
@@ -1801,10 +1802,21 @@ sub _wMessage {
         'none',
         ''
     );
+
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
     $windowConfirm->set_transient_for($window);
+
+    # The message can be selected by user (eg for copy/paste)
+    if ($selectable) {
+        $windowConfirm->get_message_area()->foreach(sub {
+            my $child = shift;
+            if (ref($child) eq 'Gtk3::Label') {
+                $child->set_selectable(1);
+            }
+        });
+    }
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
@@ -1813,8 +1825,8 @@ sub _wMessage {
         $windowConfirm->destroy();
     } else {
         $windowConfirm->show_all();
-        while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+        while (Gtk3::events_pending()) {
+            Gtk3::main_iteration();
         }
     }
 
@@ -1875,8 +1887,8 @@ sub _wProgress {
         $WINDOWPROGRESS{pb}->set_fraction($partial / $total);
 
         $WINDOWPROGRESS{_GUI}->show_all();
-        while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+        while (Gtk3::events_pending()) {
+            Gtk3::main_iteration();
         }
     } else {
         $WINDOWPROGRESS{_GUI}->hide();
@@ -3924,7 +3936,7 @@ Support function to calculate the location of the popup menu
 
 =head2 sub _wMessage
 
-Create a modela message to the user
+Create a modal message to the user
 
 =head2 sub _wProgress
 
