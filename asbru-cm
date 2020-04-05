@@ -147,7 +147,6 @@ if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
         exit 0;
     }
     print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
-    exit 0;
     system "mv -f $CFG_DIR.old $CFG_DIR";
     # We should remove unsuccesful migration to be able to do a new one after any fix.
     my $asbru_dir = $CFG_DIR;
@@ -159,15 +158,16 @@ if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
     sub setMessage {
         my $msg = qq”Your config file has been migrated to a new version of Ásbrú CM.
 
-        If you decide to continue, we will restore the previous configurations and any new changes that you did to the current configuration file will be lost.
+        If you decide to continue, we will restore the previous configurations backup and
+        any new changes that you did to the current configuration file will be lost.
+
+        If you want to save your current settings make a backup of: <b>~/.config/asbru</b>
 
         Do you want to continue ?
         ”;
         return $msg;
     }
 }
-
-print "??????????\n"; exit 0;
 
 # Create Asbru config dir if necessary
 if (!-d $CFG_DIR) {
