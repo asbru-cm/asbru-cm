@@ -2017,45 +2017,25 @@ ctrl("DISCONNECTED");
 exit 0;
 
 sub close_log_file {
+    my $line;
+
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
     }
-    if (!open(F,"<:utf8",$LOG_FILE)) {
+    if (!open(FIN,"<:raw",$LOG_FILE)) {
         ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
         return 1;
     }
-    my @lines = <F>;
-    close F;
-    if (! open(F,">:utf8","$LOG_FILE.$$")) {
+    if (!open(FOUT,">:raw","$LOG_FILE.$$")) {
         ctrl("ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)");
+        close FIN;
         return 1;
     }
-    print F _removeEscapeSeqs(join('', @lines));
-    close F;
-    rename("$LOG_FILE.$$", $LOG_FILE) or ctrl("ERROR: $!");
-}
-
-END {
-    if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
-        return 1;
+    while ($line = <FIN>) {
+        print FOUT _removeEscapeSeqs($line);
     }
-
-    ctrl("LOGFILE:Removing CONTROL characters");
-
-    if (!open(F,"<:utf8",$LOG_FILE)) {
-        ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
-        return 1;
-    }
-    my @lines = <F>;
-    close F;
-
-    if (! open(F,">:utf8","$LOG_FILE.$$")) {
-        ctrl("ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)");
-        return 1;
-    }
-    print F _removeEscapeSeqs(join('', @lines));
-    close F;
-
+    close FIN;
+    close FOUT;
     rename("$LOG_FILE.$$", $LOG_FILE) or ctrl("ERROR: $!");
 }
 

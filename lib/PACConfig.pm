@@ -734,6 +734,9 @@ sub _updateGUIPreferences {
     if (!defined $$cfg{'defaults'}{'theme'}) {
         $$cfg{'defaults'}{'theme'} = 'default';
     }
+    if (!-d $$cfg{'defaults'}{'session logs folder'}) {
+        $$cfg{'defaults'}{'session logs folder'} = "$CFG_DIR/session_logs";
+    }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
     _($self, 'cbCfgAutoAcceptKeys')->set_active($$cfg{'defaults'}{'auto accept key'});
