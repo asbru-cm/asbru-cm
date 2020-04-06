@@ -26,6 +26,10 @@ env:
     - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
     - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
     - OS=linuxmint DIST=tricia PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
+
+before_install:
+    - openssl aes-256-cbc -K $encrypted_404964577bd1_key -iv $encrypted_404964577bd1_iv -in all.gpg.enc -out all.gpg -d
+    - gpg --import all.gpg
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3-pip python3-setuptools
@@ -61,6 +65,15 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       branch: loki
+  - provider: packagecloud
+    skip_cleanup: true
+    repository: debian-cleanup
+    username: ${PACKAGECLOUD_USER}
+    token: ${PACKAGECLOUD_TOKEN}
+    dist: ${OS}/${DIST}
+    package_glob: "build/*.{deb,rpm,dsc}"
+    on:
+      branch: debian-cleanup
 
 
 after_deploy:
