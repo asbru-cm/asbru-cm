@@ -327,7 +327,12 @@ sub _setupCallbacks {
 
     # Capture 'open folder' button clicked
     _($self, 'btnEditOpenSessionLogs')->signal_connect('clicked' => sub {
-        system('/usr/bin/xdg-open ' . (_($self, 'btnEditSaveSessionLogs')->get_current_folder()) );
+        my $folder = _($self, 'btnEditSaveSessionLogs')->get_current_folder();
+        if (!-e $folder) {
+            $folder = "$CFG_DIR/session_logs";
+            _($self, 'btnEditSaveSessionLogs')->get_current_folder($folder);
+        }
+        system("/usr/bin/xdg-open $folder");
     });
 
     # Capture 'Get Command line' button clicked
@@ -616,6 +621,10 @@ sub _updateGUIPreferences {
     if (!defined $$self{_CFG}{'environments'}{$uuid}{'use proxy'}) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
     }
+    # Test for missing folders, wrong migrations paths, alternate config paths
+    if (!$$self{_CFG}{'environments'}{$uuid}{'session logs folder'} || !-d $$self{_CFG}{'environments'}{$uuid}{'session logs folder'}) {
+        $$self{_CFG}{'environments'}{$uuid}{'session logs folder'} = "$CFG_DIR/session_logs";
+    }
     _($self, 'rbUseProxyIfCFG')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 0);
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
@@ -646,7 +655,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
     _($self, 'vboxEditSaveSessionLogs')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'entryEditLogFileName')->set_text($$self{_CFG}{'environments'}{$uuid}{'session log pattern'});
-    _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'} // $CFG_DIR . '/session_logs');
+    _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'});
     _($self, 'spEditSaveSessionLogs')->set_value($$self{_CFG}{'environments'}{$uuid}{'session logs amount'} // 10);
     _($self, 'entryUserPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '');
     _($self, 'entryPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '');
