@@ -21,4 +21,5 @@ else
 	if [ "$PACKAGE" == "deb"]; then
 		design --sign=origin -k DAF15319138C6A8F build/*.deb
 		design -k DAF15319138C6A8F build/*.dsc
+	fi
 fi
