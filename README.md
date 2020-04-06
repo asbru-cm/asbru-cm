@@ -69,6 +69,18 @@ To do so, execute the following commands:
   $ sudo apt-get install asbru-cm
   ````
   
+- Windows
+
+  Though it is currently unsupported running Ásbrú Connection Manager on Windows it is possible with a few addons.
+  Prior to this you need to install WSL and a working XServer on Windows (for example xlaunch).
+  Inside your WSL you can install the package asbru-cm (see Debian/Ubuntu).
+  Prior to running the command "asbru-cm" you will need to define your display:
+  ````
+  $ export DISPLAY=:0
+  ````
+  
+  For more information check out this article: https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx
+  
 Once installed on your system, type ````asbru-cm```` in your terminal.
 
 ### Testing new features
