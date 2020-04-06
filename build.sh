@@ -19,7 +19,7 @@ else
 	git clone https://github.com/packpack/packpack.git packpack
 	sudo ./packpack/packpack
 	if [ "$PACKAGE" == "deb" ]; then
-		design --sign=origin -k DAF15319138C6A8F build/*.deb
-		design -k DAF15319138C6A8F build/*.dsc
+		debsign --sign=origin -k DAF15319138C6A8F build/*.deb
+		debsign -k DAF15319138C6A8F build/*.dsc
 	fi
 fi
