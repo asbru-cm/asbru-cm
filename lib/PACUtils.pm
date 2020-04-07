@@ -3290,14 +3290,12 @@ sub _replaceBadChars {
 sub _removeEscapeSeqs {
     my $string = shift // '';
 
-    $string =~ s/\e\[[0-9;]*m//g;
-    $string =~ s/\e\[[0-9;]*[mG]//g;
-    $string =~ s/\e\[[0-9;]*[mGKH]//g;
-    $string =~ s/\e\[[0-9;]*[a-zA-Z]//g;
+    $string =~ s/\x1B[=>]//g;
+    $string =~ s/\e\[[0-9;]*[a-zA-Z]%?//g;
     $string =~ s/\e\[[0-9;]*m(?:\e\[K)?//g;
-    $string =~ s/\x1B.+~\x07//g;
-    $string =~ s/(\x1B|\x08|\x07)(\[w)?//g;
-    $string =~ s/\[\?\d+h//g;
+    $string =~ s/\x1B.+?\x07//g;
+    $string =~ s/(\x1B|\x08|\x07)(\[w|=)?//g;
+    $string =~ s/\[\?\d+\w{1,2}//g;
     $string =~ s/\]\d;//g;
 
     return $string;
