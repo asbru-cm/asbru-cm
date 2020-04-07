@@ -1144,7 +1144,10 @@ if ($GETCMD) {
 }
 
 # Set log file
-$EXP->log_file($LOG_FILE);
+# Only if the target file is writable ; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
+if (-w $LOG_FILE) {
+    $EXP->log_file($LOG_FILE);
+}
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
