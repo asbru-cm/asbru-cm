@@ -72,6 +72,17 @@ sub migrate {
         # Downgrade only once
         return 0;
     }
+    # Move saved migrated dirs forward
+    for (my $n = 8; $n >= 0; $n--) {
+        my $m = $n+1;
+        if (-e "$old_dir.new$n") {
+            if (-e "$old_dir.old$m") {
+                system "rm -Rf $old_dir.new$m";
+            }
+            system "mv -f $old_dir.new$n $old_dir.new$m";
+        }
+    }
+    system "cp -Rfp $old_dir $old_dir.new0";
     if ($VERBOSE) {
         print "  - Create $new_dir\n";
     }
