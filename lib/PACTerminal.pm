@@ -385,9 +385,20 @@ sub start {
 
     # Delete the oldest auto-saved session log
     if ($$self{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
-        _deleteOldestSessionLog($$self{_UUID}, $$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'}, $$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs amount'});
-    } elsif($$self{_CFG}{'defaults'}{'save session logs'}) {
-        _deleteOldestSessionLog($$self{_UUID}, $$self{_CFG}{'defaults'}{'session logs folder'},  $$self{_CFG}{'defaults'}{'session logs amount'});
+        if (-w $$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'}) {
+            _deleteOldestSessionLog($$self{_UUID}, $$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'}, $$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs amount'});
+        } else {
+            print STDERR "WARN: Unable to write into the session logs folder [$$self{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'}], session logs will not be recorded.\n";
+            print STDERR "WARN: Check your terminal settings to fix the issue.\n";
+        }
+    }
+    if (!$$self{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'} && $$self{_CFG}{'defaults'}{'save session logs'}) {
+        if (-w $$self{_CFG}{'defaults'}{'session logs folder'}) {
+            _deleteOldestSessionLog($$self{_UUID}, $$self{_CFG}{'defaults'}{'session logs folder'}, $$self{_CFG}{'defaults'}{'session logs amount'});
+        } else {
+            print STDERR "WARN: Unable to write into the session logs folder [$$self{_CFG}{'defaults'}{'session logs folder'}], session logs will not be recorded.\n";
+            print STDERR "WARN: Check your global preferences to fix the issue.\n";
+        }
     }
 
     $$self{CONNECTING} = 1;
