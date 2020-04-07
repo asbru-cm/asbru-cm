@@ -110,6 +110,7 @@ our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
 our $ASBRU;
+our $VERBOSE        = 0;
 # END: Define GLOBAL variables
 ###################################################################
 
@@ -118,6 +119,12 @@ our $ASBRU;
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
 print "INFO: $APP_NAME ($Script) started with PID $$\n";
+
+foreach my $arg (@ARGV) {
+    if ($arg =~ /-{1,2}verbose/) {
+        $VERBOSE = 1;
+    }
+}
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -136,36 +143,34 @@ if (!-d "$ENV{'HOME'}/.config") {
     mkdir( "$ENV{'HOME'}/.config" );
 }
 
-# Code for future configuration migrations when needed
-if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
-    config_migration($CFG_DIR_OLD,$CFG_DIR);
-} elsif (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
-    # Downgrade default user data only
-    my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
-    if ($resp ne 'OK') {
-        print "INFO: Downgrade canceled.\n";
-        exit 0;
-    }
-    print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
-    system "mv -f $CFG_DIR.old $CFG_DIR";
-    # We should remove unsuccesful migration to be able to do a new one after any fix.
-    my $asbru_dir = $CFG_DIR;
-    $asbru_dir =~ s/pac$/asbru/;
-    if (-e $asbru_dir) {
-        system "rm -Rf $asbru_dir";
-    }
+# Downgrade from 6.2
+if (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
+    if (-e "$ENV{'HOME'}/.config/asrbu") {
+        # Downgrade asrbu to pac
+        my ($status);
+        my $PATH = "$RealBin/";
+        if ($status = system("$PATH/utils/asbru2pac.pl","$ENV{'HOME'}/.config/asrbu",$CFG_DIR,$VERBOSE)) {
+            print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
+            exit 0;
+        }
+    } else {
+        # Recover old data there is no new config dir?
+        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
+        if ($resp ne 'OK') {
+            print "INFO: Downgrade canceled.\n";
+            exit 0;
+        }
+        print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
+        system "mv -f $CFG_DIR.old $CFG_DIR";
 
-    sub setMessage {
-        my $msg = qq”Your config file has been migrated to a new version of Ásbrú CM.
+        sub setMessage {
+            my $msg = qq”Ásbrú could not find a migrated data configuration, we will proceed to
+            recover your saved configuration data.
 
-        If you decide to continue, we will restore the previous configurations backup and
-        any new changes that you did to the current configuration file will be lost.
-
-        If you want to save your current settings make a backup of: <b>~/.config/asbru</b>
-
-        Do you want to continue ?
-        ”;
-        return $msg;
+            Do you want to continue ?
+            ”;
+            return $msg;
+        }
     }
 }
 
@@ -203,13 +208,6 @@ $ASBRU->start;
 
 print "INFO: Finished $APP_NAME ($Script) (PID:$$)...\n";
 exit 0;
-
-# Implemented when necessary
-sub config_migration {
-    my ($old_dir,$new_dir) = @_;
-
-    return 0;
-}
 
 sub getDesktopEnvironment {
     my $c;

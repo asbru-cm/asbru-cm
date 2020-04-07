@@ -4,17 +4,17 @@
 # This file is part of Ásbrú Connection Manager
 #
 # Copyright (C) 2020 Ásbrú Connection Manager team (https://asbru-cm.net)
-# 
+#
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License version 3
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -34,7 +34,7 @@ our $BACKUP_DIR     = "bak";
 our $CFG_FILE_NAME  = "asbru.yml";
 
 if ($VERBOSE) {
-    print STDERR "INFO: Executing migration from PAC to Ásbrú\n";
+    print STDERR "INFO: Executing downgrade from Ásbrú to PAC\n";
     print STDERR "INFO: $ARGV[0] , $ARGV[1]\n";
     print STDERR "INFO: RealBin = $RealBin\n";
 }
@@ -53,22 +53,15 @@ sub migrate {
     my ($ss);
 
     if ($VERBOSE) {
-        print "INFO: Migration messages:\n";
+        print "INFO: Downgrade messages:\n";
         print "  - Show confirmation dialog\n";
     }
-    my $resp = _wPopUP('Confirm', 'Ásbrú Migration Confirmation', setMessage("$old_dir.old"));
+    my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
     if ($resp ne 'OK') {
         if ($resp eq 'NOT AVAILABLE') {
             print "WARN: Continue without gtk3 warning\n";
         } else {
-            print "WARN: Ásbrú migration aborted\n";
-            if ($old_dir =~ /\.migration/) {
-                # Fix non standard config dir back to how it was
-                if ($VERBOSE) {
-                    print "  - Recover none standard directory $old_dir -> $new_dir\n";
-                }
-                system "mv -f $old_dir $new_dir";
-            }
+            print "WARN: Ásbrú downgrade aborted\n";
             exit 1;
         }
     }
@@ -76,31 +69,24 @@ sub migrate {
         if ($VERBOSE) {
             print "  - $new_dir exists, we should not be here\n";
         }
-        # Migrate only once
+        # Downgrade only once
         return 0;
-    }
-    if (!-e "$old_dir.old") {
-        # Write only once to avoid a disaster if user has moved things manually and this is rerun
-        if ($VERBOSE) {
-            print "  - Creating back up directory : $old_dir.old\n";
-        }
-        system "cp -rfp $old_dir $old_dir.old";
     }
     if ($VERBOSE) {
         print "  - Create $new_dir\n";
     }
     system "mv $old_dir $new_dir";
-    foreach my $f ('pac.yml', 'pac_notray.notified', 'pac.pcc', 'pac.yml.gui', 'pac.yml.tree', 'pac_start.desktop', 'pac.dumper') {
+    foreach my $f ('asbru.yml', 'asbru_notray.notified', 'asbru.pcc', 'asbru.yml.gui', 'asbru.yml.tree', 'asbru_start.desktop', 'asbru.dumper') {
         my $n = $f;
-        $n =~ s/pac/asbru/;
+        $n =~ s/asbru/pac/;
         if (-e "$new_dir/$f") {
             if ($VERBOSE) {print "  - move $f -> $n\n";}
             system "mv -f $new_dir/$f $new_dir/$n";
         }
     }
-    foreach my $f ('pac_start.desktop') {
+    foreach my $f ('asbru_start.desktop') {
         my $n = $f;
-        $n =~ s/pac/asbru/;
+        $n =~ s/asbru/pac/;
         if (-e "$new_dir/autostart/$f") {
             if ($VERBOSE) {
                 print "  - mv $f -> $n\n";
@@ -126,27 +112,27 @@ sub migrate {
     while (my $f = readdir($ss)) {
         if ($f =~ /\.png/) {
             my $n = $f;
-            $n =~ s/pac/asbru/;
+            $n =~ s/asbru/pac/;
             system "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
         }
     }
-    # Process pac.yml
+    # Process asbru.yml
     if ($VERBOSE) {
-        print "  - Fix paths in asbru.yml\n";
+        print "  - Fix paths in pac.yml\n";
     }
-    open(YMLO, "<:utf8", "$new_dir/asbru.yml");
-    open(YMLN, ">:utf8", "$new_dir/asbru.yml.new");
+    open(YMLO, "<:utf8", "$new_dir/pac.yml");
+    open(YMLN, ">:utf8", "$new_dir/pac.yml.new");
     while (my $l = <YMLO>) {
         if ($l =~ m|$old_dir|) {
             $l =~ s|$old_dir|$new_dir|;
-        } elsif ($l =~ /pac_/) {
-            $l =~ s|pac_|asbru_|g;
+        } elsif ($l =~ /asbru_/) {
+            $l =~ s|asbru_|pac_|g;
         }
         print YMLN $l;
     }
     close YMLO;
     close YMLN;
-    system "mv -f $new_dir/asbru.yml.new $new_dir/asbru.yml";
+    system "mv -f $new_dir/pac.yml.new $new_dir/pac.yml";
     # Remove nfreeze
     if ($VERBOSE) {print "  - Remove nfreeze files to be recreated\n";}
     system "rm -f $new_dir/*.nfreeze";
@@ -156,14 +142,15 @@ sub migrate {
     # Pango markup is OK
     sub setMessage {
         my $dir = shift;
-        my $msg = qq”Before you can use this version of Ásbrú Connection Manager, your configuration needs to be migrated.
+        my $msg = qq”Your configuration directory has been upgraded to a newer PAC version.
 
-        A backup copy of your original configuration will be created at : <b>$dir</b>
+        If you continue, your cofiguration directory will be downgraded to be able to run under this
+        Ásbrú version. Your options are:
 
-        You can downgrade from your package manager if the migration fails.
+        Abort and install a newere version of Ásbrú.
+        Continue with the downgrade process.
 
-        You may click <b>Cancel</b> to stop this operation immediately,
-        or <b>Continue</b> to start the migration.
+        Do you wish to continue?
         ”;
 
         if (!$VERBOSE) {
