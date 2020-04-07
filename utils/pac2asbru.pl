@@ -4,17 +4,17 @@
 # This file is part of Ásbrú Connection Manager
 #
 # Copyright (C) 2020 Ásbrú Connection Manager team (https://asbru-cm.net)
-# 
+#
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Ásbrú Connection Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License version 3
 # along with Ásbrú Connection Manager.
 # If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -79,13 +79,17 @@ sub migrate {
         # Migrate only once
         return 0;
     }
-    if (!-e "$old_dir.old") {
-        # Write only once to avoid a disaster if user has moved things manually and this is rerun
-        if ($VERBOSE) {
-            print "  - Creating back up directory : $old_dir.old\n";
+    # Move saved dirs forward
+    for (my $n = 8; $n >= 0; $n--) {
+        my $m = $n+1;
+        if (-e "$old_dir.old$n") {
+            if (-e "$old_dir.old$m") {
+                system "rm -Rf $old_dir.old$m";
+            }
+            system "mv -f $old_dir.old$n $old_dir.old$m";
         }
-        system "cp -rfp $old_dir $old_dir.old";
     }
+    system "cp -rfp $old_dir $old_dir.old0";
     if ($VERBOSE) {
         print "  - Create $new_dir\n";
     }
