@@ -19,7 +19,9 @@ else
 	git clone https://github.com/packpack/packpack.git packpack
 	sudo ./packpack/packpack
 	if [ "$PACKAGE" == "deb" ]; then
-		debsign --sign=origin -k DAF15319138C6A8F build/*.deb
-		debsign -k DAF15319138C6A8F build/*.dsc
+		echo $1 > gpg_passphrase.txt
+		debsigs -p'gpg --passphrase-file gpg_passphrase.txt --batch --no-use-agent' --sign=origin -k DAF15319138C6A8F build/*.deb
+		debsign -p'gpg --passphrase-file gpg_passphrase.txt --batch --no-use-agent' -k DAF15319138C6A8F build/*.dsc
+		rm gpg_passphrase.txt
 	fi
 fi
