@@ -31,7 +31,7 @@ use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 our $VERBOSE        = $ARGV[2];
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $BACKUP_DIR     = "bak";
-our $CFG_FILE_NAME  = "asbru.yml";
+our $CFG_FILE_NAME  = "pac.yml";
 
 if ($VERBOSE) {
     print STDERR "INFO: Executing downgrade from Ásbrú to PAC\n";
@@ -72,7 +72,7 @@ sub migrate {
         # Downgrade only once
         return 0;
     }
-    # Move saved migrated dirs forward
+    # Move saved upgraded dirs forward
     for (my $n = 8; $n >= 0; $n--) {
         my $m = $n+1;
         if (-e "$old_dir.new$n") {
@@ -106,7 +106,7 @@ sub migrate {
         }
     }
     # Rename BackUps
-    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/pac.yml";
+    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/asbru.yml";
     if ($VERBOSE) {
         print "  - Move backups\n";
     }

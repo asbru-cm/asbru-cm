@@ -145,12 +145,12 @@ if (!-d "$ENV{'HOME'}/.config") {
 
 # Downgrade from 6.2
 if (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
-    if (-e "$ENV{'HOME'}/.config/asrbu") {
-        # Downgrade asrbu to pac
+    if (-e "$ENV{'HOME'}/.config/asbru") {
+        # Downgrade arbru to pac
         my ($status);
         my $PATH = "$RealBin/";
-        if ($status = system("$PATH/utils/asbru2pac.pl","$ENV{'HOME'}/.config/asrbu",$CFG_DIR,$VERBOSE)) {
-            print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
+        if ($status = system("$PATH/utils/asbru2pac.pl","$ENV{'HOME'}/.config/asbru",$CFG_DIR,$VERBOSE)) {
+            print "INFO: Downgrade aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }
     } else {
