@@ -32,10 +32,10 @@ before_install:
     - gpg --import all.gpg
 install:
     - sudo apt-get update
-    - sudo apt-get install -y git devscripts debhelper quilt python3-pip python3-setuptools
+    - sudo apt-get install -y git devscripts debhelper quilt python3-pip python3-setuptools debsigs
     - sudo pip install mkdocs mkdocs-material
 script:
-    - ./build.sh $gpg_passphrase
+    - sudo ./build.sh $gpg_passphrase
     - bash scripts/deploy_docs.sh
 deploy:
   - provider: packagecloud
