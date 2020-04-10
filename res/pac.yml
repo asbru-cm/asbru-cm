@@ -13,6 +13,8 @@ defaults:
   global variables: {}
   hide on connect: ''
   force split tabs to 50%: 0
+  enable force tree size to x pixels: 0
+  force tree size to x pixels: 200
   intro reconnects: ''
   minimize to tray: ''
   new data color: '#00008888ffff'

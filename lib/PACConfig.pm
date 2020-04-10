@@ -221,6 +221,9 @@ sub _setupCallbacks {
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {
         _($self, 'entryPassword')->set_visibility(_($self, 'cbConnShowPass')->get_active());
     });
+    _($self, 'cbCfgEnableForceTreeSize')->signal_connect('toggled' => sub {
+        _($self, 'cbCfgForceTreeSize')->set_sensitive(_($self, 'cbCfgEnableForceTreeSize')->get_active());
+    });
     _($self, 'cbCfgPreConnPingPort')->signal_connect('toggled' => sub {
         _($self, 'spCfgPingTimeout')->set_sensitive(_($self, 'cbCfgPreConnPingPort')->get_active());
     });
@@ -693,6 +696,9 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAutoAcceptKeys')->set_active($$cfg{'defaults'}{'auto accept key'});
     _($self, 'cbCfgHideOnConnect')->set_active($$cfg{'defaults'}{'hide on connect'});
     _($self, 'cbCfgForceSplitSize')->set_active($$cfg{'defaults'}{'force split tabs to 50%'});
+    _($self, 'cbCfgEnableForceTreeSize')->set_active($$cfg{'defaults'}{'enable force tree size to x pixels'});
+    _($self, 'cbCfgForceTreeSize')->set_value($$cfg{'defaults'}{'force tree size to x pixels'});
+    _($self, 'cbCfgForceTreeSize')->set_sensitive(_($self, 'cbCfgEnableForceTreeSize')->get_active());
     _($self, 'cbCfgCloseToTray')->set_active($$cfg{'defaults'}{'close to tray'});
     _($self, 'cbCfgStartMainMaximized')->set_active($$cfg{'defaults'}{'start main maximized'});
     _($self, 'cbCfgRememberSize')->set_active($$cfg{'defaults'}{'remember main size'});
@@ -939,6 +945,8 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'auto hide button bar'} = _($self, 'cbCfgButtonBarAutoHide')->get_active();
     $$self{_CFG}{'defaults'}{'hide on connect'} = _($self, 'cbCfgHideOnConnect')->get_active();
     $$self{_CFG}{'defaults'}{'force split tabs to 50%'} = _($self, 'cbCfgForceSplitSize')->get_active();
+    $$self{_CFG}{'defaults'}{'enable force tree size to x pixels'} = _($self, 'cbCfgEnableForceTreeSize')->get_active();
+    $$self{_CFG}{'defaults'}{'force tree size to x pixels'} = _($self, 'cbCfgForceTreeSize')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'ping port before connect'} = _($self, 'cbCfgPreConnPingPort')->get_active();
     $$self{_CFG}{'defaults'}{'ping port timeout'} = _($self, 'spCfgPingTimeout')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'start iconified'} = _($self, 'cbCfgStartIconified')->get_active();

@@ -1001,6 +1001,14 @@ sub _initGUI {
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
     $$self{_GUI}{_vboxSearch}->hide();
 
+    if ($$self{_CFG}{'defaults'}{'enable force tree size to x pixels'}) {
+        $self->_forceHpanePosition();
+
+        $$self{_GUI}{hpane}->signal_connect('size-allocate', sub {
+            $self->_forceHpanePosition();
+        });
+    }
+
     $self->_updateGUIPreferences();
     if ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'connections') {
         $$self{_GUI}{nbTree}->set_current_page(0);
@@ -1014,6 +1022,30 @@ sub _initGUI {
     } else {
         $$self{_GUI}{nbTree}->set_current_page(3);
         $self->_updateGUIHistory();
+    }
+
+    return 1;
+}
+
+sub _forceHpanePosition {
+    my $self = shift;
+
+    my $x = $$self{_GUI}{main}->get_allocated_width;
+
+    if ($$self{_CFG}{defaults}{'tree on right side'}) {
+        my $newpos = $x - $$self{_CFG}{'defaults'}{'force tree size to x pixels'};
+        my $oldpos = $$self{_GUI}{hpane}->get_position();
+        if ($newpos != $oldpos) {
+            #print "INFO: Change hpane position from $oldpos to $newpos\n";
+            $$self{_GUI}{hpane}->set_position($newpos);
+        }
+    } else {
+        my $newpos = $$self{_CFG}{'defaults'}{'force tree size to x pixels'};
+        my $oldpos = $$self{_GUI}{hpane}->get_position();
+        if ($newpos != $oldpos) {
+            #print "INFO: Change hpane position from $oldpos to $newpos\n";
+            $$self{_GUI}{hpane}->set_position($newpos);
+        }
     }
 
     return 1;

@@ -70,6 +70,13 @@ If not, see <http://www.gnu.org/licenses/>.
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="adjustment15">
+    <property name="lower">200</property>
+    <property name="upper">4000</property>
+    <property name="value">200</property>
+    <property name="step_increment">10</property>
+    <property name="page_increment">100</property>
+  </object>
   <object class="GtkWindow" id="windowEdit">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
@@ -3633,6 +3640,50 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkBox" id="hbox69">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="cbCfgEnableForceTreeSize">
+                            <property name="label" translatable="yes">Force sidebar size to X pixels: </property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="xalign">0.5</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="cbCfgForceTreeSize">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="invisible_char">•</property>
+                            <property name="primary_icon_activatable">False</property>
+                            <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">adjustment15</property>
+                            <property name="numeric">True</property>
+                            <property name="update_policy">if-valid</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkCheckButton" id="cbCfgHideOnConnect">
                         <property name="label" translatable="yes">Hide on connection</property>
                         <property name="use_action_appearance">False</property>
@@ -3645,7 +3696,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">6</property>
                       </packing>
                     </child>
                     <child>
