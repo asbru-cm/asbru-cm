@@ -334,7 +334,7 @@ sub subst {
     my $get = shift;
     my ($pos);
 
-    if ($get) {
+    if (!$GETCMD && $get) {
         ctrl("$get:");
         $get = readData($get);
         return $get;
