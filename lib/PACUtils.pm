@@ -1793,7 +1793,8 @@ sub _wMessage {
     my $window = shift;
     my $msg = shift;
     my $modal = shift // 1;
-    my $msg_type = shift // 'GTK_MESSAGE_WARNING';
+    my $selectable = shift // 0;
+    my $msg_type = 'GTK_MESSAGE_WARNING';
     my $class = 'w-warning';
 
     if (defined $window && ref $window ne 'Gtk3::Window') {
@@ -1819,6 +1820,16 @@ sub _wMessage {
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME : Message");
+
+    # The message can be selected by user (eg for copy/paste)
+    if ($selectable) {
+        $windowConfirm->get_message_area()->foreach(sub {
+            my $child = shift;
+            if (ref($child) eq 'Gtk3::Label') {
+                $child->set_selectable(1);
+            }
+        });
+    }
 
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
