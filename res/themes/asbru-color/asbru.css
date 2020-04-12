@@ -60,7 +60,7 @@ tooltip {
     border: 1px solid #888888;
 }
 .w-warning {
-    background-color: #F6F877;
+    background-color: #FFFFEB;
     border: 1px solid #888888;
 }
 .w-error {
@@ -68,6 +68,9 @@ tooltip {
     border: 1px solid #888888;
 }
 .w-confirm {
+    border: 1px solid #888888;
+}
+.w-info {
     border: 1px solid #888888;
 }
 

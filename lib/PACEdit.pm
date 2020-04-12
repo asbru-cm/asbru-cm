@@ -343,7 +343,7 @@ sub _setupCallbacks {
             $kpxc->getMasterPassword($$self{_WINDOWEDIT});
         }
         my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
-        _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1);
+        _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1, 'w-info');
     });
 
     # Capture "Save session logs" checkbox

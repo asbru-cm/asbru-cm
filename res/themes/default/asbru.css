@@ -64,10 +64,10 @@ tooltip {
     border: 1px solid #888888;
 }
 .w-error {
-    background-color: #F17E84;
+    background-color: #FFFFEB;
     border: 1px solid #888888;
 }
-.w-confirm {
+.w-info {
     border: 1px solid #888888;
 }
 
