@@ -43,5 +43,5 @@ For example some good titles would be:
 5. If this is the 1st pull request to the repo the 'CLAassistant' asks you to sign committer agreement.
 6. The pull request appears on the original repo awaiting someone with write access to the repo to merge it.
 
-The detailed info on contributing to someones github repository (easy and with screenshorts) is available here: 
+The detailed info on contributing to someones github repository (easy and with screenshots) is available here: 
 https://guides.github.com/activities/forking/ .
