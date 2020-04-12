@@ -7,7 +7,7 @@ Dear testers,
 
 We are about to merge a change (see [#515](https://github.com/asbru-cm/asbru-cm/pull/515)) that will require your attention as it may have some impact on your working environment.
 
-This change is related to [#182](https://github.com/asbru-cm/asbru-cm/issues/518) and will basically rename the default configuration file from ```~/.config/pac``` to ```~/.config/asbru``` to move forward in the rebranding of the forked application.
+This change is related to [#182](https://github.com/asbru-cm/asbru-cm/issues/182) and will basically rename the default configuration file from ```~/.config/pac``` to ```~/.config/asbru``` to move forward in the rebranding of the forked application.
 
 As of version 6.2.0, that is under testing in our ["loki" branch](https://github.com/asbru-cm/asbru-cm#testing-new-features), you will be required to migrate your existing configuration to the new file layout.
 
