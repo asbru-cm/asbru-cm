@@ -29,6 +29,7 @@ use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 
 our $VERBOSE        = $ARGV[2];
+our $SKIP_CONF      = $ARGV[3] // 0;
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $BACKUP_DIR     = "bak";
 our $CFG_FILE_NAME  = "pac.yml";
@@ -56,13 +57,15 @@ sub migrate {
         print "INFO: Downgrade messages:\n";
         print "  - Show confirmation dialog\n";
     }
-    my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
-    if ($resp ne 'OK') {
-        if ($resp eq 'NOT AVAILABLE') {
-            print "WARN: Continue without gtk3 warning\n";
-        } else {
-            print "WARN: Ásbrú downgrade aborted\n";
-            exit 1;
+    if (!$SKIP_CONF) {
+        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
+        if ($resp ne 'OK') {
+            if ($resp eq 'NOT AVAILABLE') {
+                print "WARN: Continue without gtk3 warning\n";
+            } else {
+                print "WARN: Ásbrú downgrade aborted\n";
+                exit 1;
+            }
         }
     }
     if (-e $new_dir) {
@@ -149,19 +152,17 @@ sub migrate {
     system "rm -f $new_dir/*.nfreeze";
     return 0;
 
-    # Set warning message, do not worrie about tabs, spaces at the beggining
-    # Pango markup is OK
+    # Set warning message
+    # do not worry about tabs, spaces at the beginning ; Pango markup is OK
     sub setMessage {
         my $dir = shift;
-        my $msg = qq”Your configuration directory has been upgraded to a newer PAC version.
+        my $msg = qq”Your configuration directory has been upgraded to a newer version of Ásbrú
+        that cannot be loaded by this version.
 
-        If you continue, your cofiguration directory will be downgraded to be able to run under this
-        Ásbrú version. Your options are:
+        Do you want to downgrade your migrated configuration data ?
 
-        Abort and install a newere version of Ásbrú.
-        Continue with the downgrade process.
-
-        Do you wish to continue?
+        You may click <b>Cancel</b> to stop this operation immediately,
+        or <b>Continue</b> to start the downgrade.
         ”;
 
         if (!$VERBOSE) {

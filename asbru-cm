@@ -104,7 +104,6 @@ use warnings;
 our $CFG_FILE_NAME  = "pac.yml";
 our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
-our $CFG_DIR_OLD    = "";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
@@ -143,34 +142,86 @@ if (!-d "$ENV{'HOME'}/.config") {
     mkdir( "$ENV{'HOME'}/.config" );
 }
 
-# Downgrade from 6.2
-if (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && -e "$CFG_DIR.old") {
-    if (-e "$ENV{'HOME'}/.config/asbru") {
-        # Downgrade arbru to pac
-        my ($status);
-        my $PATH = "$RealBin/";
-        if ($status = system("$PATH/utils/asbru2pac.pl","$ENV{'HOME'}/.config/asbru",$CFG_DIR,$VERBOSE)) {
-            print "INFO: Downgrade aborted or errors occured, execute with --verbose to see more information ($status)\n";
-            exit 0;
+# Downgrade from more recent version
+my $CFG_DIR_OLD = "$CFG_DIR.old";
+my $CFG_DIR_NEW = "$ENV{'HOME'}/.config/asbru";
+if (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && (-e "$CFG_DIR_OLD" || -e "$CFG_DIR_NEW")) {
+    my $migration_ok = 1;
+    if (-e "$CFG_DIR_NEW") {
+        # Downgrade from newer version
+        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessageDowngradeMigrated());
+        if ($resp ne 'OK') {
+            print "INFO: Downgrade from new configuration canceled.\n";
+            $migration_ok = 0;
+        } else {
+            my $status;
+            my $PATH = "$RealBin/";
+            if ($status = system("$PATH/utils/asbru2pac.pl", $CFG_DIR_NEW, $CFG_DIR, $VERBOSE, 1)) {
+                print "INFO: Downgrade aborted or errors occured, execute with --verbose to see more information ($status)\n";
+            }
         }
     } else {
         # Recover old data there is no new config dir?
-        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
+        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessageRecoverOld());
         if ($resp ne 'OK') {
-            print "INFO: Downgrade canceled.\n";
+            print "INFO: Downgrade from old configuration canceled.\n";
+            $migration_ok = 0;
+        } else {
+            print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
+            system "mv -f $CFG_DIR.old $CFG_DIR";
+        }
+    }
+
+    if (!$migration_ok) {
+        # Migration failed, offer the option to create a new connfiguration of do nothing
+        my $resp = _wPopUP('Confirm', 'Ásbrú Create New Configuration', setMessageMigrationFailed());
+        if ($resp ne 'OK') {
+            print "INFO: Startup aborted.\n";
             exit 0;
         }
-        print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
-        system "mv -f $CFG_DIR.old $CFG_DIR";
+    }
 
-        sub setMessage {
-            my $msg = qq”Ásbrú could not find a migrated data configuration, we will proceed to
-            recover your saved configuration data.
+    sub setMessageDowngradeMigrated {
+        my $msg = qq”Ásbrú could not find the configuration directory <b>$CFG_DIR</b>,
+        but found a migrated version of your configuration in <b>$CFG_DIR_NEW</b>.
+        
+        Do you want to downgrade your migrated configuration data ?
 
-            Do you want to continue ?
-            ”;
-            return $msg;
-        }
+        Alternatively, you may want to your the <i>--config-dir</i> option to specify
+        the configuration directory you want to use.
+
+        You may click <b>Cancel</b> to stop this operation immediately,
+        or <b>Continue</b> to start the downgrade.
+        ”;
+        return $msg;
+    }
+
+    sub setMessageRecoverOld {
+        my $msg = qq”Ásbrú could not find the configuration directory <b>$CFG_DIR</b>,
+        but found a saved version of your configuration in <b>$CFG_DIR_OLD</b>.
+        
+        Do you want recover your saved configuration data ?
+
+        Alternatively, you may want to your the <i>--config-dir</i> option to specify
+        the configuration directory you want to use.
+
+        You may click <b>Cancel</b> to stop this operation immediately,
+        or <b>Continue</b> to start the recovery.
+        ”;
+        return $msg;
+    }
+
+    sub setMessageMigrationFailed {
+        my $msg = qq”Migrated of legacy configuration exists on your machine but
+        were not sucessfully migrated.
+
+        Do you want to create a new configuration
+        in <b>$CFG_DIR</b> ?
+
+        You may click <b>Cancel</b> to stop this operation immediately,
+        or <b>Continue</b> to create the new configuration directory.
+        ”;
+        return $msg;
     }
 }
 
