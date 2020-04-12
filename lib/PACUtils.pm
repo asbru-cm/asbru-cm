@@ -3955,7 +3955,13 @@ Support function to build and xml file to build the popup menu
 
 Support function to calculate the location of the popup menu
 
-=head2 sub _wMessage
+=head2 sub _wMessage(window,msg,modal,selectable,class)
+
+    window      parent window to be transient for
+    msg         message to display
+    modal       0 no, 1 yes (defaul yes)
+    selectable  should message be selectable (default no)
+    class       css class : w-warning, w-info, w-error (default w-warning)
 
 Create a modal message to the user
 
