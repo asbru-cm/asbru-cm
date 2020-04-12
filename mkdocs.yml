@@ -15,6 +15,7 @@ nav:
       - News: General/NEWS.md
       - Installation: General/Installation.md
       - Changelog: General/Changelog.md
+      - Warning:   General/sensitive-info-notice.md
   - 2. User's Manual:
       - Quick Start: Manual/QuickStart.md
       - Preferences:
