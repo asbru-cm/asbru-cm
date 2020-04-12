@@ -1794,8 +1794,8 @@ sub _wMessage {
     my $msg = shift;
     my $modal = shift // 1;
     my $selectable = shift // 0;
+    my $class =  shift // 'w-warning';
     my $msg_type = 'GTK_MESSAGE_WARNING';
-    my $class = 'w-warning';
 
     if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
