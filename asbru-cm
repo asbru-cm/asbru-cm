@@ -145,20 +145,24 @@ if (!-d "$ENV{'HOME'}/.config") {
 }
 
 # Code for future configuration migrations when needed
-if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR) && (!-e $CFG_DIR) && ($CFG_DIR =~ /\/asbru$/)) {
+if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /\/asbru$/) {
     # Production user data
-    if ($VERBOSE) {print "INFO:MIGRATION of default directory\n";}
-    config_migration($CFG_DIR_OLD,$CFG_DIR);
+    if ($VERBOSE) {
+        print "INFO: Migration of default directory\n";
+    }
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
 } elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
     # Alternate configuration directory
     $CFG_DIR_OLD = "$CFG_DIR.migration";
-    if ($VERBOSE) {print "INFO:MIGRATION of alternate directory\n";}
+    if ($VERBOSE) {
+        print "INFO: Migration of alternate directory\n";
+    }
     system "rm -Rf $CFG_DIR_OLD";
     system "mv -f $CFG_DIR $CFG_DIR.migration";
-    config_migration($CFG_DIR_OLD,$CFG_DIR);
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
-# Create Asbru config dir if necessary
+# Create Ásbrú configuration directory (if necessary)
 if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
 }
@@ -196,12 +200,12 @@ exit 0;
 # Implemented when necessary
 
 sub config_migration {
-    my ($old_dir,$new_dir) = @_;
+    my ($old_dir, $new_dir) = @_;
     my $PATH = "$RealBin/";
     my $status;
 
     if (-e "$PATH/utils/pac2asbru.pl") {
-        if ($status = system("$PATH/utils/pac2asbru.pl",$old_dir,$new_dir,$VERBOSE)) {
+        if ($status = system("$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
             print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }

@@ -29,12 +29,13 @@ use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 
 our $VERBOSE        = $ARGV[2];
+our $SKIP_CONF      = $ARGV[3] // 0;
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $BACKUP_DIR     = "bak";
-our $CFG_FILE_NAME  = "asbru.yml";
+our $CFG_FILE_NAME  = "pac.yml";
 
 if ($VERBOSE) {
-    print STDERR "INFO: Executing migration from PAC to Ásbrú\n";
+    print STDERR "INFO: Executing downgrade from Ásbrú to PAC\n";
     print STDERR "INFO: $ARGV[0] , $ARGV[1]\n";
     print STDERR "INFO: RealBin = $RealBin\n";
 }
@@ -53,61 +54,53 @@ sub migrate {
     my ($ss);
 
     if ($VERBOSE) {
-        print "INFO: Migration messages:\n";
+        print "INFO: Downgrade messages:\n";
         print "  - Show confirmation dialog\n";
     }
-    my $resp = _wPopUP('Confirm', 'Ásbrú Migration Confirmation', setMessage("$old_dir.old"));
-    if ($resp ne 'OK') {
-        if ($resp eq 'NOT AVAILABLE') {
-            print "WARN: Continue without gtk3 warning\n";
-        } else {
-            print "WARN: Ásbrú migration aborted\n";
-            if ($old_dir =~ /\.migration/) {
-                # Fix non standard config dir back to how it was
-                if ($VERBOSE) {
-                    print "  - Recover none standard directory $old_dir -> $new_dir\n";
-                }
-                system "mv -f $old_dir $new_dir";
+    if (!$SKIP_CONF) {
+        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessage());
+        if ($resp ne 'OK') {
+            if ($resp eq 'NOT AVAILABLE') {
+                print "WARN: Continue without gtk3 warning\n";
+            } else {
+                print "WARN: Ásbrú downgrade aborted\n";
+                exit 1;
             }
-            exit 1;
         }
     }
     if (-e $new_dir) {
         if ($VERBOSE) {
             print "  - $new_dir exists, we should not be here\n";
         }
-        # Migrate only once
+        # Downgrade only once
         return 0;
     }
-    # Move saved dirs forward
+    # Move saved upgraded dirs forward
     for (my $n = 8; $n >= 0; $n--) {
         my $m = $n+1;
-        if (-e "$old_dir.old$n") {
+        if (-e "$old_dir.new$n") {
             if (-e "$old_dir.old$m") {
-                system "rm -Rf $old_dir.old$m";
+                system "rm -Rf $old_dir.new$m";
             }
-            system "mv -f $old_dir.old$n $old_dir.old$m";
+            system "mv -f $old_dir.new$n $old_dir.new$m";
         }
     }
-    if (-e "$old_dir.old") {
-        system "mv -f $old_dir.old $old_dir.old0";
-    }
-    system "cp -rfpL $old_dir $old_dir.old";
+    system "cp -Rfp $old_dir $old_dir.new0";
     if ($VERBOSE) {
         print "  - Create $new_dir\n";
     }
     system "mv $old_dir $new_dir";
-    foreach my $f ('pac.yml', 'pac_notray.notified', 'pac.pcc', 'pac.yml.gui', 'pac.yml.tree', 'pac_start.desktop', 'pac.dumper') {
+    foreach my $f ('asbru.yml', 'asbru_notray.notified', 'asbru.pcc', 'asbru.yml.gui', 'asbru.yml.tree', 'asbru_start.desktop', 'asbru.dumper') {
         my $n = $f;
-        $n =~ s/pac/asbru/;
+        $n =~ s/asbru/pac/;
         if (-e "$new_dir/$f") {
             if ($VERBOSE) {print "  - move $f -> $n\n";}
             system "mv -f $new_dir/$f $new_dir/$n";
         }
     }
-    foreach my $f ('pac_start.desktop') {
+    foreach my $f ('asbru_start.desktop') {
         my $n = $f;
-        $n =~ s/pac/asbru/;
+        $n =~ s/asbru/pac/;
         if (-e "$new_dir/autostart/$f") {
             if ($VERBOSE) {
                 print "  - mv $f -> $n\n";
@@ -115,8 +108,8 @@ sub migrate {
             system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
         }
     }
-    # Rename Backups
-    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/pac.yml";
+    # Rename BackUps
+    my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/asbru.yml";
     if ($VERBOSE) {
         print "  - Move backups\n";
     }
@@ -133,44 +126,43 @@ sub migrate {
     while (my $f = readdir($ss)) {
         if ($f =~ /\.png/) {
             my $n = $f;
-            $n =~ s/pac/asbru/;
+            $n =~ s/asbru/pac/;
             system "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
         }
     }
-    # Process pac.yml
+    # Process asbru.yml
     if ($VERBOSE) {
-        print "  - Fix paths in asbru.yml\n";
+        print "  - Fix paths in pac.yml\n";
     }
-    open(YMLO, "<:utf8", "$new_dir/asbru.yml");
-    open(YMLN, ">:utf8", "$new_dir/asbru.yml.new");
+    open(YMLO, "<:utf8", "$new_dir/pac.yml");
+    open(YMLN, ">:utf8", "$new_dir/pac.yml.new");
     while (my $l = <YMLO>) {
         if ($l =~ m|$old_dir|) {
             $l =~ s|$old_dir|$new_dir|;
-        } elsif ($l =~ /pac_/) {
-            $l =~ s|pac_|asbru_|g;
+        } elsif ($l =~ /asbru_/) {
+            $l =~ s|asbru_|pac_|g;
         }
         print YMLN $l;
     }
     close YMLO;
     close YMLN;
-    system "mv -f $new_dir/asbru.yml.new $new_dir/asbru.yml";
+    system "mv -f $new_dir/pac.yml.new $new_dir/pac.yml";
     # Remove nfreeze
     if ($VERBOSE) {print "  - Remove nfreeze files to be recreated\n";}
     system "rm -f $new_dir/*.nfreeze";
     return 0;
 
-    # Set warning message, do not worrie about tabs, spaces at the beggining
-    # Pango markup is OK
+    # Set warning message
+    # do not worry about tabs, spaces at the beginning ; Pango markup is OK
     sub setMessage {
         my $dir = shift;
-        my $msg = qq”Before you can use this version of Ásbrú Connection Manager, your configuration needs to be migrated.
+        my $msg = qq”Your configuration directory has been upgraded to a newer version of Ásbrú
+        that cannot be loaded by this version.
 
-        A backup copy of your original configuration will be created at : <b>$dir</b>
-
-        You can downgrade from your package manager if the migration fails.
+        Do you want to downgrade your migrated configuration data ?
 
         You may click <b>Cancel</b> to stop this operation immediately,
-        or <b>Continue</b> to start the migration.
+        or <b>Continue</b> to start the downgrade.
         ”;
 
         if (!$VERBOSE) {
