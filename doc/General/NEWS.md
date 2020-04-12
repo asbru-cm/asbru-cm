@@ -16,12 +16,13 @@ At application startup, a warning message will give you the opportunity to think
 We believe we did everything to make this as smooth and transparent as possible.
 
 But what you may want to understand:
-- Nothing will be lost
-- A safe copy of your existing configuration will be done to ```~/.config/pac.old```
-- Older versions of Ásbrú will not be able to read that new configuration
-- When starting an old version (6.0 or higher), you can use ```--config-dir ~/.config/pac.old``` to use your old configuration
-- When starting an old version (6.1.x), Ásbrú will propose to downgrade your migrated configuration or recover your old configuration
-- Upgrade and downgrade scripts are available in the ```utils``` directory
+
+* Nothing will be lost
+* A safe copy of your existing configuration will be done to ```~/.config/pac.old```
+* Older versions of Ásbrú will not be able to read that new configuration
+* When starting an old version (6.0 or higher), you can use ```--config-dir ~/.config/pac.old``` to use your old configuration
+* When starting an old version (6.1.x), Ásbrú will propose to downgrade your migrated configuration or recover your old configuration
+* Upgrade and downgrade scripts are available in the ```utils``` directory
 
 Please comme issue [#569](https://github.com/asbru-cm/asbru-cm/issues/569) if you have any concern with this change ; or simply thumb it up if you understand what will happen in the next days and are ready to test this to ensure a proper release of 6.2.0.
 
