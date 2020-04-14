@@ -19,9 +19,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+**Environment (please complete the following information):**
+ - OS: [e.g. Ubuntu 19.04, Fedora 31 or Arch]
+ - Ásbrú Version [e.g. 6.1.1 or 6.2.0 or loki]
 
 **Additional context**
 Add any other context about the problem here.
