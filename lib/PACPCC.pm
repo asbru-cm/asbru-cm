@@ -98,10 +98,10 @@ sub new {
     _setupCallbacks($self);
 
     # Autoload any text
-    #if (($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) && (open(F, "$CFG_DIR/pac.pcc") ))
+    #if (($$self{_WINDOWPCC}{cbAutoSave}->get_active // 1) && (open(F, "$CFG_DIR/asbru.pcc") ))
 
     my @content;
-    if (open(F,"<:utf8","$CFG_DIR/pac.pcc") ) {
+    if (open(F,"<:utf8","$CFG_DIR/asbru.pcc") ) {
         @content = <F>;
         close F;
 
@@ -365,8 +365,8 @@ sub _initGUI {
     $$self{_WINDOWPCC}{btnSelection}->set_image(Gtk3::Image->new_from_stock('gtk-select-all', 'button') );
     $$self{_WINDOWPCC}{btnSelection}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{btnSelection}, 0, 1, 0);
-    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label('Use PAC variables');
-    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text('Allow PAC to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)');
+    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label('Use Ásbrú variables');
+    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text('Allow Ásbrú to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)');
     $$self{_WINDOWPCC}{cbSubstitute}->set_active(1);
     $$self{_WINDOWPCC}{cbSubstitute}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{cbSubstitute}, 0, 1, 0);
@@ -380,7 +380,7 @@ sub _initGUI {
     $$self{_WINDOWPCC}{btnClose}->set('can_focus', 0);
     $$self{_WINDOWPCC}{btnClusterAdmin} = Gtk3::Button->new_with_mnemonic('Cl_usters');
     $$self{_WINDOWPCC}{btnClusterAdmin}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnClusterAdmin}->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button') );
+    $$self{_WINDOWPCC}{btnClusterAdmin}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button') );
     $$self{_WINDOWPCC}{btnSeparate} = Gtk3::Button->new_with_mnemonic('_Explode');
     $$self{_WINDOWPCC}{btnSeparate}->set('can_focus', 0);
     $$self{_WINDOWPCC}{btnSeparate}->set_tooltip_text("Separate and resize clustered windows to fit screen");
@@ -894,7 +894,7 @@ sub _setupCallbacks {
                 $$self{_RUNNING}{$uuid}{'terminal'}{_PROPAGATE} = 1;
             }
         }
-        open(F,">:utf8","$CFG_DIR/pac.pcc");
+        open(F,">:utf8","$CFG_DIR/asbru.pcc");
         my ($x, $y) = $$self{_WINDOWPCC}{main}->get_position;
         my ($w, $h) = $$self{_WINDOWPCC}{main}->get_size;
         ($$self{_W}, $$self{_H}) = ($w, $h) if $$self{_WINDOWPCC}{cbShowMultiText}->get_active;

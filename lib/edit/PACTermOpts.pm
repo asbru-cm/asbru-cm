@@ -255,7 +255,7 @@ sub _buildTermOptsGUI {
     $hbox1->pack_start($frameCommandPrompt, 1, 1, 0);
 
     $w{entryCfgPrompt} = Gtk3::Entry->new;
-    $w{entryCfgPrompt}->set_icon_from_stock('primary', 'pac-prompt');
+    $w{entryCfgPrompt}->set_icon_from_stock('primary', 'asbru-prompt');
     $frameCommandPrompt->add($w{entryCfgPrompt});
     $frameCommandPrompt->set_shadow_type('GTK_SHADOW_NONE');
 

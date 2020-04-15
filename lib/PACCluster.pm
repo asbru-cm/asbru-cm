@@ -57,7 +57,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CLUSTERS_FILE = "$CFG_DIR/pac_clusters.nfreeze";
+my $CLUSTERS_FILE = "$CFG_DIR/asbru_clusters.nfreeze";
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR;
 my $GROUPICONOPEN;
@@ -236,7 +236,7 @@ sub _initGUI {
 
     $$self{_WINDOWCLUSTER}{main} = Gtk3::Window->new;
     $$self{_WINDOWCLUSTER}{main}->set_position('center');
-    $$self{_WINDOWCLUSTER}{main}->set_icon_name('pac-app-big');
+    $$self{_WINDOWCLUSTER}{main}->set_icon_name('asbru-app-big');
     $$self{_WINDOWCLUSTER}{main}->set_size_request(650, 500);
     $$self{_WINDOWCLUSTER}{main}->set_default_size(650, 500);
     $$self{_WINDOWCLUSTER}{main}->set_resizable(1);
@@ -259,7 +259,7 @@ sub _initGUI {
     my $lbl1 = Gtk3::Label->new;
     $lbl1->set_markup('<b>RUNNING CLUSTERS </b>');
     $tablbl1->pack_start($lbl1, 0, 1, 0);
-    $tablbl1->pack_start(Gtk3::Image->new_from_stock('pac-terminal-ok-small', 'menu'), 0, 1, 0);
+    $tablbl1->pack_start(Gtk3::Image->new_from_stock('asbru-terminal-ok-small', 'menu'), 0, 1, 0);
     $tablbl1->show_all;
 
     my $vbox1 = Gtk3::VBox->new(0, 0);
@@ -377,7 +377,7 @@ sub _initGUI {
     my $lbl2 = Gtk3::Label->new;
     $lbl2->set_markup('<b>Saved Clusters </b>');
     $tablbl2->pack_start($lbl2, 0, 1, 0);
-    $tablbl2->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager', 'menu'), 0, 1, 0);
+    $tablbl2->pack_start(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'menu'), 0, 1, 0);
     $tablbl2->show_all;
 
     my $hboxclu = Gtk3::HBox->new(0, 0);
@@ -497,7 +497,7 @@ sub _initGUI {
     my $lbl3 = Gtk3::Label->new;
     $lbl3->set_markup('<b>Auto Clusters </b>');
     $tablbl3->pack_start($lbl3, 0, 1, 0);
-    $tablbl3->pack_start(Gtk3::Image->new_from_stock('pac-cluster-manager2', 'menu'), 0, 1, 0);
+    $tablbl3->pack_start(Gtk3::Image->new_from_stock('asbru-cluster-manager2', 'menu'), 0, 1, 0);
     $tablbl3->show_all;
 
     my $hboxautoclu = Gtk3::HBox->new(0, 0);
@@ -1338,7 +1338,7 @@ sub _setupCallbacks {
             ''
         );
         $windowConfirm->set_markup("Terminals matching Auto Cluster <b>$cluster</b> conditions:$cond");
-        $windowConfirm->set_icon_name('pac-app-big');
+        $windowConfirm->set_icon_name('asbru-app-big');
         $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Auto Cluster matching");
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
         $windowConfirm->set_size_request(640, 400);
@@ -1461,7 +1461,7 @@ sub addToCluster {
 
     $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER} = $cluster;
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
-        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager', 'button');
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('asbru-cluster-manager', 'button');
     }
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
         $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("In CLUSTER: $cluster");
@@ -1478,7 +1478,7 @@ sub delFromCluster {
 
     $$self{_RUNNING}{$uuid}{'terminal'}{_CLUSTER} = '';
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
-        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('pac-cluster-manager-off', 'button');
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('asbru-cluster-manager-off', 'button');
     }
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
         $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("Unclustered");

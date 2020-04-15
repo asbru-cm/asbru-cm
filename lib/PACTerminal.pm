@@ -68,7 +68,7 @@ my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
 my $PERL_BIN = '/usr/bin/perl';
-my $PAC_CONN = "$RealBin/lib/pac_conn";
+my $PAC_CONN = "$RealBin/lib/asbru_conn";
 
 my $SHELL_BIN = -x '/bin/sh' ? '/bin/sh' : '/bin/bash';
 my $SHELL_NAME = -x '/bin/sh' ? 'sh' : 'bash';
@@ -146,7 +146,7 @@ sub new {
     $self->{EMBED} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'embed'};
 
     ++$_C;
-    $self->{_UUID_TMP} = "pac_PID{$$}_n$_C";
+    $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
 
     if ($self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'} . '/';
@@ -159,24 +159,24 @@ sub new {
     }
     $self->{_TMPCFG} = "$CFG_DIR/tmp/$$self{_UUID_TMP}freeze";
 
-    $self->{_TMPPIPE} = "$CFG_DIR/tmp/pac_PID{$$}_n$_C.pipe";
+    $self->{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
     while (-f $$self{_TMPPIPE}) {
         ++$_C;
-        $$self{_TMPPIPE} = "$CFG_DIR/tmp/pac_PID{$$}_n$_C.pipe";
+        $$self{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
     }
     unlink $$self{_TMPPIPE};
 
-    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.socket";
+    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
     while (-f $$self{_TMPSOCKET}) {
         ++$_C;
-        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.socket";
+        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
     }
     unlink $$self{_TMPSOCKET};
 
-    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.exec.socket";
+    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
     while (-f $$self{_TMPSOCKETEXEC}) {
         ++$_C;
-        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/pac_PID{$$}_n$_C.exec.socket";
+        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
     }
     unlink $$self{_TMPSOCKETEXEC};
 
@@ -372,7 +372,7 @@ sub start {
         delete $$self{_CFG}{'tmp'}{'height'};
     }
 
-    # Duplicate and dump non-persistent configuration into temporal file for 'pac_conn'
+    # Duplicate and dump non-persistent configuration into temporal file for 'asbru_conn'
     my %new_cfg;
     $new_cfg{'defaults'} = dclone($$self{_CFG}{'defaults'});
     $new_cfg{'environments'}{$$self{_UUID}} = dclone($$self{_CFG}{'environments'}{$$self{_UUID}});
@@ -380,7 +380,7 @@ sub start {
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
-    nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save PAC config file '$$self{_TMPCFG}': $!";
+    nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save Ásbrú config file '$$self{_TMPCFG}': $!";
     undef %new_cfg;
 
     # Delete the oldest auto-saved session log
@@ -545,7 +545,7 @@ sub stop {
         undef($$self{_WINDOWTERMINAL});
     }
 
-    # Try to ensure we leave no background "pac_conn" processes running after closing the terminal
+    # Try to ensure we leave no background "asbru_conn" processes running after closing the terminal
     if ($$self{_PID}) {
         kill(15, $$self{_PID});
     }
@@ -736,7 +736,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         # Create a checkbox to show/hide the button bar
         $$self{_GUI}{btnShowButtonBar} = Gtk3::ToggleButton->new();
-        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'pac-buttonbar-show' : 'pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
         $$self{_GUI}{btnShowButtonBar}->set('can-focus' => 0);
         $$self{_GUI}{btnShowButtonBar}->set_tooltip_text('Show/Hide button bar');
         $$self{_GUI}{btnShowButtonBar}->set_active($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1);
@@ -769,7 +769,7 @@ sub _initGUI {
     $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{status}, 1, 1, 4);
 
     # Create a status icon
-    $$self{_GUI}{statusIcon} = Gtk3::Image->new_from_stock('pac-terminal-ko-small', 'button');
+    $$self{_GUI}{statusIcon} = Gtk3::Image->new_from_stock('asbru-terminal-ko-small', 'button');
     $$self{_GUI}{statusIcon}->set_tooltip_text('Disconnected');
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusIcon}, 0, 0, 4);
 
@@ -779,7 +779,7 @@ sub _initGUI {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusExpect}, 0, 0, 4);
 
     # Create a cluster icon
-    $$self{_GUI}{statusCluster} = Gtk3::Image->new_from_stock('pac-cluster-manager-off', 'button');
+    $$self{_GUI}{statusCluster} = Gtk3::Image->new_from_stock('asbru-cluster-manager-off', 'button');
     $$self{_GUI}{statusCluster}->set_tooltip_text('Unclustered');
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusCluster}, 0, 0, 4);
 
@@ -904,10 +904,10 @@ sub _setupCallbacks {
     if ($$self{_GUI}{btnShowButtonBar}) {
         $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
             if ($$self{_GUI}{btnShowButtonBar}->get_active()) {
-                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->show();
             } else {
-                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('pac-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
+                $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->hide();
             };
         });
@@ -1261,7 +1261,7 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
 
     # Capture Drag and Drop events
-    my @targets = (Gtk3::TargetEntry->new('PAC Connect', [], 0));
+    my @targets = (Gtk3::TargetEntry->new('Ásbrú Connect', [], 0));
     $$self{_GUI}{_VTE}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
     $$self{_GUI}{_VTE}->signal_connect('drag_drop' => sub {
         if (!$$self{CONNECTED}) {
@@ -1333,7 +1333,7 @@ sub _setupCallbacks {
     # Append VTE's connection finalization with CLOSE event
     $$self{_GUI}{_VTE}->signal_connect ('child_exited' => sub {
         if (defined $$self{_GUI}{statusIcon}) {
-            $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ko-small', 'button');
+            $$self{_GUI}{statusIcon}->set_from_stock('asbru-terminal-ko-small', 'button');
         }
         if (defined $$self{_GUI}{statusIcon}) {
             $$self{_GUI}{statusIcon}->set_tooltip_text('Disconnected');
@@ -1428,7 +1428,7 @@ sub _watchConnectionData {
         $data = decode('UTF-16', $data);
 
         if ($data eq 'CONNECTED') {
-            $$self{_GUI}{statusIcon}->set_from_stock('pac-terminal-ok-small', 'button');
+            $$self{_GUI}{statusIcon}->set_from_stock('asbru-terminal-ok-small', 'button');
             $$self{_GUI}{statusIcon}->set_tooltip_text('Connected');
             $$self{_GUI}{statusExpect}->clear;
             $$self{CONNECTED} = 1;
@@ -1523,7 +1523,7 @@ sub _watchConnectionData {
             }
         } elsif ($data =~ /^SCRIPT_SUB_(.+)\[NAME:(.+)\]\[PARAMS:(.*)\]/go) {
             my ($func, $name, $params) = ($1, $2, $3);
-            $data = "PAC Script '$name' --> $func($params)";
+            $data = "Ásbrú Script '$name' --> $func($params)";
         } elsif ($data =~ /^TITLE:(.+)/go) {
             $$self{_TITLE} = $1;
             $self->_updateCFG();
@@ -1598,7 +1598,7 @@ sub _watchConnectionData {
         } elsif ($data =~ /^WENTER\|/) {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
-            my ($val,$pos) = _wEnterValue($$self{_WINDOWTERMINAL},$lblup,$lbldown,$default,$visible,'');
+            my ($val,$pos) = _wEnterValue($$self{_WINDOWTERMINAL},$lblup,$lbldown,$default,$visible);
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->grab_focus();
@@ -1705,17 +1705,17 @@ sub _vteMenu {
         # Add a submenu with available connections (including: LOCAL SHELL) and chaining connections
         push(@vte_menu_items, {
             label => 'Connection',
-            stockicon => 'pac-group',
+            stockicon => 'asbru-group',
             submenu =>
             [
                 {
                     label => 'Favourites',
-                    stockicon => 'pac-favourite-on',
+                    stockicon => 'asbru-favourite-on',
                     submenu => _menuFavouriteConnections($self)
                 },
                 {
                     label => 'All',
-                    stockicon => 'pac-treelist',
+                    stockicon => 'asbru-treelist',
                     submenu =>
                     [
                         {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;}},
@@ -1897,8 +1897,8 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Execute Script',
-        stockicon => 'pac-script',
-        tooltip => 'Execute selected PAC Script in this connection',
+        stockicon => 'asbru-script',
+        tooltip => 'Execute selected Ásbrú Script in this connection',
         submenu => \@scripts_sub_menu,
     });
 
@@ -2182,9 +2182,9 @@ sub _vteMenu {
     # Add take screenshot
     push(@vte_menu_items, {label => 'Take Screenshot', stockicon => 'gtk-media-record', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub {
         my $screenshot_file = '';
-        $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
+        $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
         while(-f $screenshot_file) {
-            $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
+            $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
         }
         select(undef, undef, undef, 0.5);
         _screenshot($$self{_GUI}{_VBOX}, $screenshot_file);
@@ -2198,7 +2198,7 @@ sub _vteMenu {
         # Open SFTP to this connection if it is SSH
         push(@vte_menu_items, {
             label => 'Open new SFTP window',
-            stockicon => 'pac-method-SFTP',
+            stockicon => 'asbru-method-SFTP',
             sensitive => 1,
             code => sub {
                 my @idx;
@@ -2218,7 +2218,7 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Terminal',
-        stockicon => 'pac-shell',
+        stockicon => 'asbru-shell',
         sensitive => 1,
         submenu =>
         [
@@ -2243,7 +2243,7 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Session',
-        stockicon => 'pac-method-' . $$self{_CFG}{environments}{$$self{_UUID}}{method},
+        stockicon => 'asbru-method-' . $$self{_CFG}{environments}{$$self{_UUID}}{method},
         sensitive => 1,
         submenu =>
         [
@@ -2367,8 +2367,8 @@ sub _setTabColour {
                 }
 
                 my $screenshot_file = '';
-                $screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';
-                while(-f $screenshot_file) {$screenshot_file = '/tmp/pac_screenshot_' . rand(123456789). '.png';}
+                $screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';
+                while(-f $screenshot_file) {$screenshot_file = '/tmp/asbru_screenshot_' . rand(123456789). '.png';}
                 _screenshot($$self{EMBED} ? $$self{FOCUS} : $$self{_GUI}{_VBOX}, $screenshot_file);
                 $PACMain::FUNCS{_MAIN}{_GUI}{screenshots}->add($screenshot_file, $$self{_CFG}{'environments'}{$$self{_UUID}});
                 $PACMain::FUNCS{_MAIN}->_updateGUIPreferences();
@@ -3031,7 +3031,7 @@ sub _setupTabDND {
     my $self = shift;
     my $widget = shift // $$self{_GUI}{_VBOX};
 
-    my @targets = (Gtk3::TargetEntry->new('PAC Tabbed', [], 0));
+    my @targets = (Gtk3::TargetEntry->new('Ásbrú Tabbed', [], 0));
     $$self{_GUI}{_TABLBL}->drag_source_set('GDK_BUTTON1_MASK', \@targets, ['move']);
     $$self{_GUI}{_TABLBL}->signal_connect('drag_begin' => sub {
         # Does not work anymore on Gtk3
@@ -4306,7 +4306,7 @@ Package to create a terminal object with its own windows, event handlers and men
     _FOCUS              0 No , 1 Yes
     _GUILOCKED          0 No , 1 Yes
     _FOCUSED            0 No , 1 Yes
-    _UUID_TMP           Current UUID assigned to this terminal : pac_PID{pidnumber}_n$COUNT
+    _UUID_TMP           Current UUID assigned to this terminal : asbru_PID{pidnumber}_n$COUNT
 
 =head2 sub new
 
@@ -4326,7 +4326,7 @@ Destroys object on exit
 
 Create the connection
 
-    Create connection using lib/pac_conn
+    Create connection using lib/asbru_conn
     Update progressbar
     CONNECTED=1
     Execute Startup scripts
