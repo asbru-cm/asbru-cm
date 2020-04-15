@@ -33,3 +33,15 @@ For example some good titles would be:
 
 [Bugfix] - Fixed connection issue for old SSH versions
 [Doc] - Correct typo in installation docs
+
+## Pull request workflow
+1. You clone the original repo to your github account.
+2. You make changes in cloned repo.
+3. If you made a pull request inside your cloned repo for your changes the best way is 'Squash and Merge' 
+   (avoids your merge commit appear as separate commit in pull request to original repo later)
+4. You create pull request to original repo.
+5. If this is the 1st pull request to the repo the 'CLAassistant' asks you to sign committer agreement.
+6. The pull request appears on the original repo awaiting someone with write access to the repo to merge it.
+
+The detailed info on contributing to someones github repository (easy and with screenshots) is available here: 
+https://guides.github.com/activities/forking/ .

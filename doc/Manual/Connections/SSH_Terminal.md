@@ -6,13 +6,19 @@ If you have configured your connection to have full automation, the login sequen
 
 ![](images/ssht1.png)
 
-If you have configured your connection not to have a password saved, you will receive a popup window requesting you to type your password.
+If you have configured your connection not to have a saved password, you will receive a popup window requesting you to type your password.
 
 ![](images/ssht2.png)
 
 
 !!! note "Expired passwords and change password required"
     In this cases you may see additional popup windows for each password requested: password, original password, new password, confirmation password.
+
+    If you have problems to complete an expired password process, because the expect regex do not work well for you.
+
+    + Edit the connection and set it to __Manual__
+    + Save
+    + Open the connection and complete the login sequence manually
 
 ## Mouse Interaction
 
@@ -26,7 +32,7 @@ When you are connected to a remote server, the remote application could request 
 
 If the remote application does not process any mouse events, then the local terminal processes this mouse events locally.
 
-To distinguish if the remote application is or not processing mouse events, look at the cursor shape. When a remote program is not processing mouse events then the cursor is a text cursor, other wise a traditional mouse pointer.
+To distinguish if the remote application is processing mouse events, look at the cursor shape. When a remote program is not processing mouse events then the cursor is a text caret.
 
 __No mouse processing__
 
@@ -40,19 +46,21 @@ __Mouse processing__
 !!! tip "Local Clipboard"
     A local selection creates copies to your __local clipboard__, not to the remote clipboard.
 
+    This will let you paste the text in some local application (text editor, IDE, etc.)
+
 #### Remote application does NOT process mouse events.
 
-__double click__ : The terminal will select a "word" the "visible" text on the terminal. The characters used as a word are [a-Z_] plus additional characters that you configured in rule described in the [Main options Advanced Tab : Select by word characters](../Preferences/MOAdvanced.md).
+__double click__ : The terminal will select a "word" on the "visible" text of the terminal. The characters used as a word are [a-Z_] plus any additional characters that you configured in rule described in the [Main options Advanced Tab : Select by word characters](../Preferences/MOAdvanced.md).
 
 ![](images/ssht5.png)
 
 
-__triple click__ : The terminal will select the "visible" row of text on the terminal.
+__triple click__ : The terminal will select the "visible" row of text of the terminal.
 
 ![](images/ssht6.png)
 
 
-__Click and drag__ : The terminal will select the text from the start point of the mouse drag to the end point in complete sequence, jumping lines and start from the beginning of the line on each new line.
+__Click and drag__ : The terminal will select the text from the start point of the mouse drag to the end point in a complete sequence, jumping lines and start from the beginning of the next new line.
 
 ![](images/ssht10.png)
 
@@ -62,11 +70,11 @@ __`<Shift + Ctrl>` + drag__ : Will create a square selection from the starting d
 
 
 !!! tip "Copy / Paste"
-    As soon as you select the text and release the mouse, the selected text is copied to the clipboard without any further actions (no need to : right click copy, `<crtl-c>`)
+    As soon as you select the text and release the mouse, the selected text is copied to the clipboard without any further actions (no need to : `right-click > Copy`, `<crtl-c>`)
 
-    To paste text from your local clipboard into the terminal. `<Shift + Insert>` or `right clic and "Paste"`.
-
-    You can imagine that the "Paste action", is similar to sending all the characters in the buffer to the terminal. So they will be sent with all the existing tabs, new line characters, etc.
+    + To paste your text into another application `<Ctrl-V>`
+    + To paste text from your local clipboard into the terminal. `<Shift + Insert>` or `right clic > Paste`.
+        - You can imagine that the "Paste action", is similar to sending all the characters in the buffer to the terminal. So they will be sent with all the existing tabs, new line characters, etc.
 
 !!! danger "The terminal is a canvas"
     The terminal has no knowledge of the remote application, so when selecting and copying, it selects the text that finds on the visible area, and treats it as a canvas (a paintable area).
@@ -75,7 +83,11 @@ __`<Shift + Ctrl>` + drag__ : Will create a square selection from the starting d
 
 #### Remote application does process mouse events.
 
-Depending on the application the selection would look and you will fill a difference in the action itself : could be very slow depending on the connection, could it be that the selection is shown when releasing the mouse or that the highlight is delayed.
+Depending on the remote application, the selection process would look and feel different :
+
+    + could be very slow
+    + or that the selection is shown after releasing the mouse
+    + or that the highlight is delayed.
 
 __Example of a remote double and triple click selection__
 
@@ -97,13 +109,13 @@ __Copy / Paste from editor copies line numbers__
 
 __Solution__
 
-Use the square selection technic, or hide the number panel in your editor before copying.
+Use the square selection technique, or hide the number panel in your editor before copying.
 
 ![](images/ssht12.png)
 
 ## Poppup Menu
 
-When you right click on the terminal (`<Shift> + right click` if the remote application process mouse events)
+When you right click on the terminal or `<Shift> + right click` (if the remote application process mouse events)
 
 You will see a popup menu similar to the next image.
 

@@ -36,11 +36,11 @@ This options offers 2 export options
 
 Will let you create a copy of all your configurations, so it can be used in another computer.
 
-To use copy the file to the new computer in your config directory, located at : `/home/user/config/.pac`
+To use copy the file to the new computer in your config directory, located at : `/home/user/.config/asrbu`
 
 ### Anonymized data for DEBUG
 
-This creates a configuration file that cleans up all the sensitive information. Is requested and used by the Ásbrú to facilitate the solution of some bug report when we have problems trying to reproduce. Some bugs are related to the combination of settings and only can be reproduced all settings are known.
+This creates a configuration file that cleans up all the sensitive information. Is requested and used by the Ásbrú Team to facilitate the solution of some bug report when we have problems trying to reproduce. Some bugs are related to the combination of settings and only can be reproduced all settings are known.
 
 When you select this option you will receive a warning similar to the next image, and the option to cancel the process.
 

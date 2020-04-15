@@ -60,14 +60,34 @@ To do so, execute the following commands:
   ````
   yaourt -S asbru-cm-git
   ````
+  
+- MX Linux
 
-Once installed on your system, type ````/opt/asbru/asbru```` in your terminal.
+  Ásbrú Connection Manager can be installed through the MX Package Installer under the Test Repo tab
+  or by enabling the Test Repo and running
+  ````
+  $ sudo apt-get install asbru-cm
+  ````
+  
+- Windows
+
+  Though it is currently unsupported running Ásbrú Connection Manager on Windows it is possible with a few addons.
+  Prior to this you need to install WSL and a working XServer on Windows (for example xlaunch).
+  Inside your WSL you can install the package asbru-cm (see Debian/Ubuntu).
+  Prior to running the command "asbru-cm" you will need to define your display:
+  ````
+  $ export DISPLAY=:0
+  ````
+  
+  For more information check out this article: https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx
+  
+Once installed on your system, type ````asbru-cm```` in your terminal.
 
 ### Testing new features
 
 Our master and the snapshots are being kept as stable as possible. New features for new major releases are being developed inside the "loki" branch.
 
-Beware that Loki can sometimes behave in a malicious manner to you. You might think of "sid"
+Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in an unexpected manner to you.  This is somehow the same concept as the "[Debian sid](https://www.debian.org/releases/sid/)" release.
 
 You are welcome to contribute and test by checking out "loki" or by installing our builds.
 

@@ -3,7 +3,7 @@ This article has been written by [Hans Peyrot](https://github.com/hanspr)
 # Introduction to Expect
 
 !!! danger "Executed during the login process only"
-    This expect actions take place only during the login process.
+    Expect actions are run only during the login process.
 
     It helps you to automate a login sequence and a continuous set of actions.
 
@@ -14,7 +14,7 @@ This article has been written by [Hans Peyrot](https://github.com/hanspr)
     __You must know how to write regular expressions for this to work properly.__
 
 
-There are several regular expressions in different parts of the General Preferences and Connection Preferences that allows you to control of the login sequence.
+There are several regular expressions in different parts of the General Preferences and Connection Preferences that allows you to control the login sequence.
 
 
 ## Introduction to user, password, prompt sequence.
@@ -38,7 +38,7 @@ These are the must important configuration regular expressions that will automat
 
 ### Terminal Options
 
-You can override some of the previous regular expressions for a particular terminal if they do not fit.
+You can override some of the previous regular expressions for a particular terminal if they do not work well on a particular connection.
 
 Is recommended to use a terminal override when the expression you want to add is not common to all your connections or it makes your global option fail if you combine them with the more general one.
 

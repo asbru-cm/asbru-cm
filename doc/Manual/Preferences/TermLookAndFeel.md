@@ -1,6 +1,6 @@
 # Look & Feel
 
-!!! note " "
+!!! note "Global Settings"
     This options apply to all terminals. If you need a particular terminal to behave differently is best to configure the look and feel options at the connection level.
 
 
@@ -49,8 +49,25 @@ Example macros as list
 + __Cursor shape__ : Cursor shape to use in the terminal.
 + __Scrollback lines__ : How many lines of history to store to scroll back.
 + __Transparency__ : Set background transparency for the terminal.
+    - You must enable transparency first to activate the transparency feature.
 + __Colors__ : Set your predefined colors to override the basic 16 terminal colors.
     - Top row are the normal text colors.
     - Bottom row are the bold text colors.
 
+!!! danger "Transparency"
+    Transparency __is not a feature__ , the transparency feature was removed from the Vte library.
 
+    And to provide the so desired __visual effect__, a __hack__ into the code had to be applied to make it work.
+
+    The conclusion is that it will consume more CPU resources. The reason is that the full window is made transparent, and the the visible areas that have to be visible, repainted.
+
+    Depending on your environment, the impact could be minimal or high.
+
+    There are too many things in an environment to list, but this are some of them:
+    
+    + screen resolution (the higher the resolution, more pixels to repaint)
+    + desktop environment performance : gnome-shell, gnome-classic, cinnamon, xfce, etc.
+    + Additional visual effects used in Ásbrú: show tooltips.
+    + Number of CPUs, amount of ram, graphics card, etc.
+
+    For a discussion about this you can check this thread: [Discussion about CPU usage](https://github.com/asbru-cm/asbru-cm/issues/533#issuecomment-607359378)

@@ -1,6 +1,6 @@
 # Terminal Advanced Settings
 
-!!! note " "
+!!! note "Global Settings"
     This options apply to all terminals. If you need a particular terminal to behave differently is best to configure the look and feel options at the connection level.
 
 ![](images/to3.png)
@@ -16,7 +16,7 @@
 
 ![](images/to9.png)
 
-!!! note " "
+!!! note "Access"
     You can always access your connections from the connection tree, or right clicking on the system tray.
 
 + __Audible Bell__ : Produce a sound when the terminal wants to send a bell event. (Not available in all vte versions)
