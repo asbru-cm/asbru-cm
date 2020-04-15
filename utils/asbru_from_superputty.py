@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #Author: Brian Raaen
 #Original code: https://www.brianraaen.com/2016/11/04/superputty-to-pac-manager/
 #
