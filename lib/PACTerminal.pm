@@ -144,7 +144,6 @@ sub new {
     $self->{_FOCUSED} = 0;
     $self->{FOCUS} = 0;
     $self->{EMBED} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'embed'};
-    $self->{_PARENTWINDOW} = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
 
     ++$_C;
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
@@ -842,6 +841,7 @@ sub _initGUI {
         if ($$self{_CFG}{'defaults'}{'start maximized'}) {
             $$self{_NOTEBOOKWINDOW}->maximize();
         }
+        $self->{_PARENTWINDOW} = $$self{_NOTEBOOKWINDOW};
 
     }
     # New WINDOW:
@@ -891,6 +891,7 @@ sub _initGUI {
             $NPOSY++;
             $NPOSX = 0;
         }
+        $self->{_PARENTWINDOW} = $$self{_WINDOWTERMINAL};
     }
 
     _updateCFG($self);
@@ -1605,9 +1606,9 @@ sub _watchConnectionData {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
             my ($val,$pos) = _wEnterValue($$self{_PARENTWINDOW},$lblup,$lbldown,$default,$visible);
-            $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             if (defined $$self{_WINDOWTERMINAL}) {
                 $$self{_WINDOWTERMINAL}->grab_focus();
+                $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = $$self{_WINDOWTERMINAL};
             }
             $self->_sendData("WENTER|:|$val|:|$pos");
         }
@@ -2527,6 +2528,7 @@ sub _tabToWin {
 
     $$self{_WINDOWTERMINAL}->show();
     $$self{_WINDOWTERMINAL}->present();
+    $self->{_PARENTWINDOW} = $$self{_WINDOWTERMINAL};
 
     # Capture window close
     $$self{_WINDOWTERMINAL}->signal_connect('delete_event' => sub {
@@ -2582,6 +2584,7 @@ sub _winToTab {
     });
 
     $$self{_GUI}{_TABLBL}->show_all();
+    $self->{_PARENTWINDOW} = $$self{_NOTEBOOKWINDOW};
 
     $self->_setupTabDND();
 
