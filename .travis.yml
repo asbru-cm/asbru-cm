@@ -13,8 +13,8 @@ env:
     - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true
     - OS=ubuntu DIST=xenial PACKAGE=deb
     - OS=ubuntu DIST=bionic PACKAGE=deb
-    - OS=ubuntu DIST=disco PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
     - OS=ubuntu DIST=eoan PACKAGE=deb
+    - OS=ubuntu DIST=focal PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
     - OS=fedora DIST=29 PACKAGE=rpm
     - OS=fedora DIST=30 PACKAGE=rpm
     - OS=fedora DIST=31 PACKAGE=rpm
@@ -29,7 +29,8 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3-pip python3-setuptools
-    - sudo pip install mkdocs mkdocs-material
+    - sudo pip3 install --upgrade pip
+    - sudo pip3 install mkdocs mkdocs-material
 script:
     - ./build.sh
     - bash scripts/deploy_docs.sh

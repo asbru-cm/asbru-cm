@@ -1,6 +1,6 @@
 ## Options
 
-!!! note " "
+!!! note "Global Settings"
     This options apply to all terminals. If you need a particular terminal to behave differently is best to configure the look and feel options at the connection level.
 
 ![](images/to1.png)
