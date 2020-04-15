@@ -85,13 +85,11 @@ desktop-file-validate res/asbru-cm.desktop
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/{%{_mandir}/man1,%{_bindir}}
-mkdir -p %{buildroot}/%{_datadir}/{%{name}/{lib,res},applications}
+mkdir -p %{buildroot}/%{_datadir}/{%{name}/{lib,res,utils},applications}
 mkdir -p %{buildroot}/%{_bashcompletiondir}
 mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/{24x24,64x64,256x256,scalable}/apps
 
 install -m 755 asbru-cm %{buildroot}/%{_bindir}/%{name}
-install -m 755 utils/pac_from_mcm.pl %{buildroot}/%{_bindir}/%{name}_from_mcm
-install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putty
 
 echo Bashcompletion Directory %{_bashcompletiondir}
 
@@ -109,7 +107,7 @@ cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{
 cp -a res/*.{png,pl,glade,svg} %{buildroot}/%{_datadir}/%{name}/res/
 cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
-
+cp -a utils/*.{pl,py} %{buildroot}/%{_datadir}/%{name}/utils/
 
 %files
 %doc README.md
@@ -138,6 +136,10 @@ fi
 
 
 %changelog
+* Sun Apr 12 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.2
+- 6.1.2 release
+* Fri Mar 27 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0
+- 6.1.0 release
 * Sat Mar 14 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0rc2
 - 6.1.0rc2 release
 * Sun Mar 01 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0rc1

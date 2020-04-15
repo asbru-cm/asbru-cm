@@ -8,13 +8,14 @@ repo_url: https://github.com/asbru-cm/asbru-cm
 edit_uri: edit/master/doc
 repo_name: GitHub
 theme:
-    name: readthedocs
+    name: material
 nav:
   - Home: 'index.md'
   - 1. General:
       - News: General/NEWS.md
       - Installation: General/Installation.md
       - Changelog: General/Changelog.md
+      - Warning:   General/sensitive-info-notice.md
   - 2. User's Manual:
       - Quick Start: Manual/QuickStart.md
       - Preferences:
