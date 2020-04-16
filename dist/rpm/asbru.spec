@@ -68,7 +68,7 @@ sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/asbru_conn
 sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/asbru_conn
 sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/asbru_conn
 sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/asbru_conn
-find . -type f -exec sed -i \
+find . -not -path './utils/*' -type f -exec sed -i \
   -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
   -e 's|/\.\.\(/\)|\1|' \
@@ -107,7 +107,7 @@ cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{
 cp -a res/*.{png,pl,glade,svg} %{buildroot}/%{_datadir}/%{name}/res/
 cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
-cp -a utils/*.{pl,py} %{buildroot}/%{_datadir}/%{name}/utils/
+cp -a utils/*.pl %{buildroot}/%{_datadir}/%{name}/utils/
 
 %files
 %doc README.md
