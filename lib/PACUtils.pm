@@ -1449,6 +1449,7 @@ sub _wEnterValue {
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'asbru-help';
+    my $entry;
     my @list;
     my $pos = -1;
     my %w;
@@ -1530,14 +1531,19 @@ sub _wEnterValue {
     } else {
         # Create the entry widget
         $w{window}{gui}{entry} = Gtk3::Entry->new();
+        $entry = $w{window}{gui}{entry};
         $w{window}{gui}{vbox}->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
         $w{window}{gui}{entry}->set_width_chars(30);
         $w{window}{gui}{entry}->set_activates_default(1);
         $w{window}{gui}{entry}->set_visibility($visible);
+        $w{window}{gui}{entry}->grab_focus();
     }
 
     # Show the window (in a modal fashion)
+    if ($entry) {
+        $entry->grab_focus();
+    }
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
     my $val = '';
