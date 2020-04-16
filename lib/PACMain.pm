@@ -1886,17 +1886,9 @@ sub _setupCallbacks {
     });
     $$self{_GUI}{configBtn}->signal_connect('clicked' => sub { $$self{_CONFIG}->show; });
     $$self{_GUI}{connEditBtn}->signal_connect('clicked' => sub {
-        my $pnum = $$self{_GUI}{nbTree}->get_current_page();
-        my $tree;
-
-        if  ($pnum == 0) {
-            $tree = $$self{_GUI}{treeConnections};
-        } elsif ($pnum == 1) {
-            $tree = $$self{_GUI}{treeFavourites};
-        } else {
-            $tree = $$self{_GUI}{treeHistory};
-        }
+        my $tree = $self->_getCurrentTree();
         my @sel = $tree->_getSelectedUUIDs();
+
         if (!scalar(@sel)) {
             return 1;
         }
@@ -1940,15 +1932,7 @@ sub _setupCallbacks {
         if ($$self{_NO_PROPAGATE_FAV_TOGGLE}) {
             return 1;
         }
-        my $pnum = $$self{_GUI}{nbTree}->get_current_page();
-        my $tree;
-        if  ($pnum == 0) {
-            $tree = $$self{_GUI}{treeConnections};
-        } elsif ($pnum == 1) {
-            $tree = $$self{_GUI}{treeFavourites};
-        } else {
-            $tree = $$self{_GUI}{treeHistory};
-        }
+        my $tree = $self->_getCurrentTree();
         if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
@@ -4714,6 +4698,24 @@ sub _ApplyLayout {
     }
 }
 
+# Returns the currently selected tree
+sub _getCurrentTree {
+    my $self = shift;
+    my $pnum = $$self{_GUI}{nbTree}->get_current_page();
+    my $page = $$self{_GUI}{nbTree}->get_nth_page($pnum);
+    my $tree;
+
+    # Search for the PACTree into the selected tab
+    $page->foreach(sub {
+        my $child = shift;
+        if (ref($child) eq 'PACTree') {
+            $tree = $child;
+        }
+    });
+
+    return $tree;
+}
+
 # END: Define PRIVATE CLASS functions
 ###################################################################
 
@@ -5003,3 +5005,6 @@ Updates runtime Configuration changes that affect the Main GUI: Readonly, Auto S
 
 Pending
 
+=head2 sub _getCurrentTree
+
+Returns the currently selected tree (from the left menu)
