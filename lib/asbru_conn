@@ -1148,6 +1148,8 @@ if ($GETCMD) {
 if (open(TEST,">",$LOG_FILE)) {
     close TEST;
     $EXP->log_file($LOG_FILE);
+} else {
+    print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
 
 # Spawn the session
