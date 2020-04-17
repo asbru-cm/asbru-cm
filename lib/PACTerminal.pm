@@ -856,16 +856,19 @@ sub _initGUI {
         my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
 
         my $conns_per_row = 2;
+        my $conns_per_col = 1;
         if ($self->{_CLUSTER}) {
             if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
                 my $screen = Gtk3::Gdk::Screen::get_default();
                 my $sw = $screen->get_width();
                 my $sh = $screen->get_height() - 100;
                 $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
+                $conns_per_col = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 7 ? 2 : 3;
                 my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
+                my $cols = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_col) || 1;
                 $hsize = int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
                 if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
-                    $vsize = int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
+                    $vsize = int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $cols)));
                 } else {
                     $vsize = $sh;
                 }
