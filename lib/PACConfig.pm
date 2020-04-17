@@ -49,6 +49,7 @@ use PACTermOpts;
 use PACGlobalVarEntry;
 use PACExecEntry;
 use PACKeePass;
+use PACKeyBindings;
 
 # END: Import Modules
 ###################################################################
@@ -187,6 +188,7 @@ sub _initGUI {
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
+    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new(1, $$self{_CFG}{defaults}{keybindings}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -941,6 +943,8 @@ sub _updateGUIPreferences {
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
     $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
+    $$self{_KEYBINDS}->update($$self{_CFG}{'defaults'}{'keybindings'});
+
     if (defined $PACMain::FUNCS{_EDIT}) {
         _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     }
