@@ -83,7 +83,7 @@ sub GetKeyMask {
 
     #print "$keyval : $unicode : $ctrl : $shift\n";
 
-    if (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert/)) {
+    if (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert|KP_Enter/)) {
         return ($keyval,1,"$alt$ctrl$shift$keyval");
     }
 
@@ -170,14 +170,33 @@ sub _initCFG {
     $$cfg{'pactabs'}{'Ctrl+Tab'} = ['Tabbed terminals','last','Last Tab'];
     $$cfg{'pactabs'}{'CtrlPage_Down'} = ['Tabbed terminals','next','Next Tab'];
     $$cfg{'pactabs'}{'CtrlPage_Up'} = ['Tabbed terminals','previous','Previous Tab'];
-    $$cfg{'pactabs'}{'Ctrl+0'} = ['Tabbed terminals','infotab','Got o Info Tab'];
+    $$cfg{'pactabs'}{'undef-infotab'} = ['Tabbed terminals','infotab','Got to Info Tab'];
     $$cfg{'pacmain'}{'Ctrl+f'} = ['Main Window','find','Find in connection tree'];
     $$cfg{'pacmain'}{'Ctrl+q'} = ['Main Window','quit','Exit Ásbrú'];
     $$cfg{'pacmain'}{'Ctrl+t'} = ['Main Window','localshell','Open a local shell'];
-    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
-    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
-    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
-    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
+    $$cfg{'terminal'}{'F11'} = ['Terminal','fullscreen','Go full screen'];
+    $$cfg{'terminal'}{'Ctrl+Return'} = ['Terminal','start','Start Terminal'];
+    $$cfg{'terminal'}{'AltCtrl+X'} = ['Terminal','reset','Reset Terminal'];
+    $$cfg{'terminal'}{'CtrlAlt+r'} = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
+    $$cfg{'terminal'}{'CtrlInsert'} = ['Terminal','copy','Copy selection to clipboard'];
+    $$cfg{'terminal'}{'ShiftInsert'} = ['Terminal','paste','Paste selection into terminal'];
+    $$cfg{'terminal'}{'Ctrl+p'} = ['Terminal','paste-passwd','Paste terminal password'];
+    $$cfg{'terminal'}{'Ctrl+b'} = ['Terminal','paste-delete','Paste and delete'];
+    $$cfg{'terminal'}{'Ctrl+g'} = ['Terminal','hostname','Guess hostname'];
+    $$cfg{'terminal'}{'Ctrl+w'} = ['Terminal','close','Close Terminal'];
+    $$cfg{'terminal'}{'Ctrl+q'} = ['Terminal','quit','Exit Ásbrú'];
+    $$cfg{'terminal'}{'Ctrl+f'} = ['Terminal','find','Find in connection tree'];
+    $$cfg{'terminal'}{'F4'} = ['Terminal','closealltabs','Close all tabs'];
+    $$cfg{'terminal'}{'Ctrl+n'} = ['Terminal','close-disconected','Close disconnected sessions'];
+    $$cfg{'terminal'}{'Ctrl+d'} = ['Terminal','duplicate','Duplicate connection'];
+    $$cfg{'terminal'}{'Ctrl+r'} = ['Terminal','restart','Restart connection (close and start)'];
+    $$cfg{'terminal'}{'Ctrl+i'} = ['Terminal','infotab','Show the Info tab'];
+    $$cfg{'terminal'}{'CtrlF3'} = ['Terminal','find-terminal','Find Terminal'];
+    $$cfg{'terminal'}{'Alt+n'} = ['Terminal','showconnections','Show connections list'];
+    $$cfg{'terminal'}{'Alt+e'} = ['Terminal','edit','Edit Connection'];
+    $$cfg{'terminal'}{'Ctrl+plus'} = ['Terminal','zoomin','Zoom in text'];
+    $$cfg{'terminal'}{'Ctrl+minus'} = ['Terminal','zoomout','Zoom out text'];
+    $$cfg{'terminal'}{'Ctrl+0'} = ['Terminal','zoomreset','Zoom reset text'];
     $self->{cfg} = $cfg;
 }
 

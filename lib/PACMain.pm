@@ -2067,9 +2067,6 @@ sub _setupCallbacks {
             return 0;
         } elsif ($action eq 'infotab') {
             $$self{_GUI}{nb}->set_current_page(0);
-        } elsif ($action =~ /^Ctrl\+(\d+)/) {
-            my $n = $1;
-            $$self{_GUI}{nb}->set_current_page($n - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
         } elsif ($action eq 'last') {
             $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
         } elsif ($action eq 'next') {
@@ -2084,6 +2081,11 @@ sub _setupCallbacks {
             } else {
                 $$self{_GUI}{nb}->prev_page();
             }
+        } elsif ($action eq 'Ctrl+0') {
+            return 0;
+        } elsif ($action =~ /^Ctrl\+(\d+)/) {
+            my $n = $1;
+            $$self{_GUI}{nb}->set_current_page($n - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
         } else {
             return 0;
         }
