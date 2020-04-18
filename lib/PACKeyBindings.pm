@@ -72,8 +72,6 @@ sub new {
     return $self;
 }
 
-# Global Methods
-
 sub GetKeyMask {
     my ($self, $widget, $event) = @_;
     my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
@@ -83,17 +81,91 @@ sub GetKeyMask {
     my $ctrl    = $state * ['control-mask'] ? 'Ctrl'  : '';
     my $alt     = $state * ['mod1-mask']    ? 'Alt'   : '';
 
-    if (!$unicode || (!$ctrl && !$alt)) {
-        return ($unicode,'');
+    if (!$unicode && ($keyval =~ /F\d+/)) {
+        return ($keyval,1,"$alt$ctrl$shift$keyval");
     }
-    return ($unicode,"$alt$ctrl+$keyval");
+
+    if (!$unicode || (!$ctrl && !$alt)) {
+        return ($keyval,$unicode,'');
+    }
+    return ($keyval,$unicode,"$alt$ctrl+$keyval");
 }
 
-# Private Methods
+sub GetFunction {
+    my ($self,$window, $widget, $event) = @_;
+    my $cfg = $self->{cfg};
+
+    if (!$window) {
+        return '';
+    }
+    if (!$cfg) {
+        return '';
+    }
+    my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
+    if (!$keymask) {
+        return $keyval;
+    }
+    if ($$cfg{$window}{$keymask}) {
+        return $$cfg{$window}{$keymask}[1];
+    }
+    return '';
+}
+
+sub update {
+    my $self = shift;
+    my $cfg;
+    my %actions;
+
+    if (!$self->{cfg}) {
+        $self->_initCFG();
+    }
+    $cfg = $self->{cfg};
+    @{$$self{frame}{keylist}{'data'}} = ();
+    foreach my $w (sort keys %$cfg) {
+        my $wk = $$cfg{$w};
+        %actions = ();
+        foreach my $k (keys %$wk) {
+            $actions{$$wk{$k}[1]} = $k;
+        }
+        foreach my $a (sort keys %actions) {
+            my $k = $actions{$a};
+            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$k,$$wk{$k}[1] ], children => []});
+        }
+    }
+}
+
+sub get_cfg {
+}
+
+# END: Public class methods
+###################################################################
+
+###################################################################
+# START: Private Methods
+
+sub _initCFG {
+    my $self = shift;
+    my $cfg = $self->{cfg};
+
+    $$cfg{'treeFavourites'}{'Alt+e'} = ['Favourites Tree','edit_node','Edit selected node'];
+    $$cfg{'treeHistory'}{'Alt+e'} = ['History Tree','edit_node','Edit selected node'];
+    $$cfg{'treeClusters'}{'Alt+e'} = ['Clusters Tree','edit_node','Edit selected node'];
+    $$cfg{'treeConnections'}{'Alt+e'} = ['Connections Tree','edit_node','Edit selected node'];
+    $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree','find','Find in connection tree'];
+    $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree','expand_all','Expand tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree','collaps_all','Collaps tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+d'} = ['Connections Tree','clone','Clone connection'];
+    $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree','copy','Copy node'];
+    $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','copy','Cut node'];
+    $$cfg{'treeConnections'}{'Ctrl+v'} = ['Connections Tree','paste','Paste node'];
+    $$cfg{'treeConnections'}{'Alt+e'} = ['Connections Tree','edit','Edit node'];
+    $$cfg{'treeConnections'}{'Alt+r'} = ['Connections Tree','protection','Toggle protection'];
+    $$cfg{'treeConnections'}{'F2'} = ['Connections Tree','rename','Rename node'];
+    $self->{cfg} = $cfg;
+}
 
 sub _buildGUI {
     my $self = shift;
-    my $cfg = $self->{cfg};
     my %w;
 
 
@@ -108,7 +180,7 @@ sub _buildGUI {
     # Build a vbox
     #$w{vbox} = Gtk3::VBox->new(0,0);
     $w{keylist} = PACTree->new(
-        'Location' => 'text',
+        'Window' => 'text',
         'Action' => 'text',
         'Keys' => 'text',
         'fcall' => 'hidden',
@@ -132,12 +204,14 @@ sub _buildGUI {
         my @paths   = _getSelectedRows($selection);
         my $entry   = $model->get_value($model->get_iter($paths[0]),1);
 
-        my ($unicode, $keymask) = $self->GetKeyMask($widget, $event);
+        my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
+
+        print "$keyval, $unicode, $keymask\n";
 
         if ($unicode == 8 || $unicode == 127) {
             print "Borrar\n";
             return 1;
-        } elsif (!$unicode) {
+        } elsif (!$keymask) {
             return 0;
         }
 
@@ -148,19 +222,6 @@ sub _buildGUI {
         print STDERR "KEYPRESS ($entry): $keymask\n";
         return 1;
     });
-}
-
-sub update {
-    my $self = shift;
-
-    @{$$self{frame}{keylist}{'data'}} = ();
-    foreach my $x ('Main Window|First Tab|Ctrl+1|move_to_tab','Terminal|Zoom in text|Ctrl++|zoom_in','Terminal|Zoom out text|Ctrl+-|zoom_out','Terminal|Zoom reset|Ctrl+0|zoom_reset') {
-        my ($l,$a,$k,$f) = split /\|/,$x;
-        push(@{$$self{frame}{keylist}{'data'}}, {value => [ $l,$a,$k,$f ], children => []});
-    }
-}
-
-sub get_cfg {
 }
 
 1;
