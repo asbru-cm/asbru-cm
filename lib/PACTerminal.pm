@@ -998,7 +998,7 @@ sub _setupCallbacks {
         }
 
         my $action = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event);
-        print "ACTION: $action\n";
+
         if (!$action) {
             return 0;
         } elsif ($action eq 'start' || $action eq 'CtrlKP_Enter') {
