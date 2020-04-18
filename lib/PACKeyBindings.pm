@@ -81,7 +81,9 @@ sub GetKeyMask {
     my $ctrl    = $state * ['control-mask'] ? 'Ctrl'  : '';
     my $alt     = $state * ['mod1-mask']    ? 'Alt'   : '';
 
-    if (!$unicode && ($keyval =~ /F\d+/)) {
+    #print "$keyval : $unicode : $ctrl : $shift\n";
+
+    if (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert/)) {
         return ($keyval,1,"$alt$ctrl$shift$keyval");
     }
 
@@ -91,7 +93,7 @@ sub GetKeyMask {
     return ($keyval,$unicode,"$alt$ctrl+$keyval");
 }
 
-sub GetFunction {
+sub GetAction {
     my ($self,$window, $widget, $event) = @_;
     my $cfg = $self->{cfg};
 
@@ -108,7 +110,7 @@ sub GetFunction {
     if ($$cfg{$window}{$keymask}) {
         return $$cfg{$window}{$keymask}[1];
     }
-    return '';
+    return $keymask;
 }
 
 sub update {
@@ -129,7 +131,11 @@ sub update {
         }
         foreach my $a (sort keys %actions) {
             my $k = $actions{$a};
-            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$k,$$wk{$k}[1] ], children => []});
+            my $kb = $k;
+            if ($kb =~ /^undef-/) {
+                $kb = '';
+            }
+            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$kb,$$wk{$k}[1] ], children => []});
         }
     }
 }
@@ -161,6 +167,17 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Alt+e'} = ['Connections Tree','edit','Edit node'];
     $$cfg{'treeConnections'}{'Alt+r'} = ['Connections Tree','protection','Toggle protection'];
     $$cfg{'treeConnections'}{'F2'} = ['Connections Tree','rename','Rename node'];
+    $$cfg{'pactabs'}{'Ctrl+Tab'} = ['Tabbed terminals','last','Last Tab'];
+    $$cfg{'pactabs'}{'CtrlPage_Down'} = ['Tabbed terminals','next','Next Tab'];
+    $$cfg{'pactabs'}{'CtrlPage_Up'} = ['Tabbed terminals','previous','Previous Tab'];
+    $$cfg{'pactabs'}{'Ctrl+0'} = ['Tabbed terminals','infotab','Got o Info Tab'];
+    $$cfg{'pacmain'}{'Ctrl+f'} = ['Main Window','find','Find in connection tree'];
+    $$cfg{'pacmain'}{'Ctrl+q'} = ['Main Window','quit','Exit Ásbrú'];
+    $$cfg{'pacmain'}{'Ctrl+t'} = ['Main Window','localshell','Open a local shell'];
+    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
+    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
+    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
+    $$cfg{'pacmain'}{''} = ['Main Window','action','desc'];
     $self->{cfg} = $cfg;
 }
 
@@ -183,7 +200,7 @@ sub _buildGUI {
         'Window' => 'text',
         'Action' => 'text',
         'Keys' => 'text',
-        'fcall' => 'hidden',
+        'kbaction' => 'hidden',
     );
     $w{keylist}->set_enable_tree_lines(0);
     $w{keylist}->set_headers_visible(1);

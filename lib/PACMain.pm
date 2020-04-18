@@ -1369,7 +1369,7 @@ sub _setupCallbacks {
             if (!@sel) {
                 return 0;
             }
-            my $action = $FUNCS{_KEYBINDS}->GetFunction($what, $widget, $event);
+            my $action = $FUNCS{_KEYBINDS}->GetAction($what, $widget, $event);
             if (!$action) {
                 return 0;
             }
@@ -1424,7 +1424,7 @@ sub _setupCallbacks {
         if (!@sel) {
             return 0;
         }
-        my $action = $FUNCS{_KEYBINDS}->GetFunction('treeClusters', $widget, $event);
+        my $action = $FUNCS{_KEYBINDS}->GetAction('treeClusters', $widget, $event);
         if (!$action) {
             return 0;
         }
@@ -1449,7 +1449,7 @@ sub _setupCallbacks {
                 $is_group = 1;
             }
         }
-        my $action = $FUNCS{_KEYBINDS}->GetFunction('treeConnections', $widget, $event);
+        my $action = $FUNCS{_KEYBINDS}->GetAction('treeConnections', $widget, $event);
 
         if (!$action) {
             return 0;
@@ -2058,105 +2058,36 @@ sub _setupCallbacks {
     # Capture some keypress on TABBED window
     $$self{_GUI}{_PACTABS}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state();
-        my $ctrl = $state * ['control-mask'];
-        my $shift = $state * ['shift-mask'];
-        my $alt = $state * ['mod1-mask'];
-
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:TABBEDWINDOW:KEYPRESS:*$state*$keyval*$unicode*\n";
-        }
-
         # Get current page's tab number
         my $curr_page = $$self{_GUI}{nb}->get_current_page();
 
-        # Continue checking keypress only if <Ctrl> is pushed
-        if ($ctrl && $shift && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'}) && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'})) {
-            # Capture <Ctrl>number --> select number tab
-            if ($keyval =~ /^\d$/go) {
-                $$self{_GUI}{nb}->set_current_page($keyval - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
-                return 1;
-            }
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
 
-            # If not a tab key, skip
-            if ($keyval !~ /^.*_?Tab/go) {
-                return 0;
-            }
-
-            if ($$self{_CFG}{defaults}{'ctrl tab'} eq 'last') {
-                $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
+        if (!$action) {
+            return 0;
+        } elsif ($action eq 'infotab') {
+            $$self{_GUI}{nb}->set_current_page(0);
+        } elsif ($action =~ /^Ctrl\+(\d+)/) {
+            my $n = $1;
+            $$self{_GUI}{nb}->set_current_page($n - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
+        } elsif ($action eq 'last') {
+            $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
+        } elsif ($action eq 'next') {
+            if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
+                $$self{_GUI}{nb}->set_current_page(0);
             } else {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page($$self{_GUI}{nb}->get_n_pages - 1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
+                $$self{_GUI}{nb}->next_page();
             }
-            return 1;
+        } elsif ($action eq 'previous') {
+            if ($curr_page == 0) {
+                $$self{_GUI}{nb}->set_current_page(-1);
+            } else {
+                $$self{_GUI}{nb}->prev_page();
+            }
+        } else {
+            return 0;
         }
-        # Continue checking keypress only if <Ctrl> is pushed
-        elsif ($ctrl && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})) {
-            # Capture <Ctrl>PgUp/Left --> select previous tab
-            if ($keyval eq 'Page_Up' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page(-1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
-            }
-            # Capture <Ctrl>PgDwn/Right --> select next tab
-            elsif ($keyval eq 'Page_Down' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-                if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                    $$self{_GUI}{nb}->set_current_page(0);
-                } else {
-                    $$self{_GUI}{nb}->next_page();
-                }
-            }
-            # Capture <Ctrl>number --> select number tab
-            elsif ($keyval =~ /^\d$/go) {
-                $$self{_GUI}{nb}->set_current_page($keyval - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
-            }
-            # Capture <Ctrl>TAB --> switch between tabs
-            elsif ($keyval eq 'Tab') {
-                if ($$self{_CFG}{defaults}{'ctrl tab'} eq 'last') {
-                    $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
-                } else {
-                    if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                        $$self{_GUI}{nb}->set_current_page(0);
-                    } else {
-                        $$self{_GUI}{nb}->next_page();
-                    }
-                }
-            } else {
-                return 0;
-            }
-            return 1;
-        # Continue checking keypress only if <Alt> is pushed
-        } elsif ($alt && (! $$self{_CFG}{'defaults'}{'disable ALT key bindings'}) && $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-            # Capture <Alt>PgUp/Left --> select previous tab
-            if ($keyval eq 'Left') {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page(-1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
-            }
-            # Capture <Alt>PgDwn/Right --> select next tab
-            elsif ($keyval eq 'Right') {
-                if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                    $$self{_GUI}{nb}->set_current_page(0);
-                } else {
-                    $$self{_GUI}{nb}->next_page();
-                }
-            } else {
-                return 0;
-            }
-            return 1;
-        }
-        return 0;
+        return 1;
     });
 
     # Capture some keypress on Description widget
@@ -2179,6 +2110,7 @@ sub _setupCallbacks {
         push(@{ $$self{_UNDO} }, $$self{_GUI}{descBuffer}->get_property('text'));
         return 0;
     });
+
     $$self{_GUI}{descBuffer}->signal_connect('changed' => sub {
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         if (!(scalar(@sel) == 1 && $$self{_GUI}{nbTree}->get_current_page() == 0 && $$self{_GUI}{descView}->is_sensitive)) {
@@ -2269,42 +2201,22 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state();
-        my $shift = $state * ['shift-mask'];
-        my $ctrl = $state * ['control-mask'];
-        my $alt = $state * ['mod1-mask'];
-        my $alt2 = $state * ['mod2-mask'];
-        my $alt5 = $state * ['mod5-mask'];
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pacmain', $widget, $event);
 
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:MAIN:KEYPRESS:*$state*$keyval*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-        }
-
-        # <Ctrl><Shift>
-        if (!(($ctrl && $shift) && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'}))) {
+        if (!$action) {
             return 0;
-        }
-
-        # F --> FIND in treeView
-        if($_[1]->keyval == 102)  {
+        } elsif ($action eq 'find') {
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
-            return 1;
-        }
-        # Q --> Finish
-        elsif ($_[1]->keyval == 113) {
+        } elsif ($action eq 'quit') {
             $PACMain::FUNCS{_MAIN}->_quitProgram();
-            return 1;
-        }
-        # T --> Open local shell
-        elsif (lc $keyval eq 't') {
+        } elsif ($action eq 'localshell') {
             $$self{_GUI}{shellBtn}->clicked();
-            return 1;
+        } else {
+            return 0;
         }
-        return 0;
+        return 1;
     });
     $$self{_SIGNALS}{_WINDOWSTATEVENT} = $$self{_GUI}{main}->signal_connect('window_state_event' => sub {
         $$self{_GUI}{maximized} = $_[1]->new_window_state eq 'maximized';
