@@ -65,6 +65,7 @@ sub new {
 
     $self->{cfg} = shift;
     $self->{container} = undef;
+    $self->{hotkey} = {};
 
     _buildGUI($self);
 
@@ -83,8 +84,12 @@ sub GetKeyMask {
 
     #print "$keyval : $unicode : $ctrl : $shift\n";
 
+    # Test special keys
     if (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert|KP_Enter/)) {
-        return ($keyval,1,"$alt$ctrl$shift$keyval");
+        if ("$alt$ctrl$shift") {
+            return ($keyval,0,"$alt$ctrl$shift+$keyval");
+        }
+        return ($keyval,0,$keyval);
     }
 
     if (!$unicode || (!$ctrl && !$alt)) {
@@ -96,6 +101,7 @@ sub GetKeyMask {
 sub GetAction {
     my ($self,$window, $widget, $event) = @_;
     my $cfg = $self->{cfg};
+    my $hk  = $self->{hotkey};
 
     if (!$window) {
         return '';
@@ -109,19 +115,41 @@ sub GetAction {
     }
     if ($$cfg{$window}{$keymask}) {
         return $$cfg{$window}{$keymask}[1];
+    } elsif ($$hk{$window}{$keymask}) {
+        return $$hk{$window}{$keymask}[1];
     }
     return $keymask;
 }
 
+sub RegisterHotKey {
+    my ($self,$window,$keymask,$action,$description) = @_;
+    my $cfg = $self->{cfg};
+    my $hk  = $self->{hotkey};
+
+    if (!$window || !$keymask || !$action || !$description) {
+        return (0,"window,keymask,action,description : are required");
+    }
+    if ($$cfg{$window}{$keymask}) {
+        return (0,"Key binding already in use by global settings : $$cfg{$window}{$keymask}[2]");
+    }
+    if ($$hk{$window}{$keymask}) {
+        return (0,"Key binding already in use by hotkey : $$hk{$window}{$keymask}[2]");
+    }
+    $$hk{$window}{$keymask} = ['User hotkey',$action,$description];
+    return (1,'');
+}
+
 sub update {
     my $self = shift;
-    my $cfg;
+    my $cfg = shift;
     my %actions;
 
-    if (!$self->{cfg}) {
+    if (!$cfg) {
         $self->_initCFG();
+        $cfg = $self->{cfg};
+    } else {
+        $self->{cfg} = $cfg;
     }
-    $cfg = $self->{cfg};
     @{$$self{frame}{keylist}{'data'}} = ();
     foreach my $w (sort keys %$cfg) {
         my $wk = $$cfg{$w};
@@ -132,6 +160,9 @@ sub update {
         foreach my $a (sort keys %actions) {
             my $k = $actions{$a};
             my $kb = $k;
+            if ($$wk{$k}[0] eq 'User hotey') {
+                next;
+            }
             if ($kb =~ /^undef-/) {
                 $kb = '';
             }
@@ -141,6 +172,9 @@ sub update {
 }
 
 sub get_cfg {
+    my $self = shift;
+
+    return $self->{cfg};
 }
 
 # END: Public class methods
@@ -151,7 +185,7 @@ sub get_cfg {
 
 sub _initCFG {
     my $self = shift;
-    my $cfg = $self->{cfg};
+    my $cfg;
 
     $$cfg{'treeFavourites'}{'Alt+e'} = ['Favourites Tree','edit_node','Edit selected node'];
     $$cfg{'treeHistory'}{'Alt+e'} = ['History Tree','edit_node','Edit selected node'];
@@ -168,8 +202,8 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Alt+r'} = ['Connections Tree','protection','Toggle protection'];
     $$cfg{'treeConnections'}{'F2'} = ['Connections Tree','rename','Rename node'];
     $$cfg{'pactabs'}{'Ctrl+Tab'} = ['Tabbed terminals','last','Last Tab'];
-    $$cfg{'pactabs'}{'CtrlPage_Down'} = ['Tabbed terminals','next','Next Tab'];
-    $$cfg{'pactabs'}{'CtrlPage_Up'} = ['Tabbed terminals','previous','Previous Tab'];
+    $$cfg{'pactabs'}{'Ctrl+Page_Down'} = ['Tabbed terminals','next','Next Tab'];
+    $$cfg{'pactabs'}{'Ctrl+Page_Up'} = ['Tabbed terminals','previous','Previous Tab'];
     $$cfg{'pactabs'}{'undef-infotab'} = ['Tabbed terminals','infotab','Got to Info Tab'];
     $$cfg{'pacmain'}{'Ctrl+f'} = ['Main Window','find','Find in connection tree'];
     $$cfg{'pacmain'}{'Ctrl+q'} = ['Main Window','quit','Exit Ásbrú'];
@@ -178,8 +212,8 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+Return'} = ['Terminal','start','Start Terminal'];
     $$cfg{'terminal'}{'AltCtrl+X'} = ['Terminal','reset','Reset Terminal'];
     $$cfg{'terminal'}{'CtrlAlt+r'} = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
-    $$cfg{'terminal'}{'CtrlInsert'} = ['Terminal','copy','Copy selection to clipboard'];
-    $$cfg{'terminal'}{'ShiftInsert'} = ['Terminal','paste','Paste selection into terminal'];
+    $$cfg{'terminal'}{'Ctrl+Insert'} = ['Terminal','copy','Copy selection to clipboard'];
+    $$cfg{'terminal'}{'Shift+Insert'} = ['Terminal','paste','Paste selection into terminal'];
     $$cfg{'terminal'}{'Ctrl+p'} = ['Terminal','paste-passwd','Paste terminal password'];
     $$cfg{'terminal'}{'Ctrl+b'} = ['Terminal','paste-delete','Paste and delete'];
     $$cfg{'terminal'}{'Ctrl+g'} = ['Terminal','hostname','Guess hostname'];
@@ -191,7 +225,7 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+d'} = ['Terminal','duplicate','Duplicate connection'];
     $$cfg{'terminal'}{'Ctrl+r'} = ['Terminal','restart','Restart connection (close and start)'];
     $$cfg{'terminal'}{'Ctrl+i'} = ['Terminal','infotab','Show the Info tab'];
-    $$cfg{'terminal'}{'CtrlF3'} = ['Terminal','find-terminal','Find Terminal'];
+    $$cfg{'terminal'}{'Ctrl+F3'} = ['Terminal','find-terminal','Find Terminal'];
     $$cfg{'terminal'}{'Alt+n'} = ['Terminal','showconnections','Show connections list'];
     $$cfg{'terminal'}{'Alt+e'} = ['Terminal','edit','Edit Connection'];
     $$cfg{'terminal'}{'Ctrl+plus'} = ['Terminal','zoomin','Zoom in text'];
@@ -204,17 +238,17 @@ sub _buildGUI {
     my $self = shift;
     my %w;
 
+    # Build a vbox
+    $w{vbox} = Gtk3::VBox->new(0,0);
+    # Attach to class attribute
+    $$self{container} = $w{vbox};
+    $$self{frame} = \%w;
 
     $w{scroll} = Gtk3::ScrolledWindow->new();
     $w{scroll}->set_overlay_scrolling(0);
     $w{scroll}->set_policy('automatic', 'automatic');
+    $w{vbox}->pack_start($w{scroll},1,1,1);
 
-    # Attach to class attribute
-    $$self{container} = $w{scroll};
-    $$self{frame} = \%w;
-
-    # Build a vbox
-    #$w{vbox} = Gtk3::VBox->new(0,0);
     $w{keylist} = PACTree->new(
         'Window' => 'text',
         'Action' => 'text',
@@ -231,7 +265,6 @@ sub _buildGUI {
     $w{keylist}->get_selection()->set_mode('GTK_SELECTION_SINGLE');
     $w{scroll}->add($w{keylist});
 
-    #$w{vbox}->pack_start($w{keylist},1,1,1);
 
     $w{keylist}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;

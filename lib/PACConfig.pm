@@ -945,6 +945,8 @@ sub _updateGUIPreferences {
     $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
     $$self{_KEYBINDS}->update($$self{_CFG}{'defaults'}{'keybindings'});
 
+    # Register hotkeys : PENDING
+
     if (defined $PACMain::FUNCS{_EDIT}) {
         _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     }
