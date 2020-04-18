@@ -60,10 +60,10 @@ use PACTree;
 
 sub new {
     my $class = shift;
-    my $buildgui = shift;
     my $self;
 
     $self->{cfg} = shift;
+    $self->{parent} = shift;
     $self->{container} = undef;
     $self->{hotkey} = {};
 
@@ -113,6 +113,10 @@ sub GetAction {
     if (!$keymask) {
         return $keyval;
     }
+
+    #print "$window : $keymask => $$cfg{$window}{$keymask}\n";
+    #foreach my $w (sort keys %$cfg) {my $wk = $$cfg{$w};foreach my $k (keys %$wk) {print "cfg{$w}{$k} = $$cfg{$w}{$k}\n";}}
+
     if ($$cfg{$window}{$keymask}) {
         return $$cfg{$window}{$keymask}[1];
     } elsif ($$hk{$window}{$keymask}) {
@@ -160,13 +164,10 @@ sub update {
         foreach my $a (sort keys %actions) {
             my $k = $actions{$a};
             my $kb = $k;
-            if ($$wk{$k}[0] eq 'User hotey') {
-                next;
-            }
             if ($kb =~ /^undef-/) {
                 $kb = '';
             }
-            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$kb,$$wk{$k}[1] ], children => []});
+            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$kb,$$wk{$k}[1],$w ], children => []});
         }
     }
 }
@@ -187,10 +188,11 @@ sub _initCFG {
     my $self = shift;
     my $cfg;
 
-    $$cfg{'treeFavourites'}{'Alt+e'} = ['Favourites Tree','edit_node','Edit selected node'];
-    $$cfg{'treeHistory'}{'Alt+e'} = ['History Tree','edit_node','Edit selected node'];
-    $$cfg{'treeClusters'}{'Alt+e'} = ['Clusters Tree','edit_node','Edit selected node'];
-    $$cfg{'treeConnections'}{'Alt+e'} = ['Connections Tree','edit_node','Edit selected node'];
+    #      app_window_name  keybind       User window name    action     user description
+    $$cfg{'treeFavourites'}{'Alt+e'}   = ['Favourites Tree','edit_node','Edit selected node'];
+    $$cfg{'treeHistory'}{'Alt+e'}      = ['History Tree','edit_node','Edit selected node'];
+    $$cfg{'treeClusters'}{'Alt+e'}     = ['Clusters Tree','edit_node','Edit selected node'];
+    $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit_node','Edit selected node'];
     $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree','find','Find in connection tree'];
     $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree','expand_all','Expand tree completly'];
     $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree','collaps_all','Collaps tree completly'];
@@ -198,39 +200,39 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree','copy','Copy node'];
     $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','copy','Cut node'];
     $$cfg{'treeConnections'}{'Ctrl+v'} = ['Connections Tree','paste','Paste node'];
-    $$cfg{'treeConnections'}{'Alt+e'} = ['Connections Tree','edit','Edit node'];
-    $$cfg{'treeConnections'}{'Alt+r'} = ['Connections Tree','protection','Toggle protection'];
-    $$cfg{'treeConnections'}{'F2'} = ['Connections Tree','rename','Rename node'];
-    $$cfg{'pactabs'}{'Ctrl+Tab'} = ['Tabbed terminals','last','Last Tab'];
+    $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit','Edit node'];
+    $$cfg{'treeConnections'}{'Alt+r'}  = ['Connections Tree','protection','Toggle protection'];
+    $$cfg{'treeConnections'}{'F2'}     = ['Connections Tree','rename','Rename node'];
+    $$cfg{'pactabs'}{'Ctrl+Tab'}       = ['Tabbed terminals','last','Last focused Tab'];
     $$cfg{'pactabs'}{'Ctrl+Page_Down'} = ['Tabbed terminals','next','Next Tab'];
-    $$cfg{'pactabs'}{'Ctrl+Page_Up'} = ['Tabbed terminals','previous','Previous Tab'];
-    $$cfg{'pactabs'}{'undef-infotab'} = ['Tabbed terminals','infotab','Got to Info Tab'];
-    $$cfg{'pacmain'}{'Ctrl+f'} = ['Main Window','find','Find in connection tree'];
-    $$cfg{'pacmain'}{'Ctrl+q'} = ['Main Window','quit','Exit Ásbrú'];
-    $$cfg{'pacmain'}{'Ctrl+t'} = ['Main Window','localshell','Open a local shell'];
-    $$cfg{'terminal'}{'F11'} = ['Terminal','fullscreen','Go full screen'];
-    $$cfg{'terminal'}{'Ctrl+Return'} = ['Terminal','start','Start Terminal'];
-    $$cfg{'terminal'}{'AltCtrl+X'} = ['Terminal','reset','Reset Terminal'];
-    $$cfg{'terminal'}{'CtrlAlt+r'} = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
-    $$cfg{'terminal'}{'Ctrl+Insert'} = ['Terminal','copy','Copy selection to clipboard'];
-    $$cfg{'terminal'}{'Shift+Insert'} = ['Terminal','paste','Paste selection into terminal'];
-    $$cfg{'terminal'}{'Ctrl+p'} = ['Terminal','paste-passwd','Paste terminal password'];
-    $$cfg{'terminal'}{'Ctrl+b'} = ['Terminal','paste-delete','Paste and delete'];
-    $$cfg{'terminal'}{'Ctrl+g'} = ['Terminal','hostname','Guess hostname'];
-    $$cfg{'terminal'}{'Ctrl+w'} = ['Terminal','close','Close Terminal'];
-    $$cfg{'terminal'}{'Ctrl+q'} = ['Terminal','quit','Exit Ásbrú'];
-    $$cfg{'terminal'}{'Ctrl+f'} = ['Terminal','find','Find in connection tree'];
-    $$cfg{'terminal'}{'F4'} = ['Terminal','closealltabs','Close all tabs'];
-    $$cfg{'terminal'}{'Ctrl+n'} = ['Terminal','close-disconected','Close disconnected sessions'];
-    $$cfg{'terminal'}{'Ctrl+d'} = ['Terminal','duplicate','Duplicate connection'];
-    $$cfg{'terminal'}{'Ctrl+r'} = ['Terminal','restart','Restart connection (close and start)'];
-    $$cfg{'terminal'}{'Ctrl+i'} = ['Terminal','infotab','Show the Info tab'];
-    $$cfg{'terminal'}{'Ctrl+F3'} = ['Terminal','find-terminal','Find Terminal'];
-    $$cfg{'terminal'}{'Alt+n'} = ['Terminal','showconnections','Show connections list'];
-    $$cfg{'terminal'}{'Alt+e'} = ['Terminal','edit','Edit Connection'];
-    $$cfg{'terminal'}{'Ctrl+plus'} = ['Terminal','zoomin','Zoom in text'];
-    $$cfg{'terminal'}{'Ctrl+minus'} = ['Terminal','zoomout','Zoom out text'];
-    $$cfg{'terminal'}{'Ctrl+0'} = ['Terminal','zoomreset','Zoom reset text'];
+    $$cfg{'pactabs'}{'Ctrl+Page_Up'}   = ['Tabbed terminals','previous','Previous Tab'];
+    $$cfg{'pactabs'}{'undef-infotab'}  = ['Tabbed terminals','infotab','Got to Info Tab'];
+    $$cfg{'pacmain'}{'Ctrl+f'}         = ['Main Window','find','Find in connection tree'];
+    $$cfg{'pacmain'}{'Ctrl+q'}         = ['Main Window','quit','Exit Ásbrú'];
+    $$cfg{'pacmain'}{'Ctrl+t'}         = ['Main Window','localshell','Open a local shell'];
+    $$cfg{'terminal'}{'F11'}           = ['Terminal','fullscreen','Go full screen'];
+    $$cfg{'terminal'}{'Ctrl+Return'}   = ['Terminal','start','Start Terminal'];
+    $$cfg{'terminal'}{'AltCtrl+X'}     = ['Terminal','reset','Reset Terminal'];
+    $$cfg{'terminal'}{'CtrlAlt+r'}     = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
+    $$cfg{'terminal'}{'Ctrl+Insert'}   = ['Terminal','copy','Copy selection to clipboard'];
+    $$cfg{'terminal'}{'Shift+Insert'}  = ['Terminal','paste','Paste selection into terminal'];
+    $$cfg{'terminal'}{'Ctrl+p'}        = ['Terminal','paste-passwd','Paste terminal password'];
+    $$cfg{'terminal'}{'Ctrl+b'}        = ['Terminal','paste-delete','Paste and delete'];
+    $$cfg{'terminal'}{'Ctrl+g'}        = ['Terminal','hostname','Guess hostname'];
+    $$cfg{'terminal'}{'Ctrl+w'}        = ['Terminal','close','Close Terminal'];
+    $$cfg{'terminal'}{'Ctrl+q'}        = ['Terminal','quit','Exit Ásbrú'];
+    $$cfg{'terminal'}{'Ctrl+f'}        = ['Terminal','find','Find in connection tree'];
+    $$cfg{'terminal'}{'F4'}            = ['Terminal','closealltabs','Close all tabs'];
+    $$cfg{'terminal'}{'Ctrl+n'}        = ['Terminal','close-disconected','Close disconnected sessions'];
+    $$cfg{'terminal'}{'Ctrl+d'}        = ['Terminal','duplicate','Duplicate connection'];
+    $$cfg{'terminal'}{'Ctrl+r'}        = ['Terminal','restart','Restart connection (close and start)'];
+    $$cfg{'terminal'}{'Ctrl+i'}        = ['Terminal','infotab','Show the Info tab'];
+    $$cfg{'terminal'}{'Ctrl+F3'}       = ['Terminal','find-terminal','Find Terminal'];
+    $$cfg{'terminal'}{'Alt+n'}         = ['Terminal','showconnections','Show connections list'];
+    $$cfg{'terminal'}{'Alt+e'}         = ['Terminal','edit','Edit Connection'];
+    $$cfg{'terminal'}{'Ctrl+plus'}     = ['Terminal','zoomin','Zoom in text'];
+    $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
+    $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
     $self->{cfg} = $cfg;
 }
 
@@ -250,10 +252,11 @@ sub _buildGUI {
     $w{vbox}->pack_start($w{scroll},1,1,1);
 
     $w{keylist} = PACTree->new(
-        'Window' => 'text',
-        'Action' => 'text',
-        'Keys' => 'text',
+        'Window'   => 'text',
+        'Action'   => 'text',
+        'Keys'     => 'text',
         'kbaction' => 'hidden',
+        'pacwin'   => 'hidden',
     );
     $w{keylist}->set_enable_tree_lines(0);
     $w{keylist}->set_headers_visible(1);
@@ -269,16 +272,15 @@ sub _buildGUI {
     $w{keylist}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         my $selection = $w{keylist}->get_selection();
-        my $model   = $w{keylist}->get_model();
-        my @paths   = _getSelectedRows($selection);
-        my $entry   = $model->get_value($model->get_iter($paths[0]),1);
-
+        my $model     = $w{keylist}->get_model();
+        my @paths     = _getSelectedRows($selection);
+        my ($window,$desc,$keybind,$action,$pacwin) = $model->get($model->get_iter($paths[0]));
         my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
 
-        print "$keyval, $unicode, $keymask\n";
+        #print "$keyval, $unicode, $keymask\n"; print "ROW:$window : $desc : $keybind : $action : $pacwin\n";
 
         if ($unicode == 8 || $unicode == 127) {
-            print "Borrar\n";
+            $self->_updateKeyBinding($selection,$model,$paths[0],"undef-$action",$pacwin,$keybind);
             return 1;
         } elsif (!$keymask) {
             return 0;
@@ -288,9 +290,30 @@ sub _buildGUI {
             return 0;
         }
 
-        print STDERR "KEYPRESS ($entry): $keymask\n";
+        #print STDERR "KEYPRESS ($desc): $keymask\n";
+        $self->_updateKeyBinding($selection,$model,$paths[0],$keymask,$pacwin,$keybind);
         return 1;
     });
+}
+
+sub _updateKeyBinding {
+    my ($self,$selection,$model,$path,$keynew,$window,$keyold) = @_;
+    my $cfg = $self->{cfg};
+
+    if ("$window$keynew" eq "$window$keyold") {
+        return 0;
+    }
+    if ($$cfg{$window}{$keynew}) {
+        _wMessage($self->{parent},"Keybind $keynew already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
+        return 0;
+    }
+    $$cfg{$window}{$keynew} = $$cfg{$window}{$keyold};
+    delete $$cfg{$window}{$keyold};
+    if ($keynew =~ /^undef-/) {
+        $keynew = '';
+    }
+    my $gvalue = Glib::Object::Introspection::GValueWrapper->new('Glib::String', $keynew);
+    $model->set_value($model->get_iter($path), 2, $gvalue);
 }
 
 1;

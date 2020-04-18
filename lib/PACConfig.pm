@@ -188,7 +188,7 @@ sub _initGUI {
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
-    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new(1, $$self{_CFG}{defaults}{keybindings}))->{container});
+    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings},$$self{_WINDOWCONFIG}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -1178,6 +1178,8 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'remote commands'} = $$self{_CMD_REMOTE}->get_cfg();
     # Save KeePass options
     $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg(1);
+    # Save KeyBindings options
+    $$self{_CFG}{'defaults'}{'keybindings'} = $$self{_KEYBINDS}->get_cfg();
 
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
     $self->_updateGUIPreferences();
