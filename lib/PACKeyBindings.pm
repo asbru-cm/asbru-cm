@@ -404,6 +404,11 @@ sub _updateKeyBinding {
         _wMessage($self->{parent},"<i>$keynew</i> already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
         return 0;
     } elsif (!$undef) {
+        my ($free,$msg) = $self->HotKeyIsFree('terminal',$keynew);
+        if (!$free) {
+            _wMessage($self->{parent},$msg);
+            return 0;
+        }
         foreach my $w (sort keys %$cfg) {
             if ($w eq $window) {
                 next;
