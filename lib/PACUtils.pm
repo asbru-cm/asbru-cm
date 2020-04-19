@@ -2133,9 +2133,6 @@ sub _cfgSanityCheck {
         $$cfg{'defaults'}{'gui password'} //= '';
     }
     $$cfg{'defaults'}{'use gui password tray'} //= 0;
-    $$cfg{'defaults'}{'disable CTRL key bindings'} //= 0;
-    $$cfg{'defaults'}{'disable SHIFT key bindings'} //= 0;
-    $$cfg{'defaults'}{'disable ALT key bindings'} //= 0;
     $$cfg{'defaults'}{'prevent F11'} //= 0;
     $$cfg{'defaults'}{'autostart shell upon start'} //= 0;
     $$cfg{'defaults'}{'tree on right side'} //= 0;
@@ -2241,9 +2238,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'timeout command'} //= 40;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'timeout connect'} //= 40;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'use personal settings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable CTRL key bindings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable ALT key bindings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'audible bell'} //= 0;
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
@@ -2539,9 +2533,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout command'} = 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout connect'} = 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use personal settings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable CTRL key bindings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} = 0;
         } else {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
@@ -2565,9 +2556,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout command'} //= 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout connect'} //= 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use personal settings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable CTRL key bindings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'audible bell'} //= 0;
         }
     }

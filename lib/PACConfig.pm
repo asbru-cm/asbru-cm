@@ -796,9 +796,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgUseGUIPassword')->set_active($$cfg{'defaults'}{'use gui password'});
     _($self, 'hboxCfgPACPassword')->set_sensitive($$cfg{'defaults'}{'use gui password'});
     _($self, 'cbCfgUseGUIPasswordTray')->set_active($$cfg{'defaults'}{'use gui password tray'});
-    _($self, 'cbCfgCTRLDisable')->set_active($$cfg{'defaults'}{'disable CTRL key bindings'});
-    _($self, 'cbCfgALTDisable')->set_active($$cfg{'defaults'}{'disable ALT key bindings'});
-    _($self, 'cbCfgSHIFTDisable')->set_active($$cfg{'defaults'}{'disable SHIFT key bindings'});
     _($self, 'cbCfgAutoStartShell')->set_active($$cfg{'defaults'}{'autostart shell upon PAC start'});
     _($self, 'cbCfgTreeOnRight')->set_active($$cfg{'defaults'}{'tree on right side'});
     _($self, 'cbCfgTreeOnLeft')->set_active(! $$cfg{'defaults'}{'tree on right side'});
@@ -1097,9 +1094,6 @@ sub _saveConfiguration {
 
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
-    $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} = _($self, 'cbCfgCTRLDisable')->get_active();
-    $$self{_CFG}{'defaults'}{'disable ALT key bindings'} = _($self, 'cbCfgALTDisable')->get_active();
-    $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'} = _($self, 'cbCfgSHIFTDisable')->get_active();
     $$self{_CFG}{'defaults'}{'prevent F11'} = _($self, 'cbCfgPreventF11')->get_active();
     $$self{_CFG}{'defaults'}{'autostart shell upon PAC start'} = _($self, 'cbCfgAutoStartShell')->get_active();
     $$self{_CFG}{'defaults'}{'tree on right side'} = _($self, 'cbCfgTreeOnRight')->get_active();
