@@ -1067,7 +1067,7 @@ sub _setupCallbacks {
             $self->_zoomHandler($action);
         } elsif ($action =~ /HOTKEY_CMD:(\w+)/) {
             my $where = $1;
-            my ($ask,$cmd) = $PACMain::FUNCS{_KEYBINDS}->GetHotKeyCommand('terminal',$keymask);
+            my ($ask,$cmd) = $PACMain::FUNCS{_KEYBINDS}->GetHotKeyCommand('terminal',$keymask,$$self{_UUID});
             if (!$cmd) {
                 return 0;
             }

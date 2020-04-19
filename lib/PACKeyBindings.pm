@@ -159,10 +159,16 @@ sub GetAction {
 }
 
 sub GetHotKeyCommand {
-    my ($self,$window,$keymask) = @_;
+    my ($self,$window,$keymask,$uuid) = @_;
     my $hk  = $self->{hotkey};
     my $cmd = $$hk{$window}{$keymask}[2];
 
+    if ($uuid && $$hk{$uuid}{$window}{$keymask}[2]) {
+        $cmd = $$hk{$uuid}{$window}{$keymask}[2];
+    }
+    if (!$cmd) {
+        return (0,'');
+    }
     if ($cmd =~ s/^\?//) {
         return (1,$cmd);
     }
@@ -171,9 +177,18 @@ sub GetHotKeyCommand {
 
 sub LoadHotKeys {
     my ($self,$cfg,$uuid) = @_;
+    my $CFG = {};
+    my @what;
 
-    foreach my $w ('remote','local') {
-        foreach my $hash (@{$$cfg{'defaults'}{"$w commands"}}) {
+    if ($uuid) {
+        $CFG = $$cfg{'environments'}{$uuid};
+        @what = ('macros');
+    } else {
+        $CFG = $$cfg{'defaults'};
+        @what = ('remote commands','local commands');
+    }
+    foreach my $w (@what) {
+        foreach my $hash (@{$$CFG{$w}}) {
             if ($$hash{keybind}) {
                 my $lf  = $$hash{intro} ? "\n" : '';
                 my $ask = $$hash{confirm} ? "?" : '';
@@ -202,19 +217,23 @@ sub RegisterHotKey {
 }
 
 sub UnRegisterHotKey {
-    my ($self,$window,$keymask) = @_;
+    my ($self,$window,$keymask,$uuid) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
     if (!$window || !$keymask) {
         return (0,"window,keymask : are required");
     }
-    delete $$hk{$window}{$keymask};
+    if ($uuid) {
+        delete $$hk{$uuid}{$window}{$keymask};
+    } else {
+        delete $$hk{$window}{$keymask};
+    }
     return (1,'');
 }
 
 sub HotKeyIsFree {
-    my ($self,$window,$keymask) = @_;
+    my ($self,$window,$keymask,$uuid) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
@@ -223,6 +242,11 @@ sub HotKeyIsFree {
     }
     if ($$cfg{$window}{$keymask}) {
         return (0,"<i>$keymask</i> already assigned to <b>$$cfg{$window}{$keymask}[0]</b>\n\n$$cfg{$window}{$keymask}[2]");
+    }
+    if ($uuid) {
+        if ($$hk{$uuid}{$window}{$keymask}) {
+            return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");
+        }
     }
     if ($$hk{$window}{$keymask}) {
         return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");

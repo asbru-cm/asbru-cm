@@ -79,6 +79,7 @@ sub update {
     my $cfg = shift;
     my $variables = shift;
     my $where = shift;
+    my $uuid = shift;
 
     if (defined $cfg) {
         $$self{cfg} = $cfg;
@@ -89,6 +90,7 @@ sub update {
     if (defined $where) {
         $$self{where} = $where;
     }
+    $$self{uuid} = $uuid // 0;
 
     # Destroy previous widgets
     $$self{frame}{vbexec}->foreach(sub {
@@ -129,7 +131,8 @@ sub get_cfg {
             # Register final values after all editing changes
             my $lf  = $hash{intro} ? "\n" : '';
             my $ask = $hash{confirm} ? "?" : '';
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD:$self->{where}","$ask$hash{txt}$lf");
+            print "Registrar : HOTKEY_CMD:$self->{where} ? $self->{uuid}\n";
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD:$self->{where}","$ask$hash{txt}$lf",$self->{uuid});
         }
     }
 
@@ -238,7 +241,7 @@ sub _buildExec {
             # Register so we can validate
             my $lf  = $intro   ? "\n" : '';
             my $ask = $confirm ? "?"  : '';
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD:$self->{where}","$ask$txt$lf");
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD:$self->{where}","$ask$txt$lf", $self->{uuid});
         }
     }
 
@@ -334,7 +337,7 @@ sub _buildExec {
         splice(@{$$self{cfg}}, $w{position}, 1);
         if ($keymask) {
             # Remove registered keybind
-            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask);
+            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask, $self->{uuid});
         }
         $self->update();
         return 1;
@@ -512,7 +515,7 @@ sub _buildExec {
 
         if (!$keymask && ($unicode == 8 || $unicode == 127)) {
             if ($text) {
-                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask);
+                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask, $self->{uuid});
             }
             $widget->set_text('');
             return 1;
@@ -520,10 +523,10 @@ sub _buildExec {
             return 0;
         }
 
-        my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask);
+        my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask, $self->{uuid});
         if ($free) {
             # Register to validate, and apply changes online
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD:$self->{where}","$ask$command$lf");
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD:$self->{where}","$ask$command$lf", $self->{uuid});
             $widget->set_text($keymask);
         } else {
             _wMessage($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},$msg);

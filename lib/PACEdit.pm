@@ -711,8 +711,8 @@ sub _updateGUIPreferences {
     $$self{_VARIABLES}->update($$self{_CFG}{'environments'}{$uuid}{'variables'});
     $$self{_PRE_EXEC}->update($$self{_CFG}{'environments'}{$uuid}{'local before'}, $$self{_CFG}{'environments'}{$uuid}{'variables'});
     $$self{_POST_EXEC}->update($$self{_CFG}{'environments'}{$uuid}{'local after'}, $$self{_CFG}{'environments'}{$uuid}{'variables'});
-    $$self{_MACROS}->update($$self{_CFG}{'environments'}{$uuid}{'macros'}, $$self{_CFG}{'environments'}{$uuid}{'variables'}, 'remote');
-    $$self{_LOCAL_EXEC}->update($$self{_CFG}{'environments'}{$uuid}{'local connected'}, $$self{_CFG}{'environments'}{$uuid}{'variables'}, 'local');
+    $$self{_MACROS}->update($$self{_CFG}{'environments'}{$uuid}{'macros'}, $$self{_CFG}{'environments'}{$uuid}{'variables'}, 'remote', $uuid);
+    $$self{_LOCAL_EXEC}->update($$self{_CFG}{'environments'}{$uuid}{'local connected'}, $$self{_CFG}{'environments'}{$uuid}{'variables'}, 'local', $uuid);
     _($self, 'frameExpect')->set_sensitive(! _($self, 'rbCfgAuthManual')->get_active());
     _($self, 'labelExpect')->set_sensitive(! _($self, 'rbCfgAuthManual')->get_active());
     $$self{_EXPECT_EXEC}->update($$self{_CFG}{'environments'}{$uuid}{'expect'}, $$self{_CFG}{'environments'}{$uuid}{'variables'});
