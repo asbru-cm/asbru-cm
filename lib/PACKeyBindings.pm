@@ -166,7 +166,7 @@ sub GetHotKeyCommand {
     if ($uuid && $$hk{$uuid}{$window}{$keymask}[2]) {
         $cmd = $$hk{$uuid}{$window}{$keymask}[2];
     }
-    if (!$cmd) {
+    if (defined $cmd && $cmd eq '') {
         return (0,'');
     }
     if ($cmd =~ s/^\?//) {
