@@ -85,7 +85,21 @@ sub GetKeyMask {
     #print "$keyval : $unicode : $ctrl : $shift\n";
 
     # Test special keys
-    if (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert|KP_Enter/)) {
+    if ($keyval =~ /^KP_(.+)/) {
+        # Unify keypad and keyboard to be the same
+        my $kp = $1;
+        if ($kp =~ /\d/) {
+            $keyval = $kp;
+        } else {
+            my %kp2key = ('Add','plus','Subtract','minus','Multiply','asterix','Divide','slash','Decimal','period','Enter','Return');
+            if ($kp2key{$kp}) {
+                $keyval = $kp2key{$kp};
+            }
+        }
+        if (!$unicode) {
+            $unicode = 1;
+        }
+    } elsif (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert/)) {
         if ("$alt$ctrl$shift") {
             return ($keyval,0,"$alt$ctrl$shift+$keyval");
         }
@@ -102,6 +116,7 @@ sub GetAction {
     my ($self,$window, $widget, $event) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
+    my @tests = ();
 
     if (!$window) {
         return '';

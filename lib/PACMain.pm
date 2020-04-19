@@ -2086,6 +2086,7 @@ sub _setupCallbacks {
                 $$self{_GUI}{nb}->prev_page();
             }
         } elsif ($action eq 'Ctrl+0') {
+            # Special case: if Ctrl+0 is not bind to an action then ignore it
             return 0;
         } elsif ($action =~ /^Ctrl\+(\d+)/) {
             my $n = $1;

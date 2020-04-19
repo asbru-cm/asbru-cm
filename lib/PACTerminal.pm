@@ -993,7 +993,7 @@ sub _setupCallbacks {
 
         if (!$action) {
             return 0;
-        } elsif ($action eq 'start' || $action eq 'CtrlKP_Enter') {
+        } elsif ($action eq 'start') {
             if (!$$self{CONNECTED} && ! $$self{CONNECTING}) {
                 $self->start;
             }
@@ -1062,7 +1062,7 @@ sub _setupCallbacks {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
             }
-        } elsif ($action =~ /zoom|Ctrl\+KP_/) {
+        } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
         } elsif ($action eq 'Ctrl+ampersand') {
             _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
@@ -4127,13 +4127,13 @@ sub _zoomHandler {
     my $zoom = 0;
     my $scale = $$self{_GUI}{_VTE}->get_font_scale();
 
-    if ($action eq 'zoomin' || $action eq 'Ctrl+KP_Add') {
+    if ($action eq 'zoomin') {
         $zoom = 1;
         $scale += 0.1;
-    } elsif ($action eq 'zoomout' || $action eq 'Ctrl+KP_Subtract') {
+    } elsif ($action eq 'zoomout') {
         $zoom = 1;
         $scale -= 0.1;
-    } elsif ($action eq 'zoomreset' || $action eq 'Ctrl+KP_0') {
+    } elsif ($action eq 'zoomreset') {
         $zoom = 1;
         $scale = 1;
     }
