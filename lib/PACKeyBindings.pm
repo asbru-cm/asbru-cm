@@ -311,41 +311,49 @@ sub _buildGUI {
         my $selection = $w{keylist}->get_selection();
         my $model     = $w{keylist}->get_model();
         my @paths     = _getSelectedRows($selection);
+
+        if (!@paths) {
+            return 0;
+        }
+
         my ($window,$desc,$keybind,$action,$pacwin) = $model->get($model->get_iter($paths[0]));
         my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
 
         #print "$keyval, $unicode, $keymask\n"; print "ROW:$window : $desc : $keybind : $action : $pacwin\n";
 
-        if ($unicode == 8 || $unicode == 127) {
-            $self->_updateKeyBinding($selection,$model,$paths[0],"undef-$action",$pacwin,$keybind);
+        if (!$keymask && ($unicode == 8 || $unicode == 127)) {
+            $self->_updateKeyBinding($selection,$model,$paths[0],"undef-$action",$pacwin,$keybind,$action);
             return 1;
         } elsif (!$keymask) {
             return 0;
         }
 
-        if (!$keymask) {
-            return 0;
-        }
-
-        #print STDERR "KEYPRESS ($desc): $keymask\n";
-        $self->_updateKeyBinding($selection,$model,$paths[0],$keymask,$pacwin,$keybind);
+        $self->_updateKeyBinding($selection,$model,$paths[0],$keymask,$pacwin,$keybind,$action);
         return 1;
     });
 }
 
 sub _updateKeyBinding {
-    my ($self,$selection,$model,$path,$keynew,$window,$keyold) = @_;
+    my ($self,$selection,$model,$path,$keynew,$window,$keyold,$action) = @_;
     my $cfg = $self->{cfg};
 
     if ("$window$keynew" eq "$window$keyold") {
         return 0;
+    } elsif ($$cfg{$window}{$keynew} && $keynew =~ /^undef-/) {
+        return 0;
     }
+
     if ($$cfg{$window}{$keynew}) {
         _wMessage($self->{parent},"Keybind $keynew already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
         return 0;
     }
-    $$cfg{$window}{$keynew} = $$cfg{$window}{$keyold};
-    delete $$cfg{$window}{$keyold};
+    if ($$cfg{$window}{"undef-$action"}) {
+        $$cfg{$window}{$keynew} = $$cfg{$window}{"undef-$action"};
+        delete $$cfg{$window}{"undef-$action"};
+    } else {
+        $$cfg{$window}{$keynew} = $$cfg{$window}{$keyold};
+        delete $$cfg{$window}{$keyold};
+    }
     if ($keynew =~ /^undef-/) {
         $keynew = '';
     }
