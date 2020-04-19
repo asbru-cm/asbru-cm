@@ -40,7 +40,6 @@ use Gtk3 '-init';
 
 # PAC modules
 use PACUtils;
-use PACKeyBindings;
 
 # END: Import Modules
 ###################################################################
@@ -62,7 +61,6 @@ sub new {
     $self->{cfg} = shift;
     $self->{variables} = shift;
     $self->{where} = shift;
-
     $self->{container} = undef;
     $self->{frame} = {};
     $self->{list} = [];
@@ -488,6 +486,22 @@ sub _buildExec {
     });
 
     $w{keybind}->signal_connect('key_press_event' => sub {
+        my ($widget, $event) = @_;
+        my ($keyval, $unicode, $keymask) = $PACMain::FUNCS{_KEYBINDS}->GetKeyMask($widget, $event);
+
+        if (!$keymask && ($unicode == 8 || $unicode == 127)) {
+            $widget->set_text('');
+            return 1;
+        } elsif (!$keymask) {
+            return 0;
+        }
+
+        my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask);
+        if ($free) {
+            $widget->set_text($keymask);
+        } else {
+            _wMessage($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},$msg);
+        }
     });
 
     return %w;

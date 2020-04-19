@@ -148,13 +148,36 @@ sub RegisterHotKey {
     if (!$window || !$keymask || !$action || !$description) {
         return (0,"window,keymask,action,description : are required");
     }
+    my ($free,$msg) = $self->HotKeyIsFree($window,$keymask);
+
+    if ($free) {
+        $$hk{$window}{$keymask} = ['User hotkey',$action,$description];
+    }
+    return ($free,$msg);
+}
+
+sub HotKeyIsFree {
+    my ($self,$window,$keymask) = @_;
+    my $cfg = $self->{cfg};
+    my $hk  = $self->{hotkey};
+
+    if (!$window || !$keymask) {
+        return (0,"window,keymask : are required");
+    }
     if ($$cfg{$window}{$keymask}) {
-        return (0,"Key binding already in use by global settings : $$cfg{$window}{$keymask}[2]");
+        return (0,"<i>$keymask</i> already assigned to <b>$$cfg{$window}{$keymask}[0]</b>\n\n$$cfg{$window}{$keymask}[2]");
     }
     if ($$hk{$window}{$keymask}) {
-        return (0,"Key binding already in use by hotkey : $$hk{$window}{$keymask}[2]");
+        return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");
     }
-    $$hk{$window}{$keymask} = ['User hotkey',$action,$description];
+    foreach my $w (sort keys %$cfg) {
+        if ($w eq $window) {
+            next;
+        }
+        if ($$cfg{$w}{$keymask}) {
+            return (0,"<i>$keymask</i> already assigned to <b>$$cfg{$w}{$keymask}[0]</b>\n\n$$cfg{$w}{$keymask}[2]");
+        }
+    }
     return (1,'');
 }
 
