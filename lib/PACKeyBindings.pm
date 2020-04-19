@@ -175,7 +175,7 @@ sub update {
         my $wk = $$cfg{$w};
         %actions = ();
         foreach my $k (keys %$wk) {
-            $actions{$$wk{$k}[1]} = $k;
+            $actions{$$wk{$k}[2]} = $k;
         }
         foreach my $a (sort keys %actions) {
             my $k = $actions{$a};
@@ -282,6 +282,7 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+plus'}     = ['Terminal','zoomin','Zoom in text'];
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
+    $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal','cisco','Send Cisco interrupt keypress'];
     $self->{cfg} = $cfg;
 }
 
@@ -303,7 +304,7 @@ sub _buildGUI {
     $w{keylist} = PACTree->new(
         'Window'   => 'markup',
         'Action'   => 'text',
-        'Keybind'     => 'text',
+        'Keybind'  => 'text',
         'kbaction' => 'hidden',
         'pacwin'   => 'hidden',
     );
@@ -351,16 +352,40 @@ sub _buildGUI {
 sub _updateKeyBinding {
     my ($self,$selection,$model,$path,$keynew,$window,$keyold,$action) = @_;
     my $cfg = $self->{cfg};
+    my $undef = $keynew =~ /^undef-/;
 
     if ("$window$keynew" eq "$window$keyold") {
         return 0;
-    } elsif ($$cfg{$window}{$keynew} && $keynew =~ /^undef-/) {
+    } elsif ($$cfg{$window}{$keynew} && $undef) {
         return 0;
     }
 
     if ($$cfg{$window}{$keynew}) {
-        _wMessage($self->{parent},"Keybind $keynew already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
+        _wMessage($self->{parent},"<i>$keynew</i> already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
         return 0;
+    } elsif (!$undef) {
+        foreach my $w (sort keys %$cfg) {
+            if ($w eq $window) {
+                next;
+            }
+            if ($$cfg{$w}{$keynew}) {
+                my $warning = '';
+                my $other = '';
+
+                if ($$cfg{$window}{"undef-$action"}) {
+                    $other = $$cfg{$window}{"undef-$action"}[0];
+                } else {
+                    $other = $$cfg{$window}{$keyold}[0];
+                }
+
+                if ($w lt $window) {
+                    $warning = "This keybind will not be available when <b>$$cfg{$w}{$keynew}[0]</b> is visible.";
+                } else {
+                    $warning = "This keybind will not be available for window <b>$$cfg{$w}{$keynew}[0]</b>\nwhen <b>$other</b> is visible.";
+                }
+                _wMessage($self->{parent},"<i>$keynew</i> used in\n\n<b>$$cfg{$w}{$keynew}[0]</b> : $$cfg{$w}{$keynew}[2]\n\n$warning");
+            }
+        }
     }
     if ($$cfg{$window}{"undef-$action"}) {
         $$cfg{$window}{$keynew} = $$cfg{$window}{"undef-$action"};
@@ -369,11 +394,10 @@ sub _updateKeyBinding {
         $$cfg{$window}{$keynew} = $$cfg{$window}{$keyold};
         delete $$cfg{$window}{$keyold};
     }
-    if ($keynew =~ /^undef-/) {
+    if ($undef) {
         $keynew = '';
     }
-    my $gvalue = Glib::Object::Introspection::GValueWrapper->new('Glib::String', $keynew);
-    $model->set_value($model->get_iter($path), 2, $gvalue);
+    $model->set_value($model->get_iter($path), 2, Glib::Object::Introspection::GValueWrapper->new('Glib::String', $keynew));
 }
 
 1;

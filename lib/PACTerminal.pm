@@ -746,7 +746,6 @@ sub _initGUI {
         # Create a button to show the info tab
         $$self{_GUI}{btnShowInfoTab} = Gtk3::Button->new();
         $$self{_GUI}{btnShowInfoTab}->set_image(Gtk3::Image->new_from_stock('gtk-info', 'GTK_ICON_SIZE_BUTTON'));
-        $$self{_GUI}{btnShowInfoTab}->set_tooltip_text('Show information tab (Shift+Ctrl+I)');
         $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowInfoTab}, 0, 1, 4);
     }
 
@@ -1064,7 +1063,7 @@ sub _setupCallbacks {
             }
         } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
-        } elsif ($action eq 'Ctrl+ampersand') {
+        } elsif ($action eq 'cisco') {
             _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
             #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
             #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c]");
