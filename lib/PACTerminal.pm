@@ -989,14 +989,6 @@ sub _setupCallbacks {
             return 1;
         }
 
-        if ($unicode eq 38) {
-            _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
-            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
-            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c]");
-            _vteFeedChildBinary($$self{_GUI}{_VTE}, chr(30) . 'x');
-            return 1;
-        }
-
         my $action = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event);
 
         if (!$action) {
@@ -1072,6 +1064,12 @@ sub _setupCallbacks {
             }
         } elsif ($action =~ /zoom|Ctrl\+KP_/) {
             $self->_zoomHandler($action);
+        } elsif ($action eq 'Ctrl+ampersand') {
+            _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
+            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
+            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c]");
+            _vteFeedChildBinary($$self{_GUI}{_VTE}, chr(30) . 'x');
+            return 1;
         } else {
             return 0;
         }
