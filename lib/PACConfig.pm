@@ -983,8 +983,10 @@ sub _closeConfiguration {
 sub _saveConfiguration {
     my $self = shift;
 
+    # Increase and document config version changes
     $$self{_CFG}{'config version'} = 2;
     $$self{_CFG}{'config version change'} = 'Added keybindings settings';
+
     $$self{_CFG}{'defaults'}{'command prompt'} = _($self, 'entryCfgPrompt')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'username prompt'} = _($self, 'entryCfgUserPrompt')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'password prompt'} = _($self, 'entryCfgPasswordPrompt')->get_chars(0, -1);
