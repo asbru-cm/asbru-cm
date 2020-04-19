@@ -154,6 +154,7 @@ sub update {
     } else {
         $self->{cfg} = $cfg;
     }
+    _updateDefaultCFG();
     @{$$self{frame}{keylist}{'data'}} = ();
     foreach my $w (sort keys %$cfg) {
         my $wk = $$cfg{$w};
@@ -183,6 +184,39 @@ sub get_cfg {
 
 ###################################################################
 # START: Private Methods
+
+sub _updateDefaultCFG {
+    my $self = shift;
+
+    # Add new default keybindigs here
+    # $self->_newKeyBind('app_window_name','keybind','User window name','action','user description');
+}
+
+sub _newKeyBind {
+    my ($self,$appwin,$keybind,$window,$action,$desc) = @_;
+    my $cfg = $self->{cfg};
+
+    if ($self->_exists($appwin,$action)) {
+        return 0;
+    }
+    $$cfg{$appwin}{$keybind} = [$window,$action,$desc];
+}
+
+sub _exists {
+    my ($self,$appwin,$action) = @_;
+    my $cfg = $self->{cfg};
+    my $wk = $$cfg{$appwin};
+
+    if (!$wk) {
+        return 0;
+    }
+    foreach my $k (keys %$wk) {
+        if ($$wk{$k}[1] eq $action) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 sub _initCFG {
     my $self = shift;
