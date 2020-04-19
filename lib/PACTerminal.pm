@@ -981,34 +981,23 @@ sub _setupCallbacks {
     # Capture keypresses on VTE
     $$self{_GUI}{_VTE}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval) // '';
+        my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state();
-        my $shift = $state * ['shift-mask'];
-        my $ctrl = $state * ['control-mask'];
-        my $alt = $state * ['mod1-mask'];
-        my $alt2 = $state * ['mod2-mask'];
-        my $alt5 = $state * ['mod5-mask'];
 
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:TERMINAL:KEYPRESS:*$state*$keyval*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-        }
 
         if (defined $$self{_KEYS_RECEIVE}) {
             return 1;
         }
 
-        # ENTER --> reconnect if disconnected
-        if ((($keyval eq 'Return') || ($keyval eq 'KP_Enter')) && (! $$self{CONNECTED} && ! $$self{CONNECTING})) {
-            $self->start;
-            return 1;
-        } elsif (($keyval eq 'Return') || ($keyval eq 'KP_Enter')) {
-            $$self{_INTRO_PRESS} = 1;
-        }
+        my $action = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event);
 
-        # F11 --> [un]fullscreen window
-        if (($keyval eq 'F11') && (! $$self{_CFG}{defaults}{'prevent F11'})) {
+        if (!$action) {
+            return 0;
+        } elsif ($action eq 'start' || $action eq 'CtrlKP_Enter') {
+            if (!$$self{CONNECTED} && ! $$self{CONNECTING}) {
+                $self->start;
+            }
+        } elsif ($action eq 'fullscreen') {
             if ($$self{_FULLSCREEN}) {
                 $$self{_FSTOTAB} and $self->_winToTab;
                 $$self{_GUI}{_VBOX}->get_window()->unfullscreen();
@@ -1019,199 +1008,72 @@ sub _setupCallbacks {
                 $$self{_GUI}{_VBOX}->get_window()->fullscreen();
                 $$self{_FULLSCREEN} = 1;
             }
+        } elsif ($action eq 'reset') {
+            $$self{_GUI}{_VTE}->reset(1, 1);
+        } elsif ($action eq 'remove_from_cluster') {
+            $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+        } elsif ($action eq 'copy') {
+            $$self{_GUI}{_VTE}->copy_clipboard;
+        } elsif ($action eq 'paste') {
+            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
+        } elsif ($action eq 'paste-passwd' && $$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '') {
+            $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+        } elsif ($action eq 'paste-delete') {
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            my $delete = _wEnterValue(
+                $$self{_PARENTWINDOW},
+                "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
+                'Use string or Perl RegExps (ex: \n means "carriage return")',
+                '\n|\f|\r'
+            ) or return 1;
+            $text =~ s/$delete//g;
+            $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
+        } elsif ($action eq 'hostname') {
+            ($$self{CONNECTED} && ! $$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
+        } elsif ($action eq 'close') {
+            $self->stop(undef, 1);
+        } elsif ($action eq 'quit') {
+            $PACMain::FUNCS{_MAIN}->_quitProgram;
+        } elsif ($action eq 'find') {
+            $PACMain::FUNCS{_MAIN}->_showConnectionsList(0);
+            $PACMain::FUNCS{_MAIN}{_GUI}{_vboxSearch}->show();
+            $PACMain::FUNCS{_MAIN}{_GUI}{_entrySearch}->grab_focus();
+        } elsif ($action eq 'closealltabs') {
+            $self->_closeAllTerminals();
+        } elsif ($action eq 'close-disconected') {
+            $self->_closeDisconnectedTerminals();
+        } elsif ($action eq 'duplicate') {
+            my $terminals = $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);
+            $$self{_NOTEBOOK}->reorder_child ($$terminals[0]->{_GUI}{_VBOX}, $$self{_NOTEBOOK}->page_num($$self{_GUI}{_VBOX}) + 1);
+        } elsif ($action eq 'restart') {
+            $self->_disconnectAndRestartTerminal();
+        } elsif ($action eq 'infotab') {
+            $self->_showInfoTab();
+        } elsif ($action eq 'find-terminal') {
+            _wFindInTerminal($self);
+        } elsif ($action eq 'showconnections') {
+            if (!$$self{_TABBED} || !$$self{_CFG}{defaults}{'tabs in main window'}) {
+                $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+            } else {
+                $PACMain::FUNCS{_MAIN}->_toggleConnectionsList();
+            }
+        } elsif ($action eq 'edit') {
+            if (not $$self{_UUID} eq '__PAC_SHELL__') {
+                $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
+            }
+        } elsif ($action =~ /zoom|Ctrl\+KP_/) {
+            $self->_zoomHandler($action);
+        } elsif ($action eq 'Ctrl+ampersand') {
+            _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
+            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
+            #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c]");
+            _vteFeedChildBinary($$self{_GUI}{_VTE}, chr(30) . 'x');
             return 1;
+        } else {
+            return 0;
         }
-
-        # Capture only keypresses with modifiers (ctrl, alt, etc.)
-
-        ############################################
-        # Generic VTE keystrokes
-
-        # <Shift><Ctrl><Alt>
-        if (($ctrl && $alt && $shift) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'}) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
-            # X --> Reset terminal
-            if (lc $keyval eq 'x') {
-                $$self{_GUI}{_VTE}->reset(1, 1);
-                return 1;
-            }
-        }
-        # <Ctrl><Alt>
-        elsif (($ctrl && $alt) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'})) {
-            # r --> remove from cluster
-            if (lc $keyval eq 'r') {
-                $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
-                return 1;
-            }
-        }
-        # <Ctrl><Shift>
-        if (($ctrl && $shift) && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
-            # C --> COPY
-            if (lc $keyval eq 'c') {
-                $$self{_GUI}{_VTE}->copy_clipboard;
-                return 1;
-            }
-            # V --> PASTE
-            elsif (lc $keyval eq 'v') {
-                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
-                $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
-                return 1;
-            }
-            # P --> PASTE CONNECTION PASSWORD
-            elsif ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' && lc $keyval eq 'p') {
-                $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
-                return 1;
-            }
-            # B --> PASTE AND DELETE
-            elsif (lc $keyval eq 'b')
-            {
-                my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
-                my $delete = _wEnterValue(
-                    $$self{_PARENTWINDOW},
-                    "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
-                    'Use string or Perl RegExps (ex: \n means "carriage return")',
-                    '\n|\f|\r'
-                ) or return 1;
-                $text =~ s/$delete//g;
-                $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
-                return 1;
-            }
-            # X --> Reset terminal
-            elsif (lc $keyval eq 'x') {
-                $$self{_GUI}{_VTE}->reset(1, 0);
-                return 1;
-            }
-            # g --> Guess hostname and set as title
-            elsif (lc $keyval eq 'g') {
-                ($$self{CONNECTED} && ! $$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
-                return 1;
-            }
-            # w --> Close terminal
-            elsif (lc $keyval eq 'w') {
-                $self->stop(undef, 1);
-                return 1;
-            }
-            # q --> Close PAC
-            elsif (lc $keyval eq 'q') {
-                $PACMain::FUNCS{_MAIN}->_quitProgram;
-                return 1;
-            }
-            # f --> FIND in treeView
-            elsif (lc $keyval eq 'f')
-            {
-                $PACMain::FUNCS{_MAIN}->_showConnectionsList(0);
-                $PACMain::FUNCS{_MAIN}{_GUI}{_vboxSearch}->show();
-                $PACMain::FUNCS{_MAIN}{_GUI}{_entrySearch}->grab_focus();
-                return 1;
-            }
-            # 6 --> Send a Cisco interrupt keypress
-            elsif ($unicode eq 38)
-            {
-                _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
-                #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
-                #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c]");
-                _vteFeedChildBinary($$self{_GUI}{_VTE}, chr(30) . 'x');
-                return 1;
-            }
-            # F4 --> CLOSE *ALL* opened tabs
-            elsif (($self->{_TABBED}) and ($keyval eq 'F4'))
-            {
-                $self->_closeAllTerminals();
-                return 1;
-            }
-            # n --> Close disconnected sessions
-            elsif (lc $keyval eq 'n') {
-                $self->_closeDisconnectedTerminals();
-                return 1;
-            }
-            # d --> duplicate connection
-            elsif (lc $keyval eq 'd') {
-                my $terminals = $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);
-                $$self{_NOTEBOOK}->reorder_child ($$terminals[0]->{_GUI}{_VBOX}, $$self{_NOTEBOOK}->page_num($$self{_GUI}{_VBOX}) + 1);
-                return 1;
-            }
-            # f --> Find in history
-            #elsif (lc $keyval eq 'f') {
-                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    #$self->_wHistory;
-                #}
-                #return 1;
-            #}
-            # r --> Disconnect and Restart session
-            elsif (lc $keyval eq 'r') {
-                $self->_disconnectAndRestartTerminal();
-                return 1;
-            }
-            # i --> Show the information tab
-            elsif (lc $keyval eq 'i') {
-                $self->_showInfoTab();
-                return 1;
-            }
-
-            # Test Zooming actions
-            if ($self->_zoomHandler($keyval)) {
-                return 1;
-            }
-        }
-        # <Ctrl>
-        elsif ($ctrl && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable CTRL key bindings'})) {
-            # F4 --> CLOSE current tab
-            if (($self->{_TABBED}) and ($keyval eq 'F4')) {
-                $self->stop(undef, 1);
-                return 1;
-            }
-
-            # F3 --> FIND in text buffer
-            if ($keyval eq 'F3') {
-                _wFindInTerminal($self);
-                return 1;
-            }
-
-            # <ins> --> COPY
-            if ($keyval eq 'Insert') {
-                $$self{_GUI}{_VTE}->copy_clipboard;
-                return 1;
-            }
-
-            # Test Zooming actions
-            if ($self->_zoomHandler($keyval)) {
-                return 1;
-            }
-        }
-        # <Shift>
-        elsif ($shift && (! $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable SHIFT key bindings'})) {
-            # <ins> --> PASTE
-            if ($keyval eq 'Insert') {
-                $$self{_GUI}{_VTE}->paste_clipboard;
-                return 1;
-            }
-        }
-        # <Alt>
-        elsif ($alt && (!$$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'disable ALT key bindings'})) {
-            # c | n --> Show main connections window
-            if ((lc $keyval eq 'c') || (lc $keyval eq 'n')) {
-                if (! $$self{_TABBED} || ! $$self{_CFG}{defaults}{'tabs in main window'}) {
-                    $PACMain::FUNCS{_MAIN}->_showConnectionsList();
-                } else {
-                    $PACMain::FUNCS{_MAIN}->_toggleConnectionsList();
-                }
-                return 1;
-            }
-            # e --> Show main edit connection window
-            if (lc $keyval eq 'e') {
-                if (not $$self{_UUID} eq '__PAC_SHELL__') {
-                    $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
-                }
-                return 1;
-            }
-            # h --> Show command history window
-            #if (lc $keyval eq 'h') {
-                #if ($$self{_CFG}{'defaults'}{'record command history'}) {
-                    #$self->_wHistory;
-                #}
-                #return 1;
-            #}
-        }
-        return 0;
+        return 1;
     });
 
     # Right mouse click on VTE
@@ -4205,7 +4067,7 @@ sub _closeDisconnectedTerminals {
     my @list = keys %PACMain::RUNNING;
 
     foreach my $uuid (@list) {
-        if ($PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED') {
+        if (defined $PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} && $PACMain::RUNNING{$uuid}{'terminal'}{_LAST_STATUS} eq 'DISCONNECTED') {
             $PACMain::RUNNING{$uuid}{'terminal'}->stop('force', 'deep');
         }
     }
@@ -4260,18 +4122,18 @@ sub _showEmbedMessages {
 
 sub _zoomHandler {
     my $self = shift;
-    my $keyval = shift;
+    my $action = shift;
 
     my $zoom = 0;
     my $scale = $$self{_GUI}{_VTE}->get_font_scale();
 
-    if ($keyval eq 'plus' || $keyval eq 'KP_Add') {
+    if ($action eq 'zoomin' || $action eq 'Ctrl+KP_Add') {
         $zoom = 1;
         $scale += 0.1;
-    } elsif ($keyval eq 'minus' || $keyval eq 'KP_Subtract') {
+    } elsif ($action eq 'zoomout' || $action eq 'Ctrl+KP_Subtract') {
         $zoom = 1;
         $scale -= 0.1;
-    } elsif ($keyval eq 'period' || $keyval eq 'KP_Decimal') {
+    } elsif ($action eq 'zoomreset' || $action eq 'Ctrl+KP_0') {
         $zoom = 1;
         $scale = 1;
     }
