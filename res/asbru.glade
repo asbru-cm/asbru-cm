@@ -2832,7 +2832,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                   <object class="GtkLabel" id="label116">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes"> Terminal Options</property>
+                    <property name="label" translatable="yes"> &lt;b&gt;Terminal Options&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>

@@ -228,8 +228,8 @@ sub _initCFG {
     $$cfg{'treeClusters'}{'Alt+e'}     = ['Clusters Tree','edit_node','Edit selected node'];
     $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit_node','Edit selected node'];
     $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree','find','Find in connection tree'];
-    $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree','expand_all','Expand tree completly'];
-    $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree','collaps_all','Collaps tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+R'} = ['Connections Tree','expand_all','Expand tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+T'} = ['Connections Tree','collaps_all','Collaps tree completly'];
     $$cfg{'treeConnections'}{'Ctrl+d'} = ['Connections Tree','clone','Clone connection'];
     $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree','copy','Copy node'];
     $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','copy','Cut node'];
