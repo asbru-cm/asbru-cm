@@ -125,6 +125,12 @@ sub get_cfg {
         # Normalize capitalization of groups
         $hash{description} =~ s/^(.+?):/\u\L$1\E:/;
         push(@cfg, \%hash) unless $hash{txt} eq '';
+        if ($hash{keybind}) {
+            # Register final values after all editing changes
+            my $lf  = $hash{intro} ? "\n" : '';
+            my $ask = $hash{confirm} ? "?" : '';
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD","$ask$hash{txt}$lf");
+        }
     }
 
     @cfg = sort {lc($$a{description}) cmp lc($$b{description})} @cfg;
@@ -223,11 +229,17 @@ sub _buildExec {
     my $width = 80;
 
     if (ref($hash) ) {
-        $txt = $$hash{txt} // '';
-        $desc = $$hash{description} // '';
+        $txt     = $$hash{txt} // '';
+        $desc    = $$hash{description} // '';
         $confirm = $$hash{confirm} // 0;
-        $intro = $$hash{intro} // 1;
+        $intro   = $$hash{intro} // 1;
         $keybind = $$hash{keybind} // '';
+        if ($keybind && defined $PACMain::FUNCS{_KEYBINDS}) {
+            # Register so we can validate
+            my $lf  = $intro   ? "\n" : '';
+            my $ask = $confirm ? "?"  : '';
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD","$ask$txt$lf");
+        }
     }
 
     my @undo;
@@ -317,8 +329,13 @@ sub _buildExec {
 
     # Assign a callback for deleting entry
     $w{btn}->signal_connect('clicked' => sub {
+        my $keymask = $w{keybind}->get_chars(0, -1);
         splice(@{$$self{list}}, $w{position}, 1);
         splice(@{$$self{cfg}}, $w{position}, 1);
+        if ($keymask) {
+            # Remove registered keybind
+            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask);
+        }
         $self->update();
         return 1;
     });
@@ -488,8 +505,15 @@ sub _buildExec {
     $w{keybind}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         my ($keyval, $unicode, $keymask) = $PACMain::FUNCS{_KEYBINDS}->GetKeyMask($widget, $event);
+        my $text    = $widget->get_chars(0, -1);
+        my $command = $w{txt}->get_chars(0, -1);
+        my $lf      = $w{intro}->get_active() ? "\n" : '';
+        my $ask     = $w{confirm}->get_active() ? "?"  : '';
 
         if (!$keymask && ($unicode == 8 || $unicode == 127)) {
+            if ($text) {
+                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask);
+            }
             $widget->set_text('');
             return 1;
         } elsif (!$keymask) {
@@ -498,6 +522,8 @@ sub _buildExec {
 
         my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask);
         if ($free) {
+            # Register to validate, and apply changes online
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD","$ask$command$lf");
             $widget->set_text($keymask);
         } else {
             _wMessage($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},$msg);

@@ -140,20 +140,37 @@ sub GetAction {
     return $keymask;
 }
 
+sub GetHotKeyCommand {
+    my ($self,$window,$keymask) = @_;
+    my $hk  = $self->{hotkey};
+
+    return $$hk{$window}{$keymask}[2];
+}
+
+# This function overwrites duplicated keybindings
+# Programmer should use HotKeyIsFree, to avoid duplicates
 sub RegisterHotKey {
-    my ($self,$window,$keymask,$action,$description) = @_;
+    my ($self,$window,$keymask,$action,$command) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
-    if (!$window || !$keymask || !$action || !$description) {
-        return (0,"window,keymask,action,description : are required");
+    if (!$window || !$keymask || !$action || !$command) {
+        return (0,"window,keymask,action,command : are required");
     }
-    my ($free,$msg) = $self->HotKeyIsFree($window,$keymask);
+    $$hk{$window}{$keymask} = ['User hotkey',$action,$command];
+    return (1,'');
+}
 
-    if ($free) {
-        $$hk{$window}{$keymask} = ['User hotkey',$action,$description];
+sub UnRegisterHotKey {
+    my ($self,$window,$keymask) = @_;
+    my $cfg = $self->{cfg};
+    my $hk  = $self->{hotkey};
+
+    if (!$window || !$keymask) {
+        return (0,"window,keymask : are required");
     }
-    return ($free,$msg);
+    delete $$hk{$window}{$keymask};
+    return (1,'');
 }
 
 sub HotKeyIsFree {
