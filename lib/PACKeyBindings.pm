@@ -113,10 +113,11 @@ sub GetKeyMask {
 }
 
 sub GetAction {
-    my ($self,$window, $widget, $event) = @_;
+    my ($self,$window, $widget, $event, $uuid) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
     my @tests = ();
+    my $warray  = wantarray;
 
     if (!$window) {
         return '';
@@ -126,6 +127,9 @@ sub GetAction {
     }
     my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
     if (!$keymask) {
+        if ($warray) {
+            return ($keyval,'');
+        }
         return $keyval;
     }
 
@@ -133,9 +137,23 @@ sub GetAction {
     #foreach my $w (sort keys %$cfg) {my $wk = $$cfg{$w};foreach my $k (keys %$wk) {print "cfg{$w}{$k} = $$cfg{$w}{$k}\n";}}
 
     if ($$cfg{$window}{$keymask}) {
+        if ($warray) {
+            return ($$cfg{$window}{$keymask}[1],$keymask);
+        }
         return $$cfg{$window}{$keymask}[1];
+    } elsif ($uuid && $$hk{$uuid}{$window}{$keymask}) {
+        if ($warray) {
+            return ($$hk{$uuid}{$window}{$keymask}[1],$keymask);
+        }
+        return $$hk{$uuid}{$window}{$keymask}[1];
     } elsif ($$hk{$window}{$keymask}) {
+        if ($warray) {
+            return ($$hk{$window}{$keymask}[1],$keymask);
+        }
         return $$hk{$window}{$keymask}[1];
+    }
+    if ($warray) {
+        return ($keymask,'');
     }
     return $keymask;
 }
@@ -143,21 +161,43 @@ sub GetAction {
 sub GetHotKeyCommand {
     my ($self,$window,$keymask) = @_;
     my $hk  = $self->{hotkey};
+    my $cmd = $$hk{$window}{$keymask}[2];
 
-    return $$hk{$window}{$keymask}[2];
+    if ($cmd =~ s/^\?//) {
+        return (1,$cmd);
+    }
+    return (0,$cmd);
+}
+
+sub LoadHotKeys {
+    my ($self,$cfg,$uuid) = @_;
+
+    foreach my $w ('remote','local') {
+        foreach my $hash (@{$$cfg{'defaults'}{"$w commands"}}) {
+            if ($$hash{keybind}) {
+                my $lf  = $$hash{intro} ? "\n" : '';
+                my $ask = $$hash{confirm} ? "?" : '';
+                $self->RegisterHotKey('terminal',$$hash{keybind},"HOTKEY_CMD:$w","$ask$$hash{txt}$lf",$uuid);
+            }
+        }
+    }
 }
 
 # This function overwrites duplicated keybindings
 # Programmer should use HotKeyIsFree, to avoid duplicates
 sub RegisterHotKey {
-    my ($self,$window,$keymask,$action,$command) = @_;
+    my ($self,$window,$keymask,$action,$command,$uuid) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
     if (!$window || !$keymask || !$action || !$command) {
         return (0,"window,keymask,action,command : are required");
     }
-    $$hk{$window}{$keymask} = ['User hotkey',$action,$command];
+    if ($uuid) {
+        $$hk{$uuid}{$window}{$keymask} = ['User hotkey',$action,$command];
+    } else {
+        $$hk{$window}{$keymask} = ['User hotkey',$action,$command];
+    }
     return (1,'');
 }
 

@@ -129,7 +129,7 @@ sub get_cfg {
             # Register final values after all editing changes
             my $lf  = $hash{intro} ? "\n" : '';
             my $ask = $hash{confirm} ? "?" : '';
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD","$ask$hash{txt}$lf");
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD:$self->{where}","$ask$hash{txt}$lf");
         }
     }
 
@@ -238,7 +238,7 @@ sub _buildExec {
             # Register so we can validate
             my $lf  = $intro   ? "\n" : '';
             my $ask = $confirm ? "?"  : '';
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD","$ask$txt$lf");
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD:$self->{where}","$ask$txt$lf");
         }
     }
 
@@ -523,7 +523,7 @@ sub _buildExec {
         my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask);
         if ($free) {
             # Register to validate, and apply changes online
-            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD","$ask$command$lf");
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD:$self->{where}","$ask$command$lf");
             $widget->set_text($keymask);
         } else {
             _wMessage($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},$msg);

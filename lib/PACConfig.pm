@@ -940,8 +940,7 @@ sub _updateGUIPreferences {
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
     $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
     $$self{_KEYBINDS}->update($$self{_CFG}{'defaults'}{'keybindings'});
-
-    # Register hotkeys : PENDING
+    $$self{_KEYBINDS}->LoadHotKeys($$self{_CFG});
 
     if (defined $PACMain::FUNCS{_EDIT}) {
         _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});

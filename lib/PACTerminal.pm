@@ -988,7 +988,7 @@ sub _setupCallbacks {
             return 1;
         }
 
-        my $action = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event);
+        my ($action,$keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event, $$self{_UUID});
 
         if (!$action) {
             return 0;
@@ -1063,6 +1063,20 @@ sub _setupCallbacks {
             }
         } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
+        } elsif ($action =~ /HOTKEY_CMD:(\w+)/) {
+            my $where = $1;
+            my ($ask,$cmd) = $PACMain::FUNCS{_KEYBINDS}->GetHotKeyCommand('terminal',$keymask);
+            if (!$cmd) {
+                return 0;
+            }
+            if ($where eq 'local') {
+                $self->_execute('local', $cmd, $ask);
+            } else {
+                my $ok = $self->_execute('remote', $cmd, $ask,1,0,0);
+                if (($$self{_CLUSTER})&&($ok)) {
+                    $self->_clusterCommit(undef, $cmd, undef);
+                }
+            }
         } elsif ($action eq 'cisco') {
             _vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^x");
             #_vteFeedChildBinary($$self{_GUI}{_VTE}, "\c^");
