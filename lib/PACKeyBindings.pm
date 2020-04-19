@@ -182,7 +182,7 @@ sub LoadHotKeys {
 
     if ($uuid) {
         $CFG = $$cfg{'environments'}{$uuid};
-        @what = ('macros');
+        @what = ('macros','local connected');
     } else {
         $CFG = $$cfg{'defaults'};
         @what = ('remote commands','local commands');

@@ -131,7 +131,6 @@ sub get_cfg {
             # Register final values after all editing changes
             my $lf  = $hash{intro} ? "\n" : '';
             my $ask = $hash{confirm} ? "?" : '';
-            print "Registrar : HOTKEY_CMD:$self->{where} ? $self->{uuid}\n";
             $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD:$self->{where}","$ask$hash{txt}$lf",$self->{uuid});
         }
     }
