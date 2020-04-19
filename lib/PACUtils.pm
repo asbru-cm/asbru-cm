@@ -2133,7 +2133,6 @@ sub _cfgSanityCheck {
         $$cfg{'defaults'}{'gui password'} //= '';
     }
     $$cfg{'defaults'}{'use gui password tray'} //= 0;
-    $$cfg{'defaults'}{'prevent F11'} //= 0;
     $$cfg{'defaults'}{'autostart shell upon start'} //= 0;
     $$cfg{'defaults'}{'tree on right side'} //= 0;
     $$cfg{'defaults'}{'prevent mouse over show tree'} //= 1;

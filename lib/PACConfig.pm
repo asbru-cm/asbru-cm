@@ -871,7 +871,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
     _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
-    _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
     _($self, 'cbCfgHideConnSubMenu')->set_active($$cfg{'defaults'}{'hide connections submenu'});
     _($self, 'fontTree')->set_font_name($$cfg{'defaults'}{'tree font'});
     _($self, 'fontInfo')->set_font_name($$cfg{'defaults'}{'info font'});
@@ -1094,7 +1093,6 @@ sub _saveConfiguration {
 
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
-    $$self{_CFG}{'defaults'}{'prevent F11'} = _($self, 'cbCfgPreventF11')->get_active();
     $$self{_CFG}{'defaults'}{'autostart shell upon PAC start'} = _($self, 'cbCfgAutoStartShell')->get_active();
     $$self{_CFG}{'defaults'}{'tree on right side'} = _($self, 'cbCfgTreeOnRight')->get_active();
     $$self{_CFG}{'defaults'}{'prevent mouse over show tree'} = ! _($self, 'cbCfgPreventMOShowTree')->get_active();
