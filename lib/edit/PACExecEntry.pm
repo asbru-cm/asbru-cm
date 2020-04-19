@@ -117,6 +117,7 @@ sub get_cfg {
         my %hash;
         $hash{txt} = $$w{txt}->get_chars(0, -1);
         $hash{description} = $$w{desc}->get_chars(0, -1);
+        $hash{keybind} = $$w{keybind}->get_chars(0, -1);
         $hash{confirm} = $$w{confirm}->get_active() || '0';
         $hash{intro} = $$w{intro}->get_active() || '0';
         # Force no descriptions equal to command
@@ -306,7 +307,7 @@ sub _buildExec {
         $w{hbox4}->pack_start($w{btnExec}, 0, 0, 0);
     }
 
-    $w{vbox}->pack_start(Gtk3::Separator->new('GTK_ORIENTATION_HORIZONTAL'), 1, 1, 0);
+    $w{vbox}->pack_start(Gtk3::HSeparator->new(), 1, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbexec}->pack_start($w{frame}, 0, 1, 0);
