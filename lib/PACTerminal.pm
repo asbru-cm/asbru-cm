@@ -202,6 +202,8 @@ sub new {
     $PACMain::RUNNING{$$self{'_UUID_TMP'}}{'terminal'} = $self;
     $PACMain::RUNNING{$$self{'_UUID_TMP'}}{'is_shell'} = 0;
 
+    $PACMain::FUNCS{_KEYBINDS}->LoadHotKeys($$self{_CFG},$$self{_UUID});
+
     $self->{_EXPECTED} = 0;
     $self->{_PULSE} = 1;
     $self->{_TOTAL} = 0;
