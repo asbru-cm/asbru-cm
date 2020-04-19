@@ -168,7 +168,7 @@ sub update {
             if ($kb =~ /^undef-/) {
                 $kb = '';
             }
-            push(@{$$self{frame}{keylist}{'data'}}, {value => [ $$wk{$k}[0],$$wk{$k}[2],$kb,$$wk{$k}[1],$w ], children => []});
+            push(@{$$self{frame}{keylist}{'data'}}, {value => [ "<b>$$wk{$k}[0]</b>",$$wk{$k}[2],$kb,$$wk{$k}[1],$w ], children => []});
         }
     }
 }
@@ -237,10 +237,10 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit','Edit node'];
     $$cfg{'treeConnections'}{'Alt+r'}  = ['Connections Tree','protection','Toggle protection'];
     $$cfg{'treeConnections'}{'F2'}     = ['Connections Tree','rename','Rename node'];
-    $$cfg{'pactabs'}{'Ctrl+Tab'}       = ['Tabbed terminals','last','Last focused Tab'];
-    $$cfg{'pactabs'}{'Ctrl+Page_Down'} = ['Tabbed terminals','next','Next Tab'];
-    $$cfg{'pactabs'}{'Ctrl+Page_Up'}   = ['Tabbed terminals','previous','Previous Tab'];
-    $$cfg{'pactabs'}{'undef-infotab'}  = ['Tabbed terminals','infotab','Got to Info Tab'];
+    $$cfg{'pactabs'}{'Ctrl+Tab'}       = ['Tabs','last','Last focused Tab'];
+    $$cfg{'pactabs'}{'Ctrl+Page_Down'} = ['Tabs','next','Next Tab'];
+    $$cfg{'pactabs'}{'Ctrl+Page_Up'}   = ['Tabs','previous','Previous Tab'];
+    $$cfg{'pactabs'}{'undef-infotab'}  = ['Tabs','infotab','Got to Info Tab'];
     $$cfg{'pacmain'}{'Ctrl+f'}         = ['Main Window','find','Find in connection tree'];
     $$cfg{'pacmain'}{'Ctrl+q'}         = ['Main Window','quit','Exit Ásbrú'];
     $$cfg{'pacmain'}{'Ctrl+t'}         = ['Main Window','localshell','Open a local shell'];
@@ -286,9 +286,9 @@ sub _buildGUI {
     $w{vbox}->pack_start($w{scroll},1,1,1);
 
     $w{keylist} = PACTree->new(
-        'Window'   => 'text',
+        'Window'   => 'markup',
         'Action'   => 'text',
-        'Keys'     => 'text',
+        'Keybind'     => 'text',
         'kbaction' => 'hidden',
         'pacwin'   => 'hidden',
     );
@@ -298,10 +298,13 @@ sub _buildGUI {
     $w{keylist}->set_has_tooltip(0);
     $w{keylist}->set_show_expanders(0);
     $w{keylist}->set_activate_on_single_click(1);
-    $w{keylist}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_BOTH');
+    $w{keylist}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
     $w{keylist}->get_selection()->set_mode('GTK_SELECTION_SINGLE');
     $w{scroll}->add($w{keylist});
-
+    my @col = $w{keylist}->get_columns();
+    $col[2]->set_alignment(0.5);
+    my ($c) = $col[2]->get_cells();
+    $c->set_alignment(0.5,0.5);
 
     $w{keylist}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
