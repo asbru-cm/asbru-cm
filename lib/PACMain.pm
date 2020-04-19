@@ -1738,8 +1738,12 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('key_press_event' => sub {
+        my ($widget, $event) = @_;
         # Capture 'escape' keypress to hide the interactive search
-        if ($_[1]->keyval == 65307) {
+
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
+
+        if ($action eq 'Escape') {
             $$self{_SHOWFINDTREE} = 0;
             $$self{_GUI}{_entrySearch}->set_text('');
             $$self{_GUI}{_vboxSearch}->hide();
@@ -1747,12 +1751,12 @@ sub _setupCallbacks {
             return 1;
         }
         # Capture 'up arrow'  keypress to move to previous ocurrence
-        elsif ($_[1]->keyval == 65362) {
+        elsif ($action eq 'Up') {
             $$self{_GUI}{_btnPrevSearch}->clicked();
             return 1;
         }
         # Capture 'down arrow'  keypress to move to next ocurrence
-        elsif ($_[1]->keyval == 65364) {
+        elsif ($action eq 'Down') {
             $$self{_GUI}{_btnNextSearch}->clicked();
             return 1;
         }
@@ -2098,8 +2102,10 @@ sub _setupCallbacks {
         my $keyval = '' . ($event->keyval);
         my $state = '' . ($event->state);
 
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
+
         # Check if <Ctrl>z is pushed
-        if (($event->state == [ qw(control-mask) ]) && (chr($keyval) eq 'z') && (scalar @{ $$self{_UNDO} })) {
+        if ($action eq 'Ctrl+z' || $action eq 'Ctrl+Z') {
             $$self{_GUI}{descBuffer}->set_text(pop(@{ $$self{_UNDO} }));
             return 1;
         }
