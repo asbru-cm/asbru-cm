@@ -305,7 +305,8 @@ sub _buildExec {
 
     # Build Keybind
     $w{keybind} = Gtk3::Entry->new();
-    $w{keybind}->set_max_width_chars(20);
+    $w{keybind}->set_max_width_chars(18);
+    $w{keybind}->set_width_chars(18);
     $w{keybind}->set_editable(0);
     $w{hbox4}->pack_start($w{keybind}, 0, 0, 0);
     $w{keybind}->set_text($keybind);
@@ -522,6 +523,8 @@ sub _buildExec {
             return 1;
         } elsif (!$keymask) {
             return 0;
+        } elsif ($text && $text ne $keymask) {
+            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$text, $self->{uuid});
         }
 
         my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask, $self->{uuid});
