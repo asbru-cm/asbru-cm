@@ -90,7 +90,7 @@ sub update {
     if (defined $where) {
         $$self{where} = $where;
     }
-    if (!$$self{uuid} && defined $uuid) {
+    if (defined $uuid) {
         $$self{uuid} = $uuid;
     }
 
