@@ -82,7 +82,7 @@ sub GetKeyMask {
     my $ctrl    = $state * ['control-mask'] ? 'Ctrl'  : '';
     my $alt     = $state * ['mod1-mask']    ? 'Alt'   : '';
 
-    #print "$keyval : $unicode : $ctrl : $shift\n";
+    print "$keyval : $unicode : $ctrl : $shift\n";
 
     # Test special keys
     if ($keyval =~ /^KP_(.+)/) {
@@ -99,11 +99,13 @@ sub GetKeyMask {
         if (!$unicode) {
             $unicode = 1;
         }
-    } elsif (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert/)) {
+    } elsif (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert|Left|Right|Up|Down|Scroll_Lock|Pause|Break/)) {
         if ("$alt$ctrl$shift") {
             return ($keyval,0,"$alt$ctrl$shift+$keyval");
+        } elsif ($keyval =~ /F\d+/) {
+            return ($keyval,0,$keyval);
         }
-        return ($keyval,0,$keyval);
+        return ($keyval,0,'');
     }
 
     if (!$unicode || (!$ctrl && !$alt)) {
@@ -117,45 +119,25 @@ sub GetAction {
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
     my @tests = ();
-    my $warray  = wantarray;
 
     if (!$window) {
-        return '';
+        return wantarray ? (0,'') : '';
     }
     if (!$cfg) {
-        return '';
+        return wantarray ? (0,'') : '';
     }
     my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
     if (!$keymask) {
-        if ($warray) {
-            return ($keyval,'');
-        }
-        return $keyval;
+        return wantarray ? ($keyval,'') : $keyval;
     }
-
-    #print "$window : $keymask => $$cfg{$window}{$keymask}\n";
-    #foreach my $w (sort keys %$cfg) {my $wk = $$cfg{$w};foreach my $k (keys %$wk) {print "cfg{$w}{$k} = $$cfg{$w}{$k}\n";}}
-
     if ($$cfg{$window}{$keymask}) {
-        if ($warray) {
-            return ($$cfg{$window}{$keymask}[1],$keymask);
-        }
-        return $$cfg{$window}{$keymask}[1];
+        return wantarray ? ($$cfg{$window}{$keymask}[1],$keymask) : $$cfg{$window}{$keymask}[1];
     } elsif ($uuid && $$hk{$uuid}{$window}{$keymask}) {
-        if ($warray) {
-            return ($$hk{$uuid}{$window}{$keymask}[1],$keymask);
-        }
-        return $$hk{$uuid}{$window}{$keymask}[1];
+        return wantarray ? ($$hk{$uuid}{$window}{$keymask}[1],$keymask) : $$hk{$uuid}{$window}{$keymask}[1];
     } elsif ($$hk{$window}{$keymask}) {
-        if ($warray) {
-            return ($$hk{$window}{$keymask}[1],$keymask);
-        }
-        return $$hk{$window}{$keymask}[1];
+        return wantarray ? ($$hk{$window}{$keymask}[1],$keymask) : $$hk{$window}{$keymask}[1];
     }
-    if ($warray) {
-        return ($keymask,'');
-    }
-    return $keymask;
+    return wantarray ? ($keymask,'') : $keymask;
 }
 
 sub GetHotKeyCommand {
@@ -233,23 +215,25 @@ sub UnRegisterHotKey {
 }
 
 sub HotKeyIsFree {
-    my ($self,$window,$keymask,$uuid) = @_;
+    my ($self,$window,$keymask,$uuid,$hotkey_only) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
     if (!$window || !$keymask) {
         return (0,"window,keymask : are required");
     }
-    if ($$cfg{$window}{$keymask}) {
-        return (0,"<i>$keymask</i> already assigned to <b>$$cfg{$window}{$keymask}[0]</b>\n\n$$cfg{$window}{$keymask}[2]");
-    }
-    if ($uuid) {
-        if ($$hk{$uuid}{$window}{$keymask}) {
-            return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");
-        }
-    }
     if ($$hk{$window}{$keymask}) {
         return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");
+    }
+    if ($uuid && $$hk{$uuid}{$window}{$keymask}) {
+        return (0,"<i>$keymask</i> already assigned to <b>hotkey</b>\n\n$$hk{$window}{$keymask}[2]");
+    }
+    if ($hotkey_only) {
+        return (1,'');
+    }
+    # Full check other windows
+    if ($$cfg{$window}{$keymask}) {
+        return (0,"<i>$keymask</i> already assigned to <b>$$cfg{$window}{$keymask}[0]</b>\n\n$$cfg{$window}{$keymask}[2]");
     }
     foreach my $w (sort keys %$cfg) {
         if ($w eq $window) {
@@ -468,7 +452,7 @@ sub _updateKeyBinding {
         _wMessage($self->{parent},"<i>$keynew</i> already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
         return 0;
     } elsif (!$undef) {
-        my ($free,$msg) = $self->HotKeyIsFree('terminal',$keynew);
+        my ($free,$msg) = $self->HotKeyIsFree('terminal',$keynew,'',1);
         if (!$free) {
             _wMessage($self->{parent},$msg);
             return 0;
