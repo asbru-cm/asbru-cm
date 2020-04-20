@@ -517,7 +517,7 @@ sub _buildExec {
 
         if (!$keymask && ($unicode == 8 || $unicode == 127)) {
             if ($text) {
-                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask, $self->{uuid});
+                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$text, $self->{uuid});
             }
             $widget->set_text('');
             return 1;
@@ -525,8 +525,9 @@ sub _buildExec {
             return 0;
         } elsif ($text && $text ne $keymask) {
             $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$text, $self->{uuid});
+        } elsif ($text && $text eq $keymask) {
+            return 0;
         }
-
         my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask, $self->{uuid});
         if ($free) {
             # Register to validate, and apply changes online
