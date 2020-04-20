@@ -385,7 +385,7 @@ sub _buildGUI {
     $$self{frame} = \%w;
 
     $w{scroll} = Gtk3::ScrolledWindow->new();
-    $w{scroll}->set_overlay_scrolling(0);
+    $w{scroll}->set_overlay_scrolling(1);
     $w{scroll}->set_policy('automatic', 'automatic');
     $w{vbox}->pack_start($w{scroll},1,1,1);
 
