@@ -90,7 +90,9 @@ sub update {
     if (defined $where) {
         $$self{where} = $where;
     }
-    $$self{uuid} = $uuid // 0;
+    if (!$$self{uuid} && defined $uuid) {
+        $$self{uuid} = $uuid;
+    }
 
     # Destroy previous widgets
     $$self{frame}{vbexec}->foreach(sub {
