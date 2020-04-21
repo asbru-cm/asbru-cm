@@ -1,10 +1,10 @@
-## Connection
+# Common configuration options
 
-### Connection Details
+## Connection Details
 
 ![](images/ssh1.png)
 
-+ __Method__ : For this case, we select SSH
++ __Method__ : Select any of the selection methods available
 + __Host__ : The IP or Hostname of the machine we want to connect to.
 + __Port__ : Port number to use for this connection.
 + __Run with sudo__ : * Pending
@@ -36,7 +36,7 @@
 
     If you are aiming for the highest level of security and automation at the same time, you need to use [KeePass Integration](../Preferences/KeePassXC.md)
 
-### Advanced Parameters
+## Advanced Parameters
 
 ![](images/ssh2.png)
 
@@ -47,7 +47,7 @@
     - Log patter name: Define the pattern to name your session file.
 
 
-### Network Settings
+## Network Settings
 
 This networking options override the Global Networking options for this connection.
 
@@ -70,31 +70,12 @@ You need to have a public key installed in your __Jump Server__  to be able to u
 
 It can be a default public key, or a personal private key that you were assigned.
 
-## SSH Options
-
-![](images/ssh6.png)
-
-Select any additional SSH options.
-
-### Local / Remote Port Forwarding
-
-Define your local or remote port forwarding rules.
-
-In the example image above, the connection opens 4 port forwards to access remote SQL Servers behind a Firewall.
-
-### Dynamic Socks Proxy
-
-*Pending
-
-### Advanced Options
-
-Write any sequence of additional SSH options.
-
-The command field allows you to right click and have access to known SSH options.
-
 ## (Pre / Post) Exec
 
 This commands will be executed immediately __before__ (Pre) the connection is launched. And after (Post) the connection has been __closed__.
+
+![](images/ssh9.png)
+
 
 This commands are executed in the local computer, not on the remote terminal.
 
@@ -128,8 +109,6 @@ We exit the terminal, the terminal is closed and the post exec command is execut
 !!! tip "Possible uses"
     Launch : an IDE, a Database Client (DBeaver), start a local scripts that uploads or downloads files, etc.
 
-![](images/ssh9.png)
-
 ## Expect
 
 ![](images/ssh7.png)
@@ -160,21 +139,22 @@ You can create and execute a sequence of automated actions that will be executed
 
 Remote Macros have the same principle as the [Global Remote Commands](../Preferences/RemoteCommands.md)
 
-!!! note " "
-    But this commands will show on the popup menu for this connection only, and no others.
+!!! note
+    This commands will show on the popup menu for this connection only, and no others.
 
 ## Local Macros
 
 Local Macros have the same principle as the [Global Local Commands](../Preferences/LocalCommands.md)
 
-!!! note " "
-    But this commands will show on the popup menu for this connection only, and no others.
+!!! note
+    This commands will show on the popup menu for this connection only, and no others.
 
 ## User Variables
 
 This have the same principle as the [Global Variables](../Preferences/GlobalVariables.md)
 
-But will be available only for this particular connection.
+!!! note
+    Will be available only for this particular connection.
 
 ## Terminal Options
 
