@@ -177,6 +177,8 @@ sub _initGUI {
     $$self{_WINDOWEDIT}->set_size_request(-1, 550);
 
     _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
+    _($self, "linkHelpConn1")->set_label('');
+    _($self, "linkHelpConn1")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
@@ -185,8 +187,8 @@ sub _initGUI {
     _($self, 'alignVar')->add(($$self{_VARIABLES} = PACVarEntry->new())->{container});
     _($self, 'alignPreExec')->add(($$self{_PRE_EXEC} = PACPrePostEntry->new())->{container});
     _($self, 'alignPostExec')->add(($$self{_POST_EXEC} = PACPrePostEntry->new())->{container});
-    _($self, 'alignMacros')->add(($$self{_MACROS} = PACExecEntry->new())->{container});
-    _($self, 'alignLocal')->add(($$self{_LOCAL_EXEC} = PACExecEntry->new())->{container});
+    _($self, 'alignMacros')->add(($$self{_MACROS} = PACExecEntry->new(undef, undef, 'cremote'))->{container});
+    _($self, 'alignLocal')->add(($$self{_LOCAL_EXEC} = PACExecEntry->new(undef, undef, 'clocal'))->{container});
     _($self, 'alignExpect')->add(($$self{_EXPECT_EXEC} = PACExpectEntry->new())->{container});
     _($self, 'nbProps')->show_all();
 
