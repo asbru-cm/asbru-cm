@@ -161,8 +161,12 @@ sub _buildExecGUI {
     if ($$self{where}) {
         if ($$self{where} eq 'local') {
             $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/LocalCommands/');
-        } else {
+        } elsif ($$self{where} eq 'remote') {
             $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/RemoteCommands/');
+        } elsif ($$self{where} eq 'cremote') {
+            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/#remote-macros');
+        } elsif ($$self{where} eq 'clocal') {
+            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/#local-macros');
         }
         $w{hbox}->pack_start($w{help},0,1,0);
 

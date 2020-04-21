@@ -434,6 +434,25 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         <property name="position">1</property>
                                                       </packing>
                                                     </child>
+                                                    <child>
+                                                      <object class="GtkLinkButton" id="linkHelpConn1">
+                                                        <property name="label" translatable="yes">Help</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="focus_on_click">False</property>
+                                                        <property name="receives_default">True</property>
+                                                        <property name="tooltip_text" translatable="yes">Open Online Help</property>
+                                                        <property name="relief">none</property>
+                                                        <property name="always_show_image">True</property>
+                                                        <property name="uri">https://docs.asbru-cm.net/Manual/Connections/SSH/</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="pack_type">end</property>
+                                                        <property name="position">2</property>
+                                                      </packing>
+                                                    </child>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
