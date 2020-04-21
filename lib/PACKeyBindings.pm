@@ -82,7 +82,7 @@ sub GetKeyMask {
     my $ctrl    = $state * ['control-mask'] ? 'Ctrl'  : '';
     my $alt     = $state * ['mod1-mask']    ? 'Alt'   : '';
 
-    print "$keyval : $unicode : $ctrl : $shift\n";
+    #print "$keyval : $unicode : $ctrl : $shift\n";
 
     # Test special keys
     if ($keyval =~ /^KP_(.+)/) {
