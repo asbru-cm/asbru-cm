@@ -944,7 +944,7 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections','Favourites','History') {
+    foreach my $tree ('Connections','Favourites','History','Clusters') {
         my @col = $$self{_GUI}{"tree$tree"}->get_columns();
         if ($tree eq 'Connections') {
             $col[0]->set_visible(0);
