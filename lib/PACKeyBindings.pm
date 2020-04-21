@@ -383,9 +383,23 @@ sub _buildGUI {
 
     # Build a vbox
     $w{vbox} = Gtk3::VBox->new(0,0);
+    $w{hbox} = Gtk3::HBox->new(0, 0);
+
     # Attach to class attribute
     $$self{container} = $w{vbox};
     $$self{frame} = \%w;
+    $w{vbox}->pack_start($w{hbox}, 0, 1, 0);
+
+    $w{btnreset} = Gtk3::Button->new('Set default values');
+    $w{hbox}->pack_start($w{btnreset}, 0, 0, 0);
+
+    $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeyBindings/');
+    $w{help}->set_halign('GTK_ALIGN_END');
+    $w{help}->set_label('');
+    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_always_show_image(1);
+    $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    $w{hbox}->pack_start($w{help}, 1, 1, 0);
 
     $w{scroll} = Gtk3::ScrolledWindow->new();
     $w{scroll}->set_overlay_scrolling(1);

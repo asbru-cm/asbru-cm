@@ -9133,8 +9133,7 @@ to read any KeePass database file and use any entry to automate connection insid
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Keybindings&lt;/b&gt;
-</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Keybindings&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
