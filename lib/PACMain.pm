@@ -1376,6 +1376,15 @@ sub _setupCallbacks {
             if ($action eq 'edit_node' && $sel[0] ne '__PAC_SHELL__') {
                 $$self{_GUI}{connEditBtn}->clicked();
                 return 1;
+            } elsif ($action eq 'del_favourite') {
+                if ($$self{_GUI}{connFavourite}->get_sensitive()) {
+                    my $tree = $self->_getCurrentTree();
+                    if (!$tree->_getSelectedUUIDs()) {
+                        return 1;
+                    }
+                    $self->_setFavourite(0,$tree);
+                }
+                return 1;
             }
             return 0;
         });
@@ -1486,6 +1495,18 @@ sub _setupCallbacks {
         } elsif ($action eq 'rename') {
             if ((scalar(@sel) == 1) && ($sel[0] ne '__PAC__ROOT__')) {
                 $$self{_GUI}{nodeRenBtn}->clicked();
+            }
+        } elsif ($action eq 'add_favourite' || $action eq 'del_favourite') {
+            if ($$self{_GUI}{connFavourite}->get_sensitive()) {
+                my $tree = $self->_getCurrentTree();
+                if (!$tree->_getSelectedUUIDs()) {
+                    return 1;
+                }
+                if ($action eq 'add_favourite') {
+                    $self->_setFavourite(1,$tree);
+                } else {
+                    $self->_setFavourite(0,$tree);
+                }
             }
         } elsif ($action eq 'Delete') {
             $$self{_GUI}{nodeDelBtn}->clicked();
@@ -1945,17 +1966,7 @@ sub _setupCallbacks {
         if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
-        map $$self{_CFG}{'environments'}{$_}{'favourite'} = $$self{_GUI}{connFavourite}->get_active(), $tree->_getSelectedUUIDs();
-        if ($$self{_GUI}{nbTree}->get_current_page() == 1) {
-            $self->_updateFavouritesList();
-            $self->_updateGUIFavourites();
-            $self->_updateGUIPreferences();
-        }
-        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
-        $self->_setCFGChanged(1);
+        $self->_setFavourite($$self{_GUI}{connFavourite}->get_active(),$tree);
         return 1;
     });
     $$self{_GUI}{scriptsBtn}->signal_connect('clicked' => sub { $$self{_SCRIPTS}->show(); });
@@ -2232,6 +2243,23 @@ sub _setupCallbacks {
         return 0;
     });
     return 1;
+}
+
+sub _setFavourite {
+    my ($self,$b,$tree) = @_;
+
+    map $$self{_CFG}{'environments'}{$_}{'favourite'} = $b, $tree->_getSelectedUUIDs();
+    if ($$self{_GUI}{nbTree}->get_current_page() == 1) {
+        $self->_updateFavouritesList();
+        $self->_updateGUIFavourites();
+        $self->_updateGUIPreferences();
+    }
+    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($b ? 'on' : 'off'), 'button'));
+    $$self{_GUI}{connFavourite}->set_active($b);
+    if ($UNITY) {
+        $FUNCS{_TRAY}->_setTrayMenu();
+    }
+    $self->_setCFGChanged(1);
 }
 
 sub _lockPAC {

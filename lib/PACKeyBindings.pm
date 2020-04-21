@@ -327,9 +327,12 @@ sub _initCFG {
 
     #      app_window_name  keybind       User window name    action     user description
     $$cfg{'treeFavourites'}{'Alt+e'}   = ['Favourites Tree','edit_node','Edit selected node'];
+    $$cfg{'treeFavourites'}{'Alt+F'}   = ['Favourites Tree','del_favourite','Remove connection from favourites'];
     $$cfg{'treeHistory'}{'Alt+e'}      = ['History Tree','edit_node','Edit selected node'];
     $$cfg{'treeClusters'}{'Alt+e'}     = ['Clusters Tree','edit_node','Edit selected node'];
     $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit_node','Edit selected node'];
+    $$cfg{'treeConnections'}{'Alt+f'}  = ['Connections Tree','add_favourite','Add connection to favourites'];
+    $$cfg{'treeConnections'}{'Alt+F'}  = ['Connections Tree','del_favourite','Remove connection from favourites'];
     $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree','find','Find in connection tree'];
     $$cfg{'treeConnections'}{'Ctrl+R'} = ['Connections Tree','expand_all','Expand tree completly'];
     $$cfg{'treeConnections'}{'Ctrl+T'} = ['Connections Tree','collaps_all','Collaps tree completly'];
