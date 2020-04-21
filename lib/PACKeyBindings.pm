@@ -251,11 +251,13 @@ sub update {
     my $cfg = shift;
     my %actions;
 
-    if (!$cfg) {
+    if (!$cfg && !$self->{cfg}) {
         $self->_initCFG();
         $cfg = $self->{cfg};
-    } else {
+    } elsif ($cfg) {
         $self->{cfg} = $cfg;
+    } else {
+        $cfg = $self->{cfg};
     }
     _updateDefaultCFG();
     @{$$self{frame}{keylist}{'data'}} = ();
@@ -427,6 +429,13 @@ sub _buildGUI {
     my ($c) = $col[2]->get_cells();
     $c->set_alignment(0.5,0.5);
 
+    $w{btnreset}->signal_connect('clicked' => sub {
+        if (!_wConfirm($self->{parent}, "Reset all keybindings to there default values?")) {
+            return 1;
+        }
+        delete $self->{cfg};
+        $self->update();
+    });
     $w{keylist}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         my $selection = $w{keylist}->get_selection();
