@@ -182,10 +182,6 @@ sub _buildScreenshotsGUI {
 
     $w{bbox}->add($w{btnopenfolder});
 
-    # Build a separator
-    $w{sep} = Gtk3::VSeparator->new();
-    $w{hbox}->pack_start($w{sep}, 0, 1, 5);
-
     # Build a scrolled window
     $w{sw} = Gtk3::ScrolledWindow->new();
     $w{hbox}->pack_start($w{sw}, 1, 1, 0);
