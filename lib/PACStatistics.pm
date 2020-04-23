@@ -320,30 +320,33 @@ sub _buildStatisticsGUI {
         my $name = $$cfg{environments}{$uuid}{name};
 
         if ($uuid eq '__PAC__ROOT__') {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset <b>ALL PAC</b> statistics?\n(This action can not be undone!)");
-            foreach my $child (keys %{$$cfg{environments}})
-            {
-                next if $child eq '__PAC__ROOT__';
-                $$self{statistics}{$child}{start} = 0;
-                $$self{statistics}{$child}{stop} = 0;
-                $$self{statistics}{$child}{total_conn} = 0;
-                $$self{statistics}{$child}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset <b>all Ásbrú</b> statistics?\n\nThis action can not be undone!")) {
+                foreach my $child (keys %{$$cfg{environments}}) {
+                    if ($child eq '__PAC__ROOT__') {
+                        next;
+                    }
+                    $$self{statistics}{$child}{start} = 0;
+                    $$self{statistics}{$child}{stop} = 0;
+                    $$self{statistics}{$child}{total_conn} = 0;
+                    $$self{statistics}{$child}{total_time} = 0;
+                }
             }
         } elsif ($$cfg{environments}{$uuid}{_is_group}) {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for group '<b>$name</b>'?\n(This action can not be undone!)");
-            foreach my $child ($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}->_getChildren($uuid, 0, 1) )
-            {
-                $$self{statistics}{$child}{start} = 0;
-                $$self{statistics}{$child}{stop} = 0;
-                $$self{statistics}{$child}{total_conn} = 0;
-                $$self{statistics}{$child}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for group:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+                foreach my $child ($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}->_getChildren($uuid, 0, 1)) {
+                    $$self{statistics}{$child}{start} = 0;
+                    $$self{statistics}{$child}{stop} = 0;
+                    $$self{statistics}{$child}{total_conn} = 0;
+                    $$self{statistics}{$child}{total_time} = 0;
+                }
             }
         } else {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for connection '<b>$name</b>'?\n(This action can not be undone!)");
-            $$self{statistics}{$uuid}{start} = 0;
-            $$self{statistics}{$uuid}{stop} = 0;
-            $$self{statistics}{$uuid}{total_conn} = 0;
-            $$self{statistics}{$uuid}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for connection:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+                $$self{statistics}{$uuid}{start} = 0;
+                $$self{statistics}{$uuid}{stop} = 0;
+                $$self{statistics}{$uuid}{total_conn} = 0;
+                $$self{statistics}{$uuid}{total_time} = 0;
+            }
         }
 
         $self->update($uuid);
