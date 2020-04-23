@@ -290,6 +290,7 @@ sub _buildStatisticsGUI {
 
     $w{lblPR} = Gtk3::Label->new;
     $w{lblPR}->set_justify('left');
+    $w{lblPR}->set_line_wrap(1);
     $w{hboxPACRoot}->pack_start($w{lblPR}, 0, 1, 0);
 
     $w{hboxPACGroup} = Gtk3::HBox->new(0, 0);
@@ -297,6 +298,7 @@ sub _buildStatisticsGUI {
 
     $w{lblPG} = Gtk3::Label->new;
     $w{lblPG}->set_justify('left');
+    $w{lblPG}->set_line_wrap(1);
     $w{hboxPACGroup}->pack_start($w{lblPG}, 0, 0, 0);
 
     $w{hboxPACNode} = Gtk3::HBox->new(0, 0);
@@ -304,6 +306,7 @@ sub _buildStatisticsGUI {
 
     $w{lblPN} = Gtk3::Label->new;
     $w{lblPN}->set_justify('left');
+    $w{lblPN}->set_line_wrap(1);
     $w{hboxPACNode}->pack_start($w{lblPN}, 0, 1, 0);
 
     $$self{container} = $w{hbox};
