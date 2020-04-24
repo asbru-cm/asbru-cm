@@ -468,6 +468,7 @@ sub _initGUI {
     $$self{_GUI}{main}->add($$self{_GUI}{vbox1});
 
     $$self{_GUI}{hpane} = Gtk3::HPaned->new();
+    $$self{_GUI}{hpane}->set_wide_handle(1);
     $$self{_GUI}{vbox1}->add($$self{_GUI}{hpane});
 
     # Create a vbox3: actions, connections and other tools
@@ -818,6 +819,8 @@ sub _initGUI {
     $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{scrollDescription}, 1, 1, 0);
     $$self{_GUI}{scrollDescription}->set_policy('automatic', 'automatic');
+    $$self{_GUI}{scrollDescription}->set_shadow_type('GTK_SHADOW_IN');
+    $$self{_GUI}{scrollDescription}->set_border_width(5);
 
     # Create descView as a gtktextview with descBuffer
     $$self{_GUI}{descBuffer} = Gtk3::TextBuffer->new();
@@ -830,24 +833,25 @@ sub _initGUI {
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string('monospace'));
 
     # Create a frameStatistics for statistics
-    $$self{_GUI}{frameStatistics} = Gtk3::Frame->new(' STATISTICS: ');
+    $$self{_GUI}{frameStatistics} = Gtk3::Frame->new('STATISTICS ');
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameStatistics}, 0, 1, 0);
     $$self{_GUI}{frameStatistics}->set_border_width(5);
+    $$self{_GUI}{frameStatistics}->set_shadow_type('GTK_SHADOW_NONE');
 
     $$self{_GUI}{frameStatisticslbl} = Gtk3::Label->new();
-    $$self{_GUI}{frameStatisticslbl}->set_markup(' <b>STATISTICS:</b> ');
+    $$self{_GUI}{frameStatisticslbl}->set_markup('<b>STATISTICS</b> ');
     $$self{_GUI}{frameStatistics}->set_label_widget($$self{_GUI}{frameStatisticslbl});
 
     $$self{_GUI}{statistics} = $$self{_SCREENSHOTS} = PACStatistics->new();
     $$self{_GUI}{frameStatistics}->add($$self{_GUI}{statistics}->{container});
 
     # Create a frameScreenshot for screenshot
-    $$self{_GUI}{frameScreenshots} = Gtk3::Frame->new(' SCREENSHOTS: ');
+    $$self{_GUI}{frameScreenshots} = Gtk3::Frame->new('SCREENSHOTS ');
     $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameScreenshots}, 0, 1, 0);
     $$self{_GUI}{frameScreenshots}->set_border_width(5);
 
     $$self{_GUI}{frameScreenshotslbl} = Gtk3::Label->new();
-    $$self{_GUI}{frameScreenshotslbl}->set_markup(' <b>SCREENSHOTS:</b> ');
+    $$self{_GUI}{frameScreenshotslbl}->set_markup('<b>SCREENSHOTS</b> ');
     $$self{_GUI}{frameScreenshots}->set_label_widget($$self{_GUI}{frameScreenshotslbl});
 
     $$self{_GUI}{screenshots} = $$self{_SCREENSHOTS} = PACScreenshots->new();
