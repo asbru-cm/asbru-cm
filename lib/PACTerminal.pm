@@ -1059,7 +1059,7 @@ sub _setupCallbacks {
             } else {
                 $PACMain::FUNCS{_MAIN}->_toggleConnectionsList();
             }
-        } elsif ($action eq 'edit') {
+        } elsif ($action eq 'edit_node') {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
             }

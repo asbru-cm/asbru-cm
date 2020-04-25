@@ -1488,7 +1488,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'paste') {
             map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
             $$self{_COPY}{'data'} = {};
-        } elsif ($action eq 'edit') {
+        } elsif ($action eq 'edit_node') {
             if (!$is_root) {
                 $$self{_GUI}{connEditBtn}->clicked();
             }

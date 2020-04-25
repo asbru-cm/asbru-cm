@@ -340,9 +340,8 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Ctrl+T'} = ['Connections Tree','collaps_all','Collaps tree completly'];
     $$cfg{'treeConnections'}{'Ctrl+d'} = ['Connections Tree','clone','Clone connection'];
     $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree','copy','Copy node'];
-    $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','copy','Cut node'];
+    $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','cut','Cut node'];
     $$cfg{'treeConnections'}{'Ctrl+v'} = ['Connections Tree','paste','Paste node'];
-    $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree','edit','Edit node'];
     $$cfg{'treeConnections'}{'Alt+r'}  = ['Connections Tree','protection','Toggle protection'];
     $$cfg{'treeConnections'}{'F2'}     = ['Connections Tree','rename','Rename node'];
     $$cfg{'pactabs'}{'Ctrl+Tab'}       = ['Tabs','last','Last focused Tab'];
@@ -371,7 +370,7 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+i'}        = ['Terminal','infotab','Show the Info tab'];
     $$cfg{'terminal'}{'Ctrl+F3'}       = ['Terminal','find-terminal','Find Terminal'];
     $$cfg{'terminal'}{'Alt+n'}         = ['Terminal','showconnections','Show connections list'];
-    $$cfg{'terminal'}{'Alt+e'}         = ['Terminal','edit','Edit Connection'];
+    $$cfg{'terminal'}{'Alt+e'}         = ['Terminal','edit_node','Edit Connection'];
     $$cfg{'terminal'}{'Ctrl+plus'}     = ['Terminal','zoomin','Zoom in text'];
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
