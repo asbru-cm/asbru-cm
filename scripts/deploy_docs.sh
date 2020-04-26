@@ -7,8 +7,8 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
     exit 0
 fi
 
-if [ -z "$CHANGELOG_GITHUB_TOKEN" ]; then
-	echo "CHANGELOG_GITHUB_TOKEN not set. Will stop here"
+if [ -z "$GITHUB_API_KEY" ]; then
+	echo "GITHUB_API_KEY not set. Will stop here"
 	exit 1
 fi
 
