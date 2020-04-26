@@ -2,9 +2,14 @@
 GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
 FULL_REPO="https://${GITHUB_API_KEY}$GH_REPO"
 
-if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ] || [ -z "$CHANGELOG_GITHUB_TOKEN" ]; then
+if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
     echo "Doc build skipped"
     exit 0
+fi
+
+if [ -z "$CHANGELOG_GITHUB_TOKEN" ]; then
+	echo "CHANGELOG_GITHUB_TOKEN not set. Will stop here"
+	exit 1
 fi
 
 mkdir -p out
