@@ -30,7 +30,6 @@ install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3 python3-pip python3-setuptools
     - sudo pip3 install --upgrade pip
-    - sudo pip3 install mkdocs mkdocs-material six>=1.11.0
 script:
     - ./build.sh
     - bash scripts/deploy_docs.sh
