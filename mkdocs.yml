@@ -34,6 +34,7 @@ nav:
         - Local Commands: Manual/Preferences/LocalCommands.md
         - Remote Commands: Manual/Preferences/RemoteCommands.md
         - KeePass: Manual/Preferences/KeePassXC.md
+        - Systemtray Extensions: Manual/Preferences/SytemTrayExtensions.md 
       - Command Line: Manual/CommandLine.md
       - Connections:
         - Configure: Manual/Connections/SSH.md
