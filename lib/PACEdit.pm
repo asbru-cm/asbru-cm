@@ -641,6 +641,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     _($self, 'entryCfgJumpConnPass')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
+    _($self, 'chkPseudoJumpServer')->set_active($$self{_CFG}{'environments'}{$uuid}{'pseudo jump'} // 0);
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
     } else {
@@ -814,6 +815,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = _($self, 'entryCfgJumpConnPass')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'pseudo jump'} = _($self, 'chkPseudoJumpServer')->get_active();
     if (_($self, 'rbCfgAuthUserPass')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
     } elsif (_($self, 'rbCfgAuthPublicKey')->get_active()) {
