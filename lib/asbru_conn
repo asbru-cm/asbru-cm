@@ -887,7 +887,7 @@ sub _getLocalPort {
 sub getJumpPassword {
     my $before = shift;
 
-
+    return '';
 }
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {

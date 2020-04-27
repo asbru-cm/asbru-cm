@@ -2186,6 +2186,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="tooltip_text" translatable="yes">Host server user</property>
+                                                    <property name="visibility">False</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
