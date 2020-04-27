@@ -1604,7 +1604,9 @@ sub _watchConnectionData {
             $$self{CONNECTING} = 1;
             $$self{_RESTART} = 0;
         } elsif ($data eq 'HIDE_TERMINAL') {
-            $$self{_WINDOWTERMINAL}->hide();
+            if (defined $$self{_WINDOWTERMINAL}) {
+                $$self{_WINDOWTERMINAL}->hide();
+            }
         } elsif ($data =~ /^WENTER\|/) {
             $PACMain::FUNCS{_MAIN}{_HAS_FOCUS} = '';
             my ($cmd,$lblup,$lbldown,$default,$visible) = split /\|:\|/,$data;
