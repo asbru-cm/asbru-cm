@@ -1582,9 +1582,8 @@ elsif (!$MANUAL) {
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     _hardClose($EXP, $UUID);
                 }
-            }
-            # ... too many password attempts: provided password is no longer valid!!
-            else {
+            } else {
+                # ... too many password attempts: provided password is no longer valid!!
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
                 _hardClose($EXP, $UUID);
             }

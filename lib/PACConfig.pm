@@ -927,6 +927,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpIP')->set_text($$cfg{'defaults'}{'jump ip'} // '');
     _($self, 'entryCfgJumpPort')->set_value(($$cfg{'defaults'}{'jump port'} // 22) || 22);
     _($self, 'entryCfgJumpUser')->set_text($$cfg{'defaults'}{'jump user'} // '');
+    _($self, 'entryCfgJumpPass')->set_text($$cfg{'defaults'}{'jump pass'} // '');
     if (($$cfg{'defaults'}{'proxy'} eq 'Jump')&&(defined $$self{_CFG}{'defaults'}{'jump key'})&&($$self{_CFG}{'defaults'}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpKey')->set_uri("file://$$self{_CFG}{'defaults'}{'jump key'}");
     }
@@ -1031,6 +1032,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'jump ip'} = _($self, 'entryCfgJumpIP')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump port'} = _($self, 'entryCfgJumpPort')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
+    $$self{_CFG}{'defaults'}{'jump pass'} = _($self, 'entryCfgJumpPass')->get_chars(0, -1);
 
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);

@@ -2089,7 +2089,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">1</property>
+                                            <property name="position">0</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -2132,7 +2132,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                           <packing>
                                             <property name="expand">False</property>
                                             <property name="fill">True</property>
-                                            <property name="position">2</property>
+                                            <property name="position">1</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -2168,6 +2168,42 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkFrame" id="frame2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label_xalign">0</property>
+                                            <property name="shadow_type">none</property>
+                                            <child>
+                                              <object class="GtkAlignment" id="alignment1">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <child>
+                                                  <object class="GtkEntry" id="entryCfgJumpConnPass">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="tooltip_text" translatable="yes">Host server user</property>
+                                                    <property name="invisible_char">•</property>
+                                                    <property name="primary_icon_activatable">False</property>
+                                                    <property name="secondary_icon_activatable">False</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child type="label">
+                                              <object class="GtkLabel" id="label7">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Password:</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
                                             <property name="position">3</property>
                                           </packing>
                                         </child>
@@ -2182,10 +2218,12 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                       <object class="GtkBox" id="hbox34">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="spacing">5</property>
                                         <child>
                                           <object class="GtkLabel" id="labelConnKey">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="valign">center</property>
                                             <property name="label" translatable="yes">Private key file: </property>
                                             <property name="use_markup">True</property>
                                           </object>
@@ -2207,7 +2245,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                             <property name="title" translatable="yes">Select an OpenSSH Private Key</property>
                                           </object>
                                           <packing>
-                                            <property name="expand">True</property>
+                                            <property name="expand">False</property>
                                             <property name="fill">True</property>
                                             <property name="position">1</property>
                                           </packing>
@@ -8697,6 +8735,7 @@ For all other types of connection, this setting will be ignored.
                                 <property name="can_focus">False</property>
                                 <property name="margin_left">21</property>
                                 <property name="orientation">vertical</property>
+                                <property name="spacing">3</property>
                                 <child>
                                   <object class="GtkBox" id="hbox1">
                                     <property name="visible">True</property>
@@ -8735,7 +8774,7 @@ For all other types of connection, this setting will be ignored.
                                       <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
-                                        <property name="position">1</property>
+                                        <property name="position">0</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -8775,7 +8814,7 @@ For all other types of connection, this setting will be ignored.
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">2</property>
+                                        <property name="position">1</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -8812,6 +8851,43 @@ For all other types of connection, this setting will be ignored.
                                       <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkFrame" id="frame7">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label_xalign">0</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkAlignment" id="alignment2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkEntry" id="entryCfgJumpPass">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="tooltip_text" translatable="yes">Proxy password</property>
+                                                <property name="visibility">False</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child type="label">
+                                          <object class="GtkLabel" id="label58">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Password</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
                                         <property name="position">3</property>
                                       </packing>
                                     </child>
@@ -8826,6 +8902,7 @@ For all other types of connection, this setting will be ignored.
                                   <object class="GtkBox" id="hbox42">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="spacing">5</property>
                                     <child>
                                       <object class="GtkLabel" id="labelConnKey1">
                                         <property name="visible">True</property>
@@ -8851,7 +8928,7 @@ For all other types of connection, this setting will be ignored.
                                         <property name="title" translatable="yes">Select an OpenSSH Private Key</property>
                                       </object>
                                       <packing>
-                                        <property name="expand">True</property>
+                                        <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">1</property>
                                       </packing>
