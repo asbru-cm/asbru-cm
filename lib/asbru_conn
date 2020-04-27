@@ -89,6 +89,7 @@ my %COLOR = (
     'norm' => "\033[m",    # reset
     'log' => "\033[33m",   # yellow
     'recv' => "\033[35m",  # magenta
+    'cyan' => "\033[36m",  # cyan
     'sent' => "\033[0m\033[32m", # green
     'err' => "\033[31m" # red
 );
@@ -890,14 +891,13 @@ sub getJumpPassword {
     my $debug = $DEBUG ? $DEBUG : $ENV{'VERBOSE'};
 
     if ($debug) {
-        print "$COLOR{log}\n";
-        print "IP       : $IP\n";
-        print "PROXY IP : $proxy_ip\n";
-        print "MATCH : >$match<\nBEFORE:\n";
-        print "JUMP UUID    : $$CFG{'environments'}{$UUID}{'jump key'}\n";
-        print "JUMP DEFAULT : $$CFG{'defaults'}{'jump key'}\n";
-        print "TERMINAL KEY : $$CFG{'defaults'}{'jump key'}\n";
-        print "$COLOR{'norm'}";
+        print "\n$COLOR{log}",
+        "MATCH   : >$match<\n",
+        "IP      : $IP\n",
+        "JUMP IP : $proxy_ip\n",
+        "DEFAULT  KEY : $$CFG{'defaults'}{'jump key'}\n",
+        "TERMINAL KEY : $$CFG{'environments'}{$UUID}{'jump key'}\n",
+        "$COLOR{'norm'}";
     }
 
     if ($$CFG{'environments'}{$UUID}{'use proxy'} == 3 && !$JUMP_PASS) {
@@ -906,12 +906,12 @@ sub getJumpPassword {
             $JUMP_PASS++;
             if ($proxy_pass) {
                 if ($debug) {
-                    print "$COLOR{log}   TRY JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+                    print "$COLOR{cyan}TRY JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
                 }
                 return $proxy_pass;
             }
             if ($debug) {
-                print "$COLOR{recv}   ASK JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+                print "$COLOR{recv}* ASK JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
             }
             return askPassword();
         }
@@ -921,12 +921,12 @@ sub getJumpPassword {
             $JUMP_PASS++;
             if ($proxy_pass) {
                 if ($debug) {
-                    print "$COLOR{log}   TRY JUMP DEFAULT PASSPHRASE OK!$COLOR{'norm'}\n";
+                    print "$COLOR{cyan}TRY JUMP DEFAULT PASSPHRASE OK!$COLOR{'norm'}\n";
                 }
                 return $proxy_pass;
             }
             if ($debug) {
-                print "$COLOR{recv}   ASK JUMP DEFAULT PASSPRHASE$COLOR{'norm'}\n";
+                print "$COLOR{recv}* ASK JUMP DEFAULT PASSPRHASE$COLOR{'norm'}\n";
             }
             return askPassword();
         }
@@ -934,22 +934,24 @@ sub getJumpPassword {
         $TERM_PASS++;
         if ($PASSPHRASE) {
             if ($debug) {
-                print "$COLOR{log}   TRY TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+                print "$COLOR{cyan}TRY TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
             }
             return $PASSPHRASE;
         }
         if ($debug) {
-            print "$COLOR{recv}   ASK TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+            print "$COLOR{recv}* ASK TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
         }
         return askPassword();
     }
     if ($debug) {
-        print "$COLOR{log}JUMP PASS? $JUMP_PASS\n";
-        print "TERM PASS? $TERM_PASS$COLOR{'norm'}\n";
+        print "$COLOR{log}",
+        "JUMP PASS? $JUMP_PASS\n",
+        "TERM PASS? $TERM_PASS",
+        "$COLOR{'norm'}\n";
     }
     if (!$JUMP_PASS && $proxy_pass) {
         if ($debug) {
-            print "$COLOR{log}   TRY DEFAULT JUMP$COLOR{'norm'}\n";
+            print "$COLOR{cyan}TRY DEFAULT JUMP$COLOR{'norm'}\n";
         }
         $JUMP_PASS++;
         return $proxy_pass;
@@ -960,18 +962,18 @@ sub getJumpPassword {
         $TERM_PASS++;
         if ($AUTH eq 'publickey' && $PASSPHRASE) {
             if ($debug) {
-                print "$COLOR{log}   TRY DESTINATION PASSPHRASE$COLOR{'norm'}\n";
+                print "$COLOR{cyan}TRY DESTINATION PASSPHRASE$COLOR{'norm'}\n";
             }
             return $PASSPHRASE;
         } elsif ($AUTH eq 'userpass' && $PASS && $PASS ne '<<ASK_PASS>>') {
             if ($debug) {
-                print "$COLOR{log}   TRY DESTINATION PASSWORD$COLOR{'norm'}\n";
+                print "$COLOR{cyan}TRY DESTINATION PASSWORD$COLOR{'norm'}\n";
             }
             return $PASS;
         }
     }
     if ($debug) {
-        print "$COLOR{recv}   ASK PASSWORD$COLOR{'norm'}\n";
+        print "$COLOR{recv}* ASK PASSWORD$COLOR{'norm'}\n";
     }
     # Extract the last line and use it is as prompt for the request password dialog
     return askPassword();
@@ -1665,20 +1667,15 @@ elsif (!$MANUAL) {
                 my @before = split /\n/, $EXP->before;
 
                 $PASSWORD_COUNT++;
-
-                if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
-                    if ($proxy_jump) {
-                        # get the correct Password
-                        $password = getJumpPassword();
-                    }
-                    if (!$password) {
-                        $password = askPassword();
-                    }
-                } elsif ($proxy_jump) {
-                    # get the correct Password
+                if ($proxy_jump) {
+                    # get the next password
                     $password = getJumpPassword();
                 } else {
-                    $password = $PASS;
+                    if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
+                        $password = askPassword();
+                    } else {
+                        $password = $PASS;
+                    }
                 }
                 if ($password) {
                     $EXP->log_stdout(0);
