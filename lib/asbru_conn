@@ -882,6 +882,13 @@ sub _getLocalPort {
     return $LPORT;
 }
 
+# We have a jump proxy, we have to figure out which password is being asked: Jump server? Destination?
+
+sub getJumpPassword {
+    my $before = shift;
+
+
+}
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
@@ -1555,24 +1562,36 @@ elsif (!$MANUAL) {
 
         # Found password/passphrase string
         [$PASSWORD_PROMPT, sub {
-
-        # A few attempts...
+            # A few attempts...
             if ($PASSWORD_COUNT < 6) {
+                my $password = '';
+                my @before = split /\n/, $EXP->before;
+
                 $PASSWORD_COUNT++;
                 $WAS_ASK_PASS = 0;
 
                 if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
-                    my @before = split /\n/, $EXP->before;
-                    # Extract the last line and use it is as prompt for the request password dialog
-                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
-                    $WAS_ASK_PASS = 1;
-                    ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+                    if ($proxy_jump) {
+                        # get the correct Password
+                        $password = getJumpPassword(\@before);
+                    }
+                    if (!$password) {
+                        # Extract the last line and use it is as prompt for the request password dialog
+                        my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
+                        $WAS_ASK_PASS = 1;
+                        ctrl("PASSWORD:Asking user for password...");
+                        $password = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+                    }
+                } elsif ($proxy_jump) {
+                    # get the correct Password
+                    $password = getJumpPassword(\@before);
+                } else {
+                    $password = $PASS;
                 }
-                if (defined $PASS) {
+                if ($password) {
                     $EXP->log_stdout(0);
-                    $PASS = subst($PASS);
-                    send_slow($EXP, "$PASS\n", 'hide');
+                    $PASS = subst($password);
+                    send_slow($EXP, "$password\n", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
                     # Next time we will ask the password since the automatic one did not work
