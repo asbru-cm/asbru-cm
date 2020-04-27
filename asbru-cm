@@ -134,6 +134,7 @@ chomp $wl;
 foreach my $arg (@ARGV) {
     if ($arg =~ /-{1,2}verbose/) {
         $VERBOSE = 1;
+        $ENV{'VERBOSE'} = 1;
     }
 }
 

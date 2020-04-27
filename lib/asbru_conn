@@ -66,7 +66,6 @@ my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
 my $PASSWORD_COUNT = 0;
-my $WAS_ASK_PASS = 0;
 my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
 my $HIDE_TERMINAL = 0;
@@ -80,12 +79,14 @@ my $proxy_pass = '';
 my $proxy_cmd = '';
 my $proxy_jump = 0;
 my $proxy_get = '';
+my $JUMP_PASS = 0;
+my $TERM_PASS = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
 # Define some ANSI colors
 my %COLOR = (
-    'norm' => "\033[m",    # black
+    'norm' => "\033[m",    # reset
     'log' => "\033[33m",   # yellow
     'recv' => "\033[35m",  # magenta
     'sent' => "\033[0m\033[32m", # green
@@ -885,10 +886,102 @@ sub _getLocalPort {
 # We have a jump proxy, we have to figure out which password is being asked: Jump server? Destination?
 
 sub getJumpPassword {
-    my $before = shift;
+    my $match = $EXP->match();
+    my $debug = $DEBUG ? $DEBUG : $ENV{'VERBOSE'};
 
-    return '';
+    if ($debug) {
+        print "$COLOR{log}MATCH : >$match<\nBEFORE:\n";
+        print "JUMP UUID    : $$CFG{'environments'}{$UUID}{'jump key'}\n";
+        print "JUMP DEFAULT : $$CFG{'defaults'}{'jump key'}\n";
+        print "TERMINAL KEY : $$CFG{'defaults'}{'jump key'}$COLOR{'norm'}\n$COLOR{'norm'}";
+    }
+
+    if ($$CFG{'environments'}{$UUID}{'use proxy'} == 3 && !$JUMP_PASS) {
+        # Use terminal configuration settings
+        if ($$CFG{'environments'}{$UUID}{'jump key'} && $match =~ /$$CFG{'environments'}{$UUID}{'jump key'}/) {
+            $JUMP_PASS++;
+            if ($proxy_pass) {
+                if ($debug) {
+                    print "$COLOR{log}   TRY JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+                }
+                return $proxy_pass;
+            }
+            if ($debug) {
+                print "$COLOR{recv}   ASK JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+            }
+            return askPassword();
+        }
+    } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0 && $$CFG{'defaults'}{'proxy'} eq 'Jump' && !$JUMP_PASS) {
+        # Use global configuration settings
+        if ($$CFG{'defaults'}{'jump key'} && $match =~ /$$CFG{'defaults'}{'jump key'}/) {
+            $JUMP_PASS++;
+            if ($proxy_pass) {
+                if ($debug) {
+                    print "$COLOR{log}   TRY JUMP DEFAULT PASSPHRASE OK!$COLOR{'norm'}\n";
+                }
+                return $proxy_pass;
+            }
+            if ($debug) {
+                print "$COLOR{recv}   ASK JUMP DEFAULT PASSPRHASE$COLOR{'norm'}\n";
+            }
+            return askPassword();
+        }
+    } elsif ($PUBKEY && $match =~ /$PUBKEY/ && $TERM_PASS<2) {
+        $TERM_PASS++;
+        if ($PASSPHRASE) {
+            if ($debug) {
+                print "$COLOR{log}   TRY TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+            }
+            return $PASSPHRASE;
+        }
+        if ($debug) {
+            print "$COLOR{recv}   ASK TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+        }
+        return askPassword();
+    }
+    if ($debug) {
+        print "$COLOR{log}JUMP PASS? $JUMP_PASS\n";
+        print "TERM PASS? $TERM_PASS$COLOR{'norm'}\n";
+    }
+    if (!$JUMP_PASS && $proxy_pass) {
+        if ($debug) {
+            print "$COLOR{recv}   TRY DEFAULT JUMP$COLOR{'norm'}\n";
+        }
+        $JUMP_PASS++;
+        return $proxy_pass;
+    }
+    $JUMP_PASS++;
+    if (!$TERM_PASS) {
+        # Try a terminal password, maybe the jump server is alrealy logged in
+        $TERM_PASS++;
+        if ($AUTH eq 'publickey' && $PASSPHRASE) {
+            if ($debug) {
+                print "$COLOR{log}   TRY DESTINATION PASSPHRASE$COLOR{'norm'}\n";
+            }
+            return $PASSPHRASE;
+        } elsif ($AUTH eq 'userpass' && $PASS) {
+            if ($debug) {
+                print "$COLOR{log}   TRY DESTINATION PASSWORD$COLOR{'norm'}\n";
+            }
+            return $PASS;
+        }
+    }
+    if ($debug) {
+        print "$COLOR{recv}   ASK PASSWORD$COLOR{'norm'}\n";
+    }
+    # Extract the last line and use it is as prompt for the request password dialog
+    return askPassword();
 }
+
+sub askPassword {
+    my @before;
+
+    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
+    ctrl("PASSWORD:Asking user for password...");
+    my $p = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+    return $p;
+}
+
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
@@ -1568,23 +1661,18 @@ elsif (!$MANUAL) {
                 my @before = split /\n/, $EXP->before;
 
                 $PASSWORD_COUNT++;
-                $WAS_ASK_PASS = 0;
 
                 if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
                     if ($proxy_jump) {
                         # get the correct Password
-                        $password = getJumpPassword(\@before);
+                        $password = getJumpPassword();
                     }
                     if (!$password) {
-                        # Extract the last line and use it is as prompt for the request password dialog
-                        my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
-                        $WAS_ASK_PASS = 1;
-                        ctrl("PASSWORD:Asking user for password...");
-                        $password = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+                        $password = askPassword();
                     }
                 } elsif ($proxy_jump) {
                     # get the correct Password
-                    $password = getJumpPassword(\@before);
+                    $password = getJumpPassword();
                 } else {
                     $password = $PASS;
                 }
