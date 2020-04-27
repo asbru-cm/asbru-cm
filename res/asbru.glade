@@ -1875,7 +1875,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <object class="GtkLabel" id="label101">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">IP / Host:</property>
+                                            <property name="label" translatable="yes">IP / Host</property>
                                           </object>
                                         </child>
                                       </object>
@@ -1920,7 +1920,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <object class="GtkLabel" id="label102">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Port:</property>
+                                            <property name="label" translatable="yes">Port</property>
                                           </object>
                                         </child>
                                       </object>
@@ -1958,7 +1958,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <object class="GtkLabel" id="label103">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">User:</property>
+                                            <property name="label" translatable="yes">User</property>
                                           </object>
                                         </child>
                                       </object>
@@ -1997,7 +1997,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <object class="GtkLabel" id="label104">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Password:</property>
+                                            <property name="label" translatable="yes">Password</property>
                                           </object>
                                         </child>
                                       </object>
@@ -2127,7 +2127,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                               <object class="GtkLabel" id="label125">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Port:</property>
+                                                <property name="label" translatable="yes">Port</property>
                                               </object>
                                             </child>
                                           </object>
@@ -2164,7 +2164,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                               <object class="GtkLabel" id="label126">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">User:</property>
+                                                <property name="label" translatable="yes">User</property>
                                               </object>
                                             </child>
                                           </object>
@@ -2202,7 +2202,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                               <object class="GtkLabel" id="label7">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Password:</property>
+                                                <property name="label" translatable="yes">Password</property>
                                               </object>
                                             </child>
                                           </object>
