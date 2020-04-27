@@ -945,7 +945,7 @@ sub getJumpPassword {
     }
     if (!$JUMP_PASS && $proxy_pass) {
         if ($debug) {
-            print "$COLOR{recv}   TRY DEFAULT JUMP$COLOR{'norm'}\n";
+            print "$COLOR{log}   TRY DEFAULT JUMP$COLOR{'norm'}\n";
         }
         $JUMP_PASS++;
         return $proxy_pass;
@@ -959,7 +959,7 @@ sub getJumpPassword {
                 print "$COLOR{log}   TRY DESTINATION PASSPHRASE$COLOR{'norm'}\n";
             }
             return $PASSPHRASE;
-        } elsif ($AUTH eq 'userpass' && $PASS) {
+        } elsif ($AUTH eq 'userpass' && $PASS && $PASS ne '<<ASK_PASS>>') {
             if ($debug) {
                 print "$COLOR{log}   TRY DESTINATION PASSWORD$COLOR{'norm'}\n";
             }
