@@ -890,10 +890,14 @@ sub getJumpPassword {
     my $debug = $DEBUG ? $DEBUG : $ENV{'VERBOSE'};
 
     if ($debug) {
-        print "$COLOR{log}MATCH : >$match<\nBEFORE:\n";
+        print "$COLOR{log}\n";
+        print "IP       : $IP\n";
+        print "PROXY IP : $proxy_ip\n";
+        print "MATCH : >$match<\nBEFORE:\n";
         print "JUMP UUID    : $$CFG{'environments'}{$UUID}{'jump key'}\n";
         print "JUMP DEFAULT : $$CFG{'defaults'}{'jump key'}\n";
-        print "TERMINAL KEY : $$CFG{'defaults'}{'jump key'}$COLOR{'norm'}\n$COLOR{'norm'}";
+        print "TERMINAL KEY : $$CFG{'defaults'}{'jump key'}\n";
+        print "$COLOR{'norm'}";
     }
 
     if ($$CFG{'environments'}{$UUID}{'use proxy'} == 3 && !$JUMP_PASS) {
