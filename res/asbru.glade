@@ -1778,8 +1778,8 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                           <object class="GtkBox" id="vboxEditNetworkSettings">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="margin_left">12</property>
-                            <property name="margin_right">12</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
                             <property name="margin_top">12</property>
                             <property name="margin_bottom">12</property>
                             <property name="orientation">vertical</property>
@@ -1847,12 +1847,12 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                   <object class="GtkBox" id="vboxCfgManualProxyConnOptions">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="spacing">12</property>
+                                    <property name="margin_left">22</property>
+                                    <property name="spacing">5</property>
                                     <child>
                                       <object class="GtkFrame" id="frame15">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="margin_left">21</property>
                                         <property name="label_xalign">0</property>
                                         <property name="shadow_type">none</property>
                                         <child>
@@ -1946,6 +1946,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="tooltip_text" translatable="yes">Proxy user name</property>
                                                 <property name="invisible_char">•</property>
+                                                <property name="width_chars">18</property>
                                                 <property name="max_width_chars">10</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
@@ -1962,7 +1963,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">True</property>
+                                        <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">2</property>
                                       </packing>
@@ -1984,6 +1985,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="tooltip_text" translatable="yes">Proxy password</property>
                                                 <property name="visibility">False</property>
                                                 <property name="invisible_char">•</property>
+                                                <property name="width_chars">18</property>
                                                 <property name="max_width_chars">10</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
@@ -2000,7 +2002,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">True</property>
+                                        <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">3</property>
                                       </packing>
@@ -2048,14 +2050,14 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                   <object class="GtkBox" id="vboxJumpCfgOptions">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="margin_left">21</property>
+                                    <property name="margin_left">22</property>
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">4</property>
                                     <child>
                                       <object class="GtkBox" id="hbox38">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="spacing">12</property>
+                                        <property name="spacing">5</property>
                                         <child>
                                           <object class="GtkFrame" id="frame23">
                                             <property name="visible">True</property>
@@ -2151,6 +2153,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                                     <property name="can_focus">True</property>
                                                     <property name="tooltip_text" translatable="yes">Host server user</property>
                                                     <property name="invisible_char">•</property>
+                                                    <property name="width_chars">18</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                   </object>
@@ -2166,7 +2169,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                             </child>
                                           </object>
                                           <packing>
-                                            <property name="expand">True</property>
+                                            <property name="expand">False</property>
                                             <property name="fill">True</property>
                                             <property name="position">2</property>
                                           </packing>
@@ -2188,6 +2191,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                                     <property name="tooltip_text" translatable="yes">Host server user</property>
                                                     <property name="visibility">False</property>
                                                     <property name="invisible_char">•</property>
+                                                    <property name="width_chars">18</property>
                                                     <property name="primary_icon_activatable">False</property>
                                                     <property name="secondary_icon_activatable">False</property>
                                                   </object>
@@ -2203,7 +2207,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                             </child>
                                           </object>
                                           <packing>
-                                            <property name="expand">True</property>
+                                            <property name="expand">False</property>
                                             <property name="fill">True</property>
                                             <property name="position">3</property>
                                           </packing>
@@ -8536,7 +8540,7 @@ For all other types of connection, this setting will be ignored.
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="margin_left">22</property>
-                                <property name="spacing">12</property>
+                                <property name="spacing">5</property>
                                 <child>
                                   <object class="GtkFrame" id="frame24">
                                     <property name="visible">True</property>
@@ -8628,8 +8632,8 @@ For all other types of connection, this setting will be ignored.
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="tooltip_text" translatable="yes">Proxy user name</property>
-                                            <property name="max_length">14</property>
                                             <property name="invisible_char">•</property>
+                                            <property name="width_chars">18</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
                                           </object>
@@ -8645,7 +8649,7 @@ For all other types of connection, this setting will be ignored.
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">True</property>
+                                    <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">2</property>
                                   </packing>
@@ -8667,6 +8671,7 @@ For all other types of connection, this setting will be ignored.
                                             <property name="tooltip_text" translatable="yes">Proxy password</property>
                                             <property name="visibility">False</property>
                                             <property name="invisible_char">•</property>
+                                            <property name="width_chars">18</property>
                                             <property name="primary_icon_activatable">False</property>
                                             <property name="secondary_icon_activatable">False</property>
                                           </object>
@@ -8682,7 +8687,7 @@ For all other types of connection, this setting will be ignored.
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">True</property>
+                                    <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">3</property>
                                   </packing>
@@ -8734,14 +8739,14 @@ For all other types of connection, this setting will be ignored.
                               <object class="GtkBox" id="vboxPrefJumpCfgOptions">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="margin_left">21</property>
+                                <property name="margin_left">22</property>
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">3</property>
                                 <child>
                                   <object class="GtkBox" id="hbox1">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="spacing">12</property>
+                                    <property name="spacing">5</property>
                                     <child>
                                       <object class="GtkFrame" id="frame19">
                                         <property name="visible">True</property>
@@ -8833,8 +8838,8 @@ For all other types of connection, this setting will be ignored.
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="tooltip_text" translatable="yes">Host server user</property>
-                                                <property name="max_length">14</property>
                                                 <property name="invisible_char">•</property>
+                                                <property name="width_chars">18</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
                                               </object>
@@ -8850,7 +8855,7 @@ For all other types of connection, this setting will be ignored.
                                         </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">True</property>
+                                        <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">2</property>
                                       </packing>
@@ -8872,6 +8877,7 @@ For all other types of connection, this setting will be ignored.
                                                 <property name="tooltip_text" translatable="yes">Proxy password</property>
                                                 <property name="visibility">False</property>
                                                 <property name="invisible_char">•</property>
+                                                <property name="width_chars">18</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
                                               </object>
@@ -8887,7 +8893,7 @@ For all other types of connection, this setting will be ignored.
                                         </child>
                                       </object>
                                       <packing>
-                                        <property name="expand">True</property>
+                                        <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">3</property>
                                       </packing>
