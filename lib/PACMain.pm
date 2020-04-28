@@ -592,13 +592,13 @@ sub _initGUI {
     $$self{_GUI}{_hboxSearch} = Gtk3::HBox->new(1, 0);
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_hboxSearch}, 0, 1, 0);
 
-    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new_with_mnemonic('Prev_ious');
+    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new('Prev_ious');
     $$self{_GUI}{_btnPrevSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-previous', 'button'));
     $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnPrevSearch}, 0, 1, 0);
     $$self{_GUI}{_btnPrevSearch}->set('can_focus', 0);
     $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
 
-    $$self{_GUI}{_btnNextSearch} = Gtk3::Button->new_with_mnemonic('_Next');
+    $$self{_GUI}{_btnNextSearch} = Gtk3::Button->new('Next');
     $$self{_GUI}{_btnNextSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-next', 'button'));
     $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnNextSearch}, 0, 1, 0);
     $$self{_GUI}{_btnNextSearch}->set('can_focus', 0);
@@ -755,7 +755,7 @@ sub _initGUI {
         $$self{_GUI}{clusterBtn} = Gtk3::Button->new();
         $$self{_GUI}{clusterBtn}->get_style_context()->add_class("button-cp");
     } else {
-        $$self{_GUI}{clusterBtn} = Gtk3::Button->new_with_mnemonic('C_lusters');
+        $$self{_GUI}{clusterBtn} = Gtk3::Button->new('Clusters');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{clusterBtn}, 1, 1, 0);
     $$self{_GUI}{clusterBtn}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager2', 'button'));
@@ -766,7 +766,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{scriptsBtn} = Gtk3::Button->new();
     } else {
-        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new_with_mnemonic('Scrip_ts');
+        $$self{_GUI}{scriptsBtn} = Gtk3::Button->new('Scripts');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{scriptsBtn}, 1, 1, 0);
     $$self{_GUI}{scriptsBtn}->set_image(Gtk3::Image->new_from_stock('asbru-script', 'button'));
@@ -781,7 +781,7 @@ sub _initGUI {
         $$self{_GUI}{pccBtn} = Gtk3::Button->new();
         $$self{_GUI}{pccBtn}->get_style_context()->add_class("button-cp");
     } else {
-        $$self{_GUI}{pccBtn} = Gtk3::Button->new_with_mnemonic('PC_C');
+        $$self{_GUI}{pccBtn} = Gtk3::Button->new('PCC');
     }
     $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{pccBtn}, 1, 1, 0);
     $$self{_GUI}{pccBtn}->set_image(Gtk3::Image->new_from_stock('gtk-justify-fill', 'GTK_ICON_SIZE_BUTTON'));
@@ -870,7 +870,7 @@ sub _initGUI {
     $$self{_GUI}{showConnBtn}->set_tooltip_text('Show/Hide connections tree panel');
 
     # Create WakeOnLan button
-    $$self{_GUI}{wolBtn} = Gtk3::Button->new_with_mnemonic('Wake On Lan');
+    $$self{_GUI}{wolBtn} = Gtk3::Button->new('Wake On Lan');
     $$self{_GUI}{wolBtn}->set_image(Gtk3::Image->new_from_stock('asbru-wol', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{wolBtn}, 1, 1, 0);
     $$self{_GUI}{wolBtn}->set('can-focus' => 0);
@@ -896,7 +896,7 @@ sub _initGUI {
         $$self{_GUI}{configBtn}->get_style_context()->add_class("button-cp");
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     } else {
-        $$self{_GUI}{configBtn} = Gtk3::Button->new_with_mnemonic('_Preferences');
+        $$self{_GUI}{configBtn} = Gtk3::Button->new('Preferences');
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     }
     $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
@@ -904,7 +904,7 @@ sub _initGUI {
     $$self{_GUI}{configBtn}->set_tooltip_text('Open the general preferences control');
 
     # Create saveBtn button
-    $$self{_GUI}{saveBtn} = Gtk3::Button->new_with_mnemonic('_Save');
+    $$self{_GUI}{saveBtn} = Gtk3::Button->new('Save');
     $$self{_GUI}{saveBtn}->set_image(Gtk3::Image->new_from_stock('gtk-save', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{saveBtn}, 1, 1, 0);
     $$self{_GUI}{saveBtn}->set('can-focus' => 0);
@@ -930,7 +930,7 @@ sub _initGUI {
         $$self{_GUI}{quitBtn} = Gtk3::Button->new();
         $$self{_GUI}{quitBtn}->get_style_context()->add_class("button-cp");
     } else {
-        $$self{_GUI}{quitBtn} = Gtk3::Button->new_with_mnemonic('_Quit');
+        $$self{_GUI}{quitBtn} = Gtk3::Button->new('Quit');
     }
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
