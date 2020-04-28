@@ -136,6 +136,8 @@ fi
 
 
 %changelog
+* Tue Apr 28 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.3
+- 6.1.3 release
 * Sun Apr 12 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.2
 - 6.1.2 release
 * Fri Mar 27 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0
