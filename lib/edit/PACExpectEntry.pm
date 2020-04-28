@@ -178,7 +178,7 @@ sub _buildExpectGUI {
 
     $w{vp} = Gtk3::Viewport->new();
     $w{sw}->add($w{vp});
-    $w{vp}->set_property('border-width', 5);
+    #$w{vp}->set_property('border-width', 0);
     $w{vp}->set_shadow_type('none');
 
     # Build and add the vbox that will contain the expect widgets
@@ -234,10 +234,13 @@ sub _buildExpect {
     # Make an container frame
     $w{frame} = Gtk3::Frame->new;
     $w{frame}->set_label_widget($w{active});
+    $w{frame}->set_shadow_type('GTK_SHADOW_NONE');
 
     # Build an HBox
+    $w{vbox} = Gtk3::VBox->new(0, 5);
     $w{hbox1} = Gtk3::HBox->new(0, 0);
-    $w{frame}->add($w{hbox1});
+    $w{frame}->add($w{vbox});
+    $w{vbox}->pack_start($w{hbox1}, 0, 1, 0);
 
     # Build a vbox for event_boxes 1 & 2
     $w{vbox1} = Gtk3::VBox->new(0, 0);
@@ -254,7 +257,7 @@ sub _buildExpect {
     $w{ebdown}->add(Gtk3::Image->new_from_stock('gtk-go-down', 'small-toolbar') );
 
     # Build a vbox for expect and send entries
-    $w{vbox2} = Gtk3::VBox->new(0, 0);
+    $w{vbox2} = Gtk3::VBox->new(0, 3);
     $w{hbox1}->pack_start($w{vbox2}, 1, 1, 0);
     $w{vbox2}->set_sensitive($active);
 
@@ -366,7 +369,10 @@ sub _buildExpect {
 
     # Build delete button
     $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
-    $w{hbox1}->pack_start($w{btn}, 0, 1, 0);
+    $w{btn}->set_valign('GTK_ALIGN_START');
+    $w{hbox1}->pack_start($w{btn}, 0, 0, 0);
+
+    $w{vbox}->pack_start(Gtk3::HSeparator->new(), 1, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbexpect}->pack_start($w{frame}, 0, 1, 0);
