@@ -1058,18 +1058,15 @@ if (defined $METHOD) {
         }
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*mosh.*$/) || ($METHOD eq 'MOSH')) {
-        $METHOD = 'mosh';
-        if ($PORT != 22) {
-            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
-        }
         my $key = '';
+        $METHOD = 'mosh';
         if ($AUTH eq 'publickey') {
-            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = $PUBKEY ? "-i '$PUBKEY'" : '';
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
-            $CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
-        } elsif (! $AUTHFALLBACK) {
-            $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
+            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT $key\"";
+        } elsif ($PORT != 22) {
+            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
         }
         $connection_cmd = "$METHOD $CONNECT_OPTS ${USER}\@$IP";
         $connection_txt = $connection_cmd;
