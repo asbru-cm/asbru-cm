@@ -1,5 +1,35 @@
 # The SSH Terminal
 
+### Connection Details
+
+__Method__ : For this case we select __SSH__
+
+![](images/ssh1.png)
+
+
+## SSH Options Tab
+
+![](images/ssh6.png)
+
+Select any additional SSH options.
+
+### Local / Remote Port Forwarding
+
+Define your local or remote port forwarding rules.
+
+In the example image above, the connection opens 4 port forwards to access remote SQL Servers behind a Firewall.
+
+### Dynamic Socks Proxy
+
+*Pending
+
+### Advanced Options
+
+Write any sequence of additional SSH options.
+
+The command field allows you to right click and have access to known SSH options.
+
+
 ## The login process
 
 If you have configured your connection to have full automation, the login sequence will not require any intervention on your part, and the login process will look as clean as this.
