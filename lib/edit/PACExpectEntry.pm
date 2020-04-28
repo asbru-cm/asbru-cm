@@ -376,6 +376,13 @@ sub _buildExpect {
 
     # Setup some callbacks
 
+    # Disable scroll on spin buttons to avoid changes by mistake
+    foreach my $spin ('time_out','on_match','on_fail') {
+        $w{$spin}->signal_connect('scroll-event' => sub {
+            return 1;
+        });
+    }
+
     $w{on_match}->signal_connect('value_changed' => sub {
         my $v = $w{on_match}->get_chars(0, -1);
         return 1 if $v <= scalar(@{$$self{cfg}} -1);
