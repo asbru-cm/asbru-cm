@@ -1229,6 +1229,11 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                 _hardClose($EXP, $UUID);
             }
         }],
+
+        # Found success string for xfreerdp
+        ['\[INFO\]', sub {
+            return 1;
+        }],
     )
 }
 elsif (($METHOD =~ /^.*vncviewer$/) || ($METHOD eq 'VNC')) {
