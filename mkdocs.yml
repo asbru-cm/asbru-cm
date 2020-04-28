@@ -34,12 +34,13 @@ nav:
         - Local Commands: Manual/Preferences/LocalCommands.md
         - Remote Commands: Manual/Preferences/RemoteCommands.md
         - KeePass: Manual/Preferences/KeePassXC.md
+        - Systemtray Extensions: Manual/Preferences/SytemTrayExtensions.md 
       - Command Line: Manual/CommandLine.md
       - Connections:
-        - SSH:
-          - Configure: Manual/Connections/SSH.md
-          - Terminal: Manual/Connections/SSH_Terminal.md
-        - RDP: Manual/Connections/RDP.md
+        - Configure: Manual/Connections/SSH.md
+        - Methods:
+            - SSH: Manual/Connections/SSH_Terminal.md
+            - RDP: Manual/Connections/RDP.md
       - References:
         - Substitution: Manual/Substitutions.md
   - 3. Contributed Articles:
