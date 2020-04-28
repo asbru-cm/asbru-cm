@@ -81,6 +81,7 @@ my $proxy_jump = 0;
 my $proxy_get = '';
 my $JUMP_PASS = 0;
 my $TERM_PASS = 0;
+my $PSEUDO_JUMP = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
@@ -1049,8 +1050,6 @@ if (defined $METHOD) {
                 # Pseudo jump, connect to the first server and then we will send the second connection command over the second server
                 $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS jumpserver";
                 $connection_cmd2 = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
-                # Remove > from promtp regex, it causes problems with expect from second server
-                $COMMAND_PROMPT =~ s/>//g;
             } else {
                 $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
             }
@@ -1712,10 +1711,15 @@ elsif (!$MANUAL) {
         [$COMMAND_PROMPT, sub {
             $CONNECTED = 1;
 
-            # Test Pseudo Jump Server
             if ($connection_cmd2) {
-                send_slow($EXP, "$connection_cmd2\n", '');
+                # Pseudo Jump Server
+                send_slow($EXP, "$connection_cmd2\n");
                 $connection_cmd2 = '';
+                $PSEUDO_JUMP = 1;
+                $EXP->clear_accum();
+                exp_continue();
+            } elsif ($PSEUDO_JUMP && $EXP->before() =~ /\x1B$/) {
+                # On pseudo jumps, the strings come with terminal escape sequences that match the user prompt regex
                 $EXP->clear_accum();
                 exp_continue();
             } else {
@@ -1725,7 +1729,6 @@ elsif (!$MANUAL) {
                 if (!$EXPECT || !$CONNECTED) {
                     return 1;
                 }
-
 
                 $EXP->restart_timeout_upon_receive(1);
                 for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
