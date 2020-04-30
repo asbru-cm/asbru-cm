@@ -592,7 +592,7 @@ sub _initGUI {
     $$self{_GUI}{_hboxSearch} = Gtk3::HBox->new(1, 0);
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_hboxSearch}, 0, 1, 0);
 
-    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new('Prev_ious');
+    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new('Previous');
     $$self{_GUI}{_btnPrevSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-previous', 'button'));
     $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnPrevSearch}, 0, 1, 0);
     $$self{_GUI}{_btnPrevSearch}->set('can_focus', 0);
