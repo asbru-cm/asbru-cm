@@ -2150,7 +2150,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
     $$cfg{'defaults'}{'selection to clipboard'} //= 1;
-    $$cfg{'defaults'}{'how to switch tabs'} //= 0;
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;

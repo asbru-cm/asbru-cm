@@ -877,8 +877,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAudibleBell')->set_active($$cfg{'defaults'}{'audible bell'});
     _($self, 'cbCfgShowTerminalStatus')->set_active($$cfg{'defaults'}{'terminal show status bar'});
     _($self, 'cbCfgChangeMainTitle')->set_active($$cfg{'defaults'}{'change main title'});
-    _($self, 'rbCfgSwitchTabsCtrl')->set_active(! $$cfg{'defaults'}{'how to switch tabs'});
-    _($self, 'rbCfgSwitchTabsAlt')->set_active($$cfg{'defaults'}{'how to switch tabs'});
 
     # Terminal Colors
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorBlack', 'color black', _($self, 'colorBlack')->get_color()->to_string());
@@ -1107,7 +1105,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'change main title'} = _($self, 'cbCfgChangeMainTitle')->get_active();
     $$self{_CFG}{'defaults'}{'when no more tabs'} = _($self, 'rbOnNoTabsNothing')->get_active() ? 'last' : 'next';
     $$self{_CFG}{'defaults'}{'selection to clipboard'} = _($self, 'cbCfgSelectionToClipboard')->get_active();
-    $$self{_CFG}{'defaults'}{'how to switch tabs'} = _($self, 'rbCfgSwitchTabsAlt')->get_active();
     $$self{_CFG}{'defaults'}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlCharsConf')->get_active();
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active();
