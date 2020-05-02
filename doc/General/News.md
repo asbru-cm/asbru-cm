@@ -1,4 +1,4 @@
-# NEWS
+# What's new about Ásbrú Connection Manager ?
 Here you can find important news on the project
 
 ## 12.04.2020
