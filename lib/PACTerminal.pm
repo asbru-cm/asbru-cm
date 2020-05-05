@@ -1585,7 +1585,7 @@ sub _vteMenu {
         stockicon => 'gtk-help',
         sensitive => 1,
         code => sub {
-            _wMessage($$self{_PARENT},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('terminal'),1,0,'w-info');
+            _wMessage($$self{_PARENTWINDOW},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('terminal'),1,0,'w-info');
         }
     });
     # If PAC Script running, show a STOP script menuitem

@@ -2658,7 +2658,7 @@ sub _treeConnections_menu {
         stockicon => 'gtk-help',
         sensitive => 1,
         code => sub {
-            _wMessage($$self{_PARENT},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('treeConnections'),1,0,'w-info');
+            _wMessage($$self{_GUI}{main},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('treeConnections'),1,0,'w-info');
         }
     });
     # Expand All
