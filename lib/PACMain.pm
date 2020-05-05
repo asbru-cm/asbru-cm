@@ -955,6 +955,10 @@ sub _initGUI {
         } else {
             my ($c) = $col[1]->get_cells();
             $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+            if ($tree eq 'History') {
+                my ($c) = $col[2]->get_cells();
+                $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+            }
         }
     }
 
