@@ -1065,8 +1065,6 @@ sub _setupCallbacks {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
             }
-        } elsif ($action eq 'cluster_remove') {
-            $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
         } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
         } elsif ($action =~ /HOTKEY_CMD:(\w+)/) {

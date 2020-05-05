@@ -392,7 +392,6 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
     $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal','cisco','Send Cisco interrupt keypress'];
-    $$cfg{'terminal'}{'AltCtrl+r'}     = ['Terminal','cluster_remove','Remove Terminal from cluster'];
     $self->{cfg} = $cfg;
 }
 
