@@ -165,6 +165,9 @@ sub ListKeyBindings {
     my $tab = '';
 
     foreach my $kb (sort keys %$kbs) {
+        if ($kb =~ /^undef-/) {
+            next;
+        }
         $list .= sprintf("<b>%-20s</b>$tab\t%s\n",$kb,$$kbs{$kb}[2]);
     }
     return "$list</span>";
