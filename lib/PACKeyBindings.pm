@@ -353,12 +353,13 @@ sub _initCFG {
     $$cfg{'pacmain'}{'Ctrl+t'}         = ['Main Window','localshell','Open a local shell'];
     $$cfg{'terminal'}{'F11'}           = ['Terminal','fullscreen','Go full screen'];
     $$cfg{'terminal'}{'Ctrl+Return'}   = ['Terminal','start','Start Terminal'];
-    $$cfg{'terminal'}{'AltCtrl+X'}     = ['Terminal','reset','Reset Terminal'];
+    $$cfg{'terminal'}{'AltCtrl+x'}     = ['Terminal','reset','Reset Terminal'];
+    $$cfg{'terminal'}{'AltCtrl+X'}     = ['Terminal','reset','Reset Terminal and Clear window'];
     $$cfg{'terminal'}{'CtrlAlt+r'}     = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
     $$cfg{'terminal'}{'Ctrl+Insert'}   = ['Terminal','copy','Copy selection to clipboard'];
     $$cfg{'terminal'}{'Shift+Insert'}  = ['Terminal','paste','Paste selection into terminal'];
     $$cfg{'terminal'}{'Ctrl+p'}        = ['Terminal','paste-passwd','Paste terminal password'];
-    $$cfg{'terminal'}{'Ctrl+b'}        = ['Terminal','paste-delete','Paste and delete'];
+    $$cfg{'terminal'}{'Ctrl+b'}        = ['Terminal','paste-delete','Paste and regex delete'];
     $$cfg{'terminal'}{'Ctrl+g'}        = ['Terminal','hostname','Guess hostname'];
     $$cfg{'terminal'}{'Ctrl+w'}        = ['Terminal','close','Close Terminal'];
     $$cfg{'terminal'}{'Ctrl+q'}        = ['Terminal','quit','Exit Ásbrú'];
@@ -375,6 +376,7 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
     $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal','cisco','Send Cisco interrupt keypress'];
+    $$cfg{'terminal'}{'AltCtrl+r'}     = ['Terminal','cluster_remove','Remove Terminal from cluster'];
     $self->{cfg} = $cfg;
 }
 

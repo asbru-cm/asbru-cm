@@ -1010,6 +1010,8 @@ sub _setupCallbacks {
                 $$self{_FULLSCREEN} = 1;
             }
         } elsif ($action eq 'reset') {
+            $$self{_GUI}{_VTE}->reset(1, 0);
+        } elsif ($action eq 'resetclear') {
             $$self{_GUI}{_VTE}->reset(1, 1);
         } elsif ($action eq 'remove_from_cluster') {
             $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
@@ -1063,6 +1065,8 @@ sub _setupCallbacks {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
             }
+        } elsif ($action eq 'cluster_remove') {
+            $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
         } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
         } elsif ($action =~ /HOTKEY_CMD:(\w+)/) {
@@ -1713,7 +1717,6 @@ sub _vteMenu {
     {
         label => 'New Cluster...',
         stockicon => 'gtk-new',
-        shortcut => '',
         tooltip => 'Create a new cluster and put this connection in it',
         code => sub {
             my $cluster = _wEnterValue($$self{_PARENTWINDOW}, 'Enter a name for the <b>New Cluster</b>');
@@ -1752,7 +1755,6 @@ sub _vteMenu {
     push(@vte_menu_items,
     {
         label => 'Remove from Cluster',
-        shortcut => '<control><alt>r',
         stockicon => 'gtk-delete',
         tooltip => $$self{_CLUSTER} ne '' ? "Remove this connection from cluster '$$self{_CLUSTER}'" : '',
         sensitive => $$self{_CLUSTER} ne '',
@@ -1968,7 +1970,6 @@ sub _vteMenu {
     {
         label => 'Copy',
         stockicon => 'gtk-copy',
-        shortcut => '<control><shift>c',
         code => sub {$$self{_GUI}{_VTE}->copy_clipboard;}
     });
     # Copy Connection Password
@@ -1976,7 +1977,6 @@ sub _vteMenu {
         push(@vte_menu_items, {
             label => 'Copy Connection Password',
             stockicon => 'gtk-copy',
-            shortcut => '',
             sensitive => $$self{CONNECTED},
             code => sub {
                 _copyPass($$self{_UUID});
@@ -1988,7 +1988,6 @@ sub _vteMenu {
     {
         label => 'Paste',
         stockicon => 'gtk-paste',
-        shortcut => '<control><shift>v',
         sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
         code => sub {
             my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
@@ -2001,7 +2000,6 @@ sub _vteMenu {
         {
             label => 'Paste Connection Password',
             stockicon => 'gtk-paste',
-            shortcut => '<control><shift>p',
             code => sub {
                 my $pass = '';
                 if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
@@ -2022,7 +2020,6 @@ sub _vteMenu {
     {
         label => 'Paste and Delete...',
         stockicon => 'gtk-paste',
-        shortcut => '<control><shift>b',
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
         sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
         code => sub {
@@ -2040,13 +2037,13 @@ sub _vteMenu {
 
     # Add find string
     push(@vte_menu_items, {separator => 1});
-    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '<control>F3', code => sub {$self->_wFindInTerminal; return 1;}});
+    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', code => sub {$self->_wFindInTerminal; return 1;}});
 
     # Add save session log
-    push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
+    push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', code => sub{$self->_saveSessionLog;}});
 
     # Add edit session
-    push(@vte_menu_items, {label => 'Edit session...', stockicon => 'gtk-edit', shortcut => '<alt>e', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub{$PACMain::FUNCS{_EDIT}->show($$self{_UUID});}});
+    push(@vte_menu_items, {label => 'Edit session...', stockicon => 'gtk-edit', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub{$PACMain::FUNCS{_EDIT}->show($$self{_UUID});}});
 
     # Add change temporary tab label
     push(@vte_menu_items, {label => 'Temporary TAB Label change...', stockicon => 'gtk-edit', code => sub {
@@ -2063,10 +2060,10 @@ sub _vteMenu {
     }});
 
     # Change title with guessed hostname
-    push(@vte_menu_items, {label => 'Set title with guessed hostname', sensitive => ($$self{CONNECTED} && ! $$self{CONNECTING}), shortcut => '<control><shift>g', code => sub {$self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);}});
+    push(@vte_menu_items, {label => 'Set title with guessed hostname', sensitive => ($$self{CONNECTED} && ! $$self{CONNECTING}), code => sub {$self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);}});
 
     # Open file explorer on current directory (for PAC Shells only)
-    $$self{_UUID} eq '__PAC_SHELL__' and push(@vte_menu_items, {label => 'Open file manager on current dir', stockicon => 'gtk-open', shortcut => '', sensitive => ($$self{CONNECTED} && ! $$self{CONNECTING}), code => sub {$self->_execute('remote', 'xdg-open .', undef, undef, undef);}});
+    $$self{_UUID} eq '__PAC_SHELL__' and push(@vte_menu_items, {label => 'Open file manager on current dir', stockicon => 'gtk-open', sensitive => ($$self{CONNECTED} && ! $$self{CONNECTING}), code => sub {$self->_execute('remote', 'xdg-open .', undef, undef, undef);}});
 
     # Add take screenshot
     push(@vte_menu_items, {label => 'Take Screenshot', stockicon => 'gtk-media-record', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub {
@@ -2115,14 +2112,12 @@ sub _vteMenu {
                 label => 'Reset',
                 stockicon => 'gtk-refresh',
                 sensitive => 1,
-                shortcut => '<control><shift>x',
                 code => sub{$$self{_GUI}{_VTE}->reset(1, 0);}
             },
             {
                 label => 'Reset and clear',
                 stockicon => 'gtk-refresh',
                 sensitive => 1,
-                shortcut => '<control><alt><shift>x',
                 code => sub{$$self{_GUI}{_VTE}->reset(1, 1);}
             }
         ]
@@ -2166,7 +2161,6 @@ sub _vteMenu {
             # Duplicate connection
             {
                 label => 'Duplicate connection',
-                shortcut => '<control><shift>d',
                 stockicon => 'gtk-copy',
                 code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]])}
             },
@@ -2188,21 +2182,18 @@ sub _vteMenu {
             {
                 label => 'Disconnect and Restart session',
                 stockicon => 'gtk-refresh',
-                shortcut => '<control><shift>r',
                 sensitive => $$self{CONNECTED} && $$self{_PID},
                 code => sub {$self->_disconnectAndRestartTerminal();}
             },
             # Close terminal
             {
                 label => 'Close Terminal',
-                shortcut => '<control>F4',
                 stockicon => 'gtk-close',
                 code => sub {$self->stop(0, 1);}
             },
             # Close all terminals
             {
                 label => 'Close All Terminals',
-                shortcut => '<control><shift>F4',
                 stockicon => 'gtk-close',
                 sensitive => $self->_hasOtherTerminals(),
                 code => sub {$self->_closeAllTerminals();}
@@ -2210,7 +2201,6 @@ sub _vteMenu {
             # Close disconnected terminals
             {
                 label => 'Close Disconnected Terminals',
-                shortcut => '<control><shift>n',
                 stockicon => 'gtk-close',
                 sensitive => $self->_hasDisconnectedTerminals(),
                 code => sub {$self->_closeDisconnectedTerminals();}
@@ -2630,7 +2620,6 @@ sub _tabMenu {
     {
         label => 'New Cluster...',
         stockicon => 'gtk-new',
-        shortcut => '',
         code => sub {
             my $cluster = _wEnterValue($$self{_PARENTWINDOW}, 'Enter a name for the <b>New Cluster</b>');
             if ((! defined $cluster) || ($cluster =~ /^\s*$/go)) {
@@ -2683,10 +2672,10 @@ sub _tabMenu {
     });
     push(@vte_menu_items, {separator => 1});
 
-    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => '', code => sub {$self->_wFindInTerminal; return 1;}});
+    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', code => sub {$self->_wFindInTerminal; return 1;}});
 
     # Add save session log
-    push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', shortcut => '', code => sub{$self->_saveSessionLog;}});
+    push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', code => sub{$self->_saveSessionLog;}});
 
     # Add edit session
     push(@vte_menu_items, {label => 'Edit session...', stockicon => 'gtk-edit', sensitive => $$self{_UUID} ne '__PAC_SHELL__', code => sub{$PACMain::FUNCS{_EDIT}->show($$self{_UUID});}});
@@ -2712,15 +2701,15 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'New connection', stockicon => 'gtk-connect', submenu => &_menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
 
     # Add a 'duplicate connection' button
-    push(@vte_menu_items, {label => 'Duplicate connection', stockicon => 'gtk-copy', shortcut => '', sensitive => 1, code => sub{$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);}});
+    push(@vte_menu_items, {label => 'Duplicate connection', stockicon => 'gtk-copy', sensitive => 1, code => sub{$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);}});
 
     # Add close terminal
     push(@vte_menu_items, {separator => 1});
     # Add a 'disconnect' button to disconnect without closing the terminal
     push(@vte_menu_items, {label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub {kill(15, $$self{_PID});}});
     push(@vte_menu_items, {label => 'Restart session', stockicon => 'gtk-execute', sensitive => !$$self{CONNECTED} || !$$self{_PID}, code => sub {$self->start();}});
-    push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
-    push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
+    push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', code => sub {$self->stop(undef, 1);}});
+    push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', code => sub {
         my @list = keys %PACMain::RUNNING;
         if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
             return 1;
