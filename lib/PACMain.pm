@@ -643,6 +643,7 @@ sub _initGUI {
     $sort_modelfav->set_default_sort_func(\&__treeSort, $$self{_CFG});
 
     $$self{_GUI}{treeFavourites}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeFavourites}->set_show_expanders(0);
     $$self{_GUI}{treeFavourites}->set_headers_visible(0);
     $$self{_GUI}{treeFavourites}->set_enable_search(0);
     $$self{_GUI}{treeFavourites}->set_has_tooltip(1);
@@ -672,6 +673,7 @@ sub _initGUI {
     );
     $$self{_GUI}{scroll3}->add($$self{_GUI}{treeHistory});
     $$self{_GUI}{treeHistory}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeHistory}->set_show_expanders(0);
     $$self{_GUI}{treeHistory}->set_headers_visible(0);
     $$self{_GUI}{treeHistory}->set_enable_search(0);
     $$self{_GUI}{treeHistory}->set_has_tooltip(1);
@@ -708,6 +710,7 @@ sub _initGUI {
     );
     $$self{_GUI}{scrolledclu}->add($$self{_GUI}{treeClusters});
     $$self{_GUI}{treeClusters}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeClusters}->set_show_expanders(0);
     $$self{_GUI}{treeClusters}->set_headers_visible(0);
     $$self{_GUI}{treeClusters}->set_enable_search(0);
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
