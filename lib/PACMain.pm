@@ -2593,7 +2593,7 @@ sub _treeConnections_menu_lite {
     my @submenu_cluster;
     my %clusters;
     foreach my $uuid_tmp (keys %RUNNING) {
-        if ($RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (!$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
             next;
         }
         $clusters{$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
@@ -2652,6 +2652,15 @@ sub _treeConnections_menu {
     }
 
     my @tree_menu_items;
+
+    push(@tree_menu_items, {
+        label => "Show Keybindings",
+        stockicon => 'gtk-help',
+        sensitive => 1,
+        code => sub {
+            _wMessage($$self{_PARENT},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('treeConnections'),1,0,'w-info');
+        }
+    });
     # Expand All
     push(@tree_menu_items, {
         label => 'Expand all',

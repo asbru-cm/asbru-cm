@@ -157,6 +157,19 @@ sub GetHotKeyCommand {
     return (0,$cmd);
 }
 
+sub ListKeyBindings {
+    my ($self,$window) = @_;
+    my $cfg = $self->{cfg};
+    my $kbs = $$cfg{$window};
+    my $list = "<b>Keybindings for : $window</b>\n\n<span font_family='monospace'>";
+    my $tab = '';
+
+    foreach my $kb (sort keys %$kbs) {
+        $list .= sprintf("<b>%-20s</b>$tab\t%s\n",$kb,$$kbs{$kb}[2]);
+    }
+    return "$list</span>";
+}
+
 sub LoadHotKeys {
     my ($self,$cfg,$uuid) = @_;
     my $CFG = {};

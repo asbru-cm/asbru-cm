@@ -1580,6 +1580,14 @@ sub _vteMenu {
 
     my @vte_menu_items;
 
+    push(@vte_menu_items, {
+        label => "Show Terminal Keybindings",
+        stockicon => 'gtk-help',
+        sensitive => 1,
+        code => sub {
+            _wMessage($$self{_PARENT},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('terminal'),1,0,'w-info');
+        }
+    });
     # If PAC Script running, show a STOP script menuitem
     if ($$self{_SCRIPT_STATUS} ne 'STOP') {
         push(@vte_menu_items,
