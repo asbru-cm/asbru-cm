@@ -1012,15 +1012,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'disconnect') {
             kill(15, $$self{_PID});
         } elsif ($action eq 'sftp') {
-            my @idx;
-            my $newuuid = '_tmp_' . rand;
-            push(@idx, [$newuuid]);
-            $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
-            $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
-            $$self{_CFG}{environments}{$newuuid}{expect} = [];
-            $$self{_CFG}{environments}{$newuuid}{options} = '';
-            $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
-            $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
+            $self->_openSFTP()
         } elsif ($action eq 'reset') {
             $$self{_GUI}{_VTE}->reset(1, 0);
         } elsif ($action eq 'reset-clear') {
@@ -2112,15 +2104,7 @@ sub _vteMenu {
             shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','sftp'),
             sensitive => 1,
             code => sub {
-                my @idx;
-                my $newuuid = '_tmp_' . rand;
-                push(@idx, [$newuuid]);
-                $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
-                $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
-                $$self{_CFG}{environments}{$newuuid}{expect} = [];
-                $$self{_CFG}{environments}{$newuuid}{options} = '';
-                $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
-                $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
+                $self->_openSFTP();
             }
         });
     }
@@ -2358,6 +2342,24 @@ sub _updateStatus {
     }
 
     return 1;
+}
+
+sub _openSFTP {
+    my $self = shift;
+
+    if ($$self{_CFG}{environments}{$$self{_UUID}}{method} ne 'SSH') {
+        return 0;
+    }
+
+    my @idx;
+    my $newuuid = '_tmp_' . rand;
+    push(@idx, [$newuuid]);
+    $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
+    $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
+    $$self{_CFG}{environments}{$newuuid}{expect} = [];
+    $$self{_CFG}{environments}{$newuuid}{options} = '';
+    $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
+    $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
 }
 
 sub _clusterCommit {
