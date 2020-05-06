@@ -1009,9 +1009,21 @@ sub _setupCallbacks {
                 $$self{_GUI}{_VBOX}->get_window()->fullscreen();
                 $$self{_FULLSCREEN} = 1;
             }
+        } elsif ($action eq 'disconnect') {
+            kill(15, $$self{_PID});
+        } elsif ($action eq 'sftp') {
+            my @idx;
+            my $newuuid = '_tmp_' . rand;
+            push(@idx, [$newuuid]);
+            $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
+            $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
+            $$self{_CFG}{environments}{$newuuid}{expect} = [];
+            $$self{_CFG}{environments}{$newuuid}{options} = '';
+            $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
+            $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
         } elsif ($action eq 'reset') {
             $$self{_GUI}{_VTE}->reset(1, 0);
-        } elsif ($action eq 'resetclear') {
+        } elsif ($action eq 'reset-clear') {
             $$self{_GUI}{_VTE}->reset(1, 1);
         } elsif ($action eq 'remove_from_cluster') {
             $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
@@ -1662,6 +1674,7 @@ sub _vteMenu {
             sensitive => 1,
             label => 'Detach tab to a new Window',
             stockicon => 'gtk-fullscreen',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','fullscreen'),
             tooltip => 'Separate this connection window from the tabbed view, and put it in a separate window',
             code => sub {$self->_tabToWin;}
         });
@@ -1762,6 +1775,7 @@ sub _vteMenu {
     {
         label => 'Remove from Cluster',
         stockicon => 'gtk-delete',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','remove_from_cluster'),
         tooltip => $$self{_CLUSTER} ne '' ? "Remove this connection from cluster '$$self{_CLUSTER}'" : '',
         sensitive => $$self{_CLUSTER} ne '',
         code => sub {$PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});}
@@ -1976,6 +1990,7 @@ sub _vteMenu {
     {
         label => 'Copy',
         stockicon => 'gtk-copy',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','copy'),
         code => sub {$$self{_GUI}{_VTE}->copy_clipboard;}
     });
     # Copy Connection Password
@@ -1994,6 +2009,7 @@ sub _vteMenu {
     {
         label => 'Paste',
         stockicon => 'gtk-paste',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste'),
         sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
         code => sub {
             my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
@@ -2006,6 +2022,7 @@ sub _vteMenu {
         {
             label => 'Paste Connection Password',
             stockicon => 'gtk-paste',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste-passwd'),
             code => sub {
                 my $pass = '';
                 if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
@@ -2026,6 +2043,7 @@ sub _vteMenu {
     {
         label => 'Paste and Delete...',
         stockicon => 'gtk-paste',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste-delete'),
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
         sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
         code => sub {
@@ -2043,7 +2061,7 @@ sub _vteMenu {
 
     # Add find string
     push(@vte_menu_items, {separator => 1});
-    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', code => sub {$self->_wFindInTerminal; return 1;}});
+    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','find-terminal'), code => sub {$self->_wFindInTerminal; return 1;}});
 
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', code => sub{$self->_saveSessionLog;}});
@@ -2091,6 +2109,7 @@ sub _vteMenu {
         push(@vte_menu_items, {
             label => 'Open new SFTP window',
             stockicon => 'asbru-method-SFTP',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','sftp'),
             sensitive => 1,
             code => sub {
                 my @idx;
@@ -2117,12 +2136,14 @@ sub _vteMenu {
             {
                 label => 'Reset',
                 stockicon => 'gtk-refresh',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','reset'),
                 sensitive => 1,
                 code => sub{$$self{_GUI}{_VTE}->reset(1, 0);}
             },
             {
                 label => 'Reset and clear',
                 stockicon => 'gtk-refresh',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','reset-clear'),
                 sensitive => 1,
                 code => sub{$$self{_GUI}{_VTE}->reset(1, 1);}
             }
@@ -2181,6 +2202,7 @@ sub _vteMenu {
             {
                 label => 'Disconnect',
                 stockicon => 'gtk-stop',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','disconnect'),
                 sensitive => $$self{_PID},
                 code => sub {kill(15, $$self{_PID});}
             },
@@ -2188,6 +2210,7 @@ sub _vteMenu {
             {
                 label => 'Disconnect and Restart session',
                 stockicon => 'gtk-refresh',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','restart'),
                 sensitive => $$self{CONNECTED} && $$self{_PID},
                 code => sub {$self->_disconnectAndRestartTerminal();}
             },
@@ -2195,11 +2218,13 @@ sub _vteMenu {
             {
                 label => 'Close Terminal',
                 stockicon => 'gtk-close',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','close'),
                 code => sub {$self->stop(0, 1);}
             },
             # Close all terminals
             {
                 label => 'Close All Terminals',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','closeallterminals'),
                 stockicon => 'gtk-close',
                 sensitive => $self->_hasOtherTerminals(),
                 code => sub {$self->_closeAllTerminals();}
@@ -2208,6 +2233,7 @@ sub _vteMenu {
             {
                 label => 'Close Disconnected Terminals',
                 stockicon => 'gtk-close',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','close-disconected'),
                 sensitive => $self->_hasDisconnectedTerminals(),
                 code => sub {$self->_closeDisconnectedTerminals();}
             }
