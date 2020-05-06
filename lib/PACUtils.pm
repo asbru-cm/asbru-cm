@@ -1319,7 +1319,8 @@ sub _menuFavouriteConnections {
             next;
         }
 
-        my $name = $$cfg{'environments'}{$uuid}{'name'};
+        my $group = $$cfg{'environments'}{$uuid}{'parent'} ? "$$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} : " : '';
+        my $name = "$group$$cfg{'environments'}{$uuid}{'name'}";
 
         if ($terminal) {
             push(@fav, {
