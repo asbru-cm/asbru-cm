@@ -173,6 +173,7 @@ sub _buildGUI {
 
     $w{frPredict} = Gtk3::Frame->new(' Select speculative local echo (predictions) model: ');
     $w{frPredict}->set_tooltip_text('[-(a|n)] : Controls use of speculative local echo (defaults to "adaptive")');
+    $w{frPredict}->set_shadow_type('GTK_SHADOW_NONE');
     $w{vbox}->pack_start($w{frPredict}, 0, 1, 0);
 
     $w{hboxPredict} = Gtk3::HBox->new(0, 0);
