@@ -173,6 +173,34 @@ sub ListKeyBindings {
     return "$list</span>";
 }
 
+sub GetAccelerator {
+    my ($self,$window,$action) = @_;
+    my $cfg = $self->{cfg};
+    my $kbs = $$cfg{$window};
+    my $acc = '';
+
+    foreach my $kb (sort keys %$kbs) {
+        if ($$kbs{$kb}[1] eq $action) {
+            my ($mod,$key) = split /\+/,$kb;
+            if (!$key) {
+                $key = $mod;
+            }
+            if ($kb =~ /^undef-/) {
+                next;
+            }
+            if ($kb =~ /Ctrl/) {
+                $acc .= '<control>';
+            }
+            if ($kb =~ /Alt/) {
+                $acc .= '<alt>';
+            }
+            $acc .= $key;
+            last;
+        }
+    }
+    return $acc;
+}
+
 sub LoadHotKeys {
     my ($self,$cfg,$uuid) = @_;
     my $CFG = {};

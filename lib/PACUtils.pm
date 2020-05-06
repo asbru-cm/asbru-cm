@@ -1735,6 +1735,10 @@ sub _wPopUpMenu {
             my $sensitive = $$m{sensitive} // 1;
             my $tooltip = $$m{tooltip} // '';
 
+            if (!$$m{shortcut}) {
+                $$m{shortcut} = '';
+            }
+
             my $label_orig =  __text($label);
             $label =~ s/\//__backslash__/go;
             my $pre_path = $path;

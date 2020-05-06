@@ -2665,6 +2665,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Expand all',
         stockicon => 'gtk-add',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','expand_all'),
         tooltip => 'Expand ALL (including sub-nodes)',
         sensitive => 1,
         code => sub { $$self{_GUI}{treeConnections}->expand_all(); }
@@ -2673,6 +2674,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Collapse all',
         stockicon => 'gtk-remove',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','collaps_all'),
         tooltip => 'Collapse ALL (including sub-nodes)',
         sensitive => 1,
         code => sub { $$self{_GUI}{treeConnections}->collapse_all(); }
@@ -2683,6 +2685,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => scalar(@sel) > 1 ? ('Toggle Protected state') : (($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'Un-' : '') . 'Protect'),
             stockicon => 'asbru-' . ($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'un' : '') . 'protected',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','protection'),
             tooltip => "Protect or not this node, in order to avoid any changes (Edit, Delete, Rename, ...)",
             sensitive => 1,
             code => sub { $self->__treeToggleProtection(); }
@@ -2693,6 +2696,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => "Edit connection$p",
             stockicon => 'gtk-edit',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','edit_node'),
             tooltip => "Edit this connection\'s data",
             sensitive => 1,
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2703,6 +2707,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','copy'),
             sensitive => 1,
             code => sub {
                 _copyPass($sel[0]);
@@ -2714,6 +2719,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Bulk Edit connections...',
             stockicon => 'gtk-edit',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','edit_node'),
             tooltip => "Bulk edit some values of selected connection\'s",
             sensitive => 1,
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2802,6 +2808,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Rename ' . ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__' ? 'Group' : 'Connection'),
         stockicon => 'gtk-spell-check',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','rename'),
         sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
         code => sub { $$self{_GUI}{nodeRenBtn}->clicked(); }
     });
@@ -2818,6 +2825,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Clone connection$p",
         stockicon => 'gtk-copy',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','clone'),
         sensitive => ((scalar(@sel) == 1) && ! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
         code => sub {
             $self->_copyNodes();
@@ -2831,6 +2839,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Copy node$p",
         stockicon => 'gtk-copy',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','copy'),
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub{
             $self->_copyNodes();
@@ -2842,12 +2851,14 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Cut node$p",
         stockicon => 'gtk-cut',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','cut'),
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__') && (! $with_protected)),
         code => sub{  $self->_cutNodes(); }
     });
     push(@tree_menu_items, {
         label => "Paste node$p",
         stockicon => 'gtk-paste',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','paste'),
         #sensitive => scalar(keys %{ $$self{_COPY}{'data'} }) && (scalar @sel == 1) && (($sel[0] eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})),
         sensitive => (($clip)&&(scalar @sel == 1)) ? 1 : 0,
         code => sub {
