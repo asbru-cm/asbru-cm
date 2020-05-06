@@ -1,4 +1,4 @@
-# Keybindongs
+# Keybindings
 
 Select the __Keybindings tab__ to list the available actions and current keybindings set to each one.
 
@@ -13,10 +13,18 @@ Select the __Keybindings tab__ to list the available actions and current keybind
 
     For example users of the traditional mode have all windows available at the same time : Main Window, Tabs, Terminal, Connections list.
 
-    Gtk will use the following priority at the moment to test events, if a key combination is processed in a window with precedence, the action will not be available for the window with less priority.
+    Gtk will use the following priority at the moment to test events
+    
+    1. Main Window
+    2. Tabs widget
+    3. Terminal
+   
+    If a key combination is processed in a window with precedence, the action will not be available for the window with less priority.
 
     But key combinations in different windows is not restricted, because when working with detached window terminals there is no conflict with other windows.
 
+ 
+    
 ## How to customize keybindings
 
 + Select a row
@@ -27,7 +35,7 @@ Select the __Keybindings tab__ to list the available actions and current keybind
 
 ## List keybindings
 
-If you forget the available actions and what is the current keybinding associated.
+If you forget the available actions and what are the current keybindings associated.
 
 Right click on the terminal or Connection List, and select "Show Keybindings"
 
