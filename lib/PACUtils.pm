@@ -1758,7 +1758,7 @@ sub _wPopUpMenu {
                 push(@{$menu_array}, [
                     "MenuItem$label:$jari:EndMenuItem",
                     $$m{stockicon},
-                    $label_orig, '',
+                    $label_orig, $$m{shortcut},
                     $$m{tooltip},
                     sub {&{$$m{code}};}
                 ]);
