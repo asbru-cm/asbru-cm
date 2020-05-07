@@ -484,7 +484,7 @@ sub _setupCallbacks {
     });
 
     # Capture right mouse click to show custom context menu
-    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
+    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
 
             return 0 unless $event->button eq 3;
@@ -578,8 +578,12 @@ sub _setupCallbacks {
                 }
             });
 
-            if ($w eq 'IP') {
+            if ($w eq 'IP' || $w =~ /ConnIP/) {
                 $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
+            } elsif ($w =~ /ConnUser/) {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username',_($self, "entry$w"),\@menu_items);
+            } elsif ($w =~ /ConnPass/) {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'password',_($self, "entry$w"),\@menu_items);
             }
 
             _wPopUpMenu(\@menu_items, $event);
