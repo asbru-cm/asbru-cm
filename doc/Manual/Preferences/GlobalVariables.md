@@ -2,7 +2,9 @@
 
 ![](images/gv1.png)
 
-Global variables, allows you to define variable names and assign value. That variable can be latter used in any:
+Global variables, allows you to define variable names and assign them a value.
+
+That variable can be latter used in any:
 
 + Local Commands
 + Global Commands
@@ -23,6 +25,6 @@ For example, using the above image, you could create a command similar to this o
 
 `ls -l <GV:MyDocs>`
 
-And assign it o a local, remote command or expect.
+And assign it to a local, remote command or expect.
 
 
