@@ -174,7 +174,7 @@ If you don't want to use any of the pre-built package, here are instructions to 
 ### Start application
 
     $ cd asbru-cm
-    $ ./absru
+    $ ./asbru-cm
 
 ### Additional information for Debian systems
 
