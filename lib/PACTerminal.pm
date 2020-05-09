@@ -1738,7 +1738,7 @@ sub _vteMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (!defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
             next;
         }
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
@@ -2663,13 +2663,9 @@ sub _tabMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
+        if (!defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
             next;
         }
-        if ($PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne '') {
-            next;
-        }
-
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{connections} .= "$PACMain::RUNNING{$uuid_tmp}{terminal}{_NAME}\n";
     }

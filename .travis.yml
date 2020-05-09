@@ -18,6 +18,7 @@ env:
     - OS=fedora DIST=29 PACKAGE=rpm
     - OS=fedora DIST=30 PACKAGE=rpm
     - OS=fedora DIST=31 PACKAGE=rpm
+    - OS=fedora DIST=32 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm
     - OS=el DIST=7 PACKAGE=rpm
     - OS=el DIST=8 PACKAGE=rpm
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
