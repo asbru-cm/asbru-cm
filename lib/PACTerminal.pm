@@ -963,7 +963,7 @@ sub _setupCallbacks {
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
         if ($$self{_CFG}{defaults}{'change main title'}) {
-            $PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
+            $$self{_NOTEBOOKWINDOW}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
         }
     });
 
