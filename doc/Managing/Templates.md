@@ -9,7 +9,7 @@ Thou the concept of Templates do not exist, it can be implemented very easy by y
 __There are 2 approaches to this problem__
 
 1. All your existing connections are templates
-1. Create a Templates group and add templates off all common connection types that you use.
+1. Create a Templates group and add templates of all common connection types that you use.
 
 ## Existing Connections are Templates
 
@@ -28,7 +28,7 @@ Go to your Connection List and Create a new group called "Templates".
 1. Create a new connection of the type you need your template.
 1. Named so it gives you an idea of the options that has
     2. SSH and Xforward.
-    2. SSh and Local Forward.
+    2. SSH and Local Forward.
 1. Fill with generic data.
 1. Set the predefined options that you like to have on all new connections.
 

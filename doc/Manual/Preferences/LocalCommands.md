@@ -2,7 +2,7 @@
 
 ![](images/lc1.png)
 
-Local commands are instruction that will be executed in your local computer.
+Local commands are instructions that will be executed in your local computer.
 
 They could be used to :
 
@@ -24,7 +24,7 @@ To access this commands we must have an open terminal and right click on it.
 
 ![](images/lc2.png)
 
-After click the local text editor is opened.
+After clicking on the remote command, the local text editor is shown.
 
 ![](images/lc3.png)
 
