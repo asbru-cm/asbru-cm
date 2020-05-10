@@ -1950,7 +1950,6 @@ sub _wConfirm {
     $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME");
-    $windowConfirm->set_transient_for($window);
     $windowConfirm->set_default_response($default);
 
     $windowConfirm->show_all();
