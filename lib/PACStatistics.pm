@@ -54,7 +54,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $STATS_FILE = $CFG_DIR . '/pac_stats.nfreeze';
+my $STATS_FILE = $CFG_DIR . '/asbru_stats.nfreeze';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -69,7 +69,6 @@ sub new {
 
     $self->{cfg} = shift;
     $self->{statistics} = {};
-
     $self->{container} = undef;
     $self->{frame} = {};
 
@@ -110,12 +109,16 @@ sub update {
         my $total_time = 0;
 
         foreach my $tmpuuid (keys %{$$cfg{'environments'}}) {
-            next if $tmpuuid eq '__PAC__ROOT__';
+            if ($tmpuuid eq '__PAC__ROOT__') {
+                next;
+            }
             if ($$cfg{'environments'}{$tmpuuid}{_is_group}) {
                 $groups++;
                 $total_conn += ($$self{statistics}{$tmpuuid}{total_connections} // 0);
             } else {
-                $nodes++ unless $tmpuuid eq '__PAC_SHELL__';
+                if ($tmpuuid ne '__PAC_SHELL__') {
+                    $nodes++;
+                }
                 $total_time += ($$self{statistics}{$tmpuuid}{total_time} // 0);
                 $total_conn += ($$self{statistics}{$tmpuuid}{total_conn} // 0);
             }
@@ -123,18 +126,17 @@ sub update {
 
         # Prepare STRINGIFIED data
         my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400)    . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24    . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60    . ' minutes, ';
-        $str_total_time .= $total_time % 60                . ' seconds';
+        $str_total_time .= int($total_time / 86400) . ' days, ';
+        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
+        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
+        $str_total_time .= $total_time % 60 . ' seconds';
 
         $$self{frame}{lblPR}->set_markup(
-            "<span $font>" .
-                "Total groups:                  <b>$groups</b>"            . "\n" .
-                "Total nodes:                   <b>$nodes</b>"            . "\n" .
-                "Total connections established: <b>$total_conn</b>"        . "\n" .
-                "Total time connected:          <b>$str_total_time</b>" .
-            "</span>"
+            "<span $font><b>All connections</b>\n" .
+            "Total groups:                  <b>$groups</b>\n" .
+            "Total nodes:                   <b>$nodes</b>\n" .
+            "Total connections established: <b>$total_conn</b>\n" .
+            "Total time connected:          <b>$str_total_time</b></span>"
         );
     } elsif ($$cfg{environments}{$uuid}{_is_group}) {
         $$self{frame}{hboxPACRoot}->hide;
@@ -159,18 +161,17 @@ sub update {
 
         # Prepare STRINGIFIED data
         my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400)    . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24    . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60    . ' minutes, ';
-        $str_total_time .= $total_time % 60                . ' seconds';
+        $str_total_time .= int($total_time / 86400) . ' days, ';
+        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
+        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
+        $str_total_time .= $total_time % 60 . ' seconds';
 
         $$self{frame}{lblPG}->set_markup(
-            "<span $font>" .
-                "Total sub-groups:              <b>$groups</b>"            . "\n" .
-                "Total contained nodes:         <b>$nodes</b>"            . "\n" .
-                "Total connections established: <b>$total_conn</b>"        . "\n" .
-                "Total time connected:          <b>$str_total_time</b>" .
-            "</span>"
+            "<span $font><b>Group: @{[__($name)]}</b>\n" .
+            "Total sub-groups:              <b>$groups</b>\n" .
+            "Total contained nodes:         <b>$nodes</b>\n" .
+            "Total connections established: <b>$total_conn</b>\n" .
+            "Total time connected:          <b>$str_total_time</b></span>"
         );
     } else {
         $$self{frame}{hboxPACRoot}->hide;
@@ -201,23 +202,18 @@ sub update {
 
         # Prepare STRINGIFIED data
         my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400)    . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24    . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60    . ' minutes, ';
-        $str_total_time .= $total_time % 60                . ' seconds';
+        $str_total_time .= int($total_time / 86400) . ' days, ';
+        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
+        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
+        $str_total_time .= $total_time % 60 . ' seconds';
 
         $$self{frame}{lblPN}->set_markup(
-            "<span $font>" .
-                "Total time connected:          <b>$str_total_time</b>"    . "\n" .
-                "Total connections established: <b>$total_conn</b>"        . "\n" .
-                "Last connection:               <b>$str_start</b>" .
-            "</span>"
+            "<span $font><b>Connection: @{[__($name)]}</b>\n\n" .
+            "Total connections established: <b>$total_conn</b>\n" .
+            "Last connection:               <b>$str_start</b>\n" .
+            "Total time connected:          <b>$str_total_time</b></span>"
         );
     }
-
-    if ($uuid eq '__PAC__ROOT__')                        {$$self{frame}{btnReset}->set_label("Reset Statistics for\n'all connections'...");}
-    elsif ($$cfg{'environments'}{$uuid}{_is_group})    {$$self{frame}{btnReset}->set_label("Reset statistics for group\n'$name'...");}
-    else                                                {$$self{frame}{btnReset}->set_label("Reset statistics for\n'$name'...");}
 
     return 1;
 }
@@ -278,36 +274,40 @@ sub _buildStatisticsGUI {
     # Build a vbox for:buttons, separator and image widgets
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-        $w{btnReset} = Gtk3::Button->new_with_label('Reset Statistics...');
-        $w{btnReset}->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
-        $w{btnReset}->set('can-focus', 0);
-        $w{hbox}->pack_start($w{btnReset}, 0, 1, 0);
+    $w{btnReset} = Gtk3::Button->new_with_label('Reset Statistics');
+    $w{btnReset}->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
+    $w{btnReset}->set('can-focus', 0);
+    $w{hbox}->pack_start($w{btnReset}, 0, 0, 5);
+    $w{btnReset}->set_vexpand(0);
 
-        $w{hbox}->pack_start(Gtk3::VSeparator->new, 0, 1, 5);
+    #$w{hbox}->pack_start(Gtk3::VSeparator->new, 0, 1, 5);
 
-        $w{vbox} = Gtk3::VBox->new(0, 0);
-        $w{hbox}->pack_start($w{vbox}, 1, 1, 0);
+    $w{vbox} = Gtk3::VBox->new(0, 0);
+    $w{hbox}->pack_start($w{vbox}, 1, 1, 0);
 
-            $w{hboxPACRoot} = Gtk3::HBox->new(0, 0);
-            $w{vbox}->pack_start($w{hboxPACRoot}, 0, 1, 0);
+    $w{hboxPACRoot} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hboxPACRoot}, 0, 1, 0);
 
-                $w{lblPR} = Gtk3::Label->new;
-                $w{lblPR}->set_justify('left');
-                $w{hboxPACRoot}->pack_start($w{lblPR}, 0, 1, 0);
+    $w{lblPR} = Gtk3::Label->new;
+    $w{lblPR}->set_justify('left');
+    $w{lblPR}->set_line_wrap(1);
+    $w{hboxPACRoot}->pack_start($w{lblPR}, 0, 1, 0);
 
-            $w{hboxPACGroup} = Gtk3::HBox->new(0, 0);
-            $w{vbox}->pack_start($w{hboxPACGroup}, 0, 1, 0);
+    $w{hboxPACGroup} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hboxPACGroup}, 0, 1, 0);
 
-                $w{lblPG} = Gtk3::Label->new;
-                $w{lblPG}->set_justify('left');
-                $w{hboxPACGroup}->pack_start($w{lblPG}, 0, 1, 0);
+    $w{lblPG} = Gtk3::Label->new;
+    $w{lblPG}->set_justify('left');
+    $w{lblPG}->set_line_wrap(1);
+    $w{hboxPACGroup}->pack_start($w{lblPG}, 0, 0, 0);
 
-            $w{hboxPACNode} = Gtk3::HBox->new(0, 0);
-            $w{vbox}->pack_start($w{hboxPACNode}, 0, 1, 0);
+    $w{hboxPACNode} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hboxPACNode}, 0, 1, 0);
 
-                $w{lblPN} = Gtk3::Label->new;
-                $w{lblPN}->set_justify('left');
-                $w{hboxPACNode}->pack_start($w{lblPN}, 0, 1, 0);
+    $w{lblPN} = Gtk3::Label->new;
+    $w{lblPN}->set_justify('left');
+    $w{lblPN}->set_line_wrap(1);
+    $w{hboxPACNode}->pack_start($w{lblPN}, 0, 1, 0);
 
     $$self{container} = $w{hbox};
     $$self{frame} = \%w;
@@ -320,30 +320,33 @@ sub _buildStatisticsGUI {
         my $name = $$cfg{environments}{$uuid}{name};
 
         if ($uuid eq '__PAC__ROOT__') {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset <b>ALL PAC</b> statistics?\n(This action can not be undone!)");
-            foreach my $child (keys %{$$cfg{environments}})
-            {
-                next if $child eq '__PAC__ROOT__';
-                $$self{statistics}{$child}{start} = 0;
-                $$self{statistics}{$child}{stop} = 0;
-                $$self{statistics}{$child}{total_conn} = 0;
-                $$self{statistics}{$child}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset <b>all Ásbrú</b> statistics?\n\nThis action can not be undone!")) {
+                foreach my $child (keys %{$$cfg{environments}}) {
+                    if ($child eq '__PAC__ROOT__') {
+                        next;
+                    }
+                    $$self{statistics}{$child}{start} = 0;
+                    $$self{statistics}{$child}{stop} = 0;
+                    $$self{statistics}{$child}{total_conn} = 0;
+                    $$self{statistics}{$child}{total_time} = 0;
+                }
             }
         } elsif ($$cfg{environments}{$uuid}{_is_group}) {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for group '<b>$name</b>'?\n(This action can not be undone!)");
-            foreach my $child ($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}->_getChildren($uuid, 0, 1) )
-            {
-                $$self{statistics}{$child}{start} = 0;
-                $$self{statistics}{$child}{stop} = 0;
-                $$self{statistics}{$child}{total_conn} = 0;
-                $$self{statistics}{$child}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for group:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+                foreach my $child ($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}->_getChildren($uuid, 0, 1)) {
+                    $$self{statistics}{$child}{start} = 0;
+                    $$self{statistics}{$child}{stop} = 0;
+                    $$self{statistics}{$child}{total_conn} = 0;
+                    $$self{statistics}{$child}{total_time} = 0;
+                }
             }
         } else {
-            return 1 unless _wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for connection '<b>$name</b>'?\n(This action can not be undone!)");
-            $$self{statistics}{$uuid}{start} = 0;
-            $$self{statistics}{$uuid}{stop} = 0;
-            $$self{statistics}{$uuid}{total_conn} = 0;
-            $$self{statistics}{$uuid}{total_time} = 0;
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for connection:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+                $$self{statistics}{$uuid}{start} = 0;
+                $$self{statistics}{$uuid}{stop} = 0;
+                $$self{statistics}{$uuid}{total_conn} = 0;
+                $$self{statistics}{$uuid}{total_time} = 0;
+            }
         }
 
         $self->update($uuid);

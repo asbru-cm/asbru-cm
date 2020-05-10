@@ -64,10 +64,10 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %prep
 %autosetup -n asbru-cm-%{_github_version} -p1
-sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/pac_conn
+sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/asbru_conn
 find . -not -path './utils/*' -type f -exec sed -i \
   -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
@@ -104,10 +104,10 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,jpg,pl,glade,css,svg} %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,pl,glade,svg} %{buildroot}/%{_datadir}/%{name}/res/
+cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
 cp -a utils/*.pl %{buildroot}/%{_datadir}/%{name}/utils/
-
 
 %files
 %doc README.md

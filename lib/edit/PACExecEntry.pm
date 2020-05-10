@@ -118,6 +118,12 @@ sub get_cfg {
         $hash{description} = $$w{desc}->get_chars(0, -1);
         $hash{confirm} = $$w{confirm}->get_active() || '0';
         $hash{intro} = $$w{intro}->get_active() || '0';
+        # Force no descriptions equal to command
+        if (!$hash{description}) {
+            $hash{description} = $hash{txt};
+        }
+        # Normalize capitalization of groups
+        $hash{description} =~ s/^(.+?):/\u\L$1\E:/;
         push(@cfg, \%hash) unless $hash{txt} eq '';
     }
 
@@ -141,15 +147,31 @@ sub _buildExecGUI {
 
     # Build a vbox for:buttons, separator and expect widgets
     $w{vbox} = Gtk3::VBox->new(0, 0);
+    $w{hbox} = Gtk3::HBox->new(1, 0);
 
     # Build a hbuttonbox for widgets actions (add, etc.)
     $w{bbox} = Gtk3::HButtonBox->new();
-    $w{vbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{vbox}->pack_start($w{hbox}, 0, 1, 0);
+    $w{hbox}->pack_start($w{bbox}, 0, 1, 0);
     $w{bbox}->set_layout('GTK_BUTTONBOX_START');
 
     # Build 'add' button
     $w{btnadd} = Gtk3::Button->new_from_stock('gtk-add');
     $w{bbox}->add($w{btnadd});
+    if ($$self{where}) {
+        if ($$self{where} eq 'local') {
+            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/LocalCommands/');
+        } else {
+            $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/RemoteCommands/');
+        }
+        $w{hbox}->pack_start($w{help},0,1,0);
+
+        $w{help}->set_halign('GTK_ALIGN_END');
+        $w{help}->set_label('');
+        $w{help}->set_tooltip_text('Open Online Help');
+        $w{help}->set_always_show_image(1);
+        $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    }
 
     # Build a separator
     $w{sep} = Gtk3::HSeparator->new();
@@ -251,6 +273,7 @@ sub _buildExec {
     # Build label
     $w{lbl2} = Gtk3::Label->new('Description: ');
     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
+    $w{hbox4}->set_tooltip_markup("<i>Group</i><b>:</b><i>Description</i>\n<b>Group:</b> This value will group all commands with the same name in the menu.\n\nExample <b>Mysql</b>:<i>Show tables</i>");
 
     # Build entry
     $w{desc} = Gtk3::Entry->new();
@@ -292,7 +315,7 @@ sub _buildExec {
 
         # Ask for confirmation
         if ($w{confirm}->get_active()) {
-            if (!_wConfirm(undef, "Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY')) {
+            if (!_wConfirm($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},"Execute <b>'" . __($cmd) . "'</b> " . 'LOCALLY')) {
                 # Not confirmed, do not execute
                 return 1;
             }
@@ -307,7 +330,9 @@ sub _buildExec {
     $w{txt}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
-        return 0 unless $event->button eq 3;
+        if ($event->button != 3) {
+            return 0;
+        }
 
         my @menu_items;
 
@@ -414,56 +439,7 @@ sub _buildExec {
         push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find()) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {
-                        $w{txt}->insert_text("<KPX_title:$$hash{title}>", -1, $w{txt}->get_position());
-                    }
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {
-                        $w{txt}->insert_text("<KPX_username:$$hash{username}>", -1, $w{txt}->get_position());
-                    }
-                });
-                push(@usernames, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {
-                        $w{txt}->insert_text("<KPX_url:$$hash{url}>", -1, $w{txt}->get_position());
-                    }
-                });
-            }
-
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu => [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {
-                            $w{txt}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{txt}->get_position());
-                        }
-                    }
-                ]
-            });
-        }
+        $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username,password',$w{txt},\@menu_items);
 
         _wPopUpMenu(\@menu_items, $event);
 

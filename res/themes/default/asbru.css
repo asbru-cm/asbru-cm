@@ -1,0 +1,55 @@
+button {
+    border: 1px solid #dddddd;
+    margin: 1px;
+}
+radiobutton, checkbutton {
+    border: 1px solid rgba(1,1,1,0);
+    margin: 1px;
+}
+button:hover {
+    border: 1px solid #555555;
+    color: #000000;
+    background-color: #ffffff;
+}
+entry:focus {
+    color: #000000;
+    background-color:#FFEBBB;
+}
+spinbutton {
+    color: #000000;
+    font-size: 0.9em;
+    border: 1px solid #dddddd;
+    background-color: #dddddd;
+    border-radius: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+spinbutton:hover {
+    border: 1px solid #555555;
+    background-color: #ffffff;
+}
+checkbutton:hover, radiobutton:hover {
+    border: 1px solid #555555;
+}
+.button-cp {
+    border: 1px solid rgba(1,1,1,0);
+    border-radius: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+tooltip {
+    font-size: 0.8em;
+}
+.dnd-icon {
+  border: 1px solid #000000;
+}
+
+.banner-fill {
+  background-image: linear-gradient(to right, #007aff, #2fedde);
+  padding: 0.25em 0;
+}
+.banner-text {
+  color: #EEE;
+  text-shadow: 0px 0px 8px rgba(17, 17, 17, 0.75);
+  font-size: 2.5em;
+}

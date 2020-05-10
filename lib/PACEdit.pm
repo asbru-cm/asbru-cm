@@ -54,6 +54,7 @@ use PACExecEntry;
 use PACPrePostEntry;
 use PACVarEntry;
 use PACTermOpts;
+use PACKeePass;
 
 # END: Import Modules
 ###################################################################
@@ -63,13 +64,13 @@ use PACTermOpts;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $RES_DIR = $RealBin . '/res';
-my $AUTOSTART_FILE = $RES_DIR . '/pac_start.desktop';
-
-my $GLADE_FILE = $RES_DIR . '/asbru.glade';
-my $INIT_CFG_FILE = $RES_DIR . '/pac.yml';
+my $RES_DIR = "$RealBin/res";
+my $AUTOSTART_FILE = "$RES_DIR/asbru_start.desktop";
+my $THEME_DIR = "$RES_DIR/themes/defualt";
+my $GLADE_FILE = "$RES_DIR/asbru.glade";
+my $INIT_CFG_FILE = "$RES_DIR/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = $CFG_DIR . '/pac.yml';
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -99,8 +100,12 @@ sub new {
     $self->{_LOCAL_EXEC} = undef;
     $self->{_TXTOPTSBUFFER} = undef;
 
+    if ($$self{_CFG}{defaults}{theme}) {
+        $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{defaults}{theme}";
+    }
+
     # Setup known connection methods
-    %{$$self{_METHODS}} = _getMethods($self);
+    %{$$self{_METHODS}} = _getMethods($self,$THEME_DIR);
 
     # Build the GUI
     _initGUI($self) or return 0;
@@ -130,7 +135,7 @@ sub show {
     my $title;
     if ($$self{_IS_NEW} eq 'quick') {
         _($self, 'btnSaveEdit')->set_label('_Start Connection');
-        _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('pac-quick-connect', 'button') );
+        _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('asbru-quick-connect', 'button') );
         _($self, 'btnCloseEdit')->set_label('_Cancel Quick connect');
         _($self, 'btnCloseEdit')->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button') );
         $title = "Quick Connect : $APPNAME (v$APPVERSION)";
@@ -144,7 +149,11 @@ sub show {
 
     $$self{_WINDOWEDIT}->set_title($title);
 
-    if ($$self{_IS_NEW}) {_($self, 'nbProps')->set_current_page(0); _($self, 'entryIP')->grab_focus; _($self, 'nbDetails')->set_current_page(0);}
+    if ($$self{_IS_NEW}) {
+        _($self, 'nbProps')->set_current_page(0);
+        _($self, 'entryIP')->grab_focus;
+        _($self, 'nbDetails')->set_current_page(0);
+    }
 
     $$self{_WINDOWEDIT}->set_modal(1);
 
@@ -167,12 +176,12 @@ sub _initGUI {
     $$self{_WINDOWEDIT} = $$self{_GLADE}->get_object('windowEdit');
     $$self{_WINDOWEDIT}->set_size_request(-1, 550);
 
-    _($self, 'imgBannerEditIcon')->set_from_file($RES_DIR . '/asbru-edit.svg');
+    _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
     _($self, 'alignTermOpts')->add(($$self{_TERMOPTS} = PACTermOpts->new())->{container});
-    _($self, 'imgTermOpts')->set_from_stock('pac-terminal-ok-small', 'button');
+    _($self, 'imgTermOpts')->set_from_stock('asbru-terminal-ok-small', 'button');
     _($self, 'alignVar')->add(($$self{_VARIABLES} = PACVarEntry->new())->{container});
     _($self, 'alignPreExec')->add(($$self{_PRE_EXEC} = PACPrePostEntry->new())->{container});
     _($self, 'alignPostExec')->add(($$self{_POST_EXEC} = PACPrePostEntry->new())->{container});
@@ -188,10 +197,8 @@ sub _initGUI {
         $$self{_METHODS}{$method}{'position'} = $i++;
     }
 
-    map({_($self, 'comboKPXWhere')->append_text($_); push(@{$$self{_KPXWHERE}}, $_);} ('comment', 'created', 'password', 'title', 'url', 'username') );
-
     # Initialize main window
-    $$self{_WINDOWEDIT}->set_icon_name('pac-app-big');
+    $$self{_WINDOWEDIT}->set_icon_name('asbru-app-big');
     $$self{_WINDOWEDIT}->set_position('center');
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -200,10 +207,12 @@ sub _initGUI {
     $$self{cbLogsShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
     _($self, 'btnEditSaveSessionLogs')->set_extra_widget($$self{cbLogsShowHidden});
 
-    _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('pac-keepass', 'button') );
+    _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
+    _($self, 'btnCheckKPX')->set_label('');
 
     _($self, 'btnSaveEdit')->set_use_underline(1);
     _($self, 'btnCloseEdit')->set_use_underline(1);
+    _($self, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
 
     return 1;
 }
@@ -318,13 +327,23 @@ sub _setupCallbacks {
 
     # Capture 'open folder' button clicked
     _($self, 'btnEditOpenSessionLogs')->signal_connect('clicked' => sub {
-        system('/usr/bin/xdg-open ' . (_($self, 'btnEditSaveSessionLogs')->get_current_folder()) );
+        my $folder = _($self, 'btnEditSaveSessionLogs')->get_current_folder();
+        if (!-e $folder) {
+            $folder = "$CFG_DIR/session_logs";
+            _($self, 'btnEditSaveSessionLogs')->get_current_folder($folder);
+        }
+        system("/usr/bin/xdg-open $folder");
     });
 
     # Capture 'Get Command line' button clicked
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
-        my $cmd = `$RealBin/lib/pac_conn $CFG_DIR/pac.nfreeze $$self{_UUID} 0 1`;
-        _wMessage($$self{_WINDOWEDIT}, "<b>COMMAND LINE:</b>\n$cmd");
+        # DevNote: please make sure to keep double quotes in "$RealBin/lib/asbru_conn" since it might be replaced by packagers (see RPM spec)
+        if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
+            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+            $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+        }
+        my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
+        _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1);
     });
 
     # Capture "Save session logs" checkbox
@@ -338,41 +357,27 @@ sub _setupCallbacks {
         _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
     });
 
-    #_($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {_($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active());});
-    _($self, 'cbInferUserPassKPX')->signal_connect('toggled' => sub {
-        _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active());
-        _($self, 'entryKPXRE')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active());
-        _($self, 'btnCheckKPX')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active());
-        _($self, 'comboKPXWhere')->set_sensitive(_($self, 'cbInferUserPassKPX')->get_active());
-    });
-
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
-        if (! $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            _wMessage($$self{_WINDOWEDIT}, "ERROR: <b>KeePassX</b> can not be used because\nit is not enabled under <b>'Preferences->KeePass Options'</b>");
-            return 1;
+        my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
+        if ($selection) {
+            # Commented for the time being, until keepassxc-cli team implements get the UUID
+            # Feature request at https://github.com/keepassxreboot/keepassxc/issues/4112
+            # Feature request at https://github.com/keepassxreboot/keepassxc/issues/4113
+            #my ($title,$ok) = $PACMain::FUNCS{_KEEPASS}->getFieldValue('Uuid',$selection);
+
+            # For the time being, we will use the full path
+            my $title = $selection;
+            if ($title) {
+                if (_($self, 'rbCfgAuthUserPass')->get_active) {
+                    _($self, 'entryUser')->set_text("<username|$title>");
+                    _($self, 'entryPassword')->set_text("<password|$title>");
+                } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
+                    _($self, 'entryUserPassphrase')->set_text("<username|$title>");
+                    _($self, 'entryPassphrase')->set_text("<password|$title>");
+                }
+            }
         }
-
-        my $title = _($self, 'entryKPXRE')->get_chars(0,-1);
-        my $where = $$self{_KPXWHERE}[_($self, 'comboKPXWhere')->get_active()];
-        my ($user, $pass, $comment, $created);
-
-        $PACMain::FUNCS{_KEEPASS}->reload;
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($where, qr/$title/);
-        if (! scalar @found) {
-            wMessage($$self{_WINDOWEDIT}, "ERROR: No entry '<b>$where</b>' found on KeePassX matching '<b>" . __($title) . "</b>'");
-            return 1;
-        }
-        elsif (((scalar @found) > 1) && $$self{_CFG}{defaults}{keepass}{ask_user})    {
-            my $tmp = "<ASK:KeePass $where matching '$title':"; foreach my $hash (@found) {$tmp .= '|' . $$hash{$where};} $tmp .= '>';
-            my ($str, $out) = _subst($tmp);
-            ($user, $pass, $comment, $created) = ($found[$$out{pos}]{username}, $found[$$out{pos}]{password}, $found[$$out{pos}]{comment}, $found[$$out{pos}]{created});
-        } else {
-            ($user, $pass, $comment, $created) = ($found[0]{username}, $found[0]{password}, $found[0]{comment}, $found[0]{created});
-        }
-
-        _wMessage($$self{_WINDOWEDIT}, "KeePass data inferred for $where '<b>" . __($title) . "</b>'\n - <b>User:</b> " . __($user) . "\n - <b>Password:</b> " . __($pass) . "\n - <b>Created:</b> " . __($created) . "\n - <b>Comment:</b> " . __($comment) );
-
         return 1;
     });
 
@@ -424,6 +429,10 @@ sub _setupCallbacks {
         # Populate with environment variables
         my @environment_menu;
         foreach my $key (sort {$a cmp $b} keys %ENV) {
+            # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+            if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                next;
+            }
             my $value = $ENV{$key};
             push(@environment_menu, {
                 label => "<ENV:" . __($key) . ">",
@@ -446,49 +455,6 @@ sub _setupCallbacks {
                 _($self, "entryEditSendString")->select_region($pos + 5, $pos + 22);
             }
         });
-
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_title:$$hash{title}>");}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_username:$$hash{username}>");}
-                });
-                push(@urls, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, "entryEditSendString")->set_text("<KPX_url:$$hash{url}>");}
-                });
-            }
-
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [{
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {_($self, "entryEditSendString")->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                    }
-                ]
-            });
-        }
 
         _wPopUpMenu(\@menu_items, $event);
 
@@ -610,47 +576,8 @@ sub _setupCallbacks {
                 }
             });
 
-            # Populate with KeePass special strings
-            if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-                my (@titles, @usernames, @urls, @query);
-                foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
-                    push(@titles, {
-                        label => "<KPX_title:$$hash{title}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_title:$$hash{title}>");}
-                    });
-                    push(@usernames, {
-                        label => "<KPX_username:$$hash{username}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_username:$$hash{username}>");}
-                    });
-                    push(@urls, {
-                        label => "<KPX_url:$$hash{url}>",
-                        tooltip => "$$hash{password}",
-                        code => sub {_($self, "entry$w")->set_text("<KPX_url:$$hash{url}>");}
-                    });
-                }
-
-                push(@menu_items, {
-                    label => 'KeePassX',
-                    stockicon => 'pac-keepass',
-                    submenu =>
-                    [{
-                            label => 'KeePassX title values',
-                            submenu => \@titles
-                        }, {
-                            label => 'KeePassX username values',
-                            submenu => \@usernames
-                        }, {
-                            label => 'KeePassX URL values',
-                            submenu => \@urls
-                        }, {
-                            label => "KeePass Extended Query",
-                            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                            code => sub {_($self, "entry$w")->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                        }
-                    ]
-                });
+            if ($w eq 'IP') {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
             }
 
             _wPopUpMenu(\@menu_items, $event);
@@ -694,6 +621,10 @@ sub _updateGUIPreferences {
     if (!defined $$self{_CFG}{'environments'}{$uuid}{'use proxy'}) {
         $$self{_CFG}{'environments'}{$uuid}{'use proxy'} = 0;
     }
+    # Test for missing folders, wrong migrations paths, alternate config paths
+    if (!$$self{_CFG}{'environments'}{$uuid}{'session logs folder'} || !-d $$self{_CFG}{'environments'}{$uuid}{'session logs folder'}) {
+        $$self{_CFG}{'environments'}{$uuid}{'session logs folder'} = "$CFG_DIR/session_logs";
+    }
     _($self, 'rbUseProxyIfCFG')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 0);
     _($self, 'rbUseProxyAlways')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1);
     _($self, 'rbUseProxyNever')->set_active($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 2);
@@ -724,7 +655,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
     _($self, 'vboxEditSaveSessionLogs')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'entryEditLogFileName')->set_text($$self{_CFG}{'environments'}{$uuid}{'session log pattern'});
-    _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'} // $CFG_DIR . '/session_logs');
+    _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'});
     _($self, 'spEditSaveSessionLogs')->set_value($$self{_CFG}{'environments'}{$uuid}{'session logs amount'} // 10);
     _($self, 'entryUserPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase user'} // '');
     _($self, 'entryPassphrase')->set_text($$self{_CFG}{'environments'}{$uuid}{'passphrase'} // '');
@@ -740,7 +671,7 @@ sub _updateGUIPreferences {
     _($self, 'entryPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'pass'});
     _($self, 'cbCfgAuthFallback')->set_active(! $$self{_CFG}{'environments'}{$uuid}{'auth fallback'});
     _($self, 'comboMethod')->set_active($$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'position'} // 4);
-    _($self, 'imageMethod')->set_from_stock('pac-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
+    _($self, 'imageMethod')->set_from_stock('asbru-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
     _($self, 'entryTabWindowTitle')->set_text($$self{_CFG}{'environments'}{$uuid}{'title'} || "$$self{_CFG}{'environments'}{$uuid}{'name'} ");
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
@@ -751,15 +682,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgStartupLaunch')->set_active($$self{_CFG}{'environments'}{$uuid}{'startup launch'} // 0);
     _($self, 'sbCfgSendSlow')->set_value($$self{_CFG}{'environments'}{$uuid}{'send slow'} // 0);
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
-    _($self, 'cbInferUserPassKPX')->set_active(($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} // 0) && $$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
-    _($self, 'entryKPXRE')->set_text($$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} // ".*$$self{_CFG}{'environments'}{$uuid}{'title'}.*");
-    _($self, 'entryKPXRE')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'btnCheckKPX')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
-    _($self, 'hboxCfgAuthUserPass')->set_sensitive(! _($self, 'cbInferUserPassKPX')->get_active());
-    _($self, 'hboxKeePass')->set_sensitive($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'});
     _($self, 'entryUUID')->set_text($uuid);
-    _($self, 'comboKPXWhere')->set_active($$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} // 3);
-    _($self, 'comboKPXWhere')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'});
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
 
     # Populate 'comboStartScript' combobox
@@ -806,17 +729,17 @@ sub _updateGUIPreferences {
     $self->__checkRBAuth;
 
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
-        _($self, 'imgProtectedEdit')->set_from_stock('pac-protected', 'button');
+        _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(0);
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#E60023">PROTECTED</span></b> against changes. You <b>can not</b> save changes.');
     } else {
-        _($self, 'imgProtectedEdit')->set_from_stock('pac-unprotected', 'button');
+        _($self, 'imgProtectedEdit')->set_from_stock('asbru-unprotected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(1);
         _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.');
     }
 
     # Show Jump options in network settings (only for SSH method)
-    if ($$self{_CFG}{'environments'}{$uuid}{'method'} eq "SSH") {
+    if ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /SSH|SFTP/i) {
         # Control SSH capabilities
         my $ssh = `ssh 2>&1`;
         $ssh =~ s/\n//g;
@@ -931,13 +854,10 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} = _($self, 'cbCfgAutoreconnect')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'startup launch'} = _($self, 'cbCfgStartupLaunch')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send slow'} = _($self, 'sbCfgSendSlow')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'startup script'} = _($self, 'cbStartScript')->get_active && _($self, 'comboStartScript')->get_active_text();
-    $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text();
-    $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active();
-    $$self{_CFG}{'environments'}{$uuid}{'infer user pass from KPX'} = _($self, 'cbInferUserPassKPX')->get_active();
-    $$self{_CFG}{'environments'}{$uuid}{'KPX title regexp'} = _($self, 'entryKPXRE')->get_chars(0, -1);
-    $$self{_CFG}{'environments'}{$uuid}{'infer from KPX where'} = _($self, 'comboKPXWhere')->get_active();
-    $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'startup script'} = _($self, 'cbStartScript')->get_active && _($self, 'comboStartScript')->get_active_text;
+    $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text;
+    $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
+    $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
 
     ##################
     # Other options...

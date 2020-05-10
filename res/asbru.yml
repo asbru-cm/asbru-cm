@@ -1,0 +1,52 @@
+---
+defaults:
+  auto accept key: 1
+  auto hide connections list: ''
+  back color: '#000000000000'
+  close terminal on disconnect: ''
+  close to tray: 1
+  command prompt: '[#%\$>]|\:\/\s*$'
+  connected color: '#0c0cbaba0000'
+  cursor shape: block
+  debug: ''
+  disconnected color: '#ffff00000000'
+  global variables: {}
+  hide on connect: ''
+  force split tabs to 50%: 0
+  intro reconnects: ''
+  minimize to tray: ''
+  new data color: '#00008888ffff'
+  only one instance: 1
+  open connections in tabs: 1
+  ping port before connect: ''
+  ping port timeout: 1
+  proxy ip: ''
+  proxy pass: ''
+  proxy port: ''
+  proxy user: ''
+  record command history: 1
+  save on exit: ''
+  save session logs: ''
+  screenshots external viewer: /usr/bin/xdg-open
+  screenshots use external viewer: ''
+  session logs amount: 10
+  shell binary: /bin/bash
+  shell options: -login
+  show screenshots: 1
+  start iconified: ''
+  start main maximized: 1
+  start maximized: ''
+  tabs in main window: 1
+  tabs position: top
+  terminal font: Monospace 9
+  terminal scrollback lines: 5000
+  terminal transparency: 0.3
+  terminal windows hsize: 1024
+  terminal windows vsize: 768
+  text color: '#cc62cc62cc62'
+  timeout command: 40
+  timeout connect: 40
+  use bw icon: ''
+  use proxy: ''
+  use system proxy: 1
+environments: {}

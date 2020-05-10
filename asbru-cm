@@ -49,6 +49,7 @@ BEGIN {
         print "\t--no-splash : no splash screen on startup\n";
         print "\t--iconified : go to tray once started\n";
         print "\t--readonly : start in read only mode (no config changes allowed)\n";
+        print "\t--verbose : display more debugging information\n";
         print "\n";
         print "See 'man asbru' for additional information.\n";
         print "\n";
@@ -75,7 +76,7 @@ BEGIN {
         ###################################################################
         # DEFAULT CONFIG DIR SHOULD BE DEFINED HERE
         ###################################################################
-        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/pac";
+        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/asbru";
     }
     # Workaround to unexpected SSH disconnections due to wrong handling of the WINCH event in some Gnome versions
     # See https://www.perlmonks.org/?node_id=11109454
@@ -101,15 +102,16 @@ use warnings;
 
 ###################################################################
 # START: Define GLOBAL variables
-our $CFG_FILE_NAME  = "pac.yml";
+our $CFG_FILE_NAME  = "asbru.yml";
 our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
+our $CFG_DIR_OLD    = "$ENV{'HOME'}/.config/pac";
+our $CFG_FILE_OLD   = "pac.yml";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
 our $ASBRU;
 our $VERBOSE        = 0;
-
 # END: Define GLOBAL variables
 ###################################################################
 
@@ -129,6 +131,12 @@ foreach my $arg (@ARGV) {
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
 
+foreach my $arg (@ARGV) {
+    if ($arg =~ /-{1,2}verbose/) {
+        $VERBOSE = 1;
+    }
+}
+
 if (($? eq 0) && (!grep(/'asbru'/, $wl))) {
     print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";
     $wl =~ s/'\s*]/', 'asbru']/;
@@ -142,90 +150,25 @@ if (!-d "$ENV{'HOME'}/.config") {
     mkdir( "$ENV{'HOME'}/.config" );
 }
 
-# Downgrade from more recent version
-my $CFG_DIR_OLD = "$CFG_DIR.old";
-my $CFG_DIR_NEW = "$ENV{'HOME'}/.config/asbru";
-if (!-e "$CFG_DIR" && $CFG_DIR =~ /\/pac$/ && (-e "$CFG_DIR_OLD" || -e "$CFG_DIR_NEW")) {
-    my $migration_ok = 1;
-    if (-e "$CFG_DIR_NEW") {
-        # Downgrade from newer version
-        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessageDowngradeMigrated());
-        if ($resp ne 'OK') {
-            print "INFO: Downgrade from new configuration canceled.\n";
-            $migration_ok = 0;
-        } else {
-            my $status;
-            my $PATH = "$RealBin/";
-            if ($status = system("$PATH/utils/asbru2pac.pl", $CFG_DIR_NEW, $CFG_DIR, $VERBOSE, 1)) {
-                print "INFO: Downgrade aborted or errors occured, execute with --verbose to see more information ($status)\n";
-            }
-        }
-    } else {
-        # Recover old data there is no new config dir?
-        my $resp = _wPopUP('Confirm', 'Ásbrú Downgrade Confirmation', setMessageRecoverOld());
-        if ($resp ne 'OK') {
-            print "INFO: Downgrade from old configuration canceled.\n";
-            $migration_ok = 0;
-        } else {
-            print "INFO: Downgrade CONFIG_DIR MIGRATION\n";
-            system "mv -f $CFG_DIR.old $CFG_DIR";
-        }
+# Code for future configuration migrations when needed
+if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /\/asbru$/) {
+    # Production user data
+    if ($VERBOSE) {
+        print "INFO: Migration of default directory\n";
     }
-
-    if (!$migration_ok) {
-        # Migration failed, offer the option to create a new connfiguration of do nothing
-        my $resp = _wPopUP('Confirm', 'Ásbrú Create New Configuration', setMessageMigrationFailed());
-        if ($resp ne 'OK') {
-            print "INFO: Startup aborted.\n";
-            exit 0;
-        }
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
+} elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
+    # Alternate configuration directory
+    $CFG_DIR_OLD = "$CFG_DIR.migration";
+    if ($VERBOSE) {
+        print "INFO: Migration of alternate directory\n";
     }
-
-    sub setMessageDowngradeMigrated {
-        my $msg = qq”Ásbrú could not find the configuration directory <b>$CFG_DIR</b>,
-        but found a migrated version of your configuration in <b>$CFG_DIR_NEW</b>.
-        
-        Do you want to downgrade your migrated configuration data ?
-
-        Alternatively, you may want to your the <i>--config-dir</i> option to specify
-        the configuration directory you want to use.
-
-        You may click <b>Cancel</b> to stop this operation immediately,
-        or <b>Continue</b> to start the downgrade.
-        ”;
-        return $msg;
-    }
-
-    sub setMessageRecoverOld {
-        my $msg = qq”Ásbrú could not find the configuration directory <b>$CFG_DIR</b>,
-        but found a saved version of your configuration in <b>$CFG_DIR_OLD</b>.
-        
-        Do you want recover your saved configuration data ?
-
-        Alternatively, you may want to your the <i>--config-dir</i> option to specify
-        the configuration directory you want to use.
-
-        You may click <b>Cancel</b> to stop this operation immediately,
-        or <b>Continue</b> to start the recovery.
-        ”;
-        return $msg;
-    }
-
-    sub setMessageMigrationFailed {
-        my $msg = qq”Migrated of legacy configuration exists on your machine but
-        were not sucessfully migrated.
-
-        Do you want to create a new configuration
-        in <b>$CFG_DIR</b> ?
-
-        You may click <b>Cancel</b> to stop this operation immediately,
-        or <b>Continue</b> to create the new configuration directory.
-        ”;
-        return $msg;
-    }
+    system "rm -Rf $CFG_DIR_OLD";
+    system "mv -f $CFG_DIR $CFG_DIR.migration";
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
-# Create Asbru config dir if necessary
+# Create Ásbrú configuration directory (if necessary)
 if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
 }
@@ -255,16 +198,27 @@ if (!($ASBRU = PACMain -> new(@ARGV))) {
     exit 0
 }
 
-$ASBRU->start;
+$ASBRU->start();
 
 print "INFO: Finished $APP_NAME ($Script) (PID:$$)...\n";
 exit 0;
 
 # Implemented when necessary
-sub config_migration {
-    my ($old_dir,$new_dir) = @_;
 
-    return 0;
+sub config_migration {
+    my ($old_dir, $new_dir) = @_;
+    my $PATH = "$RealBin/";
+    my $status;
+
+    if (-e "$PATH/utils/pac2asbru.pl") {
+        if ($status = system("$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
+            print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
+            exit 0;
+        }
+    } else {
+        print "ERROR: Missing migration script $PATH/utils/pac2asbru.pl ; please check your installation.\n";
+        exit 0;
+    }
 }
 
 sub getDesktopEnvironment {
@@ -279,15 +233,18 @@ sub getDesktopEnvironment {
             last;
         }
     }
-    if (defined($ENV{'XDG_SESSION_DESKTOP'}) && $ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
-        $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
-    }
     if (!$ENV{'ASBRU_DESKTOP'}) {
         $ENV{'ASBRU_DESKTOP'} = 'other';
     } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
         # Test to see it has the unite extension installed
-        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
-            $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+        if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
+            $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
+        }
+        foreach my $extension ('unite@hardpixel.eu','top-icons@gnome-shell-extensions.gcampax.github.com') {
+            if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/$extension" || -e "/usr/share/gnome-shell/extensions/$extension") {
+                $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+                last;
+            }
         }
     }
     print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
@@ -296,7 +253,7 @@ sub getDesktopEnvironment {
 sub CheckConfigurationFile {
     use POSIX qw(strftime);
 
-    my $nfreeze = "$CFG_DIR/pac.nfreeze";
+    my $nfreeze = "$CFG_DIR/asbru.nfreeze";
     my $now = strftime "%Y%m%d%H%M%S", localtime;
     my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME";
     my $MAX_BACKUP_FILES = 10;
