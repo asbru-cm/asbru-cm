@@ -62,13 +62,15 @@ When you are connected to a remote server, the remote application could request 
 
 If the remote application does not process any mouse events, then the local terminal processes this mouse events locally.
 
-To distinguish if the remote application is processing mouse events, look at the cursor shape. When a remote program is not processing mouse events then the cursor is a text caret.
+To distinguish if the remote application is processing mouse events, look at the mouse pointer shape. When a remote program is not processing mouse events then the mouse pointer is a text caret.
 
 __No mouse processing__
 
 ![](images/ssht3.png)
 
 __Mouse processing__
+
+The mouse pointer looks as your default pointer.
 
 ![](images/ssht4.png)
 
@@ -113,11 +115,11 @@ __`<Shift + Ctrl>` + drag__ : Will create a square selection from the starting d
 
 #### Remote application does process mouse events.
 
-Depending on the remote application, the selection process would look and feel different :
+Depending on the remote application and connection speed, the selection process would look and feel different :
 
-    + could be very slow
-    + or that the selection is shown after releasing the mouse
-    + or that the highlight is delayed.
++ could be very slow
++ or the selection is shown after releasing the mouse
++ or the highlight is delayed.
 
 __Example of a remote double and triple click selection__
 
@@ -154,36 +156,4 @@ You will see a popup menu similar to the next image.
 __Actions__
 
 * Pending
-
-## Keybindings
-
-This is the list of existing Ásbrú key bindings.
-
-|Key binding     |Action                                        |
-|----------------|----------------------------------------------|
-|`F4`            |Close all tabs                                |
-|`F11`           |Toggle Full screen mode                       |
-|`<Ctrl+Alt-r>`  |Remove terminal from cluster                  |
-|`<Ctrl+Shift+C>`|Copy                                          |
-|`<Ctrl+Shift+V>`|Paste                                         |
-|`<Ctrl+Shift+P>`|Paste connection password                     |
-|`<Ctrl+Shift+B>`|Apply a regex to clipboard and then Paste     |
-|`<Ctrl+Shift+X>`|Reset terminal                                |
-|`<Ctrl+Shift+G>`|Guess hostname and set terminal title         |
-|`<Ctrl+Shift+W>`|Close terminal                                |
-|`<Ctrl+Shift+Q>`|Quit Ásbrú                                    |
-|`<Ctrl+Shift+F>`|Find node in the tree view                    |
-|`<Ctrl+Shift+N>`|Close all disconnected session windows or tabs|
-|`<Ctrl+Shift+D>`|Duplicate connection                          |
-|`<Ctrl+Shift+R>`|Disconnect and restart session                |
-|`<Ctrl-F4>`     |Close current tab                             |
-|`<Ctrl-F3>`     |Find text in the text buffer                  |
-|`<Ctrl-Insert>` |Copy selection to clipboard                   |
-|`<Shift-Insert>`|Insert text into the current cursor position  |
-|`<Alt-c>`       |Show main connection window                   |
-|`<Alt-n>`       |Show main connection window                   |
-|`<Alt-e>`       |Show main edit connection window              |
-|`<Ctrl++>`      |Zoom in : increase terminal font size         |
-|`<Ctrl+->`      |Zoom out: decrease terminal font size         |
-|`<Ctrl+0>`      |Zoom reset: set font size to default size     |
 
