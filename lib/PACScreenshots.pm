@@ -114,7 +114,7 @@ sub add {
     }
 
     if (! _pixBufFromFile($file) ) {
-        _wMessage(undef, "File '$file' could not be loaded as a screenshot file");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "File '$file' could not be loaded as a screenshot file");
         return 0;
     }
 
@@ -424,7 +424,7 @@ sub _showImage {
 
     my $window = Gtk3::Dialog->new_with_buttons(
         "$APPNAME (v$APPVERSION) : Screenshot '$file'",
-        undef,
+        $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'GTK_DIALOG_DESTROY_WITH_PARENT',
         'gtk-close' => 'close',
     );

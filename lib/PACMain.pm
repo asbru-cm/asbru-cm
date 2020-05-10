@@ -244,7 +244,7 @@ sub new {
     if ($$self{_CFG}{'defaults'}{'use gui password'}) {
         my $pass;
         grep({ if (/^--password=(.+)$/) { $pass = $1; } } @{ $$self{_OPTS} });
-        if (! defined $pass) {
+        if (!defined $pass) {
             PACUtils::_splash(1, "Waiting for password...", $PAC_START_PROGRESS, $PAC_START_TOTAL);
             $pass = _wEnterValue(undef, 'GUI Password Protection', 'Please, enter GUI Password...', undef, 0, 'asbru-protected');
         }
@@ -414,7 +414,7 @@ sub start {
     }
 
     # Auto start scripts
-    grep({ /^--start-script=(.+)$/ and $$self{_SCRIPTS}->_execScript($1); } @{ $$self{_OPTS} });
+    grep({ /^--start-script=(.+)$/ and $$self{_SCRIPTS}->_execScript($1,$$self{_GUI}{main}); } @{ $$self{_OPTS} });
 
     # Auto start Shell
     grep({ /^--start-shell$/ and $$self{_GUI}{shellBtn}->clicked(); } @{ $$self{_OPTS} });
@@ -643,6 +643,7 @@ sub _initGUI {
     $sort_modelfav->set_default_sort_func(\&__treeSort, $$self{_CFG});
 
     $$self{_GUI}{treeFavourites}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeFavourites}->set_show_expanders(0);
     $$self{_GUI}{treeFavourites}->set_headers_visible(0);
     $$self{_GUI}{treeFavourites}->set_enable_search(0);
     $$self{_GUI}{treeFavourites}->set_has_tooltip(1);
@@ -672,6 +673,7 @@ sub _initGUI {
     );
     $$self{_GUI}{scroll3}->add($$self{_GUI}{treeHistory});
     $$self{_GUI}{treeHistory}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeHistory}->set_show_expanders(0);
     $$self{_GUI}{treeHistory}->set_headers_visible(0);
     $$self{_GUI}{treeHistory}->set_enable_search(0);
     $$self{_GUI}{treeHistory}->set_has_tooltip(1);
@@ -708,6 +710,7 @@ sub _initGUI {
     );
     $$self{_GUI}{scrolledclu}->add($$self{_GUI}{treeClusters});
     $$self{_GUI}{treeClusters}->set_enable_tree_lines(0);
+    $$self{_GUI}{treeClusters}->set_show_expanders(0);
     $$self{_GUI}{treeClusters}->set_headers_visible(0);
     $$self{_GUI}{treeClusters}->set_enable_search(0);
     $$self{_GUI}{treeClusters}->set_has_tooltip(0);
@@ -948,13 +951,17 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections','Favourites','History') {
+    foreach my $tree ('Connections','Favourites','History','Clusters') {
         my @col = $$self{_GUI}{"tree$tree"}->get_columns();
         if ($tree eq 'Connections') {
             $col[0]->set_visible(0);
         } else {
             my ($c) = $col[1]->get_cells();
             $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+            if ($tree eq 'History') {
+                my ($c) = $col[2]->get_cells();
+                $c->set('font',$$self{_CFG}{defaults}{'tree font'});
+            }
         }
     }
 
@@ -1339,7 +1346,7 @@ sub _setupCallbacks {
             return 1;
         }
         if ($self->_hasProtectedChildren(\@del)) {
-            return _wMessage($$self{_GUI}{main}, "Can not delete selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not delete selection:\nThere are <b>Protected</b> nodes selected");
         }
 
         if (scalar(@del) > 1) {
@@ -1965,7 +1972,7 @@ sub _setupCallbacks {
             }
         }
         if (((scalar(@sel)>1) || ((scalar(@sel)==1) && $is_group)) && ($self->_hasProtectedChildren(\@sel))) {
-            return _wMessage($$self{_GUI}{main}, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>'Protected'</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>Protected</b> nodes selected");
         }
 
         if ((scalar(@sel) == 1) && (! $is_group)) {
@@ -2100,7 +2107,7 @@ sub _setupCallbacks {
 
     # Capture TABs window closing
     ! $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_PACTABS}->signal_connect('delete_event' => sub {
-        if ($$self{_GUILOCKED} || ! _wConfirm(undef, "Close <b>TABBED TERMINALS</b> Window ?")) {
+        if ($$self{_GUILOCKED} || ! _wConfirm($$self{_GUI}{_PACTABS}, "Close <b>TABBED TERMINALS</b> Window ?")) {
             return 1;
         }
         foreach my $uuid (keys %RUNNING) {
@@ -3187,7 +3194,7 @@ sub _launchTerminals {
     }
 
     my $wtmp;
-    scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting '<b><big>". (scalar(@{ $terminals })) . "</big></b>' terminals...", 0);
+    scalar(@{ $terminals }) > 1 and $wtmp = _wMessage($$self{_GUI}{main}, "Starting <b><big>". (scalar(@{ $terminals })) . "</big></b> terminals...", 0);
     $$self{_NTERMINALS} = scalar(@{ $terminals });
 
     # Create all selected terminals
@@ -4000,7 +4007,7 @@ sub _cutNodes {
         return 1;
     }
     if ($self->_hasProtectedChildren(\@sel_uuids)) {
-        return _wMessage($$self{_GUI}{main}, "Can not CUT selection:\nThere are <b>'Protected'</b> nodes selected");
+        return _wMessage($$self{_GUI}{main}, "Can not CUT selection:\nThere are <b>Protected</b> nodes selected");
     }
 
     # Copy the selected nodes
@@ -4138,7 +4145,7 @@ sub __exportNodes {
         return 1;
     }
 
-    my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being exported...", 0);
+    my $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file <b>$file</b> is being exported...", 0);
     Gtk3::main_iteration() while Gtk3::events_pending();
 
     # Make a backup of the original CFG
@@ -4166,7 +4173,7 @@ sub __exportNodes {
         _wMessage($$self{_WINDOWCONFIG}, "Connection(s) succesfully exported to:\n\n$file");
     } else {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file '$file':\n\n$!");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not export connection(s) to file <b>$file</b>:\n\n$!");
     }
 
     return 1;
@@ -4201,7 +4208,7 @@ sub __importNodes {
         return 1;
     }
 
-    my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file '$file' is being imported...", 0);
+    my $w = _wMessage($$self{_GUI}{main}, "Please, wait while file <b>$file</b> is being imported...", 0);
     Gtk3::main_iteration() while Gtk3::events_pending();
 
     require YAML;
@@ -4209,7 +4216,7 @@ sub __importNodes {
     eval { $$self{_COPY}{'data'} = YAML::LoadFile($file); };
     if ($@) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not import connection from file <b>$file</b>:\n\n$@");
         return 1;
     }
 
@@ -4240,7 +4247,7 @@ sub __importNodes {
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        _wMessage($$self{_WINDOWCONFIG}, "File '$file' succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
         system("(sleep 3; $0) &");
         sleep 2;
         exit 0;
@@ -4249,7 +4256,7 @@ sub __importNodes {
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
         delete $$self{_COPY}{'data'}{'children'};
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "File '$file' does not look like a valid exported connection!");
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> does not look like a valid exported connection!");
         return 1;
 
     # Correct partial export file
@@ -4262,7 +4269,7 @@ sub __importNodes {
         $$self{_COPY}{'data'} = {};
         _decipherCFG($$self{_CFG});
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "File '<b>$file</b>' succesfully imported:\n<b>$i</b> element(s) added");
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported:\n<b>$i</b> element(s) added");
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
         $self->_setCFGChanged(1);

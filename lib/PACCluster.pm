@@ -770,7 +770,7 @@ sub _setupCallbacks {
 
     # Capture 'add cluster' button clicked
     $$self{_WINDOWCLUSTER}{addCluster}->signal_connect('clicked' => sub {
-        my $new_cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
 
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
@@ -799,7 +799,7 @@ sub _setupCallbacks {
 
     # Capture 'add cluster 1' button clicked
     $$self{_WINDOWCLUSTER}{addCluster1}->signal_connect('clicked' => sub {
-        my $new_cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
 
         if ((!defined $new_cluster)||($new_cluster =~ /^\s*$/go)) {
             return 1;
@@ -841,7 +841,7 @@ sub _setupCallbacks {
     # Capture 'rename cluster 1' button clicked
     $$self{_WINDOWCLUSTER}{renCluster1}->signal_connect('clicked' => sub {
         my $old_cluster = $$self{_WINDOWCLUSTER}{comboClusters1}->get_active_text;
-        my $new_cluster = _wEnterValue($self, "Enter a <b>NEW</b> name for cluster <b>$old_cluster</b>", undef, $old_cluster);
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, "Enter a <b>NEW</b> name for cluster <b>$old_cluster</b>", undef, $old_cluster);
 
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
@@ -989,7 +989,7 @@ sub _setupCallbacks {
         if (!($total && (defined $cluster) && ($cluster ne ''))) {
             _wMessage($$self{_WINDOWCLUSTER}{main}, "Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster");
 
-            $cluster = _wEnterValue($self, 'Enter a name for the <b>New Cluster</b>');
+            $cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
 
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go) ) {
                 return 1;
@@ -1189,7 +1189,7 @@ sub _setupCallbacks {
     });
 
     $$self{_WINDOWCLUSTER}{addAC}->signal_connect('clicked' => sub {
-        my $new_ac = _wEnterValue($self, 'Enter new <b>AUTO CLUSTER</b> name');
+        my $new_ac = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter new <b>AUTO CLUSTER</b> name');
         if ((! defined $new_ac) || ($new_ac =~ /^\s*$/go)) {
             return 1;
         }
@@ -1225,7 +1225,7 @@ sub _setupCallbacks {
         }
         my $sel = $selected[0];
         my $old_cluster = $$self{_WINDOWCLUSTER}{treeAutocluster}{data}[$sel][0];
-        my $new_cluster = _wEnterValue($self, "Enter a <b>NEW</b> name for Auto Cluster <b>$old_cluster</b>", undef, $old_cluster);
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, "Enter a <b>NEW</b> name for Auto Cluster <b>$old_cluster</b>", undef, $old_cluster);
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
         }

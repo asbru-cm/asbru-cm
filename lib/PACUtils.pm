@@ -1319,7 +1319,8 @@ sub _menuFavouriteConnections {
             next;
         }
 
-        my $name = $$cfg{'environments'}{$uuid}{'name'};
+        my $group = $$cfg{'environments'}{$uuid}{'parent'} ? "$$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} : " : '';
+        my $name = "$group$$cfg{'environments'}{$uuid}{'name'}";
 
         if ($terminal) {
             push(@fav, {
@@ -1448,7 +1449,8 @@ sub _wEnterValue {
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
-    my $stock_icon = shift // 'gtk-edit';
+    my $stock_icon = shift // 'asbru-help';
+    my $entry;
     my @list;
     my $pos = -1;
     my %w;
@@ -1473,29 +1475,36 @@ sub _wEnterValue {
             $parent = $WINDOWSPLASH{_GUI};
         }
     }
-
+    if (!$stock_icon) {
+        $stock_icon = 'asbru-help';
+    }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Enter data",
-        undef,
+        "$APPNAME : Enter data",
+        $parent,
         'modal',
         'gtk-cancel' => 'cancel',
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
+    $w{window}{data}->set_decorated(0);
+    $w{window}{data}->get_style_context()->add_class('w-entervalue');
     $w{window}{data}->set_default_response('ok');
     if (!$parent) {
         $w{window}{data}->set_position('center');
     }
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
 
+    # Create a VBox to avoid vertical expansions
+    $w{window}{gui}{vbox} = Gtk3::VBox->new(0, 0);
+    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{vbox}, 0, 0, 0);
+
     # Create an HBox to contain a picture and a label
     $w{window}{gui}{hbox} = Gtk3::HBox->new(0, 0);
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox}, 1, 1, 5);
-    $w{window}{gui}{hbox}->set_border_width(5);
+    $w{window}{gui}{hbox}->set_border_width(0);
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{hbox}, 0, 0, 5);
 
     # Create image
     $w{window}{gui}{img} = Gtk3::Image->new_from_stock($stock_icon, 'dialog');
@@ -1503,18 +1512,18 @@ sub _wEnterValue {
 
     # Create 1st label
     $w{window}{gui}{lblup} = Gtk3::Label->new();
-    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 5);
-    $w{window}{gui}{lblup}->set_markup($lblup);
+    $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 0, 0, 0);
+    $w{window}{gui}{lblup}->set_markup($lblup // '');
 
     # Create 2nd label
     $w{window}{gui}{lbldwn} = Gtk3::Label->new();
-    $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
-    $w{window}{gui}{lbldwn}->set_text($lbldown // '');
+    $w{window}{gui}{vbox}->pack_start($w{window}{gui}{lbldwn}, 0, 0, 5);
+    $w{window}{gui}{lbldwn}->set_markup($lbldown // '');
 
     if (@list) {
         # Create combobox widget
         $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{comboList}, 0, 1, 0);
+        $w{window}{gui}{vbox}->pack_start($w{window}{gui}{comboList}, 0, 1, 5);
         $w{window}{gui}{comboList}->set_property('can_focus', 0);
         foreach my $text (@list) {
             $w{window}{gui}{comboList}->append_text($text)
@@ -1523,14 +1532,19 @@ sub _wEnterValue {
     } else {
         # Create the entry widget
         $w{window}{gui}{entry} = Gtk3::Entry->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{entry}, 0, 1, 5);
+        $entry = $w{window}{gui}{entry};
+        $w{window}{gui}{vbox}->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
+        $w{window}{gui}{entry}->set_width_chars(30);
         $w{window}{gui}{entry}->set_activates_default(1);
         $w{window}{gui}{entry}->set_visibility($visible);
+        $w{window}{gui}{entry}->grab_focus();
     }
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($parent);
+    if ($entry) {
+        $entry->grab_focus();
+    }
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
     my $val = '';
@@ -1579,17 +1593,17 @@ sub _wAddRenameNode {
 
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Enter data",
-        undef,
+        "$APPNAME : Enter data",
+        $PACMain::FUNCS{_MAIN}{_GUI}{main},
         'modal',
         'gtk-cancel' => 'cancel',
         'gtk-ok' => 'ok'
     );
     # and setup some dialog properties.
+    $w{window}{data}->set_decorated(0);
+    $w{window}{data}->get_style_context()->add_class('w-renamenode');
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
     $w{window}{data}->set_icon_name('asbru-app-big');
-    $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
 
@@ -1621,6 +1635,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry1} = Gtk3::Entry->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{entry1}, 1, 1, 0);
     $w{window}{gui}{entry1}->set_text($name);
+    $w{window}{gui}{entry1}->set_width_chars(30);
     $w{window}{gui}{entry1}->set_activates_default(1);
     $w{window}{gui}{entry1}->signal_connect('changed', sub {
         $w{window}{gui}{entry2}->set_text($w{window}{gui}{entry1}->get_chars(0, -1) . ($uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' :  " - $parent_name")));
@@ -1640,10 +1655,10 @@ sub _wAddRenameNode {
     $w{window}{gui}{entry2} = Gtk3::Entry->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{entry2}, 1, 1, 0);
     $w{window}{gui}{entry2}->set_text($title);
+    $w{window}{gui}{entry2}->set_width_chars(30);
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
 
@@ -1786,8 +1801,9 @@ sub _wMessage {
     my $msg = shift;
     my $modal = shift // 1;
     my $selectable = shift // 0;
+    my $class =  shift // 'w-warning';
+    my $msg_type = 'GTK_MESSAGE_WARNING';
 
-    # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
         undef $window;
@@ -1795,18 +1811,22 @@ sub _wMessage {
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
     }
+    if ($msg =~ /error/i) {
+        $msg_type = 'GTK_MESSAGE_ERROR';
+        $class = 'w-error';
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
-        'GTK_MESSAGE_INFO',
+        $msg_type,
         'none',
         ''
     );
-
+    $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class($class);
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
-    $windowConfirm->set_transient_for($window);
+    $windowConfirm->set_title("$APPNAME : Message");
 
     # The message can be selected by user (eg for copy/paste)
     if ($selectable) {
@@ -1917,10 +1937,12 @@ sub _wConfirm {
         'none',
         ''
     );
+    $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class('w-confirm');
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
+    $windowConfirm->set_title("Confirm action : $APPNAME");
     $windowConfirm->set_transient_for($window);
     $windowConfirm->set_default_response($default);
 
@@ -1936,6 +1958,9 @@ sub _wYesNoCancel {
     my $msg = shift;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1943,14 +1968,12 @@ sub _wYesNoCancel {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
+    $windowConfirm->set_decorated(0);
+    $windowConfirm->get_style_context()->add_class('w-confirm');
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
-    $windowConfirm->set_transient_for($window);
+    $windowConfirm->set_title("Confirm action : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -2821,7 +2844,15 @@ sub _subst {
     my %out;
     my $pos = -1;
     my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
+    my $parent;
 
+    if ($uuid) {
+        if (defined $PACMain::RUNNING{$uuid}{_PARENTWINDOW}) {
+            $parent = $PACMain::RUNNING{$uuid}{_PARENTWINDOW};
+        }
+    } else {
+        $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
             return $string;
@@ -3188,7 +3219,7 @@ sub _wakeOnLan {
     }
 
     if (! send(S, $MAGIC, $SIZE, $paddr)) {
-        _wMessage(undef, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
         return $mac;
     } else {
         send(S, $MAGIC, $SIZE, $paddr);
@@ -3205,7 +3236,7 @@ sub _wakeOnLan {
             send(S, $MAGIC, $SIZE, sockaddr_in(9, $ipaddr));
         }
 
-        _wMessage(undef, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
     }
 
     return $mac;
@@ -3934,7 +3965,13 @@ Support function to build and xml file to build the popup menu
 
 Support function to calculate the location of the popup menu
 
-=head2 sub _wMessage
+=head2 sub _wMessage(window,msg,modal,selectable,class)
+
+    window      parent window to be transient for
+    msg         message to display
+    modal       0 no, 1 yes (defaul yes)
+    selectable  should message be selectable (default no)
+    class       css class : w-warning, w-info, w-error (default w-warning)
 
 Create a modal message to the user
 
