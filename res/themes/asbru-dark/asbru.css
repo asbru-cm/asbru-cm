@@ -59,14 +59,11 @@ messagedialog > box {
   margin-top: 16px;
 }
 .w-entervalue {
-    border: 1px solid #dddddd;
 }
 .w-renamenode {
-    border: 1px solid #dddddd;
 }
 .w-warning {
     background-color: #616124;
-    border: 1px solid #dddddd;
 }
 .w-error {
     background-color: #42050A;
