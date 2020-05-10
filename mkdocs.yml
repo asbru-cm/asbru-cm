@@ -9,10 +9,15 @@ edit_uri: edit/master/doc
 repo_name: GitHub
 theme:
     name: material
+    palette:
+        primary: deep purple
+        accent: pink
+extra_css:
+    - stylesheets/custom.css
 nav:
   - Home: 'index.md'
   - 1. General:
-      - News: General/NEWS.md
+      - News: General/News.md
       - Installation: General/Installation.md
       - Changelog: General/Changelog.md
       - Warning:   General/sensitive-info-notice.md
@@ -34,7 +39,8 @@ nav:
         - Local Commands: Manual/Preferences/LocalCommands.md
         - Remote Commands: Manual/Preferences/RemoteCommands.md
         - KeePass: Manual/Preferences/KeePassXC.md
-        - Systemtray Extensions: Manual/Preferences/SytemTrayExtensions.md 
+        - KeyBindings: Manual/Preferences/KeyBindings.md
+        - Systemtray Extensions: Manual/Preferences/SytemTrayExtensions.md
       - Command Line: Manual/CommandLine.md
       - Connections:
         - Configure: Manual/Connections/SSH.md
@@ -53,5 +59,9 @@ nav:
       - Code of conduct: Contributing/CODE_OF_CONDUCT.md
 
 markdown_extensions:
-  - admonition
-
+    - admonition
+    - toc:
+        permalink: true
+        toc_depth: 6
+    - codehilite:
+        guess_lang: false

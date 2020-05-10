@@ -58,17 +58,46 @@ This networking options override the Global Networking options for this connecti
 + __Use SOCKS proxy__ : Use a SOCKS proxy to exit the local network.
 + __Jump Server__ : Use a jump server to exit the local network, or connect to an internal machine behind a FireWall.
 
+### Socks Server
+
 ![](images/ssh4.png)
 
 If your network administrator has added a SOCKS server to the network and grants you access to it, you will have to select and configure the SOCKS Proxy.
+
+### Jump Server
 
 ![](images/ssh5.png)
 
 If you have SSH access to a remote machine in your network, that has access to the a local machine on the remote network. Then you can use this technique to access to an external machine behind a firewall, that has no public address.
 
-You need to have a public key installed in your __Jump Server__  to be able to use it as an intermediate machine to access the other network.
+Rules for connections
 
-It can be a default public key, or a personal private key that you were assigned.
++ Certificate is set
+    - Username is required
+    - Password will be used as a passphrase
++ Certificate is __not__ set
+    - User name and password will be used to login.
+    - They are not required will be asked during the login process if they are not set
+
+### Pseudo Jump Server
+
+![](images/js1.png)
+
+If you activate the checkbox __Pseudo jump server__.
+
+The connection __will not__ use the `-J` option from ssh. Instead, it will do the following actions:
+
++ SSH into the jump server
++ Send an SSH connection string based on your connection settings
+
+!!! important "Important for this to work"
+    Because the connection now is stablished in the __Jump Server__ any keys, hostnames, etc. Has to be available in the Jump server environment for the destination connection to take place.
+
+    So if you use a private key in your server, you need to provide the key in the destination server. And the path to that key has to be the connection.
+
+    Because the keys are selected locally in your computer, you need to have the same key and path in the destination server.
+
+    Or to easy the situation, create an entry in the on user ssh config file  `~/ssh/.config` with the corresponding paths to your key and the user name. And use the connection name as your Host name.
 
 ## (Pre / Post) Exec
 
