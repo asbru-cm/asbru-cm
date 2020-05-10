@@ -3,13 +3,13 @@ GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
 FULL_REPO="https://${GITHUB_API_KEY}$GH_REPO"
 
 if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
-    echo "Doc build skipped"
+    echo "Doc build skipped."
     exit 0
 fi
 
 if [ -z "$GITHUB_API_KEY" ]; then
-	echo "GITHUB_API_KEY not set. Will stop here"
-	exit 1
+    echo "GITHUB_API_KEY not set.  This is probably a pull request from another repository.  Doc build skipped."
+    exit 0
 fi
 
 mkdir -p out
@@ -49,7 +49,7 @@ EOF
 )
 
 mkdocs build --clean
-	
+
 build_result=$?
 
 # Only deploy after merging to master
