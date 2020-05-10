@@ -212,8 +212,7 @@ if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     $PASS = subst($PASS);
 }
 
-#Translate variables, KeePassXC
-
+# Translate variables, KeePassXC
 $TITLE = subst($TITLE,'GET_TITLE');
 $IP = subst($IP);
 $PORT = subst($PORT);
