@@ -62,23 +62,17 @@ messagedialog > box {
   margin-top: 16px;
 }
 .w-entervalue {
-    border: 1px solid #888888;
 }
 .w-renamenode {
-    border: 1px solid #888888;
 }
 .w-warning {
     background-color: #FFFFEB;
-    border: 1px solid #888888;
 }
 .w-error {
     background-color: #F17E84;
-    border: 1px solid #888888;
-}
-.w-confirm {
-    border: 1px solid #888888;
 }
 .w-info {
-    border: 1px solid #888888;
+}
+.w-confirm {
 }
 
