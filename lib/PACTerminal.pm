@@ -494,7 +494,7 @@ sub stop {
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
-        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
+        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?", 'yes')) {
             return 1;
         }
 
@@ -962,7 +962,7 @@ sub _setupCallbacks {
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
         if ($$self{_CFG}{defaults}{'change main title'}) {
-            $PACMain::FUNCS{_MAIN}{_GUI}{main}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
+            $$self{_NOTEBOOKWINDOW}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
         }
     });
 
@@ -1847,7 +1847,7 @@ sub _vteMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (!defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
             next;
         }
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
@@ -2763,13 +2763,9 @@ sub _tabMenu {
         }
     });
     foreach my $uuid_tmp (keys %PACMain::RUNNING) {
-        if (! defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
+        if (!defined $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} || $PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
             next;
         }
-        if ($PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER} ne '') {
-            next;
-        }
-
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
         $clusters{$PACMain::RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{connections} .= "$PACMain::RUNNING{$uuid_tmp}{terminal}{_NAME}\n";
     }
@@ -2845,7 +2841,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
+        if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to close <b>every</b> terminal?"))) {
             return 1;
         }
         foreach my $uuid (@list) {
