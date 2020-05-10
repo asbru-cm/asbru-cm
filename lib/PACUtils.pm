@@ -118,7 +118,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.2.0';
+our $APPVERSION = '6.3.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -1924,6 +1924,7 @@ sub _wProgress {
 sub _wConfirm {
     my $window = shift;
     my $msg = shift;
+    my $default = shift // 'no';
 
     if (!$window) {
         $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
@@ -1946,9 +1947,11 @@ sub _wConfirm {
     $windowConfirm->set_decorated(0);
     $windowConfirm->get_style_context()->add_class('w-confirm');
     $windowConfirm->set_markup($msg);
-    $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
+    $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME");
+    $windowConfirm->set_transient_for($window);
+    $windowConfirm->set_default_response($default);
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
