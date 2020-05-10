@@ -1900,6 +1900,7 @@ sub _wProgress {
 sub _wConfirm {
     my $window = shift;
     my $msg = shift;
+    my $default = shift // 'no';
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (defined $window && ref $window ne 'Gtk3::Window') {
@@ -1917,10 +1918,11 @@ sub _wConfirm {
         ''
     );
     $windowConfirm->set_markup($msg);
-    $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
+    $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
+    $windowConfirm->set_default_response($default);
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();

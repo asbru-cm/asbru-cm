@@ -494,7 +494,7 @@ sub stop {
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
-        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?")) {
+        if (!_wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close '" . ($$self{_SPLIT} ? 'this split tab' : __($$self{_TITLE})) . "'?", 'yes')) {
             return 1;
         }
 
@@ -2832,7 +2832,7 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', shortcut => '<control>F4', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', shortcut => '<control><shift>F4', code => sub {
         my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to CLOSE <b>every</b> terminal?"))) {
+        if (!(scalar(@list) && _wConfirm($$self{_WINDOWTERMINAL}, "Are you sure you want to close <b>every</b> terminal?"))) {
             return 1;
         }
         foreach my $uuid (@list) {

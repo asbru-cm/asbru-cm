@@ -3274,7 +3274,7 @@ sub _quitProgram {
         my $string = "Are you sure you want to <b>exit</b> $APPNAME ?";
         $rc and $string .= "\n\n(" . ($rc > 1 ? "there are $rc open terminals" : "there is $rc open terminal")  . ")";
         if ($$self{_CFG}{'defaults'}{'confirm exit'} || $rc) {
-            if (!_wConfirm($$self{_GUI}{main}, $string)) {
+            if (!_wConfirm($$self{_GUI}{main}, $string, 'yes')) {
                 return 1;
             }
         };
