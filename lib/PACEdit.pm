@@ -223,6 +223,10 @@ sub __checkRBAuth {
     my $self = shift;
 
     if (_($self, 'comboMethod')->get_active_text() =~ /SSH|SFTP/i) {
+        _($self, 'entryCfgJumpConnPass')->set_sensitive(1);
+        _($self, 'entryCfgJumpConnPass')->set_visible(1);
+        _($self, 'lblJumpPass')->set_sensitive(1);
+        _($self, 'lblJumpPass')->set_visible(1);
         if(_($self, 'rbCfgAuthManual')->get_active()) {
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'labelExpect')->set_sensitive(0);
@@ -249,7 +253,12 @@ sub __checkRBAuth {
         _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'entryCfgJumpConnPass')->set_sensitive(0);
+        _($self, 'entryCfgJumpConnPass')->set_visible(0);
         _($self, 'vboxCfgManualProxyConn')->set_visible(1);
+        _($self, 'lblJumpPass')->set_sensitive(0);
+        _($self, 'lblJumpPass')->set_visible(0);
+        _($self, 'entryCfgJumpConnPass')->set_text('');
     } else {
         if (_($self, 'rbUseProxyJump')->get_active()) {
             _($self, 'rbUseProxyIfCFG')->set_active(1);

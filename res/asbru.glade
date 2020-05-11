@@ -2199,7 +2199,7 @@ An alternative to SSH tunneling to access internal machines through gateway.</pr
                                               </object>
                                             </child>
                                             <child type="label">
-                                              <object class="GtkLabel" id="label7">
+                                              <object class="GtkLabel" id="lblJumpPass">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Password</property>
