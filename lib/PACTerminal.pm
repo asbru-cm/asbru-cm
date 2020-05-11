@@ -984,13 +984,21 @@ sub _setupCallbacks {
         my ($widget, $event) = @_;
         my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
         my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-
+        my ($action,$keymask);
 
         if (defined $$self{_KEYS_RECEIVE}) {
             return 1;
         }
 
-        my ($action,$keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event, $$self{_UUID});
+        if ($$self{_TABBED}) {
+            ($action,$keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event, $$self{_UUID});
+            if ($action eq 'close') {
+                $self->stop(undef, 1);
+                return 1;
+            }
+        }
+
+        ($action,$keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event, $$self{_UUID});
 
         if (!$action) {
             return 0;
