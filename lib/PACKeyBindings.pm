@@ -387,6 +387,7 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Ctrl+v'} = ['Connections Tree','paste','Paste node'];
     $$cfg{'treeConnections'}{'Alt+r'}  = ['Connections Tree','protection','Toggle protection'];
     $$cfg{'treeConnections'}{'F2'}     = ['Connections Tree','rename','Rename node'];
+    $$cfg{'treeConnections'}{'Alt+c'}  = ['Connections Tree','connect_node','Connect selected node'];
     $$cfg{'pactabs'}{'Ctrl+F4'}        = ['Tabs','close','Close current Tab'];
     $$cfg{'pactabs'}{'Ctrl+Tab'}       = ['Tabs','last','Last focused Tab'];
     $$cfg{'pactabs'}{'Ctrl+Page_Down'} = ['Tabs','next','Next Tab'];

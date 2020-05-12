@@ -1499,6 +1499,10 @@ sub _setupCallbacks {
             if (!$is_root) {
                 $$self{_GUI}{connEditBtn}->clicked();
             }
+        } elsif ($action eq 'connect_node') {
+            if (!$is_root) {
+                $$self{_GUI}{connExecBtn}->clicked();
+            }
         } elsif ($action eq 'protection') {
             if (!$is_root) {
                 $self->__treeToggleProtection();
@@ -2653,6 +2657,7 @@ sub _treeConnections_menu {
 
     my @tree_menu_items;
 
+    # Show keyboard shortcuts
     push(@tree_menu_items, {
         label => "Show Keybindings",
         stockicon => 'gtk-help',
@@ -2661,6 +2666,10 @@ sub _treeConnections_menu {
             _wMessage($$self{_GUI}{main},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('treeConnections'),1,0,'w-info');
         }
     });
+
+    # Separator
+    push(@tree_menu_items, { separator => 1 });
+
     # Expand All
     push(@tree_menu_items, {
         label => 'Expand all',
@@ -2786,41 +2795,65 @@ sub _treeConnections_menu {
         });
     }
 
+    # Separator
     push(@tree_menu_items, { separator => 1 });
+
+    # Start all connections of the selected group
+    if (scalar @sel == 1 && $$self{_CFG}{'environments'}{$sel[0]}{'_is_group'}) {
+        push(@tree_menu_items, {
+            label => 'Start Group',
+            stockicon => 'asbru-group-connect',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections', 'connect'),
+            tooltip => "Start all connections of this group",
+            code => sub{
+                $$self{_GUI}{connExecBtn}->clicked();
+            }
+        });
+    }
     # Add connection/group
-    if ((scalar @sel == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')) {
+    if (scalar @sel == 1 && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')) {
         # Add Connection
         push(@tree_menu_items, {
             label => 'Add Connection',
             stockicon => 'asbru-node-add',
-            tooltip => "Create a new CONNECTION under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
-            code => sub{ $$self{_GUI}{connAddBtn}->clicked(); }
+            tooltip => "Create a new connection under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
+            code => sub{
+                $$self{_GUI}{connAddBtn}->clicked();
+            }
         });
         # Add Group
         push(@tree_menu_items, {
             label => 'Add Group',
             stockicon => 'asbru-group-add',
-            tooltip => "Create a new GROUP under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
-            code => sub{ $$self{_GUI}{groupAddBtn}->clicked(); }
+            tooltip => "Create a new group under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
+            code => sub{
+                $$self{_GUI}{groupAddBtn}->clicked();
+            }
         });
     }
     # Rename
     push(@tree_menu_items, {
         label => 'Rename ' . ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__' ? 'Group' : 'Connection'),
         stockicon => 'gtk-spell-check',
-        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','rename'),
-        sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
-        code => sub { $$self{_GUI}{nodeRenBtn}->clicked(); }
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections', 'rename'),
+        sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && !$with_protected,
+        code => sub {
+            $$self{_GUI}{nodeRenBtn}->clicked();
+        }
     });
     # Delete
     push(@tree_menu_items, {
         label => 'Delete...',
         stockicon => 'gtk-delete',
-        sensitive => (scalar(@sel) >= 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
-        code => sub { $$self{_GUI}{nodeDelBtn}->clicked(); }
+        sensitive => (scalar(@sel) >= 1) && $sel[0] ne '__PAC__ROOT__' && !$with_protected,
+        code => sub {
+            $$self{_GUI}{nodeDelBtn}->clicked();
+        }
     });
 
+    # Separator
     push(@tree_menu_items, { separator => 1 });
+
     # Clone connection
     push(@tree_menu_items, {
         label => "Clone connection$p",
