@@ -95,12 +95,6 @@ sub update {
         $$self{cfg} = $cfg;
     }
 
-    $$self{gui}{cbCTRLDisable}->set_active($$cfg{'disable CTRL key bindings'} // 0);
-    $$self{gui}{cbALTDisable}->set_active($$cfg{'disable ALT key bindings'} // 0);
-    $$self{gui}{cbSHIFTDisable}->set_active($$cfg{'disable SHIFT key bindings'} // 0);
-
-    $$self{gui}{cbAudibleBell}->set_active($$cfg{'audible bell'} // 0);
-
     $$self{gui}{cbUsePersonal}->set_active(1); # Just to force 'toggled' signal to trigger that callback and update GUI
     $$self{gui}{cbUsePersonal}->set_active($$cfg{'use personal settings'} // 0);
 
@@ -150,12 +144,6 @@ sub get_cfg {
     my $self = shift;
 
     my %options;
-
-    $options{'disable CTRL key bindings'} = $$self{gui}{cbCTRLDisable}->get_active;
-    $options{'disable ALT key bindings'} = $$self{gui}{cbALTDisable}->get_active;
-    $options{'disable SHIFT key bindings'} = $$self{gui}{cbSHIFTDisable}->get_active;
-
-    $options{'audible bell'} = $$self{gui}{cbAudibleBell}->get_active;
 
     $options{'use personal settings'} = $$self{gui}{cbUsePersonal}->get_active // 0;
 
@@ -207,35 +195,6 @@ sub _buildTermOptsGUI {
 
     $w{hboxopts} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxopts}, 0, 1, 0);
-
-    $w{frameBindings} = Gtk3::Frame->new(" Disable next key bindings for this connection  ");
-    $w{hboxopts}->pack_start($w{frameBindings}, 0, 1, 0);
-    $w{frameBindings}->set_tooltip_text("Here you can select which key bindings will not be available in this connection. ");
-
-    $w{hboxKBD} = Gtk3::HBox->new(0, 0);
-    $w{frameBindings}->add($w{hboxKBD});
-    $w{frameBindings}->set_shadow_type('GTK_SHADOW_NONE');
-    $w{hboxKBD}->set_border_width(5);
-
-    $w{cbCTRLDisable} = Gtk3::CheckButton->new_with_label('CTRL');
-    $w{hboxKBD}->pack_start($w{cbCTRLDisable}, 0, 1, 0);
-
-    $w{cbALTDisable} = Gtk3::CheckButton->new_with_label('ALT');
-    $w{hboxKBD}->pack_start($w{cbALTDisable}, 0, 1, 0);
-
-    $w{cbSHIFTDisable} = Gtk3::CheckButton->new_with_label('SHIFT');
-    $w{hboxKBD}->pack_start($w{cbSHIFTDisable}, 0, 1, 0);
-
-    $w{frameBell} = Gtk3::Frame->new(" Other options  ");
-    $w{hboxopts}->pack_start($w{frameBell}, 0, 1, 0);
-
-    $w{hboxbell} = Gtk3::HBox->new(0, 0);
-    $w{frameBell}->add($w{hboxbell});
-    $w{frameBell}->set_shadow_type('GTK_SHADOW_NONE');
-    $w{hboxbell}->set_border_width(5);
-
-    $w{cbAudibleBell} = Gtk3::CheckButton->new_with_label('Audible bell');
-    $w{hboxbell}->pack_start($w{cbAudibleBell}, 0, 1, 0);
 
     $w{frameSuper} = Gtk3::Frame->new;
     $w{vbox}->pack_start($w{frameSuper}, 1, 1, 0);

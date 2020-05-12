@@ -49,6 +49,7 @@ use PACTermOpts;
 use PACGlobalVarEntry;
 use PACExecEntry;
 use PACKeePass;
+use PACKeyBindings;
 
 # END: Import Modules
 ###################################################################
@@ -187,6 +188,7 @@ sub _initGUI {
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
+    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings},$$self{_WINDOWCONFIG}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -794,9 +796,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgUseGUIPassword')->set_active($$cfg{'defaults'}{'use gui password'});
     _($self, 'hboxCfgPACPassword')->set_sensitive($$cfg{'defaults'}{'use gui password'});
     _($self, 'cbCfgUseGUIPasswordTray')->set_active($$cfg{'defaults'}{'use gui password tray'});
-    _($self, 'cbCfgCTRLDisable')->set_active($$cfg{'defaults'}{'disable CTRL key bindings'});
-    _($self, 'cbCfgALTDisable')->set_active($$cfg{'defaults'}{'disable ALT key bindings'});
-    _($self, 'cbCfgSHIFTDisable')->set_active($$cfg{'defaults'}{'disable SHIFT key bindings'});
     _($self, 'cbCfgAutoStartShell')->set_active($$cfg{'defaults'}{'autostart shell upon PAC start'});
     _($self, 'cbCfgTreeOnRight')->set_active($$cfg{'defaults'}{'tree on right side'});
     _($self, 'cbCfgTreeOnLeft')->set_active(! $$cfg{'defaults'}{'tree on right side'});
@@ -872,15 +871,12 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
     _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
-    _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
     _($self, 'cbCfgHideConnSubMenu')->set_active($$cfg{'defaults'}{'hide connections submenu'});
     _($self, 'fontTree')->set_font_name($$cfg{'defaults'}{'tree font'});
     _($self, 'fontInfo')->set_font_name($$cfg{'defaults'}{'info font'});
     _($self, 'cbCfgAudibleBell')->set_active($$cfg{'defaults'}{'audible bell'});
     _($self, 'cbCfgShowTerminalStatus')->set_active($$cfg{'defaults'}{'terminal show status bar'});
     _($self, 'cbCfgChangeMainTitle')->set_active($$cfg{'defaults'}{'change main title'});
-    _($self, 'rbCfgSwitchTabsCtrl')->set_active(! $$cfg{'defaults'}{'how to switch tabs'});
-    _($self, 'rbCfgSwitchTabsAlt')->set_active($$cfg{'defaults'}{'how to switch tabs'});
 
     # Terminal Colors
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorBlack', 'color black', _($self, 'colorBlack')->get_color()->to_string());
@@ -941,6 +937,9 @@ sub _updateGUIPreferences {
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
     $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
+    $$self{_KEYBINDS}->update($$self{_CFG}{'defaults'}{'keybindings'});
+    $$self{_KEYBINDS}->LoadHotKeys($$self{_CFG});
+
     if (defined $PACMain::FUNCS{_EDIT}) {
         _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     }
@@ -976,6 +975,10 @@ sub _closeConfiguration {
 
 sub _saveConfiguration {
     my $self = shift;
+
+    # Increase and document config version changes
+    $$self{_CFG}{'config version'} = 2;
+    $$self{_CFG}{'config version change'} = 'Added keybindings settings';
 
     $$self{_CFG}{'defaults'}{'command prompt'} = _($self, 'entryCfgPrompt')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'username prompt'} = _($self, 'entryCfgUserPrompt')->get_chars(0, -1);
@@ -1087,10 +1090,6 @@ sub _saveConfiguration {
 
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
-    $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} = _($self, 'cbCfgCTRLDisable')->get_active();
-    $$self{_CFG}{'defaults'}{'disable ALT key bindings'} = _($self, 'cbCfgALTDisable')->get_active();
-    $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'} = _($self, 'cbCfgSHIFTDisable')->get_active();
-    $$self{_CFG}{'defaults'}{'prevent F11'} = _($self, 'cbCfgPreventF11')->get_active();
     $$self{_CFG}{'defaults'}{'autostart shell upon PAC start'} = _($self, 'cbCfgAutoStartShell')->get_active();
     $$self{_CFG}{'defaults'}{'tree on right side'} = _($self, 'cbCfgTreeOnRight')->get_active();
     $$self{_CFG}{'defaults'}{'prevent mouse over show tree'} = ! _($self, 'cbCfgPreventMOShowTree')->get_active();
@@ -1106,7 +1105,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'change main title'} = _($self, 'cbCfgChangeMainTitle')->get_active();
     $$self{_CFG}{'defaults'}{'when no more tabs'} = _($self, 'rbOnNoTabsNothing')->get_active() ? 'last' : 'next';
     $$self{_CFG}{'defaults'}{'selection to clipboard'} = _($self, 'cbCfgSelectionToClipboard')->get_active();
-    $$self{_CFG}{'defaults'}{'how to switch tabs'} = _($self, 'rbCfgSwitchTabsAlt')->get_active();
     $$self{_CFG}{'defaults'}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlCharsConf')->get_active();
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active();
@@ -1172,6 +1170,8 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'remote commands'} = $$self{_CMD_REMOTE}->get_cfg();
     # Save KeePass options
     $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg(1);
+    # Save KeyBindings options
+    $$self{_CFG}{'defaults'}{'keybindings'} = $$self{_KEYBINDS}->get_cfg();
 
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
     $self->_updateGUIPreferences();

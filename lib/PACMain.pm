@@ -1028,6 +1028,9 @@ sub _initGUI {
     $$self{_CONFIG}{_KEEPASS}{_VERBOSE} = $$self{_VERBOSE};
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
+    # Get the KeyBindings object from configuration
+    $FUNCS{_KEYBINDS} = $$self{_CONFIG}{_KEYBINDS};
+
     # Build Edit window
     $FUNCS{_EDIT} = $$self{_EDIT} = PACEdit->new($$self{_CFG});
     # Set parent
@@ -1373,16 +1376,24 @@ sub _setupCallbacks {
         $$self{_GUI}{$what}->signal_connect('key_press_event' => sub {
             my ($widget, $event) = @_;
 
-            my $keyval = '' . ($event->keyval);
-            my $state = '' . ($event->state);
-            if (!(($event->state == [qw(mod1-mask)])&&(!$$self{_CFG}{'defaults'}{'disable ALT key bindings'}))) {
+            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs();
+            if (!@sel) {
                 return 0;
             }
-            my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs();
-            # e --> Show main edit connection window
-            if (chr($keyval) eq 'e') {
-                if ($sel[0] ne '__PAC_SHELL__') {
-                    $$self{_GUI}{connEditBtn}->clicked();
+            my $action = $FUNCS{_KEYBINDS}->GetAction($what, $widget, $event);
+            if (!$action) {
+                return 0;
+            }
+            if ($action eq 'edit_node' && $sel[0] ne '__PAC_SHELL__') {
+                $$self{_GUI}{connEditBtn}->clicked();
+                return 1;
+            } elsif ($action eq 'del_favourite') {
+                if ($$self{_GUI}{connFavourite}->get_sensitive()) {
+                    my $tree = $self->_getCurrentTree();
+                    if (!$tree->_getSelectedUUIDs()) {
+                        return 1;
+                    }
+                    $self->_setFavourite(0,$tree);
                 }
                 return 1;
             }
@@ -1429,39 +1440,23 @@ sub _setupCallbacks {
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
-        my $keyval = '' . ($event->keyval);
-        my $state = '' . ($event->state);
         my @sel = $$self{_GUI}{treeClusters}->_getSelectedNames();
         if (!@sel) {
             return 0;
         }
-        if (($event->state == [qw(mod1-mask)])&&(!$$self{_CFG}{'defaults'}{'disable ALT key bindings'})) {
-            # e --> Show main edit connection Window
-            if (chr($keyval) eq 'e') {
-                $$self{_CLUSTER}->show($sel[0]);
-                return 1;
-            }
+        my $action = $FUNCS{_KEYBINDS}->GetAction('treeClusters', $widget, $event);
+        if (!$action) {
+            return 0;
+        }
+        if ($action eq 'edit_node') {
+            $$self{_CLUSTER}->show($sel[0]);
+            return 1;
         }
     });
 
     # Capture 'treeconnections' keypress
     $$self{_GUI}{treeConnections}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-
-        my $keyval = '' . ($event->keyval);
-        my $state = '' . ($event->state);
-        my $stateb = $event->get_state();
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $shift = $stateb * ['shift-mask'];
-        my $ctrl = $stateb * ['control-mask'];
-        my $alt = $stateb * ['mod1-mask'];
-        my $alt2 = $stateb * ['mod2-mask'];
-        my $alt5 = $stateb * ['mod5-mask'];
-
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:TREECONNECTIONS:KEYPRESS:*$state*$keyval*" . chr($keyval) . "*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-        }
-
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
         my $is_group = 0;
@@ -1474,84 +1469,59 @@ sub _setupCallbacks {
                 $is_group = 1;
             }
         }
+        my $action = $FUNCS{_KEYBINDS}->GetAction('treeConnections', $widget, $event);
 
-        # <Ctrl>
-        if (($ctrl) && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})) {
-            # <Ctrl>f --> FIND in treeView
-            if ($keyval == 102) {
-                $$self{_SHOWFINDTREE} = 1;
-                $$self{_GUI}{_vboxSearch}->show();
-                $$self{_GUI}{_entrySearch}->grab_focus();
-                return 1;
-            }
-            # r --> Expand all
-            elsif (chr($keyval) eq 'r') {
-                $$self{_GUI}{treeConnections}->expand_all();
-            }
-            # t --> Collapse all
-            elsif (chr($keyval) eq 't') {
-                $$self{_GUI}{treeConnections}->collapse_all();
-            }
-            if (scalar(@sel)==0) {
-                return 0;
-            }
-
-            # <Ctrl>d --> CLONE current connection
-            if (chr($keyval) eq 'd') {
-                $self->_copyNodes();
-                foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
-                    $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
-                    $$self{_COPY}{'data'} = {};
-                };
-            }
-            # <Ctrl>c --> COPY current CONNECTION
-            elsif ($keyval == 99) {
-                $self->_copyNodes(); return 1;
-            }
-            # <Ctrl>x --> CUT current CONNECTION
-            elsif ($keyval == 120) {
-                $self->_cutNodes();
-                return 1;
-            }
-            # <Ctrl>v --> PASTE cut/copied CONNECTION
-            elsif ($keyval == 118) {
-                map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
-                $$self{_COPY}{'data'} = {};
-                return 1;
-            }
-        }
-        # <Alt>
-        elsif (($alt) && (!$$self{_CFG}{'defaults'}{'disable ALT key bindings'})) {
-            # e --> Show main edit connection window
-            if (chr($keyval) eq 'e') {
-                if (!$is_root) {
-                    $$self{_GUI}{connEditBtn}->clicked();
-                }
-                return 1;
-            }
-            # r --> Toggle protection flag
-            elsif (chr($keyval) eq 'r') {
-                if (!$is_root) {
-                    $self->__treeToggleProtection();
-                }
-                return 1;
-            }
+        if (!$action) {
             return 0;
         }
-        # Capture 'F2' keypress to rename nodes
-        elsif ($event->keyval == 65471) {
+        if ($action eq 'find') {
+            $$self{_SHOWFINDTREE} = 1;
+            $$self{_GUI}{_vboxSearch}->show();
+            $$self{_GUI}{_entrySearch}->grab_focus();
+        } elsif ($action eq 'expand_all') {
+            $$self{_GUI}{treeConnections}->expand_all();
+        } elsif ($action eq 'collaps_all') {
+            $$self{_GUI}{treeConnections}->collapse_all();
+        } elsif ($action eq 'clone') {
+            $self->_copyNodes();
+            foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
+                $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
+                $$self{_COPY}{'data'} = {};
+            };
+        } elsif ($action eq 'copy') {
+            $self->_copyNodes();
+        } elsif ($action eq 'cut') {
+            $self->_cutNodes();
+        } elsif ($action eq 'paste') {
+            map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
+            $$self{_COPY}{'data'} = {};
+        } elsif ($action eq 'edit_node') {
+            if (!$is_root) {
+                $$self{_GUI}{connEditBtn}->clicked();
+            }
+        } elsif ($action eq 'protection') {
+            if (!$is_root) {
+                $self->__treeToggleProtection();
+            }
+        } elsif ($action eq 'rename') {
             if ((scalar(@sel) == 1) && ($sel[0] ne '__PAC__ROOT__')) {
                 $$self{_GUI}{nodeRenBtn}->clicked();
             }
-            return 1;
-        }
-        # Capture 'Del' keypress to delete connection
-        elsif ($event->keyval == 65535) {
+        } elsif ($action eq 'add_favourite' || $action eq 'del_favourite') {
+            if ($$self{_GUI}{connFavourite}->get_sensitive()) {
+                my $tree = $self->_getCurrentTree();
+                if (!$tree->_getSelectedUUIDs()) {
+                    return 1;
+                }
+                if ($action eq 'add_favourite') {
+                    $self->_setFavourite(1,$tree);
+                } else {
+                    $self->_setFavourite(0,$tree);
+                }
+            }
+        } elsif ($action eq 'Delete') {
             $$self{_GUI}{nodeDelBtn}->clicked();
-            return 1;
-        }
-        # Capture 'left arrow'  keypress to collapse row
-        elsif ($event->keyval == 65361) {
+        } elsif ($action eq 'Left') {
             my @idx;
             foreach my $uuid (@sel) {
                 push(@idx, [ $uuid ]);
@@ -1574,9 +1544,7 @@ sub _setupCallbacks {
             } else {
                 $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
             }
-        }
-        # Capture 'right arrow' keypress to expand row
-        elsif ($event->keyval == 65363) {
+        } elsif ($action eq 'Right') {
             my @idx;
             foreach my $uuid (@sel) {
                 push(@idx, [ $uuid ]);
@@ -1593,9 +1561,7 @@ sub _setupCallbacks {
                 return 0;
             }
             $tree->expand_row($paths[0], 0);
-        }
-        # Capture 'intro' keypress to expand/collapse row or launch terminals
-        elsif ($event->keyval == 65293) {
+        } elsif ($action eq 'Return') {
             my $tree = $$self{_GUI}{treeConnections};
             my $selection = $tree->get_selection();
             my $model = $tree->get_model();
@@ -1611,19 +1577,17 @@ sub _setupCallbacks {
                 }
                 $self->_launchTerminals(\@idx);
             }
-
-            return 1;
-        }
-        # Capture 'standard ascii characters' to start custom interactive search
-        elsif (($event->keyval >= 32) && ($event->keyval <= 126)) {
+        } elsif ($action eq 'Down') {
+            return 0;
+        } elsif ($action eq 'Up') {
+            return 0;
+        } elsif (($event->keyval >= 32) && ($event->keyval <= 126)) {
+            # This does not consider other languages
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
             $$self{_GUI}{_entrySearch}->insert_text(chr($event->keyval), -1, 0);
             $$self{_GUI}{_entrySearch}->set_position(-1);
-            return 1;
-        } else {
-            return 0;
         }
         return 1;
     });
@@ -1631,7 +1595,7 @@ sub _setupCallbacks {
     # Capture 'treeconnections' selected element changed
     $$self{_GUI}{treeConnections}->get_selection()->signal_connect('changed' => sub {
         $self->_updateGUIPreferences();
-        });
+    });
 
     # Capture row double clicking (execute selected connection)
     $$self{_GUI}{treeConnections}->signal_connect('row_activated' => sub {
@@ -1806,8 +1770,12 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('key_press_event' => sub {
+        my ($widget, $event) = @_;
         # Capture 'escape' keypress to hide the interactive search
-        if ($_[1]->keyval == 65307) {
+
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
+
+        if ($action eq 'Escape') {
             $$self{_SHOWFINDTREE} = 0;
             $$self{_GUI}{_entrySearch}->set_text('');
             $$self{_GUI}{_vboxSearch}->hide();
@@ -1815,12 +1783,12 @@ sub _setupCallbacks {
             return 1;
         }
         # Capture 'up arrow'  keypress to move to previous ocurrence
-        elsif ($_[1]->keyval == 65362) {
+        elsif ($action eq 'Up') {
             $$self{_GUI}{_btnPrevSearch}->clicked();
             return 1;
         }
         # Capture 'down arrow'  keypress to move to next ocurrence
-        elsif ($_[1]->keyval == 65364) {
+        elsif ($action eq 'Down') {
             $$self{_GUI}{_btnNextSearch}->clicked();
             return 1;
         }
@@ -2009,17 +1977,7 @@ sub _setupCallbacks {
         if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
-        map $$self{_CFG}{'environments'}{$_}{'favourite'} = $$self{_GUI}{connFavourite}->get_active(), $tree->_getSelectedUUIDs();
-        if ($$self{_GUI}{nbTree}->get_current_page() == 1) {
-            $self->_updateFavouritesList();
-            $self->_updateGUIFavourites();
-            $self->_updateGUIPreferences();
-        }
-        $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($$self{_GUI}{connFavourite}->get_active() ? 'on' : 'off'), 'button'));
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
-        $self->_setCFGChanged(1);
+        $self->_setFavourite($$self{_GUI}{connFavourite}->get_active(),$tree);
         return 1;
     });
     $$self{_GUI}{scriptsBtn}->signal_connect('clicked' => sub { $$self{_SCRIPTS}->show(); });
@@ -2126,105 +2084,39 @@ sub _setupCallbacks {
     # Capture some keypress on TABBED window
     $$self{_GUI}{_PACTABS}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state();
-        my $ctrl = $state * ['control-mask'];
-        my $shift = $state * ['shift-mask'];
-        my $alt = $state * ['mod1-mask'];
-
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:TABBEDWINDOW:KEYPRESS:*$state*$keyval*$unicode*\n";
-        }
-
         # Get current page's tab number
         my $curr_page = $$self{_GUI}{nb}->get_current_page();
 
-        # Continue checking keypress only if <Ctrl> is pushed
-        if ($ctrl && $shift && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'}) && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'})) {
-            # Capture <Ctrl>number --> select number tab
-            if ($keyval =~ /^\d$/go) {
-                $$self{_GUI}{nb}->set_current_page($keyval - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
-                return 1;
-            }
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
 
-            # If not a tab key, skip
-            if ($keyval !~ /^.*_?Tab/go) {
-                return 0;
-            }
-
-            if ($$self{_CFG}{defaults}{'ctrl tab'} eq 'last') {
-                $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
+        if (!$action) {
+            return 0;
+        } elsif ($action eq 'infotab') {
+            $$self{_GUI}{nb}->set_current_page(0);
+        } elsif ($action eq 'last') {
+            $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
+        } elsif ($action eq 'next') {
+            if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
+                $$self{_GUI}{nb}->set_current_page(0);
             } else {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page($$self{_GUI}{nb}->get_n_pages - 1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
+                $$self{_GUI}{nb}->next_page();
             }
-            return 1;
+        } elsif ($action eq 'previous') {
+            if ($curr_page == 0) {
+                $$self{_GUI}{nb}->set_current_page(-1);
+            } else {
+                $$self{_GUI}{nb}->prev_page();
+            }
+        } elsif ($action eq 'Ctrl+0') {
+            # Special case: if Ctrl+0 is not bind to an action then ignore it
+            return 0;
+        } elsif ($action =~ /^Ctrl\+(\d+)/) {
+            my $n = $1;
+            $$self{_GUI}{nb}->set_current_page($n - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
+        } else {
+            return 0;
         }
-        # Continue checking keypress only if <Ctrl> is pushed
-        elsif ($ctrl && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})) {
-            # Capture <Ctrl>PgUp/Left --> select previous tab
-            if ($keyval eq 'Page_Up' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page(-1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
-            }
-            # Capture <Ctrl>PgDwn/Right --> select next tab
-            elsif ($keyval eq 'Page_Down' && ! $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-                if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                    $$self{_GUI}{nb}->set_current_page(0);
-                } else {
-                    $$self{_GUI}{nb}->next_page();
-                }
-            }
-            # Capture <Ctrl>number --> select number tab
-            elsif ($keyval =~ /^\d$/go) {
-                $$self{_GUI}{nb}->set_current_page($keyval - ($$self{_CFG}{'defaults'}{'tabs in main window'} ? 0 : 1));
-            }
-            # Capture <Ctrl>TAB --> switch between tabs
-            elsif ($keyval eq 'Tab') {
-                if ($$self{_CFG}{defaults}{'ctrl tab'} eq 'last') {
-                    $$self{_GUI}{nb}->set_current_page($$self{_PREVTAB});
-                } else {
-                    if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                        $$self{_GUI}{nb}->set_current_page(0);
-                    } else {
-                        $$self{_GUI}{nb}->next_page();
-                    }
-                }
-            } else {
-                return 0;
-            }
-            return 1;
-        # Continue checking keypress only if <Alt> is pushed
-        } elsif ($alt && (! $$self{_CFG}{'defaults'}{'disable ALT key bindings'}) && $$self{_CFG}{'defaults'}{'how to switch tabs'}) {
-            # Capture <Alt>PgUp/Left --> select previous tab
-            if ($keyval eq 'Left') {
-                if ($curr_page == 0) {
-                    $$self{_GUI}{nb}->set_current_page(-1);
-                } else {
-                    $$self{_GUI}{nb}->prev_page();
-                }
-            }
-            # Capture <Alt>PgDwn/Right --> select next tab
-            elsif ($keyval eq 'Right') {
-                if ($curr_page == $$self{_GUI}{nb}->get_n_pages - 1) {
-                    $$self{_GUI}{nb}->set_current_page(0);
-                } else {
-                    $$self{_GUI}{nb}->next_page();
-                }
-            } else {
-                return 0;
-            }
-            return 1;
-        }
-        return 0;
+        return 1;
     });
 
     # Capture some keypress on Description widget
@@ -2233,8 +2125,10 @@ sub _setupCallbacks {
         my $keyval = '' . ($event->keyval);
         my $state = '' . ($event->state);
 
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pactabs', $widget, $event);
+
         # Check if <Ctrl>z is pushed
-        if (($event->state == [ qw(control-mask) ]) && (chr($keyval) eq 'z') && (scalar @{ $$self{_UNDO} })) {
+        if ($action eq 'Ctrl+z' || $action eq 'Ctrl+Z') {
             $$self{_GUI}{descBuffer}->set_text(pop(@{ $$self{_UNDO} }));
             return 1;
         }
@@ -2247,6 +2141,7 @@ sub _setupCallbacks {
         push(@{ $$self{_UNDO} }, $$self{_GUI}{descBuffer}->get_property('text'));
         return 0;
     });
+
     $$self{_GUI}{descBuffer}->signal_connect('changed' => sub {
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         if (!(scalar(@sel) == 1 && $$self{_GUI}{nbTree}->get_current_page() == 0 && $$self{_GUI}{descView}->is_sensitive)) {
@@ -2337,48 +2232,45 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
-        my $keyval = Gtk3::Gdk::keyval_name($event->keyval);
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
-        my $state = $event->get_state();
-        my $shift = $state * ['shift-mask'];
-        my $ctrl = $state * ['control-mask'];
-        my $alt = $state * ['mod1-mask'];
-        my $alt2 = $state * ['mod2-mask'];
-        my $alt5 = $state * ['mod5-mask'];
+        my $action = $FUNCS{_KEYBINDS}->GetAction('pacmain', $widget, $event);
 
-        if ($$self{_VERBOSE}) {
-            print STDERR "DEBUG:MAIN:KEYPRESS:*$state*$keyval*$unicode*$shift*$ctrl*$alt*$alt2*$alt5*\n";
-        }
-
-        # <Ctrl><Shift>
-        if (!(($ctrl && $shift) && (! $$self{_CFG}{'defaults'}{'disable CTRL key bindings'})  && (! $$self{_CFG}{'defaults'}{'disable SHIFT key bindings'}))) {
+        if (!$action) {
             return 0;
-        }
-
-        # F --> FIND in treeView
-        if($_[1]->keyval == 102)  {
+        } elsif ($action eq 'find') {
             $$self{_SHOWFINDTREE} = 1;
             $$self{_GUI}{_vboxSearch}->show();
             $$self{_GUI}{_entrySearch}->grab_focus();
-            return 1;
-        }
-        # Q --> Finish
-        elsif ($_[1]->keyval == 113) {
+        } elsif ($action eq 'quit') {
             $PACMain::FUNCS{_MAIN}->_quitProgram();
-            return 1;
-        }
-        # T --> Open local shell
-        elsif (lc $keyval eq 't') {
+        } elsif ($action eq 'localshell') {
             $$self{_GUI}{shellBtn}->clicked();
-            return 1;
+        } else {
+            return 0;
         }
-        return 0;
+        return 1;
     });
     $$self{_SIGNALS}{_WINDOWSTATEVENT} = $$self{_GUI}{main}->signal_connect('window_state_event' => sub {
         $$self{_GUI}{maximized} = $_[1]->new_window_state eq 'maximized';
         return 0;
     });
     return 1;
+}
+
+sub _setFavourite {
+    my ($self,$b,$tree) = @_;
+
+    map $$self{_CFG}{'environments'}{$_}{'favourite'} = $b, $tree->_getSelectedUUIDs();
+    if ($$self{_GUI}{nbTree}->get_current_page() == 1) {
+        $self->_updateFavouritesList();
+        $self->_updateGUIFavourites();
+        $self->_updateGUIPreferences();
+    }
+    $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($b ? 'on' : 'off'), 'button'));
+    $$self{_GUI}{connFavourite}->set_active($b);
+    if ($UNITY) {
+        $FUNCS{_TRAY}->_setTrayMenu();
+    }
+    $self->_setCFGChanged(1);
 }
 
 sub _lockPAC {
@@ -2590,7 +2482,6 @@ sub _treeConnections_menu_lite {
         push(@tree_menu_items, {
             label => 'Edit connection',
             stockicon => 'gtk-edit',
-            shortcut => '<alt>e',
             tooltip => "Edit this connection\'s data",
             sensitive => $sel[0] ne '__PAC_SHELL__',
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2601,7 +2492,6 @@ sub _treeConnections_menu_lite {
         push(@tree_menu_items, {
             label => 'Bulk Edit connections...',
             stockicon => 'gtk-edit',
-            shortcut => '<alt>e',
             tooltip => "Bulk edit some values of selected connection\'s",
             sensitive => 1,
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2682,7 +2572,6 @@ sub _treeConnections_menu_lite {
     push(@tree_menu_items, {
         label => 'Execute in New Cluster...',
         stockicon => 'gtk-new',
-        shortcut => '',
         sensitive => scalar @sel >= 1,
         code => sub {
             my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');
@@ -2704,7 +2593,7 @@ sub _treeConnections_menu_lite {
     my @submenu_cluster;
     my %clusters;
     foreach my $uuid_tmp (keys %RUNNING) {
-        if ($RUNNING{$uuid_tmp}{terminal}{_CLUSTER} eq '') {
+        if (!$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}) {
             next;
         }
         $clusters{$RUNNING{$uuid_tmp}{terminal}{_CLUSTER}}{total}++;
@@ -2763,11 +2652,20 @@ sub _treeConnections_menu {
     }
 
     my @tree_menu_items;
+
+    push(@tree_menu_items, {
+        label => "Show Keybindings",
+        stockicon => 'gtk-help',
+        sensitive => 1,
+        code => sub {
+            _wMessage($$self{_GUI}{main},$PACMain::FUNCS{_KEYBINDS}->ListKeyBindings('treeConnections'),1,0,'w-info');
+        }
+    });
     # Expand All
     push(@tree_menu_items, {
         label => 'Expand all',
         stockicon => 'gtk-add',
-        shortcut => '<ctrl>r',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','expand_all'),
         tooltip => 'Expand ALL (including sub-nodes)',
         sensitive => 1,
         code => sub { $$self{_GUI}{treeConnections}->expand_all(); }
@@ -2776,7 +2674,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Collapse all',
         stockicon => 'gtk-remove',
-        shortcut => '<ctrl>t',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','collaps_all'),
         tooltip => 'Collapse ALL (including sub-nodes)',
         sensitive => 1,
         code => sub { $$self{_GUI}{treeConnections}->collapse_all(); }
@@ -2787,7 +2685,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => scalar(@sel) > 1 ? ('Toggle Protected state') : (($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'Un-' : '') . 'Protect'),
             stockicon => 'asbru-' . ($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'un' : '') . 'protected',
-            shortcut => '<alt>r',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','protection'),
             tooltip => "Protect or not this node, in order to avoid any changes (Edit, Delete, Rename, ...)",
             sensitive => 1,
             code => sub { $self->__treeToggleProtection(); }
@@ -2798,7 +2696,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => "Edit connection$p",
             stockicon => 'gtk-edit',
-            shortcut => '<alt>e',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','edit_node'),
             tooltip => "Edit this connection\'s data",
             sensitive => 1,
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2809,7 +2707,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Copy Password',
             stockicon => 'gtk-copy',
-            shortcut => '',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','copy'),
             sensitive => 1,
             code => sub {
                 _copyPass($sel[0]);
@@ -2821,7 +2719,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Bulk Edit connections...',
             stockicon => 'gtk-edit',
-            shortcut => '<alt>e',
+            shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','edit_node'),
             tooltip => "Bulk edit some values of selected connection\'s",
             sensitive => 1,
             code => sub { $$self{_GUI}{connEditBtn}->clicked(); }
@@ -2831,7 +2729,6 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Export ' . ($sel[0] eq '__PAC__ROOT__' ? 'ALL' : 'SELECTED') . ' connection(s)...',
         stockicon => 'gtk-save-as',
-        shortcut => '',
         tooltip => 'Export connection(s) to a YAML file',
         sensitive =>  scalar @sel >= 1,
         code => sub {
@@ -2854,7 +2751,6 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Import connection(s)...',
         stockicon => 'gtk-open',
-        shortcut => '',
         tooltip => 'Import connection(s) from a file',
         sensitive =>  (scalar(@sel) == 1) && ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__'),
         code => sub { $self->__importNodes }
@@ -2912,7 +2808,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Rename ' . ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__' ? 'Group' : 'Connection'),
         stockicon => 'gtk-spell-check',
-        shortcut => 'F2',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','rename'),
         sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && ! $with_protected,
         code => sub { $$self{_GUI}{nodeRenBtn}->clicked(); }
     });
@@ -2929,7 +2825,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Clone connection$p",
         stockicon => 'gtk-copy',
-        shortcut => '<control>d',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','clone'),
         sensitive => ((scalar(@sel) == 1) && ! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
         code => sub {
             $self->_copyNodes();
@@ -2943,7 +2839,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Copy node$p",
         stockicon => 'gtk-copy',
-        shortcut => '<control>c',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','copy'),
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub{
             $self->_copyNodes();
@@ -2955,14 +2851,14 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => "Cut node$p",
         stockicon => 'gtk-cut',
-        shortcut => '<control>x',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','cut'),
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__') && (! $with_protected)),
         code => sub{  $self->_cutNodes(); }
     });
     push(@tree_menu_items, {
         label => "Paste node$p",
         stockicon => 'gtk-paste',
-        shortcut => '<control>v',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','paste'),
         #sensitive => scalar(keys %{ $$self{_COPY}{'data'} }) && (scalar @sel == 1) && (($sel[0] eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})),
         sensitive => (($clip)&&(scalar @sel == 1)) ? 1 : 0,
         code => sub {
@@ -3015,7 +2911,6 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Execute in New Cluster...',
         stockicon => 'gtk-new',
-        shortcut => '',
         sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
         code => sub {
             my $cluster = _wEnterValue($$self{_GUI}{main}, 'Enter a name for the <b>New Cluster</b>');

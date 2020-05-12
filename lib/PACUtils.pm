@@ -1735,6 +1735,10 @@ sub _wPopUpMenu {
             my $sensitive = $$m{sensitive} // 1;
             my $tooltip = $$m{tooltip} // '';
 
+            if (!$$m{shortcut}) {
+                $$m{shortcut} = '';
+            }
+
             my $label_orig =  __text($label);
             $label =~ s/\//__backslash__/go;
             my $pre_path = $path;
@@ -1922,6 +1926,9 @@ sub _wConfirm {
     my $msg = shift;
     my $default = shift // 'no';
 
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     # Why no Gtk3::MessageDialog->new_with_markup() available??
     if (defined $window && ref $window ne 'Gtk3::Window') {
         print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
@@ -1943,7 +1950,6 @@ sub _wConfirm {
     $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME");
-    $windowConfirm->set_transient_for($window);
     $windowConfirm->set_default_response($default);
 
     $windowConfirm->show_all();
@@ -2137,10 +2143,6 @@ sub _cfgSanityCheck {
         $$cfg{'defaults'}{'gui password'} //= '';
     }
     $$cfg{'defaults'}{'use gui password tray'} //= 0;
-    $$cfg{'defaults'}{'disable CTRL key bindings'} //= 0;
-    $$cfg{'defaults'}{'disable SHIFT key bindings'} //= 0;
-    $$cfg{'defaults'}{'disable ALT key bindings'} //= 0;
-    $$cfg{'defaults'}{'prevent F11'} //= 0;
     $$cfg{'defaults'}{'autostart shell upon start'} //= 0;
     $$cfg{'defaults'}{'tree on right side'} //= 0;
     $$cfg{'defaults'}{'prevent mouse over show tree'} //= 1;
@@ -2155,7 +2157,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
     $$cfg{'defaults'}{'selection to clipboard'} //= 1;
-    $$cfg{'defaults'}{'how to switch tabs'} //= 0;
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
@@ -2245,9 +2246,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'timeout command'} //= 40;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'timeout connect'} //= 40;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'use personal settings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable CTRL key bindings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable ALT key bindings'} //= 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'audible bell'} //= 0;
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
@@ -2543,9 +2541,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout command'} = 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout connect'} = 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use personal settings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable CTRL key bindings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} = 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} = 0;
         } else {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
@@ -2569,9 +2564,6 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout command'} //= 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'timeout connect'} //= 40;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use personal settings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable CTRL key bindings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable ALT key bindings'} //= 0;
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'disable SHIFT key bindings'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'audible bell'} //= 0;
         }
     }

@@ -61,7 +61,6 @@ sub new {
     $self->{cfg} = shift;
     $self->{variables} = shift;
     $self->{where} = shift;
-
     $self->{container} = undef;
     $self->{frame} = {};
     $self->{list} = [];
@@ -80,6 +79,7 @@ sub update {
     my $cfg = shift;
     my $variables = shift;
     my $where = shift;
+    my $uuid = shift;
 
     if (defined $cfg) {
         $$self{cfg} = $cfg;
@@ -89,6 +89,9 @@ sub update {
     }
     if (defined $where) {
         $$self{where} = $where;
+    }
+    if ($uuid) {
+        $$self{uuid} = $uuid;
     }
 
     # Destroy previous widgets
@@ -116,6 +119,7 @@ sub get_cfg {
         my %hash;
         $hash{txt} = $$w{txt}->get_chars(0, -1);
         $hash{description} = $$w{desc}->get_chars(0, -1);
+        $hash{keybind} = $$w{keybind}->get_chars(0, -1);
         $hash{confirm} = $$w{confirm}->get_active() || '0';
         $hash{intro} = $$w{intro}->get_active() || '0';
         # Force no descriptions equal to command
@@ -125,6 +129,12 @@ sub get_cfg {
         # Normalize capitalization of groups
         $hash{description} =~ s/^(.+?):/\u\L$1\E:/;
         push(@cfg, \%hash) unless $hash{txt} eq '';
+        if ($hash{keybind}) {
+            # Register final values after all editing changes
+            my $lf  = $hash{intro} ? "\n" : '';
+            my $ask = $hash{confirm} ? "?" : '';
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$hash{keybind},"HOTKEY_CMD:$self->{where}","$ask$hash{txt}$lf",$self->{uuid});
+        }
     }
 
     @cfg = sort {lc($$a{description}) cmp lc($$b{description})} @cfg;
@@ -219,17 +229,25 @@ sub _buildExecGUI {
 sub _buildExec {
     my $self = shift;
     my $hash = shift;
-
     my $txt = $hash;
     my $desc = '';
+    my $keybind = '';
     my $confirm = 0;
     my $intro = 1;
+    my $width = 80;
 
     if (ref($hash) ) {
-        $txt = $$hash{txt} // '';
-        $desc = $$hash{description} // '';
+        $txt     = $$hash{txt} // '';
+        $desc    = $$hash{description} // '';
         $confirm = $$hash{confirm} // 0;
-        $intro = $$hash{intro} // 1;
+        $intro   = $$hash{intro} // 1;
+        $keybind = $$hash{keybind} // '';
+        if ($keybind && defined $PACMain::FUNCS{_KEYBINDS}) {
+            # Register so we can validate
+            my $lf  = $intro   ? "\n" : '';
+            my $ask = $confirm ? "?"  : '';
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keybind,"HOTKEY_CMD:$self->{where}","$ask$txt$lf", $self->{uuid});
+        }
     }
 
     my @undo;
@@ -245,19 +263,22 @@ sub _buildExec {
 
     $w{frame} = Gtk3::Frame->new();
     $w{frame}->set_label_widget($w{confirm});
+    $w{frame}->set_shadow_type('GTK_SHADOW_NONE');
 
     # Make an HBox to contain checkbox, entry and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
     $w{frame}->add($w{hbox});
 
-    $w{vbox} = Gtk3::VBox->new(0, 0);
+    $w{vbox} = Gtk3::VBox->new(0, 5);
     $w{hbox}->pack_start($w{vbox}, 1, 1, 0);
 
     $w{hbox3} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hbox3}, 0, 1, 0);
 
     # Build label
-    $w{lbl} = Gtk3::Label->new('Command: ');
+    $w{lbl} = Gtk3::Label->new('Command');
+    $w{lbl}->set_size_request($width,-1);
+    $w{lbl}->set_xalign(0);
     $w{hbox3}->pack_start($w{lbl}, 0, 1, 0);
 
     # Build entry
@@ -267,7 +288,7 @@ sub _buildExec {
     $w{txt}->set_text($txt);
 
     # Build checkbutton
-    $w{intro} = Gtk3::CheckButton->new(' send <INTRO> at the end');
+    $w{intro} = Gtk3::CheckButton->new('send <INTRO>');
     $w{hbox3}->pack_start($w{intro}, 0, 1, 0);
     $w{intro}->set_active($intro);
 
@@ -275,7 +296,9 @@ sub _buildExec {
     $w{vbox}->pack_start($w{hbox4}, 0, 1, 0);
 
     # Build label
-    $w{lbl2} = Gtk3::Label->new('Description: ');
+    $w{lbl2} = Gtk3::Label->new('Description');
+    $w{lbl2}->set_size_request($width,-1);
+    $w{lbl2}->set_xalign(0);
     $w{hbox4}->pack_start($w{lbl2}, 0, 1, 0);
     $w{hbox4}->set_tooltip_markup("<i>Group</i><b>:</b><i>Description</i>\n<b>Group:</b> This value will group all commands with the same name in the menu.\n\nExample <b>Mysql</b>:<i>Show tables</i>");
 
@@ -284,18 +307,26 @@ sub _buildExec {
     $w{hbox4}->pack_start($w{desc}, 1, 1, 0);
     $w{desc}->set_text($desc);
 
-    $w{vbox2} = Gtk3::VBox->new(0, 0);
-    $w{hbox}->pack_start($w{vbox2}, 0, 1, 0);
+    # Build Keybind
+    $w{keybind} = Gtk3::Entry->new();
+    $w{keybind}->set_max_width_chars(18);
+    $w{keybind}->set_width_chars(18);
+    $w{keybind}->set_editable(0);
+    $w{hbox4}->pack_start($w{keybind}, 0, 0, 0);
+    $w{keybind}->set_text($keybind);
+    $w{keybind}->set_placeholder_text("Set Keybinding");
 
     # Build delete button
     $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
-    $w{vbox2}->pack_start($w{btn}, 1, 1, 0);
+    $w{hbox3}->pack_start($w{btn}, 0, 0, 0);
 
     if ($$self{'where'} eq 'local') {
         # Build exec button
         $w{btnExec} = Gtk3::Button->new_from_stock('gtk-execute');
-        $w{vbox2}->pack_start($w{btnExec}, 0, 1, 0);
+        $w{hbox4}->pack_start($w{btnExec}, 0, 0, 0);
     }
+
+    $w{vbox}->pack_start(Gtk3::HSeparator->new(), 1, 1, 0);
 
     # Add built control to main container
     $$self{frame}{vbexec}->pack_start($w{frame}, 0, 1, 0);
@@ -307,8 +338,13 @@ sub _buildExec {
 
     # Assign a callback for deleting entry
     $w{btn}->signal_connect('clicked' => sub {
+        my $keymask = $w{keybind}->get_chars(0, -1);
         splice(@{$$self{list}}, $w{position}, 1);
         splice(@{$$self{cfg}}, $w{position}, 1);
+        if ($keymask) {
+            # Remove registered keybind
+            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$keymask, $self->{uuid});
+        }
         $self->update();
         return 1;
     });
@@ -473,6 +509,37 @@ sub _buildExec {
             return 1;
         }
         return 0;
+    });
+
+    $w{keybind}->signal_connect('key_press_event' => sub {
+        my ($widget, $event) = @_;
+        my ($keyval, $unicode, $keymask) = $PACMain::FUNCS{_KEYBINDS}->GetKeyMask($widget, $event);
+        my $text    = $widget->get_chars(0, -1);
+        my $command = $w{txt}->get_chars(0, -1);
+        my $lf      = $w{intro}->get_active() ? "\n" : '';
+        my $ask     = $w{confirm}->get_active() ? "?"  : '';
+
+        if (!$keymask && ($unicode == 8 || $unicode == 127)) {
+            if ($text) {
+                $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$text, $self->{uuid});
+            }
+            $widget->set_text('');
+            return 1;
+        } elsif (!$keymask) {
+            return 0;
+        } elsif ($text && $text ne $keymask) {
+            $PACMain::FUNCS{_KEYBINDS}->UnRegisterHotKey('terminal',$text, $self->{uuid});
+        } elsif ($text && $text eq $keymask) {
+            return 0;
+        }
+        my ($free,$msg) = $PACMain::FUNCS{_KEYBINDS}->HotKeyIsFree('terminal',$keymask, $self->{uuid});
+        if ($free) {
+            # Register to validate, and apply changes online
+            $PACMain::FUNCS{_KEYBINDS}->RegisterHotKey('terminal',$keymask,"HOTKEY_CMD:$self->{where}","$ask$command$lf", $self->{uuid});
+            $widget->set_text($keymask);
+        } else {
+            _wMessage($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},$msg);
+        }
     });
 
     return %w;
