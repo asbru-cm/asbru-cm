@@ -120,22 +120,18 @@ our $VERBOSE        = 0;
 # START: MAIN program
 # Load PACMain now, so it can read the global $CFG_DIR
 print "INFO: $APP_NAME ($Script) started with PID $$\n";
+$ENV{'VERBOSE'} = 0;
 
 foreach my $arg (@ARGV) {
     if ($arg =~ /-{1,2}verbose/) {
         $VERBOSE = 1;
+        $ENV{'VERBOSE'} = 1;
     }
 }
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
-
-foreach my $arg (@ARGV) {
-    if ($arg =~ /-{1,2}verbose/) {
-        $VERBOSE = 1;
-    }
-}
 
 if (($? eq 0) && (!grep(/'asbru'/, $wl))) {
     print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";

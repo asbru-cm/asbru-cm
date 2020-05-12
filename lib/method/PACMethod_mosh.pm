@@ -76,6 +76,7 @@ sub update {
     $$self{gui}{rbPredictAlways}->set_active($$options{predictAlways});
     $$self{gui}{rbPredictNever}->set_active($$options{predictNever});
     $$self{gui}{sbUDPPort}->set_value($$options{udpPort});
+    $$self{gui}{sbUDPPort2}->set_value($$options{udpPort2});
 
     return 1;
 }
@@ -89,6 +90,7 @@ sub get_cfg {
     $options{predictAlways} = $$self{gui}{rbPredictAlways}->get_active;
     $options{predictNever} = $$self{gui}{rbPredictNever}->get_active;
     $options{udpPort} = $$self{gui}{sbUDPPort}->get_chars(0, -1);
+    $options{udpPort2} = $$self{gui}{sbUDPPort2}->get_chars(0, -1);
 
     return _parseOptionsToCfg(\%options);
 }
@@ -106,16 +108,29 @@ sub _parseCfgToOptions {
     $hash{predictAdaptive} = 1;
     $hash{predictAlways} = 0;
     $hash{predictNever} = 0;
-    $hash{udpPort} = 60000;
+    $hash{udpPort}  = 60000;
+    $hash{udpPort2} = 60005;
 
     my @opts = split(/\s+-/, $cmd_line);
     foreach my $opt (@opts) {
-        next unless $opt ne '';
+        if ($opt eq '') {
+            next;
+        }
         $opt =~ s/\s+$//go;
 
-        $opt eq 'a'                and    $hash{predictAlways} = 1;
-        $opt eq 'n'                and    $hash{predictNever} = 1;
-        $opt =~ /p\s+(\d+)/go    and    $hash{udpPort} = $1;
+        if ($opt eq 'a') {
+            $hash{predictAlways} = 1;
+        }
+        if ($opt eq 'n') {
+            $hash{predictNever} = 1;
+        }
+        if ($opt =~ /p\s+(\d+):(\d+)/go) {
+            $hash{udpPort}  = $1;
+            $hash{udpPort2} = $2;
+        } elsif ($opt =~ /p\s+(\d+)/go) {
+            $hash{udpPort} = $1;
+            $hash{udpPort2} = $hash{udpPort}+5;
+        }
     }
 
     return \%hash;
@@ -125,10 +140,18 @@ sub _parseOptionsToCfg {
     my $hash = shift;
 
     my $txt = '';
-
-    $txt .= ' -a'    if $$hash{predictAlways};
-    $txt .= ' -n'    if $$hash{predictNever};
-    (defined $$hash{udpPort}) and $txt .= " -p $$hash{udpPort}";
+    if ($$hash{predictAlways}) {
+        $txt .= ' -a';
+    }
+    if ($$hash{predictNever}) {
+        $txt .= ' -n'
+    }
+    if (defined $$hash{udpPort}) {
+        if (!$$hash{udpPort2} || $$hash{udpPort2} <= $$hash{udpPort}) {
+            $$hash{udpPort2} = $$hash{udpPort}+5;
+        }
+        $txt .= " -p $$hash{udpPort}:$$hash{udpPort2}";
+    }
 
     return $txt;
 }
@@ -148,38 +171,61 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
-        $w{frPredict} = Gtk3::Frame->new(' Select speculative local echo (predictions) model: ');
-        $w{frPredict}->set_tooltip_text('[-(a|n)] : Controls use of speculative local echo (defaults to "adaptive")');
-        $w{vbox}->pack_start($w{frPredict}, 0, 1, 0);
+    $w{frPredict} = Gtk3::Frame->new(' Select speculative local echo (predictions) model: ');
+    $w{frPredict}->set_tooltip_text('[-(a|n)] : Controls use of speculative local echo (defaults to "adaptive")');
+    $w{frPredict}->set_shadow_type('GTK_SHADOW_NONE');
+    $w{vbox}->pack_start($w{frPredict}, 0, 1, 0);
 
-            $w{hboxPredict} = Gtk3::HBox->new(0, 0);
-            $w{frPredict}->add($w{hboxPredict});
+    $w{hboxPredict} = Gtk3::HBox->new(0, 0);
+    $w{frPredict}->add($w{hboxPredict});
 
-                $w{rbPredictAdaptive} = Gtk3::RadioButton->new_with_label(undef, 'Adaptive');
-                $w{hboxPredict}->pack_start($w{'rbPredictAdaptive'}, 0, 1, 0);
+    $w{rbPredictAdaptive} = Gtk3::RadioButton->new_with_label(undef, 'Adaptive');
+    $w{hboxPredict}->pack_start($w{'rbPredictAdaptive'}, 0, 1, 0);
 
-                $w{rbPredictAlways} = Gtk3::RadioButton->new_with_label($w{rbPredictAdaptive}, 'Always');
-                $w{hboxPredict}->pack_start($w{rbPredictAlways}, 0, 1, 0);
+    $w{rbPredictAlways} = Gtk3::RadioButton->new_with_label($w{rbPredictAdaptive}, 'Always');
+    $w{hboxPredict}->pack_start($w{rbPredictAlways}, 0, 1, 0);
 
-                $w{rbPredictNever} = Gtk3::RadioButton->new_with_label($w{rbPredictAdaptive}, 'Never');
-                $w{hboxPredict}->pack_start($w{rbPredictNever}, 0, 1, 0);
+    $w{rbPredictNever} = Gtk3::RadioButton->new_with_label($w{rbPredictAdaptive}, 'Never');
+    $w{hboxPredict}->pack_start($w{rbPredictNever}, 0, 1, 0);
 
-                $w{rbPredictAdaptive}->set_active(1);
+    $w{rbPredictAdaptive}->set_active(1);
 
-        $w{vbox}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
+    $w{vbox}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
 
-        $w{hbUDPPort} = Gtk3::HBox->new(0, 0);
-        $w{vbox}->pack_start($w{hbUDPPort}, 0, 1, 0);
+    $w{hbUDPPort} = Gtk3::HBox->new(0, 0);
+    $w{vbox}->pack_start($w{hbUDPPort}, 0, 1, 0);
 
-            $w{hbUDPPort}->pack_start(Gtk3::Label->new('Server-side UDP Port: '), 0, 1, 0);
-            $w{sbUDPPort} = Gtk3::SpinButton->new(Gtk3::Adjustment->new(60000, 1, 65535, 1, 10, 0), 1, 0);
+    $w{hbUDPPort}->pack_start(Gtk3::Label->new('Server-side UDP Port Start: '), 0, 1, 0);
+    $w{sbUDPPort} = Gtk3::SpinButton->new(Gtk3::Adjustment->new(60000, 1, 65535, 1, 10, 0), 1, 0);
+    $w{hbUDPPort}->pack_start($w{sbUDPPort}, 0, 1, 0);
 
-            $w{hbUDPPort}->pack_start($w{sbUDPPort}, 0, 1, 0);
+    $w{hbUDPPort}->pack_start(Gtk3::Label->new('Server-side UDP Port End: '), 0, 1, 0);
+    $w{sbUDPPort2} = Gtk3::SpinButton->new(Gtk3::Adjustment->new(60005, 1, 65535, 1, 10, 0), 1, 0);
+    $w{hbUDPPort}->pack_start($w{sbUDPPort2}, 0, 1, 0);
 
     $$self{gui} = \%w;
 
     # Avoid the enter of non numeric values in this entry
-    $w{sbUDPPort}->signal_connect('insert_text' => sub {$_[1] =~ s/[^\d]//go; return $_[1], $_[3];});
+    $w{sbUDPPort}->signal_connect('insert_text' => sub {
+        $_[1] =~ s/[^\d]//go;
+        return $_[1], $_[3];
+    });
+    $w{sbUDPPort2}->signal_connect('insert_text' => sub {
+        $_[1] =~ s/[^\d]//go;
+        return $_[1], $_[3];
+    });
+
+    # Do not allow inverse port range or overlap, at least 1 unit difference
+    $w{sbUDPPort}->signal_connect('value-changed' => sub {
+        if ($w{sbUDPPort}->get_chars(0, -1) ge $w{sbUDPPort2}->get_chars(0, -1)) {
+            $w{sbUDPPort2}->set_value(int($w{sbUDPPort}->get_chars(0, -1)) + 1);
+        }
+    });
+    $w{sbUDPPort2}->signal_connect('value-changed' => sub {
+        if ($w{sbUDPPort}->get_chars(0, -1) ge $w{sbUDPPort2}->get_chars(0, -1)) {
+            $w{sbUDPPort}->set_value(int($w{sbUDPPort2}->get_chars(0, -1)) - 1);
+        }
+    });
 
     return 1;
 }

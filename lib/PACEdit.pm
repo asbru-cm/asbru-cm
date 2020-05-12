@@ -223,6 +223,10 @@ sub __checkRBAuth {
     my $self = shift;
 
     if (_($self, 'comboMethod')->get_active_text() =~ /SSH|SFTP/i) {
+        _($self, 'entryCfgJumpConnPass')->set_sensitive(1);
+        _($self, 'entryCfgJumpConnPass')->set_visible(1);
+        _($self, 'lblJumpPass')->set_sensitive(1);
+        _($self, 'lblJumpPass')->set_visible(1);
         if(_($self, 'rbCfgAuthManual')->get_active()) {
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'labelExpect')->set_sensitive(0);
@@ -249,7 +253,12 @@ sub __checkRBAuth {
         _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
+        _($self, 'entryCfgJumpConnPass')->set_sensitive(0);
+        _($self, 'entryCfgJumpConnPass')->set_visible(0);
         _($self, 'vboxCfgManualProxyConn')->set_visible(1);
+        _($self, 'lblJumpPass')->set_sensitive(0);
+        _($self, 'lblJumpPass')->set_visible(0);
+        _($self, 'entryCfgJumpConnPass')->set_text('');
     } else {
         if (_($self, 'rbUseProxyJump')->get_active()) {
             _($self, 'rbUseProxyIfCFG')->set_active(1);
@@ -484,7 +493,7 @@ sub _setupCallbacks {
     });
 
     # Capture right mouse click to show custom context menu
-    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
+    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
 
             return 0 unless $event->button eq 3;
@@ -578,8 +587,12 @@ sub _setupCallbacks {
                 }
             });
 
-            if ($w eq 'IP') {
+            if ($w eq 'IP' || $w =~ /ConnIP/) {
                 $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'url',_($self, "entry$w"),\@menu_items);
+            } elsif ($w =~ /ConnUser/) {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username',_($self, "entry$w"),\@menu_items);
+            } elsif ($w =~ /ConnPass/) {
+                $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'password',_($self, "entry$w"),\@menu_items);
             }
 
             _wPopUpMenu(\@menu_items, $event);
@@ -640,6 +653,8 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
+    _($self, 'entryCfgJumpConnPass')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
+    _($self, 'chkPseudoJumpServer')->set_active($$self{_CFG}{'environments'}{$uuid}{'pseudo jump'} // 0);
     if ((defined $$self{_CFG}{'environments'}{$uuid}{'jump key'})&&($$self{_CFG}{'environments'}{$uuid}{'jump key'} ne '')) {
         _($self, 'entryCfgJumpConnKey')->set_uri("file://$$self{_CFG}{'environments'}{$uuid}{'jump key'}");
     } else {
@@ -812,6 +827,8 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = _($self, 'entryCfgJumpConnIP')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump port'} = _($self, 'entryCfgJumpConnPort')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'jump user'} = _($self, 'entryCfgJumpConnUser')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = _($self, 'entryCfgJumpConnPass')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'pseudo jump'} = _($self, 'chkPseudoJumpServer')->get_active();
     if (_($self, 'rbCfgAuthUserPass')->get_active()) {
         $$self{_CFG}{'environments'}{$uuid}{'auth type'} = 'userpass';
     } elsif (_($self, 'rbCfgAuthPublicKey')->get_active()) {

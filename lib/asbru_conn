@@ -66,7 +66,6 @@ my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
 my $PASSWORD_COUNT = 0;
-my $WAS_ASK_PASS = 0;
 my $SUDO_PASSWORD_COUNT = 0;
 my $USER_COUNT = 0;
 my $HIDE_TERMINAL = 0;
@@ -80,14 +79,18 @@ my $proxy_pass = '';
 my $proxy_cmd = '';
 my $proxy_jump = 0;
 my $proxy_get = '';
+my $JUMP_PASS = 0;
+my $TERM_PASS = 0;
+my $PSEUDO_JUMP = 0;
 
 my @KPXWHERE = ('comment', 'created', 'password', 'title', 'url', 'username');
 
 # Define some ANSI colors
 my %COLOR = (
-    'norm' => "\033[m",    # black
+    'norm' => "\033[m",    # reset
     'log' => "\033[33m",   # yellow
     'recv' => "\033[35m",  # magenta
+    'cyan' => "\033[36m",  # cyan
     'sent' => "\033[0m\033[32m", # green
     'err' => "\033[31m" # red
 );
@@ -209,11 +212,20 @@ if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     $PASS = subst($PASS);
 }
 
+# Translate variables, KeePassXC
 $TITLE = subst($TITLE,'GET_TITLE');
 $IP = subst($IP);
 $PORT = subst($PORT);
 $PASSPHRASE = subst($PASSPHRASE);
 $PASSPHRASE_USER = subst($PASSPHRASE_USER);
+$$CFG{'environments'}{$UUID}{'proxy user'} = subst($$CFG{'environments'}{$UUID}{'proxy user'});
+$$CFG{'environments'}{$UUID}{'proxy pass'} = subst($$CFG{'environments'}{$UUID}{'proxy pass'});
+$$CFG{'environments'}{$UUID}{'jump user'}  = subst($$CFG{'environments'}{$UUID}{'jump user'});
+$$CFG{'environments'}{$UUID}{'jump pass'}  = subst($$CFG{'environments'}{$UUID}{'jump pass'});
+$$CFG{'defaults'}{'jump user'}  = subst($$CFG{'defaults'}{'jump user'});
+$$CFG{'defaults'}{'jump pass'}  = subst($$CFG{'defaults'}{'jump pass'});
+$$CFG{'defaults'}{'proxy user'} = subst($$CFG{'defaults'}{'proxy user'});
+$$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
@@ -882,6 +894,110 @@ sub _getLocalPort {
     return $LPORT;
 }
 
+# We have a jump proxy, we have to figure out which password is being asked: Jump server? Destination?
+
+sub getJumpPassword {
+    my $match = $EXP->match();
+    my $debug = $DEBUG ? $DEBUG : $ENV{'VERBOSE'};
+
+    if ($debug) {
+        print "\n$COLOR{log}",
+        "MATCH   : >$match<\n",
+        "IP      : $IP\n",
+        "JUMP IP : $proxy_ip\n",
+        "DEFAULT  KEY : $$CFG{'defaults'}{'jump key'}\n",
+        "TERMINAL KEY : $$CFG{'environments'}{$UUID}{'jump key'}\n",
+        "$COLOR{'norm'}";
+    }
+
+    if ($$CFG{'environments'}{$UUID}{'use proxy'} == 3 && !$JUMP_PASS) {
+        # Use terminal configuration settings
+        if ($$CFG{'environments'}{$UUID}{'jump key'} && $match =~ /$$CFG{'environments'}{$UUID}{'jump key'}/) {
+            $JUMP_PASS++;
+            if ($proxy_pass) {
+                if ($debug) {
+                    print "$COLOR{cyan}TRY JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+                }
+                return $proxy_pass;
+            }
+            if ($debug) {
+                print "$COLOR{recv}* ASK JUMP UUID PASSPRHASE$COLOR{'norm'}\n";
+            }
+            return askPassword();
+        }
+    } elsif ($$CFG{'environments'}{$UUID}{'use proxy'} == 0 && $$CFG{'defaults'}{'proxy'} eq 'Jump' && !$JUMP_PASS) {
+        # Use global configuration settings
+        if ($$CFG{'defaults'}{'jump key'} && $match =~ /$$CFG{'defaults'}{'jump key'}/) {
+            $JUMP_PASS++;
+            if ($proxy_pass) {
+                if ($debug) {
+                    print "$COLOR{cyan}TRY JUMP DEFAULT PASSPHRASE OK!$COLOR{'norm'}\n";
+                }
+                return $proxy_pass;
+            }
+            if ($debug) {
+                print "$COLOR{recv}* ASK JUMP DEFAULT PASSPRHASE$COLOR{'norm'}\n";
+            }
+            return askPassword();
+        }
+    } elsif ($AUTH eq 'publickey' && $PUBKEY && $match =~ /$PUBKEY/ && $TERM_PASS<2) {
+        $TERM_PASS++;
+        if ($PASSPHRASE) {
+            if ($debug) {
+                print "$COLOR{cyan}TRY TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+            }
+            return $PASSPHRASE;
+        }
+        if ($debug) {
+            print "$COLOR{recv}* ASK TERMINAL PASSPHRASE ($TERM_PASS)$COLOR{'norm'}\n";
+        }
+        return askPassword();
+    }
+    if ($debug) {
+        print "$COLOR{log}",
+        "JUMP PASS? $JUMP_PASS\n",
+        "TERM PASS? $TERM_PASS",
+        "$COLOR{'norm'}\n";
+    }
+    if (!$JUMP_PASS && $proxy_pass) {
+        if ($debug) {
+            print "$COLOR{cyan}TRY DEFAULT JUMP$COLOR{'norm'}\n";
+        }
+        $JUMP_PASS++;
+        return $proxy_pass;
+    }
+    $JUMP_PASS++;
+    if (!$TERM_PASS) {
+        # Try a terminal password, maybe the jump server is alrealy logged in
+        $TERM_PASS++;
+        if ($AUTH eq 'publickey' && $PASSPHRASE) {
+            if ($debug) {
+                print "$COLOR{cyan}TRY DESTINATION PASSPHRASE$COLOR{'norm'}\n";
+            }
+            return $PASSPHRASE;
+        } elsif ($AUTH eq 'userpass' && $PASS && $PASS ne '<<ASK_PASS>>') {
+            if ($debug) {
+                print "$COLOR{cyan}TRY DESTINATION PASSWORD$COLOR{'norm'}\n";
+            }
+            return $PASS;
+        }
+    }
+    if ($debug) {
+        print "$COLOR{recv}* ASK PASSWORD$COLOR{'norm'}\n";
+    }
+    # Extract the last line and use it is as prompt for the request password dialog
+    return askPassword();
+}
+
+sub askPassword {
+    my @before;
+
+    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
+    ctrl("PASSWORD:Asking user for password...");
+    my $p = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+    return $p;
+}
+
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
@@ -918,6 +1034,7 @@ BEGIN{
 
 # Choose and prepare the connection method
 my $connection_cmd = '';
+my $connection_cmd2 = '';
 my $connection_txt = '';
 
 if (defined $METHOD) {
@@ -938,24 +1055,27 @@ if (defined $METHOD) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
         if ($proxy_jump) {
-            $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
+            if ($$CFG{'environments'}{$UUID}{'pseudo jump'}) {
+                # Pseudo jump, connect to the first server and then we will send the second connection command over the second server
+                $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS jumpserver";
+                $connection_cmd2 = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
+            } else {
+                $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
+            }
         } else {
             $connection_cmd = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
         }
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*mosh.*$/) || ($METHOD eq 'MOSH')) {
-        $METHOD = 'mosh';
-        if ($PORT != 22) {
-            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
-        }
         my $key = '';
+        $METHOD = 'mosh';
         if ($AUTH eq 'publickey') {
-            $key = ($PUBKEY ? "-i \"$PUBKEY\"" : "") . ($AUTHFALLBACK ? '' : ' -o "PreferredAuthentications=publickey"');
+            $key = $PUBKEY ? "-i '$PUBKEY'" : '';
             $USER = $PASSPHRASE_USER;
             $PASS = $PASSPHRASE;
-            $CONNECT_OPTS = " --ssh=\"ssh -p $PORT $key\"";
-        } elsif (! $AUTHFALLBACK) {
-            $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
+            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT $key\"";
+        } elsif ($PORT != 22) {
+            $CONNECT_OPTS .= " --ssh=\"ssh -p $PORT\"";
         }
         $connection_cmd = "$METHOD $CONNECT_OPTS ${USER}\@$IP";
         $connection_txt = $connection_cmd;
@@ -1560,36 +1680,39 @@ elsif (!$MANUAL) {
 
         # Found password/passphrase string
         [$PASSWORD_PROMPT, sub {
-
-        # A few attempts...
+            # A few attempts...
             if ($PASSWORD_COUNT < 6) {
-                $PASSWORD_COUNT++;
-                $WAS_ASK_PASS = 0;
+                my $password = '';
+                my @before = split /\n/, $EXP->before;
 
-                if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
-                    my @before = split /\n/, $EXP->before;
-                    # Extract the last line and use it is as prompt for the request password dialog
-                    my $real_prompt = (scalar @before > 0 ? $before[-1] : '') . $EXP->match();
-                    $WAS_ASK_PASS = 1;
-                    ctrl("PASSWORD:Asking user for password...");
-                    $PASS = wEnterValue('<b>Manual Password requested</b>', $real_prompt, '', 0);
+                $PASSWORD_COUNT++;
+                if ($proxy_jump) {
+                    # get the next password
+                    $password = getJumpPassword();
+                } else {
+                    if ((!$PASS) || ($PASS eq '<<ASK_PASS>>')) {
+                        $password = askPassword();
+                    } else {
+                        $password = $PASS;
+                    }
                 }
-                if (defined $PASS) {
+                if ($password) {
                     $EXP->log_stdout(0);
-                    $PASS = subst($PASS);
-                    send_slow($EXP, "$PASS\n", 'hide');
+                    $password = subst($password);
+                    send_slow($EXP, "$password\n", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
-                    # Next time we will ask the password since the automatic one did not work
-                    $PASS = '<<ASK_PASS>>';
+                    if (!$proxy_jump) {
+                        # Next time we will ask the password since the automatic one did not work
+                        $PASS = '<<ASK_PASS>>';
+                    }
                     exp_continue();
                 } else {
                     ctrl("CLOSE:PASSWORD:Password input cancelled by user");
                     _hardClose($EXP, $UUID);
                 }
-            }
-            # ... too many password attempts: provided password is no longer valid!!
-            else {
+            } else {
+                # ... too many password attempts: provided password is no longer valid!!
                 ctrl("CLOSE:PASSWORD:Provided username/password '$USER/<<hidden_password>>' was rejected");
                 _hardClose($EXP, $UUID);
             }
@@ -1598,136 +1721,149 @@ elsif (!$MANUAL) {
         # Found user prompt
         [$COMMAND_PROMPT, sub {
             $CONNECTED = 1;
-            my $avoid_first_expectation = 1;
 
-            # Do we have to do complex expects?
-            if (!$EXPECT || !$CONNECTED) {
-                return 1;
-            }
+            if ($connection_cmd2) {
+                # Pseudo Jump Server
+                send_slow($EXP, "$connection_cmd2\n");
+                $connection_cmd2 = '';
+                $PSEUDO_JUMP = 1;
+                $EXP->clear_accum();
+                exp_continue();
+            } elsif ($PSEUDO_JUMP && $EXP->before() =~ /\x1B$/) {
+                # On pseudo jumps, the strings come with terminal escape sequences that match the user prompt regex
+                $EXP->clear_accum();
+                exp_continue();
+            } else {
+                my $avoid_first_expectation = 1;
 
-            $EXP->restart_timeout_upon_receive(1);
-            for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
-                my $hash = $$CFG{'environments'}{$UUID}{'expect'}[$i];
-                my $pattern = $$hash{'expect'} // '';
-                my $command = $$hash{'send'} // '';
-                my $hide = $$hash{'hidden'} // 0;
-                my $active = $$hash{'active'} // 0;
-                my $return = $$hash{'return'} // 1;
-                my $on_match = $$hash{'on_match'} // -1;
-                my $on_fail = $$hash{'on_fail'} // -1;
-                my $time_out = $$hash{'time_out'} // -1;
-
-                if (!$active) {
-                    next;
+                # Do we have to do complex expects?
+                if (!$EXPECT || !$CONNECTED) {
+                    return 1;
                 }
 
-                my $jump = 0;
+                $EXP->restart_timeout_upon_receive(1);
+                for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
+                    my $hash = $$CFG{'environments'}{$UUID}{'expect'}[$i];
+                    my $pattern = $$hash{'expect'} // '';
+                    my $command = $$hash{'send'} // '';
+                    my $hide = $$hash{'hidden'} // 0;
+                    my $active = $$hash{'active'} // 0;
+                    my $return = $$hash{'return'} // 1;
+                    my $on_match = $$hash{'on_match'} // -1;
+                    my $on_fail = $$hash{'on_fail'} // -1;
+                    my $time_out = $$hash{'time_out'} // -1;
 
-                if ($time_out >= 0) {
-                    $TIMEOUT_CMD = $time_out;
-                }
-                $pattern = subst($pattern);
+                    if (!$active) {
+                        next;
+                    }
 
-                ctrl("EXPECT:WAITING:$pattern");
+                    my $jump = 0;
 
-                # Wait for pattern prompt before continue...
-                $EXP->expect($TIMEOUT_CMD,
+                    if ($time_out >= 0) {
+                        $TIMEOUT_CMD = $time_out;
+                    }
+                    $pattern = subst($pattern);
 
-                    [timeout => sub {
-                        if ($on_fail == -1) {
-                            ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
+                    ctrl("EXPECT:WAITING:$pattern");
+
+                    # Wait for pattern prompt before continue...
+                    $EXP->expect($TIMEOUT_CMD,
+
+                        [timeout => sub {
+                            if ($on_fail == -1) {
+                                ctrl("CLOSE:TIMEOUT:$TIMEOUT_CMD seconds expecting pattern '$pattern'!!");
+                                $CONNECTED = 0;
+                                _hardClose($EXP, $UUID);
+                            } elsif ($on_fail == -2) {
+                                ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
+                                $CONNECTED = 1;
+                                $end = 1;
+                            } else {
+                                ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
+                                $i = --$on_fail;
+                                $jump = 1;
+                            }
+                        }],
+
+                        [eof => sub {
                             $CONNECTED = 0;
+                            ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
                             _hardClose($EXP, $UUID);
-                        } elsif ($on_fail == -2) {
-                            ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Finishing Expect");
-                            $CONNECTED = 1;
-                            $end = 1;
-                        } else {
-                            ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
-                            $i = --$on_fail;
-                            $jump = 1;
-                        }
-                    }],
+                        }],
 
-                    [eof => sub {
+                        # Found Host-Key verification string
+                        [$HOSTCHANGE_PROMPT, sub {
+
+                            my $match = $EXP->match();
+                            $match =~ /$HOSTCHANGE_PROMPT/g;
+                            my ($yes, $no) = ($1, $2);
+                            if ($ACCEPT_KEY) {
+                                send_slow($EXP, "$yes\n");
+                                ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
+                                exp_continue();
+                            } else {
+                                send_slow($EXP, "$no\n");
+                                $CONNECTED = 0;
+                                _hardClose($EXP, $UUID);
+                                ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
+                            }
+                        }],
+
+                        [($avoid_first_expectation) ? '' : $pattern, sub {
+                            if ($on_match == -1) {
+                                $jump = 0;
+                            } elsif ($on_match == -2) {
+                                $end = 1;
+                                $CONNECTED = 1;
+                                ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Stopping by config");
+                            } else {
+                                ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
+                                $avoid_first_expectation = 1;
+                                $i = --$on_match;
+                            }
+                        }]
+                    );
+                    if ($end) {
+                        last;
+                    }
+                    if ($jump) {
+                        next;
+                    }
+                    $avoid_first_expectation = 0;
+                    if (!$CONNECTED) {
+                        last;
+                    }
+
+                    $command = subst($command);
+
+                    # Disconnect if an error occured during command substitution (eg: when user cancelled data entry)
+                    if (not defined($command)) {
                         $CONNECTED = 0;
-                        ctrl("CLOSE:Connection ended by remote peer!! " . $EXP->set_accum());
-                        _hardClose($EXP, $UUID);
-                    }],
+                        last;
+                    }
 
-                    # Found Host-Key verification string
-                    [$HOSTCHANGE_PROMPT, sub {
+                    # otherwise launch command
+                    if ($hide) {
+                        ctrl("EXPECT:SENDING:<<HIDDEN STRING>>" . ($return ? '\n' : ''));
+                        $EXP->log_stdout(0);
+                    } else {
+                        my $cmd_str = $command;
+                        $cmd_str =~ s/\n$//go;
+                        ctrl("EXPECT:SENDING:$cmd_str" . ($return ? '\n' : ''));
+                    }
 
-                        my $match = $EXP->match();
-                        $match =~ /$HOSTCHANGE_PROMPT/g;
-                        my ($yes, $no) = ($1, $2);
-                        if ($ACCEPT_KEY) {
-                            send_slow($EXP, "$yes\n");
-                            ctrl("EXPECT:HOSTKEY:accepted by configuration (sent '$yes')");
-                            exp_continue();
-                        } else {
-                            send_slow($EXP, "$no\n");
-                            $CONNECTED = 0;
-                            _hardClose($EXP, $UUID);
-                            ctrl("CLOSE:EXPECT:HOSTKEY:rejected by configuration (sent '$no')");
-                        }
-                    }],
+                    send_slow($EXP, $command);
+                    if ($return) {
+                        send_slow($EXP, "\n");
+                    }
 
-                    [($avoid_first_expectation) ? '' : $pattern, sub {
-                        if ($on_match == -1) {
-                            $jump = 0;
-                        } elsif ($on_match == -2) {
-                            $end = 1;
-                            $CONNECTED = 1;
-                            ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Stopping by config");
-                        } else {
-                            ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
-                            $avoid_first_expectation = 1;
-                            $i = --$on_match;
-                        }
-                    }]
-                );
-                if ($end) {
-                    last;
-                }
-                if ($jump) {
-                    next;
-                }
-                $avoid_first_expectation = 0;
-                if (!$CONNECTED) {
-                    last;
+                    if ($hide) {
+                        $EXP->log_stdout(1);
+                    }
                 }
 
-                $command = subst($command);
-
-                # Disconnect if an error occured during command substitution (eg: when user cancelled data entry)
-                if (not defined($command)) {
-                    $CONNECTED = 0;
-                    last;
-                }
-
-                # otherwise launch command
-                if ($hide) {
-                    ctrl("EXPECT:SENDING:<<HIDDEN STRING>>" . ($return ? '\n' : ''));
-                    $EXP->log_stdout(0);
-                } else {
-                    my $cmd_str = $command;
-                    $cmd_str =~ s/\n$//go;
-                    ctrl("EXPECT:SENDING:$cmd_str" . ($return ? '\n' : ''));
-                }
-
-                send_slow($EXP, $command);
-                if ($return) {
-                    send_slow($EXP, "\n");
-                }
-
-                if ($hide) {
-                    $EXP->log_stdout(1);
-                }
+                $EXP->restart_timeout_upon_receive(0);
             }
-
-            $EXP->restart_timeout_upon_receive(0);
-
         }],
 
     ); # EXPECT CLOSE
