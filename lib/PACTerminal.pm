@@ -1137,7 +1137,8 @@ sub _setupCallbacks {
                 $handled_by_vte = $$self{_GUI}{_VTE}->event($event);
                 $right_click_deep = 0;
             }
-            if (! $handled_by_vte) {
+            if (!$handled_by_vte) {
+                $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
                 $self->_vteMenu($event);
             }
             return 1;  # One way or another, we've handled it.
