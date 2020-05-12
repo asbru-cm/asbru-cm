@@ -379,8 +379,8 @@ sub _initCFG {
     $$cfg{'treeConnections'}{'Alt+f'}  = ['Connections Tree','add_favourite','Add connection to favourites'];
     $$cfg{'treeConnections'}{'Alt+F'}  = ['Connections Tree','del_favourite','Remove connection from favourites'];
     $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree','find','Find in connection tree'];
-    $$cfg{'treeConnections'}{'Ctrl+R'} = ['Connections Tree','expand_all','Expand tree completly'];
-    $$cfg{'treeConnections'}{'Ctrl+T'} = ['Connections Tree','collaps_all','Collaps tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree','expand_all','Expand tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree','collaps_all','Collaps tree completly'];
     $$cfg{'treeConnections'}{'Ctrl+d'} = ['Connections Tree','clone','Clone connection'];
     $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree','copy','Copy node'];
     $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree','cut','Cut node'];
@@ -394,7 +394,7 @@ sub _initCFG {
     $$cfg{'pactabs'}{'undef-infotab'}  = ['Tabs','infotab','Got to Info Tab'];
     $$cfg{'pacmain'}{'Ctrl+f'}         = ['Main Window','find','Find in connection tree'];
     $$cfg{'pacmain'}{'Ctrl+q'}         = ['Main Window','quit','Exit Ásbrú'];
-    $$cfg{'pacmain'}{'Ctrl+t'}         = ['Main Window','localshell','Open a local shell'];
+    $$cfg{'pacmain'}{'Ctrl+T'}         = ['Main Window','localshell','Open a local shell'];
     $$cfg{'terminal'}{'F11'}           = ['Terminal','fullscreen','Go full screen'];
     $$cfg{'terminal'}{'Ctrl+Return'}   = ['Terminal','start','Start Terminal'];
     $$cfg{'terminal'}{'AltCtrl+x'}     = ['Terminal','reset','Reset Terminal'];
