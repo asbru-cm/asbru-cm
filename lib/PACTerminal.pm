@@ -1002,9 +1002,12 @@ sub _setupCallbacks {
 
         if (!$action) {
             return 0;
+        } elsif ($action eq 'Return' && !$$self{CONNECTED} && !$$self{CONNECTING}) {
+            # Only consider "RETURN" if disconnected ; otherwise do not consider it as an action
+            $self->start();
         } elsif ($action eq 'start') {
-            if (!$$self{CONNECTED} && ! $$self{CONNECTING}) {
-                $self->start;
+            if (!$$self{CONNECTED} && !$$self{CONNECTING}) {
+                $self->start();
             }
         } elsif ($action eq 'fullscreen') {
             if ($$self{_FULLSCREEN}) {
@@ -1045,7 +1048,7 @@ sub _setupCallbacks {
             $text =~ s/$delete//g;
             $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
         } elsif ($action eq 'hostname') {
-            ($$self{CONNECTED} && ! $$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
+            ($$self{CONNECTED} && !$$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
         } elsif ($action eq 'close') {
             $self->stop(undef, 1);
         } elsif ($action eq 'quit') {
@@ -1062,7 +1065,11 @@ sub _setupCallbacks {
             my $terminals = $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);
             $$self{_NOTEBOOK}->reorder_child ($$terminals[0]->{_GUI}{_VBOX}, $$self{_NOTEBOOK}->page_num($$self{_GUI}{_VBOX}) + 1);
         } elsif ($action eq 'restart') {
-            $self->_disconnectAndRestartTerminal();
+            if ($$self{CONNECTED} || $$self{CONNECTING}) {
+                $self->_disconnectAndRestartTerminal();
+            } else {
+                $self->start();
+            }
         } elsif ($action eq 'infotab') {
             $self->_showInfoTab();
         } elsif ($action eq 'find-terminal') {

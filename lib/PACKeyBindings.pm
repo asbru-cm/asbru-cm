@@ -115,10 +115,9 @@ sub GetKeyMask {
 }
 
 sub GetAction {
-    my ($self,$window, $widget, $event, $uuid) = @_;
+    my ($self, $window, $widget, $event, $uuid) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
-    my @tests = ();
 
     if (!$window) {
         return wantarray ? (0,'') : '';
@@ -411,10 +410,10 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+q'}        = ['Terminal','quit','Exit Ásbrú'];
     $$cfg{'terminal'}{'Ctrl+f'}        = ['Terminal','find','Find in connection tree'];
     $$cfg{'terminal'}{'F4'}            = ['Terminal','closealltabs','Close all tabs'];
-    $$cfg{'terminal'}{'Ctrl+n'}        = ['Terminal','close-disconected','Close disconnected sessions'];
-    $$cfg{'terminal'}{'Ctrl+d'}        = ['Terminal','duplicate','Duplicate connection'];
-    $$cfg{'terminal'}{'Ctrl+r'}        = ['Terminal','restart','Restart connection (close and start)'];
-    $$cfg{'terminal'}{'Ctrl+i'}        = ['Terminal','infotab','Show the Info tab'];
+    $$cfg{'terminal'}{'Ctrl+N'}        = ['Terminal','close-disconected','Close disconnected sessions'];
+    $$cfg{'terminal'}{'Ctrl+D'}        = ['Terminal','duplicate','Duplicate connection'];
+    $$cfg{'terminal'}{'Ctrl+R'}        = ['Terminal','restart','Restart connection (close and start)'];
+    $$cfg{'terminal'}{'Ctrl+I'}        = ['Terminal','infotab','Show the Info tab'];
     $$cfg{'terminal'}{'Ctrl+F3'}       = ['Terminal','find-terminal','Find Terminal'];
     $$cfg{'terminal'}{'Alt+n'}         = ['Terminal','showconnections','Show connections list'];
     $$cfg{'terminal'}{'Alt+e'}         = ['Terminal','edit_node','Edit Connection'];
