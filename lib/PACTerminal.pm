@@ -1049,7 +1049,7 @@ sub _setupCallbacks {
             $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
         } elsif ($action eq 'hostname') {
             ($$self{CONNECTED} && !$$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
-        } elsif ($action eq 'close') {
+        } elsif ($action eq 'close' && !$$self{_TABBED}) {
             $self->stop(undef, 1);
         } elsif ($action eq 'quit') {
             $PACMain::FUNCS{_MAIN}->_quitProgram;
