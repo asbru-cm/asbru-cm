@@ -1021,12 +1021,9 @@ sub _hardClose {
 }
 
 sub logTime {
-    my $txt = _removeEscapeSeqs($_[0]);
     my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
-    #print LOG ">$_[0]<\n";
-    #print LOG "[$txt]\n";
-    print LOG "$t : $txt";
-    if ($txt !~ /\n|\r$/) {
+    print LOG "$t : $_[0]";
+    if ($_[0] !~ /\n|\r$/) {
         print LOG "\n";
     }
 }
@@ -1293,8 +1290,12 @@ if ($GETCMD) {
 # Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
 
 if (open(LOG,">:raw",$LOG_FILE)) {
-    #$EXP->log_file($LOG_FILE);
-    $EXP->log_file(\&logTime);
+    if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+        $EXP->log_file(\&logTime);
+    } else {
+        close LOG;
+        $EXP->log_file($LOG_FILE);
+    }
 } else {
     print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
@@ -2179,9 +2180,9 @@ exit 0;
 sub close_log_file {
     my $line;
 
-    close LOG;
-    return 1;
-
+    if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+        close LOG;
+    }
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
     }
@@ -2195,7 +2196,14 @@ sub close_log_file {
         return 1;
     }
     while ($line = <FIN>) {
-        print FOUT _removeEscapeSeqs($line);
+        my $l = _removeEscapeSeqs($line);
+        if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+            while ($l =~ s/^(\D.+?)\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /$1/) {}
+            if ($l !~ /^\d{3,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /) {
+                print FOUT ' 'x22;
+            }
+        }
+        print FOUT $l;
     }
     close FIN;
     close FOUT;
