@@ -42,6 +42,7 @@ use IO::Socket::INET;
 use Encode;
 use PACKeePass;
 use PACUtils;
+use POSIX qw(strftime);
 
 use Gtk3 '-init';
 
@@ -1019,6 +1020,17 @@ sub _hardClose {
     return 0;
 }
 
+sub logTime {
+    my $txt = _removeEscapeSeqs($_[0]);
+    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
+    #print LOG ">$_[0]<\n";
+    #print LOG "[$txt]\n";
+    print LOG "$t : $txt";
+    if ($txt !~ /\n|\r$/) {
+        print LOG "\n";
+    }
+}
+
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
@@ -1279,9 +1291,10 @@ if ($GETCMD) {
 
 # Set log file
 # Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
-if (open(TEST,">",$LOG_FILE)) {
-    close TEST;
-    $EXP->log_file($LOG_FILE);
+
+if (open(LOG,">:raw",$LOG_FILE)) {
+    #$EXP->log_file($LOG_FILE);
+    $EXP->log_file(\&logTime);
 } else {
     print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
@@ -2165,6 +2178,9 @@ exit 0;
 
 sub close_log_file {
     my $line;
+
+    close LOG;
+    return 1;
 
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
