@@ -220,12 +220,16 @@ $IP = subst($IP);
 $PORT = subst($PORT);
 $PASSPHRASE = subst($PASSPHRASE);
 $PASSPHRASE_USER = subst($PASSPHRASE_USER);
+$$CFG{'environments'}{$UUID}{'proxy ip'}   = subst($$CFG{'environments'}{$UUID}{'proxy ip'});
 $$CFG{'environments'}{$UUID}{'proxy user'} = subst($$CFG{'environments'}{$UUID}{'proxy user'});
 $$CFG{'environments'}{$UUID}{'proxy pass'} = subst($$CFG{'environments'}{$UUID}{'proxy pass'});
+$$CFG{'environments'}{$UUID}{'jump ip'}    = subst($$CFG{'environments'}{$UUID}{'jump ip'});
 $$CFG{'environments'}{$UUID}{'jump user'}  = subst($$CFG{'environments'}{$UUID}{'jump user'});
 $$CFG{'environments'}{$UUID}{'jump pass'}  = subst($$CFG{'environments'}{$UUID}{'jump pass'});
+$$CFG{'defaults'}{'jump ip'}    = subst($$CFG{'defaults'}{'jump ip'});
 $$CFG{'defaults'}{'jump user'}  = subst($$CFG{'defaults'}{'jump user'});
 $$CFG{'defaults'}{'jump pass'}  = subst($$CFG{'defaults'}{'jump pass'});
+$$CFG{'defaults'}{'proxy ip'}   = subst($$CFG{'defaults'}{'proxy ip'});
 $$CFG{'defaults'}{'proxy user'} = subst($$CFG{'defaults'}{'proxy user'});
 $$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 
