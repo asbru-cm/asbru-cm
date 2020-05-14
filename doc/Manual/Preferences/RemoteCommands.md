@@ -12,10 +12,11 @@ To add a new remote command to the list, click on the "Add" Button.
 + __Command__ : The command to be executed. It can contain global variables in it.
 + __Send `<INTRO>` at the end__ : Will send or not a \n at the end of the command string. Uncheck if your command requires you to type some extra information before sending the `<Enter>` key.
 + __Description__ : The name that will be displayed in the pop up menu.
-    - Description has a pattern that you can use to group common commands. The patterns is `Group:Name`
+    - Description has a pattern that you can use to group common commands. The patterns is `Group:Name` (version 6.2+)
     - Descriptions with "no" group. Will be shown after all grouped commands.
     - If you omit giving a Description to your command, the command will become the description.
     - All commands are sorted alphabetically by Description.
+- __Set Keybinding__  : Click in the field and type a key combination to assign a hot key to your command. This hot key will be available in a terminal (version 6.3+) 
 
 ## Execution
 
