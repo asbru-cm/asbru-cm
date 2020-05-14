@@ -54,13 +54,13 @@ deploy:
       tags: true
   - provider: packagecloud
     skip_cleanup: true
-    repository: loki
+    repository: v6.1
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
-      branch: loki
+      branch: legacy/6.1
 
 
 after_deploy:
