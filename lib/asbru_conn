@@ -178,6 +178,7 @@ my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
+my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
@@ -1290,7 +1291,7 @@ if ($GETCMD) {
 # Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
 
 if (open(LOG,">:raw",$LOG_FILE)) {
-    if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+    if ($LOG_TIMESTAMP) {
         $EXP->log_file(\&logTime);
     } else {
         close LOG;
@@ -2180,7 +2181,7 @@ exit 0;
 sub close_log_file {
     my $line;
 
-    if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+    if ($LOG_TIMESTAMP) {
         close LOG;
     }
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
@@ -2197,7 +2198,7 @@ sub close_log_file {
     }
     while ($line = <FIN>) {
         my $l = _removeEscapeSeqs($line);
-        if ($$CFG{'environments'}{$UUID}{'log timestamp'}) {
+        if ($LOG_TIMESTAMP) {
             while ($l =~ s/^(\D.+?)\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /$1/) {}
             if ($l !~ /^\d{3,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /) {
                 print FOUT ' 'x22;
