@@ -120,7 +120,7 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 
 our %RUNNING;
 our %FUNCS;
-my @SELECTED_UIDS;
+my @SELECTED_UUIDS;
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -1666,7 +1666,7 @@ sub _setupCallbacks {
     $$self{_GUI}{treeConnections}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
         if ($event->button eq 3) {
-            if (@SELECTED_UIDS && $#SELECTED_UIDS>0) {
+            if (@SELECTED_UUIDS && $#SELECTED_UUIDS>0) {
                 # There are selected rows, abort reselecting
                 return 1;
             }
@@ -1679,12 +1679,12 @@ sub _setupCallbacks {
 
         if ($event->button ne 3) {
             # Load selected rows from left click
-            @SELECTED_UIDS = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
+            @SELECTED_UUIDS = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
             return 0;
         }
-        if (!@SELECTED_UIDS || $#SELECTED_UIDS<1) {
+        if (!@SELECTED_UUIDS || $#SELECTED_UUIDS<1) {
             # There is only one selected element, is obsolete, selecte the current one
-            @SELECTED_UIDS = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
+            @SELECTED_UUIDS = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         }
         $self->_treeConnections_menu($event);
         return 1;
@@ -2657,7 +2657,7 @@ sub _treeConnections_menu {
     my $p = '';
     my $clip = scalar (keys %{$$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'}});
 
-    my @sel = @SELECTED_UIDS;
+    my @sel = @SELECTED_UUIDS;
     if (scalar(@sel) == 0) {
         return 1;
     } elsif ((scalar(@sel)>1)||($clip > 1)) {
