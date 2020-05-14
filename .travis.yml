@@ -36,15 +36,6 @@ script:
 deploy:
   - provider: packagecloud
     skip_cleanup: true
-    repository: snapshots
-    username: ${PACKAGECLOUD_USER}
-    token: ${PACKAGECLOUD_TOKEN}
-    dist: ${OS}/${DIST}
-    package_glob: "build/*.{deb,rpm,dsc}"
-    on:
-      branch: master
-  - provider: packagecloud
-    skip_cleanup: true
     repository: asbru-cm
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
@@ -54,7 +45,7 @@ deploy:
       tags: true
   - provider: packagecloud
     skip_cleanup: true
-    repository: v6.1
+    repository: legacy
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
     dist: ${OS}/${DIST}
