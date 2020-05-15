@@ -701,6 +701,7 @@ sub _updateGUIPreferences {
     _($self, 'cbAutossh')->set_active($$self{_CFG}{'environments'}{$uuid}{'autossh'} // 0);
     _($self, 'entryUUID')->set_text($uuid);
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
+    _($self, 'cbCfgLogTimestamp')->set_active($$self{_CFG}{'environments'}{$uuid}{'log timestamp'});
 
     # Populate 'comboStartScript' combobox
     _($self, 'comboStartScript')->remove_all();
@@ -877,6 +878,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'startup script name'} = _($self, 'comboStartScript')->get_active_text;
     $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
+    $$self{_CFG}{'environments'}{$uuid}{'log timestamp'} = _($self, 'cbCfgLogTimestamp')->get_active;
 
     ##################
     # Other options...

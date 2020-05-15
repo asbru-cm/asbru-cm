@@ -1468,15 +1468,100 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="can_focus">False</property>
                                         <property name="orientation">vertical</property>
                                         <child>
+                                          <object class="GtkBox">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_left">20</property>
+                                            <child>
+                                              <object class="GtkCheckButton" id="cbCfgRemoveCtrlChars">
+                                                <property name="label" translatable="yes">Remove CONTROL characters. </property>
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="xalign">0</property>
+                                                <property name="draw_indicator">True</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkCheckButton" id="cbCfgLogTimestamp">
+                                                <property name="label" translatable="yes">Add timestamp</property>
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="margin_left">20</property>
+                                                <property name="xalign">0</property>
+                                                <property name="draw_indicator">True</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label99">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="has_tooltip">True</property>
+                                                <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
+                                                <property name="label" translatable="yes"> Files to save (0=infinite): </property>
+                                                <property name="xalign">1</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">True</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">2</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkSpinButton" id="spEditSaveSessionLogs">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="has_tooltip">True</property>
+                                                <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
+                                                <property name="invisible_char">•</property>
+                                                <property name="text" translatable="yes">0</property>
+                                                <property name="primary_icon_activatable">False</property>
+                                                <property name="secondary_icon_activatable">False</property>
+                                                <property name="adjustment">adjFileSave</property>
+                                                <property name="numeric">True</property>
+                                                <property name="update_policy">if-valid</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="pack_type">end</property>
+                                                <property name="position">3</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">False</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
                                           <object class="GtkBox" id="hboxEditSaveSessionLogs">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
+                                            <property name="margin_left">20</property>
                                             <property name="border_width">2</property>
                                             <child>
                                               <object class="GtkLabel" id="label97">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Save in: </property>
+                                                <property name="margin_right">9</property>
+                                                <property name="label" translatable="yes">Save in</property>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -1489,6 +1574,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="focus_on_click">False</property>
+                                                <property name="margin_right">5</property>
                                                 <property name="action">select-folder</property>
                                                 <property name="title" translatable="yes">Choose a folder for saving log files</property>
                                               </object>
@@ -1541,62 +1627,11 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="position">2</property>
                                               </packing>
                                             </child>
-                                            <child>
-                                              <object class="GtkCheckButton" id="cbCfgRemoveCtrlChars">
-                                                <property name="label" translatable="yes">Remove CONTROL characters. </property>
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">False</property>
-                                                <property name="halign">start</property>
-                                                <property name="xalign">0.5</property>
-                                                <property name="draw_indicator">True</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">3</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel" id="label99">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="has_tooltip">True</property>
-                                                <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
-                                                <property name="label" translatable="yes"> Files to save (0=infinite): </property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">4</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkSpinButton" id="spEditSaveSessionLogs">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="has_tooltip">True</property>
-                                                <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
-                                                <property name="invisible_char">•</property>
-                                                <property name="text" translatable="yes">0</property>
-                                                <property name="primary_icon_activatable">False</property>
-                                                <property name="secondary_icon_activatable">False</property>
-                                                <property name="adjustment">adjFileSave</property>
-                                                <property name="numeric">True</property>
-                                                <property name="update_policy">if-valid</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">5</property>
-                                              </packing>
-                                            </child>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">0</property>
+                                            <property name="position">1</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1608,6 +1643,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                               <object class="GtkLabel" id="lblEditLogFileName1">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
+                                                <property name="margin_left">20</property>
                                                 <property name="label" translatable="yes">Logfile name pattern: </property>
                                               </object>
                                               <packing>
@@ -1652,7 +1688,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">1</property>
+                                            <property name="position">2</property>
                                           </packing>
                                         </child>
                                       </object>
@@ -1682,6 +1718,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <object class="GtkBox" id="hbox62">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="margin_top">6</property>
                                 <property name="margin_bottom">6</property>
                                 <child>
                                   <object class="GtkLabel" id="lblUUID">
@@ -5731,9 +5768,91 @@ sudo -p sudo_prompt_string ...</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="margin_left">20</property>
+                                    <child>
+                                      <object class="GtkCheckButton" id="cbCfgRemoveCtrlCharsConf">
+                                        <property name="label" translatable="yes">Remove CONTROL characters. </property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="cbCfgLogTimestam">
+                                        <property name="label" translatable="yes">Add timestamp</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="margin_left">20</property>
+                                        <property name="xalign">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label30">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
+                                        <property name="halign">end</property>
+                                        <property name="label" translatable="yes"> Files to save </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSpinButton" id="spCfgSaveSessionLogs">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="text" translatable="yes">0</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">adjustment11</property>
+                                        <property name="numeric">True</property>
+                                        <property name="update_policy">if-valid</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="pack_type">end</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
                                   <object class="GtkBox" id="hboxCfgSaveSessionLogsasdf">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="margin_left">20</property>
                                     <child>
                                       <object class="GtkLabel" id="label25">
                                         <property name="visible">True</property>
@@ -5803,66 +5922,18 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="position">2</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <object class="GtkCheckButton" id="cbCfgRemoveCtrlCharsConf">
-                                        <property name="label" translatable="yes">Remove CONTROL characters. </property>
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="xalign">0.5</property>
-                                        <property name="draw_indicator">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">3</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="label30">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
-                                        <property name="label" translatable="yes"> Files to save </property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">4</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkSpinButton" id="spCfgSaveSessionLogs">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">0 to keep all session logs</property>
-                                        <property name="invisible_char">•</property>
-                                        <property name="primary_icon_activatable">False</property>
-                                        <property name="secondary_icon_activatable">False</property>
-                                        <property name="adjustment">adjustment11</property>
-                                        <property name="numeric">True</property>
-                                        <property name="update_policy">if-valid</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">5</property>
-                                      </packing>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="expand">True</property>
                                     <property name="fill">True</property>
-                                    <property name="position">0</property>
+                                    <property name="position">1</property>
                                   </packing>
                                 </child>
                                 <child>
                                   <object class="GtkBox" id="hbox24">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="margin_left">20</property>
                                     <child>
                                       <object class="GtkLabel" id="lblEditLogFileName">
                                         <property name="visible">True</property>
@@ -5911,7 +5982,7 @@ sudo -p sudo_prompt_string ...</property>
                                   <packing>
                                     <property name="expand">True</property>
                                     <property name="fill">True</property>
-                                    <property name="position">1</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
