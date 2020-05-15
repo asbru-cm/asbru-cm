@@ -2185,11 +2185,11 @@ exit 0;
 sub close_log_file {
     my $line;
 
-    if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
-        return 1;
-    }
     if ($LOG_TIMESTAMP) {
         close LOG;
+    }
+    if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
+        return 1;
     }
     if (!open(FIN,"<:raw",$LOG_FILE)) {
         ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
