@@ -55,9 +55,21 @@ $ git fetch --tags
 $ git checkout 6.2.0
 ```
 
+To downgrade to a previous version:
+
+```
+$ git checkout 6.1.1
+```
+
+To get back to latest version (that might not be released):
+
+```
+$ git checkout master
+```
+
 ## Configuration file
 
-Even if we believe we did everything to avoid data loss, we cannot guarantee the upgrade/downgrade process is 100% safe so before proceeding to any major changes, please make a safe backup copy of your configuration directory (that is by default ```~/.config/asbru```).
+Even if we believe we did everything to avoid data loss, we cannot guarantee the upgrade/downgrade process is 100% safe so before proceeding with any major changes, please make a safe backup copy of your configuration directory (that is by default ```~/.config/asbru```).
 
 ### Upgrade/downgrade of configuation file
 
@@ -65,7 +77,7 @@ At startup, **Ásbrú Connection Manager** is proceeding with the necessary step
 
 ### File rename
 
-Please note that files have been renamed in version 6.2 ; the main directory is now ```~/.config/asbru``` (instead of ```~/.config/pac```).  Files inside the directory have also be renamed (as an example: ```pac.yml``` is now ```asbru.yml```)
+Please note that some configuration files have been renamed in version 6.2 ; the main directory is now ```~/.config/asbru``` (instead of ```~/.config/pac```).  Files inside the directory have also be renamed (as an example: ```pac.yml``` is now ```asbru.yml```)
 
 Again, at startup, **Ásbrú Connection Manager** will make the necessary changes automatically; a warning message will give you the opportunity to think twice about it:
 
@@ -87,7 +99,7 @@ When starting an old version (6.1.x), Ásbrú will propose to downgrade your mig
 
 ![Downgrade warning](images/upgrade2.png)
 
-Please note that, as for the upgrade, a copy of your existing configuration will be done before processed with the downgrade.
+Please note that, as for the upgrade, a copy of your existing configuration will be done before processing with the downgrade.
 
 If you don't want to downgrade your files, you will be offered to create a new configuration directory:
 
