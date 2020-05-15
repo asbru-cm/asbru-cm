@@ -9,6 +9,13 @@ If you installed Ásbrú Connection Manager from our packages prepared for most 
 For Debian-based distributions, it would typically be:
 
 ```
+sudo apt-get update
+sudo apt-get install --only-upgrade asbru-cm
+```
+
+to downgrade to a specific version:
+
+```
 sudo apt-get install asbru-cm=6.1.2
 ```
 
@@ -19,6 +26,12 @@ apt-cache madison asbru-cm
 ```
 
 For Fedora-based distributions, it would typically be:
+
+```
+sudo dnf update asbru-cm -y
+```
+
+to downgrade to a specific version:
 
 ```
 sudo dnf install asbru-cm-6.0.4-1.fc31
