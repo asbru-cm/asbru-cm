@@ -1128,7 +1128,6 @@ sub _setupCallbacks {
     my @targets = Gtk3::TargetEntry->new('Connect', [], 0);
     $drag_dest->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, [ 'copy', 'move' ]);
     $drag_dest->signal_connect('drag_motion' => sub {
-        print("Drag motion\n");
         $_[0]->get_parent_window()->raise();
         return 1;
     });
@@ -1136,8 +1135,6 @@ sub _setupCallbacks {
         my ($me, $context, $x, $y, $data, $info, $time) = @_;
         my @idx;
         my %tmp;
-
-        print("Drag drop\n");
 
         foreach my $uuid (@{ $$self{'DND'}{'selection'} }) {
             if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
