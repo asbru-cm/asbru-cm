@@ -101,7 +101,7 @@ sub _initGUI {
     # Tray available (not Gnome-shell)?
     $$self{_TRAY}->set_property('tooltip-markup', "<b>$APPNAME</b> (v.$APPVERSION)");
     $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
-    $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = $$self{_TRAY}->is_embedded ? 1 : 'warning';
+    $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = $$self{_TRAY}->is_embedded() ? 1 : 'warning';
 
     return 1;
 }
@@ -112,7 +112,7 @@ sub _setupCallbacks {
     $$self{_TRAY}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
-        if ($event->button eq 3 && !$$self{_MAIN}{_GUI}{lockPACBtn}->get_active) {
+        if ($event->button eq 3 && !$$self{_MAIN}{_GUI}{lockApplicationBtn}->get_active()) {
             $self->_trayMenu($widget, $event);
         }
 
@@ -121,18 +121,18 @@ sub _setupCallbacks {
             return 1;
         }
 
-        if ($$self{_MAIN}{_GUI}{main}->get_visible) {
+        if ($$self{_MAIN}{_GUI}{main}->get_visible()) {
             # Trigger the "lock" procedure
             if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
-                $$self{_MAIN}{_GUI}{lockPACBtn}->set_active(1);
+                $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(1);
             }
-            $$self{_MAIN}->_hideConnectionsList;
+            $$self{_MAIN}->_hideConnectionsList();
         } else {
             # Check if show password is required
             if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
                 # Trigger the "unlock" procedure
-                $$self{_MAIN}{_GUI}{lockPACBtn}->set_active(0);
-                if (! $$self{_MAIN}{_GUI}{lockPACBtn}->get_active) {
+                $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(0);
+                if (! $$self{_MAIN}{_GUI}{lockApplicationBtn}->get_active()) {
                     $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
                     $$self{_MAIN}->_showConnectionsList;
                 }
@@ -144,7 +144,7 @@ sub _setupCallbacks {
                     # Workaround the window manager, so it shows in the correct place all the time
                     $$self{_MAIN}->_hideConnectionsList();
                     $$self{_MAIN}->_showConnectionsList();
-                    $$self{_MAIN}{_GUI}{main}->move($x,$y);
+                    $$self{_MAIN}{_GUI}{main}->move($x, $y);
                 }
             }
         }
@@ -157,10 +157,10 @@ sub _setupCallbacks {
 sub _pos {
     my ($self,$event) = @_;
     my $h = $$self{_MAIN}{wheight};
-    my $w = $$self{_MAIN}{_GUI}{main}->size_request->width/2;
-    my $ymax = $event->get_screen->get_height;
-    my $dy = $event->window->get_height;
-    my ($x, $y) = $event->window->get_origin;
+    my $w = $$self{_MAIN}{_GUI}{main}->get_preferred_size()->width/2;
+    my $ymax = $event->get_screen()->get_height();
+    my $dy = $event->window->get_height();
+    my ($x, $y) = $event->window->get_origin();
 
     # Over the event widget
     if ($dy + $y + $h > $ymax) {
@@ -182,19 +182,19 @@ sub _trayMenu {
 
     my @m;
 
-    push(@m, {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;}});
+    push(@m, {label => 'Local Shell', stockicon => 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked();}});
     push(@m, {separator => 1});
     push(@m, {label => 'Clusters', stockicon => 'asbru-cluster-manager', submenu => _menuClusterConnections});
     push(@m, {label => 'Favourites', stockicon => 'asbru-favourite-on', submenu => _menuFavouriteConnections});
     push(@m, {label => 'Connect to', stockicon => 'asbru-group', submenu => _menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
     push(@m, {separator => 1});
-    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show;}});
-    push(@m, {label => 'Clusters...', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_CLUSTER}->show;}});
-    push(@m, {label => 'PCC', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_PCC}->show;}});
-    push(@m, {label => 'Show Window', stockicon => 'gtk-home', code => sub {$$self{_MAIN}->_showConnectionsList;}});
+    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show();}});
+    push(@m, {label => 'Clusters...', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_CLUSTER}->show();}});
+    push(@m, {label => 'PCC', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_PCC}->show();}});
+    push(@m, {label => 'Show Window', stockicon => 'gtk-home', code => sub {$$self{_MAIN}->_showConnectionsList();}});
     push(@m, {separator => 1});
-    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow;}});
-    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram;}});
+    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow();}});
+    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram();}});
 
     _wPopUpMenu(\@m, $event, 'below calling widget');
 

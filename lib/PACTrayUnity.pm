@@ -108,32 +108,32 @@ sub _setTrayMenu {
 
     my @m;
 
-    push(@m, {label => 'Local Shell', stockicon => $PACMain::UNITY ? '' : 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;} });
+    push(@m, {label => 'Local Shell', stockicon => $PACMain::UNITY ? '' : 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked();} });
     push(@m, {separator => 1});
     push(@m, {label => 'Clusters', stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-manager', submenu => _menuClusterConnections}) unless $PACMain::UNITY;
     push(@m, {label => 'Favourites', stockicon => $PACMain::UNITY ? '' : 'asbru-favourite-on', submenu => _menuFavouriteConnections});
     push(@m, {label => 'Connect to', stockicon => 'asbru-group', submenu => _menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
     push(@m, {separator => 1});
-    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show;} });
-    push(@m, {label => 'Clusters...', stockicon => $PACMain::UNITY ? '' : 'gtk-justify-fill'    , code => sub {$$self{_MAIN}{_CLUSTER}->show;}  });
-    push(@m, {label => 'PCC', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_PCC}->show;}});
+    push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show();} });
+    push(@m, {label => 'Clusters...', stockicon => $PACMain::UNITY ? '' : 'gtk-justify-fill'    , code => sub {$$self{_MAIN}{_CLUSTER}->show();}  });
+    push(@m, {label => 'PCC', stockicon => 'gtk-justify-fill', code => sub {$$self{_MAIN}{_PCC}->show();}});
     push(@m, {label => 'Show Window', stockicon => $PACMain::UNITY ? '' : 'gtk-home', code => sub {
         # Check if show password is required
         if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
             # Trigger the "unlock" procedure
-            $$self{_MAIN}{_GUI}{lockPACBtn}->set_active(0);
-            if (! $$self{_MAIN}{_GUI}{lockPACBtn}->get_active) {
-                $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active : $$self{_TRAY}->set_passive;
-                $$self{_MAIN}->_showConnectionsList;
+            $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(0);
+            if (! $$self{_MAIN}{_GUI}{lockApplicationBtn}->get_active()) {
+                $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
+                $$self{_MAIN}->_showConnectionsList();
             }
         } else {
-            $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active : $$self{_TRAY}->set_passive;
-            $$self{_MAIN}->_showConnectionsList;
+            $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
+            $$self{_MAIN}->_showConnectionsList();
         }
     }});
     push(@m, {separator => 1});
-    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow;} });
-    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram;} });
+    push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow();} });
+    push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram();} });
 
     $$self{_TRAY}->set_menu(_wPopUpMenu(\@m, $event, 'below calling widget', 'get_menu_ref') );
 

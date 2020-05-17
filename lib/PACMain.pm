@@ -451,39 +451,42 @@ sub _initGUI {
         return 0;
     }
 
-    ##############################################
+    ############################################################################################
     # Create main window
-    ##############################################
+    ############################################################################################
+    # The main window is made of:
+    #  - a "command panel" with tools buttons, connections list, favorites, etc.
+    #  - a "connections panel" with info tab & tabbed connections
+    ############################################################################################
     $$self{_GUI}{main} = Gtk3::Window->new();
     if ($$self{_CFG}{defaults}{'tabs in main window'} && $$self{_CFG}{defaults}{'terminal support transparency'}) {
         _setWindowPaintable($$self{_GUI}{main});
     }
+
+    # DevNote: would be nice to have this inside the theme itself
     if ($$self{_THEME} =~ /dark/) {
         _setDefaultRGBA(56,56,56,1);
     } else {
         _setDefaultRGBA(240,240,240,1);
     }
 
-    # Create a vbox1: main, status
-    $$self{_GUI}{vbox1} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{main}->add($$self{_GUI}{vbox1});
-
+    # Create a main horizontal box
     $$self{_GUI}{hpane} = Gtk3::HPaned->new();
-    $$self{_GUI}{hpane}->set_wide_handle(1);
-    $$self{_GUI}{vbox1}->add($$self{_GUI}{hpane});
+    $$self{_GUI}{hpane}->set_wide_handle(1);  # DevNote: if not set, text selection in a terminal will not be possible near the handle
+    $$self{_GUI}{main}->add($$self{_GUI}{hpane});
 
-    # Create a vbox3: actions, connections and other tools
-    $$self{_GUI}{vbox3} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->set_size_request(200, -1);
+    # Create a vboxCommandPanel: actions, connections and other tools
+    $$self{_GUI}{vboxCommandPanel} = Gtk3::VBox->new(0, 0);
+    $$self{_GUI}{vboxCommandPanel}->set_size_request(200, -1);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
-        $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox3}, 0, 0);
+        $$self{_GUI}{hpane}->pack2($$self{_GUI}{vboxCommandPanel}, 0, 0);
     } else {
-        $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox3}, 0, 0);
+        $$self{_GUI}{hpane}->pack1($$self{_GUI}{vboxCommandPanel}, 0, 0);
     }
 
     # Create a hbuttonbox1: add, rename, delete, etc...
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new(1, 0);
-    $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
+    $$self{_GUI}{vboxCommandPanel}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
 
     # Create groupAdd button
     $$self{_GUI}{groupAddBtn} = Gtk3::Button->new();
@@ -539,7 +542,7 @@ sub _initGUI {
 
     # Put a notebook for connections, favourites and history
     $$self{_GUI}{nbTree} = Gtk3::Notebook->new();
-    $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{nbTree}, 1, 1, 0);
+    $$self{_GUI}{vboxCommandPanel}->pack_start($$self{_GUI}{nbTree}, 1, 1, 0);
     $$self{_GUI}{nbTree}->set_scrollable(1);
 
     # Create a scrolled1 scrolled window to contain the connections tree
@@ -584,7 +587,7 @@ sub _initGUI {
     );
 
     $$self{_GUI}{_vboxSearch} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{_vboxSearch}, 0, 1, 0);
+    $$self{_GUI}{vboxCommandPanel}->pack_start($$self{_GUI}{_vboxSearch}, 0, 1, 0);
 
     $$self{_GUI}{_entrySearch} = Gtk3::Entry->new();
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_entrySearch}, 0, 1, 0);
@@ -718,7 +721,7 @@ sub _initGUI {
 
     # Create a hbox0: exec and clusters
     $$self{_GUI}{hbox0} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{vbox3}->pack_start($$self{_GUI}{hbox0}, 0, 1, 0);
+    $$self{_GUI}{vboxCommandPanel}->pack_start($$self{_GUI}{hbox0}, 0, 1, 0);
 
     $$self{_GUI}{hboxsearchstart} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxsearchstart}, 0, 1, 0);
@@ -754,7 +757,7 @@ sub _initGUI {
     $$self{_GUI}{hboxclusters} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxclusters}, 0, 1, 0);
 
-    # Create clusterBtn button
+    # Create "Clusters" button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{clusterBtn} = Gtk3::Button->new();
         $$self{_GUI}{clusterBtn}->get_style_context()->add_class("button-cp");
@@ -766,7 +769,7 @@ sub _initGUI {
     $$self{_GUI}{clusterBtn}->set('can-focus' => 0);
     $$self{_GUI}{clusterBtn}->set_tooltip_text('Open the Clusters Administration Console');
 
-    # Create scriptsBtn button
+    # Create "Scripts" button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{scriptsBtn} = Gtk3::Button->new();
     } else {
@@ -780,7 +783,7 @@ sub _initGUI {
     }
     $$self{_GUI}{scriptsBtn}->set_tooltip_text('Open the Scripts Administration Console');
 
-    # Create clusterBtn button
+    # Create "Clusters" button
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{pccBtn} = Gtk3::Button->new();
         $$self{_GUI}{pccBtn}->get_style_context()->add_class("button-cp");
@@ -792,20 +795,20 @@ sub _initGUI {
     $$self{_GUI}{pccBtn}->set('can-focus' => 0);
     $$self{_GUI}{pccBtn}->set_tooltip_text("Open the Power Clusters Controller:\nexecute commands in every clustered terminal from this single window");
 
-    # Create a vbox5: description
-    $$self{_GUI}{vbox5} = Gtk3::VBox->new(0, 0);
-    $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 1, 0);
+    # Create a vbox for info tab, connections (if tabbed) and button bar
+    $$self{_GUI}{vboxConnectionPanel} = Gtk3::VBox->new(0, 0);
+    $$self{_GUI}{hpane}->pack2($$self{_GUI}{vboxConnectionPanel}, 1, 0);
     if ($$self{_CFG}{defaults}{'tree on right side'}) {
-        $$self{_GUI}{hpane}->pack1($$self{_GUI}{vbox5}, 0, 0);
+        $$self{_GUI}{hpane}->pack1($$self{_GUI}{vboxConnectionPanel}, 0, 0);
     } else {
-        $$self{_GUI}{hpane}->pack2($$self{_GUI}{vbox5}, 0, 0);
+        $$self{_GUI}{hpane}->pack2($$self{_GUI}{vboxConnectionPanel}, 0, 0);
     }
 
-    # Create a notebook widget
-    my $nb = Gtk3::Notebook->new();
-    $$self{_GUI}{vbox5}->pack_start($nb, 1, 1, 0);
-    $nb->set_scrollable(1);
-    $nb->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
+    # Create a notebook for info tab and connections
+    $$self{_GUI}{nbConnectionPanel} = Gtk3::Notebook->new();
+    $$self{_GUI}{vboxConnectionPanel}->pack_start($$self{_GUI}{nbConnectionPanel}, 1, 1, 0);
+    $$self{_GUI}{nbConnectionPanel}->set_scrollable(1);
+    $$self{_GUI}{nbConnectionPanel}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
 
     my $tablbl = Gtk3::HBox->new(0, 0);
     my $eblbl = Gtk3::EventBox->new();
@@ -817,7 +820,7 @@ sub _initGUI {
 
     # Create a vboxInfo: description
     $$self{_GUI}{vboxInfo} = Gtk3::VBox->new(0, 0);
-    $nb->append_page($$self{_GUI}{vboxInfo}, $tablbl);
+    $$self{_GUI}{nbConnectionPanel}->append_page($$self{_GUI}{vboxInfo}, $tablbl);
 
     # Create a scrolled2 scrolled window to contain the description textview
     $$self{_GUI}{scrollDescription} = Gtk3::ScrolledWindow->new();
@@ -863,24 +866,24 @@ sub _initGUI {
 
     # Create a hbuttonbox1: show/hide, WOL, Shell, Preferences, etc...
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new();
-    $$self{_GUI}{vbox5}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
+    $$self{_GUI}{vboxConnectionPanel}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
 
-    # Create hideConn button
+    # Create "Hide command panel" button
     $$self{_GUI}{showConnBtn} = Gtk3::ToggleButton->new();
     $$self{_GUI}{showConnBtn}->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{showConnBtn}->set_active(1);
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 1, 1, 0);
     $$self{_GUI}{showConnBtn}->set('can-focus' => 0);
     $$self{_GUI}{showConnBtn}->set_tooltip_text('Show/Hide connections tree panel');
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 1, 1, 0);
 
-    # Create WakeOnLan button
+    # Create "Wake on LAN" button
     $$self{_GUI}{wolBtn} = Gtk3::Button->new('Wake On Lan');
     $$self{_GUI}{wolBtn}->set_image(Gtk3::Image->new_from_stock('asbru-wol', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{wolBtn}, 1, 1, 0);
     $$self{_GUI}{wolBtn}->set('can-focus' => 0);
-    $$self{_GUI}{wolBtn}->set_tooltip_text('Start the Wake On Lan utility window');
+    $$self{_GUI}{wolBtn}->set_tooltip_text('Start the "Wake On LAN" utility window');
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{wolBtn}, 1, 1, 0);
 
-    # Create shellBtn button
+    # Create "Local Shell" button
     $$self{_GUI}{shellBtn} = Gtk3::Button->new();
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
@@ -894,56 +897,54 @@ sub _initGUI {
     }
     $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
 
-    # Create configBtn button
+    # Create "Preferences" button
+    $$self{_GUI}{configBtn} = Gtk3::Button->new();
+    $$self{_GUI}{configBtn}->get_style_context()->add_class("button-cp");
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{configBtn} = Gtk3::Button->new();
-        $$self{_GUI}{configBtn}->get_style_context()->add_class("button-cp");
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     } else {
-        $$self{_GUI}{configBtn} = Gtk3::Button->new('Preferences');
+        $$self{_GUI}{configBtn}->set_label('Preferences');
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     }
     $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
     $$self{_GUI}{configBtn}->set('can-focus' => 0);
     $$self{_GUI}{configBtn}->set_tooltip_text('Open the general preferences control');
 
-    # Create saveBtn button
+    # Create "Save" button
     $$self{_GUI}{saveBtn} = Gtk3::Button->new('Save');
     $$self{_GUI}{saveBtn}->set_image(Gtk3::Image->new_from_stock('gtk-save', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{saveBtn}, 1, 1, 0);
     $$self{_GUI}{saveBtn}->set('can-focus' => 0);
     $$self{_GUI}{saveBtn}->set_sensitive(0);
+    $$self{_GUI}{saveBtn}->set_tooltip_text('Save the latest configuration changes, see also the "Automatically save every configuration change" field under "Preferences"->"Main Options"');
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{saveBtn}, 1, 1, 0);
 
-    # Create [un]lockBtn button
-    $$self{_GUI}{lockPACBtn} = Gtk3::ToggleButton->new();
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{lockPACBtn}->set_active(0);
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{lockPACBtn}, 0, 1, 0);
-    $$self{_GUI}{lockPACBtn}->set('can-focus' => 0);
-    $$self{_GUI}{lockPACBtn}->set_tooltip_text('Password [un]lock GUI. In order to use this functionality, check the "Protect with password" field under "Preferences"->"Main Options"');
+    # Create "Lock/Unlock" button
+    $$self{_GUI}{lockApplicationBtn} = Gtk3::ToggleButton->new();
+    $$self{_GUI}{lockApplicationBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockApplicationBtn}->set_active(0);
+    $$self{_GUI}{lockApplicationBtn}->set('can-focus' => 0);
+    $$self{_GUI}{lockApplicationBtn}->set_tooltip_text('Password [un]lock GUI. In order to use this functionality, check the "Protect with password" field under "Preferences"->"Main Options"');
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{lockApplicationBtn}, 0, 1, 0);
 
-    # Create aboutBtn button
+    # Create "About" button
     $$self{_GUI}{aboutBtn} = Gtk3::Button->new();
-    $$self{_GUI}{aboutBtn}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'button'));
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{aboutBtn}, 1, 1, 0);
+    $$self{_GUI}{aboutBtn}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{aboutBtn}->set('can-focus' => 0);
     $$self{_GUI}{aboutBtn}->set_tooltip_text('Show the *so needed* "About" dialog');
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{aboutBtn}, 1, 1, 0);
 
-    # Create quitBtn button
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{quitBtn} = Gtk3::Button->new();
-        $$self{_GUI}{quitBtn}->get_style_context()->add_class("button-cp");
-    } else {
-        $$self{_GUI}{quitBtn} = Gtk3::Button->new('Quit');
-    }
-    $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
+    # Create "Quit" button
+    $$self{_GUI}{quitBtn} = Gtk3::Button->new();
+    $$self{_GUI}{quitBtn}->get_style_context()->add_class("button-cp");
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     } else {
+        $$self{_GUI}{quitBtn}->set_label('Quit');
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     }
+    $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
     $$self{_GUI}{quitBtn}->set('can-focus' => 0);
-    $$self{_GUI}{quitBtn}->set_tooltip_text('Exit');
+    $$self{_GUI}{quitBtn}->set_tooltip_text('Close all terminals and terminate the application');
 
     # Setup some window properties.
     $$self{_GUI}{main}->set_title("$APPNAME" . ($$self{_READONLY} ? ' - READ ONLY MODE' : ''));
@@ -952,7 +953,7 @@ sub _initGUI {
     $$self{_GUI}{main}->set_resizable(1);
 
     # Set treeviews font
-    foreach my $tree ('Connections','Favourites','History','Clusters') {
+    foreach my $tree ('Connections', 'Favourites', 'History', 'Clusters') {
         my @col = $$self{_GUI}{"tree$tree"}->get_columns();
         if ($tree eq 'Connections') {
             $col[0]->set_visible(0);
@@ -971,7 +972,7 @@ sub _initGUI {
     ##############################################
 
     if ($$self{_CFG}{defaults}{'tabs in main window'}) {
-        $$self{_GUI}{nb} = $nb;
+        $$self{_GUI}{nb} = $$self{_GUI}{nbConnectionPanel};
         $$self{_GUI}{_PACTABS} = $$self{_GUI}{main};
     } else {
         # Create window
@@ -995,8 +996,8 @@ sub _initGUI {
         $$self{_GUI}{_PACTABS}->add($$self{_GUI}{nb});
 
         # Hide tabs on main window
-        $nb->set_show_tabs(0);
-        $nb->set_property('show_border', 0);
+        $$self{_GUI}{nbConnectionPanel}->set_show_tabs(0);
+        $$self{_GUI}{nbConnectionPanel}->set_property('show_border', 0);
 
         $$self{_TABSINWINDOW} = 1;
     }
@@ -1116,16 +1117,22 @@ sub _setupCallbacks {
     ###################################
 
     # Setup some drag and drop operations
-    my $drag_dest = ($$self{_CFG}{'defaults'}{'tabs in main window'}) ? $$self{_GUI}{vbox5} : $$self{_GUI}{nb};
+    my $drag_dest = $$self{_CFG}{'defaults'}{'tabs in main window'} ? $$self{_GUI}{vboxConnectionPanel} : $$self{_GUI}{nb};
 
-    my @targets = (Gtk3::TargetEntry->new('Connect', [], 0));
+    my @targets = Gtk3::TargetEntry->new('Connect', [], 0);
     $drag_dest->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, [ 'copy', 'move' ]);
-    $drag_dest->signal_connect('drag_motion' => sub { $_[0]->get_parent_window->raise(); return 1; });
+    $drag_dest->signal_connect('drag_motion' => sub {
+        print("Drag motion\n");
+        $_[0]->get_parent_window()->raise();
+        return 1;
+    });
     $drag_dest->signal_connect('drag_drop' => sub {
         my ($me, $context, $x, $y, $data, $info, $time) = @_;
-
         my @idx;
         my %tmp;
+
+        print("Drag drop\n");
+
         foreach my $uuid (@{ $$self{'DND'}{'selection'} }) {
             if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
                 if (!_wConfirm($$self{_GUI}{main}, "<b>ATTENTION!!</b> You have dropped some group(s)\nAre you sure you want to start <b>ALL</b> of its child connections?")) {
@@ -1898,7 +1905,7 @@ sub _setupCallbacks {
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vbox3}->show() : $$self{_GUI}{vbox3}->hide();
+        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
             $$self{_GUI}{treeConnections}->grab_focus();
         }
@@ -2006,7 +2013,7 @@ sub _setupCallbacks {
     $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration(); });
     $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow(); });
     $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan(); });
-    $$self{_GUI}{lockPACBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockPACBtn}->get_active() ? $self->_lockPAC() : $self->_unlockPAC(); });
+    $$self{_GUI}{lockApplicationBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockApplicationBtn}->get_active() ? $self->_lockApplication() : $self->_unlockApplication(); });
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{nodeClose}->signal_connect('clicked' => sub { $$self{_GUI}{main}->close(); });
     }
@@ -2066,7 +2073,7 @@ sub _setupCallbacks {
                 }
                 # Trigger the "lock" procedure ?
                 if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
-                    $$self{_GUI}{lockPACBtn}->set_active(1);
+                    $$self{_GUI}{lockApplicationBtn}->set_active(1);
                 }
                 # Hide main window
                 $self->_hideConnectionsList();
@@ -2228,7 +2235,7 @@ sub _setupCallbacks {
             }
             # Trigger the "lock" procedure ?
             if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
-                $$self{_GUI}{lockPACBtn}->set_active(1);
+                $$self{_GUI}{lockApplicationBtn}->set_active(1);
             }
             # Hide main window
             if (!$STRAY) {
@@ -2293,12 +2300,12 @@ sub _setFavourite {
     $self->_setCFGChanged(1);
 }
 
-sub _lockPAC {
+sub _lockAsbru {
     my $self = shift;
 
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{lockPACBtn}->set_active(1);
-    $$self{_GUI}{vbox3}->set_sensitive(0);
+    $$self{_GUI}{lockApplicationBtn}->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockApplicationBtn}->set_active(1);
+    $$self{_GUI}{vboxCommandPanel}->set_sensitive(0);
     $$self{_GUI}{showConnBtn}->set_sensitive(0);
     $$self{_GUI}{shellBtn}->set_sensitive(0);
     $$self{_GUI}{quitBtn}->set_sensitive(0);
@@ -2318,19 +2325,19 @@ sub _lockPAC {
     return 1;
 }
 
-sub _unlockPAC {
+sub _unlockAsbru {
     my $self = shift;
 
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
     if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
-        $$self{_GUI}{lockPACBtn}->set_active(1);
+        $$self{_GUI}{lockApplicationBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
     }
 
-    $$self{_GUI}{lockPACBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
-    $$self{_GUI}{lockPACBtn}->set_active(0);
-    $$self{_GUI}{vbox3}->set_sensitive(1);
+    $$self{_GUI}{lockApplicationBtn}->set_image(Gtk3::Image->new_from_stock('asbru-unprotected', 'GTK_ICON_SIZE_BUTTON'));
+    $$self{_GUI}{lockApplicationBtn}->set_active(0);
+    $$self{_GUI}{vboxCommandPanel}->set_sensitive(1);
     $$self{_GUI}{showConnBtn}->set_sensitive(1);
     $$self{_GUI}{shellBtn}->set_sensitive(1);
     $$self{_GUI}{quitBtn}->set_sensitive(1);
@@ -3723,7 +3730,7 @@ sub _updateGUIPreferences {
         $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'});
     }
 
-    $$self{_GUI}{lockPACBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
+    $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
 
     $self->_updateGUIWithUUID($sel_uuids[0]) if $total == 1;
 
@@ -4648,7 +4655,7 @@ sub _ApplyLayout {
             $$self{wheight} = int($H*0.8);
         }
         # This layout to work implies some configuration settings to work correctly
-        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vbox5','vboxInfo') {
+        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vboxConnectionPanel','vboxInfo') {
             $$self{_GUI}{$e}->hide();
         }
         if (!$STRAY) {
@@ -4818,15 +4825,15 @@ Creates the main window and elements
 
 Sets up all callbacks to elements in the window
 
-=head2 sub _lockPAC
+=head2 sub _lockApplication
 
-Locks Pack to leave unatended.
+Locks the application to leave unattended.
 
 Sets different objects property sesitive = 0
 
-=head2 sub _unlockPAC
+=head2 sub _unlockApplication
 
-Asks for a GUI Password to unlock variables
+Asks for a GUI password to unlock the application
 
 If password OK, set sensitive = 1
 

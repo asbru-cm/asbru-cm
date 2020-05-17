@@ -366,7 +366,7 @@ sub start {
         $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_VBOX}->get_allocated_width();
         $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_VBOX}->get_allocated_height() - $$self{_GUI}{bottombox}->get_allocated_height();
         eval {
-            $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_visible() or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vbox3}->get_allocated_width();
+            $PACMain::FUNCS{_MAIN}{_GUI}{vboxCommandPanel}->get_visible() or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vboxCommandPanel}->get_allocated_width();
         };
     } else {
         delete $$self{_CFG}{'tmp'}{'xid'};
