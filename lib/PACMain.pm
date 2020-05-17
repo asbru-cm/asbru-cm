@@ -874,11 +874,12 @@ sub _initGUI {
     $$self{_GUI}{showConnBtn}->set_active(1);
     $$self{_GUI}{showConnBtn}->set('can-focus' => 0);
     $$self{_GUI}{showConnBtn}->set_tooltip_text('Show/Hide connections tree panel');
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 1, 1, 0);
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{showConnBtn}, 0, 1, 0);
 
     # Create "Wake on LAN" button
     $$self{_GUI}{wolBtn} = Gtk3::Button->new('Wake On Lan');
     $$self{_GUI}{wolBtn}->set_image(Gtk3::Image->new_from_stock('asbru-wol', 'button'));
+    $$self{_GUI}{wolBtn}->set_always_show_image(1);
     $$self{_GUI}{wolBtn}->set('can-focus' => 0);
     $$self{_GUI}{wolBtn}->set_tooltip_text('Start the "Wake On LAN" utility window');
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{wolBtn}, 1, 1, 0);
@@ -888,6 +889,8 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
     } else {
+        $$self{_GUI}{shellBtn}->set_label('Local shell');
+        $$self{_GUI}{shellBtn}->set_always_show_image(1);
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{shellBtn}, 1, 1, 0);
     }
     $$self{_GUI}{shellBtn}->set_image(Gtk3::Image->new_from_stock('asbru-shell', 'button'));
@@ -904,6 +907,7 @@ sub _initGUI {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     } else {
         $$self{_GUI}{configBtn}->set_label('Preferences');
+        $$self{_GUI}{configBtn}->set_always_show_image(1);
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{configBtn}, 1, 1, 0);
     }
     $$self{_GUI}{configBtn}->set_image(Gtk3::Image->new_from_stock('gtk-preferences', 'button'));
@@ -912,6 +916,7 @@ sub _initGUI {
 
     # Create "Save" button
     $$self{_GUI}{saveBtn} = Gtk3::Button->new('Save');
+    $$self{_GUI}{saveBtn}->set_always_show_image(1);
     $$self{_GUI}{saveBtn}->set_image(Gtk3::Image->new_from_stock('gtk-save', 'button'));
     $$self{_GUI}{saveBtn}->set('can-focus' => 0);
     $$self{_GUI}{saveBtn}->set_sensitive(0);
@@ -931,7 +936,7 @@ sub _initGUI {
     $$self{_GUI}{aboutBtn}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'GTK_ICON_SIZE_BUTTON'));
     $$self{_GUI}{aboutBtn}->set('can-focus' => 0);
     $$self{_GUI}{aboutBtn}->set_tooltip_text('Show the *so needed* "About" dialog');
-    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{aboutBtn}, 1, 1, 0);
+    $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{aboutBtn}, 0, 1, 0);
 
     # Create "Quit" button
     $$self{_GUI}{quitBtn} = Gtk3::Button->new();
@@ -940,6 +945,7 @@ sub _initGUI {
         $$self{_GUI}{hboxclusters}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     } else {
         $$self{_GUI}{quitBtn}->set_label('Quit');
+        $$self{_GUI}{quitBtn}->set_always_show_image(1);
         $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{quitBtn}, 1, 1, 0);
     }
     $$self{_GUI}{quitBtn}->set_image(Gtk3::Image->new_from_stock('gtk-quit', 'button'));
