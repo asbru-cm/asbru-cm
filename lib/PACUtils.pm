@@ -1174,7 +1174,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, '  ')->set_sensitive(0);
+            _($self, 'alignAuthMethod')->set_sensitive(0);
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
