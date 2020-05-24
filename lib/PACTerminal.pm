@@ -1035,8 +1035,8 @@ sub _setupCallbacks {
         } elsif ($action eq 'paste') {
             my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
             $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
-        } elsif ($action eq 'paste-passwd' && $$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '') {
-            $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+        } elsif ($action eq 'paste-passwd' && ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' || $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
+            $self->_pasteConnectionPassword();
         } elsif ($action eq 'paste-delete') {
             my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
             my $delete = _wEnterValue(
@@ -2032,17 +2032,7 @@ sub _vteMenu {
             stockicon => 'gtk-paste',
             shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste-passwd'),
             code => sub {
-                my $pass = '';
-                if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
-                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
-                } else {
-                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
-                }
-                if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
-                    my $kpxc = $PACMain::FUNCS{_KEEPASS};
-                    $pass = $kpxc->applyMask($pass);
-                }
-                $self->_pasteToVte($pass, 1);
+                $self->_pasteConnectionPassword();
             }
         });
     };
@@ -2069,7 +2059,7 @@ sub _vteMenu {
 
     # Add find string
     push(@vte_menu_items, {separator => 1});
-    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','find-terminal'), code => sub {$self->_wFindInTerminal; return 1;}});
+    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','find-terminal'), code => sub {$self->_wFindInTerminal(); return 1;}});
 
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', code => sub{$self->_saveSessionLog;}});
@@ -4197,6 +4187,22 @@ sub _zoomHandler {
     return 0;
 }
 
+sub _pasteConnectionPassword {
+    my $self = shift;
+    my $pass = '';
+
+    if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
+        $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
+    } else {
+        $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
+    }
+    if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $pass = $kpxc->applyMask($pass);
+    }
+    $self->_pasteToVte($pass, 1);
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4494,6 +4500,10 @@ On a keypress, check if zoom factor of the terminal should be changed.
 =head2 sub _hasKeePassField
 
 Returns true (1) if this terminal has a least on field whose value is kept into a KeePass database file
+
+=head2 sub _pasteConnectionPassword
+
+Paste the password of the current connection into the current VTE terminal
 
 =head1 Vte::Terminal
 
