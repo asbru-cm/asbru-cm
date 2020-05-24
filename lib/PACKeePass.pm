@@ -497,7 +497,7 @@ sub _locateEntries {
     } else {
         $cfg = $self->get_cfg();
     }
-    $timestamp = (stat($$cfg{database}))[9];
+    $timestamp = stat($$cfg{database})->mtime;
     if (!@KPXC_LIST || $$self{'last_timestamp'} != $timestamp) {
         @KPXC_LIST = ();
         $$self{'last_timestamp'} = $timestamp;
