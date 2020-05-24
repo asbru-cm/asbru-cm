@@ -38,6 +38,7 @@ use Encode;
 use FindBin qw ($RealBin $Bin $Script);
 use IPC::Open2;
 use IPC::Open3;
+use File::stat;
 
 # GTK
 use Gtk3 '-init';
@@ -54,7 +55,8 @@ use PACTree;
 
 my $KPXC_MP = $ENV{'KPXC_MP'};
 my @KPXC_LIST;
-my %KPXC_CACHE = ();
+my $KPXC_CACHE_TIMESTAMP;
+my %KPXC_CACHE;
 my $CLI = 'keepassxc-cli';
 
 # END: Define GLOBAL CLASS variables
@@ -232,13 +234,13 @@ sub applyMask {
 
 sub getFieldValue {
     my ($self, $field, $uid) = @_;
-    my ($pid, $cfg,@err);
+    my ($pid, $cfg, @err);
     my $data='';
     my $flg = 0;
     my @out;
 
     $field = lc($field);
-    if ($KPXC_CACHE{"$field,$uid"}) {
+    if ($self->_hasCacheValue("$field,$uid")) {
         return ($KPXC_CACHE{"$field,$uid"}, 1);
     }
     if ($$self{cfg}) {
@@ -275,7 +277,7 @@ sub getFieldValue {
             $KPXC_CACHE{"$f,$uid"} = $v;
         }
     }
-    if ($KPXC_CACHE{"$field,$uid"}) {
+    if ($self->_hasCacheValue("$field,$uid")) {
         return ($KPXC_CACHE{"$field,$uid"}, 1);
     }
     return ('', 0);
@@ -785,6 +787,34 @@ sub _setCapabilities {
     }
 }
 
+sub _hasCacheValue {
+    my ($self, $key) = @_;
+    my $cfg;
+    my $ts;
+
+    # Get current modification timestamp of the KeePass database
+    if ($$self{cfg}) {
+        $cfg = $$self{cfg};
+    } else {
+        $cfg = $self->get_cfg();
+    }
+    $ts = stat($$cfg{database})->mtime;
+
+    # Check if the cache should be created or invalidated
+    if (!%KPXC_CACHE || ($KPXC_CACHE_TIMESTAMP && $KPXC_CACHE_TIMESTAMP < $ts)) {
+        %KPXC_CACHE = ();
+        $KPXC_CACHE_TIMESTAMP = $ts;
+    }
+
+    return exists($KPXC_CACHE{$key});
+}
+
+# END: Private functions definitions
+###################################################################
+
+###################################################################
+# START: Other package functions
+
 # Check magic bytes, AppImage magic bytes : 41490200
 sub _getMagicBytes {
     my $file = shift;
@@ -800,7 +830,7 @@ sub _getMagicBytes {
     return substr($data,16,8);
 }
 
-# END: Private functions definitions
+# END: Other package functions
 ###################################################################
 
 1;
@@ -901,6 +931,12 @@ Get keepassxc-cli version numbers and list of available parameters
     --show-protected        Older versions of keepassxc-cli showed by default clear passwords
                             when the show command is called. Later versions requiere this option
     --key-file              This version is capable to use a key-file
+
+=head2 sub _hasCacheValue
+
+Return true if a value already exists in the cache for the given key
+If the cache does not exist ; create a new cache structure
+ If the cache timestamp is older than the database file, invalidate the cache
 
 =head2 sub _getMagicBytes
 
