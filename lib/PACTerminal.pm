@@ -1056,7 +1056,7 @@ sub _setupCallbacks {
             }
             # P --> PASTE CONNECTION PASSWORD
             elsif ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' && lc $keyval eq 'p') {
-                $self->_pasteToVte($$self{_CFG}{environments}{$$self{_UUID}}{'pass'}, 1);
+                $self->_pasteConnectionPassword();
                 return 1;
             }
             # B --> PASTE AND DELETE
@@ -2119,17 +2119,7 @@ sub _vteMenu {
             stockicon => 'gtk-paste',
             shortcut => '<control><shift>p',
             code => sub {
-                my $pass = '';
-                if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
-                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
-                } else {
-                    $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
-                }
-                if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
-                    my $kpxc = $PACMain::FUNCS{_KEEPASS};
-                    $pass = $kpxc->applyMask($pass);
-                }
-                $self->_pasteToVte($pass, 1);
+                $self->_pasteConnectionPassword();
             }
         });
     };
@@ -4273,6 +4263,22 @@ sub _zoomHandler {
     return 0;
 }
 
+sub _pasteConnectionPassword {
+    my $self = shift;
+    my $pass = '';
+
+    if ($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '') {
+        $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'};
+    } else {
+        $pass = $$self{_CFG}{environments}{$$self{_UUID}}{'pass'};
+    }
+    if ($$self{_CFG}{defaults}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($pass)) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $pass = $kpxc->applyMask($pass);
+    }
+    $self->_pasteToVte($pass, 1);
+}
+
 # END: Private functions definitions
 ###################################################################
 
@@ -4570,6 +4576,10 @@ On a keypress, check if zoom factor of the terminal should be changed.
 =head2 sub _hasKeePassField
 
 Returns true (1) if this terminal has a least on field whose value is kept into a KeePass database file
+
+=head2 sub _pasteConnectionPassword
+
+Paste the password of the current connection into the current VTE terminal
 
 =head1 Vte::Terminal
 
