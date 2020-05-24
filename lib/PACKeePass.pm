@@ -148,7 +148,7 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'pac-keepass');
+        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'asbru-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
