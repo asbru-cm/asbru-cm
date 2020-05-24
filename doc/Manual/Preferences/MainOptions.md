@@ -99,11 +99,6 @@ Starting with Ásbru 6.2 the applications offers 4 themes for icons.
     Check [System Tray Extensions for some recommendations](SytemTrayExtensions.md)
     
 
-### Control TAB Goes to
-
-+ Last focused TAB
-+ Next TAB
-
 ### Other options
 
 + __Select key bindings to disable from TABS Window__ : If you need your remote application to receive some of those key combinations, you will have to disable them from Ásbrú, so they can be passed to your remote application.

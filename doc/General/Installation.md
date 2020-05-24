@@ -169,12 +169,16 @@ If you don't want to use any of the pre-built package, here are instructions to 
 
 ### Clone repository
 
-    $ git clone https://github.com/asbru-cm/asbru-cm.git
+```
+$ git clone https://github.com/asbru-cm/asbru-cm.git
+```
 
 ### Start application
 
-    $ cd asbru-cm
-    $ ./asbru-cm
+```
+$ cd asbru-cm
+$ ./asbru-cm
+```
 
 ### Additional information for Debian systems
 

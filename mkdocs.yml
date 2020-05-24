@@ -19,6 +19,7 @@ nav:
   - 1. General:
       - News: General/News.md
       - Installation: General/Installation.md
+      - Upgrade: General/Upgrade.md
       - Changelog: General/Changelog.md
       - Warning:   General/sensitive-info-notice.md
   - 2. User's Manual:
