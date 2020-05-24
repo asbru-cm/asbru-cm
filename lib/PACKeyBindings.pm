@@ -566,4 +566,7 @@ sub _updateKeyBinding {
     $model->set_value($model->get_iter($path), 2, Glib::Object::Introspection::GValueWrapper->new('Glib::String', $keynew));
 }
 
+# END: Private Methods
+###################################################################
+
 1;
