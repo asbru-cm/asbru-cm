@@ -16,30 +16,34 @@ our %column_types;
 *column_types = \%Gtk3::SimpleList::column_types;
 *add_column_type = \&Gtk3::SimpleList::add_column_type;
 
-# Start PAC specific methods
+# Start Ásbrú specific methods
 sub _getSelectedUUIDs {
     my $self = shift;
-    my $selection = $self->get_selection;
-    my $model = $self->get_model;
+    my $selection = $self->get_selection();
+    my $model = $self->get_model();
     my @paths = _getSelectedRows($selection);
 
     my @selected;
 
     scalar(@paths) or push(@selected, '__PAC__ROOT__');
-    foreach my $path (@paths) {push(@selected, $model->get_value($model->get_iter($path), 2) ) ;}
+    foreach my $path (@paths) {
+        push(@selected, $model->get_value($model->get_iter($path), 2));
+    }
 
     return wantarray ? @selected : scalar(@selected);
 }
 
 sub _getSelectedNames {
     my $self = shift;
-    my $selection = $self->get_selection;
-    my $model = $self->get_model;
+    my $selection = $self->get_selection();
+    my $model = $self->get_model();
     my @paths = _getSelectedRows($selection);
 
     my @selected;
 
-    foreach my $path (@paths) {push(@selected, $model->get_value($model->get_iter($path), 1) ) ;}
+    foreach my $path (@paths) {
+        push(@selected, $model->get_value($model->get_iter($path), 1));
+    }
 
     return wantarray ? @selected : scalar(@selected);
 }
@@ -48,26 +52,31 @@ sub _getChildren {
     my $self = shift;
     my $uuid = shift;
     my $which = shift // 'all'; # 0:nodes, 1:groups, all:nodes+groups
-    my $deep = shift // 0; # 0:1st_level, 1:all_levels
+    my $deep = shift // 0;      # 0:1st_level, 1:all_levels
 
-    my $selection = $self->get_selection;
-    my $modelsort = $self->get_model;
-    my $model = $modelsort->get_model;
+    my $selection = $self->get_selection();
+    my $modelsort = $self->get_model();
+    my $model = $modelsort->get_model();
 
     my @list;
     my $root;
 
     # Locate every node under $uuid
-    $modelsort->foreach(sub
-    {
+    $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $node_uuid = $store->get_value($iter, 2);
         my $node_name = $store->get_value($iter, 1);
 
-        ($node_uuid eq $uuid) and $root = $path->to_string;
-        return 0 unless (defined $root && ($deep || $path->to_string =~ /^$root:\d+$/g) );
+        if ($node_uuid eq $uuid) {
+            $root = $path->to_string;
+        }
+        if (!(defined $root && ($deep || $path->to_string =~ /^$root:\d+$/g))) {
+            return 0;
+        }
 
-        (($path->to_string =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__') ) and push(@list, $node_uuid);
+        if ((($path->to_string =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__'))) {
+            push(@list, $node_uuid);
+        }
         return $path->to_string !~ /^$root/g;
     });
 
@@ -78,19 +87,20 @@ sub _getPath {
     my $self = shift;
     my $uuid = shift;
 
-    my $selection = $self->get_selection;
-    my $modelsort = $self->get_model;
-    my $model = $modelsort->get_model;
+    my $selection = $self->get_selection();
+    my $modelsort = $self->get_model();
+    my $model = $modelsort->get_model();
 
     my $ret_path;
 
     # Locate every connection under $uuid
-    $modelsort->foreach(sub
-    {
+    $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $node_uuid = $store->get_value($iter, 2);
 
-        return 0 unless $node_uuid eq $uuid;
+        if ($node_uuid ne $uuid) {
+            return 0;
+        }
         $ret_path = $path->to_string;
         return 1;
     });
@@ -132,17 +142,18 @@ sub _delNode {
     my $self = shift;
     my $uuid = shift;
 
-    my $selection = $self->get_selection;
-    my $modelsort = $self->get_model;
-    my $model = $modelsort->get_model;
+    my $selection = $self->get_selection();
+    my $modelsort = $self->get_model();
+    my $model = $modelsort->get_model();
 
     # Delete the given UUID from the PACTree
-    $modelsort->foreach(sub
-    {
+    $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $node_uuid = $store->get_value($iter, 2);
-        return 0 unless $node_uuid eq $uuid;
-        $model->remove($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path) ));
+        if ($node_uuid ne $uuid) {
+            return 0;
+        }
+        $model->remove($modelsort->convert_iter_to_child_iter($modelsort->get_iter($path)));
         return 1;
     });
 
@@ -155,13 +166,14 @@ sub _setTreeFocus {
 
     my $model = $self->get_model;
 
-    $model->foreach(sub
-    {
+    $model->foreach(sub {
         my ($store, $path, $iter) = @_;
 
         my $elem_uuid = $model->get_value($model->get_iter($path), 2);
 
-        return 0 unless $elem_uuid eq $uuid;
+        if ($elem_uuid ne $uuid) {
+            return 0;
+        }
 
         $self->expand_to_path($path);
         $self->set_cursor($path, undef, 0);
@@ -171,33 +183,36 @@ sub _setTreeFocus {
 
     return 1;
 }
-# End of PAC specific methods
+# End of Ásbrú specific methods
 
 sub text_cell_edited {
     my ($cell_renderer, $text_path, $new_text, $model) = @_;
-    my $path = Gtk3::TreePath->new_from_string ($text_path);
-    my $iter = $model->get_iter ($path);
-    $model->set ($iter, $cell_renderer->{column}, $new_text);
+    my $path = Gtk3::TreePath->new_from_string($text_path);
+    my $iter = $model->get_iter($path);
+    $model->set($iter, $cell_renderer->{column}, $new_text);
 }
 
 sub new {
-    croak "Usage: $_[0]\->new (title => type, ...)\n"
-        . " expecting a list of column title and type name pairs.\n"
-        . " can't create a SimpleTree with no columns"
-        unless @_ >= 3; # class, key1, val1
+    if (!(@_ >= 3)) {
+        croak "Usage: $_[0]\->new (title => type, ...)\n"
+            . " expecting a list of column title and type name pairs.\n"
+            . " can't create a SimpleTree with no columns";
+    }
     return shift->new_from_treeview (Gtk3::TreeView->new (), @_);
 }
 
 sub new_from_treeview {
     my $class = shift;
     my $view = shift;
-    croak "treeview is not a Gtk3::TreeView"
-        unless defined ($view)
-           and UNIVERSAL::isa ($view, 'Gtk3::TreeView');
-    croak "Usage: $class\->new_from_treeview (treeview, title => type, ...)\n"
-        . " expecting a treeview reference and list of column title and type name pairs.\n"
-        . " can't create a SimpleTree with no columns"
-        unless @_ >= 2; # key1, val1
+
+    if (!(defined ($view) and UNIVERSAL::isa ($view, 'Gtk3::TreeView'))) {
+        croak "treeview is not a Gtk3::TreeView";
+    }
+    if (!(@_ >= 2)) {
+        croak "Usage: $class\->new_from_treeview (treeview, title => type, ...)\n"
+            . " expecting a treeview reference and list of column title and type name pairs.\n"
+            . " can't create a SimpleTree with no columns";
+    }
 
     # Defines a special column type that does not use a standard renderer
     # The renderer is built by function 'column_builder'
@@ -223,11 +238,13 @@ sub new_from_treeview {
     my @column_info = ();
     for (my $i = 0; $i < @_ ; $i+=2) {
         my $typekey = $_[$i+1];
-        croak "expecting pairs of title=>type"
-            unless $typekey;
-        croak "unknown column type $typekey, use one of "
-            . join(", ", keys %column_types)
-            unless exists $column_types{$typekey};
+
+        if (!$typekey) {
+            croak "expecting pairs of title=>type";
+        }
+        if (!(exists $column_types{$typekey})) {
+            croak "unknown column type $typekey, use one of " . join(", ", keys %column_types);
+        }
         my $type = $column_types{$typekey}{type};
         if (not defined $type) {
             $type = 'Glib::String';
@@ -309,20 +326,26 @@ sub new_from_treeview {
 
 sub set_column_editable {
     my ($self, $index, $editable) = @_;
-    my $column = $self->get_column ($index);
-    croak "invalid column index $index"
-        unless defined $column;
-    my $cell_renderer = $column->get_cells;
-    $cell_renderer->set (editable => $editable);
+    my $column = $self->get_column($index);
+
+    if (!defined $column) {
+        croak "invalid column index $index";
+    }
+
+    my $cell_renderer = $column->get_cells();
+    $cell_renderer->set(editable => $editable);
 }
 
 sub get_column_editable {
     my ($self, $index, $editable) = @_;
-    my $column = $self->get_column ($index);
-    croak "invalid column index $index"
-        unless defined $column;
-    my $cell_renderer = $column->get_cells;
-    return $cell_renderer->get ('editable');
+    my $column = $self->get_column($index);
+
+    if (!defined $column) {
+        croak "invalid column index $index";
+    }
+
+    my $cell_renderer = $column->get_cells();
+    return $cell_renderer->get('editable');
 }
 
 sub set_data_array {
