@@ -898,7 +898,7 @@ sub _initGUI {
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{shellBtn}->get_style_context()->add_class("button-cp");
     }
-    $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell <Ctrl><Shift>t');
+    $$self{_GUI}{shellBtn}->set_tooltip_text('Launch new local shell');
 
     # Create "Preferences" button
     $$self{_GUI}{configBtn} = Gtk3::Button->new();
@@ -1038,6 +1038,9 @@ sub _initGUI {
 
     # Get the KeyBindings object from configuration
     $FUNCS{_KEYBINDS} = $$self{_CONFIG}{_KEYBINDS};
+
+    # Add some key bindings to existing button tooltip
+    $$self{_GUI}{shellBtn}->set_tooltip_text($$self{_GUI}{shellBtn}->get_tooltip_text() . ' (' . $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('pacmain', 'localshell') . ')');
 
     # Build Edit window
     $FUNCS{_EDIT} = $$self{_EDIT} = PACEdit->new($$self{_CFG});
