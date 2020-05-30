@@ -488,46 +488,46 @@ sub _initGUI {
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new(1, 0);
     $$self{_GUI}{vboxCommandPanel}->pack_start($$self{_GUI}{hbuttonbox1}, 0, 1, 0);
 
-    # Create groupAdd button
+    # Create "Add Group" button
     $$self{_GUI}{groupAddBtn} = Gtk3::Button->new();
     $$self{_GUI}{groupAddBtn}->set_image(Gtk3::Image->new_from_stock('asbru-group-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{groupAddBtn}, 1, 1, 0);
     $$self{_GUI}{groupAddBtn}->set('can-focus' => 0);
     $$self{_GUI}{groupAddBtn}->get_style_context()->add_class("button-cp");
-    $$self{_GUI}{groupAddBtn}->set_tooltip_text('New GROUP');
+    $$self{_GUI}{groupAddBtn}->set_tooltip_text('Add a new group in the selected node');
 
-    # Create connAdd button
+    # Create "Add Connection" button
     $$self{_GUI}{connAddBtn} = Gtk3::Button->new();
     $$self{_GUI}{connAddBtn}->set_image(Gtk3::Image->new_from_stock('asbru-node-add', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connAddBtn}, 1, 1, 0);
     $$self{_GUI}{connAddBtn}->set('can-focus' => 0);
     $$self{_GUI}{connAddBtn}->get_style_context()->add_class("button-cp");
-    $$self{_GUI}{connAddBtn}->set_tooltip_text('New CONNECTION');
+    $$self{_GUI}{connAddBtn}->set_tooltip_text('Add a new connection in the selected node');
 
-    # Create connEditBtn button
+    # Create "Edit" button
     $$self{_GUI}{connEditBtn} = Gtk3::Button->new();
     $$self{_GUI}{connEditBtn}->set_image(Gtk3::Image->new_from_stock('gtk-edit', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{connEditBtn}, 1, 1, 0);
     $$self{_GUI}{connEditBtn}->set('can-focus' => 0);
     $$self{_GUI}{connEditBtn}->get_style_context()->add_class("button-cp");
-    $$self{_GUI}{connEditBtn}->set_tooltip_text('Edit this Connection');
+    $$self{_GUI}{connEditBtn}->set_tooltip_text('Edit the currently selected node');
 
-    # Create nodeRen button
+    # Create "Rename" button
     $$self{_GUI}{nodeRenBtn} = Gtk3::Button->new();
     $$self{_GUI}{nodeRenBtn}->set_image(Gtk3::Image->new_from_stock('gtk-spell-check', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeRenBtn}, 1, 1, 0);
     $$self{_GUI}{nodeRenBtn}->set('can-focus' => 0);
     $$self{_GUI}{nodeRenBtn}->get_style_context()->add_class("button-cp");
-    $$self{_GUI}{nodeRenBtn}->set_tooltip_text('Rename this node');
+    $$self{_GUI}{nodeRenBtn}->set_tooltip_text('Rename the currently selected node');
 
-    # Create nodeDel button
+    # Create "Delete" button
     $$self{_GUI}{nodeDelBtn} = Gtk3::Button->new();
     $$self{_GUI}{nodeDelBtn}->set_image(Gtk3::Image->new_from_stock('gtk-delete', 'button'));
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{nodeDelBtn}, 1, 1, 0);
     $$self{_GUI}{nodeDelBtn}->set('can-focus' => 0);
     $$self{_GUI}{nodeDelBtn}->get_style_context()->add_class("button-cp");
     $$self{_GUI}{nodeDelBtn}->set_sensitive(0);
-    $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete this node(s)');
+    $$self{_GUI}{nodeDelBtn}->set_tooltip_text('Delete the selected node(s)');
 
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{main}->set_decorated(0);
@@ -726,28 +726,28 @@ sub _initGUI {
     $$self{_GUI}{hboxsearchstart} = Gtk3::HBox->new(0, 0);
     $$self{_GUI}{hbox0}->pack_start($$self{_GUI}{hboxsearchstart}, 0, 1, 0);
 
-    # Create a connSearch button
+    # Create a "Search" button
     $$self{_GUI}{connSearch} = Gtk3::Button->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connSearch}, 0, 1, 0);
     $$self{_GUI}{connSearch}->set_image(Gtk3::Image->new_from_stock('gtk-find', 'button'));
     $$self{_GUI}{connSearch}->set('can-focus' => 0);
     $$self{_GUI}{connSearch}->set_tooltip_text('Start interactive search for connections');
 
-    # Create connExecBtn button
+    # Create "Start" button
     $$self{_GUI}{connExecBtn} = Gtk3::Button->new('Connect');
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connExecBtn}, 1, 1, 0);
     $$self{_GUI}{connExecBtn}->set_image(Gtk3::Image->new_from_stock('gtk-connect', 'button'));
     $$self{_GUI}{connExecBtn}->set('can-focus' => 0);
     $$self{_GUI}{connExecBtn}->set_tooltip_text('Start selected terminals/groups');
 
-    # Create connQuickBtn button
+    # Create "Quick Connect" button
     $$self{_GUI}{connQuickBtn} = Gtk3::Button->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connQuickBtn}, 0, 1, 0);
     $$self{_GUI}{connQuickBtn}->set_image(Gtk3::Image->new_from_stock('asbru-quick-connect', 'button'));
     $$self{_GUI}{connQuickBtn}->set('can-focus' => 0);
     $$self{_GUI}{connQuickBtn}->set_tooltip_text('Start a new connection, without saving it');
 
-    # Create connFavourite button
+    # Create "Favourite" button
     $$self{_GUI}{connFavourite} = Gtk3::ToggleButton->new();
     $$self{_GUI}{hboxsearchstart}->pack_start($$self{_GUI}{connFavourite}, 1, 1, 0);
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('gtk-about', 'button'));
