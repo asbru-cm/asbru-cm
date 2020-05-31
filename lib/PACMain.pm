@@ -45,6 +45,7 @@ use OSSP::uuid;
 use POSIX ":sys_wait_h";
 use POSIX qw (strftime);
 use Crypt::CBC;
+use SortedTreeStore;
 use Vte;
 
 # GTK
@@ -574,9 +575,7 @@ sub _initGUI {
     $$self{_GUI}{treeConnections}->set_has_tooltip(1);
     $$self{_GUI}{treeConnections}->set_grid_lines('GTK_TREE_VIEW_GRID_LINES_NONE');
     # Implement a "TreeModelSort" to auto-sort the data
-    my $sort_model_conn = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeConnections}->get_model());
-    $$self{_GUI}{treeConnections}->set_model($sort_model_conn);
-    $sort_model_conn->set_default_sort_func(\&__treeSort, $$self{_CFG});
+    $$self{_GUI}{treeConnections}->set_model(SortedTreeStore->create($$self{_GUI}{treeConnections}->get_model(), $$self{_CFG}, $$self{_VERBOSE}));
     $$self{_GUI}{treeConnections}->get_selection()->set_mode('GTK_SELECTION_MULTIPLE');
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
@@ -642,9 +641,7 @@ sub _initGUI {
     $$self{_GUI}{scroll2}->add($$self{_GUI}{treeFavourites});
 
     # Implement a "TreeModelSort" to auto-sort the data
-    my $sort_modelfav = Gtk3::TreeModelSort->new_with_model($$self{_GUI}{treeFavourites}->get_model());
-    $$self{_GUI}{treeFavourites}->set_model($sort_modelfav);
-    $sort_modelfav->set_default_sort_func(\&__treeSort, $$self{_CFG});
+    $$self{_GUI}{treeFavourites}->set_model(SortedTreeStore->create($$self{_GUI}{treeFavourites}->get_model(), $$self{_CFG}, $$self{_VERBOSE}));
 
     $$self{_GUI}{treeFavourites}->set_enable_tree_lines(0);
     $$self{_GUI}{treeFavourites}->set_show_expanders(0);
@@ -1125,14 +1122,17 @@ sub _setupCallbacks {
     # TREECONNECTIONS RELATED CALLBACKS
     ###################################
 
-    # Setup some drag and drop operations
-    my $drag_dest = $$self{_CFG}{'defaults'}{'tabs in main window'} ? $$self{_GUI}{vboxConnectionPanel} : $$self{_GUI}{nb};
+    # Create a structure to be managed by drag and drop operations (that can be used to start a new connection)
+    my $target_new_connection = Gtk3::TargetEntry->new('asbru/connection', ${Gtk3::TargetFlags->new (qw/same-app/)}, 0);
 
-    my @targets = Gtk3::TargetEntry->new('Connect', [], 0);
-    $drag_dest->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, [ 'copy', 'move' ]);
+    # Enable a drag and drop destination on which a new connection can be started
+    my $drag_dest = $$self{_CFG}{'defaults'}{'tabs in main window'} ? $$self{_GUI}{vboxConnectionPanel} : $$self{_GUI}{nb};
+    $drag_dest->drag_dest_set('GTK_DEST_DEFAULT_ALL', [ $target_new_connection ], [ 'move' ]);
+
+    # Handle drag and drop events
     $drag_dest->signal_connect('drag_motion' => sub {
         $_[0]->get_parent_window()->raise();
-        return 1;
+        return 0;
     });
     $drag_dest->signal_connect('drag_drop' => sub {
         my ($me, $context, $x, $y, $data, $info, $time) = @_;
@@ -1159,6 +1159,14 @@ sub _setupCallbacks {
 
     # Prepare common signalhandler for all three trees (DnD and tooltips)
     foreach my $what ('treeConnections', 'treeFavourites', 'treeHistory') {
+        # This tree ($what) will be a drag target for itself
+        my $target_tree = Gtk3::TargetEntry->new('GTK_TREE_MODEL_ROW', ${Gtk3::TargetFlags->new (qw/same-widget/)}, 1);
+        $$self{_GUI}{$what}->enable_model_drag_dest([ $target_tree ], [ 'default', 'move' ]);
+
+        # This tree will be a drag source several targets
+        $$self{_GUI}{$what}->enable_model_drag_source('GDK_BUTTON1_MASK', [ $target_new_connection, $target_tree ], [ 'default', 'move' ]);
+
+        # Render tooltip on tree nodes
         $$self{_GUI}{$what}->signal_connect('query_tooltip' => sub {
             my ($widget, $x, $y, $keyboard_tooltip, $tooltip_widget) = @_;
 
@@ -1205,49 +1213,43 @@ sub _setupCallbacks {
 
             return 1;
         });
-        $$self{_GUI}{$what}->drag_source_set('GDK_BUTTON1_MASK', \@targets, [ 'copy', 'move' ]);
-        $$self{_GUI}{$what}->signal_connect('drag_begin' => sub {
-            my ($me, $context, $x, $y, $data, $info, $time) = @_;
 
+        $$self{_GUI}{$what}->signal_connect('drag_begin' => sub {
+            my ($tree, $context) = @_;
             my @sel = $$self{_GUI}{$what}->_getSelectedUUIDs();
+
+            # No drag and drop for the root node
             if ($sel[0] eq '__PAC__ROOT__') {
-                return 0;
+                delete $$self{'DND'}{'selection'};
+                return;
             }
+
+            # Remember information about the dragged item
             $$self{'DND'}{'context'} = $context;
             $$self{'DND'}{'text'} = '';
             @{ $$self{'DND'}{'selection'} } = @sel;
-
-            $$self{'DND'}{'text'} = "<b> - Start / Chain(drop over connected Terminal):</b>";
-            foreach my $uuid (@sel) {
-                $$self{'DND'}{'text'} .= "\n" . ($$self{_CFG}{'environments'}{$uuid}{'_is_group'} ? '<b>Group:</b> ' : '<b>Connection:</b> ') . __($$self{_CFG}{'environments'}{$uuid}{'name'});
-            }
-            my $icon_window = Gtk3::Window->new();
-            my $icon_label = Gtk3::Label->new();
-            $icon_label->set_markup($$self{'DND'}{'text'});
-            $icon_label->set_margin_start(3);
-            $icon_label->set_margin_end(3);
-            $icon_label->set_margin_top(3);
-            $icon_label->set_margin_bottom(3);
-            $icon_window->get_style_context->add_class('dnd-icon');
-            $icon_window->add($icon_label);
-            $icon_window->show_all();
-            my ($w, $h) = $icon_window->get_size();
-            Gtk3::drag_set_icon_widget($context, $icon_window, $w / 2, $h);
         });
 
-        $$self{_GUI}{$what}->signal_connect('drag_end' => sub { $$self{'DND'} = undef; return 1; });
         $$self{_GUI}{$what}->signal_connect('drag_failed' => sub {
             my ($w, $px, $py) = $$self{_GUI}{main}->get_window()->get_pointer();
             my $wsx = $$self{_GUI}{main}->get_window()->get_width();
             my $wsy = $$self{_GUI}{main}->get_window()->get_height();
 
-            # User cancelled the drop operation: finish
-            $_[2] eq 'user-cancelled' and return 0;
+            if ($$self{_VERBOSE}) {
+                print("drag failed $_[2] \n");
+            }
+
+            # User cancelled the drop operation (or time out), do not process further
+            # (only consider valid DnD that did not end up onto a valid target
+            if ($_[2] ne 'no-target') {
+                return 0;
+            }
 
             # Drop happened out of window: launch terminals
-            if (($px < 0) || ($py < 0) || ($px > $wsx) || ($py > $wsy)) {
+            if ($px < 0 || $py < 0 || $px > $wsx || $py > $wsy) {
                 my @idx;
                 my %tmp;
+
                 foreach my $uuid (@{ $$self{'DND'}{'selection'} }) {
                     if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
                         if (!_wConfirm($$self{_GUI}{main}, "<b>ATTENTION!!</b> You have dropped some group(s)\nAre you sure you want to start <b>ALL</b> of its child connections?")) {
@@ -1268,6 +1270,51 @@ sub _setupCallbacks {
             # Drop happened inside of window: finish
             return 0;
         });
+
+        $$self{_GUI}{$what}->signal_connect('drag_drop' => sub {
+            my ($tree, $context, $x, $y, $time) = @_;
+            my ($dest_path, $position) = $tree->get_dest_row_at_pos($x, $y);
+            my $model = $tree->get_model();
+            my ($src_uuid, $src, $dest_uuid, $dest);
+
+            if ($$self{'DND'}{'selection'} && @{$$self{'DND'}{'selection'}}) {
+                $src_uuid = @{$$self{'DND'}{'selection'}}[0];
+                $src = $$self{_CFG}{'environments'}{$src_uuid};
+            }
+            if ($model->get_iter($dest_path)) {
+                $dest_uuid = $model->get_value($model->get_iter($dest_path), 2);
+                $dest = $$self{_CFG}{'environments'}{$dest_uuid};
+            }
+
+            if (!$src_uuid || !$dest_uuid || $src_uuid eq $dest_uuid) {
+                # No source, no destination or they are equal, nothing to do
+                return 1;
+            }
+
+            if ($$self{_VERBOSE}) {
+                print("Drag drop on $what ; $tree ; $context ; $time ; ($dest_path, $position)\n");
+                print("--------------------------------------------\n");
+                print("Drag source:\n");
+                print("UUID = {$src_uuid}\n");
+                print("Name = [" . $$src{'name'} . "], Is Group? = [" . $$src{'_is_group'} . "]\n");
+                print("--------------------------------------------\n");
+                print("Drag destination:\n");
+                print("UUID = {$dest_uuid}\n");
+                print("Name = [" . $$dest{'name'} . "], Is Group? = [" . $$dest{'_is_group'} . "]\n");
+                print("--------------------------------------------\n");
+            }
+
+            $self->_cutNodes([ $src_uuid ]);
+
+            foreach my $copy_uuid (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
+                $self->_pasteNodes($dest_uuid, $copy_uuid);
+                $tree->_setTreeFocus($copy_uuid);
+            }
+            $$self{_COPY}{'data'} = {};
+
+            return 1;
+        });
+        
     }
 
     # Capture 'add group' button clicked
@@ -2385,43 +2432,6 @@ sub __search {
         return 0;
     });
     return \@result;
-}
-
-sub __treeSort {
-    my ($treestore, $a_iter, $b_iter, $cfg) = @_;
-
-    my $groups_1st = $$cfg{'defaults'}{'sort groups first'} // 1;
-    my $b_uuid = $treestore->get_value($b_iter, 2);
-    if (!defined $b_uuid) {
-        return 0;
-    }
-    # __PAC__ROOT__ must always be the first node!!
-    if ($b_uuid eq '__PAC__ROOT__') {
-        return 1;
-    }
-
-    my $a_uuid = $treestore->get_value($a_iter, 2);
-    if (!defined $a_uuid) {
-        return 1;
-    }
-    # __PAC__ROOT__ must always be the first node!!
-    if ($a_uuid eq '__PAC__ROOT__') {
-        return -1;
-    }
-
-    # Groups first...
-    if ($groups_1st) {
-        my $a_is_group = $$cfg{'environments'}{ $a_uuid }{'_is_group'};
-        my $b_is_group = $$cfg{'environments'}{ $b_uuid }{'_is_group'};
-        if ($a_is_group && ! $b_is_group){
-            return -1;
-        }
-        if (! $a_is_group && $b_is_group){
-            return 1;
-        }
-    }
-    # ... then alphabetically
-    return lc($$cfg{'environments'}{$a_uuid}{name}) cmp lc($$cfg{'environments'}{$b_uuid}{name});
 }
 
 sub __treeBuildNodeName {
@@ -3960,7 +3970,12 @@ sub _cutNodes {
     my @sel_uuids = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
     my $total = scalar(@sel_uuids);
 
-    if (!$total || ($sel_uuids[0] eq '__PAC__ROOT__')) {
+    if (!$total) {
+        print("ERROR: Nothing to cut\n");
+        return 1;
+    }
+    if ($sel_uuids[0] eq '__PAC__ROOT__') {
+        print("ERROR: Cannot cut the root node\n");
         return 1;
     }
     if ($self->_hasProtectedChildren(\@sel_uuids)) {
@@ -3968,8 +3983,9 @@ sub _cutNodes {
     }
 
     # Copy the selected nodes
-    $self->_copyNodes('cut');
+    $self->_copyNodes('cut', '__PAC__COPY__', \@sel_uuids);
     if (! scalar(keys %{ $$self{_COPY}{'data'} })) {
+        print("ERROR: Failed to copy-cut selected data\n");
         return 1;
     }
 
@@ -3981,7 +3997,6 @@ sub _cutNodes {
     # Delete selected nodes from the configuration
     $self->_delNodes(@sel_uuids);
 
-    #$$self{_CFG}{tmp}{changed} = 1;
     $self->_setCFGChanged(1);
     return 1;
 };
@@ -3993,9 +4008,11 @@ sub _pasteNodes {
     my $first = shift // 1;
 
     if (!scalar(keys %{ $$self{_COPY}{'data'} })) {
+        print("ERROR: No data to copy...\n");
         return 1;
     }
     if ((!$$self{_CFG}{'environments'}{$parent}{'_is_group'}) && ($parent ne '__PAC__ROOT__')) {
+        print("ERROR: Cannot paste outside of root parent\n");
         return 1;
     }
 
@@ -4030,7 +4047,6 @@ sub _pasteNodes {
         $FUNCS{_TRAY}->_setTrayMenu();
     }
 
-    #$$self{_CFG}{tmp}{changed} = 1;
     $self->_setCFGChanged(1);
     return 1;
 };
@@ -4850,10 +4866,6 @@ Search action over nodes : {CFG}{environments}{uuid}{name,ip,description}
     text    text to search
     tree    gtk tree object to search from
     where   name , host or desc
-
-=head2 sub __treeSort ()
-
-Sorts nodes tree by alphaetical order
 
 =head2 sub __treeBuildNodeName (uuid)
 
