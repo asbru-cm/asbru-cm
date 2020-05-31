@@ -1,5 +1,25 @@
 package PACTree;
 
+###############################################################################
+# This file is part of Ásbrú Connection Manager
+#
+# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+#
+# Ásbrú Connection Manager is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ásbrú Connection Manager is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License version 3
+# along with Ásbrú Connection Manager.
+# If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+###############################################################################
+
 use strict;
 use Carp;
 use Gtk3;
@@ -52,7 +72,6 @@ sub _getChildren {
     my $which = shift // 'all'; # 0:nodes, 1:groups, all:nodes+groups
     my $deep = shift // 0;      # 0:1st_level, 1:all_levels
 
-    my $selection = $self->get_selection();
     my $modelsort = $self->get_model();
     my $model = $modelsort->get_model();
 
@@ -66,16 +85,16 @@ sub _getChildren {
         my $node_name = $store->get_value($iter, 1);
 
         if ($node_uuid eq $uuid) {
-            $root = $path->to_string;
+            $root = $path->to_string();
         }
-        if (!(defined $root && ($deep || $path->to_string =~ /^$root:\d+$/g))) {
+        if (!(defined $root && ($deep || $path->to_string() =~ /^$root:\d+$/g))) {
             return 0;
         }
 
-        if ((($path->to_string =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__'))) {
+        if ((($path->to_string() =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__'))) {
             push(@list, $node_uuid);
         }
-        return $path->to_string !~ /^$root/g;
+        return $path->to_string() !~ /^$root/g;
     });
 
     return wantarray ? @list : scalar(@list);
@@ -85,7 +104,6 @@ sub _getPath {
     my $self = shift;
     my $uuid = shift;
 
-    my $selection = $self->get_selection();
     my $modelsort = $self->get_model();
     my $model = $modelsort->get_model();
 
@@ -99,7 +117,7 @@ sub _getPath {
         if ($node_uuid ne $uuid) {
             return 0;
         }
-        $ret_path = $path->to_string;
+        $ret_path = $path->to_string();
         return 1;
     });
 
@@ -140,7 +158,6 @@ sub _delNode {
     my $self = shift;
     my $uuid = shift;
 
-    my $selection = $self->get_selection();
     my $modelsort = $self->get_model();
     my $model = $modelsort->get_model();
 
