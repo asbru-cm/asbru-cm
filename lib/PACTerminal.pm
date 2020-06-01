@@ -549,7 +549,7 @@ sub stop {
 
     # Try to ensure we leave no background "asbru_conn" processes running after closing the terminal
     if ($$self{_PID}) {
-        kill(15, $$self{_PID});
+        $self->_disconnectTerminal();
     }
     if ($$self{_PID}) {
         $PACMain::FUNCS{_STATS}->stop($$self{_UUID});
@@ -1021,7 +1021,7 @@ sub _setupCallbacks {
                 $$self{_FULLSCREEN} = 1;
             }
         } elsif ($action eq 'disconnect') {
-            kill(15, $$self{_PID});
+            $self->_disconnectTerminal();
         } elsif ($action eq 'sftp') {
             $self->_openSFTP()
         } elsif ($action eq 'reset') {
@@ -1291,7 +1291,7 @@ sub _setupCallbacks {
         $PACMain::FUNCS{_CLUSTER}->_updateGUI();
 
         if ($$self{_SPLIT} && $$self{_CFG}{'defaults'}{'unsplit disconnected terminals'}) {
-            $self->_unsplit;
+            $self->_unsplit();
         }
 
         $$self{_PID} = 0;
@@ -1299,7 +1299,7 @@ sub _setupCallbacks {
         if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
             sleep($$self{_RECONNECTS});
             $$self{_RECONNECTS}++;
-            $self->start;
+            $self->start();
         } else {
             # Check for post-connection commands execution
             $self->_wPrePostExec('local after');
@@ -1326,7 +1326,7 @@ sub _watchConnectionData {
     }
 
     # This should be as fast as possible, since we are called from a 'data-in' callback from the client socket
-    $self->_receiveData;
+    $self->_receiveData();
 
     while (my $data = shift(@{$self->{_SOCKET_BUFFER}})) {
         $data = decode('UTF-16', $data);
@@ -1334,7 +1334,7 @@ sub _watchConnectionData {
         if ($data eq 'CONNECTED') {
             $$self{_GUI}{statusIcon}->set_from_stock('asbru-terminal-ok-small', 'button');
             $$self{_GUI}{statusIcon}->set_tooltip_text('Connected');
-            $$self{_GUI}{statusExpect}->clear;
+            $$self{_GUI}{statusExpect}->clear();
             $$self{CONNECTED} = 1;
             $$self{CONNECTING} = 0;
             $$self{_BADEXIT} = 0;
@@ -1360,7 +1360,7 @@ sub _watchConnectionData {
                     $title = $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' ?
                     "FreeRDP: $$self{_CFG}{environments}{$$self{_UUID}}{ip}" . ($$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}") :
                     "TightVNC: $$self{_CFG}{environments}{$$self{_UUID}}{user}";
-                    my $list = _getXWindowsList;
+                    my $list = _getXWindowsList();
                     if (grep({$_ =~ /$title/ and $title = $_;} keys %{$$list{'by_name'}})) {
                         $$self{_GUI}{_SOCKET}->add_id($$list{'by_name'}{$title}{'xid'});
                     }
@@ -1490,7 +1490,9 @@ sub _watchConnectionData {
             }
             $$self{_GUI}{statusExpect}->clear;
             $$self{_BADEXIT} = $$self{CONNECTING};
-            $$self{_PID} and kill(15, $$self{_PID});
+            if ($$self{_PID}) {
+                $self->_disconnectTerminal();
+            }
         } elsif ($data =~ /^EXPECT:WAITING:(.+)/go) {
             $$self{_GUI}{statusExpect}->set_from_stock('gtk-media-play', 'button');
             $$self{_GUI}{statusExpect}->set_tooltip_text("Expecting '$1'");
@@ -1613,7 +1615,7 @@ sub _vteMenu {
             label => "Stop script '$$self{_SCRIPT_NAME}'",
             stockicon => 'gtk-media-stop',
             sensitive => 1,
-            code => sub {kill(15, $$self{_PID});}
+            code => sub {$self->_disconnectTerminal()}
         });
 
         _wPopUpMenu(\@vte_menu_items, $event);
@@ -2186,7 +2188,7 @@ sub _vteMenu {
                 label => 'Restart session',
                 stockicon => 'gtk-execute',
                 sensitive => ! $$self{CONNECTED} || ! $$self{_PID},
-                code => sub{$self->start;}
+                code => sub{$self->start();}
             },
             # Disconnect
             {
@@ -2194,7 +2196,7 @@ sub _vteMenu {
                 stockicon => 'gtk-stop',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','disconnect'),
                 sensitive => $$self{_PID},
-                code => sub {kill(15, $$self{_PID});}
+                code => sub {$self->_disconnectTerminal();}
             },
             # Disconnect and restart session
             {
@@ -2571,7 +2573,7 @@ sub _tabMenu {
             label => "Stop script '$$self{_SCRIPT_NAME}'",
             stockicon => 'gtk-media-stop',
             sensitive => 1,
-            code => sub {kill(15, $$self{_PID});}
+            code => sub {$self->_disconnectTerminal()}
         });
 
         _wPopUpMenu(\@vte_menu_items, $event);
@@ -2742,7 +2744,7 @@ sub _tabMenu {
     # Add close terminal
     push(@vte_menu_items, {separator => 1});
     # Add a 'disconnect' button to disconnect without closing the terminal
-    push(@vte_menu_items, {label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub {kill(15, $$self{_PID});}});
+    push(@vte_menu_items, {label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub {$self->_disconnectTerminal();}});
     push(@vte_menu_items, {label => 'Restart session', stockicon => 'gtk-execute', sensitive => !$$self{CONNECTED} || !$$self{_PID}, code => sub {$self->start();}});
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', code => sub {$self->stop(undef, 1);}});
     push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', code => sub {
@@ -4072,13 +4074,19 @@ sub _checkSendKeystrokes {
     return $data;
 }
 
+sub _disconnectTerminal {
+    my $self = shift;
+
+    return kill(15, $$self{_PID});
+}
+
 sub _disconnectAndRestartTerminal {
     my $self = shift;
 
-    if (kill(15, $$self{_PID})) {
+    if ($self->disconnectTerminal()) {
         # If successfully killed, restart
         Glib::Timeout->add_seconds(1, sub {
-            $self->start;
+            $self->start();
             return 0;
         });
     }
