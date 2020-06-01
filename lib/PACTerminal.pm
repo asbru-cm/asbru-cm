@@ -4072,7 +4072,15 @@ sub _checkSendKeystrokes {
 sub _disconnectTerminal {
     my $self = shift;
 
-    return kill(15, $$self{_PID});
+    if ($self->{CONNECTED} && $$self{_PID}) {
+        # Hide the embed window to avoid unexpected updates or crashes when killing the underlying process
+        if ($$self{_GUI}{_SOCKET} && $$self{_GUI}{_SOCKET}->get_plug_window()) {
+            $self->_showEmbedMessages();
+        }
+        return kill(15, $$self{_PID});
+    }
+
+    return 0;
 }
 
 sub _disconnectAndRestartTerminal {
