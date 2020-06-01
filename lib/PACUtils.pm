@@ -2153,7 +2153,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'info font'} //= 'monospace';
     $$cfg{'defaults'}{'use login shell to connect'} //= 0;
     $$cfg{'defaults'}{'audible bell'} //= 0;
-    $$cfg{'defaults'}{'ctrl tab'} //= 'last';
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
     $$cfg{'defaults'}{'selection to clipboard'} //= 1;

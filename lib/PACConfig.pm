@@ -806,8 +806,6 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgStartTreeCluster')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'clusters');
     _($self, 'cbCfgShowTreeTooltips')->set_active($$cfg{'defaults'}{'show connections tooltips'});
     _($self, 'cbCfgUseShellToConnect')->set_active($$cfg{'defaults'}{'use login shell to connect'});
-    _($self, 'rbCfgCtrlTabLast')->set_active($$cfg{'defaults'}{'ctrl tab'} eq 'last');
-    _($self, 'rbCfgCtrlTabNext')->set_active($$cfg{'defaults'}{'ctrl tab'} ne 'last');
     _($self, 'cbCfgAutoAppendGroupName')->set_active($$cfg{'defaults'}{'append group name'});
     _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     _($self, 'rbOnNoTabsNothing')->set_active($$cfg{'defaults'}{'when no more tabs'} == 0);
@@ -1102,7 +1100,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'info font'} = _($self, 'fontInfo')->get_font_name();
     $$self{_CFG}{'defaults'}{'use login shell to connect'} = _($self, 'cbCfgUseShellToConnect')->get_active();
     $$self{_CFG}{'defaults'}{'audible bell'} = _($self, 'cbCfgAudibleBell')->get_active();
-    $$self{_CFG}{'defaults'}{'ctrl tab'} = _($self, 'rbCfgCtrlTabLast')->get_active() ? 'last' : 'next';
     $$self{_CFG}{'defaults'}{'terminal show status bar'} = _($self, 'cbCfgShowTerminalStatus')->get_active();
     $$self{_CFG}{'defaults'}{'append group name'} = _($self, 'cbCfgAutoAppendGroupName')->get_active();
     $$self{_CFG}{'defaults'}{'change main title'} = _($self, 'cbCfgChangeMainTitle')->get_active();
