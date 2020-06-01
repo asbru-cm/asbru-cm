@@ -580,11 +580,7 @@ sub stop {
             Glib::Source->remove($$self{_SEND_STRING});
         };
     }
-    if (defined $$self{_EMBED_KIDNAP}) {
-        eval {
-            Glib::Source->remove($$self{_EMBED_KIDNAP});
-        };
-    }
+    $self->_stopEmbedKidnapTimeout();
 
     unlink($$self{_TMPCFG});
     unlink($$self{_TMPPIPE});
@@ -1283,11 +1279,7 @@ sub _setupCallbacks {
                 Glib::Source->remove($$self{_SEND_STRING});
             };
         }
-        if (defined $$self{_EMBED_KIDNAP}) {
-            eval {
-                Glib::Source->remove($$self{_EMBED_KIDNAP});
-            };
-        }
+        $self->_stopEmbedKidnapTimeout();
 
         # _SOCKET_CLIENT is close so no more watch to expect
         undef $$self{_SOCKET_CLIENT_WATCH};
@@ -1357,11 +1349,7 @@ sub _watchConnectionData {
             $self->_updateCFG();
             $data = $self->_checkSendKeystrokes($data);
 
-            if (defined $$self{_EMBED_KIDNAP}) {
-                eval {
-                    Glib::Source->remove($$self{_EMBED_KIDNAP});
-                };
-            }
+            $self->_stopEmbedKidnapTimeout();
             if ($$self{EMBED} && ($$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'RDP (xfreerdp)' || $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'VNC')) {
                 $$self{_EMBED_KIDNAP} = Glib::Timeout->add(500, sub {
                     my $title = 'FreeRDP: ' . $$self{_CFG}{environments}{$$self{_UUID}}{ip} . ($$self{_CFG}{environments}{$$self{_UUID}}{port} == 3389 ? '' : ":$$self{_CFG}{environments}{$$self{_UUID}}{port}");
@@ -1372,6 +1360,7 @@ sub _watchConnectionData {
                     if (grep({$_ =~ /$title/ and $title = $_;} keys %{$$list{'by_name'}})) {
                         $$self{_GUI}{_SOCKET}->add_id($$list{'by_name'}{$title}{'xid'});
                     }
+                    $$self{_EMBED_KIDNAP} = undef;
                     return 0;
                 });
             }
@@ -1490,9 +1479,7 @@ sub _watchConnectionData {
                 }
             });
         } elsif (($data eq 'DISCONNECTED') || ($data =~ /^CLOSE:.+/go) || ($data =~ /^TIMEOUT:.+/go) || ($data =~ /^connect\(\) failed with error '.+'$/go)) {
-            if (defined $$self{_EMBED_KIDNAP}) {
-                Glib::Source->remove($$self{_EMBED_KIDNAP});
-            }
+            $self->_stopEmbedKidnapTimeout();
             if ($$self{EMBED}) {
                 $self->_showEmbedMessages();
             }
@@ -4270,6 +4257,15 @@ sub _checkEmbedWindow {
     }
 
     return 1;
+}
+
+sub _stopEmbedKidnapTimeout {
+    my $self = shift;
+
+    if (defined($$self{_EMBED_KIDNAP})) {
+        Glib::Source->remove($$self{_EMBED_KIDNAP});
+        $$self{_EMBED_KIDNAP} = undef;
+    }
 }
 
 # END: Private functions definitions
