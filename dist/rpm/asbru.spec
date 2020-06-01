@@ -1,4 +1,5 @@
 %define _bashcompletiondir %(pkg-config --variable=completionsdir bash-completion)
+%define __find_requires %{nil}
 
 Name:       asbru-cm
 Version:    %{_version}
