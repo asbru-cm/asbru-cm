@@ -556,9 +556,7 @@ sub stop {
     }
 
     # Try to ensure we leave no background "asbru_conn" processes running after closing the terminal
-    if ($$self{_PID}) {
-        $self->_disconnectTerminal();
-    }
+    $self->_disconnectTerminal();
     if ($$self{_PID}) {
         $PACMain::FUNCS{_STATS}->stop($$self{_UUID});
     }
@@ -1122,7 +1120,7 @@ sub _setupCallbacks {
             return 0;  # Bubble up, let VTE's original handler take care of it.
         }
         my ($widget, $event) = @_;
-        my $state = $event->get_state;
+        my $state = $event->get_state();
         my $shift = $state * ['shift-mask'];
 
         if ($event->button eq 2) {
@@ -1485,9 +1483,7 @@ sub _watchConnectionData {
             }
             $$self{_GUI}{statusExpect}->clear;
             $$self{_BADEXIT} = $$self{CONNECTING};
-            if ($$self{_PID}) {
-                $self->_disconnectTerminal();
-            }
+            $self->_disconnectTerminal();
         } elsif ($data =~ /^EXPECT:WAITING:(.+)/go) {
             $$self{_GUI}{statusExpect}->set_from_stock('gtk-media-play', 'button');
             $$self{_GUI}{statusExpect}->set_tooltip_text("Expecting '$1'");
@@ -1610,7 +1606,9 @@ sub _vteMenu {
             label => "Stop script '$$self{_SCRIPT_NAME}'",
             stockicon => 'gtk-media-stop',
             sensitive => 1,
-            code => sub {$self->_disconnectTerminal()}
+            code => sub {
+                $self->_disconnectTerminal();
+            }
         });
 
         _wPopUpMenu(\@vte_menu_items, $event);
@@ -2176,14 +2174,18 @@ sub _vteMenu {
             {
                 label => 'Duplicate connection',
                 stockicon => 'gtk-copy',
-                code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]])}
+                code => sub {
+                    $PACMain::FUNCS{_MAIN}->_launchTerminals([[$$self{_UUID}]]);
+                }
             },
             # Restart session
             {
                 label => 'Restart session',
                 stockicon => 'gtk-execute',
                 sensitive => ! $$self{CONNECTED} || ! $$self{_PID},
-                code => sub{$self->start();}
+                code => sub{
+                    $self->start();
+                }
             },
             # Disconnect
             {
@@ -2191,7 +2193,9 @@ sub _vteMenu {
                 stockicon => 'gtk-stop',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','disconnect'),
                 sensitive => $$self{_PID},
-                code => sub {$self->_disconnectTerminal();}
+                code => sub {
+                    $self->_disconnectTerminal();
+                }
             },
             # Disconnect and restart session
             {
@@ -2199,14 +2203,18 @@ sub _vteMenu {
                 stockicon => 'gtk-refresh',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','restart'),
                 sensitive => $$self{CONNECTED} && $$self{_PID},
-                code => sub {$self->_disconnectAndRestartTerminal();}
+                code => sub {
+                    $self->_disconnectAndRestartTerminal();
+                }
             },
             # Close terminal
             {
                 label => 'Close Terminal',
                 stockicon => 'gtk-close',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','close'),
-                code => sub {$self->stop(0, 1);}
+                code => sub {
+                    $self->stop(0, 1);
+                }
             },
             # Close all terminals
             {
@@ -2214,7 +2222,9 @@ sub _vteMenu {
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','closeallterminals'),
                 stockicon => 'gtk-close',
                 sensitive => $self->_hasOtherTerminals(),
-                code => sub {$self->_closeAllTerminals();}
+                code => sub {
+                    $self->_closeAllTerminals();
+                }
             },
             # Close disconnected terminals
             {
@@ -2222,7 +2232,9 @@ sub _vteMenu {
                 stockicon => 'gtk-close',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','close-disconected'),
                 sensitive => $self->_hasDisconnectedTerminals(),
-                code => sub {$self->_closeDisconnectedTerminals();}
+                code => sub {
+                    $self->_closeDisconnectedTerminals();
+                }
             }
         ]
     });
@@ -2568,7 +2580,9 @@ sub _tabMenu {
             label => "Stop script '$$self{_SCRIPT_NAME}'",
             stockicon => 'gtk-media-stop',
             sensitive => 1,
-            code => sub {$self->_disconnectTerminal()}
+            code => sub {
+                $self->_disconnectTerminal();
+            }
         });
 
         _wPopUpMenu(\@vte_menu_items, $event);
