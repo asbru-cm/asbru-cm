@@ -1,5 +1,4 @@
 %define _bashcompletiondir %(pkg-config --variable=completionsdir bash-completion)
-%define __find_requires %{nil}
 
 Name:       asbru-cm
 Version:    %{_version}
@@ -9,6 +8,7 @@ License:    GPLv3+
 URL:        https://asbru-cm.net
 Source0:    https://github.com/asbru-cm/asbru-cm/archive/%{version}.tar.gz
 BuildArch:  noarch
+Autoreq:    no 
 Requires:   perl
 Requires:   perl(Carp)
 Requires:   perl(Compress::Raw::Zlib)
