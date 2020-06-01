@@ -1316,7 +1316,6 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
     $CONNECTED = 1;
     ctrl("CONNECTED");
 
-    # No way to expect anything from 'rdesktop' command line...
     $EXP->expect($TIMEOUT_CONNECT,
 
         [eof => sub {
@@ -1339,6 +1338,12 @@ if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'R
                 send_slow($EXP, "N\n");
                 ctrl("CLOSE:HOSTKEY:rejected by configuration (sent 'N')");
             }
+        }],
+
+        # Found question about untrusted certificate ; keep the terminal open and
+        # let the user review this manually
+        ['Do you trust this certificate', sub {
+            $HIDE_TERMINAL = 0;
         }],
 
         # Found login string

@@ -144,6 +144,9 @@ sub new {
     $self->{_FOCUSED} = 0;
     $self->{FOCUS} = 0;
     $self->{EMBED} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'embed'};
+    $self->{EMBED_CHECK_COUNT} = 0;
+    $self->{EMBED_CHECK_TIMEOUT} = 250; # in milliseconds
+    $self->{EMBED_CHECK_TIMEOUT_ID} = undef;
 
     ++$_C;
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
@@ -344,18 +347,23 @@ sub start {
     $$self{_CFG}{'tmp'}{'uuid'} = $$self{_UUID_TMP};
 
     if ($$self{'EMBED'}) {
+        # Reset counter
+        $self->{EMBED_CHECK_COUNT} = 0;
+
         # Create new socket window to plug the embed window from the other process (rdp, vnc, ...)
         # (remove any remaining window before starting to add a new one)
         $$self{_GUI}{_SOCKET} = Gtk3::Socket->new();
         $$self{_GUI}{_SOCKET_PARENT_WINDOW}->foreach(sub {$$self{_GUI}{_SOCKET_PARENT_WINDOW}->remove($_[0]);});
         $$self{_GUI}{_SOCKET_PARENT_WINDOW}->add_with_viewport($$self{_GUI}{_SOCKET});
 
+        # Do not show until conncection is completed
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
+
         # Retrieve the XID of the window on which the external process will have to plug into
         if ($$self{_GUI}{_SOCKET}->get_window()) {
             $$self{_CFG}{'tmp'}{'xid'} = $$self{_GUI}{_SOCKET}->get_window()->get_xid();
             $$self{FOCUS} = $$self{_GUI}{_SOCKET};
         } else {
-            $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
             _vteFeed($$self{_GUI}{_VTE}, " !! ${COL_RED}ERROR${COL_RESET}: unable to created embedded window.  Terminal will be started in a separated window.\r\n\n");
         }
 
@@ -1368,9 +1376,9 @@ sub _watchConnectionData {
                 });
             }
 
-            # Show embed window and hide messages
+            # Check that the embed window is ready and hide messages window accordingly
             if ($$self{EMBED}) {
-                $self->_hideEmbedMessages();
+                $self->_checkEmbedWindow();
             }
 
         } elsif ($data =~ /^EXPLORER:(.+)/go) {
@@ -4219,6 +4227,49 @@ sub _pasteConnectionPassword {
         $pass = $kpxc->applyMask($pass);
     }
     $self->_pasteToVte($pass, 1);
+}
+
+sub _checkEmbedWindow {
+    my $self = shift;
+    my $time_to_connect = $self->{_CFG}{'defaults'}{'timeout connect'};
+
+    if (!$$self{_GUI}{_SOCKET}) {
+        # Too late, the socket does not exist anymore
+        $self->{EMBED_CHECK_TIMEOUT_ID} = undef;
+        return 0;
+    }
+
+    if ($$self{_GUI}{_SOCKET}->get_plug_window()) {
+        $self->_hideEmbedMessages();
+        # We found the plugged window, stop timeout
+        $self->{EMBED_CHECK_TIMEOUT_ID} = undef;
+        return 0;
+    }
+
+    if ($time_to_connect > 0 && ($self->{EMBED_CHECK_COUNT}++) * $self->{EMBED_CHECK_TIMEOUT} > 1000 * $time_to_connect) {
+        # We waited too long, force disconnection (if still connected)
+        if ($self->{CONNECTED}) {
+            _vteFeed($$self{_GUI}{_VTE},"\r\n\n${COL_YELL}WARNING: No window could be connected with expected timeout of $time_to_connect seconds, aborting connection...${COL_RESET}\r\n(note: this timeout can be changed in Preferences > Terminal Options)\r\n");
+            $self->_disconnectTerminal();
+        }
+        # and stop the timeout
+        $self->{EMBED_CHECK_TIMEOUT_ID} = undef;
+        return 0;
+    };
+
+    # Update GUI before querying the size of the embed window
+    Gtk3::main_iteration() while Gtk3::events_pending();
+    $self->_showEmbedMessages();
+
+    # If not yet done, start a timeout that will check again that the embed window
+    # if correctly plugged into the Ásbrú socket
+    if (!defined($self->{EMBED_CHECK_TIMEOUT_ID})) {
+        $self->{EMBED_CHECK_TIMEOUT_ID} = Glib::Timeout->add($self->{EMBED_CHECK_TIMEOUT}, sub {
+            return $self->_checkEmbedWindow();
+        });
+    }
+
+    return 1;
 }
 
 # END: Private functions definitions
