@@ -4137,6 +4137,11 @@ sub _showInfoTab {
 sub _hideEmbedMessages {
     my $self = shift;
 
+    if (!$$self{_GUI}{_VTE}) {
+        # Too late, probably ; message window does not exist anymore
+        return;
+    }
+
     # Hide messages and show the embed window
     $$self{_GUI}{_VTE}->hide();
     $$self{_GUI}{_SOCKET_PARENT_WINDOW}->show_all();
@@ -4151,6 +4156,11 @@ sub _hideEmbedMessages {
 
 sub _showEmbedMessages {
     my $self = shift;
+
+    if (!$$self{_GUI}{_VTE}) {
+        # Too late, probably ; message window does not exist anymore
+        return;
+    }
 
     # Show messages and hide the embed window
     $$self{_GUI}{_SOCKET_PARENT_WINDOW}->hide();
