@@ -1209,9 +1209,9 @@ sub _setupCallbacks {
         });
     }
 
-    # If embedded, add a callback for the 'get focus' button
+    # If embedded, add some more callback to manage keyboard focus and messages window
     if ($$self{EMBED}) {
-        $$self{_GUI}{_BTNFOCUS}->signal_connect ('clicked' => sub {
+        $$self{_GUI}{_BTNFOCUS}->signal_connect('clicked' => sub {
             if (defined $$self{FOCUS}) {
                 $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             }
@@ -1224,6 +1224,12 @@ sub _setupCallbacks {
                 # Messages (in Vte) were not shown; show them now, and hide the actual embed window
                 $self->_showEmbedMessages();
             }
+        });
+        $$self{_GUI}{_SOCKET_PARENT_WINDOW}->signal_connect('enter-notify-event' => sub {
+            if (defined $$self{FOCUS}) {
+                $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
+            }
+            return 0;
         });
     }
 
