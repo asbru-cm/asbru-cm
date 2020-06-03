@@ -4106,7 +4106,7 @@ sub _disconnectTerminal {
 sub _disconnectAndRestartTerminal {
     my $self = shift;
 
-    if ($self->disconnectTerminal()) {
+    if ($self->_disconnectTerminal()) {
         # If successfully killed, restart
         Glib::Timeout->add_seconds(1, sub {
             $self->start();
