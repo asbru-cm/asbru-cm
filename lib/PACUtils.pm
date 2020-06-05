@@ -107,6 +107,7 @@ require Exporter;
     _appName
     _setWindowPaintable
     _setDefaultRGBA
+    _doShellEscape
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -3833,6 +3834,14 @@ sub mydraw {
     return 0;
 }
 
+sub _doShellEscape {
+    my $str = shift;
+
+    $str =~ s/([\$\\`"])/\\$1/g;
+    
+    return $str;
+}
+
 1;
 
 __END__
@@ -4055,6 +4064,10 @@ Hack to make transparent terminals
 =head2 sub mydraw
 
 Generic routine to draw a gray background for widgets that do not painted their own.
+
+=head2 _doShellEscape
+
+Escape characters so that the text can be used in a shell string command, like echo "$VAR"
 
 =head1 Perl particulars
 

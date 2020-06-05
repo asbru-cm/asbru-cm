@@ -1059,7 +1059,7 @@ if (defined $METHOD) {
         _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
-            system("echo \"$PASS\" | vncpasswd -f > $pfile");
+            system("echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > $pfile");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
@@ -1076,7 +1076,7 @@ if (defined $METHOD) {
         } else {
             my $user = '';
 
-            $connection_cmd = "echo \"$PASS\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_cmd = "echo \"" . _doShellEscape($PASS) . "\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
             $connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
         }
     }
