@@ -26,7 +26,7 @@ cd ../
 
 gem install rack -v 1.6.4
 gem install github_changelog_generator
-github_changelog_generator --token ${GITHUB_API_KEY} --release-branch master --user asbru-cm --project asbru-cm --output doc/General/Changelog.md
+github_changelog_generator --token ${GITHUB_API_KEY} --release-branch master --user asbru-cm --project asbru-cm --output doc/General/Changelog.md --no-unreleased
 
 pip3 install --upgrade pip
 pip3 install --user --requirement <(cat <<EOF
