@@ -191,6 +191,9 @@ sub _initGUI {
     _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings},$$self{_WINDOWCONFIG}))->{container});
     _($self, 'nbPreferences')->show_all();
 
+    _($self, 'btnCfgProxyCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
+    _($self, 'btnCfgProxyCheckKPX')->set_label('');
+
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
     _($self, 'btnCfgSaveSessionLogs')->set_extra_widget($$self{cbShowHidden});
 
@@ -505,11 +508,13 @@ sub _setupCallbacks {
     # Capture proxy usage change
     _($self, 'cbCfgProxyManual')->signal_connect('toggled' => sub {
         _($self, 'hboxPrefProxyManualOptions')->set_sensitive(_($self, 'cbCfgProxyManual')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     # Capture jump host change
     _($self, 'cbCfgProxyJump')->signal_connect('toggled' => sub {
         _($self, 'vboxPrefJumpCfgOptions')->set_sensitive(_($self, 'cbCfgProxyJump')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     # Clear private key
@@ -521,6 +526,24 @@ sub _setupCallbacks {
     # Capture support transparency change
     _($self, 'cbCfgTerminalSupportTransparency')->signal_connect('toggled' => sub {
         _($self, 'spCfgTerminalTransparency')->set_sensitive(_($self, 'cbCfgTerminalSupportTransparency')->get_active());
+    });
+
+    # Associated proxy settings to KeePass entries
+    _($self, 'btnCfgProxyCheckKPX')->signal_connect('clicked' => sub {
+        # User selects an entry in KeePass
+        my $title = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWCONFIG});
+
+        if ($title) {
+            if (_($self, 'cbCfgProxyManual')->get_active) {
+                _($self, 'entryCfgProxyIP')->set_text("<url|$title>");
+                _($self, 'entryCfgProxyUser')->set_text("<username|$title>");
+                _($self, 'entryCfgProxyPassword')->set_text("<password|$title>");
+            } elsif (_($self, 'cbCfgProxyJump')->get_active) {
+                _($self, 'entryCfgJumpIP')->set_text("<url|$title>");
+                _($self, 'entryCfgJumpUser')->set_text("<username|$title>");
+                _($self, 'entryCfgJumpPass')->set_text("<password|$title>");
+            }
+        }
     });
 
     return 1;
@@ -964,6 +987,9 @@ sub _updateGUIPreferences {
     # Disable "save on exit" if "auto save" is enabled
     _updateSaveOnExit($self);
 
+    # Update KeePass button
+    _updateCfgProxyKeePass($self);
+
     return 1;
 }
 
@@ -1189,6 +1215,12 @@ sub _updateSaveOnExit {
     my $self = shift;
 
     _($self, 'cbCfgSaveOnExit')->set_sensitive(!_($self, 'cbCfgAutoSave')->get_active());
+}
+
+sub _updateCfgProxyKeePass {
+    my $self = shift;
+
+    _($self, 'btnCfgProxyCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'} && !_($self, 'cbCfgProxyNo')->get_active());
 }
 
 # END: Define PRIVATE CLASS functions
