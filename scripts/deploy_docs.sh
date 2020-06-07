@@ -3,7 +3,7 @@ GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
 FULL_REPO="https://${GITHUB_API_KEY}$GH_REPO"
 
 if [ "$EXECUTE_BUILD_DOCS" != "true" ] || [ "$TRAVIS_BRANCH" != "master" ]; then
-    echo "Doc build skipped."
+    echo "Doc build skipped, flag=[$EXECUTE_BUILD_DOCS], branch is [$TRAVIS_BRANCH]."
     exit 0
 fi
 
