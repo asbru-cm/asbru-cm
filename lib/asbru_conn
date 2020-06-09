@@ -1311,15 +1311,19 @@ if (open(LOG,">:raw",$LOG_FILE)) {
 }
 
 # Prepare command file that is only accessible to the user
+my $do_connection_cmd = $connection_cmd;
 my $cmd_file = "$CFG_DIR/tmp/cmd_$UUID.run";
-open(my $CMD, ">:utf8", $cmd_file);
-chmod(0400, $CMD);
-print { $CMD } $connection_cmd;
-close($CMD);
+if ($METHOD ne 'PACShell') {
+    open(my $CMD, ">:utf8", $cmd_file);
+    chmod(0400, $CMD);
+    print { $CMD } $connection_cmd;
+    close($CMD);
+    $do_connection_cmd = "sh $cmd_file";
+}
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
-$EXP->spawn("sh $cmd_file 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
+$EXP->spawn("$do_connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
 $EXP->exp_internal($DEBUG); # EXPECT DEBUG!!
