@@ -1009,6 +1009,11 @@ sub _hardClose {
     my ($EXP, $uuid)  = @_;
     my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
     my $sock = "$CFG_DIR/tmp/$uuid.ctl";
+    my $cmd_file = "$CFG_DIR/tmp/cmd_$uuid.run";
+
+    if (-e $cmd_file) {
+        unlink($cmd_file);
+    }
 
     if ($proxy_jump == 2 && -e $sock) {
         system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $sock -T -O exit jumpserver";
@@ -1305,12 +1310,12 @@ if (open(LOG,">:raw",$LOG_FILE)) {
     print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
 
-# Prepare CMD file that is only accessible to the user
+# Prepare command file that is only accessible to the user
 my $cmd_file = "$CFG_DIR/tmp/cmd_$UUID.run";
-my $fh = open(CMD, ">:utf8", $cmd_file);
-chmod(0700, $fh);
-print CMD $connection_cmd;
-close(CMD);
+open(my $CMD, ">:utf8", $cmd_file);
+chmod(0400, $CMD);
+print { $CMD } $connection_cmd;
+close($CMD);
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
