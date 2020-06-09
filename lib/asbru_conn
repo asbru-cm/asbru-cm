@@ -1305,10 +1305,20 @@ if (open(LOG,">:raw",$LOG_FILE)) {
     print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
 
+# Prepare CMD file that is only accessible to the user
+my $cmd_file = "$CFG_DIR/tmp/cmd_$UUID.run";
+my $fh = open(CMD, ">:utf8", $cmd_file);
+chmod(0700, $fh);
+print CMD $connection_cmd;
+close(CMD);
+
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
-$EXP->spawn("$connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
+$EXP->spawn("sh $cmd_file 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
+
+# Immediately remove the temporary file (that may contain sensible information)
+unlink($cmd_file);
 
 $EXP->exp_internal($DEBUG); # EXPECT DEBUG!!
 
