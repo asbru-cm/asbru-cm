@@ -47,8 +47,6 @@ Requires:   perl(vars)
 Requires:   perl(warnings)
 Requires:   perl-X11-GUITest
 Requires:   vte291
-Requires:   ftp
-Requires:   telnet
 Requires:   bash
 Requires:   perl-Crypt-CBC
 Requires:   perl-Crypt-Rijndael
@@ -56,6 +54,20 @@ Requires:   perl-IO-Tty
 Requires:   perl-IO-Stty
 Requires:   libwnck3
 Requires:   nmap-ncat
+%if 0%{?el7}
+Requires: telnet
+Requires: ftp
+%else
+Recommends: keepassxc
+Suggests: freerdp or rdesktop
+Suggests: tigervnc or tightvnc
+Suggests: mosh
+Suggests: cu
+Suggests: x3270-x11
+Suggests: tn5250
+Suggests: telnet
+Suggests: ftp
+%endif
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
@@ -138,6 +150,8 @@ fi
 
 
 %changelog
+* Sat Jun 06 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.2.1
+- 6.2.1 release
 * Fri May 15 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.2.0
 - 6.2.0 release
 * Tue Apr 28 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.3
