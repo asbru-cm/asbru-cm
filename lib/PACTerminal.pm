@@ -1256,6 +1256,11 @@ sub _setupCallbacks {
             $$self{_GUI}{pb}->destroy();
         }
 
+        if (!defined $$self{_UUID}) {
+            # Signal received too late, terminal is already closed
+            return;
+        }
+
         $PACMain::RUNNING{$$self{'_UUID_TMP'}}{'stop_time'} = time();
         $PACMain::FUNCS{_STATS}->stop($$self{_UUID});
 
