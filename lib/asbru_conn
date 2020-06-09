@@ -1317,9 +1317,6 @@ ctrl("SPAWNING:$connection_txt");
 $EXP->spawn("sh $cmd_file 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
-# Immediately remove the temporary file (that may contain sensible information)
-unlink($cmd_file);
-
 $EXP->exp_internal($DEBUG); # EXPECT DEBUG!!
 
 if (($METHOD =~ /^.*rdesktop$/) || ($METHOD =~ /^.*freerdp.*/) || ($METHOD eq 'RDP (Windows)')) {
@@ -1922,6 +1919,9 @@ elsif (!$MANUAL) {
         ctrl("CONNECTED");
     }
 }
+
+# Once spawned, remove the temporary file (that may contain sensible information)
+unlink($cmd_file);
 
 $SIG{'WINCH'} = sub {
     if (!$CONNECTED) {
