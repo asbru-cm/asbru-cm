@@ -55,6 +55,7 @@ Requires:   perl-Crypt-Rijndael
 Requires:   perl-IO-Tty
 Requires:   perl-IO-Stty
 Requires:   libwnck3
+Recommends: nmap-ncat
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
