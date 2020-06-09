@@ -541,7 +541,7 @@ sub stop {
     if ($$self{_TABBED}) {
         my $p_num = -1;
         if ($$self{_SPLIT}) {
-            $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent);
+            $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent());
         } else {
             $p_num = $$self{_NOTEBOOK}->page_num($p_widget);
         }
@@ -1195,7 +1195,7 @@ sub _setupCallbacks {
         }
     });
     $$self{_GUI}{_VTE}->signal_connect('drag_motion' => sub {
-        $_[0]->get_parent_window->raise; return 1;
+        $_[0]->get_parent_window()->raise(); return 1;
     });
 
     # Depending on terminal creation (window/tab), process connection closing differently
@@ -1685,7 +1685,7 @@ sub _vteMenu {
             stockicon => 'gtk-fullscreen',
             shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','fullscreen'),
             tooltip => 'Separate this connection window from the tabbed view, and put it in a separate window',
-            code => sub {$self->_tabToWin;}
+            code => sub {$self->_tabToWin();}
         });
 
         if ($$self{_SPLIT}) {
@@ -1694,14 +1694,14 @@ sub _vteMenu {
                 label => 'Unsplit',
                 stockicon => 'gtk-zoom-fit',
                 tooltip => "Remove the split view and put each connection into its own tab",
-                code => sub {$self->_unsplit;}
+                code => sub {$self->_unsplit();}
             });
             push(@vte_menu_items,
             {
                 label => 'Equally resize terminals',
                 stockicon => 'gtk-zoom-fit',
                 tooltip => "Resize terminals equally",
-                code => sub {$self->_equalresize;}
+                code => sub {$self->_equalresize();}
             });
         } else {
             push(@vte_menu_items,
@@ -2434,7 +2434,7 @@ sub _tabToWin {
             $btnfocus->signal_connect ('clicked' => sub {$$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');});
             $vbox->pack_start($btnfocus, 0, 1, 0);
 
-            $$self{_WINDOWTERMINAL}->set_default_size($$self{_GUI}{_VBOX}->get_allocated_width, $$self{_GUI}{_VBOX}->get_allocated_height - $$self{_GUI}{status}->get_allocated_height);
+            $$self{_WINDOWTERMINAL}->set_default_size($$self{_GUI}{_VBOX}->get_allocated_width(), $$self{_GUI}{_VBOX}->get_allocated_height() - $$self{_GUI}{status}->get_allocated_height());
             $$self{_WINDOWTERMINAL}->show_all();
             $$self{_GUI}{_SOCKET}->reparent($vp);
             $$self{_GUI}{_VBOX}->destroy();
@@ -2632,13 +2632,13 @@ sub _tabMenu {
                 {
                     label => 'Unsplit',
                     stockicon => 'gtk-zoom-fit',
-                    code => sub {$self->_unsplit;}
+                    code => sub {$self->_unsplit();}
                 });
                 push(@vte_menu_items,
                 {
                     label => 'Equally resize terminals',
                     stockicon => 'gtk-zoom-fit',
-                    code => sub {$self->_equalresize;}
+                    code => sub {$self->_equalresize();}
                 });
             } else {
                 push(@vte_menu_items,
@@ -2834,12 +2834,12 @@ sub _split {
     $self->_setTabColour();
     $PACMain::RUNNING{$uuid_tmp}{terminal}->_updateCFG();
 
-    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent->get_allocated_width, $$self{_SPLIT_VPANE}->get_parent->get_allocated_height);
+    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent()->get_allocated_width(), $$self{_SPLIT_VPANE}->get_parent()->get_allocated_height());
     $$self{_SPLIT_VPANE}->set_position((($vertical ? $y : $x) / 2) - 7);
 
     if ($$self{_CFG}{'defaults'}{'force split tabs to 50%'}) {
         $$self{_SPLIT_VPANE}->signal_connect('size-allocate', sub {
-            $self->_equalresize ();
+            $self->_equalresize();
         });
     }
 
@@ -2849,7 +2849,7 @@ sub _split {
 sub _equalresize {
     my $self = shift;
 
-    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent->get_allocated_width, $$self{_SPLIT_VPANE}->get_parent->get_allocated_height);
+    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent()->get_allocated_width(), $$self{_SPLIT_VPANE}->get_parent()->get_allocated_height());
     $$self{_SPLIT_VPANE}->set_position((($$self{_SPLIT_VERTICAL} ? $y : $x) / 2) - 7);
 
     return 1;
