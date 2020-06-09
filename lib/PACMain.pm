@@ -1372,7 +1372,7 @@ sub _setupCallbacks {
         my $node = $$self{_CFG}{'environments'}{$node_uuid}{'name'};
 
         if ($$self{_CFG}{'environments'}{$node_uuid}{'_protected'}) {
-            return _wMessage($$self{_GUI}{main}, "Can not rename selection:\nSelected node is <b>Protected</b>");
+            return _wMessage($$self{_GUI}{main}, "Cannot rename selection:\nSelected node is <b>Protected</b>");
         }
 
         my ($new_name, $new_title);
@@ -1410,7 +1410,7 @@ sub _setupCallbacks {
             return 1;
         }
         if ($self->_hasProtectedChildren(\@del)) {
-            return _wMessage($$self{_GUI}{main}, "Can not delete selection:\nThere are <b>Protected</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Cannot delete selection.\n\nThere are <b>protected</b> nodes selected.");
         }
 
         if (scalar(@del) > 1) {
@@ -1544,11 +1544,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'collaps_all') {
             $$self{_GUI}{treeConnections}->collapse_all();
         } elsif ($action eq 'clone') {
-            $self->_copyNodes();
-            foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
-                $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
-                $$self{_COPY}{'data'} = {};
-            };
+            $self->_cloneNodes();
         } elsif ($action eq 'copy') {
             $self->_copyNodes();
         } elsif ($action eq 'cut') {
@@ -2020,7 +2016,7 @@ sub _setupCallbacks {
             }
         }
         if (((scalar(@sel)>1) || ((scalar(@sel)==1) && $is_group)) && ($self->_hasProtectedChildren(\@sel))) {
-            return _wMessage($$self{_GUI}{main}, "Can not " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>Protected</b> nodes selected");
+            return _wMessage($$self{_GUI}{main}, "Cannot " . (scalar(@sel) > 1 ? 'Bulk ' : ' ') . "Edit selection:\nThere are <b>Protected</b> nodes selected");
         }
 
         if ((scalar(@sel) == 1) && (! $is_group)) {
@@ -2686,13 +2682,14 @@ sub _treeConnections_menu {
     } elsif ((scalar(@sel)>1)||($clip > 1)) {
         $p = 's';
     }
-    my $with_protected = $self->_hasProtectedChildren(\@sel);
-    my $with_groups = 0;
-    foreach my $uuid (@sel) {
-        if ($with_groups = $$self{_CFG}{'environments'}{ $uuid }{'_is_group'}) {
-            last;
-        }
-    }
+    # Unique ID of parent node
+    my $parent_uuid = $$self{_CFG}{'environments'}{$sel[0]}{'parent'};
+    # Main selected node is protected
+    my $is_protected = $$self{_CFG}{'environments'}{$sel[0]}{'_protected'};
+    # Any of the selected node is protected
+    my $has_protected_children = $self->_hasProtectedChildren(\@sel);
+    # Parent of selected node is protected
+    my $protected_parent = $$self{_CFG}{'environments'}{$parent_uuid}{'_protected'};
 
     my @tree_menu_items;
 
@@ -2731,8 +2728,8 @@ sub _treeConnections_menu {
     # Toggle Protect
     if (scalar(@sel) >= 1 && $sel[0] ne '__PAC__ROOT__') {
         push(@tree_menu_items, {
-            label => scalar(@sel) > 1 ? ('Toggle Protected state') : (($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'Un-' : '') . 'Protect'),
-            stockicon => 'asbru-' . ($$self{_CFG}{'environments'}{ $sel[0] }{'_protected'} ? 'un' : '') . 'protected',
+            label => scalar(@sel) > 1 ? ('Toggle Protected state') : (($is_protected ? 'Un-' : '') . 'Protect'),
+            stockicon => 'asbru-' . ($is_protected ? 'un' : '') . 'protected',
             shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','protection'),
             tooltip => "Protect or not this node, in order to avoid any changes (Edit, Delete, Rename, ...)",
             sensitive => 1,
@@ -2829,7 +2826,7 @@ sub _treeConnections_menu {
         push(@tree_menu_items, {
             label => 'Edit Local Variables',
             stockicon => 'gtk-dialog-question',
-            sensitive => ! $with_protected,
+            sensitive => ! $has_protected_children,
             submenu => \@var_submenu
         });
     }
@@ -2856,6 +2853,7 @@ sub _treeConnections_menu {
             label => 'Add Connection',
             stockicon => 'asbru-node-add',
             tooltip => "Create a new connection under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
+            sensitive => !$is_protected,
             code => sub{
                 $$self{_GUI}{connAddBtn}->clicked();
             }
@@ -2865,6 +2863,7 @@ sub _treeConnections_menu {
             label => 'Add Group',
             stockicon => 'asbru-group-add',
             tooltip => "Create a new group under '" . ($sel[0] eq '__PAC__ROOT__' ? 'ROOT' : $$self{_CFG}{'environments'}{$sel[0]}{'name'}) . "'",
+            sensitive => !$is_protected,
             code => sub{
                 $$self{_GUI}{groupAddBtn}->clicked();
             }
@@ -2875,7 +2874,7 @@ sub _treeConnections_menu {
         label => 'Rename ' . ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__' ? 'Group' : 'Connection'),
         stockicon => 'gtk-spell-check',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections', 'rename'),
-        sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && !$with_protected,
+        sensitive => (scalar(@sel) == 1) && $sel[0] ne '__PAC__ROOT__' && !$has_protected_children && !$is_protected && !$protected_parent,
         code => sub {
             $$self{_GUI}{nodeRenBtn}->clicked();
         }
@@ -2884,7 +2883,7 @@ sub _treeConnections_menu {
     push(@tree_menu_items, {
         label => 'Delete...',
         stockicon => 'gtk-delete',
-        sensitive => (scalar(@sel) >= 1) && $sel[0] ne '__PAC__ROOT__' && !$with_protected,
+        sensitive => (scalar(@sel) >= 1) && $sel[0] ne '__PAC__ROOT__' && !$has_protected_children && !$is_protected && !$protected_parent,
         code => sub {
             $$self{_GUI}{nodeDelBtn}->clicked();
         }
@@ -2898,13 +2897,9 @@ sub _treeConnections_menu {
         label => "Clone connection$p",
         stockicon => 'gtk-copy',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','clone'),
-        sensitive => ((scalar(@sel) == 1) && ! ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'} || $sel[0] eq '__PAC__ROOT__')),
+        sensitive => scalar(@sel) == 1 && $sel[0] ne '__PAC__ROOT__' && !$protected_parent,
         code => sub {
-            $self->_copyNodes();
-            foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
-                $self->_pasteNodes($$self{_CFG}{'environments'}{ $sel[0] }{'parent'}, $child);
-            }
-            $$self{_COPY}{'data'} = {};
+            $self->_cloneNodes();
         }
     });
     # Copy
@@ -2912,7 +2907,7 @@ sub _treeConnections_menu {
         label => "Copy node$p",
         stockicon => 'gtk-copy',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','copy'),
-        sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__')),
+        sensitive => scalar @sel >= 1 && $sel[0] ne '__PAC__ROOT__',
         code => sub{
             $self->_copyNodes();
             # Unselect nodes after copy
@@ -2924,15 +2919,16 @@ sub _treeConnections_menu {
         label => "Cut node$p",
         stockicon => 'gtk-cut',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','cut'),
-        sensitive => ((scalar @sel >= 1) && ($sel[0] ne '__PAC__ROOT__') && (! $with_protected)),
-        code => sub{  $self->_cutNodes(); }
+        sensitive => scalar @sel >= 1 && $sel[0] ne '__PAC__ROOT__' && !$is_protected && !$has_protected_children && !$protected_parent,
+        code => sub{
+            $self->_cutNodes();
+        }
     });
     push(@tree_menu_items, {
         label => "Paste node$p",
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('treeConnections','paste'),
-        #sensitive => scalar(keys %{ $$self{_COPY}{'data'} }) && (scalar @sel == 1) && (($sel[0] eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})),
-        sensitive => (($clip)&&(scalar @sel == 1)) ? 1 : 0,
+        sensitive => ($clip && scalar @sel == 1 ? 1 : 0) && !$is_protected,
         code => sub {
             foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
                 $self->_pasteNodes($sel[0], $child);
@@ -3720,8 +3716,8 @@ sub _updateGUIPreferences {
         $$self{_GUI}{nbTreeTabLabel}->set_text(' Connections');
     }
     $$self{_GUI}{connSearch}->set_sensitive(1);
-    $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
-    $$self{_GUI}{connAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root));
+    $$self{_GUI}{groupAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root) && !$protected);
+    $$self{_GUI}{connAddBtn}->set_sensitive($total eq 1 && ($is_group || $is_root) && !$protected);
     $$self{_GUI}{connEditBtn}->set_sensitive($total >= 1 && ! $is_root);
     $$self{_GUI}{nodeRenBtn}->set_sensitive($total eq 1 && ! $is_root && ! $protected);
     $$self{_GUI}{nodeDelBtn}->set_sensitive($total >= 1 && ! $is_root && ! $protected);
@@ -3979,7 +3975,22 @@ sub _cutNodes {
         return 1;
     }
     if ($self->_hasProtectedChildren(\@sel_uuids)) {
-        return _wMessage($$self{_GUI}{main}, "Can not CUT selection:\nThere are <b>Protected</b> nodes selected");
+        return _wMessage($$self{_GUI}{main}, "Cannot cut selection.\n\nThere are <b>protected</b> nodes selected.");
+    }
+
+    # Check that the cut node is not protected
+    if ($$self{_CFG}{'environments'}{$sel_uuids[0]}{'_is_group'} && $$self{_CFG}{'environments'}{$sel_uuids[0]}{'_protected'}) {
+        print("ERROR: Cannot cut a protected folder [$$self{_CFG}{'environments'}{$sel_uuids[0]}{name}]\n");
+        return _wMessage($$self{_GUI}{main}, "Cannot cut a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$sel_uuids[0]}{name}</b>");
+    }
+
+    # Check that parent node is not protected
+    foreach my $uuid (@sel_uuids) {
+        my $parent =  $$self{_CFG}{'environments'}{$uuid}{'parent'};
+        if ($$self{_CFG}{'environments'}{$parent}{'_is_group'} && $$self{_CFG}{'environments'}{$parent}{'_protected'}) {
+            print("ERROR: Cannot cut from a protected folder [$$self{_CFG}{'environments'}{$parent}{name}]\n");
+            return _wMessage($$self{_GUI}{main}, "Cannot cut from a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$parent}{name}</b>");
+        }
     }
 
     # Copy the selected nodes
@@ -4011,9 +4022,14 @@ sub _pasteNodes {
         print("ERROR: No data to copy...\n");
         return 1;
     }
-    if ((!$$self{_CFG}{'environments'}{$parent}{'_is_group'}) && ($parent ne '__PAC__ROOT__')) {
+    if (!$$self{_CFG}{'environments'}{$parent}{'_is_group'} && $parent ne '__PAC__ROOT__') {
         print("ERROR: Cannot paste outside of root parent\n");
         return 1;
+    }
+
+    if ($$self{_CFG}{'environments'}{$parent}{'_is_group'} && $$self{_CFG}{'environments'}{$parent}{'_protected'}) {
+        print("ERROR: Cannot paste into a protected folder [$$self{_CFG}{'environments'}{$parent}{name}]\n");
+        return _wMessage($$self{_GUI}{main}, "Cannot paste into a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$parent}{name}</b>");
     }
 
     if ($parent ne $$self{_COPY}{'data'}{$uuid}{'original_parent'}) {
@@ -4027,6 +4043,8 @@ sub _pasteNodes {
     $$self{_CFG}{'environments'}{$uuid} = $$self{_COPY}{'data'}{$uuid};
     $$self{_CFG}{'environments'}{$uuid}{'parent'} = $parent;
     $$self{_CFG}{'environments'}{$parent}{'children'}{$uuid} = 1;
+    # DevNote: a pasted folder cannot be protected otherwise recursiveness will likely fail
+    $$self{_CFG}{'environments'}{$uuid}{'_protected'} = $$self{_CFG}{'environments'}{$uuid}{'_protected'} && !$$self{_CFG}{'environments'}{$uuid}{'_is_group'};
 
     # Add new node to Connections Tree
     $$self{_GUI}{treeConnections}->_addNode(
@@ -4086,6 +4104,31 @@ sub __dupNodes {
     }
 
     return $cfg;
+}
+
+sub _cloneNodes {
+    my $self = shift;
+    my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
+    if (scalar(@sel) != 1) {
+        # We can only clone a single selection
+        return;
+    }
+
+    # The parent node
+    my $parent_uuid = $$self{_CFG}{'environments'}{$sel[0]}{'parent'};
+
+    # Prevent cloning into a protected folder
+    if (!defined($parent_uuid) || $$self{_CFG}{'environments'}{$parent_uuid}{_protected}) {
+        print("ERROR: Cannot duplicate into a protected folder [$$self{_CFG}{'environments'}{$parent_uuid}{name}]\n");
+        return _wMessage($$self{_GUI}{main}, "Cannot duplicate into a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$parent_uuid}{name}</b>");
+    }
+
+    # Actually perform cloning
+    $self->_copyNodes();
+    foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} }) {
+        $self->_pasteNodes($parent_uuid, $child);
+    };
+    $$self{_COPY}{'data'} = {};
 }
 
 sub __exportNodes {

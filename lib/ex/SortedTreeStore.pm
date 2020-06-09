@@ -145,7 +145,7 @@ sub ROW_DROP_POSSIBLE {
             print("Drop possible for UUID=[$uuid], Name=[$$dest{'name'}], Is Group?=[$$dest{'_is_group'}]\n");
         }
 
-        return $$dest{'_is_group'};
+        return $$dest{'_is_group'} && !$$dest{'_protected'};
     }
 
     return 0;
