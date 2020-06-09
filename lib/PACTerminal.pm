@@ -2836,9 +2836,13 @@ sub _split {
     $self->_setTabColour();
     $PACMain::RUNNING{$uuid_tmp}{terminal}->_updateCFG();
 
-    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent()->get_allocated_width(), $$self{_SPLIT_VPANE}->get_parent()->get_allocated_height());
-    $$self{_SPLIT_VPANE}->set_position((($vertical ? $y : $x) / 2) - 7);
+    # Force redraw to have the correct split pane size
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
+    # Equal size by default
+    $self->_equalresize();
+
+    # To always force keeping equal size
     if ($$self{_CFG}{'defaults'}{'force split tabs to 50%'}) {
         $$self{_SPLIT_VPANE}->signal_connect('size-allocate', sub {
             $self->_equalresize();
@@ -2851,8 +2855,14 @@ sub _split {
 sub _equalresize {
     my $self = shift;
 
-    my ($x, $y) = ($$self{_SPLIT_VPANE}->get_parent()->get_allocated_width(), $$self{_SPLIT_VPANE}->get_parent()->get_allocated_height());
-    $$self{_SPLIT_VPANE}->set_position((($$self{_SPLIT_VERTICAL} ? $y : $x) / 2) - 7);
+    my ($w, $h) = ($$self{_SPLIT_VPANE}->get_allocated_width(), $$self{_SPLIT_VPANE}->get_allocated_height());
+    my $s = (($$self{_SPLIT_VERTICAL} ? $h : $w) / 2) - 7;
+
+    # Set split position
+    $$self{_SPLIT_VPANE}->set_position($s);
+
+    # Force redraw
+    Gtk3::main_iteration() while Gtk3::events_pending();
 
     return 1;
 }
