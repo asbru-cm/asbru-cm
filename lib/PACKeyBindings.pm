@@ -410,7 +410,7 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+W'}        = ['Terminal','disconnect','Disconnect Terminal'];
     $$cfg{'terminal'}{'Ctrl+q'}        = ['Terminal','quit','Exit Ásbrú'];
     $$cfg{'terminal'}{'Ctrl+f'}        = ['Terminal','find','Find in connection tree'];
-    $$cfg{'terminal'}{'F4'}            = ['Terminal','closealltabs','Close all tabs'];
+    $$cfg{'terminal'}{'CtrlShift+F4'}  = ['Terminal','closealltabs','Close all tabs'];
     $$cfg{'terminal'}{'Ctrl+N'}        = ['Terminal','close-disconected','Close disconnected sessions'];
     $$cfg{'terminal'}{'Ctrl+D'}        = ['Terminal','duplicate','Duplicate connection'];
     $$cfg{'terminal'}{'Ctrl+R'}        = ['Terminal','restart','Restart connection (close and start)'];
