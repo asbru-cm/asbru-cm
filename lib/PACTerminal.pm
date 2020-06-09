@@ -486,7 +486,9 @@ sub stop {
     my $p_widget = $$self{_GUI}{_VBOX};
 
     # Set mouse pointer in case a postexec was executed
-    $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+    if ($p_widget->get_window()) {
+        $p_widget->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+    }
 
     if ($NPOSX>0) {
         $NPOSX--;
