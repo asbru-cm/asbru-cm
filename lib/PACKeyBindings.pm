@@ -292,17 +292,19 @@ sub HotKeyIsFree {
 sub update {
     my $self = shift;
     my $cfg = shift;
+    my $default_cfg = $self->_getDefaultConfig();
     my %actions;
 
     if (!$cfg && !$self->{cfg}) {
-        $self->_initCFG();
-        $cfg = $self->{cfg};
+        $cfg = $default_cfg;
     } elsif ($cfg) {
         $self->{cfg} = $cfg;
     } else {
         $cfg = $self->{cfg};
     }
-    _updateDefaultCFG();
+
+    $self->_updateConfig($default_cfg);
+
     @{$$self{frame}{keylist}{'data'}} = ();
     foreach my $w (sort keys %$cfg) {
         my $wk = $$cfg{$w};
@@ -333,11 +335,19 @@ sub get_cfg {
 ###################################################################
 # START: Private Methods
 
-sub _updateDefaultCFG {
+sub _updateConfig {
     my $self = shift;
+    my $default_cfg = shift // $self->_getDefaultConfig();
 
-    # Add new default keybindigs here
-    # $self->_newKeyBind('app_window_name','keybind','User window name','action','user description');
+    foreach my $w (keys %$default_cfg) {
+        my $wk = $$default_cfg{$w};
+        foreach my $k (keys %$wk) {
+            if (!defined ${$self->{cfg}}{$w}{$k}) {
+                print("WARN: Adding new keybinding [$k] for [$$wk{$k}[0]]/[$$wk{$k}[2]]...\n");
+                ${$self->{cfg}}{$w}{$k} = $$wk{$k};
+            }
+        }
+    }
 }
 
 sub _newKeyBind {
@@ -366,7 +376,7 @@ sub _exists {
     return 0;
 }
 
-sub _initCFG {
+sub _getDefaultConfig {
     my $self = shift;
     my $cfg;
 
@@ -396,6 +406,7 @@ sub _initCFG {
     $$cfg{'pacmain'}{'Ctrl+f'}         = ['Main Window','find','Find in connection tree'];
     $$cfg{'pacmain'}{'Ctrl+q'}         = ['Main Window','quit','Exit Ásbrú'];
     $$cfg{'pacmain'}{'Ctrl+T'}         = ['Main Window','localshell','Open a local shell'];
+    $$cfg{'pacmain'}{'Alt+n'}          = ['Main Window','showconnections','Show/Hide connections list'];
     $$cfg{'terminal'}{'F11'}           = ['Terminal','fullscreen','Go full screen'];
     $$cfg{'terminal'}{'Ctrl+Return'}   = ['Terminal','start','Start Terminal'];
     $$cfg{'terminal'}{'AltCtrl+x'}     = ['Terminal','reset','Reset Terminal'];
@@ -416,14 +427,15 @@ sub _initCFG {
     $$cfg{'terminal'}{'Ctrl+R'}        = ['Terminal','restart','Restart connection (close and start)'];
     $$cfg{'terminal'}{'Ctrl+I'}        = ['Terminal','infotab','Show the Info tab'];
     $$cfg{'terminal'}{'Ctrl+F3'}       = ['Terminal','find-terminal','Find Terminal'];
-    $$cfg{'terminal'}{'Alt+n'}         = ['Terminal','showconnections','Show connections list'];
+    $$cfg{'terminal'}{'Alt+n'}         = ['Terminal','showconnections','Show/Hide connections list'];
     $$cfg{'terminal'}{'Alt+e'}         = ['Terminal','edit_node','Edit Connection'];
     $$cfg{'terminal'}{'Ctrl+plus'}     = ['Terminal','zoomin','Zoom in text'];
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal','zoomout','Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
     $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal','cisco','Send Cisco interrupt keypress'];
     $$cfg{'terminal'}{'AltCtrl+s'}     = ['Terminal','sftp','Open SFTP session'];
-    $self->{cfg} = $cfg;
+
+    return $cfg;
 }
 
 sub _buildGUI {

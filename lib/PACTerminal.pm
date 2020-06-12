@@ -1079,11 +1079,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'find-terminal') {
             _wFindInTerminal($self);
         } elsif ($action eq 'showconnections') {
-            if (!$$self{_TABBED} || !$$self{_CFG}{defaults}{'tabs in main window'}) {
-                $PACMain::FUNCS{_MAIN}->_showConnectionsList();
-            } else {
-                $PACMain::FUNCS{_MAIN}->_toggleConnectionsList();
-            }
+            $PACMain::FUNCS{_MAIN}->_toggleConnectionsList();
         } elsif ($action eq 'edit_node') {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});

@@ -1038,6 +1038,7 @@ sub _initGUI {
 
     # Add some key bindings to existing button tooltip
     $$self{_GUI}{shellBtn}->set_tooltip_text($$self{_GUI}{shellBtn}->get_tooltip_text() . ' (' . $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('pacmain', 'localshell') . ')');
+    $$self{_GUI}{showConnBtn}->set_tooltip_text($$self{_GUI}{showConnBtn}->get_tooltip_text() . ' (' . $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('pacmain', 'showconnections') . ')');
 
     # Build Edit window
     $FUNCS{_EDIT} = $$self{_EDIT} = PACEdit->new($$self{_CFG});
@@ -1954,10 +1955,7 @@ sub _setupCallbacks {
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
-        if ($$self{_GUI}{showConnBtn}->get_active()) {
-            $$self{_GUI}{treeConnections}->grab_focus();
-        }
+        $self->_doToggleDisplayConnectionsList();
         return 1;
     });
 
@@ -2320,6 +2318,8 @@ sub _setupCallbacks {
             $PACMain::FUNCS{_MAIN}->_quitProgram();
         } elsif ($action eq 'localshell') {
             $$self{_GUI}{shellBtn}->clicked();
+        } elsif ($action eq 'showconnections') {
+            $$self{_GUI}{showConnBtn}->clicked();
         } else {
             return 0;
         }
@@ -3936,7 +3936,20 @@ sub _hideConnectionsList {
 
 sub _toggleConnectionsList {
     my $self = shift;
-    $$self{_GUI}{showConnBtn}->set_active(! $$self{_GUI}{showConnBtn}->get_active());
+    $$self{_GUI}{showConnBtn}->set_active(!$$self{_GUI}{showConnBtn}->get_active());
+}
+
+sub _doToggleDisplayConnectionsList {
+    my $self = shift;
+
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{showConnBtn}->get_active() ? $PACMain::FUNCS{_MAIN}->_showConnectionsList() : $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
+    } else {
+        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{treeConnections}->grab_focus();
+        }
+    }
 }
 
 sub _copyNodes {
@@ -5039,7 +5052,13 @@ Hides the Connections list
 
 =head2 sub _toggleConnectionsList
 
-Toggles Connection Lista (active, inactie)
+Activates or deactivate the button to toggle the display of the connections list.
+
+=head2 sub _doToggleConnectionsList
+
+Actually show or hide the connections list.
+Do not call this function directly but use _toggleConnectionsList that will also correctly
+set the corresponding button state.
 
 =head2 sub _copyNodes (cut [0,'cut'], parent, @selected_uuids)
 
