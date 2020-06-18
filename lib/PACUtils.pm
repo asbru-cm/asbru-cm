@@ -214,15 +214,15 @@ our @DONATORS_LIST = (
 );
 our @PACDESKTOP = (
     '[Desktop Entry]',
-    'Name=PAC',
-    'Comment=Perl Auto Connector (auto start)',
+    'Name=Ásbrú Connection Manager',
+    'Comment=A user interface that helps organizing remote terminal sessions and automating repetitive tasks',
     'Terminal=false',
     'Icon=pac',
     'Type=Application',
-    'Exec=/usr/bin/asbru --no-splash',
+    'Exec=/usr/bin/asbru-cm --no-splash',
     'StartupNotify=false',
-    'Name[en_US]=PAC',
-    'Comment[en_US]=Perl Auto Connector (auto start)',
+    'Name[en_US]=Ásbrú Connection Manager',
+    'Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks',
     'Categories=Applications;Network;',
     'X-GNOME-Autostart-enabled=true',
 );
@@ -3639,7 +3639,6 @@ sub _getEncodings {
     };
 }
 
-# TODO : Should be renamed to asbru.desktop
 sub _makeDesktopFile {
     my $cfg = shift;
 
@@ -3650,15 +3649,15 @@ sub _makeDesktopFile {
     }
 
     my $d = "[Desktop Entry]\n";
-    $d .= "Name=Asbru Connection Manager\n";
-    $d .= "Comment=Asbru Connection Manage\n";
+    $d .= "Name=Ásbrú Connection Manager\n";
+    $d .= "Comment=A user interface that helps organizing remote terminal sessions and automating repetitive tasks\n";
     $d .= "Terminal=false\n";
     $d .= "Icon=pac\n";
     $d .= "Type=Application\n";
     $d .= "Exec=/usr/bin/asbru-cm\n";
     $d .= "StartupNotify=true\n";
-    $d .= "Name[en_US]=Asbru\n";
-    $d .= "Comment[en_US]=Asbru Connetion Manager\n";
+    $d .= "Name[en_US]=Ásbrú Connection Manager\n";
+    $d .= "Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks\n";
     $d .= "Categories=Applications;Network;\n";
     $d .= "X-GNOME-Autostart-enabled=false\n";
     my $dal = 'Actions=Shell;Quick;Preferences;';
