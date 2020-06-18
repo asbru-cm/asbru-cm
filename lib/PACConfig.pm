@@ -1180,7 +1180,7 @@ sub _saveConfiguration {
     unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
-        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
+        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru-cm --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
         open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;
