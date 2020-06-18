@@ -49,6 +49,7 @@ BEGIN {
         print "\t--no-splash : no splash screen on startup\n";
         print "\t--iconified : go to tray once started\n";
         print "\t--readonly : start in read only mode (no config changes allowed)\n";
+        print "\t--verbose : display more debugging information\n";
         print "\n";
         print "See 'man asbru' for additional information.\n";
         print "\n";
@@ -75,7 +76,7 @@ BEGIN {
         ###################################################################
         # DEFAULT CONFIG DIR SHOULD BE DEFINED HERE
         ###################################################################
-        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/pac";
+        $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/asbru";
     }
     # Workaround to unexpected SSH disconnections due to wrong handling of the WINCH event in some Gnome versions
     # See https://www.perlmonks.org/?node_id=11109454
@@ -101,14 +102,16 @@ use warnings;
 
 ###################################################################
 # START: Define GLOBAL variables
-our $CFG_FILE_NAME  = "pac.yml";
+our $CFG_FILE_NAME  = "asbru.yml";
 our $INIT_CFG_FILE  = "$RealBin/res/$CFG_FILE_NAME";
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
-our $CFG_DIR_OLD    = "";
+our $CFG_DIR_OLD    = "$ENV{'HOME'}/.config/pac";
+our $CFG_FILE_OLD   = "pac.yml";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
 our $ASBRU;
+our $VERBOSE        = 0;
 # END: Define GLOBAL variables
 ###################################################################
 
@@ -118,9 +121,21 @@ our $ASBRU;
 # Load PACMain now, so it can read the global $CFG_DIR
 print "INFO: $APP_NAME ($Script) started with PID $$\n";
 
+foreach my $arg (@ARGV) {
+    if ($arg =~ /-{1,2}verbose/) {
+        $VERBOSE = 1;
+    }
+}
+
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
+
+foreach my $arg (@ARGV) {
+    if ($arg =~ /-{1,2}verbose/) {
+        $VERBOSE = 1;
+    }
+}
 
 if (($? eq 0) && (!grep(/'asbru'/, $wl))) {
     print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";
@@ -136,11 +151,24 @@ if (!-d "$ENV{'HOME'}/.config") {
 }
 
 # Code for future configuration migrations when needed
-if (($CFG_DIR_OLD) && ($CFG_DIR_OLD ne $CFG_DIR)) {
-    config_migration($CFG_DIR_OLD,$CFG_DIR);
+if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /\/asbru$/) {
+    # Production user data
+    if ($VERBOSE) {
+        print "INFO: Migration of default directory\n";
+    }
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
+} elsif (-e "$CFG_DIR/$CFG_FILE_OLD") {
+    # Alternate configuration directory
+    $CFG_DIR_OLD = "$CFG_DIR.migration";
+    if ($VERBOSE) {
+        print "INFO: Migration of alternate directory\n";
+    }
+    system "rm -Rf $CFG_DIR_OLD";
+    system "mv -f $CFG_DIR $CFG_DIR.migration";
+    config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
-# Create Asbru config dir if necessary
+# Create Ásbrú configuration directory (if necessary)
 if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
 }
@@ -170,16 +198,27 @@ if (!($ASBRU = PACMain -> new(@ARGV))) {
     exit 0
 }
 
-$ASBRU->start;
+$ASBRU->start();
 
 print "INFO: Finished $APP_NAME ($Script) (PID:$$)...\n";
 exit 0;
 
 # Implemented when necessary
-sub config_migration {
-    my ($old_dir,$new_dir) = @_;
 
-    return 0;
+sub config_migration {
+    my ($old_dir, $new_dir) = @_;
+    my $PATH = "$RealBin/";
+    my $status;
+
+    if (-e "$PATH/utils/pac2asbru.pl") {
+        if ($status = system("$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
+            print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
+            exit 0;
+        }
+    } else {
+        print "ERROR: Missing migration script $PATH/utils/pac2asbru.pl ; please check your installation.\n";
+        exit 0;
+    }
 }
 
 sub getDesktopEnvironment {
@@ -194,15 +233,18 @@ sub getDesktopEnvironment {
             last;
         }
     }
-    if (defined($ENV{'XDG_SESSION_DESKTOP'}) && $ENV{'XDG_SESSION_DESKTOP'} eq 'xubuntu') {
-        $ENV{'ASBRU_DESKTOP'} .= ':xubuntu';
-    }
     if (!$ENV{'ASBRU_DESKTOP'}) {
         $ENV{'ASBRU_DESKTOP'} = 'other';
     } elsif ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
         # Test to see it has the unite extension installed
-        if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/unite\@hardpixel.eu") {
-            $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+        if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
+            $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
+        }
+        foreach my $extension ('unite@hardpixel.eu','top-icons@gnome-shell-extensions.gcampax.github.com') {
+            if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/$extension" || -e "/usr/share/gnome-shell/extensions/$extension") {
+                $ENV{'ASBRU_DESKTOP'} .= '-withtray';
+                last;
+            }
         }
     }
     print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
@@ -211,7 +253,7 @@ sub getDesktopEnvironment {
 sub CheckConfigurationFile {
     use POSIX qw(strftime);
 
-    my $nfreeze = "$CFG_DIR/pac.nfreeze";
+    my $nfreeze = "$CFG_DIR/asbru.nfreeze";
     my $now = strftime "%Y%m%d%H%M%S", localtime;
     my $BACKUP_CFG_FILE  = "$CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME";
     my $MAX_BACKUP_FILES = 10;
@@ -268,6 +310,18 @@ sub CheckConfigurationFile {
     }
     # Save current known configuration
     system "cp -fp $CFG_FILE $BACKUP_CFG_FILE.0";
+}
+
+sub _wPopUP {
+    my ($type, $title, $msg) = @_;
+    my $PATH = "$RealBin";
+
+    $msg =~ s/\t//mg;
+    $msg =~ s/^ +//mg;
+    $msg =~ s/\n/&cr;/g;
+    $msg =~ s/\"/&dquot;/g;
+    $msg =~ s/\'/&squot;/g;
+    return `$PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
 }
 
 END {

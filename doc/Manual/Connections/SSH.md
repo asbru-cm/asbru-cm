@@ -1,10 +1,10 @@
-## Connection
+# Common configuration options
 
-### Connection Details
+## Connection Details
 
 ![](images/ssh1.png)
 
-+ __Method__ : For this case, we select SSH
++ __Method__ : Select any of the selection methods available
 + __Host__ : The IP or Hostname of the machine we want to connect to.
 + __Port__ : Port number to use for this connection.
 + __Run with sudo__ : * Pending
@@ -36,7 +36,7 @@
 
     If you are aiming for the highest level of security and automation at the same time, you need to use [KeePass Integration](../Preferences/KeePassXC.md)
 
-### Advanced Parameters
+## Advanced Parameters
 
 ![](images/ssh2.png)
 
@@ -47,7 +47,7 @@
     - Log patter name: Define the pattern to name your session file.
 
 
-### Network Settings
+## Network Settings
 
 This networking options override the Global Networking options for this connection.
 
@@ -58,43 +58,53 @@ This networking options override the Global Networking options for this connecti
 + __Use SOCKS proxy__ : Use a SOCKS proxy to exit the local network.
 + __Jump Server__ : Use a jump server to exit the local network, or connect to an internal machine behind a FireWall.
 
+### Socks Server
+
 ![](images/ssh4.png)
 
 If your network administrator has added a SOCKS server to the network and grants you access to it, you will have to select and configure the SOCKS Proxy.
+
+### Jump Server
 
 ![](images/ssh5.png)
 
 If you have SSH access to a remote machine in your network, that has access to the a local machine on the remote network. Then you can use this technique to access to an external machine behind a firewall, that has no public address.
 
-You need to have a public key installed in your __Jump Server__  to be able to use it as an intermediate machine to access the other network.
+Rules for connections
 
-It can be a default public key, or a personal private key that you were assigned.
++ Certificate is set
+    - Username is required
+    - Password will be used as a passphrase
++ Certificate is __not__ set
+    - User name and password will be used to login.
+    - They are not required will be asked during the login process if they are not set
 
-## SSH Options
+### Pseudo Jump Server
 
-![](images/ssh6.png)
+![](images/js1.png)
 
-Select any additional SSH options.
+If you activate the checkbox __Pseudo jump server__.
 
-### Local / Remote Port Forwarding
+The connection __will not__ use the `-J` option from ssh. Instead, it will do the following actions:
 
-Define your local or remote port forwarding rules.
++ SSH into the jump server
++ Send an SSH connection string based on your connection settings
 
-In the example image above, the connection opens 4 port forwards to access remote SQL Servers behind a Firewall.
+!!! important "Important for this to work"
+    Because the connection now is stablished in the __Jump Server__ any keys, hostnames, etc. Has to be available in the Jump server environment for the destination connection to take place.
 
-### Dynamic Socks Proxy
+    So if you use a private key in your server, you need to provide the key in the destination server. And the path to that key has to be the connection.
 
-*Pending
+    Because the keys are selected locally in your computer, you need to have the same key and path in the destination server.
 
-### Advanced Options
-
-Write any sequence of additional SSH options.
-
-The command field allows you to right click and have access to known SSH options.
+    Or to easy the situation, create an entry in the on user ssh config file  `~/ssh/.config` with the corresponding paths to your key and the user name. And use the connection name as your Host name.
 
 ## (Pre / Post) Exec
 
 This commands will be executed immediately __before__ (Pre) the connection is launched. And after (Post) the connection has been __closed__.
+
+![](images/ssh9.png)
+
 
 This commands are executed in the local computer, not on the remote terminal.
 
@@ -128,8 +138,6 @@ We exit the terminal, the terminal is closed and the post exec command is execut
 !!! tip "Possible uses"
     Launch : an IDE, a Database Client (DBeaver), start a local scripts that uploads or downloads files, etc.
 
-![](images/ssh9.png)
-
 ## Expect
 
 ![](images/ssh7.png)
@@ -160,21 +168,22 @@ You can create and execute a sequence of automated actions that will be executed
 
 Remote Macros have the same principle as the [Global Remote Commands](../Preferences/RemoteCommands.md)
 
-!!! note " "
-    But this commands will show on the popup menu for this connection only, and no others.
+!!! note
+    This commands will show on the popup menu for this connection only, and no others.
 
 ## Local Macros
 
 Local Macros have the same principle as the [Global Local Commands](../Preferences/LocalCommands.md)
 
-!!! note " "
-    But this commands will show on the popup menu for this connection only, and no others.
+!!! note
+    This commands will show on the popup menu for this connection only, and no others.
 
 ## User Variables
 
 This have the same principle as the [Global Variables](../Preferences/GlobalVariables.md)
 
-But will be available only for this particular connection.
+!!! note
+    Will be available only for this particular connection.
 
 ## Terminal Options
 

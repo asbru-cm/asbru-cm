@@ -64,11 +64,11 @@ BuildRoot:  %{_topdir}/tmp/%{name}-%{version}-%{release}-root
 
 %prep
 %autosetup -n asbru-cm-%{_github_version} -p1
-sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/pac_conn
-sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/pac_conn
-find . -type f -exec sed -i \
+sed -ri -e "s|\\\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}/lib|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin,|'%{_datadir}/%{name}/lib',|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin/\.\./|%{_datadir}/%{name}/|g" lib/asbru_conn
+sed -ri -e "s|\\\$RealBin/|%{_datadir}/%{name}/lib/|g" lib/asbru_conn
+find . -not -path './utils/*' -type f -exec sed -i \
   -e "s|\$RealBin[ ]*\.[ ]*'|'%{_datadir}/%{name}|g" \
   -e 's|"\$RealBin/|"%{_datadir}/%{name}/|g' \
   -e 's|/\.\.\(/\)|\1|' \
@@ -85,13 +85,11 @@ desktop-file-validate res/asbru-cm.desktop
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/{%{_mandir}/man1,%{_bindir}}
-mkdir -p %{buildroot}/%{_datadir}/{%{name}/{lib,res},applications}
+mkdir -p %{buildroot}/%{_datadir}/{%{name}/{lib,res,utils},applications}
 mkdir -p %{buildroot}/%{_bashcompletiondir}
 mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/{24x24,64x64,256x256,scalable}/apps
 
 install -m 755 asbru-cm %{buildroot}/%{_bindir}/%{name}
-install -m 755 utils/pac_from_mcm.pl %{buildroot}/%{_bindir}/%{name}_from_mcm
-install -m 755 utils/pac_from_putty.pl %{buildroot}/%{_bindir}/%{name}_from_putty
 
 echo Bashcompletion Directory %{_bashcompletiondir}
 
@@ -106,9 +104,10 @@ cp -a res/asbru-logo-256.png %{buildroot}/%{_datadir}/icons/hicolor/256x256/apps
 cp -a res/asbru-logo.svg %{buildroot}/%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
 
 # Copy the remaining resources and libraries
-cp -a res/*.{png,jpg,pl,glade,css,svg} %{buildroot}/%{_datadir}/%{name}/res/
+cp -a res/*.{png,pl,glade,svg} %{buildroot}/%{_datadir}/%{name}/res/
+cp -ar res/themes/ %{buildroot}/%{_datadir}/%{name}/res/
 cp -a lib/* %{buildroot}/%{_datadir}/%{name}/lib/
-
+cp -a utils/*.pl %{buildroot}/%{_datadir}/%{name}/utils/
 
 %files
 %doc README.md
@@ -137,6 +136,14 @@ fi
 
 
 %changelog
+* Sat Jun 06 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.2.1
+- 6.2.1 release
+* Fri May 15 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.2.0
+- 6.2.0 release
+* Tue Apr 28 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.3
+- 6.1.3 release
+* Sun Apr 12 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.2
+- 6.1.2 release
 * Fri Mar 27 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0
 - 6.1.0 release
 * Sat Mar 14 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.1.0rc2

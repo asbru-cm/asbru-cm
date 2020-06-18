@@ -27,14 +27,20 @@ These are the must important configuration regular expressions that will automat
 
 + __PASSWORD prompt__: Regular expression that will detect your password prompt
     - When found will type your terminal password or passphrase for you.
+    - Regex : `(?mi)(pass(word|phrase)|contraseña).*?:\s*$`
 + __USERNAME prompt__: Regular expression that will detect your username prompt
     - When found will type your terminal username for you.
+    - Regex : `([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$`
 * __Command prompt__: Regular expression that will detect your command prompt
     - When found the automated login will pass actions to your configured Expects for the terminal (if there are any configured)
+    - Regex : `[#%\$>]|\:\/\s*$`
 * __Remote host key changed__: Regular expression that will detect when the process detected a change in the remote host key.
     - When found, the terminal will issue the add and accept sequence and continue.
+    - Regex : `.*ffending .*key in (.+?)\:(\d+).*`
 * __Host-key verification string__: Regular expression that will detect you are connecting to a new server and to accept the remote key automatically.
+    - Regex : `^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$`
 * __Press any key to continue__: Regular expression that will detect a press any key to continue and send a new line for you.
+    - Regex : `.*(any key to continue|tecla para continuar).*`
 
 ### Terminal Options
 
@@ -81,15 +87,21 @@ This could automate, login to a server, then ssh into another one from this one.
 
 ## Some usual problems.
 
-!!! tip "Debug your expects"
-    If your expects do not work as expected, then you must debug your regular expressions to understand why did not work.
+### When a key fingerprint has changed, the terminal can not connect.
 
-    In this case activate the option __Expect debug__ in your __Global Settings > Terminal Options > Advanced__
+Users that have been using the same configuration file since the original project PAC Manger. Could have out dated regex for the login process.
 
-    ![](images/expect4.png)
+The issue manifests as :
 
-    When doing this all your commands and the communication will be printed on the terminal. Passwords and other sensitive data will be revealed.
+1. SSH to new host
+2. Wait for the warning with the prompt   
+   `Are you sure you want to continue connecting (yes/no/[fingerprint])? yes/no`   
+   `Please type 'yes', 'no' or the fingerprint: `
+3. __DISCONNECTED__
 
+Check your configuration regex against the ones published here. Copy paste the ones that look different to update.
+
+[See issue #145](https://github.com/asbru-cm/asbru-cm/issues/145)
 
 ### Prompt not detected
 
@@ -101,3 +113,11 @@ In this case the admin at the host decided that the prompt should have this non 
 
 So the __prompt regex__ for that particular connection had to be changed to : `:\]\s+$`
 
+!!! tip "Debug your expects"
+    If your expects do not work as expected, then you must debug your regular expressions to understand why did not work.
+
+    In this case activate the option __Expect debug__ in your __Global Settings > Terminal Options > Advanced__
+
+    ![](images/expect4.png)
+
+    When doing this all your commands and the communication will be printed on the terminal. Passwords and other sensitive data will be revealed.

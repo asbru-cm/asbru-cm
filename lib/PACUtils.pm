@@ -45,7 +45,6 @@ use Net::Ping;
 use YAML;
 use OSSP::uuid;
 use Encode;
-use KeePass;
 use DynaLoader; # Required for PACTerminal and PACShell modules
 
 # GTK
@@ -95,11 +94,8 @@ require Exporter;
     _purgeMissingScreenshots
     _splash
     _getXWindowsList
-    _getREADME
     _checkREADME
-    _showUpdate
     _getEncodings
-    _findKP
     _makeDesktopFile
     _updateWidgetColor
     _getSelectedRows
@@ -110,6 +106,8 @@ require Exporter;
     _copyPass
     _appName
     _setWindowPaintable
+    _setDefaultRGBA
+    _doShellEscape
 ); # Functions/variables to export
 
 @EXPORT_OK  = qw();
@@ -121,7 +119,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.1.2';
+our $APPVERSION = '6.2.2';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -137,15 +135,17 @@ if ($ARCH_TMP =~ /x86_64/gio) {
     $ARCH = 32;
 }
 my $RES_DIR = "$RealBin/res";
+my $THEME_DIR = "$RES_DIR/themes/default";
 my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
-my $CFG_FILE = "$CFG_DIR/pac.yml";
+my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
 my $WIDGET_POPUP;
+my ($R,$G,$B,$A);
 
 our @DONATORS_LIST = (
     'Angelo Maria Lambiasi',
@@ -253,7 +253,7 @@ sub __ {
 sub __text {
     my $str = shift // '';
 
-    $str =~ s/&amp;/\&/go;
+    while ($str =~ s/&amp;/\&/g) {}
     $str =~ s/&#124;/\|/go;
     $str =~ s/&apos;/\'/go;
     $str =~ s/&quot;/\"/go;
@@ -262,35 +262,6 @@ sub __text {
 
     return $str;
 };
-
-sub _findKP {
-    my $list = shift;
-    my $where = shift // 'title';
-    my $what = shift // qr/.*/;
-
-    my @kpx = ();
-    foreach my $hash (@{$list}) {
-        if (ref($what) eq 'Regexp') {
-            if ($$hash{$where} !~ /^$what$/) {
-                next;
-            }
-        # TODO : This should be elsif
-        } else {
-            if ($$hash{$where} ne $what) {
-                next;
-            }
-        }
-        push(@kpx, {
-            title => $$hash{title},
-            url => $$hash{url},
-            username => $$hash{username},
-            password => $$hash{password},
-            created => $$hash{created},
-            comment => $$hash{comment}
-        });
-    }
-    return wantarray ? @kpx : scalar(@kpx);
-}
 
 sub _splash {
     my $show = shift;
@@ -302,8 +273,8 @@ sub _splash {
         return 1;
     }
 
-    if (! defined $WINDOWSPLASH{_GUI}) {
-        $WINDOWSPLASH{_GUI} = Gtk3::Window->new;
+    if (!defined $WINDOWSPLASH{_GUI}) {
+        $WINDOWSPLASH{_GUI} = Gtk3::Window->new();
         $WINDOWSPLASH{_GUI}->set_type_hint('splashscreen');
         $WINDOWSPLASH{_GUI}->set_position('center');
         $WINDOWSPLASH{_GUI}->set_keep_above(1);
@@ -314,7 +285,7 @@ sub _splash {
         $WINDOWSPLASH{_IMG} = Gtk3::Image->new_from_file($SPLASH_IMG);
         $WINDOWSPLASH{_VBOX}->pack_start($WINDOWSPLASH{_IMG}, 1, 1, 0);
 
-        $WINDOWSPLASH{_LBL} = Gtk3::ProgressBar->new;
+        $WINDOWSPLASH{_LBL} = Gtk3::ProgressBar->new();
         $WINDOWSPLASH{_VBOX}->pack_start($WINDOWSPLASH{_LBL}, 1, 1, 5);
     }
 
@@ -323,14 +294,14 @@ sub _splash {
     $WINDOWSPLASH{_LBL}->set_fraction($partial / $total);
 
     if ($show) {
-        $WINDOWSPLASH{_GUI}->show_all;
-        $WINDOWSPLASH{_GUI}->present;
+        $WINDOWSPLASH{_GUI}->show_all();
+        $WINDOWSPLASH{_GUI}->present();
         while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+            Gtk3::main_iteration();
         }
     } else {
-        $WINDOWSPLASH{_GUI}->hide;
-        $WINDOWSPLASH{_GUI}->destroy;
+        $WINDOWSPLASH{_GUI}->hide();
+        $WINDOWSPLASH{_GUI}->destroy();
     }
 
     return 1;
@@ -388,8 +359,12 @@ sub _pixBufFromFile {
 
 sub _getMethods {
     my $self = shift;
-
+    my $theme_dir = shift;
     my %methods;
+
+    if ($theme_dir) {
+        $THEME_DIR = $theme_dir;
+    }
 
     `which rdesktop 1>/dev/null 2>&1`;
     my $rdesktop = $?;
@@ -406,7 +381,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -435,30 +410,30 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
             _($self, 'frameVariables')->set_sensitive(0);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(0);
             _($self, 'labelRemoteMacros')->set_sensitive(0);
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -477,7 +452,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -506,30 +481,30 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
             _($self, 'frameVariables')->set_sensitive(0);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(0);
             _($self, 'labelRemoteMacros')->set_sensitive(0);
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_rdesktop.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -551,7 +526,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (_($self, 'entryPassword')->get_chars(0, -1) eq '') && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if ((_($self, 'rbCfgAuthUserPass')->get_active()) && (_($self, 'entryPassword')->get_chars(0, -1) eq '')) {
                 push(@faults, "Password (User/Password authentication method selected)");
             }
 
@@ -571,7 +546,7 @@ sub _getMethods {
             _($self, 'labelIP')->set_text('Host: ');
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -582,23 +557,23 @@ sub _getMethods {
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'frameRemoteMacros')->set_sensitive(0);
             _($self, 'frameLocalMacros')->set_sensitive(0);
             _($self, 'frameVariables')->set_sensitive(0);
             _($self, 'frameTerminalOptions')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(0);
             _($self, 'labelRemoteMacros')->set_sensitive(0);
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(0);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_vncviewer.svg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_vncviewer.svg", 16, 16, 0),
         'escape' => ["\cc"]
     };
 
@@ -629,7 +604,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_text('');
             _($self, 'entryPassword')->set_text('');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
@@ -637,19 +612,19 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'rbCfgAuthManual')->set_active(1);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_cu.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_cu.jpg", 16, 16, 0),
         'escape' => ['~.']
     };
 
@@ -665,7 +640,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'TTY Socket');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -693,13 +668,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -707,17 +682,17 @@ sub _getMethods {
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
     `which c3270 1>/dev/null 2>&1`;
@@ -750,18 +725,18 @@ sub _getMethods {
             _($self, 'entryUser')->set_text('');
             _($self, 'entryPassword')->set_text('');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'vboxAuthMethod')->set_sensitive(0);
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'fileCfgPublicKey')->unselect_all();
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -770,7 +745,7 @@ sub _getMethods {
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_3270.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
     `which autossh 1>/dev/null 2>&1`;
@@ -788,7 +763,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port cannot be empty');
             }
-            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'cbInferUserPassKPX')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
                 push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
 
@@ -810,13 +785,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(1);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -830,11 +805,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive($autossh);
             _($self, 'cbAutossh')->set_active($$cfg{'autossh'});
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ssh.svg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_ssh.svg", 16, 16, 0),
         'escape' => ['~.']
     };
 
@@ -850,7 +825,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -874,13 +849,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -895,11 +870,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_mosh.png", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_mosh.svg", 16, 16, 0),
         'escape' => ["\c^x."]
     };
 
@@ -915,7 +890,7 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -939,13 +914,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -960,11 +935,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_cadaver.png", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_cadaver.png", 16, 16, 0),
         'escape' => ["\cc", "quit\n"]
     };
 
@@ -982,7 +957,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1007,13 +982,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1021,17 +996,17 @@ sub _getMethods {
             _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_telnet.jpg", 16, 16, 0),
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_telnet.svg", 16, 16, 0),
         'escape' => ["\c]", "quit\n"]
     };
 
@@ -1048,12 +1023,12 @@ sub _getMethods {
                 push(@faults, 'Port');
             }
             # TODO : Check if this nested "ifs" can be rewritten
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
-            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active) {
-                if (! _($self, 'fileCfgPublicKey')->get_filename) {
+            } elsif (_($self, 'rbCfgAuthPublicKey')->get_active()) {
+                if (! _($self, 'fileCfgPublicKey')->get_filename()) {
                     push(@faults, 'Public Key File (Public Key authentication method selected)');
                 }
             }
@@ -1076,13 +1051,13 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(1);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
@@ -1097,11 +1072,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_sftp.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_sftp.svg", 16, 16, 0)
     };
 
     $methods{'FTP'} = {
@@ -1117,7 +1092,7 @@ sub _getMethods {
             if (! _($self, 'entryPort')->get_chars(0, -1)) {
                 push(@faults, 'Port');
             }
-            if ((_($self, 'rbCfgAuthUserPass')->get_active) && (! _($self, 'cbInferUserPassKPX')->get_active)) {
+            if (_($self, 'rbCfgAuthUserPass')->get_active()) {
                 if (! _($self, 'entryUser')->get_chars(0, -1)) {
                     push(@faults, 'User (User/Password authentication method selected)');
                 }
@@ -1141,19 +1116,19 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'alignAuthMethod')->set_sensitive(1);
+            _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
+            _($self, 'fileCfgPublicKey')->unselect_all();
             _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
@@ -1161,11 +1136,11 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_ftp.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_ftp.svg", 16, 16, 0)
     };
 
     $methods{'Generic Command'} = {
@@ -1204,88 +1179,98 @@ sub _getMethods {
             _($self, 'rbCfgAuthManual')->set_active(1);
             _($self, 'entryUser')->set_sensitive(0);
             _($self, 'entryPassphrase')->set_text('');
-            _($self, 'fileCfgPublicKey')->unselect_all;
-            _($self, 'labelConnOptions')->set_markup("'<b>$method</b>'");
+            _($self, 'fileCfgPublicKey')->unselect_all();
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
             _($self, 'labelExpect')->set_sensitive(1);
             _($self, 'labelRemoteMacros')->set_sensitive(1);
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" '<b>$method</b>' command line options: ");
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
-        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_method_generic.jpg", 16, 16, 0)
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_generic.svg", 16, 16, 0)
     };
 
     return %methods;
 }
 
 sub _registerPACIcons {
+    my $theme_dir = shift;
+    if ($theme_dir) {
+        $THEME_DIR = $theme_dir;
+    }
+
     my %icons = (
-        'pac-app-big' => "$RES_DIR/asbru-logo-64.png",
-        'pac-group-add' => "$RES_DIR/asbru_group_add_16x16.png",
-        'pac-node-add' => "$RES_DIR/asbru_node_add_16x16.png",
-        'pac-node-del' => "$RES_DIR/asbru_node_del_16x16.png",
-        'pac-chain' => "$RES_DIR/asbru_chain.png",
-        'pac-cluster-auto' => "$RES_DIR/asbru_cluster_auto.png",
-        'pac-cluster-manager2' => "$RES_DIR/asbru_cluster_manager2.png",
-        'pac-cluster-manager' => "$RES_DIR/asbru_cluster_manager.png",
-        'pac-cluster-manager-off' => "$RES_DIR/asbru_cluster_manager_off.png",
-        'pac-favourite-on' => "$RES_DIR/asbru_favourite_on.png",
-        'pac-favourite-off' => "$RES_DIR/asbru_favourite_off.png",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
-        'pac-group-closed' => "$RES_DIR/asbru_group_closed_16x16.svg",
-        'pac-group-open' => "$RES_DIR/asbru_group_open_16x16.svg",
-        'pac-group' => "$RES_DIR/asbru_group.png",
-        'pac-history' => "$RES_DIR/asbru_history.png",
-        'pac-keepass' => "$RES_DIR/asbru_keepass.png",
-        'pac-method-WebDAV' => "$RES_DIR/asbru_method_cadaver.png",
-        'pac-method-MOSH' => "$RES_DIR/asbru_method_mosh.png",
-        'pac-method-IBM 3270/5250' => "$RES_DIR/asbru_method_3270.jpg",
-        'pac-method-Serial (cu)' => "$RES_DIR/asbru_method_cu.jpg",
-        'pac-method-FTP' => "$RES_DIR/asbru_method_ftp.jpg",
-        'pac-method-Generic Command' => "$RES_DIR/asbru_method_generic.jpg",
-        'pac-method-RDP (Windows)' => "$RES_DIR/asbru_method_rdesktop.svg",
-        'pac-method-RDP (rdesktop)' => "$RES_DIR/asbru_method_rdesktop.svg",
-        'pac-method-RDP (xfreerdp)' => "$RES_DIR/asbru_method_rdesktop.svg",
-        'pac-method-Serial (remote-tty)' => "$RES_DIR/asbru_method_remote-tty.jpg",
-        'pac-method-SFTP' => "$RES_DIR/asbru_method_sftp.jpg",
-        'pac-method-SSH' => "$RES_DIR/asbru_method_ssh.svg",
-        'pac-method-Telnet' => "$RES_DIR/asbru_method_telnet.jpg",
-        'pac-method-VNC' => "$RES_DIR/asbru_method_vncviewer.svg",
-        'pac-quick-connect' => "$RES_DIR/asbru_quick_connect.png",
-        'pac-script' => "$RES_DIR/asbru_script.png",
-        'pac-shell' => "$RES_DIR/asbru_shell.png",
-        'pac-tab' => "$RES_DIR/asbru_tab.png",
-        'pac-terminal-ok-small' => "$RES_DIR/asbru_terminal16x16.png",
-        'pac-terminal-ok-big' => "$RES_DIR/asbru_terminal64x64.png",
-        'pac-terminal-ko-small' => "$RES_DIR/asbru_terminal_x16x16.png",
-        'pac-terminal-ko-big' => "$RES_DIR/asbru_terminal_x64x64.png",
-        'pac-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
-        'pac-tray' => "$RES_DIR/asbru-logo-tray.png",
-        'pac-treelist' => "$RES_DIR/asbru_treelist.png",
-        'pac-wol' => "$RES_DIR/asbru_wol.png",
-        'pac-prompt' => "$RES_DIR/asbru_prompt.png",
-        'pac-protected' => "$RES_DIR/asbru_protected.png",
-        'pac-unprotected' => "$RES_DIR/asbru_unprotected.png",
-        'pac-buttonbar-show' => "$RES_DIR/asbru_buttonbar_show.png",
-        'pac-buttonbar-hide' => "$RES_DIR/asbru_buttonbar_hide.png",
+        'asbru-help' => "$THEME_DIR/asbru-help.svg",
+        'gtk-edit' => "$THEME_DIR/gtk-edit.svg",
+        'gtk-delete' => "$THEME_DIR/gtk-delete.svg",
+        'gtk-find' => "$THEME_DIR/gtk-find.svg",
+        'gtk-spell-check' => "$THEME_DIR/gtk-spell-check.svg",
+        'asbru-app-big' => "$RES_DIR/asbru-logo-64.png",
+        'asbru-group-add' => "$THEME_DIR/asbru_group_add_16x16.svg",
+        'asbru-node-add' => "$THEME_DIR/asbru_node_add_16x16.svg",
+        'asbru-node-del' => "$THEME_DIR/asbru_node_del_16x16.png",
+        'asbru-chain' => "$THEME_DIR/asbru_chain.png",
+        'asbru-cluster-auto' => "$THEME_DIR/asbru_cluster_auto.png",
+        'asbru-cluster-manager2' => "$THEME_DIR/asbru_cluster_manager2.png",
+        'asbru-cluster-manager' => "$THEME_DIR/asbru_cluster_manager.svg",
+        'asbru-cluster-manager-off' => "$THEME_DIR/asbru_cluster_manager_off.svg",
+        'asbru-favourite-on' => "$THEME_DIR/asbru_favourite_on.svg",
+        'asbru-favourite-off' => "$THEME_DIR/asbru_favourite_off.svg",
+        'asbru-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
+        'asbru-group-closed' => "$THEME_DIR/asbru_group_closed_16x16.svg",
+        'asbru-group-open' => "$THEME_DIR/asbru_group_open_16x16.svg",
+        'asbru-group' => "$THEME_DIR/asbru_group.svg",
+        'asbru-history' => "$THEME_DIR/asbru_history.svg",
+        'asbru-keepass' => "$THEME_DIR/asbru_keepass.png",
+        'asbru-method-WebDAV' => "$THEME_DIR/asbru_method_cadaver.png",
+        'asbru-method-MOSH' => "$THEME_DIR/asbru_method_mosh.svg",
+        'asbru-method-IBM 3270/5250' => "$THEME_DIR/asbru_method_3270.jpg",
+        'asbru-method-Serial (cu)' => "$THEME_DIR/asbru_method_cu.jpg",
+        'asbru-method-FTP' => "$THEME_DIR/asbru_method_ftp.svg",
+        'asbru-method-Generic Command' => "$THEME_DIR/asbru_method_generic.svg",
+        'asbru-method-RDP (Windows)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-RDP (rdesktop)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-RDP (xfreerdp)' => "$THEME_DIR/asbru_method_rdesktop.svg",
+        'asbru-method-Serial (remote-tty)' => "$THEME_DIR/asbru_method_remote-tty.jpg",
+        'asbru-method-SFTP' => "$THEME_DIR/asbru_method_sftp.svg",
+        'asbru-method-SSH' => "$THEME_DIR/asbru_method_ssh.svg",
+        'asbru-method-Telnet' => "$THEME_DIR/asbru_method_telnet.svg",
+        'asbru-method-VNC' => "$THEME_DIR/asbru_method_vncviewer.svg",
+        'asbru-quick-connect' => "$THEME_DIR/asbru_quick_connect.svg",
+        'asbru-script' => "$THEME_DIR/asbru_script.png",
+        'asbru-shell' => "$THEME_DIR/asbru_shell.svg",
+        'asbru-tab' => "$THEME_DIR/asbru_tab.png",
+        'asbru-terminal-ok-small' => "$RES_DIR/asbru_terminal16x16.png",
+        'asbru-terminal-ok-big' => "$RES_DIR/asbru_terminal64x64.png",
+        'asbru-terminal-ko-small' => "$RES_DIR/asbru_terminal_x16x16.png",
+        'asbru-terminal-ko-big' => "$RES_DIR/asbru_terminal_x64x64.png",
+        'asbru-tray-bw' => "$RES_DIR/asbru_tray_bw.png",
+        'asbru-tray' => "$RES_DIR/asbru-logo-tray.png",
+        'asbru-treelist' => "$THEME_DIR/asbru_treelist.svg",
+        'asbru-wol' => "$THEME_DIR/asbru_wol.svg",
+        'asbru-prompt' => "$THEME_DIR/asbru_prompt.png",
+        'asbru-protected' => "$THEME_DIR/asbru_protected.png",
+        'asbru-unprotected' => "$THEME_DIR/asbru_unprotected.png",
+        'asbru-buttonbar-show' => "$THEME_DIR/asbru_buttonbar_show.png",
+        'asbru-buttonbar-hide' => "$THEME_DIR/asbru_buttonbar_hide.png",
     );
 
-    my $icon_factory = Gtk3::IconFactory->new;
+    my $icon_factory = Gtk3::IconFactory->new();
 
     foreach my $icon (keys %icons) {
-        my $icon_source = Gtk3::IconSource->new;
+        my $icon_source = Gtk3::IconSource->new();
         $icon_source->set_filename($icons{$icon});
 
-        my $icon_set = Gtk3::IconSet->new;
+        my $icon_set = Gtk3::IconSet->new();
         $icon_set->add_source($icon_source);
 
         $icon_factory->add($icon, $icon_set);
     }
 
-    $icon_factory->add_default;
+    $icon_factory->add_default();
 
     return 1;
 }
@@ -1340,26 +1325,32 @@ sub _menuFavouriteConnections {
         if ($terminal) {
             push(@fav, {
                 label => $name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
                 submenu => [
                     {label => 'Start',
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
-                        code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);}
+                        code => sub {
+                            $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
+                        }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
-                        stockicon => $PACMain::UNITY ? '' : 'pac-chain',
+                        stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
-                        code => sub {$terminal->_wSelectChain($uuid);}
+                        code => sub {
+                            $terminal->_wSelectChain($uuid);
+                        }
                     }
                 ]
             });
         } else {
             push(@fav, {
                 label => $name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
-                code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);}
+                code => sub {
+                    $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
+                }
             });
         }
     }
@@ -1374,7 +1365,7 @@ sub _menuClusterConnections {
     foreach my $ac (sort {lc($a) cmp lc($b)} keys %{$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}}) {
         push(@fav, {
             label => $ac,
-            stockicon => $PACMain::UNITY ? '' : 'pac-cluster-auto',
+            stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-auto',
             code => sub {$PACMain::FUNCS{_MAIN}->_startCluster($ac);}
         });
     }
@@ -1382,7 +1373,7 @@ sub _menuClusterConnections {
     foreach my $cluster (sort {lc($a) cmp lc($b)} keys %{$PACMain::FUNCS{_MAIN}{_CLUSTER}->getCFGClusters}) {
         push(@fav, {
             label => $cluster,
-            stockicon => $PACMain::UNITY ? '' : 'pac-cluster-manager2',
+            stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-manager2',
             code => sub {$PACMain::FUNCS{_MAIN}->_startCluster($cluster);}
         });
     }
@@ -1412,33 +1403,39 @@ sub _menuAvailableConnections {
         if (scalar(@{$$elem_hash{'children'}})) {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : 'pac-group-closed',
+                stockicon => $PACMain::UNITY ? '' : 'asbru-group-closed',
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'} // '',
                 submenu => _menuAvailableConnections($$elem_hash{'children'}, $terminal)
             });
         } elsif ($terminal) {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$this_uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
                 submenu => [{
                         label => 'Start',
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
-                        code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);}
+                        code => sub {
+                            $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
+                        }
                     }, {
                         label => "Chain with '$$terminal{_NAME}'",
-                        stockicon => $PACMain::UNITY ? '' : 'pac-chain',
+                        stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
-                        code => sub {$terminal->_wSelectChain($this_uuid);}
+                        code => sub {
+                            $terminal->_wSelectChain($this_uuid);
+                        }
                     }
                 ]
             });
         } else {
             push(@tray_menu_items, {
                 label => $this_name,
-                stockicon => $PACMain::UNITY ? '' : "pac-method-$$cfg{'environments'}{$this_uuid}{'method'}",
+                stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
-                code => sub {$PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);}
+                code => sub {
+                    $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
+                }
             });
         }
     }
@@ -1447,23 +1444,36 @@ sub _menuAvailableConnections {
 }
 
 sub _wEnterValue {
-    my $self = shift;
+    my $parent = shift;
     my $lblup = shift;
     my $lbldown = shift;
     my $default = shift;
     my $visible = shift // 1;
     my $stock_icon = shift // 'gtk-edit';
-
     my @list;
     my $pos = -1;
+    my %w;
 
-    if (! defined $default) {
+    if (!defined $default) {
         $default = '';
     } elsif (ref($default)) {
         @list = @{$default};
+    } elsif ($default =~ /.+?\|.+?\|/) {
+        @list = split /\|/,$default;
     }
 
-    my %w;
+    # If no parent given, try to use an existing "global" window (main window or splash screen)
+    if (defined $parent && ref $parent ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wEnterValue ",ref $parent,"\n";
+        undef $parent;
+    }
+    if (!defined $parent) {
+        if (defined $PACMain::FUNCS{_MAIN}{_GUI}{main}) {
+            $parent = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+        } elsif (defined $WINDOWSPLASH{_GUI}) {
+            $parent = $WINDOWSPLASH{_GUI};
+        }
+    }
 
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
@@ -1475,8 +1485,10 @@ sub _wEnterValue {
     );
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
-    $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    if (!$parent) {
+        $w{window}{data}->set_position('center');
+    }
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
@@ -1491,18 +1503,18 @@ sub _wEnterValue {
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{img}, 0, 1, 5);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 5);
     $w{window}{gui}{lblup}->set_markup($lblup);
 
     # Create 2nd label
-    $w{window}{gui}{lbldwn} = Gtk3::Label->new;
+    $w{window}{gui}{lbldwn} = Gtk3::Label->new();
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lbldwn}, 1, 1, 5);
     $w{window}{gui}{lbldwn}->set_text($lbldown // '');
 
     if (@list) {
         # Create combobox widget
-        $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new;
+        $w{window}{gui}{comboList} = Gtk3::ComboBoxText->new();
         $w{window}{data}->get_content_area->pack_start($w{window}{gui}{comboList}, 0, 1, 0);
         $w{window}{gui}{comboList}->set_property('can_focus', 0);
         foreach my $text (@list) {
@@ -1511,7 +1523,7 @@ sub _wEnterValue {
         $w{window}{gui}{comboList}->set_active(0);
     } else {
         # Create the entry widget
-        $w{window}{gui}{entry} = Gtk3::Entry->new;
+        $w{window}{gui}{entry} = Gtk3::Entry->new();
         $w{window}{data}->get_content_area->pack_start($w{window}{gui}{entry}, 0, 1, 5);
         $w{window}{gui}{entry}->set_text($default);
         $w{window}{gui}{entry}->set_activates_default(1);
@@ -1519,25 +1531,25 @@ sub _wEnterValue {
     }
 
     # Show the window (in a modal fashion)
-    $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-    $w{window}{data}->show_all;
-    my $ok = $w{window}{data}->run;
+    $w{window}{data}->set_transient_for($parent);
+    $w{window}{data}->show_all();
+    my $ok = $w{window}{data}->run();
+    my $val = '';
 
-    my $val = undef;
     if (@list) {
         if ($ok eq 'ok') {
-            $val = $w{window}{gui}{comboList}->get_active_text;
+            $val = $w{window}{gui}{comboList}->get_active_text();
         }
-        $pos = $w{window}{gui}{comboList}->get_active;
+        $pos = $w{window}{gui}{comboList}->get_active();
     } else {
         if ($ok eq 'ok') {
             $val = $w{window}{gui}{entry}->get_chars(0, -1);
         }
     }
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
-        Gtk3::main_iteration;
+        Gtk3::main_iteration();
     }
 
     return wantarray ? ($val, $pos) : $val;
@@ -1554,12 +1566,12 @@ sub _wAddRenameNode {
         $name = $$cfg{'environments'}{$uuid}{'name'};
         $parent_name = $$cfg{'environments'}{$$cfg{'environments'}{$uuid}{'parent'}}{'name'} // '';
         $title = $$cfg{'environments'}{$uuid}{'title'};
-        $lblup = "<b>Renaming node ' @{[__($name)]}'</b>";
+        $lblup = "Renaming node <b>@{[__($name)]}</b>";
     } elsif ($action eq 'add') {
         $name = '';
         $parent_name = $$cfg{'environments'}{$uuid}{'name'};
         $title = $uuid eq '__PAC__ROOT__' || ! $$cfg{defaults}{'append group name'} ? '' : ($parent_name eq '' ? '' : " - $parent_name");
-        $lblup = "<b>Adding new node into '" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "'</b>";
+        $lblup = "Adding new node into <b>" . ($uuid eq '__PAC__ROOT__' ? 'ROOT' : __($parent_name)) . "</b>";
     }
 
     my %w;
@@ -1577,7 +1589,7 @@ sub _wAddRenameNode {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(-1, -1);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_border_width(5);
@@ -1592,7 +1604,7 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{img}, 0, 1, 0);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
     $w{window}{gui}{lblup}->set_markup($lblup);
 
@@ -1602,12 +1614,12 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox1}->set_border_width(5);
 
     # Create label
-    $w{window}{gui}{lbl1} = Gtk3::Label->new;
+    $w{window}{gui}{lbl1} = Gtk3::Label->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lbl1}, 0, 1, 0);
-    $w{window}{gui}{lbl1}->set_text('Enter new NAME: ');
+    $w{window}{gui}{lbl1}->set_text('Enter new NAME ');
 
     # Create the entry widget
-    $w{window}{gui}{entry1} = Gtk3::Entry->new;
+    $w{window}{gui}{entry1} = Gtk3::Entry->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{entry1}, 1, 1, 0);
     $w{window}{gui}{entry1}->set_text($name);
     $w{window}{gui}{entry1}->set_activates_default(1);
@@ -1621,20 +1633,20 @@ sub _wAddRenameNode {
     $w{window}{gui}{hbox2}->set_border_width(5);
 
     # Create label
-    $w{window}{gui}{lbl2} = Gtk3::Label->new;
+    $w{window}{gui}{lbl2} = Gtk3::Label->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{lbl2}, 0, 1, 0);
-    $w{window}{gui}{lbl2}->set_text('Enter new TITLE: ');
+    $w{window}{gui}{lbl2}->set_text('Enter new TITLE ');
 
     # Create the entry widget
-    $w{window}{gui}{entry2} = Gtk3::Entry->new;
+    $w{window}{gui}{entry2} = Gtk3::Entry->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{entry2}, 1, 1, 0);
     $w{window}{gui}{entry2}->set_text($title);
     $w{window}{gui}{entry2}->set_activates_default(1);
 
     # Show the window (in a modal fashion)
     $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
-    $w{window}{data}->show_all;
-    my $ok = $w{window}{data}->run;
+    $w{window}{data}->show_all();
+    my $ok = $w{window}{data}->run();
 
     if ($ok eq 'ok') {
         $new_name = $w{window}{gui}{entry1}->get_chars(0, -1);
@@ -1643,7 +1655,7 @@ sub _wAddRenameNode {
         $new_title = $w{window}{gui}{entry2}->get_chars(0, -1);
     }
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
     while (Gtk3::events_pending) {
         Gtk3::main_iteration;
     }
@@ -1672,7 +1684,7 @@ sub _wPopUpMenu {
     my $actions = Gtk3::ActionGroup->new('Actions');
     $actions->add_actions(\@array, undef);
 
-    my $ui = Gtk3::UIManager->new;
+    my $ui = Gtk3::UIManager->new();
     $ui->set_add_tearoffs(1);
     $ui->insert_action_group($actions, 0);
 
@@ -1685,7 +1697,7 @@ sub _wPopUpMenu {
     }
 
     $WIDGET_POPUP = $ui->get_widget('/Menu');
-    $WIDGET_POPUP->show_all;
+    $WIDGET_POPUP->show_all();
     if ($ref) {
         return $WIDGET_POPUP;
     }
@@ -1751,9 +1763,9 @@ sub _wPopUpMenu {
 
     sub _pos {
         my $h = $_[0]->size_request->height;
-        my $ymax = $event->get_screen->get_height;
-        my ($x, $y) = $event->window->get_origin;
-        my $dy = $event->window->get_height;
+        my $ymax = $event->get_screen->get_height();
+        my ($x, $y) = $event->window->get_origin();
+        my $dy = $event->window->get_height();
 
         # Over the event widget
         if ($dy + $y + $h > $ymax) {
@@ -1774,8 +1786,16 @@ sub _wMessage {
     my $window = shift;
     my $msg = shift;
     my $modal = shift // 1;
+    my $selectable = shift // 0;
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (defined $window && ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1783,23 +1803,31 @@ sub _wMessage {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
+
     $windowConfirm->set_markup($msg);
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Message");
     $windowConfirm->set_transient_for($window);
 
+    # The message can be selected by user (eg for copy/paste)
+    if ($selectable) {
+        $windowConfirm->get_message_area()->foreach(sub {
+            my $child = shift;
+            if (ref($child) eq 'Gtk3::Label') {
+                $child->set_selectable(1);
+            }
+        });
+    }
+
     if ($modal) {
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
-        $windowConfirm->show_all;
-        my $close = $windowConfirm->run;
-        $windowConfirm->destroy;
+        $windowConfirm->show_all();
+        my $close = $windowConfirm->run();
+        $windowConfirm->destroy();
     } else {
-        $windowConfirm->show_all;
-        while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+        $windowConfirm->show_all();
+        while (Gtk3::events_pending()) {
+            Gtk3::main_iteration();
         }
     }
 
@@ -1815,10 +1843,10 @@ sub _wProgress {
     $WINDOWPROGRESS{_RET} = 1;
 
     if (! defined $WINDOWPROGRESS{_GUI}) {
-        $WINDOWPROGRESS{_GUI} = Gtk3::Window->new;
+        $WINDOWPROGRESS{_GUI} = Gtk3::Window->new();
 
         $WINDOWPROGRESS{_GUI}->set_position('center');
-        $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+        $WINDOWPROGRESS{_GUI}->set_icon_name('asbru-app-big');
         $WINDOWPROGRESS{_GUI}->set_size_request('400', '150');
         $WINDOWPROGRESS{_GUI}->set_resizable(0);
         if (defined $window) {
@@ -1829,13 +1857,13 @@ sub _wProgress {
         $WINDOWPROGRESS{vbox} = Gtk3::VBox->new(0, 0);
         $WINDOWPROGRESS{_GUI}->add($WINDOWPROGRESS{vbox});
 
-        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new;
+        $WINDOWPROGRESS{lbl1} = Gtk3::Label->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{lbl1}, 0, 1, 5);
 
-        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new;
+        $WINDOWPROGRESS{pb} = Gtk3::ProgressBar->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{pb}, 1, 1, 5);
 
-        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new;
+        $WINDOWPROGRESS{sep} = Gtk3::HSeparator->new();
         $WINDOWPROGRESS{vbox}->pack_start($WINDOWPROGRESS{sep}, 0, 1, 5);
 
         $WINDOWPROGRESS{btnCancel} = Gtk3::Button->new_from_stock('gtk-cancel');
@@ -1844,12 +1872,12 @@ sub _wProgress {
         $WINDOWPROGRESS{_GUI}->signal_connect('delete_event' => sub {return 1;});
         $WINDOWPROGRESS{btnCancel}->signal_connect('clicked' => sub {
             $WINDOWPROGRESS{_RET} = 0;
-            $WINDOWPROGRESS{_GUI}->hide;
+            $WINDOWPROGRESS{_GUI}->hide();
             return 1;
         });
     }
 
-    $WINDOWPROGRESS{_GUI}->set_icon_name('pac-app-big');
+    $WINDOWPROGRESS{_GUI}->set_icon_name('asbru-app-big');
     $WINDOWPROGRESS{_GUI}->set_title("$APPNAME (v$APPVERSION) : $title");
 
     if ($progress) {
@@ -1859,12 +1887,12 @@ sub _wProgress {
         $WINDOWPROGRESS{pb}->set_text($msg);
         $WINDOWPROGRESS{pb}->set_fraction($partial / $total);
 
-        $WINDOWPROGRESS{_GUI}->show_all;
-        while (Gtk3::events_pending) {
-            Gtk3::main_iteration;
+        $WINDOWPROGRESS{_GUI}->show_all();
+        while (Gtk3::events_pending()) {
+            Gtk3::main_iteration();
         }
     } else {
-        $WINDOWPROGRESS{_GUI}->hide;
+        $WINDOWPROGRESS{_GUI}->hide();
     }
 
     return $WINDOWPROGRESS{_RET};
@@ -1873,8 +1901,16 @@ sub _wProgress {
 sub _wConfirm {
     my $window = shift;
     my $msg = shift;
+    my $default = shift // 'no';
 
     # Why no Gtk3::MessageDialog->new_with_markup() available??
+    if (defined $window && ref $window ne 'Gtk3::Window') {
+        print STDERR "WARN: Wrong parent parameter received _wMessage ",ref $window,"\n";
+        undef $window;
+    }
+    if (!$window) {
+        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
+    }
     my $windowConfirm = Gtk3::MessageDialog->new(
         $window,
         'GTK_DIALOG_DESTROY_WITH_PARENT',
@@ -1882,18 +1918,16 @@ sub _wConfirm {
         'none',
         ''
     );
-    if (!$window) {
-        $window = $PACMain::FUNCS{_MAIN}{_GUI}{main};
-    }
     $windowConfirm->set_markup($msg);
-    $windowConfirm->add_buttons('gtk-cancel'=> 'no','gtk-ok' => 'yes');
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
+    $windowConfirm->set_default_response($default);
 
-    $windowConfirm->show_all;
-    my $close = $windowConfirm->run;
-    $windowConfirm->destroy;
+    $windowConfirm->show_all();
+    my $close = $windowConfirm->run();
+    $windowConfirm->destroy();
 
     return ($close eq 'yes');
 }
@@ -1915,13 +1949,13 @@ sub _wYesNoCancel {
     }
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
-    $windowConfirm->set_icon_name('pac-app-big');
+    $windowConfirm->set_icon_name('asbru-app-big');
     $windowConfirm->set_title("Confirm action : $APPNAME (v$APPVERSION)");
     $windowConfirm->set_transient_for($window);
 
-    $windowConfirm->show_all;
-    my $close = $windowConfirm->run;
-    $windowConfirm->destroy;
+    $windowConfirm->show_all();
+    my $close = $windowConfirm->run();
+    $windowConfirm->destroy();
 
     return (($close eq 'delete-event') || ($close eq 'cancel')) ? 'cancel' : $close;
 }
@@ -1932,7 +1966,7 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($self, 'GUI Password Change', "Please, enter *OLD* GUI Password...", undef, 0, 'pac-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'asbru-protected');
         if (!defined $old_pass) {
             return 0;
         }
@@ -1944,19 +1978,19 @@ sub _wSetPACPassword {
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, enter *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($self, '<b>GUI Password Change</b>', "Please, repeat *NEW* GUI Password...", undef, 0, 'pac-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'asbru-protected');
     if (!defined $new_pass2) {
         return 0;
     }
 
     if ($new_pass1 ne $new_pass2) {
-        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span foreground="red"><b>DO NOT MATCH</b></span>!!!');
+        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!');
         return 0;
     }
 
@@ -1972,6 +2006,7 @@ sub _cfgSanityCheck {
     defined $$cfg{'defaults'} or $$cfg{'defaults'} = {};
 
     $$cfg{'defaults'}{'version'} //= $APPVERSION;
+    $$cfg{'defaults'}{'config version'} //= 1;
     #$$cfg{'defaults'}{'config location'} //= $ENV{"ASBRU_CFG"};
     $$cfg{'defaults'}{'auto accept key'} //= 1;
     $$cfg{'defaults'}{'show screenshots'} //= 1;
@@ -2032,6 +2067,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'show global commands box'} //= 0;
     $$cfg{'defaults'}{'terminal backspace'} //= 'auto';
     $$cfg{'defaults'}{'terminal transparency'} //= 0;
+    $$cfg{'defaults'}{'terminal support transparency'} //= $$cfg{'defaults'}{'terminal transparency'} > 0;
     $$cfg{'defaults'}{'terminal font'} //= 'Monospace 9';
     $$cfg{'defaults'}{'terminal character encoding'} //= 'UTF-8';
     $$cfg{'defaults'}{'terminal scrollback lines'} //= 5000;
@@ -2054,7 +2090,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
     $$cfg{'defaults'}{'session logs folder'} //= "$CFG_DIR/session_logs";
     # TODO : Remove, this is from a previous migration path
-    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
     $$cfg{'defaults'}{'session logs amount'} //= 10;
     $$cfg{'defaults'}{'screenshots external viewer'} //= '/usr/bin/xdg-open';
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
@@ -2065,6 +2101,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'confirm chains'} //= 1;
     $$cfg{'defaults'}{'skip first chain expect'} //= 1;
     $$cfg{'defaults'}{'enable tree lines'} //= 0;
+    $$cfg{'defaults'}{'show tree titles'} //= 1;
     #DevNote: option currently disabled
     $$cfg{'defaults'}{'check versions at start'} //= 0;
     $$cfg{'defaults'}{'show statistics'} //= 1;
@@ -2108,28 +2145,10 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'remote commands'} //= [];
     $$cfg{'defaults'}{'auto cluster'} //= {};
 
-    if (! defined $$cfg{'defaults'}{'keepass'} && -f "$ENV{'HOME'}/.config/keepassx/config.ini") {
-        open (F,"<:utf8","$ENV{'HOME'}/.config/keepassx/config.ini");
-        my @conf = <F>;
-        close F;
-        my ($lastfile) = grep(/^LastFile\=(.+)/, @conf);
-        if (defined $lastfile) {
-            $lastfile =~ s/^LastFile\=\.+\/+(.+)$/$1/gio; chomp $lastfile;
-            $$cfg{'defaults'}{'keepass'}{'database'} = "$ENV{'HOME'}/$lastfile";
-            $$cfg{'defaults'}{'keepass'}{'password'} = '';
-            $$cfg{'defaults'}{'keepass'}{'use_keepass'} = 0;
-            $$cfg{'defaults'}{'keepass'}{'ask_user'} = 1;
-        }
-    } elsif (! defined $$cfg{'defaults'}{'keepass'}) {
+    if (!defined $$cfg{'defaults'}{'keepass'}) {
         $$cfg{'defaults'}{'keepass'}{'database'} = '';
         $$cfg{'defaults'}{'keepass'}{'password'} = '';
         $$cfg{'defaults'}{'keepass'}{'use_keepass'} = 0;
-        $$cfg{'defaults'}{'keepass'}{'ask_user'} = 1;
-    } else {
-        $$cfg{'defaults'}{'keepass'}{'database'} //= '';
-        $$cfg{'defaults'}{'keepass'}{'password'} //= '';
-        $$cfg{'defaults'}{'keepass'}{'use_keepass'} //= 0;
-        $$cfg{'defaults'}{'keepass'}{'ask_user'} //= 1;
     }
 
     $$cfg{'tmp'}{'changed'} = 0;
@@ -2243,7 +2262,7 @@ sub _cfgSanityCheck {
 
             # TODO : Remove, this is from a previous migration path
             #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #    $_ =~ s/\/\.pac\//\/\.config\/asbru\//g;
             #}
 
             next;
@@ -2321,7 +2340,7 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
         $$cfg{'environments'}{$uuid}{'session logs folder'} //= "$CFG_DIR/session_logs";
         # TODO : Remove, this is from a previous migration path
-        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/pac\//g;
+        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
@@ -2370,7 +2389,7 @@ sub _cfgSanityCheck {
         } else {
             # TODO : Remove, this is from a previous migration path
             #foreach (@{$$cfg{'environments'}{$uuid}{'screenshots'}}) {
-            #    $_ =~ s/\/\.pac\//\/\.config\/pac\//g;
+            #    $_ =~ s/\/\.pac\//\/\.config\/asbru\//g;
             #}
             if (defined $$cfg{'environments'}{$uuid}{'screenshot'}) {
                 delete $$cfg{'environments'}{$uuid}{'screenshot'};
@@ -2792,133 +2811,38 @@ sub _substCFG {
     return 1;
 }
 
-# TODO : Looks like duplicate from pac_conn, can be reused?
 sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
-
+    my $asbru_conn = shift;
+    my $kpxc = shift;
     my $ret = $string;
+    my %V = ();
     my %out;
     my $pos = -1;
+    my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
 
-    my $tstamp = time;
-    my ($dy, $dm, $dd, $th, $tm, $ts) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
-    my ($name, $title, $ip, $user, $pass);
     if (defined $uuid) {
         if (!defined $$CFG{'environments'}{$uuid}) {
-            return;
+            return $string;
         }
+        $V{'UUID'}  = $uuid;
+        $V{'NAME'}  = $$CFG{'environments'}{$uuid}{name};
+        $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
+        $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
+        $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
+        $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
+        $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+    }
+    $V{'TIMESTAMP'} = time;
+    ($V{'DATE_Y'},$V{'DATE_M'},$V{'DATE_D'},$V{'TIME_H'},$V{'TIME_M'},$V{'TIME_S'}) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));
 
-        $name = $$CFG{'environments'}{$uuid}{name};
-        $title = $$CFG{'environments'}{$uuid}{title};
-        $ip = $$CFG{'environments'}{$uuid}{ip};
-        $user = $$CFG{'environments'}{$uuid}{user};
-        $pass = $$CFG{'environments'}{$uuid}{pass};
-    }
-
-    if (defined $uuid) {
-        while ($string =~ /<UUID>/go) {
-            $string =~ s/<UUID>/$uuid/g; $ret = $string;
+    foreach my $var (@LOCAL_VARS) {
+        if (defined $V{$var}) {
+            while ($string =~ s/<$var>/$V{$var}/g) {}
+            $ret = $string;
         }
-    }
-    while ($string =~ /<TIMESTAMP>/go) {
-        $string =~ s/<TIMESTAMP>/$tstamp/g; $ret = $string;
-    }
-    while ($string =~ /<DATE_Y>/go) {
-        $string =~ s/<DATE_Y>/$dy/g; $ret = $string;
-    }
-    while ($string =~ /<DATE_M>/go) {
-        $string =~ s/<DATE_M>/$dm/g; $ret = $string;
-    }
-    while ($string =~ /<DATE_D>/go) {
-        $string =~ s/<DATE_D>/$dd/g; $ret = $string;
-    }
-    while ($string =~ /<TIME_H>/go) {
-        $string =~ s/<TIME_H>/$th/g; $ret = $string;
-    }
-    while ($string =~ /<TIME_M>/go) {
-        $string =~ s/<TIME_M>/$tm/g; $ret = $string;
-    }
-    while ($string =~ /<TIME_S>/go) {
-        $string =~ s/<TIME_S>/$ts/g; $ret = $string;
-    }
-    if (defined $uuid) {
-        while ($string =~ /<NAME>/go) {
-            $string =~ s/<NAME>/$name/g; $ret = $string;
-        }
-        while ($string =~ /<TITLE>/go) {
-            $string =~ s/<TITLE>/$title/g; $ret = $string;
-        }
-        while ($string =~ /<IP>/go) {
-            $string =~ s/<IP>/$ip/g; $ret = $string;
-        }
-        while ($string =~ /<USER>/go) {
-            $string =~ s/<USER>/$user/g; $ret = $string;
-        }
-        while ($string =~ /<PASS>/go) {
-            $string =~ s/<PASS>/$pass/g; $ret = $string;
-        }
-    }
-
-    # Replace <KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==> with KeePassX value
-    while ($string =~ /<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==(.+?)==>/go) {
-        my $what = $1;
-        my $where = $2;
-        my $var = $3;
-        my $regexp = qr/$var/;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            msg("ERROR: KeePassX variable '@{[__($var)]}' can not be used because 'KeePassX' is not enabled under 'Preferences->KeePass Options'");
-            exit 1;
-        }
-
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($where, $regexp);
-        if (! scalar @found) {
-            msg("ERROR: No entry '$where' found on KeePassX matching '@{[__($var)]}'");
-            exit 1;
-        } elsif (((scalar @found) > 1) && $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-            msg("INFO: Found more than one entry for '$where' with value '$var'. Asking user...");
-            my $tmp = "<ASK:KeePass Passwords matching '$where' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{$what}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$tmp/g;
-        } else {
-            if ((scalar(@found) > 1) && ! $$CFG{'defaults'}{'keepass'}{'ask_user'}) {
-                msg("INFO: Found " . (scalar(@found)) ." entries for '$where' with value '$var'. Selected first entry...");
-            }
-            $string =~ s/<KPXRE_GET_${what}_WHERE_${where}==\Q$var\E==>/$found[0]{$what}/g;
-        }
-        $ret = $string;
-    }
-
-    # Replace <KPX_*:*> with KeePassX 'password' value
-    while ($string =~ /<KPX_(title|username|url):(.+?)>/go) {
-        my $type = $1;
-        my $var = $2;
-
-        if (! $$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-            _wMessage(undef, "ERROR: KeePassX variable '<b>@{[__($var)]}</b>' can not be used.\n'KeePassX' is not enabled under '<b>Preferences->KeePass Options</b>'");
-            return undef;
-        }
-
-        my @found = $PACMain::FUNCS{_KEEPASS}->find($type, $var);
-        if (! scalar @found) {
-            _wMessage(undef, "ERROR: No entry '<b>$type</b>' found on KeePassX matching '<b>@{[__($var)]}</b>'");
-            return undef;
-        } elsif (((scalar @found) > 1) && $$CFG{defaults}{keepass}{ask_user}) {
-            my $tmp = "<ASK:KeePass Passwords matching '$type' like '$var':";
-            foreach my $hash (@found) {
-                $tmp .= "|$$hash{password}";
-            }
-            $tmp .= '>';
-            $string =~ s/<KPX_$type:\Q$var\E>/$tmp/g;
-        } else {
-            $string =~ s/<KPX_$type:\Q$var\E>/$found[0]{password}/g;
-        }
-        $ret = $string;
     }
 
     # Replace '<GV:.+>' with user saved global variables for '$connection_cmd' execution
@@ -2953,79 +2877,95 @@ sub _subst {
         }
     }
 
-    # Replace '<ASK:#>' with user provided data for 'cmd' execution
-    while ($string =~ /<ASK:(\d+?)>/go) {
-        my $var = $1;
-        my $val = _wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
-        $string =~ s/<ASK:$var>/$val/g;
-        $ret = $string;
-    }
-
-    # Replace '<ASK:description|opt1|opt2|...|optN>' with user provided data for 'cmd' execution
-    #while ($string =~ /<ASK:(.+\|.+?)>/go) {
-    while ($string =~ /<ASK:(.+?)\|(.+?)>/go) {
-        my $desc = $1;
-        my $var = $2;
-        my @list = split('\|', $var);
-        ($ret, $pos) = _wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
-        $string =~ s/<ASK:(.+?)\|(.+?)>/$ret/;
-        $ret = $string;
-    }
-
-    # Replace '<ASK:*>' with user provided data for 'cmd' execution
-    while ($string =~ /<ASK:(.+?)>/go) {
-        my $var = $1;
-        my $val = _wEnterValue(undef, "<b>Variable substitution</b>" , "Please, enter a value for:'$var'") // return undef;
-        $string =~ s/<ASK:$var>/$val/g;
-        $ret = $string;
-    }
-
-    # Replace '<CMD:.+>' with the result of executing 'cmd'
-    while ($string =~ /<CMD:(.+?)>/go) {
-        my $var = $1;
-        my $output = `$var`;
-        chomp $output;
-        if ($output =~ /\R/go) {
-            $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
-        } else {
-            $string =~ s/<CMD:\Q$var\E>/$output/g;
+    if (!$asbru_conn) {
+        # Execute when not from asbru_conn
+        # Replace '<ASK:#>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(\d+?)>/go) {
+            my $var = $1;
+            my $val = _wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
+            $string =~ s/<ASK:$var>/$val/g;
+            $ret = $string;
         }
-        $ret = $string;
+
+        # Replace '<ASK:description|opt1|opt2|...|optN>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(.+?)\|(.+?)>/go) {
+            my $desc = $1;
+            my $var = $2;
+            my @list = split('\|', $var);
+            ($ret, $pos) = _wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
+            $string =~ s/<ASK:(.+?)\|(.+?)>/$ret/;
+            $ret = $string;
+        }
+
+        # Replace '<ASK:*>' with user provided data for 'cmd' execution
+        while ($string =~ /<ASK:(.+?)>/go) {
+            my $var = $1;
+            my $val = _wEnterValue(undef, "<b>Variable substitution</b>" , "Please, enter a value for:'$var'") // return undef;
+            $string =~ s/<ASK:$var>/$val/g;
+            $ret = $string;
+        }
+
+        # Replace '<CMD:.+>' with the result of executing 'cmd'
+        while ($string =~ /<CMD:(.+?)>/go) {
+            my $var = $1;
+            my $output = `$var`;
+            chomp $output;
+            if ($output =~ /\R/go) {
+                $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
+            } else {
+                $string =~ s/<CMD:\Q$var\E>/$output/g;
+            }
+            $ret = $string;
+        }
+
+        # Delete '<CTRL_.+:.+>' and save it's value (output)
+        while ($string =~ /<CTRL_(.+?):(.+?)>/go) {
+            my $ctrl = $1;
+            my $cmd = $2;
+            $out{'ctrl'}{'ctrl'} = $ctrl;
+            $out{'ctrl'}{'cmd'} = $cmd;
+            $string =~ s/<CTRL_$ctrl:$cmd>//g;
+            $ret = $string;
+        }
+
+        # Delete '<TEE:.+>' and save it's value (output)
+        while ($string =~ /<TEE:(.+)>/go) {
+            my $var = $1;
+            $out{'tee'} = $var;
+            $string =~ s/<TEE:$var>//g;
+            $ret = $string;
+        }
+
+        # Delete '<PIPE:.+:.+>' and save it's value (command to pipe the result through)
+        while ($string =~ /<PIPE:(.+?):(.+?)>/go) {
+            my $pipe = $1;
+            my $prompt = $2;
+            push(@{$out{'pipe'}}, $pipe);
+            $out{'prompt'} = $prompt;
+            $string =~ s/<PIPE:\Q$pipe\E:\Q$prompt>\E//g;
+            $ret = $string;
+        }
+        # Delete '<PIPE:.+>' and save it's value (command to pipe the result through)
+        while ($string =~ /<PIPE:(.+?)>/go) {
+            my $var = $1;
+            push(@{$out{'pipe'}}, $var);
+            $string =~ s/<PIPE:$var>//g;
+            $ret = $string;
+        }
     }
 
-    # Delete '<CTRL_.+:.+>' and save it's value (output)
-    while ($string =~ /<CTRL_(.+?):(.+?)>/go) {
-        my $ctrl = $1;
-        my $cmd = $2;
-        $out{'ctrl'}{'ctrl'} = $ctrl;
-        $out{'ctrl'}{'cmd'} = $cmd;
-        $string =~ s/<CTRL_$ctrl:$cmd>//g;
-        $ret = $string;
+    # KeePassXC
+    if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
+        if (!$asbru_conn) {
+            $kpxc = $PACMain::FUNCS{_KEEPASS};
+        }
+        if (defined $kpxc) {
+            $ret = $kpxc->applyMask($ret);
+        }
     }
 
-    # Delete '<TEE:.+>' and save it's value (output)
-    while ($string =~ /<TEE:(.+)>/go) {
-        my $var = $1;
-        $out{'tee'} = $var;
-        $string =~ s/<TEE:$var>//g;
-        $ret = $string;
-    }
-
-    # Delete '<PIPE:.+:.+>' and save it's value (command to pipe the result through)
-    while ($string =~ /<PIPE:(.+?):(.+?)>/go) {
-        my $pipe = $1;
-        my $prompt = $2;
-        push(@{$out{'pipe'}}, $pipe);
-        $out{'prompt'} = $prompt;
-        $string =~ s/<PIPE:\Q$pipe\E:\Q$prompt>\E//g;
-        $ret = $string;
-    }
-    # Delete '<PIPE:.+>' and save it's value (command to pipe the result through)
-    while ($string =~ /<PIPE:(.+?)>/go) {
-        my $var = $1;
-        push(@{$out{'pipe'}}, $var);
-        $string =~ s/<PIPE:$var>//g;
-        $ret = $string;
+    if ($asbru_conn) {
+        return $ret;
     }
 
     $out{'pos'} = $pos;
@@ -3063,7 +3003,7 @@ sub _wakeOnLan {
     # and setup some dialog properties.
     $w{window}{data}->set_default_response('ok');
     $w{window}{data}->set_position('center');
-    $w{window}{data}->set_icon_name('pac-app-big');
+    $w{window}{data}->set_icon_name('asbru-app-big');
     $w{window}{data}->set_size_request(480, 0);
     $w{window}{data}->set_resizable(0);
     $w{window}{data}->set_transient_for($PACMain::FUNCS{_MAIN}{_GUI}{main});
@@ -3079,7 +3019,7 @@ sub _wakeOnLan {
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox}, 1, 1, 0);
 
     # Create 1st label
-    $w{window}{gui}{lblup} = Gtk3::Label->new;
+    $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
     $w{window}{gui}{lblup}->set_markup("<b>Enter the following data and press 'OK' to send Magic Packet:</b>");
 
@@ -3089,28 +3029,28 @@ sub _wakeOnLan {
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{table}, 1, 1, 0);
 
     # Create MAC label
-    $w{window}{gui}{lblmac} = Gtk3::Label->new;
+    $w{window}{gui}{lblmac} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblmac}, 0, 1, 0, 1);
     $w{window}{gui}{lblmac}->set_text('MAC Address: ');
 
     # Create MAC entry widget
-    $w{window}{gui}{entrymac} = Gtk3::Entry->new;
+    $w{window}{gui}{entrymac} = Gtk3::Entry->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{entrymac}, 1, 2, 0, 1);
     $w{window}{gui}{entrymac}->set_text($mac);
     $w{window}{gui}{entrymac}->set_activates_default(1);
-    $w{window}{gui}{entrymac}->grab_focus;
+    $w{window}{gui}{entrymac}->grab_focus();
 
     # Create MAC icon widget
     $w{window}{gui}{iconmac} = Gtk3::Image->new_from_stock('gtk-no', 'menu');
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{iconmac}, 2, 3, 0, 1);
 
     # Create HOST label
-    $w{window}{gui}{lblip} = Gtk3::Label->new;
+    $w{window}{gui}{lblip} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblip}, 0, 1, 1, 2);
     $w{window}{gui}{lblip}->set_text('Host: ');
 
     # Create HOST entry widget
-    $w{window}{gui}{entryip} = Gtk3::Entry->new;
+    $w{window}{gui}{entryip} = Gtk3::Entry->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{entryip}, 1, 2, 1, 2);
     $w{window}{gui}{entryip}->set_text($ip);
     $w{window}{gui}{entryip}->set_sensitive(0);
@@ -3121,7 +3061,7 @@ sub _wakeOnLan {
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{iconip}, 2, 3, 1, 2);
 
     # Create PORT label
-    $w{window}{gui}{lblport} = Gtk3::Label->new;
+    $w{window}{gui}{lblport} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblport}, 0, 1, 2, 3);
     $w{window}{gui}{lblport}->set_text('Port Number: ');
 
@@ -3142,16 +3082,16 @@ sub _wakeOnLan {
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{cbbroadcast}, 1, 1, 0);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{hbox2}, 0, 1, 0);
 
-    $w{window}{gui}{lblstatus} = Gtk3::Label->new;
+    $w{window}{gui}{lblstatus} = Gtk3::Label->new();
     $w{window}{gui}{lblstatus}->set_margin_bottom(20);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lblstatus}, 0, 1, 0);
     $w{window}{gui}{lblstatus}->set_text("Checking MAC for '$ip' ...");
 
     # Show the window
-    $w{window}{data}->show_all;
+    $w{window}{data}->show_all();
 
     # Setup some callbacks...
-    $w{window}{gui}{cbbroadcast}->signal_connect('toggled' => sub {$w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active); return 0;});
+    $w{window}{gui}{cbbroadcast}->signal_connect('toggled' => sub {$w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active()); return 0;});
 
     $w{window}{gui}{entrymac}->signal_connect('event' => sub {
         $w{window}{data}->get_action_area->foreach(sub {
@@ -3186,7 +3126,7 @@ sub _wakeOnLan {
         $w{window}{gui}{entrymac}->select_region(0, length($mac));
         $w{window}{gui}{lblstatus}->set_text("'$ip' TCP port $ping_port seems to be " . ($up ? 'REACHABLE' : 'UNREACHABLE'));
         $w{window}{gui}{table}->set_sensitive(1);
-        $w{window}{gui}{entrymac}->grab_focus;
+        $w{window}{gui}{entrymac}->grab_focus();
         $w{window}{data}->get_action_area->foreach(sub {
             if ($_[0]->get_label ne 'gtk-ok') {
                 return 1;
@@ -3208,12 +3148,12 @@ sub _wakeOnLan {
 
     ##########################################################
 
-    $w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active);
+    $w{window}{gui}{entryport}->set_sensitive(! $w{window}{gui}{cbbroadcast}->get_active());
 
-    my $ok = $w{window}{data}->run;
+    my $ok = $w{window}{data}->run();
     $mac = $w{window}{gui}{entrymac}->get_chars(0, -1);
 
-    $w{window}{data}->destroy;
+    $w{window}{data}->destroy();
 
     if ($ok ne 'ok') {
         return 0;
@@ -3221,7 +3161,7 @@ sub _wakeOnLan {
 
     $$cfg{mac} = $mac;
 
-    my $broadcast = $w{window}{gui}{cbbroadcast}->get_active;
+    my $broadcast = $w{window}{gui}{cbbroadcast}->get_active();
 
     # Prepare UDP socket
     socket(S, PF_INET, SOCK_DGRAM, getprotobyname('udp')) || die "ERROR: Can't create socket ($!)";
@@ -3353,14 +3293,12 @@ sub _replaceBadChars {
 sub _removeEscapeSeqs {
     my $string = shift // '';
 
-    $string =~ s/\e\[[0-9;]*m//g;
-    $string =~ s/\e\[[0-9;]*[mG]//g;
-    $string =~ s/\e\[[0-9;]*[mGKH]//g;
-    $string =~ s/\e\[[0-9;]*[a-zA-Z]//g;
+    $string =~ s/\x1B[=>]//g;
+    $string =~ s/\e\[[0-9;]*[a-zA-Z]%?//g;
     $string =~ s/\e\[[0-9;]*m(?:\e\[K)?//g;
-    $string =~ s/\x1B.+~\x07//g;
-    $string =~ s/(\x1B|\x08|\x07)(\[w)?//g;
-    $string =~ s/\[\?\d+h//g;
+    $string =~ s/\x1B.+?\x07//g;
+    $string =~ s/(\x1B|\x08|\x07)(\[w|=)?//g;
+    $string =~ s/\[\?\d+\w{1,2}//g;
     $string =~ s/\]\d;//g;
 
     return $string;
@@ -3399,11 +3337,11 @@ sub _getXWindowsList {
     my %list;
 
     my $s = Wnck::Screen::get_default() or die print $!;
-    $s->force_update;
+    $s->force_update();
 
     foreach my $w (@{$s->get_windows}) {
-        my $xid = $w->get_xid or next;
-        my $data_name = $w->get_name;
+        my $xid = $w->get_xid() or next;
+        my $data_name = $w->get_name();
 
         $list{'by_xid'}{$xid}{'title'} = $data_name;
         $list{'by_xid'}{$xid}{'window'} = $w;
@@ -3415,15 +3353,6 @@ sub _getXWindowsList {
     }
 
     return \%list;
-}
-
-# TODO: Should be changed to github or removed
-sub _getREADME {
-    my $pid = shift // 0;
-
-    my $readme_file = "$CFG_DIR/tmp/latest_README";
-    system("(/usr/bin/wget http://sourceforge.net/projects/pacmanager/files/README -O $readme_file 1>&2 2>/dev/null; kill -10 $pid) &");
-    return 1;
 }
 
 sub _checkREADME {
@@ -3447,60 +3376,6 @@ sub _checkREADME {
     unlink $readme_file;
 
     return $version, \@changes;
-}
-
-sub _showUpdate {
-    my $NEW_VERSION = shift;
-    my $NEW_CHANGES = shift;
-    my $notify_no_updates = shift // 0;
-
-    if (((! $NEW_VERSION) || ($APPVERSION ge $NEW_VERSION)) && (! $notify_no_updates)) {
-        return 0;
-    }
-    my $windowConfirm = Gtk3::Dialog->new_with_buttons(
-        "$APPNAME (v$APPVERSION) : Check new version availability",
-        undef,
-        'modal',
-        'gtk-ok' => 'ok',
-    );
-
-    my $lbl = Gtk3::Label->new;
-    $windowConfirm->get_content_area->pack_start($lbl, 0, 0, 5);
-
-    my $lbl2 = Gtk3::LinkButton->new_with_label('http://sourceforge.net/projects/pacmanager');
-    $windowConfirm->get_content_area->pack_start($lbl2, 0, 0, 5);
-    $lbl2->set('relief', 'none');
-
-    if ((! $NEW_VERSION) || ($APPVERSION ge $NEW_VERSION)) {
-        $lbl->set_markup("There is <b>NO</b> new version available");
-        $windowConfirm->signal_connect('response', sub {$windowConfirm->destroy;});
-    } else {
-        $lbl->set_markup("There is a <b><big>NEW</big></b> version available: <b><big>$NEW_VERSION</big></b>");
-
-        # Create a scrolled window to contain the textview
-        my $scrollDescription = Gtk3::ScrolledWindow->new;
-        $windowConfirm->get_content_area->pack_start($scrollDescription, 1, 1, 0);
-        $scrollDescription->set_policy('automatic', 'automatic');
-        my $tb = Gtk3::TextBuffer->new;
-        $tb->set_text(join("\n", @{$NEW_CHANGES}));
-        my $tv = Gtk3::TextView->new_with_buffer($tb);
-        $tv->set_editable(0);
-        $scrollDescription->add($tv);
-        my $cb = Gtk3::CheckButton->new('Do not check for updates anymore (also configurable under "Preferences")');
-        $cb->set_active(! $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'check versions at start'});
-        $windowConfirm->get_content_area->pack_start($cb, 0, 0, 5);
-
-        $windowConfirm->signal_connect('response', sub {$PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'check versions at start'} = ! $cb->get_active; $PACMain::FUNCS{_MAIN}->_saveConfiguration; $windowConfirm->destroy;});
-        $windowConfirm->set_size_request(640, 480);
-        $windowConfirm->set_resizable(1);
-    }
-
-    $windowConfirm->set_position('center_always');
-    $windowConfirm->set_icon_name('pac-app-big');
-    $windowConfirm->set_border_width(5);
-    $windowConfirm->show_all;
-
-    return 1;
 }
 
 sub _getEncodings {
@@ -3808,11 +3683,11 @@ sub _makeDesktopFile {
 #        $da .= "Exec=asbru-cm --start-uuid=$uuid\n";
 #    }
 
-    if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/pac.desktop")) {
+    if (!open(F,">:utf8","$ENV{HOME}/.local/share/applications/asbru.desktop")) {
         return 0;
     }
 
-    open F, ">$ENV{HOME}/.local/share/applications/pac.desktop" or return 0;
+    open F, ">$ENV{HOME}/.local/share/applications/asbru.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
     system('/usr/bin/xdg-desktop-menu forceupdate &');
@@ -3839,7 +3714,7 @@ sub _getSelectedRows {
     # https://metacpan.org/pod/Gtk3
     # "Gtk3::TreeSelection: get_selected_rows() now returns two values: an array ref containing the selected paths, and the model."
     # Go back to the Gtk2 behavior: drop the model, return the selected paths as array.
-    my ($aref, $model) = $treeSelection->get_selected_rows;
+    my ($aref, $model) = $treeSelection->get_selected_rows();
     if (!$aref) {
         return ();
     }
@@ -3856,25 +3731,15 @@ sub _vteFeed {
 sub _vteFeedChild {
     my $vte = shift;
     my $str = shift;
+    my $feedVersion = $PACMain::FUNCS{_MAIN}{_Vte}{vte_feed_child};
 
     use bytes;
     my $b = length($str);
     my @arr = unpack ('C*', $str);
 
-    if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 54) {
+    if ($feedVersion == 1) {
         # Newer version only requires 1 parameter
         $vte->feed_child(\@arr);
-    } elsif (Vte::get_major_version() >= 1 or Vte::get_minor_version() == 52) {
-        # Some distros have a special patched version of v0.52 that still requires 2 parameters; some others only one
-        # Not nice but let's ignore the warning for that special case
-        # See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501
-        eval {
-            local $SIG{__WARN__} = sub {};
-            $vte->feed_child($str, $b);
-            1;
-        } or do {
-            $vte->feed_child(\@arr);
-        };
     } else {
         # Elder versions requires 2 parameters
         $vte->feed_child($str, $b);
@@ -3885,7 +3750,9 @@ sub _vteFeedChildBinary {
     my $vte = shift;
     my $str = shift;
     my @arr = unpack ('C*', $str);
-    if (Vte::get_major_version() >= 1 or Vte::get_minor_version() >= 46) {
+    my $feedVersion = $PACMain::FUNCS{_MAIN}{_Vte}{vte_feed_binary};
+
+    if ($feedVersion == 1) {
         # Newer version only requires 1 parameter
         $vte->feed_child_binary(\@arr);
     } else {
@@ -3901,7 +3768,7 @@ sub _createBanner {
     my $icon;
     my $text;
 
-    $icon = Gtk3::Image->new_from_file("${RES_DIR}/${icon_filename}");
+    $icon = Gtk3::Image->new_from_file("${THEME_DIR}/${icon_filename}");
     $icon->set_margin_left(10);
     $icon->set_margin_right(10);
     $text = Gtk3::Label->new();
@@ -3929,12 +3796,20 @@ sub _copyPass {
     } else {
         $clip = $$cfg{environments}{$uuid}{'pass'};
     }
+    if ($$cfg{'defaults'}{'keepass'}{'use_keepass'} && PACKeePass->isKeePassMask($clip)) {
+        my $kpxc = $PACMain::FUNCS{_KEEPASS};
+        $clip = $kpxc->applyMask($clip);
+    }
     use bytes;
     $clipboard->set_text($clip,length($clip));
 }
 
 sub _appName {
     return "$APPNAME $APPVERSION";
+}
+
+sub _setDefaultRGBA {
+    ($R,$G,$B,$A) = ($_[0]/255,$_[1]/255,$_[2]/255,$_[3]);
 }
 
 sub _setWindowPaintable {
@@ -3952,11 +3827,19 @@ sub _setWindowPaintable {
 sub mydraw {
     my ($w,$c) = @_;
 
-    $c->set_source_rgba(240,240,240,1);
+    $c->set_source_rgba($R,$G,$B,$A);
     $c->set_operator('source');
     $c->paint();
     $c->set_operator('over');
     return 0;
+}
+
+sub _doShellEscape {
+    my $str = shift;
+
+    $str =~ s/([\$\\`"])/\\$1/g;
+    
+    return $str;
 }
 
 1;
@@ -3997,14 +3880,6 @@ Prepare string to be included in a HTML TAG
 =head2 sub __text(string)
 
 Inverse of __(string)
-
-=head2 sub _findKP (list,where,what)
-
-    Search inside Keepass the list of elements that match
-    where : a field of Keypass database (title, username, ...)
-    what  : How to compare
-        'Regexp': using a regular expression
-        empty   : string equal
 
 =head2 sub _splash
 
@@ -4070,7 +3945,7 @@ Support function to calculate the location of the popup menu
 
 =head2 sub _wMessage
 
-Create a modela message to the user
+Create a modal message to the user
 
 =head2 sub _wProgress
 
@@ -4154,7 +4029,7 @@ Get hash (table, dictionary list) or encoders
 
 =head2 sub _makeDesktopFile
 
-Creates a pac.desktop file to launch application
+Creates a asbru.desktop file to launch application
 
 =head2 sub _updateWidgetColor
 
@@ -4189,6 +4064,10 @@ Hack to make transparent terminals
 =head2 sub mydraw
 
 Generic routine to draw a gray background for widgets that do not painted their own.
+
+=head2 _doShellEscape
+
+Escape characters so that the text can be used in a shell string command, like echo "$VAR"
 
 =head1 Perl particulars
 

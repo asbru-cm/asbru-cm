@@ -259,7 +259,7 @@ sub _buildExpect {
     $w{expect} = Gtk3::Entry->new;
     $w{hboxExpect}->pack_start($w{expect}, 1, 1, 0);
     $w{expect}->set_text($exp);
-    $w{expect}->set_icon_from_stock('primary', 'pac-prompt');
+    $w{expect}->set_icon_from_stock('primary', 'asbru-prompt');
 
     $w{cbTimeOut} = Gtk3::CheckButton->new('Time out (seconds): ');
     $w{cbTimeOut}->set_active($time_out != -1);
@@ -365,6 +365,13 @@ sub _buildExpect {
     $$self{list}[$w{position}] = \%w;
 
     # Setup some callbacks
+
+    # Disable scroll on spin buttons to avoid changes by mistake
+    foreach my $spin ('time_out','on_match','on_fail') {
+        $w{$spin}->signal_connect('scroll-event' => sub {
+            return 1;
+        });
+    }
 
     $w{on_match}->signal_connect('value_changed' => sub {
         my $v = $w{on_match}->get_chars(0, -1);
@@ -626,7 +633,7 @@ sub _buildExpect {
         push(@menu_items, {
             label => '<command prompt>',
             tooltip => 'Expect for a sting matching a COMMAND PROMPT (as defined under "Preferences")',
-            stockicon => 'pac-prompt',
+            stockicon => 'asbru-prompt',
             code => sub {$w{expect}->insert_text('<command prompt>', -1, $w{expect}->get_position);}
         });
 
@@ -691,48 +698,7 @@ sub _buildExpect {
         push(@int_variables_menu, {label => "PASS",code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{expect}->insert_text("<KPX_title:$$hash{title}>", -1, $w{expect}->get_position);}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{expect}->insert_text("<KPX_username:$$hash{username}>", -1, $w{expect}->get_position);}
-                });
-                push(@usernames, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{expect}->insert_text("<KPX_url:$$hash{url}>", -1, $w{expect}->get_position);}
-                });
-            }
-
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu => [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$w{expect}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{expect}->get_position);}
-                    }
-                ]
-            });
-        }
+        $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username,password',$w{expect},\@menu_items);
 
         _wPopUpMenu(\@menu_items, $event);
 
@@ -847,46 +813,29 @@ sub _buildExpect {
         push(@int_variables_menu, {label => "PASS",code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{send}->insert_text("<KPX_title:$$hash{title}>", -1, $w{send}->get_position);}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{send}->insert_text("<KPX_username:$$hash{username}>", -1, $w{send}->get_position);}
-                });
-                push(@usernames, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {$w{send}->insert_text("<KPX_url:$$hash{url}>", -1, $w{send}->get_position);}
-                });
-            }
-
+        if ($PACMain::FUNCS{_KEEPASS}->getUseKeePass()) {
+            # Copy User,Password from KeePassXC
             push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu => [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$w{send}->insert_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>", -1, $w{send}->get_position);}
+                label => 'Add Username KeePassXC',
+                tooltip => 'KeePassXC Username',
+                code => sub {
+                    my $pos = $w{send}->get_property('cursor_position');
+                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
+                    if ($selection) {
+                        $w{send}->insert_text("<username|$selection>", -1, $w{expect}->get_position);
                     }
-                ]
+                }
+            });
+            push(@menu_items, {
+                label => 'Add Password KeePassXC',
+                tooltip => 'KeePassXC Password',
+                code => sub {
+                    my $pos = $w{send}->get_property('cursor_position');
+                    my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
+                    if ($selection) {
+                        $w{send}->insert_text("<password|$selection>", -1, $w{expect}->get_position);
+                    }
+                }
             });
         }
 

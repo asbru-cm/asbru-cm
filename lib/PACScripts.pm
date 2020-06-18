@@ -62,7 +62,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $SCRIPTS_DIR = $CFG_DIR . '/scripts';
 
 # PAC Help
-my $PAC_SCRIPTS_HELP = '#PAC Scripts are simple Perl programs, so:
+my $PAC_SCRIPTS_HELP = '#Ásbrú Scripts are simple Perl programs, so:
 use strict;        # Get serious :)
 use warnings;    # Really serious! ;)
 
@@ -70,7 +70,7 @@ use warnings;    # Really serious! ;)
 # It is *MANDATORY* to declare them (as "our" or "local")
 
 our %SHARED;    # Hash to pass data from SESSION to CONNECTION
-our %COMMON;    # Common PAC utilities (substitutions, etc...) to be used *ANYWHERE* in script
+our %COMMON;    # Common Ásbrú utilities (substitutions, etc...) to be used *ANYWHERE* in script
 our %PAC;        # GUI/Terminals manipulation to be used under *SESSION* subroutine
 our %TERMINAL;    # Command/Prompt manipulation to be used under *CONNECTION* subroutine
 
@@ -100,7 +100,7 @@ our %TERMINAL;    # Command/Prompt manipulation to be used under *CONNECTION* su
 
 %{$cfg} = $COMMON{cfg}([0|1]);
 # Retrieve a copy (0->default) or a reference (1) to *whole* PAC\'s configuration
-# *ATTENTION* Retrieving a REFERENCE (1) to PAC\'s config may lead to PAC misconfiguration!!
+# *ATTENTION* Retrieving a REFERENCE (1) to PAC\'s config may lead to Ásbrú misconfiguration!!
 # NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!
 
 $txt = $COMMON{subst}(<text>);
@@ -113,7 +113,7 @@ $txt = $COMMON{del_esc}(<text>)
 
 $COMMON{cfg_sanity}(\%cfg);
 # Perform a sanity check for given %cfg (reference!), which may be empty, in which case it will
-# construct an empty PAC cfg skeleton over *referenced* %cfg variable
+# construct an empty Ásbrú cfg skeleton over *referenced* %cfg variable
 # Returns a string
 
 ####################################################
@@ -165,11 +165,11 @@ $PAC{to_tab}(<$tmp_uuid>);
 # Retab given connection
 
 $file = $PAC{cfg_save}();
-# Save current PAC cfg to standard PAC config file.
+# Save current Ásbrú cfg to standard Ásbrú config file.
 # Returns the name of such file
 
 $file = $PAC{cfg_export}([file]);
-# Save current PAC cfg to given file (or ask for a file through a GUI if no file provided)
+# Save current Ásbrú cfg to given file (or ask for a file through a GUI if no file provided)
 # in YAML format, suitable to be imported in any PAC instance
 # Returns the name of saved file
 
@@ -423,7 +423,7 @@ sub _initGUI {
                     );
 
                     $$self{_WINDOWSCRIPTS}{gui}{scroll2}->add($$self{_WINDOWSCRIPTS}{treeScripts});
-                    $$self{_WINDOWSCRIPTS}{treeScripts}->set_tooltip_text('PAC Scripts. You may Drag \'n Drop Perl (.pl) files here to import them.');
+                    $$self{_WINDOWSCRIPTS}{treeScripts}->set_tooltip_text('Ásbrú Scripts. You may Drag \'n Drop Perl (.pl) files here to import them.');
                     $$self{_WINDOWSCRIPTS}{treeScripts}->set_headers_visible(1);
                     $$self{_WINDOWSCRIPTS}{treeScripts}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
 
@@ -435,7 +435,7 @@ sub _initGUI {
 
                     my $tablbl = Gtk3::HBox->new(0, 0);
                     $tablbl->pack_start(Gtk3::Label->new(' Script Editor '), 1, 1, 0);
-                    $tablbl->pack_start(Gtk3::Image->new_from_stock('pac-script', 'menu'), 0, 1, 0);
+                    $tablbl->pack_start(Gtk3::Image->new_from_stock('asbru-script', 'menu'), 0, 1, 0);
                     $tablbl->show_all;
 
                     $$self{_WINDOWSCRIPTS}{gui}{hpanededitfunc} = Gtk3::HPaned->new;
@@ -535,7 +535,7 @@ sub _initGUI {
                     # PAC Script Help
 
                     my $tablbl2 = Gtk3::HBox->new(0, 0);
-                    $tablbl2->pack_start(Gtk3::Label->new(' PAC Script Help '), 1, 1, 0);
+                    $tablbl2->pack_start(Gtk3::Label->new(' Ásbrú Script Help '), 1, 1, 0);
                     $tablbl2->pack_start(Gtk3::Image->new_from_stock('gtk-help', 'menu'), 0, 1, 0);
                     $tablbl2->show_all;
 
@@ -661,9 +661,9 @@ sub _setupCallbacks {
 
         push(@comm_menu_items,
         {
-            label => 'Get PAC Config ($COMMON{cfg}([0|1]) )',
+            label => 'Get Ásbrú Config ($COMMON{cfg}([0|1]) )',
             tooltip => "Retrieve a copy (0->default) or a reference (1) to *whole* PAC's configuration
-*ATTENTION* Retrieving a REFERENCE (1) to PAC's config may lead to PAC misconfiguration!!
+*ATTENTION* Retrieving a REFERENCE (1) to PAC's config may lead to Ásbrú misconfiguration!!
 NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{cfg}([0|1]) ");}
         });
@@ -678,7 +678,7 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
         push(@menu_items,
         {
             label => 'COMMON methods',
-            stockicon => 'pac-script',
+            stockicon => 'asbru-script',
             submenu => \@comm_menu_items
         });
 
@@ -770,22 +770,22 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
 
         push(@session_menu_items,
         {
-            label => 'Save current PAC CFG($PAC{cfg_save}())',
-            tooltip => "Save current PAC cfg to standard PAC config file",
+            label => 'Save current Ásbrú CFG($PAC{cfg_save}())',
+            tooltip => "Save current Ásbrú cfg to standard Ásbrú config file",
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{cfg_save}()");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Export PAC CFG to file($PAC{cfg_export}([file]) )',
-            tooltip => "Save current PAC cfg to given file (or ask for a file through a GUI if no file provided)",
+            label => 'Export Ásbrú CFG to file($PAC{cfg_export}([file]) )',
+            tooltip => "Save current Ásbrú cfg to given file (or ask for a file through a GUI if no file provided)",
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{cfg_export}([file])");}
         });
 
         push(@menu_items,
         {
-            label => 'PAC methods',
-            stockicon => 'pac-tab',
+            label => 'Ásbrú methods',
+            stockicon => 'asbru-tab',
             submenu => \@session_menu_items
         });
 
@@ -884,7 +884,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         push(@menu_items,
         {
             label => 'TERMINAL methods',
-            stockicon => 'pac-shell',
+            stockicon => 'asbru-shell',
             submenu => \@connection_menu_items
         });
 
@@ -912,6 +912,10 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         my @environment_menu;
         foreach my $key (sort {$a cmp $b} keys %ENV)
         {
+            # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+            if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                next;
+            }
             my $value = $ENV{$key};
             push(@environment_menu,
             {
@@ -948,56 +952,6 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
             tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST('<CMD:command_to_launch>')");}
         });
-
-        # Populate with <KPX_(title|username|url):*> special string
-        if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'keepass'}{'use_keepass'})
-        {
-            my (@titles, @usernames, @urls);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS}->find)
-            {
-                push(@titles,
-                {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_title:$$hash{title}>)");}
-                });
-                push(@usernames,
-                {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_username:$$hash{username}>)");}
-                });
-                push(@urls,
-                {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "The given command line will be substituted real-timefor it's corresponding KeePassX value",
-                    code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST(<KPX_url:$$hash{url}>)");}
-                });
-            }
-
-            push(@menu_items,
-            {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [
-                    {
-                        label => 'KeePassX title values',
-                        submenu => \@titles
-                    }, {
-                        label => 'KeePassX username values',
-                        submenu => \@usernames
-                    }, {
-                        label => 'KeePassX URL values',
-                        submenu => \@urls
-                    }, {
-                        label => "KeePass Extended Query",
-                        tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                        code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                    }
-                ]
-            });
-        }
 
         _wPopUpMenu(\@menu_items, $event);
 
@@ -1112,7 +1066,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         return 1;
     });
     $$self{_WINDOWSCRIPTS}{gui}{btnadd}->signal_connect('clicked' => sub {
-        my $name = _wEnterValue($$self{_WINDOWSCRIPTS}{main}, "<b>Creating new Script</b>"  , "Enter a name for the new PAC Script");
+        my $name = _wEnterValue($$self{_WINDOWSCRIPTS}{main}, "<b>Creating new Script</b>"  , "Enter a name for the new Ásbrú Script");
         return 1 if ((! defined $name) || ($name =~ /^\s*$/go) );
         return 1 if -f "$SCRIPTS_DIR/$name.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, "File '$name.pl' already exists. Overwrite it?");
 
@@ -1162,7 +1116,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
     $$self{_WINDOWSCRIPTS}{gui}{btnclose}->signal_connect('clicked' => sub {
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            my $out = _wYesNoCancel($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before closing PAC Script window?");
+            my $out = _wYesNoCancel($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before closing Ásbrú Script window?");
             $out eq 'yes' and $self->_saveFile($$self{_SELECTED});
             $out eq 'cancel' and return 1;
             $out eq 'no' and $self->_loadFile($$self{_SELECTED});
@@ -1179,12 +1133,12 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         # Check for changes before removing
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $model->get_value($model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
 
         my @sel = _getSelectedRows($selection);
         return 1 unless scalar(@sel);
-        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". (scalar(@sel) ) . " PAC Scripts?");
+        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". (scalar(@sel) ) . " Ásbrú Scripts?");
 
         # Delete selected files
         foreach my $path (@sel) {
@@ -1309,7 +1263,7 @@ sub _reloadDir {
     # Check for changes before reloading
     if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified && $$self{_SELECTED}) {
         my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-        $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?");
+        $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
     }
 
     my $dh;
@@ -1348,18 +1302,18 @@ sub _updateGUI {
 
     my @sel = _getSelectedRows($$self{_WINDOWSCRIPTS}{treeScripts}->get_selection);
 
-    my $default = "* PAC Scripts *\n
-- Take a look at PAC example scripts to see how they work\n
+    my $default = "* Ásbrú Scripts *\n
+- Take a look at Ásbrú example scripts to see how they work\n
 - Now, 'Import' or create your own brand 'New' scripts, and 'Execute' them!\n
 - You may also 'Import' scripts by Drag and Drop Perl '.pl' files to the scripts list on the left side of this window\n
 - Remember: only one script can be executed at a time, and while executing, connection will be user-unresponsive (non-interactive)
 
-Feel free to send me any PAC Script you may find useful to the community!";
+Feel free to send me any Ásbrú Script you may find useful to the community!";
 
     if (! scalar(@sel) ) {
         if ($$self{_SELECTED} && $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
 
         $SOURCEVIEW and $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
@@ -1385,7 +1339,7 @@ Feel free to send me any PAC Script you may find useful to the community!";
         my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($sel[0]), 0);
 
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified && ($sel[0] ne $$self{_SELECTED}) ) {
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
         $$self{_SELECTED} = $sel[0];
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
@@ -1400,7 +1354,7 @@ Feel free to send me any PAC Script you may find useful to the community!";
     } elsif (scalar(@sel) > 1) {
         if ($$self{_SELECTED} && $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "PAC Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
 
         $SOURCEVIEW and $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
@@ -1612,7 +1566,7 @@ sub _execScript {
 
     defined &SESSION and undef &SESSION;
     if (! open(F,"<:utf8",$file)) {
-        _wMessage(undef, "Could not open PAC Script file '$file' for reading: $!");
+        _wMessage(undef, "Could not open Ásbrú Script file '$file' for reading: $!");
         return 1;
     }
     my @lines = <F>;
@@ -1622,7 +1576,7 @@ sub _execScript {
     no warnings ('redefine');
     eval $txt;
     use warnings;
-    if ($@) {_wMessage(undef, "Error parsing PAC Script: $@"); $PAC{msg}(); return 0;}
+    if ($@) {_wMessage(undef, "Error parsing Ásbrú Script: $@"); $PAC{msg}(); return 0;}
 
     # SESSION execution (local)
     if (scalar @uuid_tmps) {
@@ -1632,23 +1586,23 @@ sub _execScript {
         }
     } else {
         if (! defined &SESSION) {
-            _wMessage(undef, "Error executing PAC Script:\nNo 'SESSION' function declaration found, and script not being executed directly from any Terminal!");
+            _wMessage(undef, "Error executing Ásbrú Script:\nNo 'SESSION' function declaration found, and script not being executed directly from any Terminal!");
             $PAC{msg}();
             return 0;
         } else {
             eval {&SESSION;};
-            if ($@) {_wMessage(undef, "Error executing PAC Script: $@"); $PAC{msg}(); return 0;}
+            if ($@) {_wMessage(undef, "Error executing Ásbrú Script: $@"); $PAC{msg}(); return 0;}
         }
     }
 
     # Save the list of started connections in $SHARED{_list_}
     $SHARED{_list_} = $PAC{list};
 
-    # CONNECTION execution (pac_conn)
+    # CONNECTION execution (asbru_conn)
     foreach my $tmp_uuid (keys %{$PAC{list}}) {
         next unless defined $PACMain::RUNNING{$tmp_uuid};
         if ($PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_STATUS} ne 'STOP') {
-            _wMessage(undef, "ERROR: Can not start a new PAC Script while another one is still running:\nTerminal '$PACMain::RUNNING{$tmp_uuid}{terminal}{_NAME}' is running '$PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_NAME}'", 1) ;
+            _wMessage(undef, "ERROR: Can not start a new Ásbrú Script while another one is still running:\nTerminal '$PACMain::RUNNING{$tmp_uuid}{terminal}{_NAME}' is running '$PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_NAME}'", 1) ;
             next;
         }
 
@@ -1660,7 +1614,7 @@ sub _execScript {
             # Skip if this tmp_uuid was not properly connected (for some reason)
             return 0 unless $PACMain::RUNNING{$tmp_uuid}{terminal}{CONNECTED};
 
-            # Advise pac_conn to receive script name
+            # Advise asbru_conn to receive script name
             kill(12, $PACMain::RUNNING{$tmp_uuid}{terminal}{_PID});
             my %tmp;
             $tmp{name} = $name;

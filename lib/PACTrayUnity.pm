@@ -51,7 +51,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $TRAYICON = $RealBin . '/res/asbru-logo-tray.png';
-my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/asbru_group.png');
+my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/themes/default/asbru_group.png');
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -110,9 +110,9 @@ sub _setTrayMenu {
 
     push(@m, {label => 'Local Shell', stockicon => $PACMain::UNITY ? '' : 'gtk-home', code => sub {$PACMain::FUNCS{_MAIN}{_GUI}{shellBtn}->clicked;} });
     push(@m, {separator => 1});
-    push(@m, {label => 'Clusters', stockicon => $PACMain::UNITY ? '' : 'pac-cluster-manager', submenu => _menuClusterConnections}) unless $PACMain::UNITY;
-    push(@m, {label => 'Favourites', stockicon => $PACMain::UNITY ? '' : 'pac-favourite-on', submenu => _menuFavouriteConnections});
-    push(@m, {label => 'Connect to', stockicon => 'pac-group', submenu => _menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
+    push(@m, {label => 'Clusters', stockicon => $PACMain::UNITY ? '' : 'asbru-cluster-manager', submenu => _menuClusterConnections}) unless $PACMain::UNITY;
+    push(@m, {label => 'Favourites', stockicon => $PACMain::UNITY ? '' : 'asbru-favourite-on', submenu => _menuFavouriteConnections});
+    push(@m, {label => 'Connect to', stockicon => 'asbru-group', submenu => _menuAvailableConnections($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}{data})});
     push(@m, {separator => 1});
     push(@m, {label => 'Preferences...', stockicon => 'gtk-preferences', code => sub {$$self{_MAIN}{_CONFIG}->show;} });
     push(@m, {label => 'Clusters...', stockicon => $PACMain::UNITY ? '' : 'gtk-justify-fill'    , code => sub {$$self{_MAIN}{_CLUSTER}->show;}  });

@@ -58,11 +58,12 @@ use PACKeePass;
 
 my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
-my $AUTOSTART_FILE = "$RealBin/res/pac_start.desktop";
+my $AUTOSTART_FILE = "$RealBin/res/asbru_start.desktop";
 
 my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
+my $THEME_DIR = "$RES_DIR/themes/default";
 
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
 
@@ -138,7 +139,6 @@ sub show {
 
 sub _initGUI {
     my $self = shift;
-    my $opt = shift;
 
     # Load XML Glade file
     defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder->new_from_file($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
@@ -147,36 +147,46 @@ sub _initGUI {
     $$self{_WINDOWCONFIG} = $$self{_GLADE}->get_object ('windowConfig');
     $$self{_WINDOWCONFIG}->set_size_request(-1, -1);
 
-    _($self, 'imgBannerIcon')->set_from_file("$RES_DIR/asbru-preferences.svg");
+    _($self, 'imgBannerIcon')->set_from_file("$THEME_DIR/asbru-preferences.svg");
     _($self, 'imgBannerText')->set_text('Preferences');
 
     # Setup the check-button that defined whether PAC is auto-started on session init
-    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/pac_start.desktop');
+    _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/asbru_start.desktop');
 
     # Initialize main window
-    $$self{_WINDOWCONFIG}->set_icon_name('pac-app-big');
+    $$self{_WINDOWCONFIG}->set_icon_name('asbru-app-big');
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
+    foreach my $o ('MO','TO') {
+        foreach my $t ('BE','LF','AD') {
+            _($self, "linkHelp$o$t")->set_label('');
+            _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+        }
+    }
+    foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
+        _($self,$t)->set_label('');
+        _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    }
 
     # Option currently disabled
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
     #_($self, 'btnCheckVersion')->set_label('Check _now');
 
-    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('pac-treelist', 'button'));
-    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('pac-favourite-on', 'button'));
-    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('pac-history', 'button'));
-    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('pac-cluster-manager', 'button'));
-    _($self, 'imgKeePassOpts')->set_from_stock('pac-keepass', 'button');
-    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('pac-protected', 'button'));
+    _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'button'));
+    _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'));
+    _($self, 'rbCfgStartTreeHist')->set_image(Gtk3::Image->new_from_stock('asbru-history', 'button'));
+    _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button'));
+    _($self, 'imgKeePassOpts')->set_from_stock('asbru-keepass', 'button');
+    _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'button'));
     _($self, 'btnCfgSetGUIPassword')->set_label('Set...');
     _($self, 'btnExportYAML')->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button'));
     _($self, 'btnExportYAML')->set_label('Export config...');
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
-    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new())->{container});
-    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new())->{container});
-    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new())->{container});
+    _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
+    _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
+    _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
@@ -191,6 +201,11 @@ sub _initGUI {
         $$self{_ENCODINGS_MAP}{$enc} = ++$i;
     }
 
+    if (!$PACMain::STRAY) {
+        _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\nTray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>.");
+    }
+
+    # Show preferences
     _updateGUIPreferences($self);
 
     return 1;
@@ -198,18 +213,16 @@ sub _initGUI {
 
 sub _setupCallbacks {
     my $self = shift;
-    my $tabs_on_main =  _($self,'cbCfgTabsInMain')->get_active();
-
 
     # Capture 'autostart' checkbox toggled state
     _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
-        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/pac_start.desktop") ) {
+        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop") ) {
             $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
-                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
                 1;
             };
         } elsif (! _($self, 'cbCfgAutoStart')->get_active()) {
-            unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+            unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
             $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
         }
         return 1;
@@ -238,7 +251,14 @@ sub _setupCallbacks {
         _($self, 'colorBold')->set_sensitive(! _($self, 'cbBoldAsText')->get_active());
     });
     _($self, 'cbCfgTabsInMain')->signal_connect('toggled' => sub {
-        _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active()); _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+        if (!_($self, 'cbCfgTabsInMain')->get_active()) {
+            # Set safe values other wise options would be unaccesible
+            _($self, 'cbCfgConnectionsAutoHide')->set_active(0);
+            _($self, 'cbCfgButtonBarAutoHide')->set_active(0);
+        }
     });
     _($self, 'cbCfgNewInTab')->signal_connect('toggled' => sub {
         _($self, 'vboxCfgTabsOptions')->set_sensitive(_($self, 'cbCfgNewInTab')->get_active());
@@ -260,13 +280,20 @@ sub _setupCallbacks {
         return 1;
     });
     _($self, 'cfgComboCharEncode')->signal_connect('changed' => sub {
-        _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        my $desc = __($self->{_ENCODINGS_HASH}{_($self, 'cfgComboCharEncode')->get_active_text()} // '');
+        if ($desc) {
+            $desc = "<span size='x-small'>$desc</span>";
+        }
+        _($self, 'cfgLblCharEncode')->set_markup($desc);
     });
     _($self, 'cbCfgBWTrayIcon')->signal_connect('toggled' => sub {
-        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'pac-tray-bw' : 'pac-tray', 'menu');
+        _($self, 'imgTrayIcon')->set_from_stock(_($self, 'cbCfgBWTrayIcon')->get_active() ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     });
     _($self, 'cbCfgShowSudoPassword')->signal_connect('toggled' => sub {
         _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
+    });
+    _($self, 'cbCfgAutoSave')->signal_connect('toggled' => sub {
+        _updateSaveOnExit($self);
     });
 
     #DevNote: option currently disabled
@@ -307,7 +334,7 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
-            my $pass = _wEnterValue($self, 'PAC GUI Password Removal', 'Enter current PAC GUI Password to remove protection...', undef, 0, 'pac-protected');
+            my $pass = _wEnterValue($$self{_WINDOWCONFIG}, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
             if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
@@ -379,6 +406,10 @@ sub _setupCallbacks {
         # Populate with environment variables
         my @environment_menu;
         foreach my $key (sort {$a cmp $b} keys %ENV) {
+            # Do not offer Master Password, or any other environment variable with word PRIVATE, TOKEN
+            if ($key =~ /KPXC|PRIVATE|TOKEN/i) {
+                next;
+            }
             my $value = $ENV{$key};
             push(@environment_menu, {
                 label => "<ENV:" . __($key) . ">",
@@ -424,47 +455,6 @@ sub _setupCallbacks {
             }
         });
 
-        # Populate with KeePass special strings
-        if ($$self{_CFG}{'defaults'}{'keepass'}{'use_keepass'}) {
-            my (@titles, @usernames, @urls, @query);
-            foreach my $hash ($PACMain::FUNCS{_KEEPASS} ->find) {
-                push(@titles, {
-                    label => "<KPX_title:$$hash{title}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_title:$$hash{title}>");}
-                });
-                push(@usernames, {
-                    label => "<KPX_username:$$hash{username}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_username:$$hash{username}>");}
-                });
-                push(@urls, {
-                    label => "<KPX_url:$$hash{url}>",
-                    tooltip => "$$hash{password}",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPX_url:$$hash{url}>");}
-                });
-            }
-            push(@menu_items, {
-                label => 'KeePassX',
-                stockicon => 'pac-keepass',
-                submenu =>
-                [{
-                    label => 'KeePassX title values',
-                    submenu => \@titles
-                }, {
-                    label => 'KeePassX username values',
-                    submenu => \@usernames
-                }, {
-                    label => 'KeePassX URL values',
-                    submenu => \@urls
-                }, {
-                    label => "KeePass Extended Query",
-                    tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
-                    code => sub {_($self, 'entryCfgSudoPassword')->set_text("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
-                }]
-            });
-        }
-
         _wPopUpMenu(\@menu_items, $event);
 
         return 1;
@@ -492,12 +482,18 @@ sub _setupCallbacks {
             _($self,'cbCfgSaveOnExit')->show();
             _($self,'cbCfgStartIconified')->show();
             _($self,'cbCfgCloseToTray')->show();
+            _($self,'cbCfgShowTreeTitles')->show();
+            _($self,'cbCfgShowTreeTitles')->set_active(1);
         } else {
             _($self,'frameTabsInMainWindow')->hide();
             _($self,'cbCfgStartMainMaximized')->hide();
             _($self,'cbCfgRememberSize')->hide();
             _($self,'cbCfgSaveOnExit')->hide();
-            if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+            _($self,'cbCfgSaveOnExit')->set_active(1);
+            _($self,'cbCfgAutoSave')->set_active(1);
+            _($self,'cbCfgShowTreeTitles')->hide();
+            _($self,'cbCfgShowTreeTitles')->set_active(0);
+            if (!$PACMain::STRAY) {
                 _($self,'cbCfgStartIconified')->hide();
                 _($self,'cbCfgCloseToTray')->hide();
             }
@@ -520,6 +516,11 @@ sub _setupCallbacks {
         _($self, 'entryCfgJumpKey')->unselect_uri("file://$ENV{'HOME'}");
     });
 
+    # Capture support transparency change
+    _($self, 'cbCfgTerminalSupportTransparency')->signal_connect('toggled' => sub {
+        _($self, 'spCfgTerminalTransparency')->set_sensitive(_($self, 'cbCfgTerminalSupportTransparency')->get_active());
+    });
+
     return 1;
 }
 
@@ -540,7 +541,7 @@ sub _exporter {
         $func = 'use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Purity = 1; open(F, ">:utf8",$file) or die "ERROR: Could not open file \'$file\' for writting ($!)"; print F Dumper($$self{_CFG}); close F;';
     } elsif ($format eq 'debug') {
         $name = 'debug';
-        $suffix = '.txt';
+        $suffix = '.yml';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
         my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
         if (!$answ) {
@@ -555,8 +556,8 @@ sub _exporter {
             "$APPNAME (v.$APPVERSION) Choose file to Export configuration as '$format'",
             $$self{_WINDOWCONFIG},
             'GTK_FILE_CHOOSER_ACTION_SAVE',
-            'Export' , 'GTK_RESPONSE_ACCEPT',
             'Cancel' , 'GTK_RESPONSE_CANCEL',
+            'Export' , 'GTK_RESPONSE_ACCEPT',
         );
         $choose->set_do_overwrite_confirmation(1);
         $choose->set_current_folder($ENV{'HOME'} // '/tmp');
@@ -568,7 +569,6 @@ sub _exporter {
         if ($out ne 'accept') {
             return 1;
         }
-
         $$self{_WINDOWCONFIG}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
         $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
         while (Gtk3::events_pending) {
@@ -589,7 +589,7 @@ sub _exporter {
         _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
     } elsif (defined $w) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save PAC Config file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save Ásrbú Config file '$file':\n\n$@");
     }
     delete $$self{_CFG}{'__PAC__EXPORTED__'};
     delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
@@ -605,7 +605,9 @@ sub _exporter {
 sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
-    $out =~ s/debug\.txt/debug.yml/;
+
+    system "mv -f $file $file.txt";
+    $file .= ".txt";
 
     $SIG{__WARN__} = sub{};
     print STDERR "SAVED IN : $file\nOUT: $out\n";
@@ -614,41 +616,78 @@ sub cleanUpPersonalData {
     open(D,">:utf8",$out);
     my $C = 0;
     while (my $line = <F>) {
+        my $next = 0;
+        foreach my $key ('name','send','ip','user','prepend command','database','gui password','sudo password') {
+            if ($line =~ /^[\t ]+$key:/) {
+                $line =~ s/$key:.+/$key: 'removed'/;
+                $next = 1;
+            }
+            if ($next) {
+                next;
+            }
+        }
         if ($line =~ /KPX title regexp/) {
             $line =~ s/KPX title regexp:.+/KPX title regexp: ''/;
-        } elsif ($line =~ /^[\t ]+(send|ip|user):/) {
-            my $p = $1;
-            $line =~ s/$p:.+/$p: 'removed'/;
         } elsif ($line =~ /^[\t ]+(title|name):/) {
             my $p = $1;
             if ($p eq 'name') {
                 $C++;
             }
             $line =~ s/$p:.+/$p: '$p $C'/;
+        } elsif (($line =~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected):/) && ($line !~ /^[\t ]+(global variables|remote commands|local commands|expect|local before|local after|local connected): \[\]/)) {
+            my $global = 0;
+            my $indent = '';
+            if ($line =~ /global variables/) {
+                $global = 1;
+            }
+            if ($line =~ /^([\t ]+)/) {
+                $indent = $1;
+            }
+            print D $line;
+            while (my $l = <F>) {
+                if ($l =~ /^${indent}\w/) {
+                    print D $l;
+                    last;
+                } elsif ($global) {
+                    next;
+                } elsif ($l =~ /description|expect|send|txt/) {
+                    $l =~ s|(.+?):.+|$1: 'removed'|;
+                }
+                print D $l;
+            }
+            next;
+        } elsif ($line =~ /^[\t ]+options:/) {
+            $line =~ s/\/drive:.+?( |\')/\/drive: removed$1/;
+            $line =~ s/ disk:.+?( |\')/ disk: removed$1/;
+            $line =~ s/\/d:.+?( |\')/\/d: removed$1/;
+            $line =~ s/-d .+?( |\')/-d removed$1/;
+            if ($line =~ / -(D|L|R)/) {
+                $line =~ s/(^[\t ]+options):.+/$1: 'removed'/;
+            }
+        } elsif (($line =~ /^[\t ]+proxy (ip|pass|user):/)&&($line !~ /^[\t ]+proxy (ip|pass|user): \'\'/)) {
+            $line =~ s/(proxy.+?):.+/$1: 'removed'/;
+        } elsif (($line =~ /^[\t ]+jump (config|ip|pass|user|key):/)&&($line !~ /^[\t ]+jump (config|ip|pass|user|key): \'\'/)) {
+            $line =~ s/(jump.+?):.+/$1: 'removed'/;
         } elsif ($line =~ /^[\t ]+description:/) {
             $line =~ s/description:.+/description: 'Description'/;
         } elsif ($line =~ /^[\t ]+public key: (.+)/) {
             $line =~ s/public key:.+/public key: 'uses public key'/;
         } elsif ($line =~ /^[\t ]+pass(word|phrase)?:/) {
             $line =~ s/pass(word|phrase)?:.+/pass$1: 'removed'/;
-        } elsif ($line =~ /^[\t ]+sudo password:/) {
-            $line =~ s/sudo password:.+/sudo password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+gui password:/) {
-            $line =~ s/gui password:.+/gui password: 'removed'/;
-        } elsif ($line =~ /^[\t ]+use gui password:/) {
-            $line =~ s/use gui password:.+/use gui password: 0/;
+        } elsif ($line =~ /^[\t ]+use gui password( tray)?:/) {
+            $line =~ s/use gui password( tray)?:.+/use gui password$1: \'\'/;
         } elsif ($line =~ /^[\t ]+passphrase user:/) {
             $line =~ s/passphrase user:.+/passphrase user: 'removed'/;
-        } else {
-            $line =~ s|/home/(\w+)|/home/USER|;
         }
+        $line =~ s|/home/.+?/|/home/PATH/|;
+        $line =~ s|$ENV{USER}|USER|;
         print D $line;
     }
     # Add runtime information
     print D "\n\n#$APPNAME : $APPVERSION\n\n# ENV Data\n";
     my $user = $ENV{USER} ? $ENV{USER} : $ENV{LOGNAME};
     foreach my $k (sort keys %ENV) {
-        if ($ENV{$k} =~ /token/i) {
+        if ($k =~ /token|hostname|startup|KPXC|AUTH/i) {
             next;
         }
         my $str = $ENV{$k};
@@ -678,6 +717,7 @@ sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my %layout = ('Traditional',0,'Compact',1);
+    my %theme = ('default',0,'asbru-color',1,'asbru-dark',2,'system',3);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -687,6 +727,15 @@ sub _updateGUIPreferences {
     }
     if (!defined $$cfg{'defaults'}{'bold is brigth'}) {
         $$cfg{'defaults'}{'bold is brigth'} = 0;
+    }
+    if (!defined $$cfg{'defaults'}{'unprotected set'}) {
+        $$cfg{'defaults'}{'unprotected set'} = 'foreground';
+    }
+    if (!defined $$cfg{'defaults'}{'theme'}) {
+        $$cfg{'defaults'}{'theme'} = 'default';
+    }
+    if (!-d $$cfg{'defaults'}{'session logs folder'}) {
+        $$cfg{'defaults'}{'session logs folder'} = "$CFG_DIR/session_logs";
     }
     # Main options
     #_($self, 'btnCfgLocation')->set_uri('file://' . $$self{_CFG}{'defaults'}{'config location'});
@@ -714,9 +763,11 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgConnectionsAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'cbCfgButtonBarAutoHide')->set_active($$cfg{'defaults'}{'auto hide button bar'});
     _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+    _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
+    _($self, 'entryCfgPasswordPrompt')->select_region(0,0);
     _($self, 'entryCfgHostKeyVerification')->set_text($$cfg{'defaults'}{'hostkey changed prompt'});
     _($self, 'entryCfgPressAnyKey')->set_text($$cfg{'defaults'}{'press any key prompt'});
     _($self, 'entryCfgRemoteHostChanged')->set_text($$cfg{'defaults'}{'remote host changed prompt'});
@@ -726,14 +777,20 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgSudoPassword')->set_visibility(_($self, 'cbCfgShowSudoPassword')->get_active());
     _($self, 'entryCfgSelectByWordChars')->set_text($$cfg{'defaults'}{'word characters'});
     _($self, 'cbCfgShowTrayIcon')->set_active($$cfg{'defaults'}{'show tray icon'});
-    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    _($self, 'cbCfgAutoStart')->set_active(-f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     #DevNote: option currently disabled
     #_($self, 'cbCfgCheckVersions')->set_active($$cfg{'defaults'}{'check versions at start'});
     #_($self, 'btnCheckVersion')->set_sensitive(! $PACMain::FUNCS{_MAIN}{_UPDATING});
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'});
+
+    _($self, 'rbCfgUnForeground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'foreground');
+    _($self, 'rbCfgUnBackground')->set_active($$cfg{'defaults'}{'unprotected set'} eq 'background');
+    _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgUnProtected', 'unprotected color', _($self, 'colorCfgUnProtected')->get_color()->to_string());
+
     _($self, 'rbCfgForeground')->set_active($$cfg{'defaults'}{'protected set'} eq 'foreground');
     _($self, 'rbCfgBackground')->set_active($$cfg{'defaults'}{'protected set'} eq 'background');
     _updateWidgetColor($self, $$cfg{'defaults'}, 'colorCfgProtected', 'protected color', _($self, 'colorCfgProtected')->get_color()->to_string());
+
     _($self, 'cbCfgUseGUIPassword')->set_active($$cfg{'defaults'}{'use gui password'});
     _($self, 'hboxCfgPACPassword')->set_sensitive($$cfg{'defaults'}{'use gui password'});
     _($self, 'cbCfgUseGUIPasswordTray')->set_active($$cfg{'defaults'}{'use gui password tray'});
@@ -743,7 +800,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAutoStartShell')->set_active($$cfg{'defaults'}{'autostart shell upon PAC start'});
     _($self, 'cbCfgTreeOnRight')->set_active($$cfg{'defaults'}{'tree on right side'});
     _($self, 'cbCfgTreeOnLeft')->set_active(! $$cfg{'defaults'}{'tree on right side'});
-    _($self, 'cbCfgPreventMOShowTree')->set_active(! $$cfg{'defaults'}{'prevent mouse over show tree'});
+    _($self, 'cbCfgPreventMOShowTree')->set_active(!$$cfg{'defaults'}{'prevent mouse over show tree'});
     _($self, 'rbCfgStartTreeConn')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'connections');
     _($self, 'rbCfgStartTreeFavs')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'favourites');
     _($self, 'rbCfgStartTreeHist')->set_active($$cfg{'defaults'}{'start PAC tree on'} eq 'history');
@@ -753,7 +810,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgCtrlTabLast')->set_active($$cfg{'defaults'}{'ctrl tab'} eq 'last');
     _($self, 'rbCfgCtrlTabNext')->set_active($$cfg{'defaults'}{'ctrl tab'} ne 'last');
     _($self, 'cbCfgAutoAppendGroupName')->set_active($$cfg{'defaults'}{'append group name'});
-    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'pac-tray-bw' : 'pac-tray', 'menu');
+    _($self, 'imgTrayIcon')->set_from_stock($$cfg{'defaults'}{'use bw icon'} ? 'asbru-tray-bw' : 'asbru-tray', 'menu');
     _($self, 'rbOnNoTabsNothing')->set_active($$cfg{'defaults'}{'when no more tabs'} == 0);
     _($self, 'rbOnNoTabsClose')->set_active($$cfg{'defaults'}{'when no more tabs'} == 1);
     _($self, 'rbOnNoTabsHide')->set_active($$cfg{'defaults'}{'when no more tabs'} == 2);
@@ -762,6 +819,7 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
     _($self, 'cbCfgShowFavOnUnity')->set_active($$cfg{'defaults'}{'show favourites in unity'});
     _($self, 'comboLayout')->set_active($layout{$$cfg{'defaults'}{'layout'}});
+    _($self, 'comboTheme')->set_active($theme{$$cfg{'defaults'}{'theme'}});
 
     # Terminal Options
     _($self, 'spCfgTmoutConnect')->set_value($$cfg{'defaults'}{'timeout connect'});
@@ -773,6 +831,8 @@ sub _updateGUIPreferences {
     #_($self, 'hboxOnNoMoreTabs')->set_sensitive(_($self, 'cbCfgNewInTab')->get_active());
     _($self, 'spCfgTerminalScrollback')->set_value($$cfg{'defaults'}{'terminal scrollback lines'} // 5000);
     _($self, 'spCfgTerminalTransparency')->set_value($$cfg{'defaults'}{'terminal transparency'});
+    _($self, 'cbCfgTerminalSupportTransparency')->set_active($$cfg{'defaults'}{'terminal support transparency'} // ($$cfg{'defaults'}{'terminal transparency'} > 0));
+    _($self, 'spCfgTerminalTransparency')->set_sensitive(_($self, 'cbCfgTerminalSupportTransparency')->get_active());
     _($self, 'cbCfgExpectDebug')->set_active($$cfg{'defaults'}{'debug'});
     _($self, 'cbCfgStartMaximized')->set_active($$cfg{'defaults'}{'start maximized'});
     _($self, 'radioCfgTabsTop')->set_active($$cfg{'defaults'}{'tabs position'} eq 'top');
@@ -802,12 +862,14 @@ sub _updateGUIPreferences {
     _($self, 'btnCfgSaveSessionLogs')->set_current_folder($$cfg{'defaults'}{'session logs folder'});
     _($self, 'spCfgSaveSessionLogs')->set_value($$cfg{'defaults'}{'session logs amount'});
     _($self, 'cfgComboCharEncode')->set_active($self->{_ENCODINGS_MAP}{$$cfg{'defaults'}{'terminal character encoding'} // 'UTF-8'});
-    _($self, 'cfgLblCharEncode')->set_text($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'} // 'RFC-3629'});
+    my $desc = __($self->{_ENCODINGS_HASH}{$$cfg{'defaults'}{'terminal character encoding'}} // 'RFC-3629');
+    _($self, 'cfgLblCharEncode')->set_markup("<span size='x-small'>$desc</span>");
     _($self, 'cfgComboBackspace')->set_active($$self{_BACKSPACE_BINDING}{$$cfg{'defaults'}{'terminal backspace'} // '0'});
     _($self, 'cbCfgUnsplitDisconnected')->set_active($$cfg{'defaults'}{'unsplit disconnected terminals'} // '0');
     _($self, 'cbCfgConfirmChains')->set_active($$cfg{'defaults'}{'confirm chains'} // 1);
     _($self, 'cbCfgSkip1stChainExpect')->set_active($$cfg{'defaults'}{'skip first chain expect'} // 1);
     _($self, 'cbCfgEnableTreeLines')->set_active($$cfg{'defaults'}{'enable tree lines'} // 0);
+    _($self, 'cbCfgShowTreeTitles')->set_active($$cfg{'defaults'}{'show tree titles'} // 1);
     _($self, 'cbCfgEnableOverlayScrolling')->set_active($$cfg{'defaults'}{'tree overlay scrolling'} // 1);
     _($self, 'cbCfgShowStatistics')->set_active($$cfg{'defaults'}{'show statistics'} // 1);
     _($self, 'cbCfgPreventF11')->set_active($$cfg{'defaults'}{'prevent F11'});
@@ -878,14 +940,9 @@ sub _updateGUIPreferences {
     $$self{_VARIABLES}->update($$self{_CFG}{'defaults'}{'global variables'});
     $$self{_CMD_LOCAL}->update($$self{_CFG}{'defaults'}{'local commands'}, undef, 'local');
     $$self{_CMD_REMOTE}->update($$self{_CFG}{'defaults'}{'remote commands'}, undef, 'remote');
-    if (!$$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'})) {
-        show($self, 0);
-        _($self, 'nbPreferences')->set_current_page(-1);
-        return 0;
-    }
-
-    if (defined($$self{_CFG}{'tmp'}{'tray available'}) && $$self{_CFG}{'tmp'}{'tray available'} eq 'warning') {
-        _($self, 'lblRestartRequired')->set_text("(*) Requires restarting PAC for the change(s) to take effect\n\n" . (_($self, 'cbCfgStartIconified')->get_tooltip_text() // '') );
+    $$self{_KEEPASS}->update($$self{_CFG}{'defaults'}{'keepass'});
+    if (defined $PACMain::FUNCS{_EDIT}) {
+        _($PACMain::FUNCS{_EDIT}, 'btnCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'});
     }
 
     # Hide show options not available on choosen layout
@@ -894,11 +951,19 @@ sub _updateGUIPreferences {
         _($self,'cbCfgStartMainMaximized')->hide();
         _($self,'cbCfgRememberSize')->hide();
         _($self,'cbCfgSaveOnExit')->hide();
-        if ($ENV{'ASBRU_DESKTOP'} eq 'gnome-shell') {
+        _($self, 'cbCfgCloseToTray')->hide();
+        if ($$cfg{'defaults'}{'close to tray'} == 0) {
+            # Force close to tray on Compact mode
+            _($self, 'cbCfgCloseToTray')->set_active(1);
+            $$cfg{'defaults'}{'close to tray'} = 1;
+        }
+        if (!$PACMain::STRAY) {
             _($self,'cbCfgStartIconified')->hide();
-            _($self,'cbCfgCloseToTray')->hide();
         }
     }
+
+    # Disable "save on exit" if "auto save" is enabled
+    _updateSaveOnExit($self);
 
     return 1;
 }
@@ -928,6 +993,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'terminal scrollback lines'} = _($self, 'spCfgTerminalScrollback')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'terminal transparency'} = _($self, 'spCfgTerminalTransparency')->get_value();
     $$self{_CFG}{'defaults'}{'terminal transparency'} =~ s/,/\./go;
+    $$self{_CFG}{'defaults'}{'terminal support transparency'} = _($self, 'cbCfgTerminalSupportTransparency')->get_active();
     $$self{_CFG}{'defaults'}{'terminal backspace'} = _($self, 'cfgComboBackspace')->get_active_text();
     $$self{_CFG}{'defaults'}{'auto accept key'} = _($self, 'cbCfgAutoAcceptKeys')->get_active();
     $$self{_CFG}{'defaults'}{'debug'} = _($self, 'cbCfgExpectDebug')->get_active();
@@ -1007,12 +1073,18 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'confirm chains'} = _($self, 'cbCfgConfirmChains')->get_active();
     $$self{_CFG}{'defaults'}{'skip first chain expect'} = _($self, 'cbCfgSkip1stChainExpect')->get_active();
     $$self{_CFG}{'defaults'}{'enable tree lines'} = _($self, 'cbCfgEnableTreeLines')->get_active();
+    $$self{_CFG}{'defaults'}{'show tree titles'} = _($self, 'cbCfgShowTreeTitles')->get_active();
     $$self{_CFG}{'defaults'}{'tree overlay scrolling'} = _($self, 'cbCfgEnableOverlayScrolling')->get_active();
     #DevNote: option currently disabled
     #$$self{_CFG}{'defaults'}{'check versions at start'} = _($self, 'cbCfgCheckVersions')->get_active();
     $$self{_CFG}{'defaults'}{'show statistics'} = _($self, 'cbCfgShowStatistics')->get_active();
+
+    $$self{_CFG}{'defaults'}{'unprotected set'} = _($self, 'rbCfgUnForeground')->get_active() ? 'foreground' : 'background' ;
+    $$self{_CFG}{'defaults'}{'unprotected color'} = _($self, 'colorCfgUnProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'protected set'} = _($self, 'rbCfgForeground')->get_active() ? 'foreground' : 'background' ;
     $$self{_CFG}{'defaults'}{'protected color'} = _($self, 'colorCfgProtected')->get_color()->to_string();
+
     $$self{_CFG}{'defaults'}{'use gui password'} = _($self, 'cbCfgUseGUIPassword')->get_active();
     $$self{_CFG}{'defaults'}{'use gui password tray'} = _($self, 'cbCfgUseGUIPasswordTray')->get_active();
     $$self{_CFG}{'defaults'}{'disable CTRL key bindings'} = _($self, 'cbCfgCTRLDisable')->get_active();
@@ -1039,6 +1111,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();
     $$self{_CFG}{'defaults'}{'show favourites in unity'} = _($self, 'cbCfgShowFavOnUnity')->get_active();
     $$self{_CFG}{'defaults'}{'layout'} = _($self, 'comboLayout')->get_active_text();
+    $$self{_CFG}{'defaults'}{'theme'} = _($self, 'comboTheme')->get_active_text();
 
     # Terminal colors
     $$self{_CFG}{'defaults'}{'color black'} = _($self, 'colorBlack')->get_color()->to_string();
@@ -1066,17 +1139,6 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'when no more tabs'} = 2;
     }
 
-    #my $new_cfg_location = _($self, 'btnCfgLocation')->get_uri // "$ENV{HOME}/.config/pac";
-    #$new_cfg_location =~ s/^file:\/\///go;
-    #if ($new_cfg_location ne $$self{_CFG}{'defaults'}{'config location'}) {
-    #    system("mv $$self{_CFG}{'defaults'}{'config location'} $new_cfg_location");
-    #    if (-d $new_cfg_location) {
-    #        system("rm -rf $ENV{HOME}/.config/pac");
-    #        system("ln -s $new_cfg_location/pac $ENV{HOME}/.config/pac");
-    #}
-    #}
-    #$$self{_CFG}{'defaults'}{'config location'} = $new_cfg_location;
-
     if (_($self, 'rbCfgStartTreeConn')->get_active()) {
         $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'connections';
     }
@@ -1090,11 +1152,11 @@ sub _saveConfiguration {
         $$self{_CFG}{'defaults'}{'start PAC tree on'} = 'clusters';
     }
 
-    unlink("$ENV{'HOME'}/.config/autostart/pac_start.desktop");
+    unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
-        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/pac --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open(F, ">:utf8","$ENV{HOME}/.config/autostart/pac_start.desktop");
+        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
+        open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
         print F join("\n", @PACUtils::PACDESKTOP);
         close F;
         $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
@@ -1109,7 +1171,7 @@ sub _saveConfiguration {
     # Save the global remote commands tab options
     $$self{_CFG}{'defaults'}{'remote commands'} = $$self{_CMD_REMOTE}->get_cfg();
     # Save KeePass options
-    $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg();
+    $$self{_CFG}{'defaults'}{'keepass'} = $$self{_KEEPASS}->get_cfg(1);
 
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
     $self->_updateGUIPreferences();
@@ -1120,6 +1182,12 @@ sub _saveConfiguration {
     map {eval {$$_{'terminal'}->_updateCFG;};} (values %PACMain::RUNNING);
 
     return 1;
+}
+
+sub _updateSaveOnExit {
+    my $self = shift;
+
+    _($self, 'cbCfgSaveOnExit')->set_sensitive(!_($self, 'cbCfgAutoSave')->get_active());
 }
 
 # END: Define PRIVATE CLASS functions
