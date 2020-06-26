@@ -214,20 +214,6 @@ sub _initGUI {
 sub _setupCallbacks {
     my $self = shift;
 
-    # Capture 'autostart' checkbox toggled state
-    _($self, 'cbCfgAutoStart')->signal_connect('toggled' => sub {
-        if ((_($self, 'cbCfgAutoStart')->get_active()) && (! -f "$ENV{'HOME'}/.config/autostart/asbru_start.desktop") ) {
-            $$self{_CFG}{'defaults'}{'start at session startup'} = eval {
-                symlink($AUTOSTART_FILE, "$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
-                1;
-            };
-        } elsif (! _($self, 'cbCfgAutoStart')->get_active()) {
-            unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
-            $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
-        }
-        return 1;
-    });
-
     # Capture 'Show hidden files' checkbox for session log files
     $$self{cbShowHidden}->signal_connect('toggled' => sub {_($self, 'btnCfgSaveSessionLogs')->set_show_hidden($$self{cbShowHidden}->get_active());});
 
@@ -1155,11 +1141,20 @@ sub _saveConfiguration {
     unlink("$ENV{'HOME'}/.config/autostart/asbru_start.desktop");
     $$self{_CFG}{'defaults'}{'start at session startup'} = 0;
     if (_($self, 'cbCfgAutoStart')->get_active()) {
+        my $autostart_dir = "$ENV{HOME}/.config/autostart";
+
         $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru-cm --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
-        open(F, ">:utf8","$ENV{HOME}/.config/autostart/asbru_start.desktop");
-        print F join("\n", @PACUtils::PACDESKTOP);
-        close F;
-        $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
+        if (!-e $autostart_dir) {
+            mkdir($autostart_dir);
+        }
+        if (-d $autostart_dir) {
+            open(F, ">:utf8","$autostart_dir/asbru_start.desktop");
+            print F join("\n", @PACUtils::PACDESKTOP);
+            close F;
+            $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
+        } else {
+            print("ERROR: Unable to create autostart directory [$autostart_dir]\n");
+        }
     }
 
     # Save the global variables tab options
