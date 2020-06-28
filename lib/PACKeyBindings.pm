@@ -193,6 +193,9 @@ sub GetAccelerator {
             if ($kb =~ /Alt/) {
                 $acc .= '<alt>';
             }
+            if ($kb =~ /Shift/) {
+                $acc .= '<shift>';
+            }
             $acc .= $key;
             last;
         }
