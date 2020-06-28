@@ -658,27 +658,28 @@ sub _execScript {
         $TERMINAL{error} = '';
 
         my $wait = $tmout;
-        while ($wait > 0) {
+        my $found = 0;
+        while (!$found && $wait>0) {
             $EXP->expect(
                 1,
                 [eof => sub {$TERMINAL{error} = "Connection closed while waiting for pattern '$pattern'", exit 1;}],
                 [$pattern => sub {
-                    $TERMINAL{out1} = $EXP->before;
-                    $TERMINAL{out2} = $EXP->after;
+                    $TERMINAL{out1} = $EXP->before();
+                    $TERMINAL{out2} = $EXP->after();
                     $TERMINAL{error} = '';
-                    last;
+                    $found = 1;
                 }]
             );
             $wait--;
         }
-        if (! $wait) {
+        if (!$found) {
             $TERMINAL{error} = "Timeout ($tmout seconds) waiting for pattern '$pattern'";
             return 0;
         }
         return $TERMINAL{error} eq '';
     };
 
-    # Start PAC Script
+    # Start script
     ctrl("SCRIPT_START[NAME:$name]");
 
     no warnings ('redefine');

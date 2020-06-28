@@ -2268,7 +2268,7 @@ sub _pasteToVte {
             select(undef, undef, undef, $slow / 1000);
         }
     } else {
-        $$self{_GUI}{_VTE}->paste_clipboard();
+        $$self{_GUI}{_VTE}->paste_primary();
     }
 }
 
@@ -4457,7 +4457,7 @@ Display the popup Terminal menu on [shift] - right click
 Takes information from the clipboard and sends it to the terminal
 
     if slow : Use _vteFeedChild
-    else {_GUI}{_VTE}->paste_clipboard
+    else {_GUI}{_VTE}->paste_primary
 
 with _vteFeedChild
 
