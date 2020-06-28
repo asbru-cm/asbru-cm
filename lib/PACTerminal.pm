@@ -1015,12 +1015,12 @@ sub _setupCallbacks {
             }
         } elsif ($action eq 'fullscreen') {
             if ($$self{_FULLSCREEN}) {
-                $$self{_FSTOTAB} and $self->_winToTab;
+                $$self{_FSTOTAB} and $self->_winToTab();
                 $$self{_GUI}{_VBOX}->get_window()->unfullscreen();
                 $$self{_FULLSCREEN} = 0;
             } else {
                 $$self{_FSTOTAB} = $$self{_TABBED};
-                $$self{_TABBED} and $self->_tabToWin;
+                $$self{_TABBED} and $self->_tabToWin();
                 $$self{_GUI}{_VBOX}->get_window()->fullscreen();
                 $$self{_FULLSCREEN} = 1;
             }
@@ -1035,14 +1035,14 @@ sub _setupCallbacks {
         } elsif ($action eq 'remove_from_cluster') {
             $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
         } elsif ($action eq 'copy') {
-            $$self{_GUI}{_VTE}->copy_clipboard;
+            $$self{_GUI}{_VTE}->copy_clipboard();
         } elsif ($action eq 'paste') {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
         } elsif ($action eq 'paste-passwd' && ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' || $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
             $self->_pasteConnectionPassword();
         } elsif ($action eq 'paste-delete') {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -1303,7 +1303,7 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if (($$self{_RESTART})&&($$self{_RECONNECTS}<4)) {
+        if (($$self{_RESTART})&&($$self{_RECONNECTS} < 4)) {
             sleep($$self{_RECONNECTS});
             $$self{_RECONNECTS}++;
             $self->start();
@@ -2003,7 +2003,7 @@ sub _vteMenu {
         label => 'Copy',
         stockicon => 'gtk-copy',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','copy'),
-        code => sub {$$self{_GUI}{_VTE}->copy_clipboard;}
+        code => sub {$$self{_GUI}{_VTE}->copy_clipboard();}
     });
     # Copy Connection Password
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '')||($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
@@ -2264,11 +2264,11 @@ sub _pasteToVte {
     if ($slow) {
         foreach my $char (split('', $txt)) {
             _vteFeedChild($$self{_GUI}{_VTE}, $char);
-            Gtk3::main_iteration while Gtk3::events_pending;
+            Gtk3::main_iteration() while Gtk3::events_pending();
             select(undef, undef, undef, $slow / 1000);
         }
     } else {
-        $$self{_GUI}{_VTE}->paste_clipboard;
+        $$self{_GUI}{_VTE}->paste_clipboard();
     }
 }
 
@@ -2990,7 +2990,7 @@ sub _setupTabDND {
         if ($_[2] eq 'user-cancelled') {
             return 0;
         }
-        $self->_tabToWin;
+        $self->_tabToWin();
     });
 
     $$self{_GUI}{_TABLBL}->drag_dest_set('GTK_DEST_DEFAULT_ALL', \@targets, ['move']);
