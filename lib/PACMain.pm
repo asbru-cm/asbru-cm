@@ -2500,6 +2500,7 @@ sub __treeToggleProtection {
         my $gui_name = $self->__treeBuildNodeName($uuid);
         $model->set($modelsort->convert_iter_to_child_iter($modelsort->get_iter($$self{_GUI}{treeConnections}->_getPath($uuid))), 1, $gui_name);
     }
+    $self->_updateGUIPreferences();
     $self->_setCFGChanged(1);
 }
 
