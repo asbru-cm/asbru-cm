@@ -2765,15 +2765,8 @@ sub _tabMenu {
     push(@vte_menu_items, {label => 'Disconnect session', stockicon => 'gtk-stop', sensitive => $$self{_PID}, code => sub {$self->_disconnectTerminal();}});
     push(@vte_menu_items, {label => 'Restart session', stockicon => 'gtk-execute', sensitive => !$$self{CONNECTED} || !$$self{_PID}, code => sub {$self->start();}});
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', code => sub {$self->stop(undef, 1);}});
-    push(@vte_menu_items, {label => 'Close ALL terminals', stockicon => 'gtk-close', code => sub {
-        my @list = keys %PACMain::RUNNING;
-        if (!(scalar(@list) && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to close <b>every</b> terminal?"))) {
-            return 1;
-        }
-        foreach my $uuid (@list) {
-            $PACMain::RUNNING{$uuid}{'terminal'}->stop('force', 'deep');
-        }
-        return 1;
+    push(@vte_menu_items, {label => 'Close all terminals', stockicon => 'gtk-close', code => sub {
+        return $self->_closeAllTerminals();
     }});
 
     _wPopUpMenu(\@vte_menu_items, $event);
@@ -4136,7 +4129,9 @@ sub _closeAllTerminals {
         return 1;
     }
     foreach my $uuid (@list) {
-        $PACMain::RUNNING{$uuid}{'terminal'}->stop('force', 'deep');
+        if (ref($PACMain::RUNNING{$uuid}{'terminal'}) =~ /^PACTerminal|PACShell$/go) {
+            $PACMain::RUNNING{$uuid}{'terminal'}->stop('force', 'deep');
+        }
     }
     return 1;
 }
