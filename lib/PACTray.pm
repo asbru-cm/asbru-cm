@@ -134,7 +134,7 @@ sub _setupCallbacks {
                 $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(0);
                 if (! $$self{_MAIN}{_GUI}{lockApplicationBtn}->get_active()) {
                     $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
-                    $$self{_MAIN}->_showConnectionsList;
+                    $$self{_MAIN}->_showConnectionsList();
                 }
             } else {
                 $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});

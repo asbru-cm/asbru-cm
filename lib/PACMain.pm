@@ -327,8 +327,6 @@ sub DESTROY {
 sub start {
     my $self = shift;
 
-    #_makeDesktopFile($$self{_CFG});
-
     # Reset system tray we do not have one in gnome-shell:ubuntu
     if ($ENV{'ASBRU_DESKTOP'} =~ /gnome-shell/ && $ENV{'ASBRU_DESKTOP'} !~ /withtray/ && !$UNITY) {
         $STRAY = 0;
@@ -339,7 +337,7 @@ sub start {
 
     # Build the GUI
     PACUtils::_splash(1, "Building GUI...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
-    if (!$self->_initGUI) {
+    if (!$self->_initGUI()) {
         _splash(0);
         return 0;
     }
@@ -394,7 +392,6 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-
     if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
         $$self{_GUI}{main}->present();
     } else {
@@ -429,8 +426,6 @@ sub start {
 
     # Auto start Scripts window
     grep({ /^--scripts$/ and $$self{_GUI}{scriptsBtn}->clicked(); } @{ $$self{_OPTS} });
-
-    #$self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
 
     # Goto GTK's event loop
     Gtk3->main();
@@ -562,7 +557,7 @@ sub _initGUI {
     $$self{_GUI}{scroll1}->set_policy('automatic', 'automatic');
 
     # Create a treeConnections treeview for connections
-    $$self{_GUI}{treeConnections} = PACTree->new (
+    $$self{_GUI}{treeConnections} = PACTree->new(
         'Icon:' => 'pixbuf',
         'Name:' => 'hidden',
         'UUID:' => 'hidden',
@@ -633,7 +628,7 @@ sub _initGUI {
     $$self{_GUI}{scroll2}->set_policy('automatic', 'automatic');
 
     # Create treeFavourites
-    $$self{_GUI}{treeFavourites} = PACTree->new (
+    $$self{_GUI}{treeFavourites} = PACTree->new(
         'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
@@ -666,7 +661,7 @@ sub _initGUI {
     $$self{_GUI}{scroll3}->set_policy('automatic', 'automatic');
 
     # Create treeHistory
-    $$self{_GUI}{treeHistory} = PACTree->new (
+    $$self{_GUI}{treeHistory} = PACTree->new(
         'Icon:' => 'pixbuf',
         'Name:' => 'markup',
         'UUID:' => 'hidden',
@@ -705,7 +700,7 @@ sub _initGUI {
     $$self{_GUI}{scrolledclu}->set_policy('automatic', 'automatic');
 
     # Create treeClusters
-    $$self{_GUI}{treeClusters} = PACTree->new (
+    $$self{_GUI}{treeClusters} = PACTree->new(
         'Icon:' => 'pixbuf',
         'Name:' => 'markup'
     );
@@ -3138,7 +3133,10 @@ sub _launchTerminals {
 
     my @new_terminals;
     if (defined $$self{_GUI} && defined $$self{_GUI}{main}) {
-        $$self{_GUI}{main}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+        my $window = $$self{_GUI}{main}->get_window();
+        if ($window) {
+            $window->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
+        }
         $$self{_GUI}{main}->set_sensitive(0);
     }
 
@@ -3213,7 +3211,10 @@ sub _launchTerminals {
     }
 
     if (defined $$self{_GUI} && defined $$self{_GUI}{main}) {
-        $$self{_GUI}{main}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+        my $window = $$self{_GUI}{main}->get_window();
+        if ($window) {
+            $window->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
+        }
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
@@ -4738,17 +4739,17 @@ sub _ApplyLayout {
             $$self{_GUI}{$e}->hide();
         }
         if (!$STRAY) {
-            if (!$$self{_GUI}{main}->get_visible) {
+            if (!$$self{_GUI}{main}->get_visible()) {
                 $self->_showConnectionsList();
             }
         } else {
-            if ($$self{_GUI}{main}->get_visible) {
+            if ($$self{_GUI}{main}->get_visible()) {
                 $self->_hideConnectionsList();
             }
             $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
-        $$self{_GUI}{main}->set_default_size(220,$$self{wheight});
-        $$self{_GUI}{main}->resize(220,$$self{wheight});
+        $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
+        $$self{_GUI}{main}->resize(220, $$self{wheight});
     }
 }
 
