@@ -527,13 +527,13 @@ sub _setupCallbacks {
         if ($event->button ne 1) {
             return 0;
         }
-        $$self{_WINDOWPCC}{btnSelection}->set_sensitive($$self{_WINDOWPCC}{multiTextView}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY') )->wait_is_text_available);
+        $$self{_WINDOWPCC}{btnSelection}->set_sensitive($$self{_WINDOWPCC}{multiTextView}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY') )->wait_is_text_available());
         $$self{_WINDOWPCC}{btnBlock}->set_sensitive($self->_getCurrentBlock($$self{_WINDOWPCC}{multiTextBuffer}) );
         return 0;
     });
 
     $$self{_WINDOWPCC}{multiTextView}->signal_connect('key_release_event' => sub {
-        $$self{_WINDOWPCC}{btnSelection}->set_sensitive($$self{_WINDOWPCC}{multiTextView}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY') )->wait_is_text_available);
+        $$self{_WINDOWPCC}{btnSelection}->set_sensitive($$self{_WINDOWPCC}{multiTextView}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY') )->wait_is_text_available());
         $$self{_WINDOWPCC}{btnBlock}->set_sensitive($self->_getCurrentBlock($$self{_WINDOWPCC}{multiTextBuffer}) );
         return 0;
     });
