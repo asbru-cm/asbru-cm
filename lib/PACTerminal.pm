@@ -1050,7 +1050,7 @@ sub _setupCallbacks {
             }
             # V --> PASTE
             elsif (lc $keyval eq 'v') {
-                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
                 $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
                 return 1;
             }
@@ -1062,7 +1062,7 @@ sub _setupCallbacks {
             # B --> PASTE AND DELETE
             elsif (lc $keyval eq 'b')
             {
-                my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+                my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
                 my $delete = _wEnterValue(
                     $$self{_GUI},
                     "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -1251,9 +1251,9 @@ sub _setupCallbacks {
         if ($$self{_CFG}{defaults}{'selection to clipboard'}) {
             if ($$self{_GUI}{_VTE}->get_has_selection) {
                 $$self{_GUI}{_VTE}->copy_clipboard();
-                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text;
+                my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
                 $txt =~ s/ +$//gm;
-                Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD',0))->set_text($txt,length($txt));
+                Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('PRIMARY',0))->set_text($txt, length($txt));
             }
         }
         return 0;
@@ -2105,9 +2105,9 @@ sub _vteMenu {
         label => 'Paste',
         stockicon => 'gtk-paste',
         shortcut => '<control><shift>v',
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
         code => sub {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
             $self->_pasteToVte($txt, $$self{_CFG}{environments}{$$self{_UUID}}{'send slow'});
         }
     });
@@ -2130,9 +2130,9 @@ sub _vteMenu {
         stockicon => 'gtk-paste',
         shortcut => '<control><shift>b',
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available,
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
         code => sub {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text;
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_GUI},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -3963,7 +3963,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnCopy} = Gtk3::Button->new_from_stock('gtk-copy');
     $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnCopy}, 1, 1, 0);
     $w{window}{gui}{btnCopy}->signal_connect('clicked' => sub {
-        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->set_text (
+        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->set_text (
             join(
             "\n",
             map $w{window}{gui}{treefound}{data}[$_][1],

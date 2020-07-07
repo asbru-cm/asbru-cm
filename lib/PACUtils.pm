@@ -3789,7 +3789,7 @@ sub _copyPass {
     my $cfg = $PACMain::FUNCS{_MAIN}{_CFG};
     my $clip;
 
-    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
+    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('PRIMARY', 0));
     if ($$cfg{environments}{$uuid}{'passphrase'} ne '') {
         $clip = $$cfg{environments}{$uuid}{'passphrase'};
     } else {
