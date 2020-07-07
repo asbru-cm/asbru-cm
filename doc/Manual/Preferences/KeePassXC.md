@@ -3,7 +3,7 @@
 !!! danger "Important"
     This documentation corresponds to Ásbrú 6.2+
 
-    __This new integration brakes compatibility with stored users and passwords of previous Ásbrú versions__.
+    __This new integration breaks compatibility with stored users and passwords of previous Ásbrú versions__.
     Which means you will have to reconfigure the usernames and passwords fields. Or run a helper migration application if available.
 
     The current integration uses `keepassxc-cli` to access the database, [https://keepassxc.org/](https://keepassxc.org/).
@@ -72,7 +72,7 @@ __List__
 + __Activate use of KeePass database file__ : Activate KeePass functionality.
 + __Database file__ : Select the location of your database.
 + __Master Password__ : This field is optional.
-    - If provided, the password will be stored in the pac.yml file for convenience so you do not need to type it.
+    - If provided, the password will be stored in the `asbry.yml` file for convenience so you do not need to type it.
     - If left blank. Ásbrú will ask for the password the first time is needed, and then retain in memory for the remaining of the Ásbrú session.
 + __Key file__ : If your version of keypassxc-cli supports it, and you have configured your database to use a keyfile, then selected here.
 + __keepassxc-cli binary__ : you can choose a different `keepassxc-cli` binary to use. In case you have installed for your user only or want to use a different version available in your system.
