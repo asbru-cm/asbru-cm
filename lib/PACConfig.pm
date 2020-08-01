@@ -225,9 +225,6 @@ sub _setupCallbacks {
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {
         _($self, 'entryPassword')->set_visibility(_($self, 'cbConnShowPass')->get_active());
     });
-    _($self, 'cbCfgPreConnPingPort')->signal_connect('toggled' => sub {
-        _($self, 'spCfgPingTimeout')->set_sensitive(_($self, 'cbCfgPreConnPingPort')->get_active());
-    });
     _($self, 'cbCfgSaveSessionLogs')->signal_connect('toggled' => sub {
         _($self, 'hboxCfgSaveSessionLogs')->set_sensitive(_($self, 'cbCfgSaveSessionLogs')->get_active());
     });
@@ -760,9 +757,6 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgAutoSave')->set_active($$cfg{'defaults'}{'auto save'});
     _($self, 'cbCfgSaveOnExit')->set_active($$cfg{'defaults'}{'save on exit'});
     _($self, 'cbCfgBWTrayIcon')->set_active($$cfg{'defaults'}{'use bw icon'});
-    _($self, 'cbCfgPreConnPingPort')->set_active($$cfg{'defaults'}{'ping port before connect'});
-    _($self, 'spCfgPingTimeout')->set_value($$cfg{'defaults'}{'ping port timeout'});
-    _($self, 'spCfgPingTimeout')->set_sensitive(_($self, 'cbCfgPreConnPingPort')->get_active());
     _($self, 'cbCfgSaveShowScreenshots')->set_active($$cfg{'defaults'}{'show screenshots'});
     _($self, 'cbCfgConfirmExit')->set_active($$cfg{'defaults'}{'confirm exit'});
     _($self, 'rbCfgInternalViewer')->set_active(! $$cfg{'defaults'}{'screenshots use external viewer'});
@@ -1020,8 +1014,6 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'auto hide button bar'} = _($self, 'cbCfgButtonBarAutoHide')->get_active();
     $$self{_CFG}{'defaults'}{'hide on connect'} = _($self, 'cbCfgHideOnConnect')->get_active();
     $$self{_CFG}{'defaults'}{'force split tabs to 50%'} = _($self, 'cbCfgForceSplitSize')->get_active();
-    $$self{_CFG}{'defaults'}{'ping port before connect'} = _($self, 'cbCfgPreConnPingPort')->get_active();
-    $$self{_CFG}{'defaults'}{'ping port timeout'} = _($self, 'spCfgPingTimeout')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'start iconified'} = _($self, 'cbCfgStartIconified')->get_active();
     $$self{_CFG}{'defaults'}{'start maximized'} = _($self, 'cbCfgStartMaximized')->get_active();
     $$self{_CFG}{'defaults'}{'start main maximized'} = _($self, 'cbCfgStartMainMaximized')->get_active();
