@@ -437,6 +437,7 @@ sub _getDefaultConfig {
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal','zoomreset','Zoom reset text'];
     $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal','cisco','Send Cisco interrupt keypress'];
     $$cfg{'terminal'}{'AltCtrl+s'}     = ['Terminal','sftp','Open SFTP session'];
+    $$cfg{'terminal'}{'AltCtrl+g'}     = ['Terminal','sock5generic','Open sock5 generic command'];
 
     return $cfg;
 }

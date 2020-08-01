@@ -40,6 +40,7 @@
 
 ![](images/ssh2.png)
 
++ __Open sock5 tunnel__ : Append '-D <<random port>>' to this ssh connection and use the port to open an application using <<PORT>> as a parameter.
 + __Programmatically send a string__ : Send a specified regex expression every selected seconds to the terminal.
 + __Prepend command__ : Add this command before the ssh command connection string.
 + __Start next script when connection is launched__ : * Pending

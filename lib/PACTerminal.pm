@@ -390,6 +390,11 @@ sub start {
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
+    if ($$self{_CFG}{'environments'}{$$self{_UUID}}{'sock5 tunnel active'}) {
+        my $SOCK5PORT = _getLocalPort(10240 + int(rand(65535 - 10240)));
+        $PACMain::SOCK5PORTS{$$self{_UUID_TMP}} = $SOCK5PORT;
+        $new_cfg{'tmp'}{'randSock5Port'} = $SOCK5PORT;
+    }
     nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save Ásbrú config file '$$self{_TMPCFG}': $!";
     undef %new_cfg;
 
@@ -594,6 +599,8 @@ sub stop {
         delete $$self{_CFG}{environments}{$$self{_UUID}};
     }
 
+    delete $PACMain::SOCK5PORTS{$$self{_UUID_TMP}};
+
     # And delete ourselves
     $$self{_GUI} = undef;
     undef $self;
@@ -623,6 +630,23 @@ sub unlock {
 
 ###################################################################
 # START: Private functions definitions
+
+# Find out a free local TCP port
+sub _getLocalPort {
+    my $LPORT = shift;
+
+    my $PING = Net::Ping->new('tcp');
+    $PING->service_check(0);
+
+    for (my $break = 0; $break < 100; ++$break) {
+        $PING->port_number($LPORT);
+        if (!$PING->ping('localhost')) {
+            return $LPORT;
+        }
+        $LPORT++;
+    }
+    return $LPORT;
+}
 
 sub _initGUI {
     my $self = shift;
@@ -1028,6 +1052,8 @@ sub _setupCallbacks {
             $self->_disconnectTerminal();
         } elsif ($action eq 'sftp') {
             $self->_openSFTP()
+        } elsif ($action eq 'sock5generic') {
+            $self->_openSock5GenericCommand()
         } elsif ($action eq 'reset') {
             $$self{_GUI}{_VTE}->reset(1, 0);
         } elsif ($action eq 'reset-clear') {
@@ -2117,6 +2143,18 @@ sub _vteMenu {
                 $self->_openSFTP();
             }
         });
+
+        if ($$self{_CFG}{environments}{$$self{_UUID}}{'sock5 tunnel active'} and defined $PACMain::SOCK5PORTS{$$self{_UUID_TMP}}) {
+            push(@vte_menu_items, {
+                label => $$self{_CFG}{environments}{$$self{_UUID}}{'sock5 tunnel label'},
+                stockicon => 'asbru-method-Generic Command',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','sock5generic'),
+                sensitive => 1,
+                code => sub {
+                  $self->_openSock5GenericCommand();
+                }
+            });
+        }
     }
 
     # Terminal reset options
@@ -2380,6 +2418,31 @@ sub _openSFTP {
     push(@idx, [$newuuid]);
     $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
     $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
+    $$self{_CFG}{environments}{$newuuid}{expect} = [];
+    $$self{_CFG}{environments}{$newuuid}{options} = '';
+    $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
+    $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
+}
+
+sub _openSock5GenericCommand {
+    my $self = shift;
+
+    if ($$self{_CFG}{environments}{$$self{_UUID}}{method} ne 'SSH') {
+        return 0;
+    }
+
+    if (!$$self{_CFG}{environments}{$$self{_UUID}}{'sock5 tunnel active'} or !defined $PACMain::SOCK5PORTS{$$self{_UUID_TMP}}) {
+        return 0;
+    }
+
+    my $command = $$self{_CFG}{environments}{$$self{_UUID}}{'sock5 tunnel command'} =~ s/<<PORT>>/$PACMain::SOCK5PORTS{$$self{_UUID_TMP}}/r;
+
+    my @idx;
+    my $newuuid = '_tmp_' . rand;
+    push(@idx, [$newuuid]);
+    $$self{_CFG}{environments}{$newuuid} = dclone($$self{_CFG}{environments}{$$self{_UUID}});
+    $$self{_CFG}{environments}{$newuuid}{method} = 'Generic Command';
+    $$self{_CFG}{environments}{$newuuid}{ip} = $command;
     $$self{_CFG}{environments}{$newuuid}{expect} = [];
     $$self{_CFG}{environments}{$newuuid}{options} = '';
     $$self{_CFG}{environments}{$newuuid}{_protected} = 1;

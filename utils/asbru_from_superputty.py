@@ -160,6 +160,9 @@ elementTemplate = """{uuid}:
   screenshots: ~
   search pass on KPX: 0
   send slow: 0
+  sock5 tunnel active: ''
+  sock5 tunnel label: ''
+  sock5 tunnel command: ''
   send string active: ''
   send string every: 60
   send string intro: 1
