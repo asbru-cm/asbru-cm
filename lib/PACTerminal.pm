@@ -1126,7 +1126,7 @@ sub _setupCallbacks {
             if (!$$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'}) {
                 return 0;
             }
-            $$self{_GUI}{_VTE}->paste_clipboard();
+            $$self{_GUI}{_VTE}->paste_primary();
             $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             return 1;
         } elsif ($event->button eq 3 and $event -> type eq 'button-press') {
