@@ -3,7 +3,7 @@
 for f in build/*.${PACKAGE}
 do
 	echo "Processing $f"
-        cloudsmith push ${PACKAGE} asbru-cm/asbru-cm/${OS}/${DIST} $f
+        cloudsmith push ${PACKAGE} asbru-cm/release/${OS}/${DIST} $f
 done
 
 if [ $PACKAGE == "deb" ]
