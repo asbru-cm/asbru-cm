@@ -8,5 +8,5 @@ done
 
 if [ $PACKAGE == "deb" ]
 then
-	cloudsmith push ${PACKAGE} asbru-cm/snapshots/${OS}/${DIST} build/*.dsc --sources-file build/*.debian.tar.xz
+	cloudsmith push ${PACKAGE} asbru-cm/release/${OS}/${DIST} build/*.dsc --sources-file build/*.debian.tar.xz
 fi

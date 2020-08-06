@@ -68,6 +68,11 @@ deploy:
     script: scripts/deploy_snapshot.sh
     on:
       branch: master
+  - provider: script
+    skip_cleanup: true
+    script: scripts/deploy_release.sh
+    on:
+      tags: true
 
 
 after_deploy:
