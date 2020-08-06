@@ -8,25 +8,26 @@ env:
     - CHANGELOG_EMAIL=contact@asbru-cm.net
     - PRODUCT=asbru-cm
   matrix:
-    - OS=debian DIST=jessie PACKAGE=deb
-    - OS=debian DIST=stretch PACKAGE=deb
-    - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true
-    - OS=ubuntu DIST=xenial PACKAGE=deb
-    - OS=ubuntu DIST=bionic PACKAGE=deb
-    - OS=ubuntu DIST=eoan PACKAGE=deb
-    - OS=ubuntu DIST=focal PACKAGE=deb DOCKER_REPO=asbru/asbru-cm
-    - OS=fedora DIST=29 PACKAGE=rpm
-    - OS=fedora DIST=30 PACKAGE=rpm
-    - OS=fedora DIST=31 PACKAGE=rpm
-    - OS=fedora DIST=32 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm
-    - OS=el DIST=7 PACKAGE=rpm
-    - OS=el DIST=8 PACKAGE=rpm
-    - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch
-    - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch
-    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
-    - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
-    - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
-    - OS=linuxmint DIST=tricia PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic
+    - OS=debian DIST=jessie PACKAGE=deb PACKAGECLOUD=true
+    - OS=debian DIST=stretch PACKAGE=deb PACKAGECLOUD=true
+    - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true PACKAGECLOUD=true
+    - OS=ubuntu DIST=xenial PACKAGE=deb PACKAGECLOUD=true
+    - OS=ubuntu DIST=bionic PACKAGE=deb PACKAGECLOUD=true
+    - OS=ubuntu DIST=eoan PACKAGE=deb PACKAGECLOUD=true
+    - OS=ubuntu DIST=focal PACKAGE=deb DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
+    - OS=fedora DIST=29 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=30 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=31 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=32 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
+    - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
+    - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
+    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
+    - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
+    - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
+    - OS=linuxmint DIST=tricia PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
+    - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3 python3-pip python3-setuptools
@@ -45,6 +46,7 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       branch: master
+      condition: $PACKAGECLOUD = true
   - provider: packagecloud
     skip_cleanup: true
     repository: asbru-cm
@@ -54,6 +56,7 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       tags: true
+      condition: $PACKAGECLOUD = true
   - provider: packagecloud
     skip_cleanup: true
     repository: loki
@@ -63,6 +66,7 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       branch: loki
+      condition: $PACKAGECLOUD = true
   - provider: script
     skip_cleanup: true
     script: scripts/deploy_snapshot.sh
