@@ -62,6 +62,11 @@ deploy:
     package_glob: "build/*.{deb,rpm,dsc}"
     on:
       branch: loki
+  - provider: script
+    skip_cleanup: true
+    script: scripts/deploy_snapshot.sh
+    on:
+      branch: master
 
 
 after_deploy:
