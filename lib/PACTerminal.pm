@@ -539,24 +539,6 @@ sub stop {
         $PACMain::RUNNING{$$self{_SPLIT}}{terminal}->stop(1, 0);
     }
 
-    # Finish the GUI
-    if ($$self{_TABBED}) {
-        my $p_num = -1;
-        if ($$self{_SPLIT}) {
-            $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent());
-        } else {
-            $p_num = $$self{_NOTEBOOK}->page_num($p_widget);
-        }
-
-        # Skip destruction if this tab does not exists after having answered to _wConfirm
-        if ($p_num >= 0) {
-            $$self{_NOTEBOOK}->remove_page($p_num);
-        }
-    } else {
-        $$self{_WINDOWTERMINAL}->destroy();
-        undef($$self{_WINDOWTERMINAL});
-    }
-
     # Try to ensure we leave no background "asbru_conn" processes running after closing the terminal
     $self->_disconnectTerminal();
     if ($$self{_PID}) {
@@ -581,6 +563,24 @@ sub stop {
         };
     }
     $self->_stopEmbedKidnapTimeout();
+
+    # Finish the GUI
+    if ($$self{_TABBED}) {
+        my $p_num = -1;
+        if ($$self{_SPLIT}) {
+            $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent());
+        } else {
+            $p_num = $$self{_NOTEBOOK}->page_num($p_widget);
+        }
+
+        # Skip destruction if this tab does not exists after having answered to _wConfirm
+        if ($p_num >= 0) {
+            $$self{_NOTEBOOK}->remove_page($p_num);
+        }
+    } else {
+        $$self{_WINDOWTERMINAL}->destroy();
+        undef($$self{_WINDOWTERMINAL});
+    }
 
     unlink($$self{_TMPCFG});
     unlink($$self{_TMPPIPE});
