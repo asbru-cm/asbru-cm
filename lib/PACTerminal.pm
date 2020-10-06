@@ -308,8 +308,12 @@ sub start {
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
-        my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-        $kpxc->getMasterPassword($$self{_PARENTWINDOW});
+        if ($$self{_CFG}{defaults}{keepass}{password}) {
+            $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+        } else {
+            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+            $kpxc->getMasterPassword($$self{_PARENTWINDOW});
+        }
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
