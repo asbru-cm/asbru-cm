@@ -74,6 +74,15 @@ sub new {
     $self->{container} = undef;
     $self->{'last_timestamp'} = '';
 
+    if (!$KPXC_MP) {
+        if ($ENV{'KPXC_MP'}) {
+            $KPXC_MP = $ENV{'KPXC_MP'};
+        } elsif ($$self{cfg}{password}) {
+            $KPXC_MP = $$self{cfg}{password};
+            $ENV{'KPXC_MP'} = $$self{cfg}{password};
+        }
+    }
+
     _setCapabilities($self);
     if ($buildgui) {
         _buildKeePassGUI($self);
