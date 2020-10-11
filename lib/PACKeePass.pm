@@ -475,7 +475,7 @@ sub hasKeePassField {
         return 0;
     }
 
-    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
+    foreach my $fieldName ('user','pass','passphrase','passphrase user','ip','proxy pass','proxy user','jump ip','jump user','jump pass','proxy ip','proxy user','proxy pass') {
         if ($auth eq 'publickey' && ($fieldName eq 'user' || $fieldName eq 'pass')) {
             # Skip user and pass if public key authorization
             next;
@@ -483,14 +483,31 @@ sub hasKeePassField {
             # Skip passphrase if NOT public key authorization
             next;
         }
-        if ($self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
+        if ($$cfg{'environments'}{$uuid}{$fieldName} && $self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
+            return 1;
+        }
+        if (defined $$cfg{'defaults'}{$fieldName}) {
+            if ($$cfg{'defaults'}{$fieldName} && $self->isKeePassMask($$cfg{'defaults'}{$fieldName})) {
+                return 1;
+            }
+        }
+    }
+
+    # Search for keepass mask in expects
+    foreach my $exp (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
+        if ($self->isKeePassMask($$exp{'send'})) {
             return 1;
         }
     }
 
-    foreach my $exp (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
-        if ($self->isKeePassMask($$exp{'send'})) {
-            return 1;
+    # Search for keepass mask in global variables
+    my $gvars = $$cfg{'defaults'}{'global variables'};
+    foreach my $gvar (keys %$gvars) {
+        my $lgvars = $$cfg{'defaults'}{'global variables'}{$gvar};
+        foreach my $val (keys %$lgvars) {
+            if ($$cfg{'defaults'}{'global variables'}{$gvar}{$val} && $self->isKeePassMask($$cfg{'defaults'}{'global variables'}{$gvar}{$val})) {
+                return 1;
+            }
         }
     }
 
