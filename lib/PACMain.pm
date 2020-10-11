@@ -4134,8 +4134,8 @@ sub _cloneNodes {
 
     # Prevent cloning into a protected folder
     if (!defined($parent_uuid) || $$self{_CFG}{'environments'}{$parent_uuid}{_protected}) {
-        print("ERROR: Cannot duplicate into a protected folder [$$self{_CFG}{'environments'}{$parent_uuid}{name}]\n");
-        return _wMessage($$self{_GUI}{main}, "Cannot duplicate into a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$parent_uuid}{name}</b>");
+        print("ERROR: " . (defined($parent_uuid) ? "Cannot duplicate into a protected folder [$$self{_CFG}{'environments'}{$parent_uuid}{name}]\n" : "Cannot duplicate the root folder.\n"));
+        return _wMessage($$self{_GUI}{main}, (defined($parent_uuid) ? "Cannot duplicate into a protected folder:\n\n\t<b>$$self{_CFG}{'environments'}{$parent_uuid}{name}</b>" : "Cannot duplicate the root folder."));
     }
 
     # Actually perform cloning
