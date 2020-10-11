@@ -213,18 +213,19 @@ if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
         }
     }
 } else {
-    $USER = subst($USER);
-    $PASS = subst($PASS);
+    if ($AUTH eq 'publickey') {
+        $PASSPHRASE = subst($PASSPHRASE);
+        $PASSPHRASE_USER = subst($PASSPHRASE_USER);
+    } else {
+        $USER = subst($USER);
+        $PASS = subst($PASS);
+    }
 }
 
 # Translate variables, KeePassXC
 $TITLE = subst($TITLE,'GET_TITLE');
 $IP = subst($IP);
 $PORT = subst($PORT);
-if ($AUTH eq 'publickey') {
-    $PASSPHRASE = subst($PASSPHRASE);
-    $PASSPHRASE_USER = subst($PASSPHRASE_USER);
-}
 $$CFG{'environments'}{$UUID}{'proxy ip'}   = subst($$CFG{'environments'}{$UUID}{'proxy ip'});
 $$CFG{'environments'}{$UUID}{'proxy user'} = subst($$CFG{'environments'}{$UUID}{'proxy user'});
 $$CFG{'environments'}{$UUID}{'proxy pass'} = subst($$CFG{'environments'}{$UUID}{'proxy pass'});
