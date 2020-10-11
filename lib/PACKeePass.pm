@@ -469,12 +469,20 @@ sub hasKeePassField {
     my $uuid = shift;
     my $useKeePass = $$cfg{defaults}{keepass}{use_keepass} && $uuid ne '__PAC_SHELL__';
     my $kpxc;
+    my $auth = $$cfg{'environments'}{$uuid}{'auth type'};
 
     if (!$useKeePass) {
         return 0;
     }
 
     foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
+        if ($auth eq 'publickey' && ($fieldName eq 'user' || $fieldName eq 'pass')) {
+            # Skip user and pass if public key authorization
+            next;
+        } elsif ($auth ne 'publickey' && ($fieldName =~ /passphrase/)) {
+            # Skip passphrase if NOT public key authorization
+            next;
+        }
         if ($self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
             return 1;
         }
