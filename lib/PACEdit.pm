@@ -351,8 +351,12 @@ sub _setupCallbacks {
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
         # DevNote: please make sure to keep double quotes in "$RealBin/lib/asbru_conn" since it might be replaced by packagers (see RPM spec)
         if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
-            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-            $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+            if ($$self{_CFG}{defaults}{keepass}{password}) {
+                $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+            } else {
+                my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+                $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+            }
         }
         my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1, 'w-info');
@@ -371,6 +375,9 @@ sub _setupCallbacks {
 
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
+        if (!$ENV{'KPXC_MP'} && $$self{_CFG}{defaults}{keepass}{password}) {
+            $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+        }
         my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
         if ($selection) {
             # Commented for the time being, until keepassxc-cli team implements get the UUID

@@ -334,7 +334,12 @@ sub listEntries {
 
     if (!$KPXC_MP) {
         # Get Password user
-        getMasterPassword($self, $parent);
+        if ($$self{cfg}{password}) {
+            $KPXC_MP = $$self{cfg}{password};
+            $ENV{'KPXC_MP'} = $$self{cfg}{password};
+        } else {
+            getMasterPassword($self, $parent);
+        }
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
