@@ -3858,7 +3858,7 @@ sub _doShellEscape {
     my $str = shift;
 
     $str =~ s/([\$\\`"])/\\$1/g;
-    
+
     return $str;
 }
 

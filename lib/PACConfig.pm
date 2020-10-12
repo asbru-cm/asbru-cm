@@ -1040,6 +1040,25 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'jump user'} = _($self, 'entryCfgJumpUser')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'jump pass'} = _($self, 'entryCfgJumpPass')->get_chars(0, -1);
 
+    # Remove un used settings in network settings to avoid unexpected conflicts
+    if ($$self{_CFG}{'defaults'}{'proxy'} eq 'No') {
+        $$self{_CFG}{'defaults'}{'proxy ip'} = '';
+        $$self{_CFG}{'defaults'}{'proxy user'} = '';
+        $$self{_CFG}{'defaults'}{'proxy pass'} = '';
+        $$self{_CFG}{'defaults'}{'jump ip'} = '';
+        $$self{_CFG}{'defaults'}{'jump user'} = '';
+        $$self{_CFG}{'defaults'}{'jump pass'} = '';
+    } elsif ($$self{_CFG}{'defaults'}{'proxy'} eq 'Proxy') {
+        $$self{_CFG}{'defaults'}{'jump ip'} = '';
+        $$self{_CFG}{'defaults'}{'jump user'} = '';
+        $$self{_CFG}{'defaults'}{'jump pass'} = '';
+    } elsif ($$self{_CFG}{'defaults'}{'proxy'} eq 'Jump') {
+        $$self{_CFG}{'defaults'}{'proxy ip'} = '';
+        $$self{_CFG}{'defaults'}{'proxy user'} = '';
+        $$self{_CFG}{'defaults'}{'proxy pass'} = '';
+    }
+
+
     $$self{_CFG}{'defaults'}{'shell binary'} = _($self, 'entryCfgShellBinary')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell options'} = _($self, 'entryCfgShellOptions')->get_chars(0, -1);
     $$self{_CFG}{'defaults'}{'shell directory'} = _($self, 'entryCfgShellDirectory')->get_chars(0, -1);

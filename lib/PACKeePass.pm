@@ -334,7 +334,12 @@ sub listEntries {
 
     if (!$KPXC_MP) {
         # Get Password user
-        getMasterPassword($self, $parent);
+        if ($$self{cfg}{password}) {
+            $KPXC_MP = $$self{cfg}{password};
+            $ENV{'KPXC_MP'} = $$self{cfg}{password};
+        } else {
+            getMasterPassword($self, $parent);
+        }
     }
     # Create the dialog window,
     $w{window}{data} = Gtk3::Dialog->new_with_buttons(
@@ -469,20 +474,45 @@ sub hasKeePassField {
     my $uuid = shift;
     my $useKeePass = $$cfg{defaults}{keepass}{use_keepass} && $uuid ne '__PAC_SHELL__';
     my $kpxc;
+    my $auth = $$cfg{'environments'}{$uuid}{'auth type'};
 
     if (!$useKeePass) {
         return 0;
     }
 
-    foreach my $fieldName ('user', 'pass', 'passphrase', 'passphrase user', 'ip', 'proxy pass' , 'proxy user') {
-        if ($self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
+    foreach my $fieldName ('user','pass','passphrase','passphrase user','ip','proxy pass','proxy user','jump ip','jump user','jump pass','proxy ip','proxy user','proxy pass') {
+        if ($auth eq 'publickey' && ($fieldName eq 'user' || $fieldName eq 'pass')) {
+            # Skip user and pass if public key authorization
+            next;
+        } elsif ($auth ne 'publickey' && ($fieldName =~ /passphrase/)) {
+            # Skip passphrase if NOT public key authorization
+            next;
+        }
+        if ($$cfg{'environments'}{$uuid}{$fieldName} && $self->isKeePassMask($$cfg{'environments'}{$uuid}{$fieldName})) {
+            return 1;
+        }
+        if (defined $$cfg{'defaults'}{$fieldName}) {
+            if ($$cfg{'defaults'}{$fieldName} && $self->isKeePassMask($$cfg{'defaults'}{$fieldName})) {
+                return 1;
+            }
+        }
+    }
+
+    # Search for keepass mask in expects
+    foreach my $exp (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
+        if ($self->isKeePassMask($$exp{'send'})) {
             return 1;
         }
     }
 
-    foreach my $exp (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
-        if ($self->isKeePassMask($$exp{'send'})) {
-            return 1;
+    # Search for keepass mask in global variables
+    my $gvars = $$cfg{'defaults'}{'global variables'};
+    foreach my $gvar (keys %$gvars) {
+        my $lgvars = $$cfg{'defaults'}{'global variables'}{$gvar};
+        foreach my $val (keys %$lgvars) {
+            if ($$cfg{'defaults'}{'global variables'}{$gvar}{$val} && $self->isKeePassMask($$cfg{'defaults'}{'global variables'}{$gvar}{$val})) {
+                return 1;
+            }
         }
     }
 
