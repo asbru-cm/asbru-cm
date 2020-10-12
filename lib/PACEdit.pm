@@ -657,6 +657,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'} // '');
     _($self, 'entryCfgProxyConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
     _($self, 'entryCfgProxyConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'} // '');
+    _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'} // '');
     # Jump Server
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
@@ -888,6 +889,39 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'log timestamp'} = _($self, 'cbCfgLogTimestamp')->get_active;
 
+    # Remove lefovers from user in : network connections and authentication
+    if ($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass') {
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
+    } elsif ($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey') {
+        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
+    } else {
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
+    }
+
+    if ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1) {
+        # Use proxy
+        $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = '';
+    } elsif ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3) {
+        # Jump Server
+        $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = '';
+    } else {
+        # Global or direct connection
+        $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = '';
+    }
     ##################
     # Other options...
     ##################
