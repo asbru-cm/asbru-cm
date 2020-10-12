@@ -308,8 +308,12 @@ sub start {
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
-        my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-        $kpxc->getMasterPassword($$self{_PARENTWINDOW});
+        if ($$self{_CFG}{defaults}{keepass}{password}) {
+            $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+        } else {
+            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+            $kpxc->getMasterPassword($$self{_PARENTWINDOW});
+        }
     }
 
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
@@ -373,6 +377,9 @@ sub start {
         # Get available size for the embed window
         $$self{_CFG}{'tmp'}{'width'} = $$self{_GUI}{_VBOX}->get_allocated_width();
         $$self{_CFG}{'tmp'}{'height'} = $$self{_GUI}{_VBOX}->get_allocated_height() - $$self{_GUI}{bottombox}->get_allocated_height();
+        if (defined($$self{_GUI}{_MACROSBOX}) && $$self{_GUI}{_MACROSBOX}->get_visible()) {
+            $$self{_CFG}{'tmp'}{'height'} -= $$self{_GUI}{_MACROSBOX}->get_allocated_height();
+        }
         eval {
             $PACMain::FUNCS{_MAIN}{_GUI}{vboxCommandPanel}->get_visible() or $$self{_CFG}{'tmp'}{'width'} += $PACMain::FUNCS{_MAIN}{_GUI}{vboxCommandPanel}->get_allocated_width();
         };
