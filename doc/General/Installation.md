@@ -137,6 +137,9 @@ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh
 sudo dnf install asbru-cm
 ```
 
+## Windows 10
+It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/). The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
+
 ## Installation of legacy 5.x
 
 If you need to install the legacy v5 version of Ásbrú Connection Manager (using Gtk2 library), the legacy packages are still available.
