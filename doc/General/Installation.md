@@ -12,6 +12,9 @@ Our master and the snapshots are being kept as stable as possible. New features 
 
 Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in an unexpected manner to you.  This is somehow the same concept as the "[Debian sid](https://www.debian.org/releases/sid/)" release.
 
+## Windows 10
+It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/). The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
+
 ## Ubuntu
 **Master release**
 
@@ -136,9 +139,6 @@ To test the latest development package, use the following instructions:
 curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
 sudo dnf install asbru-cm
 ```
-
-## Windows 10
-It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/). The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
 
 ## Installation of legacy 5.x
 
