@@ -193,33 +193,39 @@ open_socket();
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     my ($ok);
     $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});
-    ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
-    if (!$ok) {
-        die "$USER";
-    }
-    ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
-    if (!$ok) {
-        die "$PASS";
-    }
-    ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
-    if (!$ok) {
-        die "$PASSPHRASE";
-    }
-    ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
-    if (!$ok) {
-        die "$PASSPHRASE_USER";
+    if ($AUTH eq 'publickey') {
+        ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
+        if (!$ok) {
+            die "$PASSPHRASE";
+        }
+        ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
+        if (!$ok) {
+            die "$PASSPHRASE_USER";
+        }
+    } else {
+        ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
+        if (!$ok) {
+            die "$USER";
+        }
+        ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
+        if (!$ok) {
+            die "$PASS";
+        }
     }
 } else {
-    $USER = subst($USER);
-    $PASS = subst($PASS);
+    if ($AUTH eq 'publickey') {
+        $PASSPHRASE = subst($PASSPHRASE);
+        $PASSPHRASE_USER = subst($PASSPHRASE_USER);
+    } else {
+        $USER = subst($USER);
+        $PASS = subst($PASS);
+    }
 }
 
 # Translate variables, KeePassXC
 $TITLE = subst($TITLE,'GET_TITLE');
 $IP = subst($IP);
 $PORT = subst($PORT);
-$PASSPHRASE = subst($PASSPHRASE);
-$PASSPHRASE_USER = subst($PASSPHRASE_USER);
 $$CFG{'environments'}{$UUID}{'proxy ip'}   = subst($$CFG{'environments'}{$UUID}{'proxy ip'});
 $$CFG{'environments'}{$UUID}{'proxy user'} = subst($$CFG{'environments'}{$UUID}{'proxy user'});
 $$CFG{'environments'}{$UUID}{'proxy pass'} = subst($$CFG{'environments'}{$UUID}{'proxy pass'});

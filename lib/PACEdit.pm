@@ -351,8 +351,12 @@ sub _setupCallbacks {
     _($self, 'btnEditGetCMD')->signal_connect('clicked' => sub {
         # DevNote: please make sure to keep double quotes in "$RealBin/lib/asbru_conn" since it might be replaced by packagers (see RPM spec)
         if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
-            my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
-            $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+            if ($$self{_CFG}{defaults}{keepass}{password}) {
+                $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+            } else {
+                my $kpxc = PACKeePass->new(0, $$self{_CFG}{defaults}{keepass});
+                $kpxc->getMasterPassword($$self{_WINDOWEDIT});
+            }
         }
         my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
         _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1, 'w-info');
@@ -371,6 +375,9 @@ sub _setupCallbacks {
 
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
+        if (!$ENV{'KPXC_MP'} && $$self{_CFG}{defaults}{keepass}{password}) {
+            $ENV{'KPXC_MP'} = $$self{_CFG}{defaults}{keepass}{password};
+        }
         my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
         if ($selection) {
             # Commented for the time being, until keepassxc-cli team implements get the UUID
@@ -650,6 +657,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy ip'} // '');
     _($self, 'entryCfgProxyConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'proxy port'} // 8080);
     _($self, 'entryCfgProxyConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy user'} // '');
+    _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'} // '');
     # Jump Server
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
@@ -881,6 +889,39 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'log timestamp'} = _($self, 'cbCfgLogTimestamp')->get_active;
 
+    # Remove lefovers from user in : network connections and authentication
+    if ($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass') {
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
+    } elsif ($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey') {
+        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
+    } else {
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
+    }
+
+    if ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 1) {
+        # Use proxy
+        $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = '';
+    } elsif ($$self{_CFG}{'environments'}{$uuid}{'use proxy'} == 3) {
+        # Jump Server
+        $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = '';
+    } else {
+        # Global or direct connection
+        $$self{_CFG}{'environments'}{$uuid}{'proxy ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'proxy pass'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump ip'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump user'} = '';
+        $$self{_CFG}{'environments'}{$uuid}{'jump pass'} = '';
+    }
     ##################
     # Other options...
     ##################
