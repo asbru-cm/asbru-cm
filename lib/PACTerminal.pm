@@ -42,6 +42,7 @@ use Encode qw (encode decode);
 use IO::Socket::INET;
 use Time::HiRes qw (gettimeofday);
 use PACKeePass;
+use List::Util qw(min max);
 
 # GTK
 use Gtk3 '-init';
@@ -1310,8 +1311,14 @@ sub _setupCallbacks {
 
         $$self{_PID} = 0;
 
-        if (($$self{_RESTART})&&($$self{_RECONNECTS} < 4)) {
-            sleep($$self{_RECONNECTS});
+        # Do retry on disconnect
+        if ($$self{_RESTART} && $$self{_RECONNECTS} < $$self{_CFG}{'defaults'}{'max retry on disconnect'}) {
+            if (!defined $$self{_RECONNECT_WAIT_TIME}) {
+                # Using a list of prime numbers to wait more after each retry
+                # (see http://neilk.net/blog/2000/06/01/abigails-regex-to-test-for-prime-numbers/)
+                @{$$self{_RECONNECT_WAIT_TIME}} = grep { $_ if (1 x $_) !~ /^1?$|^(11+?)\1+$/ } 1..500;
+            }
+            sleep($$self{_RECONNECT_WAIT_TIME}[min(@{$$self{_RECONNECT_WAIT_TIME}}, $$self{_RECONNECTS})]);
             $$self{_RECONNECTS}++;
             $self->start();
         } else {

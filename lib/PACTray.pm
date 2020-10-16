@@ -103,6 +103,18 @@ sub _initGUI {
     $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
     $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = $$self{_TRAY}->is_embedded() ? 1 : 'warning';
 
+    # Ensure the window is placed near the newly created icon
+    Gtk3::main_iteration() while Gtk3::events_pending();   # Update GUI
+    if ($$self{_TRAY}->get_visible()) {
+        my @geo = $$self{_TRAY}->get_geometry();
+        my $x = $geo[2]{x};
+        my $y = $geo[2]{y};
+
+        $$self{_MAIN}->_hideConnectionsList();
+        $$self{_MAIN}->_showConnectionsList();
+        $$self{_MAIN}{_GUI}{main}->move($x, $y);
+    }
+
     return 1;
 }
 
