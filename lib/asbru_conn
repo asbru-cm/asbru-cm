@@ -1319,13 +1319,14 @@ if (open(LOG,">:raw",$LOG_FILE)) {
 
 # Prepare command file that is only accessible to the user
 my $do_connection_cmd = $connection_cmd;
-my $cmd_file = "$CFG_DIR/tmp/cmd_$UUID.run";
+my $cmd_file = "$CFG_DIR/tmp/cmd_${UUID}_" . int(rand(123456789)) . ".run";
 if ($METHOD ne 'PACShell') {
-    open(my $CMD, ">:utf8", $cmd_file);
-    chmod(0400, $CMD);
-    print { $CMD } $connection_cmd;
-    close($CMD);
-    $do_connection_cmd = "sh $cmd_file";
+    if (open(my $CMD, ">:utf8", $cmd_file)) {
+        chmod(0400, $CMD);
+        print { $CMD } $connection_cmd;
+        close($CMD);
+        $do_connection_cmd = "sh $cmd_file";
+    }
 }
 
 # Spawn the session
@@ -1937,7 +1938,9 @@ elsif (!$MANUAL) {
 }
 
 # Once spawned, remove the temporary file (that may contain sensible information)
-unlink($cmd_file);
+if ($METHOD ne 'PACShell') {
+    unlink($cmd_file);
+}
 
 $SIG{'WINCH'} = sub {
     if (!$CONNECTED) {
