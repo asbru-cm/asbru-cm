@@ -72,15 +72,8 @@ To do so, execute the following commands:
   
 - Windows
 
-  Though it is currently unsupported running Ásbrú Connection Manager on Windows it is possible with a few addons.
-  Prior to this you need to install WSL and a working XServer on Windows (for example xlaunch).
-  Inside your WSL you can install the package asbru-cm (see Debian/Ubuntu).
-  Prior to running the command "asbru-cm" you will need to define your display:
-  ````
-  $ export DISPLAY=:0
-  ````
-  
-  For more information check out this article: https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx
+  It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/).
+  The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
   
 Once installed on your system, type ````asbru-cm```` in your terminal.
 
@@ -143,6 +136,10 @@ More questions can be found on the [dedicated project wiki page](https://github.
 If you want to contribute to Ásbrú Connection Manager, first check out the [issues](https://github.com/asbru-cm/asbru-cm/issues) and see if your request is not listed yet.  Issues and pull requests will be triaged and responded to as quickly as possible.
 
 Before contributing, please review our [contributing doc](https://github.com/asbru-cm/asbru-cm/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/asbru-cm/blob/master/CODE_OF_CONDUCT.md).
+
+### Financial support
+
+If you like Ásbrú Connection Manager, you may also consider supporting the project financially by donating on <a title="Donate Liberapay" href="https://liberapay.com/asbru-cm/donate">Liberapay</a> or by donating to one of <a href="">our cryptocurrency addresses</a>.
 
 ### License
 
