@@ -2041,6 +2041,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'show screenshots'} //= 1;
     $$cfg{'defaults'}{'back color'} //= '#000000000000';
     $$cfg{'defaults'}{'close terminal on disconnect'} //= '';
+    $$cfg{'defaults'}{'max retry on disconnect'} //= 50;
     $$cfg{'defaults'}{'close to tray'} //= 0;
     $$cfg{'defaults'}{'color black'} //= '#000000000000';
     $$cfg{'defaults'}{'color blue'} //=  '#34346565a4a4';
