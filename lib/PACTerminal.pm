@@ -1282,9 +1282,9 @@ sub _setupCallbacks {
             $self->_showEmbedMessages();
         }
 
-        if (defined $$self{_SOCKET_CLIENT}) {
-            $$self{_SOCKET_CLIENT}->close();
-        }
+        #if (defined $$self{_SOCKET_CLIENT}) {
+        #    $$self{_SOCKET_CLIENT}->close();
+        #}
         if (defined $$self{_SOCKET_CLIENT_EXEC}) {
             $$self{_SOCKET_CLIENT_EXEC}->close();
         }
