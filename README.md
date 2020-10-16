@@ -139,7 +139,7 @@ Before contributing, please review our [contributing doc](https://github.com/asb
 
 ### Financial support
 
-If you like Ásbrú Connection Manager, you may also consider supporting the project financially by donating on <a title="Donate Liberapay" href="https://liberapay.com/asbru-cm/donate">Liberapay</a> or by donating to one of <a href="">our cryptocurrency addresses</a>.
+If you like Ásbrú Connection Manager, you may also consider supporting the project financially by donating on <a title="Donate Liberapay" href="https://liberapay.com/asbru-cm/donate">Liberapay</a> or by donating to one of <a href="https://docs.asbru-cm.net/Contributing/Financial_Contribution/">our cryptocurrency addresses</a>.
 
 ### License
 
