@@ -66,6 +66,7 @@ sub new {
     $self->{parent} = shift;
     $self->{container} = undef;
     $self->{hotkey} = {};
+    $self->{verbose} = 0;
 
     _buildGUI($self);
 
@@ -338,18 +339,39 @@ sub get_cfg {
 ###################################################################
 # START: Private Methods
 
+# Check if we have a new keybinding in the default configuration that needs to be added
+# This is required to add the new keybindings that were not existing when the current
+# configuration has been created.
 sub _updateConfig {
     my $self = shift;
     my $default_cfg = shift // $self->_getDefaultConfig();
+    my %keybindings = ();
 
+    # List all keybindings in default configurating
     foreach my $w (keys %$default_cfg) {
         my $wk = $$default_cfg{$w};
         foreach my $k (keys %$wk) {
-            if (!defined ${$self->{cfg}}{$w}{$k}) {
-                print("WARN: Adding new keybinding [$k] for [$$wk{$k}[0]]/[$$wk{$k}[2]]...\n");
-                ${$self->{cfg}}{$w}{$k} = $$wk{$k};
+            my $action = $$wk{$k}[1];
+            %{$keybindings{"$w-$action"}} = ('window' => $w, 'key' => $k);
+        }
+    }
+    # Remove all used keybindings defined in the current configuration
+    foreach my $w (keys %{$self->{cfg}}) {
+        my $wk = %{$self->{cfg}}{$w};
+        foreach my $k (keys %$wk) {
+            my $action = $$wk{$k}[1];
+            if (defined($keybindings{"$w-$action"})) {
+                delete $keybindings{"$w-$action"};
             }
         }
+    }
+    # Any remaining keybinding is a newly added keybinding that needs to be added to the current configuration
+    foreach my $ka (keys %keybindings) {
+        my $k = $keybindings{$ka}{key};
+        my $w = $keybindings{$ka}{window};
+        my $wk = $$default_cfg{$w};
+        print("WARN: Adding new keybinding [$k] for [$$wk{$k}[0]]/[$$wk{$k}[2]]...\n");
+        ${$self->{cfg}}{$w}{$k} = $$wk{$k};
     }
 }
 
@@ -511,7 +533,10 @@ sub _buildGUI {
         my ($window,$desc,$keybind,$action,$pacwin) = $model->get($model->get_iter($paths[0]));
         my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
 
-        #print "$keyval, $unicode, $keymask\n"; print "ROW:$window : $desc : $keybind : $action : $pacwin\n";
+        if ($self->{verbose}) {
+            print "INFO: KEY: $keyval, $unicode, $keymask\n";
+            print "INFO: ROW: $window : $desc : $keybind : $action : $pacwin\n";
+        }
 
         if (!$keymask && ($unicode == 8 || $unicode == 127)) {
             $self->_updateKeyBinding($selection,$model,$paths[0],"undef-$action",$pacwin,$keybind,$action);
