@@ -58,9 +58,11 @@ nav:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md
       - Code of conduct: Contributing/CODE_OF_CONDUCT.md
+      - Financially: Contributing/Financial_Contribution.md
 
 markdown_extensions:
     - admonition
+    - attr_list
     - toc:
         permalink: true
         toc_depth: 6

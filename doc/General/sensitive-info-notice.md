@@ -1,10 +1,11 @@
 ## Sensitive information 
 
 ### Using 'hidden' flag in GUI
-When a user sets a string as 'hidden' in 'EXPECT', then in config or in backups of config (i.e. $HOME/.config/pac/bak/pac.yml.0) there're
-strings like '53616c7-omited-848993645' inplace. These strings represent user input encoded, not encrypted.
+
+When a user sets a string as 'hidden' in 'EXPECT', then in config or in backups of config (i.e. $HOME/.config/pac/bak/asbru.yml.0) there're strings like '53616c7-omited-848993645' inplace. These strings represent user input encoded, not encrypted.
 
 ### GUI password
+
 GUI password does NOT encrypts your config entries - it alters only GUI window & startup - GUI window asks for a password.
 
 There is no real protection of your sensitive data provided by Ásbrú. It is simply encoded but can be decoded easily.

@@ -105,23 +105,28 @@ This commands will be executed immediately __before__ (Pre) the connection is la
 
 ![](images/ssh9.png)
 
-
 This commands are executed in the local computer, not on the remote terminal.
 
-You may add many commands, and configure which command will be the default, and if Ásbrú should ask before executing it.
+You may add as many commands as needed.  When the option `Ask` is checked, Ásbrú will ask to confirm which command needs to be executed.  When the option `Default` is checked, the command will be proposed to be executed by default.  If both `Ask` and `Default` are unchecked, the command will never be executed.
 
 !!! danger "Important"
     The terminal interaction and login will be frozen until the external application is finished. Or is demonized.
 
-Example, before launching the terminal start a __local__ apache server
+**Variables**
+
+Variable [substitution](../Substitutions.md) can be used to create dynamic commands.
+
+**Example 1**
+
+Before launching the terminal start a __local__ apache server
 
 ![](images/exec9.png)
 
-After closing the terminal, execute pdfshufler
+**Example 2**
+
+After closing the terminal, execute `pdfshufler`
 
 ![](images/exec10.png)
-
-Execution examples, with a gtk application to see the results.
 
 Pre exec is configured to ask, is waiting for you to execute an available command from the list.
 

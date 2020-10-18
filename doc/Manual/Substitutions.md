@@ -2,9 +2,12 @@
 
 Inside many fields, values can be represented as masks. And this masks will be substituted by their real value at the time of a connection.
 
-These masks can be included in fields like : Global variables, local or remote commands, expects, some connection parameters.
+These masks can be included in fields like : Global variables, local or remote commands, pre- and post execution commands, expects, some connection parameters.
 
-The general format of the mask is `<[(Name|Type):]VALUE>`
+By right clicking on the input field, a wizard will help you building the substitution mask:
+![Wizard for variable substitution](images/subst3.png)
+
+The general format of the mask is `<[(Name|Type):]VALUE>`.
 
 ## Internal Variables
 
@@ -58,20 +61,20 @@ Will prompt user to enter data and use that data for substitution
 |description|value               |textbox with predefined value        |
 |description                     |textbox empty                        |
 
-__Example:__
+**Example**
 
 Lets say that you want to use a connection configuration with 2 different servers, but you do not want to have 2 separate configurations for this.
 
 The only thing that changes is the IP
 
-Create an ASK Mask in your Host entry like this : `<ASK:Select host|destination1.com|destination2.com|...>`
+Create an ASK mask in your host entry like this : `<ASK:Select host|destination1.com|destination2.com|...>`
 
-![](images/subst1.png)
+![Create an ASK mask](images/subst1.png)
 
 
 When you connect the terminal will prompt you to select an IP from the previous list that you created.
 
-![](images/subst2.png)
+![Ask mask prompt](images/subst2.png)
 
 ## CMD
 
@@ -94,4 +97,3 @@ Example
 `<title|/banks/tdc/0000>`
 
 For a full reference on how to use [KeePass Integration ](Preferences/KeePassXC.md)
-
