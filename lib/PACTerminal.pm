@@ -1045,12 +1045,13 @@ sub _setupCallbacks {
         } elsif ($action eq 'copy') {
             $$self{_GUI}{_VTE}->copy_clipboard();
         } elsif ($action eq 'paste') {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_clipboard();
+        } elsif ($action eq 'paste-primary') {
+            $$self{_GUI}{_VTE}->paste_primary();
         } elsif ($action eq 'paste-passwd' && ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' || $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
             $self->_pasteConnectionPassword();
         } elsif ($action eq 'paste-delete') {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -1058,7 +1059,7 @@ sub _setupCallbacks {
                 '\n|\f|\r'
             ) or return 1;
             $text =~ s/$delete//g;
-            $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
+            _vteFeedChild($$self{_GUI}{_VTE}, $text);
         } elsif ($action eq 'hostname') {
             ($$self{CONNECTED} && !$$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
         } elsif ($action eq 'close' && !$$self{_TABBED}) {
@@ -1133,8 +1134,7 @@ sub _setupCallbacks {
             if (!$$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'}) {
                 return 0;
             }
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_primary();
             $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             return 1;
         } elsif ($event->button eq 3 and $event -> type eq 'button-press') {
@@ -2033,10 +2033,9 @@ sub _vteMenu {
         label => 'Paste',
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste'),
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available(),
         code => sub {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{environments}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_clipboard();
         }
     });
     # Paste Current Connection Password
@@ -2058,9 +2057,9 @@ sub _vteMenu {
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste-delete'),
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available(),
         code => sub {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -2068,7 +2067,7 @@ sub _vteMenu {
                 '\n|\f|\r'
             ) or return 1;
             $text =~ s/$delete//g;
-            $self->_pasteToVte($text, $$self{_CFG}{environments}{$$self{_UUID}}{'send slow'} || 1);
+            _vteFeedChild($$self{_GUI}{_VTE}, $text);
         }
     });
 
@@ -2261,26 +2260,6 @@ sub _vteMenu {
 
     _wPopUpMenu(\@vte_menu_items, $event);
     return 1;
-}
-
-sub _pasteToVte {
-    my $self = shift;
-    my $txt = shift // '';
-    my $slow = shift // 0;
-
-    if (!$txt) {
-        return 1;
-    }
-
-    if ($slow) {
-        foreach my $char (split('', $txt)) {
-            _vteFeedChild($$self{_GUI}{_VTE}, $char);
-            Gtk3::main_iteration() while Gtk3::events_pending();
-            select(undef, undef, undef, $slow / 1000);
-        }
-    } else {
-        $$self{_GUI}{_VTE}->paste_primary();
-    }
 }
 
 sub _setTabColour {
@@ -3921,7 +3900,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnCopy} = Gtk3::Button->new_from_stock('gtk-copy');
     $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnCopy}, 1, 1, 0);
     $w{window}{gui}{btnCopy}->signal_connect('clicked' => sub {
-        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->set_text (
+        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->set_text (
             join(
             "\n",
             map $w{window}{gui}{treefound}{data}[$_][1],
@@ -4260,7 +4239,7 @@ sub _pasteConnectionPassword {
         my $kpxc = $PACMain::FUNCS{_KEEPASS};
         $pass = $kpxc->applyMask($pass);
     }
-    $self->_pasteToVte($pass, 1);
+    _vteFeedChild($$self{_GUI}{_VTE}, $pass);
 }
 
 sub _checkEmbedWindow {
@@ -4457,15 +4436,6 @@ Validate the socket connection is from Asbru application and not some other proc
 =head2 sub _vteMenu
 
 Display the popup Terminal menu on [shift] - right click
-
-=head2 sub _pasteToVte
-
-Takes information from the clipboard and sends it to the terminal
-
-    if slow : Use _vteFeedChild
-    else {_GUI}{_VTE}->paste_primary
-
-with _vteFeedChild
 
 =head2 sub _setTabColour
 
