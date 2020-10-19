@@ -261,7 +261,7 @@ sub new {
 
     # Check if only one instance is allowed
 
-    if ($$self{_APP}->get_is_remote) {
+    if ($$self{_APP}->get_is_remote()) {
         print "INFO: Ásbrú is already running.\n";
 
         my $getout = 0;
@@ -3741,7 +3741,7 @@ sub _updateGUIPreferences {
     if ($UNITY) {
         (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
     } else {
-        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'});
+        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
     }
 
     $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
@@ -3932,7 +3932,10 @@ sub _showConnectionsList {
 sub _hideConnectionsList {
     my $self = shift;
 
-    ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position();
+    if ($$self{_GUI}{main}->get_visible()) {
+        ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position();
+    }
+
     $$self{_GUI}{main}->hide();
 }
 
