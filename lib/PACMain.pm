@@ -1082,6 +1082,21 @@ sub _initGUI {
         $self->_updateGUIHistory();
     }
 
+    # Ensure the window is placed near the newly created icon (in compact mode only)
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+        # Update GUI
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my $x = $geo[2]{x};
+        my $y = $geo[2]{y};
+
+        if ($x > 0 || $y > 0) {
+            $$self{_GUI}{posx} = $x;
+            $$self{_GUI}{posy} = $y;
+        }
+    }
+
     return 1;
 }
 
@@ -3933,7 +3948,10 @@ sub _hideConnectionsList {
     my $self = shift;
 
     if ($$self{_GUI}{main}->get_visible()) {
-        ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position();
+        my ($x, $y) = $$self{_GUI}{main}->get_position();
+        if ($x > 0 || $y > 0) {
+            ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = ($x, $y);
+        }
     }
 
     $$self{_GUI}{main}->hide();
