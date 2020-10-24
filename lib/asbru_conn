@@ -172,7 +172,7 @@ my $EXPECT = defined $$CFG{'environments'}{$UUID}{'expect'};
 my $USE_PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use prepend command'};
 my $PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'prepend command'};
 my $QUOTE_COMMAND = $$CFG{'environments'}{$UUID}{'quote command'} && $USE_PREPEND_COMMAND;
-my $MANUAL = $$CFG{'environments'}{$UUID}{'auth type'} eq 'manual';
+my $MANUAL = ($$CFG{'environments'}{$UUID}{'auth type'} // '') eq 'manual';
 my $TMP_UUID = $$CFG{'tmp'}{'uuid'};
 my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
@@ -185,11 +185,16 @@ if (!$RESTART && $IS_CLUSTER) {
     $RESTART = 2;
 }
 
-my $kpxc;
+# Checks that session ID is still known in 'environements' ; otherwise abort immediately
+if (!defined($NAME)) {
+    print("$COLOR{'err'}ERROR: Session '$UUID' is invalid.$COLOR{'norm'}\n");
+    exit;
+}
 
 open_socket();
 
 # Use keepass ?
+my $kpxc;
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
     my ($ok);
     $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});

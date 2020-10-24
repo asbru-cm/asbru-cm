@@ -306,6 +306,17 @@ sub start {
     if ($$self{CONNECTED} || $$self{CONNECTING}) {
         return 1;
     }
+    my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
+    my $title = $$self{_TITLE};
+    my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
+    my $reconnect_msg = '';
+    my $reconnect_count = '';
+
+    # Check that session information is still valid
+    if (!defined($name)) {
+        # Session is invalid for some reason, ignore
+        return 0;
+    }
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
@@ -316,12 +327,6 @@ sub start {
             $kpxc->getMasterPassword($$self{_PARENTWINDOW});
         }
     }
-
-    my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = $$self{_TITLE};
-    my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
-    my $reconnect_msg = '';
-    my $reconnect_count = '';
 
     if ($$self{'_RECONNECTS'}) {
         $reconnect_msg = 'RE';
@@ -1273,7 +1278,14 @@ sub _setupCallbacks {
         $$self{CONNECTED} = 0;
         $$self{CONNECTING} = 0;
 
-        my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        # Show a "reconnect" message
+        my $string = "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        if (!defined($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'})) {
+            # Likely the session has been deleted from 'environments', there is no way to restart this session
+            $string = "THIS CONNECTION IS NOT AVAILABLE ANYMORE";
+        } elsif ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic') {
+            $string = "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)";
+        }
         if (defined $$self{_GUI}{_VTE}) {
             _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
