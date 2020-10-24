@@ -357,7 +357,8 @@ sub _updateConfig {
     }
     # Remove all used keybindings defined in the current configuration
     foreach my $w (keys %{$self->{cfg}}) {
-        my $wk = %{$self->{cfg}}{$w};
+        my $cfg = $self->{cfg};
+        my $wk = $$cfg{$w};
         foreach my $k (keys %$wk) {
             my $action = $$wk{$k}[1];
             if (defined($keybindings{"$w-$action"})) {
