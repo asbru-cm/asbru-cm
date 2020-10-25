@@ -3332,17 +3332,29 @@ sub _saveConfiguration {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my $normal = shift // 1;
+    my %tmp_sessions;
 
+    # Purge screenshots
     _purgeUnusedOrMissingScreenshots($cfg);
+    # Keep a reference to the temporary sessions
+    # (since they will be deleted by _cfgSanityCheck as we don't want to persist those on disk)
+    %tmp_sessions = _cfgGetTmpSessions($cfg);
+    # Cleanup the configuration before saving (sanityu check + remove of temporary sessions)
     _cfgSanityCheck($cfg);
+    # Do not keep passwords in plain text in the configuration
     _cipherCFG($cfg);
+    # Do store the configuration on disk
     nstore($cfg, $CFG_FILE_NFREEZE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$CFG_FILE_NFREEZE':\n\n$!");
     if ($R_CFG_FILE) {
         nstore($cfg, $R_CFG_FILE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$R_CFG_FILE':\n\n$!\n\nLocal copy saved at '$CFG_FILE_NFREEZE'");
     }
+    # Restore passwords
     _decipherCFG($cfg);
-
+    # Restore the temporary sessions
+    _cfgAddSessions($cfg, \%tmp_sessions);
+    # Save tree positions
     $self->_saveTreeExpanded();
+    # Save satistics
     $$self{_GUI}{statistics}->saveStats();
 
     $normal and $self->_setCFGChanged(0);

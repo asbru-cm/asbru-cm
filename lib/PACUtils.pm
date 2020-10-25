@@ -80,6 +80,8 @@ require Exporter;
     _wExecEntry
     _cfgCheckMigrationV3
     _cfgSanityCheck
+    _cfgGetTmpSessions
+    _cfgAddSessions
     _updateSSHToIPv6
     _cipherCFG
     _decipherCFG
@@ -2570,6 +2572,28 @@ sub _cfgSanityCheck {
     return 1;
 }
 
+sub _cfgGetTmpSessions {
+    my $cfg = shift;
+    my %tmp;
+
+    foreach my $uuid (keys %{$$cfg{'environments'}}) {
+        if ($uuid =~ /^(HASH|_tmp_|pacshell_PID)/go) {
+            $tmp{$uuid} = $$cfg{'environments'}{$uuid};
+        }
+    }
+
+    return %tmp;
+}
+
+sub _cfgAddSessions {
+    my $cfg = shift;
+    my $tmp = shift;
+
+    foreach my $uuid (keys %{$tmp}) {
+        $$cfg{'environments'}{$uuid} = $tmp->{$uuid};
+    }
+}
+
 sub _updateSSHToIPv6 {
     my $cmd_line = shift // '';
 
@@ -3992,7 +4016,15 @@ Sets the Application password
 
 =head2 sub _cfgSanityCheck
 
-Configuration Checks
+Sanitize the configuration and delete temporary sessions that should not be persisted
+
+=head2 sub _cfgGetTmpSessions
+
+Extract the temporary sessions from the configuration.  Those sessions will be deleted by _cfgSanityCheck
+
+=head2 sub _cfgAddSessions
+
+Restore a list of sessions to the configuration.
 
 =head2 sub _updateSSHToIPv6
 
