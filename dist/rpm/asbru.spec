@@ -53,7 +53,10 @@ Requires:   perl-Crypt-Rijndael
 Requires:   perl-IO-Tty
 Requires:   perl-IO-Stty
 Requires:   libwnck3
+%if 0%{?el7}
+%else
 Suggests:   perl-X11-GUITest
+%endif
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
