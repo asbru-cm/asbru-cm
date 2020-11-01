@@ -40,7 +40,7 @@ script:
     - bash scripts/deploy_docs.sh
 deploy:
   - provider: packagecloud
-    cleanup: false
+    skip_cleanup: true
     repository: snapshots
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
@@ -50,7 +50,7 @@ deploy:
       branch: master
       condition: $PACKAGECLOUD = true
   - provider: packagecloud
-    cleanup: false
+    skip_cleanup: true
     repository: asbru-cm
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
@@ -60,7 +60,7 @@ deploy:
       tags: true
       condition: $PACKAGECLOUD = true
   - provider: packagecloud
-    cleanup: false
+    skip_cleanup: true
     repository: loki
     username: ${PACKAGECLOUD_USER}
     token: ${PACKAGECLOUD_TOKEN}
@@ -70,12 +70,12 @@ deploy:
       branch: loki
       condition: $PACKAGECLOUD = true
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: scripts/deploy_snapshot.sh
     on:
       branch: master
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: scripts/deploy_release.sh
     on:
       tags: true
