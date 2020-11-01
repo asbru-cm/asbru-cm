@@ -14,11 +14,13 @@ env:
     - OS=ubuntu DIST=xenial PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=bionic PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=eoan PACKAGE=deb PACKAGECLOUD=true
-    - OS=ubuntu DIST=focal PACKAGE=deb DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
+    - OS=ubuntu DIST=focal PACKAGE=deb PACKAGECLOUD=true
+    - OS=ubuntu DIST=groovy PACKAGE=deb DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=false
     - OS=fedora DIST=29 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=30 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=31 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=fedora DIST=32 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
+    - OS=fedora DIST=32 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=33 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=false
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
