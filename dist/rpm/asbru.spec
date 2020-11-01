@@ -44,7 +44,6 @@ Requires:   perl(strict)
 Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
-Requires:   perl-X11-GUITest
 Requires:   vte291
 Requires:   ftp
 Requires:   telnet
@@ -54,6 +53,7 @@ Requires:   perl-Crypt-Rijndael
 Requires:   perl-IO-Tty
 Requires:   perl-IO-Stty
 Requires:   libwnck3
+Suggests:   perl-X11-GUITest
 BuildRequires: pkgconfig
 BuildRequires: bash-completion
 BuildRequires: desktop-file-utils
