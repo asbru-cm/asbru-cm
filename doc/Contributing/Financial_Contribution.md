@@ -14,7 +14,7 @@ Even small or symbolic donation will be greatly appreciated.  You can stop at an
 
 ## Cryptocurrencies
 
-The Ásbrú Connection Manager project also accepts donations throught the following cryptocurrency wallets:
+The Ásbrú Connection Manager project also accepts donations to the following cryptocurrency wallets:
 
 ![Bitcoin](images/bitcoin.svg){: width=48 style="vertical-align:middle; margin-right: 12px;" }<a href="bitcoin:19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45">19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45</a>
 
