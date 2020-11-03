@@ -1143,7 +1143,7 @@ sub _saveConfiguration {
     if (_($self, 'cbCfgAutoStart')->get_active()) {
         my $autostart_dir = "$ENV{HOME}/.config/autostart";
 
-        $PACUtils::PACDESKTOP[6] = 'Exec=/usr/bin/asbru-cm --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
+        $PACUtils::PACDESKTOP[6] = 'Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --no-splash' . ($$self{_CFG}{'defaults'}{'start iconified'} ? ' --iconified' : '');
         if (!-e $autostart_dir) {
             mkdir($autostart_dir);
         }

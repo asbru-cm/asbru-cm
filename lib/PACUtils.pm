@@ -219,7 +219,7 @@ our @PACDESKTOP = (
     'Terminal=false',
     'Icon=pac',
     'Type=Application',
-    'Exec=/usr/bin/asbru-cm --no-splash',
+    'Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --no-splash',
     'StartupNotify=false',
     'Name[en_US]=Ásbrú Connection Manager',
     'Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks',
@@ -3654,7 +3654,7 @@ sub _makeDesktopFile {
     $d .= "Terminal=false\n";
     $d .= "Icon=pac\n";
     $d .= "Type=Application\n";
-    $d .= "Exec=/usr/bin/asbru-cm\n";
+    $d .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm\n";
     $d .= "StartupNotify=true\n";
     $d .= "Name[en_US]=Ásbrú Connection Manager\n";
     $d .= "Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks\n";
@@ -3663,13 +3663,13 @@ sub _makeDesktopFile {
     my $dal = 'Actions=Shell;Quick;Preferences;';
     my $da = "\n[Desktop Action Shell]\n";
     $da .= "Name=<Start local shell>\n";
-    $da .= "Exec=asbru-cm --start-shell\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --start-shell\n";
     $da .= "\n[Desktop Action Quick]\n";
     $da .= "Name=<Quick connect...>\n";
-    $da .= "Exec=asbru-cm --quick-conn\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --quick-conn\n";
     $da .= "\n[Desktop Action Preferences]\n";
     $da .= "Name=<Open Preferences...>\n";
-    $da .= "Exec=asbru-cm --preferences\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --preferences\n";
 #    my $action = 0;
 #    foreach my $uuid (keys %{$$cfg{environments}}) {
 #        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
