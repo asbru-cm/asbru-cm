@@ -78,7 +78,7 @@ deploy:
     skip_cleanup: true
     script: scripts/deploy_loki.sh
     on:
-      branch: loki      
+      branch: loki
   - provider: script
     skip_cleanup: true
     script: scripts/deploy_release.sh
