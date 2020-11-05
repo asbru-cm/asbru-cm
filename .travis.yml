@@ -71,12 +71,12 @@ deploy:
       condition: $PACKAGECLOUD = true
   - provider: script
     skip_cleanup: true
-    script: scripts/deploy_snapshot.sh
+    script: scripts/deploy.sh snapshots
     on:
       branch: master
   - provider: script
     skip_cleanup: true
-    script: scripts/deploy_release.sh
+    script: scripts/deploy.sh release
     on:
       tags: true
 
