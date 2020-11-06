@@ -38,7 +38,7 @@
 
 ### Installation
 
-We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [packagecould.io](https://packagecloud.io/).
+We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [cloudsmith.io](https://cloudsmith.io/).
 
 To do so, execute the following commands:
 
@@ -85,18 +85,22 @@ Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in a
 
 You are welcome to contribute and test by checking out "loki" or by installing our builds.
 
+If you do not wish to run third party scripts on your systems, you can always access manual install instructions at https://cloudsmith.io/~asbru-cm/repos/loki/setup/
+
 - Debian / Ubuntu
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
+   curl -1sLf \
+  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' \
+  | sudo -E bash
   ````
 
 - Fedora
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
+   curl -1sLf \
+  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' \
+  | sudo -E bash
   ````
 
 
