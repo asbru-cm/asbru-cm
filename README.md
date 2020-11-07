@@ -45,14 +45,14 @@ To do so, execute the following commands:
 - Debian / Ubuntu
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
   $ sudo apt-get install asbru-cm
   ````
 
 - Fedora
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
+  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.rpm.sh' | sudo -E bash
   $ sudo dnf install asbru-cm
   ````
 
@@ -90,17 +90,13 @@ If you do not wish to run third party scripts on your systems, you can always ac
 - Debian / Ubuntu
 
   ````
-   curl -1sLf \
-  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' \
-  | sudo -E bash
+   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' | sudo -E bash
   ````
 
 - Fedora
 
   ````
-   curl -1sLf \
-  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' \
-  | sudo -E bash
+   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' | sudo -E bash
   ````
 
 

@@ -1,3 +1,10 @@
+asbru-cm (6.2.2-1) stable; urgency=medium
+
+  * Upstream 6.2.2 release
+  * Moved repositories from Packagecloud to Cloudsmith
+
+ -- Ásbrú Project Team <contact@asbru-cm.net>  Sat, 07 Nov 2020 12:00:00 +0100
+ 
 asbru-cm (6.2.1-1) stable; urgency=medium
 
   * Upstream 6.2.1 release
