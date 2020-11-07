@@ -4814,7 +4814,6 @@ sub _setVteCapabilities {
     $$self{_Vte}{vte_feed_child} = 0;
     eval {
         $vte->feed_child('abc', 3);
-        1;
     } or do {
         $$self{_Vte}{vte_feed_child} = 1;
     };
