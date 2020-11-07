@@ -4813,8 +4813,8 @@ sub _setVteCapabilities {
     #  See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501)
     $$self{_Vte}{vte_feed_child} = 0;
     eval {
+        local $SIG{__WARN__} = sub { die @_ };
         $vte->feed_child('abc', 3);
-        1;
     } or do {
         $$self{_Vte}{vte_feed_child} = 1;
     };
