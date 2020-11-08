@@ -939,29 +939,31 @@ sub _setupCallbacks {
     # Info button event (if any)
     if ($$self{_GUI}{btnShowInfoTab}) {
         $$self{_GUI}{btnShowInfoTab}->signal_connect('clicked', sub {
-            $self->_showInfoTab ();
+            $self->_showInfoTab();
         });
     }
 
     # Mouse move in out VTE events
-    $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE}->signal_connect('motion_notify_event', sub {
-        if ($$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+    if ($$self{_CFG}{defaults}{'tabs in main window'}) {
+        $$self{_GUI}{_VTE}->signal_connect('motion_notify_event', sub {
+            if ($$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+                return 0;
+            }
+            my @geo = $$self{_GUI}{_VTE}->get_window()->get_geometry();
+            if ($$self{_CFG}{defaults}{'tree on right side'}) {
+                if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child1()) eq $$self{_GUI}{_VBOX}) && !$$self{_SPLIT_VERTICAL}) {
+                    return 0;
+                }
+                $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x >= ($geo[2] - 30));
+            } else {
+                if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child2()) eq $$self{_GUI}{_VBOX}) && !$$self{_SPLIT_VERTICAL}) {
+                    return 0;
+                }
+                $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x <= 10);
+            }
             return 0;
-        }
-        my @geo = $$self{_GUI}{_VTE}->get_window()->get_geometry();
-        if ($$self{_CFG}{defaults}{'tree on right side'}) {
-            if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child1) eq $$self{_GUI}{_VBOX}) && ! $$self{_SPLIT_VERTICAL}) {
-                return 0;
-            }
-            $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x >= ($geo[2] - 30));
-        } else {
-            if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child2) eq $$self{_GUI}{_VBOX}) && ! $$self{_SPLIT_VERTICAL}) {
-                return 0;
-            }
-            $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x <= 10);
-        }
-        return 0;
-    });
+        });
+    }
 
     # ------------------------------
     # Register callbacks from VTE
@@ -1175,7 +1177,10 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
         $self->_clusterCommit(@_);
     });
-    $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
+    $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {
+        $$self{_NEW_DATA} = 1;
+        $self->_setTabColour();
+    });
 
     # Capture Drag and Drop events
     my @targets = (Gtk3::TargetEntry->new('Ásbrú Connect', [], 0));

@@ -93,15 +93,15 @@ sub update {
     $$self{frame}{lblPR}->set_markup('');
     $$self{frame}{lblPG}->set_markup('');
     $$self{frame}{lblPN}->set_markup('');
-    $$self{frame}{hboxPACRoot}->hide;
-    $$self{frame}{hboxPACGroup}->hide;
-    $$self{frame}{hboxPACNode}->hide;
+    $$self{frame}{hboxPACRoot}->hide();
+    $$self{frame}{hboxPACGroup}->hide();
+    $$self{frame}{hboxPACNode}->hide();
 
     # Show/Hide widgets
     if ($uuid eq '__PAC__ROOT__') {
-        $$self{frame}{hboxPACRoot}->show;
-        $$self{frame}{hboxPACGroup}->hide;
-        $$self{frame}{hboxPACNode}->hide;
+        $$self{frame}{hboxPACRoot}->show();
+        $$self{frame}{hboxPACGroup}->hide();
+        $$self{frame}{hboxPACNode}->hide();
 
         my $groups = 0;
         my $nodes = 0;
@@ -139,9 +139,9 @@ sub update {
             "Total time connected:          <b>$str_total_time</b></span>"
         );
     } elsif ($$cfg{environments}{$uuid}{_is_group}) {
-        $$self{frame}{hboxPACRoot}->hide;
-        $$self{frame}{hboxPACGroup}->show;
-        $$self{frame}{hboxPACNode}->hide;
+        $$self{frame}{hboxPACRoot}->hide();
+        $$self{frame}{hboxPACGroup}->show();
+        $$self{frame}{hboxPACNode}->hide();
 
         my $groups = 0;
         my $nodes = 0;
@@ -174,9 +174,9 @@ sub update {
             "Total time connected:          <b>$str_total_time</b></span>"
         );
     } else {
-        $$self{frame}{hboxPACRoot}->hide;
-        $$self{frame}{hboxPACGroup}->hide;
-        $$self{frame}{hboxPACNode}->show;
+        $$self{frame}{hboxPACRoot}->hide();
+        $$self{frame}{hboxPACGroup}->hide();
+        $$self{frame}{hboxPACNode}->show();
 
         my $groups = 0;
         my $nodes = 0;
@@ -192,10 +192,10 @@ sub update {
             $$self{statistics}{$uuid}{total_time} = 0;
         }
 
-        $start = $$self{statistics}{$uuid}{start}        // 0;
-        $stop = $$self{statistics}{$uuid}{stop}        // 0;
-        $total_conn = $$self{statistics}{$uuid}{total_conn}    // 0;
-        $total_time = $$self{statistics}{$uuid}{total_time}    // 0;
+        $start = $$self{statistics}{$uuid}{start} // 0;
+        $stop = $$self{statistics}{$uuid}{stop} // 0;
+        $total_conn = $$self{statistics}{$uuid}{total_conn} // 0;
+        $total_time = $$self{statistics}{$uuid}{total_time} // 0;
 
         my $str_start = $start ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{start}) ) : 'NO DATA AVAILABLE';
         my $str_stop = $stop ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{stop}) ) : 'NO DATA AVAILABLE';
@@ -280,15 +280,13 @@ sub _buildStatisticsGUI {
     $w{hbox}->pack_start($w{btnReset}, 0, 0, 5);
     $w{btnReset}->set_vexpand(0);
 
-    #$w{hbox}->pack_start(Gtk3::VSeparator->new, 0, 1, 5);
-
     $w{vbox} = Gtk3::VBox->new(0, 0);
     $w{hbox}->pack_start($w{vbox}, 1, 1, 0);
 
     $w{hboxPACRoot} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxPACRoot}, 0, 1, 0);
 
-    $w{lblPR} = Gtk3::Label->new;
+    $w{lblPR} = Gtk3::Label->new();
     $w{lblPR}->set_justify('left');
     $w{lblPR}->set_line_wrap(1);
     $w{hboxPACRoot}->pack_start($w{lblPR}, 0, 1, 0);
@@ -296,7 +294,7 @@ sub _buildStatisticsGUI {
     $w{hboxPACGroup} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxPACGroup}, 0, 1, 0);
 
-    $w{lblPG} = Gtk3::Label->new;
+    $w{lblPG} = Gtk3::Label->new();
     $w{lblPG}->set_justify('left');
     $w{lblPG}->set_line_wrap(1);
     $w{hboxPACGroup}->pack_start($w{lblPG}, 0, 0, 0);
@@ -304,7 +302,7 @@ sub _buildStatisticsGUI {
     $w{hboxPACNode} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxPACNode}, 0, 1, 0);
 
-    $w{lblPN} = Gtk3::Label->new;
+    $w{lblPN} = Gtk3::Label->new();
     $w{lblPN}->set_justify('left');
     $w{lblPN}->set_line_wrap(1);
     $w{hboxPACNode}->pack_start($w{lblPN}, 0, 1, 0);
@@ -313,7 +311,6 @@ sub _buildStatisticsGUI {
     $$self{frame} = \%w;
 
     # Callback(s)
-
     $w{btnReset}->signal_connect('clicked', sub {
         my $cfg = $$self{cfg};
         my $uuid = $$self{uuid};
