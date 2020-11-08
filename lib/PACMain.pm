@@ -4815,6 +4815,7 @@ sub _setVteCapabilities {
     eval {
         local $SIG{__WARN__} = sub { die @_ };
         $vte->feed_child('abc', 3);
+        1;
     } or do {
         $$self{_Vte}{vte_feed_child} = 1;
     };
