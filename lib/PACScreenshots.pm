@@ -156,7 +156,7 @@ sub _buildScreenshotsGUI {
 
     # Build a buttonbox for widgets actions (add, etc.)
     $w{bbox} = Gtk3::VButtonBox->new();
-    $w{hbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{hbox}->pack_start($w{bbox}, 0, 1, 5);
     $w{bbox}->set_layout('GTK_BUTTONBOX_SPREAD');
 
     # Build 'add' button
