@@ -803,9 +803,7 @@ sub _initGUI {
     $$self{_GUI}{nbConnectionPanel}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
 
     my $tablbl = Gtk3::HBox->new(0, 0);
-    my $eblbl = Gtk3::EventBox->new();
-    $eblbl->add(Gtk3::Label->new('Info '));
-    $tablbl->pack_start($eblbl, 0, 1, 0);
+    $tablbl->pack_start(Gtk3::Label->new('Info '), 0, 1, 0);
     $$self{_GUI}{_TABIMG} = Gtk3::Image->new_from_stock('gtk-info', 'menu');
     $tablbl->pack_start($$self{_GUI}{_TABIMG}, 0, 1, 0);
     $tablbl->show_all();
@@ -833,28 +831,31 @@ sub _initGUI {
 
     # Create a frameStatistics for statistics
     $$self{_GUI}{frameStatistics} = Gtk3::Frame->new('STATISTICS ');
-    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameStatistics}, 0, 1, 0);
     $$self{_GUI}{frameStatistics}->set_border_width(5);
     $$self{_GUI}{frameStatistics}->set_shadow_type('GTK_SHADOW_NONE');
-
     $$self{_GUI}{frameStatisticslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameStatisticslbl}->set_markup('<b>STATISTICS</b> ');
     $$self{_GUI}{frameStatistics}->set_label_widget($$self{_GUI}{frameStatisticslbl});
-
     $$self{_GUI}{statistics} = $$self{_SCREENSHOTS} = PACStatistics->new();
     $$self{_GUI}{frameStatistics}->add($$self{_GUI}{statistics}->{container});
+    $$self{_GUI}{ebFrameStatistics} = Gtk3::EventBox->new(); # required to get motion events
+    $$self{_GUI}{ebFrameStatistics}->add_events('GDK_POINTER_MOTION_MASK');
+    $$self{_GUI}{ebFrameStatistics}->add($$self{_GUI}{frameStatistics});
+    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{ebFrameStatistics}, 0, 1, 0);
 
     # Create a frameScreenshot for screenshot
     $$self{_GUI}{frameScreenshots} = Gtk3::Frame->new('SCREENSHOTS ');
-    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameScreenshots}, 0, 1, 0);
     $$self{_GUI}{frameScreenshots}->set_border_width(5);
-
+    $$self{_GUI}{frameScreenshots}->set_shadow_type('GTK_SHADOW_NONE');
     $$self{_GUI}{frameScreenshotslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameScreenshotslbl}->set_markup('<b>SCREENSHOTS</b> ');
     $$self{_GUI}{frameScreenshots}->set_label_widget($$self{_GUI}{frameScreenshotslbl});
-
     $$self{_GUI}{screenshots} = $$self{_SCREENSHOTS} = PACScreenshots->new();
     $$self{_GUI}{frameScreenshots}->add($$self{_GUI}{screenshots}->{container});
+    $$self{_GUI}{ebFrameScreenshots} = Gtk3::EventBox->new(); # required to get motion events
+    $$self{_GUI}{ebFrameScreenshots}->add_events('GDK_POINTER_MOTION_MASK');
+    $$self{_GUI}{ebFrameScreenshots}->add($$self{_GUI}{frameScreenshots});
+    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{ebFrameScreenshots}, 0, 1, 0);
 
     # Create a hbuttonbox1: show/hide, WOL, Shell, Preferences, etc...
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new();
@@ -1326,6 +1327,37 @@ sub _setupCallbacks {
             return 1;
         });
         
+    }
+
+    # Capture mouse motion and show the connections list if the cursor is near the borders of the "info" panel
+    if ($$self{_CFG}{defaults}{'tabs in main window'} && !$$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+        sub _autoShowConnectionsList {
+            my $self = shift;
+            my $x = shift;
+
+            if (!defined($self)) {
+                return 0;
+            }
+
+            my ($vbInfo_x, $vbInfo_y) = $$self{_GUI}{vboxInfo}->get_window()->get_origin();
+            if ($$self{_CFG}{defaults}{'tree on right side'}) {
+                my ($dummy_x, $dummy_y, $vbInfo_width, $vbInfo_height) = $$self{_GUI}{vboxInfo}->get_window()->get_geometry();
+                $$self{_GUI}{showConnBtn}->set_active($x >= $vbInfo_x + $vbInfo_width - 30);
+            } else {
+                $$self{_GUI}{showConnBtn}->set_active($x <= $vbInfo_x + 10);
+            }
+            return 0;
+        }
+
+        $$self{_GUI}{vboxInfo}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
+        $$self{_GUI}{ebFrameStatistics}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
+        $$self{_GUI}{ebFrameScreenshots}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
     }
 
     # Capture 'add group' button clicked
