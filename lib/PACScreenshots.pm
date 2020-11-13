@@ -90,7 +90,9 @@ sub update {
     }
 
     # Destroy previous widgets
-    $$self{frame}{hbscreenshots}->foreach(sub {$_[0]->destroy();});
+    $$self{frame}{hbscreenshots}->foreach(sub {
+        $_[0]->destroy();
+    });
 
     # Empty parent widgets' list
     $$self{list} = [];
@@ -121,7 +123,7 @@ sub add {
     my $screenshot_file = '';
     my $rn = rand(123456789);
     $screenshot_file = "$CFG_DIR/screenshots/asbru_screenshot_$rn.png";
-    while(-f $screenshot_file) {
+    while (-f $screenshot_file) {
         $rn = rand(123456789);
         $screenshot_file = "$CFG_DIR/screenshots/asbru_screenshot_$rn.png";
     }
@@ -129,7 +131,7 @@ sub add {
     copy($file, $screenshot_file);
 
     push(@{$$new_cfg{screenshots}}, $screenshot_file);
-    $self->update;
+    $self->update();
     $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
 
     return 1;
@@ -154,7 +156,7 @@ sub _buildScreenshotsGUI {
 
     # Build a buttonbox for widgets actions (add, etc.)
     $w{bbox} = Gtk3::VButtonBox->new();
-    $w{hbox}->pack_start($w{bbox}, 0, 1, 0);
+    $w{hbox}->pack_start($w{bbox}, 0, 1, 5);
     $w{bbox}->set_layout('GTK_BUTTONBOX_SPREAD');
 
     # Build 'add' button
@@ -201,7 +203,6 @@ sub _buildScreenshotsGUI {
     $$self{frame} = \%w;
 
     # Button(s) callback(s)
-
     $w{btnadd}->signal_connect('clicked', sub {
         # Save current cfg
         my $file = $self->_chooseScreenshot;
@@ -217,7 +218,9 @@ sub _buildScreenshotsGUI {
         return 1;
     });
 
-    $w{btnopenfolder}->signal_connect('clicked', sub {system("/usr/bin/xdg-open $CFG_DIR/screenshots");});
+    $w{btnopenfolder}->signal_connect('clicked', sub {
+        system("/usr/bin/xdg-open $CFG_DIR/screenshots");}
+    );
 
     my @targets = (Gtk3::TargetEntry->new('STRING', [], 0) );
     $w{hbox}->drag_dest_set('all', \@targets, ['copy', 'move']);
@@ -254,10 +257,10 @@ sub _buildScreenshots {
     $w{position} = scalar @{$$self{list}};
 
     # Create an eventbox for the image
-    $w{ebScreenshot} = Gtk3::EventBox->new;
+    $w{ebScreenshot} = Gtk3::EventBox->new();
 
     # Create a gtkImage to contain the screenshot
-    $w{imageScreenshot} = Gtk3::Image->new;
+    $w{imageScreenshot} = Gtk3::Image->new();
     -f $file and $w{imageScreenshot}->set_from_pixbuf(_scale($file, 200, 200, 1) );
     $w{ebScreenshot}->add($w{imageScreenshot});
 
@@ -351,7 +354,7 @@ sub _buildScreenshots {
 sub _chooseScreenshot {
     my $self = shift;
 
-    my $filter_images = Gtk3::FileFilter->new;
+    my $filter_images = Gtk3::FileFilter->new();
     $filter_images->set_name('Images');
     $filter_images->add_pixbuf_formats;
 
@@ -399,7 +402,7 @@ sub _preview {
         return 1;
     }
 
-    my $preview = Gtk3::Image->new;
+    my $preview = Gtk3::Image->new();
     $dialog->set_preview_widget($preview);
 
     my $preview_pixbuf = Gtk3::Gdk::Pixbuf->new_from_file_at_size($file, 256, 256);
@@ -435,7 +438,7 @@ sub _showImage {
     $window->set_size_request(320, 200);
     $window->set_resizable(1);
 
-    my $sc = Gtk3::ScrolledWindow->new;
+    my $sc = Gtk3::ScrolledWindow->new();
     my $pb = _pixBufFromFile($file);
     my $image = Gtk3::Image->new_from_pixbuf($pb);
     my $pw = $pb->get_width + 30;

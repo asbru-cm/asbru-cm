@@ -357,7 +357,8 @@ sub _updateConfig {
     }
     # Remove all used keybindings defined in the current configuration
     foreach my $w (keys %{$self->{cfg}}) {
-        my $wk = %{$self->{cfg}}{$w};
+        my $cfg = $self->{cfg};
+        my $wk = $$cfg{$w};
         foreach my $k (keys %$wk) {
             my $action = $$wk{$k}[1];
             if (defined($keybindings{"$w-$action"})) {
@@ -437,8 +438,10 @@ sub _getDefaultConfig {
     $$cfg{'terminal'}{'AltCtrl+x'}     = ['Terminal','reset','Reset Terminal'];
     $$cfg{'terminal'}{'AltCtrl+X'}     = ['Terminal','reset-clear','Reset Terminal and Clear window'];
     $$cfg{'terminal'}{'CtrlAlt+r'}     = ['Terminal','remove_from_cluster','Remove terminal from cluster'];
+    $$cfg{'terminal'}{'Ctrl+C'}        = ['Terminal','copy','Copy selection to clipboard'];
+    $$cfg{'terminal'}{'Ctrl+V'}        = ['Terminal','paste','Paste clipboard into terminal'];
     $$cfg{'terminal'}{'Ctrl+Insert'}   = ['Terminal','copy','Copy selection to clipboard'];
-    $$cfg{'terminal'}{'Shift+Insert'}  = ['Terminal','paste','Paste selection into terminal'];
+    $$cfg{'terminal'}{'Shift+Insert'}  = ['Terminal','paste-primary','Paste selection into terminal'];
     $$cfg{'terminal'}{'Ctrl+p'}        = ['Terminal','paste-passwd','Paste terminal password'];
     $$cfg{'terminal'}{'Ctrl+b'}        = ['Terminal','paste-delete','Paste and regex delete'];
     $$cfg{'terminal'}{'Ctrl+g'}        = ['Terminal','hostname','Guess hostname'];

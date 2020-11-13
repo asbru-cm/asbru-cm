@@ -261,7 +261,7 @@ sub new {
 
     # Check if only one instance is allowed
 
-    if ($$self{_APP}->get_is_remote) {
+    if ($$self{_APP}->get_is_remote()) {
         print "INFO: Ásbrú is already running.\n";
 
         my $getout = 0;
@@ -803,9 +803,7 @@ sub _initGUI {
     $$self{_GUI}{nbConnectionPanel}->set_tab_pos($$self{_CFG}{'defaults'}{'tabs position'});
 
     my $tablbl = Gtk3::HBox->new(0, 0);
-    my $eblbl = Gtk3::EventBox->new();
-    $eblbl->add(Gtk3::Label->new('Info '));
-    $tablbl->pack_start($eblbl, 0, 1, 0);
+    $tablbl->pack_start(Gtk3::Label->new('Info '), 0, 1, 0);
     $$self{_GUI}{_TABIMG} = Gtk3::Image->new_from_stock('gtk-info', 'menu');
     $tablbl->pack_start($$self{_GUI}{_TABIMG}, 0, 1, 0);
     $tablbl->show_all();
@@ -833,28 +831,31 @@ sub _initGUI {
 
     # Create a frameStatistics for statistics
     $$self{_GUI}{frameStatistics} = Gtk3::Frame->new('STATISTICS ');
-    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameStatistics}, 0, 1, 0);
     $$self{_GUI}{frameStatistics}->set_border_width(5);
     $$self{_GUI}{frameStatistics}->set_shadow_type('GTK_SHADOW_NONE');
-
     $$self{_GUI}{frameStatisticslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameStatisticslbl}->set_markup('<b>STATISTICS</b> ');
     $$self{_GUI}{frameStatistics}->set_label_widget($$self{_GUI}{frameStatisticslbl});
-
     $$self{_GUI}{statistics} = $$self{_SCREENSHOTS} = PACStatistics->new();
     $$self{_GUI}{frameStatistics}->add($$self{_GUI}{statistics}->{container});
+    $$self{_GUI}{ebFrameStatistics} = Gtk3::EventBox->new(); # required to get motion events
+    $$self{_GUI}{ebFrameStatistics}->add_events('GDK_POINTER_MOTION_MASK');
+    $$self{_GUI}{ebFrameStatistics}->add($$self{_GUI}{frameStatistics});
+    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{ebFrameStatistics}, 0, 1, 0);
 
     # Create a frameScreenshot for screenshot
     $$self{_GUI}{frameScreenshots} = Gtk3::Frame->new('SCREENSHOTS ');
-    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{frameScreenshots}, 0, 1, 0);
     $$self{_GUI}{frameScreenshots}->set_border_width(5);
-
+    $$self{_GUI}{frameScreenshots}->set_shadow_type('GTK_SHADOW_NONE');
     $$self{_GUI}{frameScreenshotslbl} = Gtk3::Label->new();
     $$self{_GUI}{frameScreenshotslbl}->set_markup('<b>SCREENSHOTS</b> ');
     $$self{_GUI}{frameScreenshots}->set_label_widget($$self{_GUI}{frameScreenshotslbl});
-
     $$self{_GUI}{screenshots} = $$self{_SCREENSHOTS} = PACScreenshots->new();
     $$self{_GUI}{frameScreenshots}->add($$self{_GUI}{screenshots}->{container});
+    $$self{_GUI}{ebFrameScreenshots} = Gtk3::EventBox->new(); # required to get motion events
+    $$self{_GUI}{ebFrameScreenshots}->add_events('GDK_POINTER_MOTION_MASK');
+    $$self{_GUI}{ebFrameScreenshots}->add($$self{_GUI}{frameScreenshots});
+    $$self{_GUI}{vboxInfo}->pack_start($$self{_GUI}{ebFrameScreenshots}, 0, 1, 0);
 
     # Create a hbuttonbox1: show/hide, WOL, Shell, Preferences, etc...
     $$self{_GUI}{hbuttonbox1} = Gtk3::HBox->new();
@@ -1080,6 +1081,21 @@ sub _initGUI {
     } else {
         $$self{_GUI}{nbTree}->set_current_page(3);
         $self->_updateGUIHistory();
+    }
+
+    # Ensure the window is placed near the newly created icon (in compact mode only)
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+        # Update GUI
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my $x = $geo[2]{x};
+        my $y = $geo[2]{y};
+
+        if ($x > 0 || $y > 0) {
+            $$self{_GUI}{posx} = $x;
+            $$self{_GUI}{posy} = $y;
+        }
     }
 
     return 1;
@@ -1311,6 +1327,37 @@ sub _setupCallbacks {
             return 1;
         });
         
+    }
+
+    # Capture mouse motion and show the connections list if the cursor is near the borders of the "info" panel
+    if ($$self{_CFG}{defaults}{'tabs in main window'} && !$$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+        sub _autoShowConnectionsList {
+            my $self = shift;
+            my $x = shift;
+
+            if (!defined($self)) {
+                return 0;
+            }
+
+            my ($vbInfo_x, $vbInfo_y) = $$self{_GUI}{vboxInfo}->get_window()->get_origin();
+            if ($$self{_CFG}{defaults}{'tree on right side'}) {
+                my ($dummy_x, $dummy_y, $vbInfo_width, $vbInfo_height) = $$self{_GUI}{vboxInfo}->get_window()->get_geometry();
+                $$self{_GUI}{showConnBtn}->set_active($x >= $vbInfo_x + $vbInfo_width - 30);
+            } else {
+                $$self{_GUI}{showConnBtn}->set_active($x <= $vbInfo_x + 10);
+            }
+            return 0;
+        }
+
+        $$self{_GUI}{vboxInfo}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
+        $$self{_GUI}{ebFrameStatistics}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
+        $$self{_GUI}{ebFrameScreenshots}->signal_connect('motion_notify_event', sub {
+            _autoShowConnectionsList($self, $_[1]->x_root);
+        });
     }
 
     # Capture 'add group' button clicked
@@ -3317,17 +3364,29 @@ sub _saveConfiguration {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
     my $normal = shift // 1;
+    my %tmp_sessions;
 
+    # Purge screenshots
     _purgeUnusedOrMissingScreenshots($cfg);
+    # Keep a reference to the temporary sessions
+    # (since they will be deleted by _cfgSanityCheck as we don't want to persist those on disk)
+    %tmp_sessions = _cfgGetTmpSessions($cfg);
+    # Cleanup the configuration before saving (sanityu check + remove of temporary sessions)
     _cfgSanityCheck($cfg);
+    # Do not keep passwords in plain text in the configuration
     _cipherCFG($cfg);
+    # Do store the configuration on disk
     nstore($cfg, $CFG_FILE_NFREEZE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$CFG_FILE_NFREEZE':\n\n$!");
     if ($R_CFG_FILE) {
         nstore($cfg, $R_CFG_FILE) or _wMessage($$self{_GUI}{main}, "ERROR: Could not save config file '$R_CFG_FILE':\n\n$!\n\nLocal copy saved at '$CFG_FILE_NFREEZE'");
     }
+    # Restore passwords
     _decipherCFG($cfg);
-
+    # Restore the temporary sessions
+    _cfgAddSessions($cfg, \%tmp_sessions);
+    # Save tree positions
     $self->_saveTreeExpanded();
+    # Save satistics
     $$self{_GUI}{statistics}->saveStats();
 
     $normal and $self->_setCFGChanged(0);
@@ -3741,7 +3800,7 @@ sub _updateGUIPreferences {
     if ($UNITY) {
         (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
     } else {
-        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'});
+        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
     }
 
     $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
@@ -3932,7 +3991,13 @@ sub _showConnectionsList {
 sub _hideConnectionsList {
     my $self = shift;
 
-    ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = $$self{_GUI}{main}->get_position();
+    if ($$self{_GUI}{main}->get_visible()) {
+        my ($x, $y) = $$self{_GUI}{main}->get_position();
+        if ($x > 0 || $y > 0) {
+            ($$self{_GUI}{posx}, $$self{_GUI}{posy}) = ($x, $y);
+        }
+    }
+
     $$self{_GUI}{main}->hide();
 }
 
@@ -4780,6 +4845,7 @@ sub _setVteCapabilities {
     #  See https://bugs.launchpad.net/ubuntu/+source/ubuntu-release-upgrader/+bug/1780501)
     $$self{_Vte}{vte_feed_child} = 0;
     eval {
+        local $SIG{__WARN__} = sub { die @_ };
         $vte->feed_child('abc', 3);
         1;
     } or do {

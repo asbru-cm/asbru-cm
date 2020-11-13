@@ -80,6 +80,8 @@ require Exporter;
     _wExecEntry
     _cfgCheckMigrationV3
     _cfgSanityCheck
+    _cfgGetTmpSessions
+    _cfgAddSessions
     _updateSSHToIPv6
     _cipherCFG
     _decipherCFG
@@ -219,7 +221,7 @@ our @PACDESKTOP = (
     'Terminal=false',
     'Icon=pac',
     'Type=Application',
-    'Exec=/usr/bin/asbru-cm --no-splash',
+    'Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --no-splash',
     'StartupNotify=false',
     'Name[en_US]=Ásbrú Connection Manager',
     'Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks',
@@ -2061,7 +2063,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'color yellow'} //=  '#c4c4a0a00000';
     $$cfg{'defaults'}{'command prompt'} //= '[#%\$>]|\:\/\s*$';
     $$cfg{'defaults'}{'username prompt'} //= '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
-    $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@\w+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+    $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
     $$cfg{'defaults'}{'hostkey changed prompt'} //= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
     $$cfg{'defaults'}{'press any key prompt'} //= '.*(any key to continue|tecla para continuar).*';
     $$cfg{'defaults'}{'remote host changed prompt'} //= '.*ffending .*key in (.+?)\:(\d+).*';
@@ -2228,7 +2230,7 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'back color'} //= '#000000000000'; # Black
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@\w+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
@@ -2523,7 +2525,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} = '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>]|\:\/\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@\w+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}  = 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
@@ -2546,7 +2548,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} //= '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@\w+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'} //= 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
@@ -2568,6 +2570,28 @@ sub _cfgSanityCheck {
     }
 
     return 1;
+}
+
+sub _cfgGetTmpSessions {
+    my $cfg = shift;
+    my %tmp;
+
+    foreach my $uuid (keys %{$$cfg{'environments'}}) {
+        if ($uuid =~ /^(HASH|_tmp_|pacshell_PID)/go) {
+            $tmp{$uuid} = $$cfg{'environments'}{$uuid};
+        }
+    }
+
+    return %tmp;
+}
+
+sub _cfgAddSessions {
+    my $cfg = shift;
+    my $tmp = shift;
+
+    foreach my $uuid (keys %{$tmp}) {
+        $$cfg{'environments'}{$uuid} = $tmp->{$uuid};
+    }
 }
 
 sub _updateSSHToIPv6 {
@@ -3676,7 +3700,7 @@ sub _makeDesktopFile {
     $d .= "Terminal=false\n";
     $d .= "Icon=pac\n";
     $d .= "Type=Application\n";
-    $d .= "Exec=/usr/bin/asbru-cm\n";
+    $d .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm\n";
     $d .= "StartupNotify=true\n";
     $d .= "Name[en_US]=Ásbrú Connection Manager\n";
     $d .= "Comment[en_US]=A user interface that helps organizing remote terminal sessions and automating repetitive tasks\n";
@@ -3685,13 +3709,13 @@ sub _makeDesktopFile {
     my $dal = 'Actions=Shell;Quick;Preferences;';
     my $da = "\n[Desktop Action Shell]\n";
     $da .= "Name=<Start local shell>\n";
-    $da .= "Exec=asbru-cm --start-shell\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --start-shell\n";
     $da .= "\n[Desktop Action Quick]\n";
     $da .= "Name=<Quick connect...>\n";
-    $da .= "Exec=asbru-cm --quick-conn\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --quick-conn\n";
     $da .= "\n[Desktop Action Preferences]\n";
     $da .= "Name=<Open Preferences...>\n";
-    $da .= "Exec=asbru-cm --preferences\n";
+    $da .= "Exec=env GDK_BACKEND=x11 /usr/bin/asbru-cm --preferences\n";
 #    my $action = 0;
 #    foreach my $uuid (keys %{$$cfg{environments}}) {
 #        if (($uuid eq '__PAC__ROOT__') || (! $$cfg{'environments'}{$uuid}{'favourite'})) {
@@ -3992,7 +4016,15 @@ Sets the Application password
 
 =head2 sub _cfgSanityCheck
 
-Configuration Checks
+Sanitize the configuration and delete temporary sessions that should not be persisted
+
+=head2 sub _cfgGetTmpSessions
+
+Extract the temporary sessions from the configuration.  Those sessions will be deleted by _cfgSanityCheck
+
+=head2 sub _cfgAddSessions
+
+Restore a list of sessions to the configuration.
 
 =head2 sub _updateSSHToIPv6
 

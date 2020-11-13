@@ -45,7 +45,6 @@ Requires:   perl(strict)
 Requires:   perl(utf8)
 Requires:   perl(vars)
 Requires:   perl(warnings)
-Requires:   perl-X11-GUITest
 Requires:   vte291
 Requires:   bash
 Requires:   perl-Crypt-CBC
@@ -67,6 +66,7 @@ Suggests: x3270-x11
 Suggests: tn5250
 Suggests: telnet
 Suggests: ftp
+Suggests: perl-X11-GUITest
 %endif
 BuildRequires: pkgconfig
 BuildRequires: bash-completion

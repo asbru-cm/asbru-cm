@@ -29,7 +29,7 @@ tar -xf asbru-cm_$DEBIAN_VERSION.orig.tar
 xz -9 asbru-cm_$DEBIAN_VERSION.orig.tar
 mv asbru-cm_$DEBIAN_VERSION.orig.tar.xz ../
 
-ls -lha
+#ls -lha
 
 if ! [[ -z "$TRAVIS_TAG" ]]; then
 	dch -v "$DEBIAN_VERSION" -D "unstable" -b -m "New automatic GitHub build from snapshot"
@@ -40,8 +40,8 @@ fi
 
 debuild -us -uc
 
-ls -lha
+#ls -lha
 cd ..
-ls -lha
+#ls -lha
 
 echo "All done. Hopefully"                   

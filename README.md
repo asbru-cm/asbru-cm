@@ -5,6 +5,7 @@
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
 [![Liberapay][liberapay-badge]][liberapay-url]
+[![Donate Bitcoins][bitcoin-badge]][bitcoin-url]
 
 [<img src="https://www.asbru-cm.net/assets/img/asbru-logo-200.png" align="right" width="200px" height="200px" />](https://asbru-cm.net)
 
@@ -37,7 +38,7 @@
 
 ### Installation
 
-We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [packagecould.io](https://packagecloud.io/).
+We recommend installing Ásbrú Connection Manager using our latest pre-built packages hosted on [cloudsmith.io](https://cloudsmith.io/).
 
 To do so, execute the following commands:
 
@@ -71,15 +72,8 @@ To do so, execute the following commands:
   
 - Windows
 
-  Though it is currently unsupported running Ásbrú Connection Manager on Windows it is possible with a few addons.
-  Prior to this you need to install WSL and a working XServer on Windows (for example xlaunch).
-  Inside your WSL you can install the package asbru-cm (see Debian/Ubuntu).
-  Prior to running the command "asbru-cm" you will need to define your display:
-  ````
-  $ export DISPLAY=:0
-  ````
-  
-  For more information check out this article: https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx
+  It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/).
+  The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
   
 Once installed on your system, type ````asbru-cm```` in your terminal.
 
@@ -91,18 +85,22 @@ Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in a
 
 You are welcome to contribute and test by checking out "loki" or by installing our builds.
 
+If you do not wish to run third party scripts on your systems, you can always access manual install instructions at https://cloudsmith.io/~asbru-cm/repos/loki/setup/
+
 - Debian / Ubuntu
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
-  $ sudo apt-get install asbru-cm
+   curl -1sLf \
+  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' \
+  | sudo -E bash
   ````
 
 - Fedora
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
-  $ sudo dnf install asbru-cm
+   curl -1sLf \
+  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' \
+  | sudo -E bash
   ````
 
 
@@ -143,6 +141,10 @@ If you want to contribute to Ásbrú Connection Manager, first check out the [is
 
 Before contributing, please review our [contributing doc](https://github.com/asbru-cm/asbru-cm/blob/master/CONTRIBUTING.md) for info on how to make feature requests and bear in mind that we adhere to the [Contributor Covenant code of conduct](https://github.com/asbru-cm/asbru-cm/blob/master/CODE_OF_CONDUCT.md).
 
+### Financial support
+
+If you like Ásbrú Connection Manager, you may also consider supporting the project financially by donating on <a title="Donate Liberapay" href="https://liberapay.com/asbru-cm/donate">Liberapay</a> or by donating to one of <a href="https://docs.asbru-cm.net/Contributing/Financial_Contribution/">our cryptocurrency addresses</a>.
+
 ### License
 
 Ásbrú Connection Manager is licensed under the GNU General Public License version 3 <http://www.gnu.org/licenses/gpl-3.0.html>.  A full copy of the license can be found in the [LICENSE](https://github.com/asbru-cm/asbru-cm/blob/master/LICENSE) file.
@@ -167,3 +169,5 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 [rpm-url]: https://packagecloud.io/asbru-cm/asbru-cm?filter=rpms
 [liberapay-badge]: http://img.shields.io/liberapay/patrons/asbru-cm.svg?logo=liberapay
 [liberapay-url]: https://liberapay.com/asbru-cm/donate
+[bitcoin-badge]: https://img.shields.io/badge/bitcoin-19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45-D28138.svg?style=flat-square
+[bitcoin-url]: https://blockchain.info/address/19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45

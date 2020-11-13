@@ -306,6 +306,17 @@ sub start {
     if ($$self{CONNECTED} || $$self{CONNECTING}) {
         return 1;
     }
+    my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
+    my $title = $$self{_TITLE};
+    my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
+    my $reconnect_msg = '';
+    my $reconnect_count = '';
+
+    # Check that session information is still valid
+    if (!defined($name)) {
+        # Session is invalid for some reason, ignore
+        return 0;
+    }
 
     # If this terminal requires a KeePass database file and that we don't have a connection to a KeePass file yet; ask for the database password now
     if (!$ENV{'KPXC_MP'} && $PACMain::FUNCS{_KEEPASS}->hasKeePassField($$self{_CFG},$$self{_UUID})) {
@@ -316,12 +327,6 @@ sub start {
             $kpxc->getMasterPassword($$self{_PARENTWINDOW});
         }
     }
-
-    my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
-    my $title = $$self{_TITLE};
-    my $method = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'};
-    my $reconnect_msg = '';
-    my $reconnect_count = '';
 
     if ($$self{'_RECONNECTS'}) {
         $reconnect_msg = 'RE';
@@ -934,29 +939,31 @@ sub _setupCallbacks {
     # Info button event (if any)
     if ($$self{_GUI}{btnShowInfoTab}) {
         $$self{_GUI}{btnShowInfoTab}->signal_connect('clicked', sub {
-            $self->_showInfoTab ();
+            $self->_showInfoTab();
         });
     }
 
     # Mouse move in out VTE events
-    $$self{_CFG}{defaults}{'tabs in main window'} and $$self{_GUI}{_VTE}->signal_connect('motion_notify_event', sub {
-        if ($$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+    if ($$self{_CFG}{defaults}{'tabs in main window'}) {
+        $$self{_GUI}{_VTE}->signal_connect('motion_notify_event', sub {
+            if ($$self{_CFG}{'defaults'}{'prevent mouse over show tree'}) {
+                return 0;
+            }
+            my @geo = $$self{_GUI}{_VTE}->get_window()->get_geometry();
+            if ($$self{_CFG}{defaults}{'tree on right side'}) {
+                if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child1()) eq $$self{_GUI}{_VBOX}) && !$$self{_SPLIT_VERTICAL}) {
+                    return 0;
+                }
+                $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x >= ($geo[2] - 30));
+            } else {
+                if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child2()) eq $$self{_GUI}{_VBOX}) && !$$self{_SPLIT_VERTICAL}) {
+                    return 0;
+                }
+                $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x <= 10);
+            }
             return 0;
-        }
-        my @geo = $$self{_GUI}{_VTE}->get_window()->get_geometry();
-        if ($$self{_CFG}{defaults}{'tree on right side'}) {
-            if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child1) eq $$self{_GUI}{_VBOX}) && ! $$self{_SPLIT_VERTICAL}) {
-                return 0;
-            }
-            $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x >= ($geo[2] - 30));
-        } else {
-            if ($$self{_SPLIT_VPANE} && (($$self{_SPLIT_VPANE}->get_child2) eq $$self{_GUI}{_VBOX}) && ! $$self{_SPLIT_VERTICAL}) {
-                return 0;
-            }
-            $PACMain::FUNCS{_MAIN}{_GUI}{showConnBtn}->set_active($_[1]->x <= 10);
-        }
-        return 0;
-    });
+        });
+    }
 
     # ------------------------------
     # Register callbacks from VTE
@@ -1045,12 +1052,13 @@ sub _setupCallbacks {
         } elsif ($action eq 'copy') {
             $$self{_GUI}{_VTE}->copy_clipboard();
         } elsif ($action eq 'paste') {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_clipboard();
+        } elsif ($action eq 'paste-primary') {
+            $$self{_GUI}{_VTE}->paste_primary();
         } elsif ($action eq 'paste-passwd' && ($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '' || $$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
             $self->_pasteConnectionPassword();
         } elsif ($action eq 'paste-delete') {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -1058,7 +1066,7 @@ sub _setupCallbacks {
                 '\n|\f|\r'
             ) or return 1;
             $text =~ s/$delete//g;
-            $self->_pasteToVte($text, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'} || 1);
+            _vteFeedChild($$self{_GUI}{_VTE}, $text);
         } elsif ($action eq 'hostname') {
             ($$self{CONNECTED} && !$$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
         } elsif ($action eq 'close' && !$$self{_TABBED}) {
@@ -1133,8 +1141,7 @@ sub _setupCallbacks {
             if (!$$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'}) {
                 return 0;
             }
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{'environments'}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_primary();
             $$self{FOCUS}->child_focus('GTK_DIR_TAB_FORWARD');
             return 1;
         } elsif ($event->button eq 3 and $event -> type eq 'button-press') {
@@ -1170,7 +1177,10 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('commit' => sub {
         $self->_clusterCommit(@_);
     });
-    $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {$$self{_NEW_DATA} = 1; $self->_setTabColour();});
+    $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {
+        $$self{_NEW_DATA} = 1;
+        $self->_setTabColour();
+    });
 
     # Capture Drag and Drop events
     my @targets = (Gtk3::TargetEntry->new('Ásbrú Connect', [], 0));
@@ -1273,7 +1283,14 @@ sub _setupCallbacks {
         $$self{CONNECTED} = 0;
         $$self{CONNECTING} = 0;
 
-        my $string = $$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic' ? "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)" : "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        # Show a "reconnect" message
+        my $string = "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        if (!defined($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'})) {
+            # Likely the session has been deleted from 'environments', there is no way to restart this session
+            $string = "THIS CONNECTION IS NOT AVAILABLE ANYMORE";
+        } elsif ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic') {
+            $string = "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)";
+        }
         if (defined $$self{_GUI}{_VTE}) {
             _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
         }
@@ -2036,10 +2053,9 @@ sub _vteMenu {
         label => 'Paste',
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste'),
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available(),
         code => sub {
-            my $txt = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
-            $self->_pasteToVte($txt, $$self{_CFG}{environments}{$$self{_UUID}}{'send slow'});
+            $$self{_GUI}{_VTE}->paste_clipboard();
         }
     });
     # Paste Current Connection Password
@@ -2061,9 +2077,9 @@ sub _vteMenu {
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal','paste-delete'),
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
-        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_is_text_available(),
+        sensitive => $$self{CONNECTED} && $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_is_text_available(),
         code => sub {
-            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->wait_for_text();
+            my $text = $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->wait_for_text();
             my $delete = _wEnterValue(
                 $$self{_PARENTWINDOW},
                 "Enter the String/RegExp of text to be *deleted* when pasting.\nUseful for, for example, deleting 'carriage return' from the text before pasting it.",
@@ -2071,7 +2087,7 @@ sub _vteMenu {
                 '\n|\f|\r'
             ) or return 1;
             $text =~ s/$delete//g;
-            $self->_pasteToVte($text, $$self{_CFG}{environments}{$$self{_UUID}}{'send slow'} || 1);
+            _vteFeedChild($$self{_GUI}{_VTE}, $text);
         }
     });
 
@@ -2264,26 +2280,6 @@ sub _vteMenu {
 
     _wPopUpMenu(\@vte_menu_items, $event);
     return 1;
-}
-
-sub _pasteToVte {
-    my $self = shift;
-    my $txt = shift // '';
-    my $slow = shift // 0;
-
-    if (!$txt) {
-        return 1;
-    }
-
-    if ($slow) {
-        foreach my $char (split('', $txt)) {
-            _vteFeedChild($$self{_GUI}{_VTE}, $char);
-            Gtk3::main_iteration() while Gtk3::events_pending();
-            select(undef, undef, undef, $slow / 1000);
-        }
-    } else {
-        $$self{_GUI}{_VTE}->paste_primary();
-    }
 }
 
 sub _setTabColour {
@@ -3924,7 +3920,7 @@ sub _wFindInTerminal {
     $w{window}{gui}{btnCopy} = Gtk3::Button->new_from_stock('gtk-copy');
     $w{window}{gui}{hbtnbox}->pack_start($w{window}{gui}{btnCopy}, 1, 1, 0);
     $w{window}{gui}{btnCopy}->signal_connect('clicked' => sub {
-        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('PRIMARY'))->set_text (
+        $$self{_GUI}{_VTE}->get_clipboard(Gtk3::Gdk::Atom::intern_static_string('CLIPBOARD'))->set_text (
             join(
             "\n",
             map $w{window}{gui}{treefound}{data}[$_][1],
@@ -4263,7 +4259,7 @@ sub _pasteConnectionPassword {
         my $kpxc = $PACMain::FUNCS{_KEEPASS};
         $pass = $kpxc->applyMask($pass);
     }
-    $self->_pasteToVte($pass, 1);
+    _vteFeedChild($$self{_GUI}{_VTE}, $pass);
 }
 
 sub _checkEmbedWindow {
@@ -4460,15 +4456,6 @@ Validate the socket connection is from Asbru application and not some other proc
 =head2 sub _vteMenu
 
 Display the popup Terminal menu on [shift] - right click
-
-=head2 sub _pasteToVte
-
-Takes information from the clipboard and sends it to the terminal
-
-    if slow : Use _vteFeedChild
-    else {_GUI}{_VTE}->paste_primary
-
-with _vteFeedChild
 
 =head2 sub _setTabColour
 

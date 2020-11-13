@@ -12,6 +12,11 @@ Our master and the snapshots are being kept as stable as possible. New features 
 
 Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in an unexpected manner to you.  This is somehow the same concept as the "[Debian sid](https://www.debian.org/releases/sid/)" release.
 
+If you do not wish to run third party scripts on your system, you are able to find manual install instructions for every repository on: https://cloudsmith.io/~asbru-cm/repos/
+
+## Windows 10
+It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/). The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
+
 ## Ubuntu
 **Master release**
 
@@ -31,7 +36,7 @@ To install the latest snapshot for testing, use the following instructions:
 ```
 sudo apt-add-repository multiverse
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/snapshots/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/snapshots/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -42,7 +47,7 @@ To test the latest development package, use the following instructions:
 ```
 sudo apt-add-repository multiverse
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -52,6 +57,8 @@ sudo apt install asbru-cm
 To install the latest release on a fresh [Mint](https://linuxmint.com/) system, use the following instructions:
 
 ```
+sudo apt update
+sudo apt install curl
 curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
 sudo apt install asbru-cm
 ```
@@ -61,8 +68,9 @@ sudo apt install asbru-cm
 To install the latest snapshot for testing, use the following instructions:
 
 ```
-curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
-curl -s https://packagecloud.io/install/repositories/asbru-cm/snapshots/script.deb.sh | sudo bash
+sudo apt update
+sudo apt install curl
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/snapshots/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -71,7 +79,9 @@ sudo apt install asbru-cm
 To test the latest development package, use the following instructions:
 
 ```
-curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
+sudo apt update
+sudo apt install curl
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -94,7 +104,7 @@ To install the latest snapshot for testing, use the following instructions:
 ```
 sudo apt update
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/snapshots/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/snapshots/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -105,7 +115,7 @@ To test the latest development package, use the following instructions:
 ```
 sudo apt update
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.deb.sh | sudo bash
+ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -124,7 +134,7 @@ sudo dnf install asbru-cm
 To install the latest snapshot for testing, use the following instructions:
 
 ```
-curl -s https://packagecloud.io/install/repositories/asbru-cm/snapshots/script.rpm.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/snapshots/cfg/setup/bash.rpm.sh' | sudo -E bash
 sudo dnf install asbru-cm
 ```
 
@@ -133,7 +143,7 @@ sudo dnf install asbru-cm
 To test the latest development package, use the following instructions:
 
 ```
-curl -s https://packagecloud.io/install/repositories/asbru-cm/loki/script.rpm.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' | sudo -E bash
 sudo dnf install asbru-cm
 ```
 

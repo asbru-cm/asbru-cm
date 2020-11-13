@@ -17,5 +17,5 @@ if [ "${SCRIPT}" == "make_debian.sh" ]; then
 	cp *.{deb,tar.xz,dsc,build,changes} build/
 else
 	git clone https://github.com/packpack/packpack.git packpack
-	sudo ./packpack/packpack
+	./packpack/packpack
 fi
