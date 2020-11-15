@@ -1,0 +1,32 @@
+version: 1
+
+AppDir:
+        path: ./AppDir
+
+        app_info:
+               id: asbru-cm
+               name: asbru-cm
+               icon: utilities-terminal
+               version: ${ASBRU_VERSION}
+               exec: usr/bin/asbru-cm
+               exec_args: $@
+
+        apt:
+               arch: amd64
+               sources:
+                       - sourceline: !ENV 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ ${UBUNTU_RELEASE} main restricted universe multiverse'
+                         key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+                       - sourceline: !ENV 'deb [arch=amd64] https://dl.cloudsmith.io/public/asbru-cm/${ASBRU_RELEASE}/deb/ubuntu ${UBUNTU_RELEASE} main'
+                         key_url: !ENV 'https://dl.cloudsmith.io/public/asbru-cm/${ASBRU_RELEASE}/cfg/gpg/gpg.${CLOUDSMITH_KEY}.key'
+
+               include:
+                       - asbru-cm
+
+        runtime:
+                env:
+                        PERL5LIB: $APPDIR/usr/share/perl5:$APPDIR/usr/lib/x86_64-linux-gnu/perl5/5.26:$PERL5LIB
+
+AppImage:
+        update-information: None
+        sign-key: None
+        arch: x86_64 
