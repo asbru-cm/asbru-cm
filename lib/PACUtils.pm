@@ -409,6 +409,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
@@ -480,6 +481,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_sensitive(1);
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
@@ -551,6 +553,7 @@ sub _getMethods {
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
             _($self, 'cbCfgAuthFallback')->set_sensitive(0);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
@@ -793,6 +796,7 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(1);
@@ -857,6 +861,7 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(1);
@@ -922,6 +927,7 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
@@ -993,6 +999,7 @@ sub _getMethods {
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
@@ -1065,6 +1072,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'alignManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
@@ -1124,6 +1132,7 @@ sub _getMethods {
             _($self, 'labelTerminalOptions')->set_sensitive(1);
             _($self, 'vboxAuthMethod')->set_sensitive(1);
             _($self, 'entryUser')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
