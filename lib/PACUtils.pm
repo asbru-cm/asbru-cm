@@ -2222,7 +2222,7 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal backspace'} //= 'auto';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal select words'} //= '-.:_/';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal scrollback lines'} //= 5000;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal scrollback lines'} //= -2;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal transparency'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal window hsize'} //= 800;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal window vsize'} //= 600;
@@ -2520,7 +2520,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} = '-.:_/';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} = 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} = 'UTF-8';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} = 5000;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} = -2;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal transparency'} = 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal window hsize'} = 800;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal window vsize'} = 600;
@@ -2546,7 +2546,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal select words'} //= '-.:_/';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal backspace'} //= 'auto';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal character encoding'} //= 'UTF-8';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} //= 5000;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal scrollback lines'} //= -2;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal transparency'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal window hsize'} //= 800;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal window vsize'} //= 600;

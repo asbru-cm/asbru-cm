@@ -192,6 +192,8 @@ sub _initGUI {
     $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
     _($self, 'btnCfgSaveSessionLogs')->set_extra_widget($$self{cbShowHidden});
 
+    _($self, 'spCfgTerminalScrollback')->set_range(-1, 99999);
+
     # Populate the Encodings combobox
     my $i = -1;
     $$self{_ENCODINGS_ARRAY} = _getEncodings();
