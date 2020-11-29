@@ -802,7 +802,8 @@ sub _initGUI {
     $$self{_GUI}{bottombox}->pack_start($$self{_GUI}{statusCluster}, 0, 0, 4);
 
     # Set the number of scrollback lines
-    $$self{_GUI}{_VTE}->set_scrollback_lines($$self{_CFG}{'defaults'}{'terminal scrollback lines'});
+    # If -2, uses the global preferences, otherwise use the value defined in terminal options
+    $$self{_GUI}{_VTE}->set_scrollback_lines($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal scrollback lines'} > -2 ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal scrollback lines'} : $$self{_CFG}{'defaults'}{'terminal scrollback lines'});
 
     ############################################################################
     # Check if this terminal should start in a new window or in a new tab/window

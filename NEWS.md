@@ -1,6 +1,14 @@
 # NEWS
 Here you can find important news on the project
 
+## 07.11.2020
+
+We are pleased to announce a bug fix release (6.2.1) of Ásbrú Connection Manager that addresses several issue.
+
+Most important to note is the move from Packagecloud to Cloudsmith for several reasons. We will be keeping the Packagecloud repository alive for some time. However new OS releases will only be published to Cloudsmith.
+
+Please check our [Installinstructions](https://docs.asbru-cm.net) for information on the new repositories.
+
 ## 06.06.2020
 
 We are pleased to announce a bug fix release (6.2.1) of Ásbrú Connection Manager that addresses the following issues:

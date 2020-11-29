@@ -25,7 +25,7 @@ To install the latest release on a fresh [Ubuntu](https://www.ubuntu.com/) syste
 ```
 sudo apt-add-repository multiverse
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -59,7 +59,7 @@ To install the latest release on a fresh [Mint](https://linuxmint.com/) system, 
 ```
 sudo apt update
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -93,7 +93,7 @@ To install the latest release on a fresh [Debian](https://www.debian.org/) syste
 ```
 sudo apt update
 sudo apt install curl
-curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
 sudo apt install asbru-cm
 ```
 
@@ -125,7 +125,7 @@ sudo apt install asbru-cm
 To install the latest release on a fresh [Fedora](https://getfedora.org/) system, use the following instructions:
 
 ```
-curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
+curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.rpm.sh' | sudo -E bash
 sudo dnf install asbru-cm
 ```
 
