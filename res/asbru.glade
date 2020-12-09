@@ -7106,6 +7106,9 @@ Changes apply to next opened connections, not current</property>
                                             <property name="width_request">150</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="tooltip_text" translatable="yes">If positive, sets the length of the scrollback buffer used by the terminal.
+If 0, disables the scrollback buffer.
+If -1, means an "infinitive scrollback".</property>
                                             <property name="halign">start</property>
                                             <property name="invisible_char">•</property>
                                             <property name="text" translatable="yes">0</property>

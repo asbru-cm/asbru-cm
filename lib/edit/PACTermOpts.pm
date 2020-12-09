@@ -112,7 +112,7 @@ sub update {
     $$self{gui}{colorBold}->set_sensitive(! $$self{gui}{cbBoldAsText}->get_active);
     $$self{gui}{fontTerminal}->set_font_name($$cfg{'terminal font'} // 'Monospace 9');
     $$self{gui}{comboCursorShape}->set_active($CURSOR_SHAPE{$$cfg{'cursor shape'} // 'block'});
-    $$self{gui}{spCfgTerminalScrollback}->set_value($$cfg{'terminal scrollback lines'} // 5000);
+    $$self{gui}{spCfgTerminalScrollback}->set_value($$cfg{'terminal scrollback lines'} // -2);
     $$self{gui}{spCfgTerminalTransparency}->set_value($$cfg{'terminal transparency'} // 0);
     if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'terminal support transparency'}) {
         $$self{gui}{spCfgTerminalTransparency}->set_sensitive(1);
@@ -300,7 +300,8 @@ sub _buildTermOptsGUI {
     $hboxTermUI2->pack_start($frameScroll, 0, 1, 0);
     $frameScroll->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{spCfgTerminalScrollback} = Gtk3::SpinButton->new_with_range(1, 99999, 100);
+    $w{spCfgTerminalScrollback} = Gtk3::SpinButton->new_with_range(-2, 99999, 100);
+    $w{spCfgTerminalScrollback}->set_tooltip_text("If positive, sets the length of the scrollback buffer used by the terminal.\nIf 0, disables the scrollback buffer.\nIf -1, means an \"infinitive scrollback\".\nIf -2, uses the value set in global preferences.");
     $frameScroll->add($w{spCfgTerminalScrollback});
 
     my $frameTransparency = Gtk3::Frame->new('Transparency:');

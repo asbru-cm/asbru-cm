@@ -2102,7 +2102,13 @@ sub _setupCallbacks {
     $$self{_GUI}{saveBtn}->signal_connect('clicked' => sub { $self->_saveConfiguration(); });
     $$self{_GUI}{aboutBtn}->signal_connect('clicked' => sub { $self->_showAboutWindow(); });
     $$self{_GUI}{wolBtn}->signal_connect('clicked' => sub { _wakeOnLan(); });
-    $$self{_GUI}{lockApplicationBtn}->signal_connect('toggled' => sub { $$self{_GUI}{lockApplicationBtn}->get_active() ? $self->_lockApplication() : $self->_unlockApplication(); });
+    $$self{_GUI}{lockApplicationBtn}->signal_connect('toggled' => sub {
+        if ($$self{_GUI}{lockApplicationBtn}->get_active()) {
+            $self->_lockAsbru();
+        } else {
+            $self->_unlockAsbru();
+        }
+    });
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
         $$self{_GUI}{nodeClose}->signal_connect('clicked' => sub { $$self{_GUI}{main}->close(); });
     }
@@ -2409,7 +2415,12 @@ sub _lockAsbru {
         $$self{_GUI}{_PACTABS}->set_sensitive(0);
     }
     foreach my $tmp_uuid (keys %RUNNING) {
-        $RUNNING{$tmp_uuid}{terminal}->lock();
+        if (!defined $RUNNING{$tmp_uuid}{terminal}) {
+            next;
+        }
+        if (ref($RUNNING{$tmp_uuid}{terminal}) =~ /^PACTerminal|PACShell$/go) {
+            $RUNNING{$tmp_uuid}{terminal}->lock();
+        }
     }
     $$self{_GUILOCKED} = 1;
 
@@ -2441,7 +2452,12 @@ sub _unlockAsbru {
         $$self{_GUI}{_PACTABS}->set_sensitive(1);
     }
     foreach my $tmp_uuid (keys %RUNNING) {
-        $RUNNING{$tmp_uuid}{terminal}->unlock();
+        if (!defined $RUNNING{$tmp_uuid}{terminal}) {
+            next;
+        }
+        if (ref($RUNNING{$tmp_uuid}{terminal}) =~ /^PACTerminal|PACShell$/go) {
+            $RUNNING{$tmp_uuid}{terminal}->unlock();
+        }
     }
     $$self{_GUILOCKED} = 0;
 
@@ -4971,13 +4987,13 @@ Creates the main window and elements
 
 Sets up all callbacks to elements in the window
 
-=head2 sub _lockApplication
+=head2 sub _lockAsbru
 
 Locks the application to leave unattended.
 
 Sets different objects property sesitive = 0
 
-=head2 sub _unlockApplication
+=head2 sub _unlockAsbru
 
 Asks for a GUI password to unlock the application
 

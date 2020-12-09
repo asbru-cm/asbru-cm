@@ -45,14 +45,14 @@ To do so, execute the following commands:
 - Debian / Ubuntu
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.deb.sh | sudo bash
+  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
   $ sudo apt-get install asbru-cm
   ````
 
 - Fedora
 
   ````
-  $ curl -s https://packagecloud.io/install/repositories/asbru-cm/asbru-cm/script.rpm.sh | sudo bash
+  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.rpm.sh' | sudo -E bash
   $ sudo dnf install asbru-cm
   ````
 
@@ -90,17 +90,13 @@ If you do not wish to run third party scripts on your systems, you can always ac
 - Debian / Ubuntu
 
   ````
-   curl -1sLf \
-  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' \
-  | sudo -E bash
+   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.deb.sh' | sudo -E bash
   ````
 
 - Fedora
 
   ````
-   curl -1sLf \
-  'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' \
-  | sudo -E bash
+   curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh' | sudo -E bash
   ````
 
 
@@ -155,9 +151,11 @@ If you like Ásbrú Connection Manager, you may also consider supporting the pro
 
 ### Packages
 
-The repositories for our RPM and DEB builds are thankfully sponsored by [packagecloud](https://packagecloud.io/). A great thanks to them.
+The repositories for our RPM and DEB builds are thankfully sponsored by [packagecloud](https://packagecloud.io/) and [Cloudsmith](https://cloudsmith.io). A great thanks to them.
 
 <a title="Private Maven, RPM, DEB, PyPi and RubyGem Repository" href="https://packagecloud.io/"><img height="46" width="158" alt="Private Maven, RPM, DEB, PyPi and RubyGem Repository" src="https://packagecloud.io/images/packagecloud-badge.png" /></a>
+
+<a href="https://cloudsmith.com/"><img height="46" widht="158" alt="Fast, secure development and distribution. Universal, web-scale package management" src="https://www.asbru-cm.net/assets/img/misc/cloudsmith-logo-color.png" /></a>
 
 [travis-badge]: https://travis-ci.org/asbru-cm/asbru-cm.svg?branch=master
 [travis-url]: https://travis-ci.org/asbru-cm/asbru-cm
