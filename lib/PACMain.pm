@@ -1114,7 +1114,7 @@ sub _setupCallbacks {
             $$self{_GUI}{connQuickBtn}->clicked();
         } elsif ($command eq 'start-uuid') {
             $self->_launchTerminals([ [ $message ] ]);
-        } elsif ($command eq'show-conn') {
+        } elsif ($command eq 'show-conn') {
             $self->_showConnectionsList();
         } elsif ($command eq 'edit-uuid') {
             my $uuid = $message;
@@ -3996,6 +3996,11 @@ sub _showConnectionsList {
     my $self = shift;
     my $move = shift // 1;
 
+    # Force hidden state so that the show operation is properly handled
+    # (otherwise the window may remain in the 'scratchpad' / 'withdrawn' state, as with i3wm)
+    $$self{_GUI}{main}->hide();
+
+    # Do show the main window
     $$self{_GUI}{main}->show();
     $$self{_GUI}{main}->present();
 
