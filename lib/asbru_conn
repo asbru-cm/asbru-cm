@@ -1085,16 +1085,21 @@ if (defined $METHOD) {
         } elsif (! $AUTHFALLBACK) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
+        # Build the command line
+        $connection_cmd = $METHOD
+                          . ($PORT > 0 ? " -p $PORT" : '')
+                          . ($key ne '' ? " $key" : "")
+                          . $CONNECT_OPTS
+                          . ($USER ? " -l $USER " : '')
+                          . " $IP";
         if ($proxy_jump) {
             if ($$CFG{'environments'}{$UUID}{'pseudo jump'}) {
                 # Pseudo jump, connect to the first server and then we will send the second connection command over the second server
+                $connection_cmd2 = $connection_cmd;
                 $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS jumpserver";
-                $connection_cmd2 = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
             } else {
                 $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
             }
-        } else {
-            $connection_cmd = "$METHOD -p $PORT $key $CONNECT_OPTS " . ($USER ? "-l $USER " : '') . "$IP";
         }
         $connection_txt = $connection_cmd;
     } elsif (($METHOD =~ /^.*mosh.*$/) || ($METHOD eq 'MOSH')) {

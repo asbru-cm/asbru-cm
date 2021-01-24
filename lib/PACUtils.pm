@@ -765,9 +765,6 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname cannot be empty');
             }
-            if (! _($self, 'entryPort')->get_chars(0, -1)) {
-                push(@faults, 'Port cannot be empty');
-            }
             if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
                 push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
@@ -784,6 +781,7 @@ sub _getMethods {
             _($self, 'imageConnOptions')->set_from_pixbuf($pixbuf);
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
+            _($self, 'entryPort')->set_range(0, 65536);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 22);
             _($self, 'labelIP')->set_text('Host: ');
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
