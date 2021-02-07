@@ -709,7 +709,10 @@ sub _initGUI {
         # Checkbutton to send or not to all terminals in cluster
         $$self{_GUI}{_MACROSCLUSTER} = Gtk3::CheckButton->new_with_label('Sending THIS: ');
         $$self{_GUI}{_MACROSCLUSTER}->set('can-focus', 0);
-        $$self{_GUI}{_MACROSCLUSTER}->signal_connect('toggled', sub {$$self{_GUI}{_MACROSCLUSTER}->set_label($$self{_GUI}{_MACROSCLUSTER}->get_active ? 'Sending CLUSTER: ' : 'Sending THIS: ');});
+        $$self{_GUI}{_MACROSCLUSTER}->signal_connect('toggled', sub {
+            my $str = $$self{_GUI}{_MACROSCLUSTER}->get_active() ? 'Sending CLUSTER: ' : 'Sending THIS: ';
+            $$self{_GUI}{_MACROSCLUSTER}->set_label($str);
+        });
         $$self{_GUI}{_MACROSBOX}->pack_start($$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0);
 
         # Create a GtkComboBox and add it to $macrosbox
@@ -3567,7 +3570,7 @@ sub _updateCFG {
             my $intro = $$hash{intro};
 
             my $ok = $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
-            if (($ok)&&($$self{_GUI}{_MACROSCLUSTER}->get_active)) {
+            if (($ok)&&($$self{_GUI}{_MACROSCLUSTER}->get_active())) {
                 $self->_clusterCommit(undef, $cmd . "\n", undef);
             }
             return 1;
@@ -3632,13 +3635,23 @@ sub _updateCFG {
         ###################################################################
     }
     # Build Buttons for macros
-    elsif ($$self{_CFG}{'defaults'}{'show commands box'} == 2 && defined $$self{_GUI}{_MACROSBOX})
+    elsif ($$self{_CFG}{'defaults'}{'show commands box'} == 2 && defined($$self{_GUI}{_MACROSBOX}))
     {
+        my $isCluster = $$self{_CLUSTER} ? 1 : 0;
+        my $wasMacroClusterActive = defined($$self{_GUI}{_MACROSCLUSTER}) ? $$self{_GUI}{_MACROSCLUSTER}->get_active() : $isCluster;
+
+        my $updateMacroButton = sub  {
+            my $str = 'Sending ' . ($$self{_GUI}{_MACROSCLUSTER}->get_active() ? 'CLUSTER' : 'THIS') . ':';
+            $$self{_GUI}{_MACROSCLUSTER}->set_label($str);
+        };
+
         $$self{_GUI}{_MACROSBOX}->set_sensitive($$self{CONNECTED});
         $$self{_GUI}{_MACROSBOX}->foreach(sub {$_[0]->destroy();});
-        $$self{_GUI}{_MACROSCLUSTER} = Gtk3::CheckButton->new_with_label('Sending THIS: ');
+        $$self{_GUI}{_MACROSCLUSTER} = Gtk3::CheckButton->new();
         $$self{_GUI}{_MACROSCLUSTER}->set('can-focus', 0);
-        $$self{_GUI}{_MACROSCLUSTER}->signal_connect('toggled', sub {$$self{_GUI}{_MACROSCLUSTER}->set_label($$self{_GUI}{_MACROSCLUSTER}->get_active ? 'Sending CLUSTER: ' : 'Sending THIS: ');});
+        $$self{_GUI}{_MACROSCLUSTER}->signal_connect('toggled', $updateMacroButton);
+        $$self{_GUI}{_MACROSCLUSTER}->set_active($wasMacroClusterActive);
+        &$updateMacroButton();
         $$self{_GUI}{_MACROSBOX}->pack_start($$self{_GUI}{_MACROSCLUSTER}, 0, 1, 0);
 
         ###################################################################
@@ -3665,7 +3678,7 @@ sub _updateCFG {
 
             $$self{_GUI}{"_BTNMACRO_$i"}->signal_connect('clicked' => sub {
                 my $ok = $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
-                if (($ok)&&($$self{_GUI}{_MACROSCLUSTER}->get_active)) {
+                if ($ok && $$self{_GUI}{_MACROSCLUSTER}->get_active()) {
                     $self->_clusterCommit(undef, $cmd . "\n", undef);
                 }
             });
@@ -3685,6 +3698,7 @@ sub _updateCFG {
                 $$self{_GUI}{"_BTNMACRO_GLOB_$i"} = Gtk3::Button->new();
                 $$self{_GUI}{"_BTNMACRO_GLOB_$i"}->set('can-focus', 0);
                 $$self{_GUI}{"_BTNMACRO_GLOB_$i"}->set_tooltip_text($cmd);
+
                 my $btn2 = Gtk3::Label->new($desc ? $desc : $cmd);
                 $btn2->set_ellipsize('PANGO_ELLIPSIZE_END');
                 $$self{_GUI}{"_BTNMACRO_GLOB_$i"}->add($btn2);
@@ -3692,7 +3706,12 @@ sub _updateCFG {
                 $$self{_GUI}{_MACROSBOX}->pack_start($$self{_GUI}{"_BTNMACRO_GLOB_$i"}, 1, 1, 0);
                 $$self{_GUI}{_MACROSBOX}->show_all();
 
-                $$self{_GUI}{"_BTNMACRO_GLOB_$i"}->signal_connect('clicked' => sub {$self->_execute('remote', $cmd, $confirm, undef, undef, $intro);});
+                $$self{_GUI}{"_BTNMACRO_GLOB_$i"}->signal_connect('clicked' => sub {
+                    my $ok = $self->_execute('remote', $cmd, $confirm, undef, undef, $intro);
+                    if ($ok && $$self{_GUI}{_MACROSCLUSTER}->get_active()) {
+                        $self->_clusterCommit(undef, $cmd . "\n", undef);
+                    }
+                });
 
                 ++$i;
             }
