@@ -110,6 +110,7 @@ our $CFG_FILE_OLD   = "pac.yml";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
+our $ASBRU_LANG     = 'en_US.UTF-8'; # no i18n support yet
 our $ASBRU;
 our $VERBOSE        = 0;
 # END: Define GLOBAL variables
@@ -128,6 +129,10 @@ foreach my $arg (@ARGV) {
         $ENV{'VERBOSE'} = 1;
     }
 }
+
+# Detect language
+print STDERR "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n";
+$ENV{'LANG'} = $ASBRU_LANG;
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -183,6 +188,7 @@ for (my $n = 1; $n < 5; $n++) {
     }
 }
 
+# Detect desktop
 getDesktopEnvironment();
 
 # Check if configuration is valid
