@@ -2068,7 +2068,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'color red'} //=  '#cccc00000000';
     $$cfg{'defaults'}{'color white'} //=  '#d3d3d7d7cfcf';
     $$cfg{'defaults'}{'color yellow'} //=  '#c4c4a0a00000';
-    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>]|\:\/\s*$';
+    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>~→]|\:\/\s*$';
     $$cfg{'defaults'}{'username prompt'} //= '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
     $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
     $$cfg{'defaults'}{'hostkey changed prompt'} //= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
@@ -2530,7 +2530,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} = 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} = '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} = '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>]|\:\/\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>~→]|\:\/\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}  = 'block';
