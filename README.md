@@ -157,8 +157,8 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 
 <a href="https://cloudsmith.com/"><img height="46" widht="158" alt="Fast, secure development and distribution. Universal, web-scale package management" src="https://www.asbru-cm.net/assets/img/misc/cloudsmith-logo-color.png" /></a>
 
-[travis-badge]: https://travis-ci.org/asbru-cm/asbru-cm.svg?branch=master
-[travis-url]: https://travis-ci.org/asbru-cm/asbru-cm
+[travis-badge]: https://travis-ci.com/asbru-cm/asbru-cm.svg?branch=master
+[travis-url]: https://travis-ci.com/asbru-cm/asbru-cm
 [license-badge]: https://img.shields.io/badge/License-GPL--3-blue.svg?style=flat
 [license-url]: LICENSE
 [deb-badge]: https://img.shields.io/badge/Packages-Debian-blue.svg?style=flat
