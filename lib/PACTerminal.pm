@@ -2396,6 +2396,7 @@ sub _openSFTP {
     $$self{_CFG}{environments}{$newuuid}{method} = 'SFTP';
     $$self{_CFG}{environments}{$newuuid}{expect} = [];
     $$self{_CFG}{environments}{$newuuid}{options} = '';
+    $$self{_CFG}{environments}{$newuuid}{autossh} = 0;
     $$self{_CFG}{environments}{$newuuid}{_protected} = 1;
     $PACMain::{FUNCS}{_MAIN}->_launchTerminals(\@idx);
 }
