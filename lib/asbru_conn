@@ -899,16 +899,19 @@ sub _openSocksTunnel {
 # Find out a free local TCP port
 sub _getLocalPort {
     my $LPORT = shift;
-    my $break = 100;
 
-    while ($break && (my $msg = `netstat -lnt | grep $LPORT 2>&1`)) {
-        if ($msg !~ /:$LPORT/) {
-            # netstat not installed?
-            last;
+    my $PING = Net::Ping->new('tcp');
+    $PING->service_check(0);
+
+    for (my $break = 0; $break < 100; ++$break) {
+        $PING->port_number($LPORT);
+        if (!$PING->ping('localhost')) {
+            return $LPORT;
         }
         $LPORT++;
-        $break--;
     }
+
+
     return $LPORT;
 }
 
