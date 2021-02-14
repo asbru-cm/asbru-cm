@@ -1336,6 +1336,7 @@ my $cmd_file = "$CFG_DIR/tmp/cmd_${UUID}_" . int(rand(123456789)) . ".run";
 if ($METHOD ne 'PACShell') {
     if (open(my $CMD, ">:utf8", $cmd_file)) {
         chmod(0400, $CMD);
+        print { $CMD } "rm -f $cmd_file\n"; # deleting the temporary file immediately after it has been started
         print { $CMD } $connection_cmd;
         close($CMD);
         $do_connection_cmd = "sh $cmd_file";
@@ -1948,11 +1949,6 @@ elsif (!$MANUAL) {
         ctrl("TITLE:$TITLE");
         ctrl("CONNECTED");
     }
-}
-
-# Once spawned, remove the temporary file (that may contain sensible information)
-if ($METHOD ne 'PACShell') {
-    unlink($cmd_file);
 }
 
 $SIG{'WINCH'} = sub {
