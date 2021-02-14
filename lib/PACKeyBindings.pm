@@ -197,6 +197,9 @@ sub GetAccelerator {
             if ($kb =~ /Shift/) {
                 $acc .= '<shift>';
             }
+            if ($key =~ /[A-Z]/) {
+                $acc .= '<shift>';
+            }
             $acc .= $key;
             last;
         }
