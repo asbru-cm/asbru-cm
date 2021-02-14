@@ -179,6 +179,11 @@ sub _initGUI {
     _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
     _($self, "linkHelpConn1")->set_label('');
     _($self, "linkHelpConn1")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    _($self, "linkHelpNetwokSettings")->set_label('');
+    _($self, "linkHelpNetwokSettings")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_label('');
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
@@ -388,6 +393,7 @@ sub _setupCallbacks {
             # For the time being, we will use the full path
             my $title = $selection;
             if ($title) {
+                _($self, 'entryIP')->set_text("<url|$title>");
                 if (_($self, 'rbCfgAuthUserPass')->get_active) {
                     _($self, 'entryUser')->set_text("<username|$title>");
                     _($self, 'entryPassword')->set_text("<password|$title>");
@@ -483,11 +489,13 @@ sub _setupCallbacks {
     # Capture proxy usage change
     _($self, 'rbUseProxyAlways')->signal_connect('toggled' => sub {
         _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     # Capture jump host change
     _($self, 'rbUseProxyJump')->signal_connect('toggled' => sub {
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     _($self, 'btnEditClearJumpPrivateKey')->signal_connect('clicked' => sub {
@@ -628,6 +636,24 @@ sub _setupCallbacks {
     _($self, 'cbStartScript')->signal_connect(toggled => sub {
         _($self, 'comboStartScript')->set_sensitive(_($self, 'cbStartScript')->get_active());
         _($self, 'cbStartScript')->get_active() and _($self, 'comboStartScript')->popup();
+    });
+
+    # Associated proxy settings to KeePass entries
+    _($self, 'btnEditNetworkSettingsCheckKPX')->signal_connect('clicked' => sub {
+        # User selects an entry in KeePass
+        my $title = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
+
+        if ($title) {
+            if (_($self, 'rbUseProxyAlways')->get_active) {
+                _($self, 'entryCfgProxyConnIP')->set_text("<url|$title>");
+                _($self, 'entryCfgProxyConnUser')->set_text("<username|$title>");
+                _($self, 'entryCfgProxyConnPassword')->set_text("<password|$title>");
+            } elsif (_($self, 'rbUseProxyJump')->get_active) {
+                _($self, 'entryCfgJumpConnIP')->set_text("<url|$title>");
+                _($self, 'entryCfgJumpConnUser')->set_text("<username|$title>");
+                _($self, 'entryCfgJumpConnPass')->set_text("<password|$title>");
+            }
+        }
     });
 
     return 1;
@@ -791,6 +817,8 @@ sub _updateGUIPreferences {
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
     }
+
+    _updateCfgProxyKeePass($self);
 
     return 1;
 }
@@ -958,6 +986,12 @@ sub _closeConfiguration {
     my $self = shift;
 
     $$self{_WINDOWEDIT}->hide();
+}
+
+sub _updateCfgProxyKeePass {
+    my $self = shift;
+
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'} && (_($self, 'rbUseProxyAlways')->get_active() || _($self, 'rbUseProxyJump')->get_active()));
 }
 
 # END: Define PRIVATE CLASS functions
