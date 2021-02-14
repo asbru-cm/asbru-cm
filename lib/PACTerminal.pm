@@ -1073,7 +1073,7 @@ sub _setupCallbacks {
             _vteFeedChild($$self{_GUI}{_VTE}, $text);
         } elsif ($action eq 'hostname') {
             ($$self{CONNECTED} && !$$self{CONNECTING}) and $self->_execute('remote', '<CTRL_TITLE:hostname>', undef, undef, undef);
-        } elsif ($action eq 'close' && !$$self{_TABBED}) {
+        } elsif ($action eq 'close') {
             $self->stop(undef, 1);
         } elsif ($action eq 'quit') {
             $PACMain::FUNCS{_MAIN}->_quitProgram;
