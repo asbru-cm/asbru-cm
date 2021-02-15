@@ -465,6 +465,7 @@ sub _buildExec {
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",      code => sub {$w{txt}->insert_text("<UUID>",      -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{txt}->insert_text("<SOCKS5_PORT>",-1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP", code => sub {$w{txt}->insert_text("<TIMESTAMP>", -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "DATE_Y",    code => sub {$w{txt}->insert_text("<DATE_Y>",    -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "DATE_M",    code => sub {$w{txt}->insert_text("<DATE_M>",    -1, $w{txt}->get_position());} });

@@ -121,6 +121,7 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 
 our %RUNNING;
 our %FUNCS;
+our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
 
 # END: Define GLOBAL CLASS variables

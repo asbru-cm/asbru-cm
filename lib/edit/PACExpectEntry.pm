@@ -700,6 +700,7 @@ sub _buildExpect {
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
@@ -815,6 +816,7 @@ sub _buildExpect {
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
