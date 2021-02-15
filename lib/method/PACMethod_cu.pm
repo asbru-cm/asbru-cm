@@ -178,7 +178,7 @@ sub _buildGUI
             $w{entryLine}->set_tooltip_text("[-l|--line] : Line to use to connect. Ex: /dev/ttyUSB0");
 
             $w{hbox1}->pack_start(Gtk3::Label->new(' Speed: '), 0, 1, 0);
-            $w{spSpeed} = Gtk3::SpinButton->new_with_range(1, 999999, 1);
+            $w{spSpeed} = Gtk3::SpinButton->new_with_range(1, 1999999, 1);
             $w{hbox1}->pack_start($w{spSpeed}, 0, 1, 0);
             $w{spSpeed}->set_tooltip_text("[-s|--speed] : Speed to use to connect. Ex: 9660");
             $w{spSpeed}->set_value(9660);
