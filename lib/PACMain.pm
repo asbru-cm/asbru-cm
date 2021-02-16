@@ -3994,17 +3994,19 @@ sub _delNodes {
 
 sub _showConnectionsList {
     my $self = shift;
-    my $move = shift // 1;
+    my $force = shift // 1;
 
-    # Force hidden state so that the show operation is properly handled
-    # (otherwise the window may remain in the 'scratchpad' / 'withdrawn' state, as with i3wm)
-    $$self{_GUI}{main}->hide();
+    if ($force) {
+        # Force hidden state so that the show operation is properly handled
+        # (otherwise the window may remain in the 'scratchpad' / 'withdrawn' state, as with i3wm)
+        $$self{_GUI}{main}->hide();
+        $$self{_GUI}{main}->show();
+    }
 
     # Do show the main window
-    $$self{_GUI}{main}->show();
     $$self{_GUI}{main}->present();
 
-    if ($move) {
+    if ($force) {
         $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
     }
 }
