@@ -164,8 +164,8 @@ if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /
     if ($VERBOSE) {
         print "INFO: Migration of alternate directory\n";
     }
-    system "rm -Rf $CFG_DIR_OLD";
-    system "mv -f $CFG_DIR $CFG_DIR.migration";
+    system "rm -Rf \"$CFG_DIR_OLD\"";
+    system "mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
     config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
@@ -284,12 +284,12 @@ sub CheckConfigurationFile {
             };
             if (!$@ && $cfg) {
                 print "INFO: Found valid file $CFG_FILE_NAME.$n, recovering...\n";
-                system "mv -f $CFG_FILE $BACKUP_CFG_FILE.$now.bad";
-                system "cp -fp $BACKUP_CFG_FILE.$n $CFG_FILE";
+                system "mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
+                system "cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
                 $OK = 1;
                 last;
             } else {
-                system "mv -f $BACKUP_CFG_FILE.$n $BACKUP_CFG_FILE.$n.$now.bad";
+                system "mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
             }
         }
         if (!$OK) {
@@ -306,12 +306,12 @@ sub CheckConfigurationFile {
         for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
             my $p = $n-1; # previous
             if (-e "$BACKUP_CFG_FILE.$p") {
-                system "cp -fp $BACKUP_CFG_FILE.$p $BACKUP_CFG_FILE.$n";
+                system "cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
             }
         }
     }
     # Save current known configuration
-    system "cp -fp $CFG_FILE $BACKUP_CFG_FILE.0";
+    system "cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
 }
 
 sub _wPopUP {
