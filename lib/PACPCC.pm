@@ -843,6 +843,15 @@ sub _setupCallbacks {
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
             my $terminal = $$self{_RUNNING}{$uuid}{'terminal'};
+
+            # Check that these are valid terminals
+            if (!defined($$self{_RUNNING}{$uuid}{terminal})) {
+                next;
+            }
+            if (ref($$self{_RUNNING}{$uuid}{terminal}) !~ /^PACTerminal|PACShell$/go) {
+                next;
+            }
+
             if ($col == $conns_per_row) {
                 $row++; $col = 0;
             }
@@ -864,12 +873,22 @@ sub _setupCallbacks {
     });
     # Capture 'Separate' button clicked
     $$self{_WINDOWPCC}{btnShowPipe}->signal_connect('clicked' => sub {$PACMain::FUNCS{_PIPE}->show;});
+
+    # Capture 'ReTab' button clicked
     $$self{_WINDOWPCC}{btnReTab}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
+            # Check that these are valid terminals
+            if (!defined($$self{_RUNNING}{$uuid}{terminal})) {
+                next;
+            }
+            if (ref($$self{_RUNNING}{$uuid}{terminal}) !~ /^PACTerminal|PACShell$/go) {
+                next;
+            }
+
             if (!$$self{_RUNNING}{$uuid}{'terminal'}{_TABBED}) {
-                $$self{_RUNNING}{$uuid}{'terminal'}->_winToTab;
+                $$self{_RUNNING}{$uuid}{'terminal'}->_winToTab();
             }
         }
     });
