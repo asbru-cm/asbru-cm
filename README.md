@@ -24,7 +24,7 @@
   - chain multiple SSH connections
   - automate tunnels creation
   - with line-send delay capabilities
-- [KeePassX](https://www.keepassx.org/) integration
+- [KeePassXC](https://keepassxc.org/) integration
 - Ability to connect to machines through a Proxy server
 - Cluster connections
 - Tabbed/Windowed terminals
