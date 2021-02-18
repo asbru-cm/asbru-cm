@@ -1202,6 +1202,104 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_generic.svg", 16, 16, 0)
     };
 
+    $methods{'Web'} = {
+        'installed' => sub {return 1;},
+        'checkCFG' => sub {
+            my $cfg = shift;
+
+            my @faults;
+
+            if (_($self, 'entryIP')->get_chars(0, -1) eq '') {
+                push(@faults, 'https://asbru-cm.net');
+            }
+
+            return @faults;
+        },
+        'updateGUI' => sub {
+            my $method = 'Web';
+            my $pixbuf = $$self{_METHODS}{$method}{'icon'};
+
+            _($self, 'imageMethod')->set_from_pixbuf($pixbuf);
+            _($self, 'imageConnOptions')->set_from_pixbuf($pixbuf);
+            _($self, 'labelIP')->set_text('URL: ');
+            _($self, 'entryIP')->set_property('tooltip-markup', "The target URL to be displayed");
+            _($self, 'framePort')->set_sensitive(0);
+            _($self, 'entryPort')->set_value(0);
+            _($self, 'entryUser')->set_text('');
+            _($self, 'entryPassword')->set_text('');
+            _($self, 'cbCfgAuthFallback')->set_sensitive(0);
+            _($self, 'frameExpect')->set_sensitive(1);
+            _($self, 'frameRemoteMacros')->set_sensitive(1);
+            _($self, 'frameLocalMacros')->set_sensitive(1);
+            _($self, 'frameVariables')->set_sensitive(1);
+            _($self, 'frameTerminalOptions')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'rbCfgAuthManual')->set_active(1);
+            _($self, 'entryUser')->set_sensitive(0);
+            _($self, 'entryPassphrase')->set_text('');
+            _($self, 'fileCfgPublicKey')->unselect_all();
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
+            _($self, 'labelExpect')->set_sensitive(1);
+            _($self, 'labelRemoteMacros')->set_sensitive(1);
+            _($self, 'labelLocalMacros')->set_sensitive(1);
+            _($self, 'labelVariables')->set_sensitive(1);
+            _($self, 'labelTerminalOptions')->set_sensitive(1);
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'cbAutossh')->set_sensitive(0);
+            _($self, 'cbAutossh')->set_active(0);
+        },
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_generic.svg", 16, 16, 0)
+    };
+
+    $methods{'Gemini'} = {
+        'installed' => sub {return 1;},
+        'checkCFG' => sub {
+            my $cfg = shift;
+
+            my @faults;
+
+            if (_($self, 'entryIP')->get_chars(0, -1) eq '') {
+                push(@faults, 'Capsule');
+            }
+
+            return @faults;
+        },
+        'updateGUI' => sub {
+            my $method = 'Web';
+            my $pixbuf = $$self{_METHODS}{$method}{'icon'};
+
+            _($self, 'imageMethod')->set_from_pixbuf($pixbuf);
+            _($self, 'imageConnOptions')->set_from_pixbuf($pixbuf);
+            _($self, 'labelIP')->set_text('Full command line: ');
+            _($self, 'entryIP')->set_property('tooltip-markup', "Full command line to execute, example:\nfirefox http://www.google.es\nor\nxdg-open \$HOME/Pictures/mounaint.jpg\nor\n/bin/bash -login\netc...");
+            _($self, 'framePort')->set_sensitive(0);
+            _($self, 'entryPort')->set_value(0);
+            _($self, 'entryUser')->set_text('');
+            _($self, 'entryPassword')->set_text('');
+            _($self, 'cbCfgAuthFallback')->set_sensitive(0);
+            _($self, 'frameExpect')->set_sensitive(1);
+            _($self, 'frameRemoteMacros')->set_sensitive(1);
+            _($self, 'frameLocalMacros')->set_sensitive(1);
+            _($self, 'frameVariables')->set_sensitive(1);
+            _($self, 'frameTerminalOptions')->set_sensitive(1);
+            _($self, 'alignAuthMethod')->set_sensitive(0);
+            _($self, 'rbCfgAuthManual')->set_active(1);
+            _($self, 'entryUser')->set_sensitive(0);
+            _($self, 'entryPassphrase')->set_text('');
+            _($self, 'fileCfgPublicKey')->unselect_all();
+            _($self, 'labelConnOptions')->set_markup("<b>$method</b>");
+            _($self, 'labelExpect')->set_sensitive(1);
+            _($self, 'labelRemoteMacros')->set_sensitive(1);
+            _($self, 'labelLocalMacros')->set_sensitive(1);
+            _($self, 'labelVariables')->set_sensitive(1);
+            _($self, 'labelTerminalOptions')->set_sensitive(1);
+            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'cbAutossh')->set_sensitive(0);
+            _($self, 'cbAutossh')->set_active(0);
+        },
+        'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_generic.svg", 16, 16, 0)
+    };
+
     return %methods;
 }
 

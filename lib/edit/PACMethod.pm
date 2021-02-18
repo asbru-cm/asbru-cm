@@ -87,6 +87,12 @@ $METHODS{'RDP (rdesktop)'} = "PACMethod_rdesktop"->new($CONTAINER);
 eval {require "$RealBin/lib/method/PACMethod_xfreerdp.pm";}; die $@ if $@;
 $METHODS{'RDP (xfreerdp)'} = "PACMethod_xfreerdp"->new($CONTAINER);
 
+eval {require "$RealBin/lib/method/AsbruMethod_gemini.pm";}; die $@ if $@;
+$METHODS{'Gemini'} = "AsbruMethod_gemini"->new($CONTAINER);
+
+eval {require "$RealBin/lib/method/AsbruMethod_web.pm";}; die $@ if $@;
+$METHODS{'Web'} = "AsbruMethod_web"->new($CONTAINER);
+
 my $tigervnc = `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
 my $realvnc = `vncviewer --help 2>&1 | /bin/grep RealVNC`;
 
