@@ -824,25 +824,34 @@ sub _setupCallbacks {
         return 1;
     });
 
-    # Capture 'Separate' button clicked
+    # Capture 'Explode' button clicked
     $$self{_WINDOWPCC}{btnSeparate}->signal_connect('clicked' => sub {
-        my $screen = Gtk3::Gdk::Screen::get_default;
-        my $sw = $screen->get_width;
-        my $sh = $screen->get_height-100;
-        my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
-        my $total = scalar(keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}}) or return 1;
+        my $screen = Gtk3::Gdk::Screen::get_default();
+        my $sw = $screen->get_width();
+        my $sh = $screen->get_height() - 100;
+        my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text() // '';
+        my $total = scalar(keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}}) or return 1;
 
         my $conns_per_row = $total < 5 ? 2 : 3;
         my $rows = POSIX::ceil($total / $conns_per_row) || 1;
-        my $defw=int($sw / (POSIX::ceil($total / $rows)));
-        my $defh=int($sh / (POSIX::ceil($total / $rows)));
+        my $defw = int($sw / (POSIX::ceil($total / $rows)));
+        my $defh = int($sh / (POSIX::ceil($total / $rows)));
 
 
         my $col = 0;
         my $row = 0;
-        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
+        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
             my $terminal = $$self{_RUNNING}{$uuid}{'terminal'};
+
+            # Check that these are valid terminals
+            if (!defined($$self{_RUNNING}{$uuid}{terminal})) {
+                next;
+            }
+            if (ref($$self{_RUNNING}{$uuid}{terminal}) !~ /^PACTerminal|PACShell$/go) {
+                next;
+            }
+
             if ($col == $conns_per_row) {
                 $row++; $col = 0;
             }
@@ -853,9 +862,9 @@ sub _setupCallbacks {
                 $$terminal{_WINDOWTERMINAL}->resize($defw, $defh);
             }
             # Move it to its corresponding position
-            $$terminal{_WINDOWTERMINAL}->move(($col*$defw+3),5+($row*$defh+($row*50)));
+            $$terminal{_WINDOWTERMINAL}->move(($col*$defw+3), 5+($row*$defh+($row*50)));
             $col++;
-            if ($col==$conns_per_row) {
+            if ($col == $conns_per_row) {
                 $row++;
                 $col=0;
             }
@@ -864,12 +873,22 @@ sub _setupCallbacks {
     });
     # Capture 'Separate' button clicked
     $$self{_WINDOWPCC}{btnShowPipe}->signal_connect('clicked' => sub {$PACMain::FUNCS{_PIPE}->show;});
+
+    # Capture 'ReTab' button clicked
     $$self{_WINDOWPCC}{btnReTab}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
+            # Check that these are valid terminals
+            if (!defined($$self{_RUNNING}{$uuid}{terminal})) {
+                next;
+            }
+            if (ref($$self{_RUNNING}{$uuid}{terminal}) !~ /^PACTerminal|PACShell$/go) {
+                next;
+            }
+
             if (!$$self{_RUNNING}{$uuid}{'terminal'}{_TABBED}) {
-                $$self{_RUNNING}{$uuid}{'terminal'}->_winToTab;
+                $$self{_RUNNING}{$uuid}{'terminal'}->_winToTab();
             }
         }
     });

@@ -860,21 +860,21 @@ sub _openSshTunnel {
     my ($uuid) = @_;
 
     if ($GETCMD) {
-        $proxy_get .= "\nssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         return 0;
     }
     $proxy_jump = 2;
 
     if (-e "$CFG_DIR/tmp/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
-        my $check = `ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -T -O check jumpserver 2>&1`;
+        my $check = `ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
     # Check if port we want to bind is not alreay in use
     $LPORT = _getLocalPort($PORT);
-    system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $CFG_DIR/tmp/$uuid.ctl -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
@@ -1031,7 +1031,7 @@ sub _hardClose {
     }
 
     if ($proxy_jump == 2 && -e $sock) {
-        system "ssh -F $CFG_DIR/tmp/$uuid.conf -S $sock -T -O exit jumpserver";
+        system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
     }
     if (-e $pipe) {
         unlink($pipe);
@@ -1099,9 +1099,9 @@ if (defined $METHOD) {
             if ($$CFG{'environments'}{$UUID}{'pseudo jump'}) {
                 # Pseudo jump, connect to the first server and then we will send the second connection command over the second server
                 $connection_cmd2 = $connection_cmd;
-                $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS jumpserver";
+                $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS jumpserver";
             } else {
-                $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -J jumpserver server";
+                $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -J jumpserver server";
             }
         }
         $connection_txt = $connection_cmd;
@@ -1130,7 +1130,7 @@ if (defined $METHOD) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
         if ($proxy_jump) {
-            $connection_cmd = "$METHOD -F $CFG_DIR/tmp/$UUID.conf $CONNECT_OPTS -o Proxyjump=jumpserver " . ($USER ? "$USER@" : '') . "$IP";
+            $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -o Proxyjump=jumpserver " . ($USER ? "$USER@" : '') . "$IP";
         } else {
             $connection_cmd = "$METHOD $key -P $PORT $CONNECT_OPTS " . ($USER ? "$USER@" : '') . "$IP";
         }
@@ -1232,13 +1232,13 @@ if (defined $METHOD) {
         _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
-            system("echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > $pfile");
+            system("echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
             if (defined $$CFG{'tmp'}{'xid'}) {
-                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
-                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
+                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
+                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
             } else {
-                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
-                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=$pfile $IP:$PORT";
+                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
+                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
             }
         } elsif ($method eq 'RealVNC') {
             my $user = $USER ? "UserName=$USER" : '';
@@ -1336,10 +1336,10 @@ my $cmd_file = "$CFG_DIR/tmp/cmd_${UUID}_" . int(rand(123456789)) . ".run";
 if ($METHOD ne 'PACShell') {
     if (open(my $CMD, ">:utf8", $cmd_file)) {
         chmod(0400, $CMD);
-        print { $CMD } "rm -f $cmd_file\n"; # deleting the temporary file immediately after it has been started
+        print { $CMD } "rm -f \"$cmd_file\"\n"; # deleting the temporary file immediately after it has been started
         print { $CMD } $connection_cmd;
         close($CMD);
-        $do_connection_cmd = "sh $cmd_file";
+        $do_connection_cmd = "sh \"$cmd_file\"";
     }
 }
 

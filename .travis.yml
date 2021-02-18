@@ -30,6 +30,7 @@ env:
     - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
     - OS=linuxmint DIST=tricia PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
     - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
+    - OS=linuxmint DIST=ulyssa PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3 python3-pip python3-setuptools
