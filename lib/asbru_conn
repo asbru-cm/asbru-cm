@@ -196,25 +196,35 @@ open_socket();
 # Use keepass ?
 my $kpxc;
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-    my ($ok);
+    sub _dieMissingKeePassEntry {
+        my $entry = shift;
+
+        die("$COLOR{'err'}ERROR$COLOR{'norm'} Unable to find entry $COLOR{'log'}$entry$COLOR{'norm'} in the configured KeePass database $COLOR{'log'}$$CFG{'defaults'}{'keepass'}{database}]$COLOR{'norm'}.\n");
+    }
+
+    my $ok;
     $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});
     if ($AUTH eq 'publickey') {
+        my $ORIG_PASSPHRASE = $PASSPHRASE;
         ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
         if (!$ok) {
-            die "$PASSPHRASE";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE);
         }
+        my $ORIG_PASSPHRASE_USER = $PASSPHRASE_USER;
         ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
         if (!$ok) {
-            die "$PASSPHRASE_USER";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE_USER);
         }
     } else {
+        my $ORIG_USER = $USER;
         ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
         if (!$ok) {
-            die "$USER";
+            _dieMissingKeePassEntry($ORIG_USER);
         }
+        my $ORIG_PASS = $PASS;
         ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
         if (!$ok) {
-            die "$PASS";
+            _dieMissingKeePassEntry($ORIG_PASS);
         }
     }
 } else {
