@@ -1077,10 +1077,11 @@ sub _initGUI {
         $self->_updateGUIFavourites();
     } elsif ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history') {
         $$self{_GUI}{nbTree}->set_current_page(2);
-        $self->_updateGUIClusters();
+        $self->_updateGUIHistory();
     } else {
         $$self{_GUI}{nbTree}->set_current_page(3);
-        $self->_updateGUIHistory();
+        $self->_updateClustersList();
+        $self->_updateGUIClusters();
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
