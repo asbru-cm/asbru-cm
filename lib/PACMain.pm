@@ -373,7 +373,7 @@ sub start {
     );
 
     # Show main interface
-    $$self{_GUI}{main}->show_all();
+    $$self{_GUI}{main}->show();
 
     # Apply Layout as early as possible
     $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
@@ -1006,7 +1006,7 @@ sub _initGUI {
 
     # Load window size/position, and treeconnections size
     $self->_loadGUIData();
-    if ($$self{_CFG}{defaults}{'start main maximized'}) {
+    if ($$self{_CFG}{defaults}{'start main maximized'} && $$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{main}->set_position('center');
         $$self{_GUI}{main}->maximize();
     } else {
@@ -1063,8 +1063,15 @@ sub _initGUI {
     $FUNCS{_METHODS} = $$self{_METHODS};
     $FUNCS{_MAIN} = $self;
 
-    # To show_all, or not to show_all... that's the question!! :)
-    $$self{_GUI}{main}->show_all() unless $$self{_CMDLINETRAY};
+    # Show the main window if not initially hidden in the systray
+    if (!$$self{_CMDLINETRAY}) {
+        if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+            $$self{_GUI}{vboxCommandPanel}->show_all();
+            $$self{_GUI}{hpane}->show();
+        } else {
+            $$self{_GUI}{main}->show_all();
+        }
+    }
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
     $$self{_GUI}{_vboxSearch}->hide();
 
@@ -1096,6 +1103,7 @@ sub _initGUI {
         if ($x > 0 || $y > 0) {
             $$self{_GUI}{posx} = $x;
             $$self{_GUI}{posy} = $y;
+            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
         }
     }
 
@@ -4002,6 +4010,12 @@ sub _showConnectionsList {
         # (otherwise the window may remain in the 'scratchpad' / 'withdrawn' state, as with i3wm)
         $$self{_GUI}{main}->hide();
         $$self{_GUI}{main}->show();
+    }
+
+    # Ensure compact panel is shown (could still be hidden if started iconified)
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{vboxCommandPanel}->show_all();
+        $$self{_GUI}{hpane}->show();
     }
 
     # Do show the main window
