@@ -2889,7 +2889,7 @@ sub _subst {
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
         $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
         $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
-        if ($$CFG{'environments'}{$uuid}{'socks5 tunnel active'} and defined $PACMain::SOCKS5PORTS{$uuid_tmp}) {
+        if ($$CFG{'environments'}{$uuid}{'socks5 tunnel active'} and defined($uuid_tmp) and defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
           $V{'SOCKS5_PORT'} = $PACMain::SOCKS5PORTS{$uuid_tmp};
         } else {
           $V{'SOCKS5_PORT'} = "";

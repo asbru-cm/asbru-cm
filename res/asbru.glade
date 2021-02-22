@@ -1272,10 +1272,10 @@ If not specified or invalid, the default SSH private key of your system will be 
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="has_tooltip">True</property>
-                                <property name="tooltip_text" translatable="yes">Allows you to open a socks5 tunnel on a random port and use it in the command field to launch other porgrams</property>
+                                <property name="tooltip_text" translatable="yes">Creates a SOCKS tunnel on a random port at connection startup.  Variable SOCKS5_PORT will contain the random port.  You can use it to start local commands and launch any other programs.</property>
                                 <child>
                                   <object class="GtkCheckButton" id="socks5TunnelActive">
-                                    <property name="label" translatable="yes">Random Socks5 tunnel</property>
+                                    <property name="label" translatable="yes">Create random SOCKS tunnel</property>
                                     <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
