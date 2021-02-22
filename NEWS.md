@@ -1,9 +1,50 @@
 # NEWS
+
 Here you can find important news on the project
+
+## 22.02.2021
+
+We are pleased to announce a bug fix release (6.3.1) of Ásbrú Connection Manager that addresses several minor issues:
+
+- Maximized connections list in compact layout ([#778](https://github.com/asbru-cm/asbru-cm/issues/778))
+- Issues when using a configuration directory that contains a space ([#777](https://github.com/asbru-cm/asbru-cm/issues/777))
+- Do not depend on nmap but ncat ([#776](https://github.com/asbru-cm/asbru-cm/issues/776))
+- Explode/ReTab in Power Cluster Controller ([#775](https://github.com/asbru-cm/asbru-cm/issues/775))
+- Empty clusters view on startup ([#753](https://github.com/asbru-cm/asbru-cm/issues/753))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
+
+## 16.02.2021
+
+We are pleased to announce a new version (6.3.0) of Ásbrú Connection Manager that brings some new important features:
+
+- Support for custom key bindings (fixes [#556](https://github.com/asbru-cm/asbru-cm/issues/556) [#285](https://github.com/asbru-cm/asbru-cm/issues/285) [#43](https://github.com/asbru-cm/asbru-cm/issues/43) [#590](https://github.com/asbru-cm/asbru-cm/issues/590) [#543](https://github.com/asbru-cm/asbru-cm/issues/543))
+- Start all connections of a selected group ([#534](https://github.com/asbru-cm/asbru-cm/issues/534))
+- Use KeePass for Host and IP of jump and proxy server ([#470](https://github.com/asbru-cm/asbru-cm/issues/470))
+- Support for drag and drop connections into groups ([#167](https://github.com/asbru-cm/asbru-cm/issues/167))
+- Support for default port in SSH connections ([#754](https://github.com/asbru-cm/asbru-cm/issues/754))
+- Support for infinite scrollback ([#739](https://github.com/asbru-cm/asbru-cm/issues/739))
+
+And other improvements or bugfixes:
+
+- Improve jump server and mosh support (fixes [#470](https://github.com/asbru-cm/asbru-cm/issues/470) [#490](https://github.com/asbru-cm/asbru-cm/issues/490) [#424](https://github.com/asbru-cm/asbru-cm/issues/424))
+- Ensure focus is set on terminal when right-clicking on it ([#604](https://github.com/asbru-cm/asbru-cm/issues/604))
+- Add option to print timestamp in session logs ([#603](https://github.com/asbru-cm/asbru-cm/issues/603))
+- Set focus to RDP terminals when entering the embed window ([#148](https://github.com/asbru-cm/asbru-cm/issues/148), [#638](https://github.com/asbru-cm/asbru-cm/issues/638))
+- Support KeePass in global network settings ([#639](https://github.com/asbru-cm/asbru-cm/issues/639))
+- Align buttons and layout in the "info" tab
+- Toggle display when entering/leaving the connections list when on the info tab ([#683](https://github.com/asbru-cm/asbru-cm/issues/683))
+- Fix regression when cleaning up terminal escape sequences
+- Process right clicks correctly when several nodes are selected ([#617](https://github.com/asbru-cm/asbru-cm/issues/617))
+- Fix panel refresh when terminal method is changed
+- Fix exception when closing a failed remote desktop connection
+- Can't enter User / Password for new SSH-Connection using generic command ([#735](https://github.com/asbru-cm/asbru-cm/issues/735))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
 
 ## 07.11.2020
 
-We are pleased to announce a bug fix release (6.2.1) of Ásbrú Connection Manager that addresses several issue.
+We are pleased to announce a bug fix release (6.2.2) of Ásbrú Connection Manager that addresses several issues.
 
 Most important to note is the move from Packagecloud to Cloudsmith for several reasons. We will be keeping the Packagecloud repository alive for some time. However new OS releases will only be published to Cloudsmith.
 
