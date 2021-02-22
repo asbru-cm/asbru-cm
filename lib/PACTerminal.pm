@@ -154,10 +154,10 @@ sub new {
 
     if ($self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'} . '/';
-        $self->{_LOGFILE} .= _subst($self->{_CFG}{'environments'}{$$self{_UUID}}{'session log pattern'}, $$self{_CFG}, $$self{_UUID});
+        $self->{_LOGFILE} .= _subst($self->{_CFG}{'environments'}{$$self{_UUID}}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     } elsif ($self->{_CFG}{'defaults'}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
-        $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID});
+        $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     } else {
         $self->{_LOGFILE} = "$CFG_DIR/tmp/$$self{_UUID_TMP}.txt";
     }
@@ -193,7 +193,7 @@ sub new {
     my $name = $$self{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $$self{_CFG}{'environments'}{$$self{_UUID}}{'title'};
     $$self{_TITLE} = $title || $name;
-    $$self{_TITLE} = _subst($$self{_TITLE}, $$self{_CFG}, $$self{_UUID});
+    $$self{_TITLE} = _subst($$self{_TITLE}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
 
     # Build the GUI
     _initGUI($self) or return 0;
@@ -403,6 +403,11 @@ sub start {
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
+    if ($$self{_CFG}{'environments'}{$$self{_UUID}}{'socks5 tunnel active'}) {
+        my $SOCKS5PORT = _getLocalPort(10240 + int(rand(65535 - 10240)));
+        $PACMain::SOCKS5PORTS{$$self{_UUID_TMP}} = $SOCKS5PORT;
+        $new_cfg{'tmp'}{'randSocks5Port'} = $SOCKS5PORT;
+    }
     nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save Ásbrú config file '$$self{_TMPCFG}': $!";
     undef %new_cfg;
 
@@ -471,7 +476,7 @@ sub start {
 
             my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
             my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID});
+            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
             _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
 
             return 1;
@@ -607,6 +612,8 @@ sub stop {
         delete $$self{_CFG}{environments}{$$self{_UUID}};
     }
 
+    delete $PACMain::SOCKS5PORTS{$$self{_UUID_TMP}};
+
     # And delete ourselves
     $$self{_GUI} = undef;
     undef $self;
@@ -636,6 +643,23 @@ sub unlock {
 
 ###################################################################
 # START: Private functions definitions
+
+# Find out a free local TCP port
+sub _getLocalPort {
+    my $LPORT = shift;
+
+    my $PING = Net::Ping->new('tcp');
+    $PING->service_check(0);
+
+    for (my $break = 0; $break < 100; ++$break) {
+        $PING->port_number($LPORT);
+        if (!$PING->ping('localhost')) {
+            return $LPORT;
+        }
+        $LPORT++;
+    }
+    return $LPORT;
+}
 
 sub _initGUI {
     my $self = shift;
@@ -1969,10 +1993,10 @@ sub _vteMenu {
         push(@variables_menu,
         {
             #label => "<V:$j> ($value)",
-            #code => sub {_vteFeedChild($$self{_GUI}{_VTE}, _subst("<V:$j>", $$self{_CFG}, $$self{_UUID}));}
+            #code => sub {_vteFeedChild($$self{_GUI}{_VTE}, _subst("<V:$j>", $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP}));}
             label => __($j),
             tooltip => "$j=$value",
-            code => sub {my $t = _subst("<V:$j>", $$self{_CFG}, $$self{_UUID}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
+            code => sub {my $t = _subst("<V:$j>", $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
         });
         ++$i;
     }
@@ -1991,7 +2015,7 @@ sub _vteMenu {
         {
             label => __($var),
             tooltip => "$var=$val",
-            code => sub {my $t = _subst("<GV:$var>", $$self{_CFG}, $$self{_UUID}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
+            code => sub {my $t = _subst("<GV:$var>", $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
         });
     }
     push(@insert_menu_items,
@@ -2013,7 +2037,7 @@ sub _vteMenu {
         {
             label => __($key),
             tooltip => "$key=$value",
-            code => sub {my $t = _subst("<ENV:$key>", $$self{_CFG}, $$self{_UUID}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
+            code => sub {my $t = _subst("<ENV:$key>", $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP}); _vteFeedChild($$self{_GUI}{_VTE}, $t);}
         });
     }
     push(@insert_menu_items,
@@ -2205,7 +2229,7 @@ sub _vteMenu {
 
                             my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
                             my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-                            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID});
+                            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
                             _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
 
                             return 1;
@@ -3074,7 +3098,7 @@ sub _execute {
         return 0;
     }
 
-    my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID});
+    my ($cmd, $data) = _subst($comm, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     if (!defined $cmd) {
         _wMessage($$self{_PARENTWINDOW}, "Canceled '<b>$where</b>' execution of '<b>$comm</b>'");
         return 0;
@@ -3214,7 +3238,7 @@ sub _wPrePostExec {
             }
 
             # Replace PAC variables with their corresponding values
-            $cmd = _subst($cmd, $$self{_CFG}, $$self{_UUID});
+            $cmd = _subst($cmd, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
 
             # Make some update to progress bar
             $ppe{window}{gui}{pb}->set_text('Executing: ' . $cmd);

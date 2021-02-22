@@ -1268,6 +1268,36 @@ If not specified or invalid, the default SSH private key of your system will be 
                             <property name="margin_bottom">5</property>
                             <property name="orientation">vertical</property>
                             <child>
+                              <object class="GtkBox" id="hbox570">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip_text" translatable="yes">Allows you to open a socks5 tunnel on a random port and use it in the command field to launch other porgrams</property>
+                                <child>
+                                  <object class="GtkCheckButton" id="socks5TunnelActive">
+                                    <property name="label" translatable="yes">Random Socks5 tunnel</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="xalign">0.5</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
                               <object class="GtkBox" id="hbox57">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
@@ -1370,7 +1400,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">0</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                             <child>
@@ -1450,7 +1480,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                             <child>
@@ -1489,7 +1519,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                             <child>
@@ -1702,6 +1732,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="tooltip_text" translatable="yes">Logfile pattern:
 
 &lt;UUID&gt; -&gt; UUID for this connection
+&lt;SOCKS5_PORT&gt; -&gt; Socks5 tunnel port
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -1715,7 +1746,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
 &lt;USER&gt; -&gt; Username for first jump
 </property>
                                                 <property name="invisible_char">•</property>
-                                                <property name="text" translatable="yes">&lt;UUID&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
+                                                <property name="text" translatable="yes">&lt;UUID&gt;_&lt;SOCKS5_PORT&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
                                                 <property name="caps_lock_warning">False</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
@@ -1753,7 +1784,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">3</property>
+                                <property name="position">4</property>
                               </packing>
                             </child>
                             <child>
@@ -1796,7 +1827,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">4</property>
+                                <property name="position">5</property>
                               </packing>
                             </child>
                             <child>
@@ -1810,7 +1841,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">5</property>
+                                <property name="position">6</property>
                               </packing>
                             </child>
                           </object>
@@ -5928,6 +5959,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="tooltip_text" translatable="yes">Logfile pattern:
 
 &lt;UUID&gt; -&gt; UUID for this connection
+&lt;SOCKS5_PORT&gt; -&gt; Socks5 tunnel port
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -5941,7 +5973,7 @@ sudo -p sudo_prompt_string ...</property>
 &lt;USER&gt; -&gt; Username for first jump
 </property>
                                         <property name="invisible_char">•</property>
-                                        <property name="text" translatable="yes">&lt;UUID&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
+                                        <property name="text" translatable="yes">&lt;UUID&gt;_&lt;SOCKS5_PORT&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
                                         <property name="caps_lock_warning">False</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>

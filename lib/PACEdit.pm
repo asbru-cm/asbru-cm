@@ -725,6 +725,7 @@ sub _updateGUIPreferences {
     _($self, 'comboMethod')->set_active($$self{_METHODS}{$$self{_CFG}{'environments'}{$uuid}{'method'}}{'position'} // 4);
     _($self, 'imageMethod')->set_from_stock('asbru-' . $$self{_CFG}{'environments'}{$uuid}{'method'}, 'button');
     _($self, 'entryTabWindowTitle')->set_text($$self{_CFG}{'environments'}{$uuid}{'title'} || "$$self{_CFG}{'environments'}{$uuid}{'name'} ");
+    _($self, 'socks5TunnelActive')->set_active($$self{_CFG}{'environments'}{$uuid}{'socks5 tunnel active'});
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'cbEditSendStringIntro')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string intro'});
@@ -904,6 +905,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'method'} = _($self, 'comboMethod')->get_active_text();
     $$self{_CFG}{'environments'}{$uuid}{'title'} = _($self, 'entryTabWindowTitle')->get_chars(0, -1) || "$$self{_CFG}{'environments'}{$uuid}{'name'} ";
     $$self{_CFG}{'environments'}{$uuid}{'auth fallback'} = ! _($self, 'cbCfgAuthFallback')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'socks5 tunnel active'} = _($self, 'socks5TunnelActive')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string active'} = _($self, 'cbEditSendString')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = _($self, 'entryEditSendString')->get_chars(0,-1);
     $$self{_CFG}{'environments'}{$uuid}{'send string intro'} = _($self, 'cbEditSendStringIntro')->get_active();

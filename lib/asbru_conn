@@ -393,7 +393,7 @@ sub subst {
     }
 
     # Reuse most of the implementation in PACUtils.pm
-    $string = _subst($string,$CFG,$UUID,1,$kpxc);
+    $string = _subst($string,$CFG,$UUID,$TMP_UUID,1,$kpxc);
 
     # Use local wEnterValue routine
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
@@ -1087,6 +1087,11 @@ if (defined $METHOD) {
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
         _setProxy('ssh');
+
+        if (defined $$CFG{'tmp'}{'randSocks5Port'}) {
+          $CONNECT_OPTS .= ' -D localhost:' . $$CFG{'tmp'}{'randSocks5Port'};
+        }
+
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }
