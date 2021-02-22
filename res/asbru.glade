@@ -3,7 +3,7 @@
 
 This file is part of Ásbrú Connection Manager.
 
-Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 Copyright (C) 2010-2016 David Torrejon Vaquerizas
 
 Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -26,7 +26,7 @@ If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-license-type gplv3 -->
   <!-- interface-name \303\201sbr\303\272 Connection Manager -->
   <!-- interface-description \303\201sbr\303\272 Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks. https://www.asbru-cm.net/ -->
-  <!-- interface-copyright 2017-2020 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
+  <!-- interface-copyright 2017-2021 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <!-- interface-authors \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <object class="GtkAdjustment" id="adjConnPort">
     <property name="lower">1</property>
