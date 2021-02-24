@@ -1064,13 +1064,11 @@ sub _initGUI {
     $FUNCS{_MAIN} = $self;
 
     # Show the main window if not initially hidden in the systray
-    if (!$$self{_CMDLINETRAY}) {
-        if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-            $$self{_GUI}{vboxCommandPanel}->show_all();
-            $$self{_GUI}{hpane}->show();
-        } else {
-            $$self{_GUI}{main}->show_all();
-        }
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{vboxCommandPanel}->show_all();
+        $$self{_GUI}{hpane}->show();
+    } else {
+        $$self{_GUI}{main}->show_all();
     }
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
     $$self{_GUI}{_vboxSearch}->hide();
