@@ -56,10 +56,11 @@ To do so, execute the following commands:
   $ sudo dnf install asbru-cm
   ````
 
-- Arch / Manjaro
+- Pacman-based (e.g. Arch Linux, Manjaro)
 
   ````
-  yaourt -S asbru-cm-git
+  git clone https://aur.archlinux.org/asbru-cm-git.git && cd asbru-cm-git
+  makepkg -si
   ````
   
 - MX Linux
