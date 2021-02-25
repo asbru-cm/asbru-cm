@@ -847,6 +847,7 @@ sub _initGUI {
 
         _setupTabDND($self);
 
+        # DevNote: append_page is having a side effect that shows the main window (if hidden), see #783
         $tabs->append_page($$self{_GUI}{_VBOX}, $$self{_GUI}{_TABLBL});
         $tabs->show();
         $$self{_GUI}{_VBOX}->show_all();

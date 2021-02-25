@@ -236,7 +236,6 @@ sub new {
     }
 
     # Start iconified is option set or command line option --iconified
-
     if (($$self{_CFG}{defaults}{'start iconified'}) || (grep({ /^--iconified$/ } @{ $$self{_OPTS} }))) {
         $$self{_CMDLINETRAY} = 1;
     }
@@ -373,7 +372,9 @@ sub start {
     );
 
     # Show main interface
-    $$self{_GUI}{main}->show();
+    if (!$$self{_CMDLINETRAY}) {
+        $$self{_GUI}{main}->show();
+    }
 
     # Apply Layout as early as possible
     $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
@@ -1064,11 +1065,13 @@ sub _initGUI {
     $FUNCS{_MAIN} = $self;
 
     # Show the main window if not initially hidden in the systray
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{vboxCommandPanel}->show_all();
-        $$self{_GUI}{hpane}->show();
-    } else {
-        $$self{_GUI}{main}->show_all();
+    if (!$$self{_CMDLINETRAY}) {
+        if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+            $$self{_GUI}{vboxCommandPanel}->show_all();
+            $$self{_GUI}{hpane}->show();
+        } else {
+            $$self{_GUI}{main}->show_all();
+        }
     }
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
     $$self{_GUI}{_vboxSearch}->hide();
@@ -3262,7 +3265,7 @@ sub _launchTerminals {
 
     # Start all created terminals
     foreach my $t (@new_terminals) {
-        if ($$t{_TABBED}) {
+        if ($$t{_TABBED} && !$$self{_CMDLINETRAY}) {
             $$self{_GUI}{_PACTABS}->present();
         }
 
@@ -3288,7 +3291,7 @@ sub _launchTerminals {
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
-    if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
+    if (!$$self{_CMDLINETRAY} && $$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         $self->_showConnectionsList(0);
     }
     if (@new_terminals) {
@@ -4015,6 +4018,13 @@ sub _showConnectionsList {
         $$self{_GUI}{vboxCommandPanel}->show_all();
         $$self{_GUI}{hpane}->show();
     }
+
+    # The first first display when started iconified must be a show_all
+    if ($$self{_CMDLINETRAY} == 1) {
+        $$self{_GUI}{main}->show_all();
+        $$self{_CMDLINETRAY} = 2;
+    }
+    
 
     # Do show the main window
     $$self{_GUI}{main}->present();
