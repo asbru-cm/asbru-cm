@@ -26,8 +26,8 @@ $|++;
 ###################################################################
 # Import Modules
 use utf8;
-binmode STDOUT,':utf8';
-binmode STDERR,':utf8';
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 
 # Standard
 use strict;
@@ -159,15 +159,15 @@ sub _initGUI {
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
-    foreach my $o ('MO','TO') {
-        foreach my $t ('BE','LF','AD') {
+    foreach my $o ('MO', 'TO') {
+        foreach my $t ('BE', 'LF', 'AD') {
             _($self, "linkHelp$o$t")->set_label('');
             _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
         }
     }
-    foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
-        _($self,$t)->set_label('');
-        _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    foreach my $t ('linkHelpLocalShell', 'linkHelpGlobalNetwork') {
+        _($self, $t)->set_label('');
+        _($self, $t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 
     # Option currently disabled
@@ -188,7 +188,7 @@ sub _initGUI {
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
-    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings},$$self{_WINDOWCONFIG}))->{container});
+    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings}, $$self{_WINDOWCONFIG}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     _($self, 'btnCfgProxyCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
@@ -465,27 +465,27 @@ sub _setupCallbacks {
     # Layout signal
     _($self, 'comboLayout')->signal_connect('changed' => sub {
         if (_($self, 'comboLayout')->get_active_text() eq 'Traditional') {
-            _($self,'frameTabsInMainWindow')->show();
-            _($self,'frameTabsInMainWindow')->show();
-            _($self,'cbCfgStartMainMaximized')->show();
-            _($self,'cbCfgRememberSize')->show();
-            _($self,'cbCfgSaveOnExit')->show();
-            _($self,'cbCfgStartIconified')->show();
-            _($self,'cbCfgCloseToTray')->show();
-            _($self,'cbCfgShowTreeTitles')->show();
-            _($self,'cbCfgShowTreeTitles')->set_active(1);
+            _($self, 'frameTabsInMainWindow')->show();
+            _($self, 'frameTabsInMainWindow')->show();
+            _($self, 'cbCfgStartMainMaximized')->show();
+            _($self, 'cbCfgRememberSize')->show();
+            _($self, 'cbCfgSaveOnExit')->show();
+            _($self, 'cbCfgStartIconified')->show();
+            _($self, 'cbCfgCloseToTray')->show();
+            _($self, 'cbCfgShowTreeTitles')->show();
+            _($self, 'cbCfgShowTreeTitles')->set_active(1);
         } else {
-            _($self,'frameTabsInMainWindow')->hide();
-            _($self,'cbCfgStartMainMaximized')->hide();
-            _($self,'cbCfgRememberSize')->hide();
-            _($self,'cbCfgSaveOnExit')->hide();
-            _($self,'cbCfgSaveOnExit')->set_active(1);
-            _($self,'cbCfgAutoSave')->set_active(1);
-            _($self,'cbCfgShowTreeTitles')->hide();
-            _($self,'cbCfgShowTreeTitles')->set_active(0);
+            _($self, 'frameTabsInMainWindow')->hide();
+            _($self, 'cbCfgStartMainMaximized')->hide();
+            _($self, 'cbCfgRememberSize')->hide();
+            _($self, 'cbCfgSaveOnExit')->hide();
+            _($self, 'cbCfgSaveOnExit')->set_active(1);
+            _($self, 'cbCfgAutoSave')->set_active(1);
+            _($self, 'cbCfgShowTreeTitles')->hide();
+            _($self, 'cbCfgShowTreeTitles')->set_active(0);
             if (!$PACMain::STRAY) {
-                _($self,'cbCfgStartIconified')->hide();
-                _($self,'cbCfgCloseToTray')->hide();
+                _($self, 'cbCfgStartIconified')->hide();
+                _($self, 'cbCfgCloseToTray')->hide();
             }
         }
     });
@@ -622,12 +622,12 @@ sub cleanUpPersonalData {
     $SIG{__WARN__} = sub{};
     print STDERR "SAVED IN : $file\nOUT: $out\n";
     # Remove all personal information
-    open(F,"<:utf8",$file);
-    open(D,">:utf8",$out);
+    open(F, "<:utf8", $file);
+    open(D, ">:utf8", $out);
     my $C = 0;
     while (my $line = <F>) {
         my $next = 0;
-        foreach my $key ('name','send','ip','user','prepend command','database','gui password','sudo password') {
+        foreach my $key ('name', 'send', 'ip', 'user', 'prepend command', 'database', 'gui password', 'sudo password') {
             if ($line =~ /^[\t ]+$key:/) {
                 $line =~ s/$key:.+/$key: 'removed'/;
                 $next = 1;
@@ -726,8 +726,8 @@ sub _resetDefaults {
 sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
-    my %layout = ('Traditional',0,'Compact',1);
-    my %theme = ('default',0,'asbru-color',1,'asbru-dark',2,'system',3);
+    my %layout = ('Traditional', 0, 'Compact', 1);
+    my %theme = ('default', 0, 'asbru-color', 1, 'asbru-dark', 2, 'system', 3);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -774,7 +774,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
-    _($self, 'entryCfgPasswordPrompt')->select_region(0,0);
+    _($self, 'entryCfgPasswordPrompt')->select_region(0, 0);
     _($self, 'entryCfgHostKeyVerification')->set_text($$cfg{'defaults'}{'hostkey changed prompt'});
     _($self, 'entryCfgPressAnyKey')->set_text($$cfg{'defaults'}{'press any key prompt'});
     _($self, 'entryCfgRemoteHostChanged')->set_text($$cfg{'defaults'}{'remote host changed prompt'});
@@ -951,10 +951,10 @@ sub _updateGUIPreferences {
 
     # Hide show options not available on choosen layout
     if ($$cfg{'defaults'}{'layout'} eq 'Compact') {
-        _($self,'frameTabsInMainWindow')->hide();
-        _($self,'cbCfgStartMainMaximized')->hide();
-        _($self,'cbCfgRememberSize')->hide();
-        _($self,'cbCfgSaveOnExit')->hide();
+        _($self, 'frameTabsInMainWindow')->hide();
+        _($self, 'cbCfgStartMainMaximized')->hide();
+        _($self, 'cbCfgRememberSize')->hide();
+        _($self, 'cbCfgSaveOnExit')->hide();
         _($self, 'cbCfgCloseToTray')->hide();
         if ($$cfg{'defaults'}{'close to tray'} == 0) {
             # Force close to tray on Compact mode
@@ -962,7 +962,7 @@ sub _updateGUIPreferences {
             $$cfg{'defaults'}{'close to tray'} = 1;
         }
         if (!$PACMain::STRAY) {
-            _($self,'cbCfgStartIconified')->hide();
+            _($self, 'cbCfgStartIconified')->hide();
         }
     }
 
@@ -1186,7 +1186,7 @@ sub _saveConfiguration {
             mkdir($autostart_dir);
         }
         if (-d $autostart_dir) {
-            open(F, ">:utf8","$autostart_dir/asbru_start.desktop");
+            open(F, ">:utf8", "$autostart_dir/asbru_start.desktop");
             print F join("\n", @PACUtils::PACDESKTOP);
             close F;
             $$self{_CFG}{'defaults'}{'start at session startup'} = 1;
