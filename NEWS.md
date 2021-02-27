@@ -2,6 +2,16 @@
 
 Here you can find important news on the project
 
+## 27.02.2021
+
+We are pleased to announce a bug fix release (6.3.2) of Ásbrú Connection Manager that addresses several issues:
+
+- Better install instructions for Pacman-based distribution ([#784](https://github.com/asbru-cm/asbru-cm/pull/784))
+- Blank window when starting iconified ([#783](https://github.com/asbru-cm/asbru-cm/issues/783))
+- Install issue on older Debian-based distribution ([#782](https://github.com/asbru-cm/asbru-cm/issues/782))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
+
 ## 22.02.2021
 
 We are pleased to announce a bug fix release (6.3.1) of Ásbrú Connection Manager that addresses several minor issues:
