@@ -2292,36 +2292,8 @@ sub _setupCallbacks {
 
         $$self{_PREVTAB} = $nb->get_current_page();
 
-        my $tab_page = $nb->get_nth_page($pnum);
+        $self->_doFocusPage($pnum);
 
-        $$self{_HAS_FOCUS} = '';
-        foreach my $tmp_uuid (keys %RUNNING) {
-            my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
-
-            if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
-                next;
-            }
-
-            my $uuid = $RUNNING{$tmp_uuid}{uuid};
-            my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
-            if ($path) {
-                $$self{_GUI}{treeConnections}->expand_to_path($path);
-                $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            }
-
-            $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
-
-            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
-                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
-                    }
-                };
-                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
-            }
-            $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
-            last;
-        }
         $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
@@ -4059,11 +4031,24 @@ sub _doToggleDisplayConnectionsList {
     my $self = shift;
 
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{showConnBtn}->get_active() ? $PACMain::FUNCS{_MAIN}->_showConnectionsList() : $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
-    } else {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+        } else {
+            $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
+        }
+    } else {
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{vboxCommandPanel}->show();
+        } else {
+            $$self{_GUI}{vboxCommandPanel}->hide();
+        }
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            # Remeber that no VTE has te focus anymore
+            $$self{_HAS_FOCUS} = '';
             $$self{_GUI}{treeConnections}->grab_focus();
+        } else {
+            my $pnum = $$self{_GUI}{nb}->get_current_page();
+            $self->_doFocusPage($pnum);
         }
     }
 }
@@ -4935,6 +4920,44 @@ sub _getCurrentTree {
     return $tree;
 }
 
+# Forces focus to the terminal inside the focused page
+sub _doFocusPage {
+    my $self = shift;
+    my $pnum = shift;
+    my $tab_page = $$self{_GUI}{nb}->get_nth_page($pnum);
+
+    $$self{_HAS_FOCUS} = '';
+    foreach my $tmp_uuid (keys %RUNNING) {
+        my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
+
+        if (!defined($check_gui) || ($check_gui ne $tab_page)) {
+            next;
+        }
+
+        my $uuid = $RUNNING{$tmp_uuid}{uuid};
+        my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
+        if ($path) {
+            $$self{_GUI}{treeConnections}->expand_to_path($path);
+            $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
+        }
+
+        $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
+
+        if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
+            eval {
+                if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
+                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
+                }
+            };
+            $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
+        }
+        $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
+
+        # When found, do not process further
+        last;
+    }
+}
+
 # END: Define PRIVATE CLASS functions
 ###################################################################
 
@@ -5229,3 +5252,7 @@ Pending
 =head2 sub _getCurrentTree
 
 Returns the currently selected tree (from the left menu)
+
+=head2 sub _doFocusPage
+
+Forces focus to the terminal inside the focused page
