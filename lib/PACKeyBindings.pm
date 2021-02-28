@@ -83,7 +83,9 @@ sub GetKeyMask {
     my $ctrl    = $state * ['control-mask'] ? 'Ctrl'  : '';
     my $alt     = $state * ['mod1-mask']    ? 'Alt'   : '';
 
-    #print "$keyval : $unicode : $ctrl : $shift\n";
+    if ($self->{verbose}) {
+        print "INFO: GETKEYMASK: $keyval, $unicode, $ctrl / $shift\n";
+    }
 
     # Test special keys
     if ($keyval =~ /^KP_(.+)/) {
@@ -325,7 +327,7 @@ sub update {
             if ($kb =~ /^undef-/) {
                 $kb = '';
             }
-            push(@{$$self{frame}{keylist}{'data'}}, {value => ["<b>$$wk{$k}[0]</b>", $$wk{$k}[2], $kb, $$wk{$k}[1], $w], children => []});
+            push(@{$$self{frame}{keylist}{'data'}}, {value => ["<b>$$wk{$k}[0]</b>", $$wk{$k}[2], $self->stringifyKeybind($kb), $$wk{$k}[1], $w], children => []});
         }
     }
 }
@@ -334,6 +336,50 @@ sub get_cfg {
     my $self = shift;
 
     return $self->{cfg};
+}
+
+sub stringifyKeybind {
+    my $self = shift;
+    my $kb = shift;
+
+    if ($kb =~ /\+[A-Z]$/) {
+        $kb = 'Shift+' . $kb;
+        $kb =~ s/(.*)\+([A-Z])$/$1\+\L$2/;
+    }
+    if ($kb =~ /CtrlShift\+/) {
+        $kb =~ s/(.*)CtrlShift\+(.*)/$1Shift\+Ctrl\+$2/;
+    }
+    if ($kb =~ /AltCtrl\+/) {
+        $kb =~ s/(.*)AltCtrl\+(.*)/$1Alt\+Ctrl\+$2/;
+    }
+    if ($kb =~ /CtrlAlt\+/) {
+        $kb =~ s/(.*)CtrlAlt\+(.*)/$1Alt\+Ctrl\+$2/;
+    }
+    if ($kb =~ /Shift\+Ctrl\+/) {
+        $kb =~ s/(.*)Shift\+Ctrl\+(.*)/$1Ctrl\+Shift\+$2/;
+    }
+
+    return $kb;
+}
+
+sub unStringifyKeybind {
+    my $self = shift;
+    my $kb = shift;
+
+    if ($kb =~ /Shift\+[a-z]$/) {
+        $kb =~ s/(.*)Shift\+([a-z])$/$1\U$2/;
+    }
+    if ($kb =~ /Ctrl\+Shift\+/) {
+        $kb =~ s/(.*)Ctrl\+Shift\+(.*)/$1Shift\+Ctrl\+$2/;
+    }
+    if ($kb =~ /Alt\+Ctrl\+/) {
+        $kb =~ s/(.*)Alt\+Ctrl\+(.*)/$1AltCtrl\+$2/;
+    }
+    if ($kb =~ /Shift\+Ctrl\+/) {
+        $kb =~ s/(.*)Shift\+Ctrl\+(.*)/$1CtrlShift\+$2/;
+    }
+
+    return $kb;
 }
 
 # END: Public class methods
@@ -539,6 +585,8 @@ sub _buildGUI {
         my ($window, $desc, $keybind, $action, $pacwin) = $model->get($model->get_iter($paths[0]));
         my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
 
+        $keybind = $self->unStringifyKeybind($keybind);
+
         if ($self->{verbose}) {
             print "INFO: KEY: $keyval, $unicode, $keymask\n";
             print "INFO: ROW: $window : $desc : $keybind : $action : $pacwin\n";
@@ -595,7 +643,7 @@ sub _updateKeyBinding {
                 } else {
                     $warning = "This keybind will not be available for window <b>$$cfg{$w}{$keynew}[0]</b>\nwhen <b>$other</b> is visible.";
                 }
-                _wMessage($self->{parent}, "<i>$keynew</i> used in\n\n<b>$$cfg{$w}{$keynew}[0]</b> : $$cfg{$w}{$keynew}[2]\n\n$warning");
+                _wMessage($self->{parent}, "<i>" . $self->stringifyKeybind($keynew) . "</i> used in\n\n<b>$$cfg{$w}{$keynew}[0]</b> : $$cfg{$w}{$keynew}[2]\n\n$warning");
             }
         }
     }
@@ -609,7 +657,7 @@ sub _updateKeyBinding {
     if ($undef) {
         $keynew = '';
     }
-    $model->set_value($model->get_iter($path), 2, Glib::Object::Introspection::GValueWrapper->new('Glib::String', $keynew));
+    $model->set_value($model->get_iter($path), 2, Glib::Object::Introspection::GValueWrapper->new('Glib::String', $self->stringifyKeybind($keynew)));
 }
 
 # END: Private Methods
