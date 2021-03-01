@@ -2211,7 +2211,6 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'use prepend command'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'prepend command'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'quote command'} = 0;
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'socks5 tunnel active'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string active'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string txt'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string intro'} = 1;
@@ -2374,7 +2373,6 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
         $$cfg{'environments'}{$uuid}{'quote command'} //= 0;
-        $$cfg{'environments'}{$uuid}{'socks5 tunnel active'} //= 0;
         $$cfg{'environments'}{$uuid}{'send string active'} //= 0;
         $$cfg{'environments'}{$uuid}{'send string txt'} //= '';
         $$cfg{'environments'}{$uuid}{'send string intro'} //= 1;
@@ -2889,7 +2887,7 @@ sub _subst {
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
         $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
         $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
-        if ($$CFG{'environments'}{$uuid}{'socks5 tunnel active'} and defined($uuid_tmp) and defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
+        if ($$CFG{'environments'}{$uuid}{'method'} =~ /ssh/i && $$CFG{'environments'}{$uuid}{options} =~ / #Ásbrú#RST#/ && defined($uuid_tmp) and defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
           $V{'SOCKS5_PORT'} = $PACMain::SOCKS5PORTS{$uuid_tmp};
         } else {
           $V{'SOCKS5_PORT'} = "";

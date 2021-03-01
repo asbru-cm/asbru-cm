@@ -256,6 +256,13 @@ $$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
+# Clean up and specific Ásbrú option
+if ($CONNECT_OPTS =~ s/ #Ásbrú#[A-Z]+#//) {
+    if (!defined($$CFG{'tmp'}{'randSocks5Port'})) {
+        $$CFG{'tmp'}{'randSocks5Port'} = 'SOCKS5_PORT';
+    }
+    $CONNECT_OPTS .= ' -D localhost:' . $$CFG{'tmp'}{'randSocks5Port'};
+}
 
 my %_W;
 my $INT = 0;
@@ -1087,10 +1094,6 @@ if (defined $METHOD) {
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
         _setProxy('ssh');
-
-        if (defined $$CFG{'tmp'}{'randSocks5Port'}) {
-          $CONNECT_OPTS .= ' -D localhost:' . $$CFG{'tmp'}{'randSocks5Port'};
-        }
 
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';

@@ -104,13 +104,16 @@ sub update
     my $self = shift;
     my $cfg = shift;
 
-    defined $cfg and $$self{cfg} = $cfg;
+    if (defined($cfg)) {
+        $$self{cfg} = $cfg;
+    }
 
     my $options = _parseCfgToOptions($$self{cfg});
 
     $$self{gui}{cbSSHVersion}->set_active($SSH_VERSION{$$options{sshVersion} // 'any'});
     $$self{gui}{cbSSHProtocol}->set_active($IP_PROTOCOL{$$options{ipVersion} // 'any'});
     $$self{gui}{chNoRemoteCmd}->set_active($$options{noRemoteCmd});
+    $$self{gui}{chRandomSocksTunnel}->set_active($$options{randomSocksTunnel});
     $$self{gui}{chForwardX}->set_active($$options{forwardX});
     $$self{gui}{chUseCompression}->set_active($$options{useCompression});
     $$self{gui}{chAllowPortConnect}->set_active($$options{allowRemoteConnection});
@@ -190,6 +193,7 @@ sub get_cfg
     $options{sshVersion} = $$self{gui}{cbSSHVersion}->get_active_text();
     $options{ipVersion} = $$self{gui}{cbSSHProtocol}->get_active_text();
     $options{noRemoteCmd} = $$self{gui}{chNoRemoteCmd}->get_active();
+    $options{randomSocksTunnel} = $$self{gui}{chRandomSocksTunnel}->get_active();
     $options{forwardX} = $$self{gui}{chForwardX}->get_active();
     $options{useCompression} = $$self{gui}{chUseCompression}->get_active();
     $options{allowRemoteConnection} = $$self{gui}{chAllowPortConnect}->get_active();
@@ -271,6 +275,7 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
+    $options{randomSocksTunnel} = ($cmd_line =~ s/ #Ásbrú#RST#//);
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -360,6 +365,7 @@ sub _parseOptionsToCfg
     foreach my $remote (@{$$hash{remotePort}}) {
         $txt .= ' -R ' . ($$remote{localIP} ? "$$remote{localIP}:" : '') . $$remote{localPort} . ':' . $$remote{remoteIP} . ':' . $$remote{remotePort};
     }
+    $txt .= ' #Ásbrú#RST#' if $$hash{randomSocksTunnel};
 
     return $txt;
 }
@@ -462,6 +468,10 @@ sub _buildGUI
     $w{chNoRemoteCmd} = Gtk3::CheckButton->new_with_label('Do NOT execute remote command');
     $hbox2->pack_start($w{chNoRemoteCmd}, 1, 1, 0);
     $w{chNoRemoteCmd}->set_tooltip_text('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)');
+
+    $w{chRandomSocksTunnel} = Gtk3::CheckButton->new_with_label('Create random SOCKS tunnel');
+    $hbox2->pack_start($w{chRandomSocksTunnel}, 1, 1, 0);
+    $w{chRandomSocksTunnel}->set_tooltip_text('Creates a SOCKS tunnel on a random port at connection startup.  Variable SOCKS5_PORT will contain the random port.  You can use it to start local commands and launch any other programs.');
 
     $w{hbox4} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hbox4}, 1, 1, 0);
