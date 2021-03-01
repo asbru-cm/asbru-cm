@@ -531,6 +531,37 @@ sub _setupCallbacks {
         }
     });
 
+    # Monitor the main notebook and detects when we are switching to the keybindings frame
+    # When the keybindings frame is shown, all 'mnemonics' has to be disabled to avoid conflicts when assigning keyboard shortcuts
+    # When another frame is shown, original mnemonics are restored
+    # DevNote: did not find a way to ignore the mnemonic, if use 'mnemonic_activate' ; the shortcut was not processed by the keybindings frame at all
+    my $hasMnemonics = 1;
+    my $labelClose = _($self, 'label86')->get_label();
+    my $textClose = _($self, 'label86')->get_text();
+    my $labelSave = _($self, 'label16')->get_label();
+    my $textSave = _($self, 'label16')->get_text();
+    my $labelReset = _($self, 'btnResetDefaults')->get_label();
+    my $textReset = $labelReset =~ s/_//r;
+    _($self, 'nbPreferences')->signal_connect('switch_page' => sub {
+        my ($nb, $frame, $data) = @_;
+        if ($frame eq _($self, 'frameKeyBindings')) {
+            if ($hasMnemonics) {
+                _($self, 'label86')->set_text($textClose);
+                _($self, 'label16')->set_text($textSave);
+                _($self, 'btnResetDefaults')->set_label($textReset);
+                $hasMnemonics = 0;
+            }
+        } else {
+            if (!$hasMnemonics) {
+                _($self, 'label86')->set_text_with_mnemonic($labelClose);
+                _($self, 'label16')->set_text_with_mnemonic($labelSave);
+                _($self, 'btnResetDefaults')->set_label($labelReset);
+                $hasMnemonics = 1;
+            }
+        }
+        return 0;
+    });
+
     return 1;
 }
 
