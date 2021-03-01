@@ -4045,8 +4045,13 @@ sub _doToggleDisplayConnectionsList {
         if ($$self{_GUI}{showConnBtn}->get_active()) {
             # Remeber that no VTE has te focus anymore
             $$self{_HAS_FOCUS} = '';
-            $$self{_GUI}{treeConnections}->grab_focus();
+            # Get the currently displayed tray and move keyboard focus to it
+            my $tree = $self->_getCurrentTree();
+            if ($tree) {
+                $tree->grab_focus();
+            }
         } else {
+            # Look for the current tab page and move keyboard focus to it
             my $pnum = $$self{_GUI}{nb}->get_current_page();
             $self->_doFocusPage($pnum);
         }
