@@ -417,7 +417,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -489,7 +489,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -559,7 +559,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -684,7 +684,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -802,7 +802,7 @@ sub _getMethods {
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -868,7 +868,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -934,7 +934,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -1073,7 +1073,7 @@ sub _getMethods {
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignAuthMethod')->set_sensitive(1);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);

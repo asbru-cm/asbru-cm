@@ -276,9 +276,9 @@ sub __checkRBAuth {
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
 
-    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active());
+    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active() || _($self, 'rbCfgAuthManual')->get_active());
     _($self, 'alignPublicKey')->set_sensitive(_($self, 'rbCfgAuthPublicKey')->get_active());
-    _($self, 'alignManual')->set_sensitive(_($self, 'rbCfgAuthManual')->get_active());
+    _($self, 'hboxAuthPassword')->set_sensitive(!_($self, 'rbCfgAuthManual')->get_active());
 
     return 1;
 }
@@ -311,9 +311,9 @@ sub _setupCallbacks {
     });
 
     # Capture "User/Pass" connection radiobutton state change
-    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth;});
+    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth();});
 
     # Capture 'show password' checkbox toggled state
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {
@@ -780,7 +780,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgAuthUserPass')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass');
     _($self, 'rbCfgAuthPublicKey')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey');
     _($self, 'rbCfgAuthManual')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'manual');
-    $self->__checkRBAuth;
+    $self->__checkRBAuth();
 
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
         _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
@@ -929,7 +929,6 @@ sub _saveConfiguration {
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
-        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
     }
 
