@@ -106,13 +106,8 @@ sub update
     my $cfg = shift;
     my $cfg_array = shift;
 
-    if (defined($cfg)) {
-        $$self{cfg} = $cfg;
-    }
-
-    if (defined($cfg_array)) {
-        $$self{cfg_array} = $cfg_array;
-    }
+    defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
 
     $$self{gui}{chRandomSocksTunnel}->set_active($$cfg_array{randomSocksTunnel});
 

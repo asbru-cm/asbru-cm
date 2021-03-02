@@ -63,6 +63,7 @@ sub new {
     $self->{container} = shift;
 
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
 
@@ -78,6 +79,7 @@ sub update {
     my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
 
     my $options = _parseCfgToOptions($$self{cfg});
 
