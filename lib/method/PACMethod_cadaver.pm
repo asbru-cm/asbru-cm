@@ -69,6 +69,7 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
 
@@ -77,6 +78,15 @@ sub update
     $$self{gui}{chTolerant}->set_active($$options{tolerant});
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg

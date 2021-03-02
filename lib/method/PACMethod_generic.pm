@@ -69,13 +69,22 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
-    my $method = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
 
     my $options = _parseCfgToOptions($$self{cfg});
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg

@@ -139,7 +139,7 @@ sub change {
 
     $$self{container}->foreach(sub {$_[0]->destroy;});
     $METHODS{$$self{_METHOD}}->_buildGUI();
-    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'});
+    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'}, $$self{_CFG}{"$$self{_METHOD} options"});
 
     return 1;
 }
@@ -157,9 +157,13 @@ sub update {
         return 0;
     }
 
-    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'});
+    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'}, $$self{_CFG}{'connection options'});
 
     return 1;
+}
+
+sub get_cfg_array {
+    return $METHODS{$_[0]{_METHOD}}->get_cfg_array();
 }
 
 sub get_cfg {

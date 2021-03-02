@@ -72,7 +72,7 @@ sub new {
 sub update {
     my $self = shift;
     my $cfg = shift;
-    my $method = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
 
@@ -87,6 +87,15 @@ sub update {
     $$self{gui}{cbDepth}->set_active($DEPTH{$$options{depth} // 'default'});
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg {

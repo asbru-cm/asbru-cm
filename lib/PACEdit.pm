@@ -953,6 +953,7 @@ sub _saveConfiguration {
     # Other options...
     ##################
     $$self{_CFG}{'environments'}{$uuid}{'options'} = $$self{_SPECIFIC}->get_cfg();
+    $$self{_CFG}{'environments'}{$uuid}{'connection options'} = $$self{_SPECIFIC}->get_cfg_array();
     $$self{_CFG}{'environments'}{$uuid}{'terminal options'} = $$self{_TERMOPTS}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'variables'} = $$self{_VARIABLES}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'local before'} = $$self{_PRE_EXEC}->get_cfg();

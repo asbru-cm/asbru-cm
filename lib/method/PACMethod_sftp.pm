@@ -95,6 +95,7 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
 
@@ -109,6 +110,15 @@ sub update
     $$self{gui}{lblAdvOpt}->set_markup('Advanced Options (<b>' . (scalar(@{$$self{listAdvOpt}}) ) . '</b>)');
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg
@@ -258,7 +268,8 @@ sub _buildGUI
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{advancedOption}}, {'option' => 'SFTP option (right-click here to show list)', 'value' => 'value'});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -318,7 +329,8 @@ sub _buildAdvOpt
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listAdvOpt}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 

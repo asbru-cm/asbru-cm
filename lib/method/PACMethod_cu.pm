@@ -70,7 +70,7 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
-    my $method = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
 
@@ -84,6 +84,15 @@ sub update
     $$self{gui}{chNoStop}->set_active($$options{'nostop'} // 0);
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg
