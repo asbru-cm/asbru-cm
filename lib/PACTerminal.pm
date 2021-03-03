@@ -405,10 +405,10 @@ sub start {
     if (defined $$self{_MANUAL}) {
         $new_cfg{'environments'}{$$self{_UUID}}{'auth type'} = $$self{_MANUAL};
     }
-    if ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /ssh/i && $$self{_CFG}{'environments'}{$$self{_UUID}}{options} =~ / #Ásbrú#RST#/) {
+    if ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} =~ /ssh/i && $$self{_CFG}{'environments'}{$$self{_UUID}}{'connection options'}{'randomSocksTunnel'}) {
         my $SOCKS5PORT = _getLocalPort(10240 + int(rand(65535 - 10240)));
         $PACMain::SOCKS5PORTS{$$self{_UUID_TMP}} = $SOCKS5PORT;
-        $new_cfg{'tmp'}{'randSocks5Port'} = $SOCKS5PORT;
+        $new_cfg{'tmp'}{'randomSocksTunnel'} = $SOCKS5PORT;
     }
     nstore(\%new_cfg, $$self{_TMPCFG}) or die"ERROR: Could not save Ásbrú config file '$$self{_TMPCFG}': $!";
     undef %new_cfg;

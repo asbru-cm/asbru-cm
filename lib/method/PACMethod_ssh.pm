@@ -87,6 +87,7 @@ sub new
 
     $self->{container} = shift;
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
     $self->{list} = [];
@@ -103,17 +104,18 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
+    my $cfg_array = shift;
 
-    if (defined($cfg)) {
-        $$self{cfg} = $cfg;
-    }
+    defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
+
+    $$self{gui}{chRandomSocksTunnel}->set_active($$cfg_array{randomSocksTunnel});
 
     my $options = _parseCfgToOptions($$self{cfg});
 
     $$self{gui}{cbSSHVersion}->set_active($SSH_VERSION{$$options{sshVersion} // 'any'});
     $$self{gui}{cbSSHProtocol}->set_active($IP_PROTOCOL{$$options{ipVersion} // 'any'});
     $$self{gui}{chNoRemoteCmd}->set_active($$options{noRemoteCmd});
-    $$self{gui}{chRandomSocksTunnel}->set_active($$options{randomSocksTunnel});
     $$self{gui}{chForwardX}->set_active($$options{forwardX});
     $$self{gui}{chUseCompression}->set_active($$options{useCompression});
     $$self{gui}{chAllowPortConnect}->set_active($$options{allowRemoteConnection});
@@ -184,6 +186,17 @@ sub update
     return 1;
 }
 
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    $options_array{randomSocksTunnel} = $$self{gui}{chRandomSocksTunnel}->get_active();
+
+    return \%options_array;
+}
+
 sub get_cfg
 {
     my $self = shift;
@@ -193,7 +206,6 @@ sub get_cfg
     $options{sshVersion} = $$self{gui}{cbSSHVersion}->get_active_text();
     $options{ipVersion} = $$self{gui}{cbSSHProtocol}->get_active_text();
     $options{noRemoteCmd} = $$self{gui}{chNoRemoteCmd}->get_active();
-    $options{randomSocksTunnel} = $$self{gui}{chRandomSocksTunnel}->get_active();
     $options{forwardX} = $$self{gui}{chForwardX}->get_active();
     $options{useCompression} = $$self{gui}{chUseCompression}->get_active();
     $options{allowRemoteConnection} = $$self{gui}{chAllowPortConnect}->get_active();
@@ -275,7 +287,6 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
-    $options{randomSocksTunnel} = ($cmd_line =~ s/ #Ásbrú#RST#//);
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -365,7 +376,6 @@ sub _parseOptionsToCfg
     foreach my $remote (@{$$hash{remotePort}}) {
         $txt .= ' -R ' . ($$remote{localIP} ? "$$remote{localIP}:" : '') . $$remote{localPort} . ':' . $$remote{remoteIP} . ':' . $$remote{remotePort};
     }
-    $txt .= ' #Ásbrú#RST#' if $$hash{randomSocksTunnel};
 
     return $txt;
 }
@@ -381,7 +391,6 @@ sub _buildGUI
     my $self = shift;
 
     my $container = $self->{container};
-    my $cfg = $self->{cfg};
 
     my %w;
 
@@ -656,7 +665,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -672,7 +682,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -687,7 +698,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => 'localhost', 'dynamicPort' => $local_port});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -696,7 +708,8 @@ sub _buildGUI
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{advancedOption}}, {'option' => 'SSH option (right-click here to show list)', 'value' => 'value'});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -774,7 +787,8 @@ sub _buildForward
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{list}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -893,7 +907,8 @@ sub _buildRemote
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listRemote}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -995,7 +1010,8 @@ sub _buildDynamic
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listDynamic}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -1074,7 +1090,8 @@ sub _buildAdvOpt
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listAdvOpt}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
