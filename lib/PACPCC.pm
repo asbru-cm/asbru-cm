@@ -895,11 +895,11 @@ sub _setupCallbacks {
 
     # Capture 'Close All' button clicked
     $$self{_WINDOWPCC}{btnCloseAll}->signal_connect('clicked' => sub {
-        my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
-        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
+        my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text() // '';
+        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, "Are you sure you want to CLOSE <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
         foreach my $uuid (@list) {
-            if (defined $$self{_RUNNING}{$uuid}{'terminal'}) {
+            if (defined($$self{_RUNNING}{$uuid}{'terminal'}) && ref($$self{_RUNNING}{$uuid}{terminal}) =~ /^PACTerminal|PACShell$/go) {
                 $$self{_RUNNING}{$uuid}{'terminal'}->stop('force', 'deep');
             }
         }

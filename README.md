@@ -45,21 +45,22 @@ To do so, execute the following commands:
 - Debian / Ubuntu
 
   ````
-  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
-  $ sudo apt-get install asbru-cm
+  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.deb.sh' | sudo -E bash
+  sudo apt-get install asbru-cm
   ````
 
 - Fedora
 
   ````
-  $ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.rpm.sh' | sudo -E bash
-  $ sudo dnf install asbru-cm
+  curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/release/cfg/setup/bash.rpm.sh' | sudo -E bash
+  sudo dnf install asbru-cm
   ````
 
-- Arch / Manjaro
+- Pacman-based (e.g. Arch Linux, Manjaro)
 
   ````
-  yaourt -S asbru-cm-git
+  git clone https://aur.archlinux.org/asbru-cm-git.git && cd asbru-cm-git
+  makepkg -si
   ````
   
 - MX Linux
@@ -67,7 +68,7 @@ To do so, execute the following commands:
   Ásbrú Connection Manager can be installed through the MX Package Installer under the Test Repo tab
   or by enabling the Test Repo and running
   ````
-  $ sudo apt-get install asbru-cm
+  sudo apt-get install asbru-cm
   ````
   
 - Windows
