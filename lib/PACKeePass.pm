@@ -220,7 +220,7 @@ sub getFieldValueFromString {
         $cfg = $self->get_cfg();
     }
     $str =~ s/[<>]//g;
-    ($field, $uid) = split /\|/, $str;
+    ($field, $uid) = split /\|/, $str, 2;
     ($value, $flg) = $self->getFieldValue($field, $uid);
     return ($value, $flg);
 }
