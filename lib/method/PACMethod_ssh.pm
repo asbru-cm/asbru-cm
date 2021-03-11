@@ -297,8 +297,8 @@ sub _parseCfgToOptions
     $options{_optionL} =
     $options{_optionR} = sub {
         my ($optionName,$forwardSpec) = @_;
-        #                                                              [-L [bind_address:]port:host:hostport]
-        my (undef,$bind_address,$port,$host,$hostport) = $forwardSpec = ~m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
+        #                                                                [-L [bind_address:]port:host:hostport]
+        my (undef,$bind_address,$port,$host,$hostport) = $forwardSpec =~ m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
 
         push @{$options{($optionName eq "_optionL" ? "forwardPort" : "remotePort")}},
             {
@@ -311,7 +311,7 @@ sub _parseCfgToOptions
     $options{_optionD} = sub {
         my (undef,$forwardSpec) = @_;
         #                                                [-D [bind_address:]port]
-        my (undef,$bind_address,$port) = $forwardSpec = ~m/((.+)(?:\/|:))*(\d+)/;
+        my (undef,$bind_address,$port) = $forwardSpec =~ m/((.+)(?:\/|:))*(\d+)/;
         push @{$options{dynamicForward}},
             {
                 'dynamicIP'   => $bind_address // '',
