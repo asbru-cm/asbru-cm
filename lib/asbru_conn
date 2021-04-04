@@ -217,6 +217,8 @@ if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
             die "$PASS";
         }
     }
+    # Makes sure the KeePass password is not exposed in the spawned process
+    delete $ENV{'KPXC_MP'};
 } else {
     if ($AUTH eq 'publickey') {
         $PASSPHRASE = subst($PASSPHRASE);
