@@ -477,6 +477,7 @@ sub _buildExec {
         push(@int_variables_menu, {label => "TITLE",     code => sub {$w{txt}->insert_text("<TITLE>",     -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "IP",        code => sub {$w{txt}->insert_text("<IP>",        -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "USER",      code => sub {$w{txt}->insert_text("<USER>",      -1, $w{txt}->get_position());} });
+        push(@int_variables_menu, {label => "PORT",      code => sub {$w{txt}->insert_text("<PORT>",      -1, $w{txt}->get_position());} });
         push(@int_variables_menu, {label => "PASS",      code => sub {$w{txt}->insert_text("<PASS>",      -1, $w{txt}->get_position());} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 

@@ -337,6 +337,7 @@ sub _buildPrePost {
         push(@int_variables_menu, {label => "NAME",code => sub {$w{command}->insert_text("<NAME>", -1, $w{command}->get_position);} });
         push(@int_variables_menu, {label => "TITLE",code => sub {$w{command}->insert_text("<TITLE>", -1, $w{command}->get_position);} });
         push(@int_variables_menu, {label => "IP",code => sub {$w{command}->insert_text("<IP>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => "PORT",code => sub {$w{command}->insert_text("<PORT>", -1, $w{command}->get_position);} });
         push(@int_variables_menu, {label => "USER",code => sub {$w{command}->insert_text("<USER>", -1, $w{command}->get_position);} });
         push(@int_variables_menu, {label => "PASS",code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
