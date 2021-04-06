@@ -2885,7 +2885,7 @@ sub _subst {
         $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
         $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
-        if ($$CFG{'environments'}{$uuid}{'auth type'} == 'publickey') {
+        if ($$CFG{'environments'}{$uuid}{'auth type'} eq 'publickey') {
             $V{'USER'}  = $$CFG{'environments'}{$uuid}{'passphrase user'};
             $V{'PASS'}  = $$CFG{'environments'}{$uuid}{passphrase};
         } else {
