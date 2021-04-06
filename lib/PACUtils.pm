@@ -2885,8 +2885,13 @@ sub _subst {
         $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
         $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
-        $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
-        $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        if ($$CFG{'environments'}{$uuid}{'auth type'} == 'publickey') {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{'passphrase user'};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{passphrase};
+        } else {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        }
         if ($$CFG{'environments'}{$uuid}{'method'} =~ /ssh/i && $$CFG{'environments'}{$uuid}{'connection options'}{'randomSocksTunnel'} && defined($uuid_tmp) && defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
           $V{'SOCKS5_PORT'} = $PACMain::SOCKS5PORTS{$uuid_tmp};
         } else {
