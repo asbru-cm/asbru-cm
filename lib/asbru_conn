@@ -136,8 +136,7 @@ $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE'
 # Check some command line options
 defined $$CFG{'environments'}{$UUID} or die("ERROR: Profile '$UUID' does not exist!!");
 
-`which autossh 1>/dev/null 2>&1`;
-my $autossh_bin = ! $?;
+my $autossh_bin = (system("which autossh &>/dev/null") eq 0);
 
 # Shorten some variables
 my $DEBUG = $$CFG{'defaults'}{'debug'};
@@ -857,8 +856,7 @@ sub _getProxyCmd {
     my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
 
     if ($proxy_user ne '') {
-        `which ncat 1>/dev/null 2>&1`;
-        if (! $?) {
+        if (system("which ncat &>/dev/null") eq 0) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
