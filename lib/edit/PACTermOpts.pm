@@ -3,7 +3,7 @@ package PACTermOpts;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -98,7 +98,7 @@ sub update {
     $$self{gui}{cbUsePersonal}->set_active(1); # Just to force 'toggled' signal to trigger that callback and update GUI
     $$self{gui}{cbUsePersonal}->set_active($$cfg{'use personal settings'} // 0);
 
-    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // '[#%\$>]|\:\/\s*$');
+    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // '[#%\$>~→]|\:\/\s*$');
     $$self{gui}{entryCfgUserPrompt}->set_text($$cfg{'username prompt'} // '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$');
     $$self{gui}{entryCfgPasswordPrompt}->set_text($$cfg{'password prompt'} // '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$');
 

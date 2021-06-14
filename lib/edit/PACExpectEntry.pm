@@ -3,7 +3,7 @@ package PACExpectEntry;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -700,6 +700,7 @@ sub _buildExpect {
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
@@ -711,6 +712,7 @@ sub _buildExpect {
         push(@int_variables_menu, {label => "TITLE",code => sub {$w{send}->insert_text("<TITLE>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "IP",code => sub {$w{send}->insert_text("<IP>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "USER",code => sub {$w{send}->insert_text("<USER>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => "PORT",code => sub {$w{send}->insert_text("<PORT>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "PASS",code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
         push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
 
@@ -815,6 +817,7 @@ sub _buildExpect {
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
         push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
         push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
         push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });

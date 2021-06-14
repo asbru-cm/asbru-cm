@@ -3,7 +3,7 @@ package PACEdit;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -179,6 +179,11 @@ sub _initGUI {
     _($self, 'imgBannerEditIcon')->set_from_file($THEME_DIR . '/asbru-edit.svg');
     _($self, "linkHelpConn1")->set_label('');
     _($self, "linkHelpConn1")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    _($self, "linkHelpNetwokSettings")->set_label('');
+    _($self, "linkHelpNetwokSettings")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_label('');
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
 
     $$self{_SPECIFIC} = PACMethod->new();
     _($self, 'alignSpecific')->add($PACMethod::CONTAINER);
@@ -271,9 +276,9 @@ sub __checkRBAuth {
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
 
-    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active());
+    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active() || _($self, 'rbCfgAuthManual')->get_active());
     _($self, 'alignPublicKey')->set_sensitive(_($self, 'rbCfgAuthPublicKey')->get_active());
-    _($self, 'alignManual')->set_sensitive(_($self, 'rbCfgAuthManual')->get_active());
+    _($self, 'hboxAuthPassword')->set_sensitive(!_($self, 'rbCfgAuthManual')->get_active());
 
     return 1;
 }
@@ -306,9 +311,9 @@ sub _setupCallbacks {
     });
 
     # Capture "User/Pass" connection radiobutton state change
-    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth;});
+    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth();});
 
     # Capture 'show password' checkbox toggled state
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {
@@ -388,6 +393,7 @@ sub _setupCallbacks {
             # For the time being, we will use the full path
             my $title = $selection;
             if ($title) {
+                _($self, 'entryIP')->set_text("<url|$title>");
                 if (_($self, 'rbCfgAuthUserPass')->get_active) {
                     _($self, 'entryUser')->set_text("<username|$title>");
                     _($self, 'entryPassword')->set_text("<password|$title>");
@@ -483,11 +489,13 @@ sub _setupCallbacks {
     # Capture proxy usage change
     _($self, 'rbUseProxyAlways')->signal_connect('toggled' => sub {
         _($self, 'vboxCfgManualProxyConnOptions')->set_sensitive(_($self, 'rbUseProxyAlways')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     # Capture jump host change
     _($self, 'rbUseProxyJump')->signal_connect('toggled' => sub {
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
+        _updateCfgProxyKeePass($self);
     });
 
     _($self, 'btnEditClearJumpPrivateKey')->signal_connect('clicked' => sub {
@@ -630,6 +638,24 @@ sub _setupCallbacks {
         _($self, 'cbStartScript')->get_active() and _($self, 'comboStartScript')->popup();
     });
 
+    # Associated proxy settings to KeePass entries
+    _($self, 'btnEditNetworkSettingsCheckKPX')->signal_connect('clicked' => sub {
+        # User selects an entry in KeePass
+        my $title = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
+
+        if ($title) {
+            if (_($self, 'rbUseProxyAlways')->get_active) {
+                _($self, 'entryCfgProxyConnIP')->set_text("<url|$title>");
+                _($self, 'entryCfgProxyConnUser')->set_text("<username|$title>");
+                _($self, 'entryCfgProxyConnPassword')->set_text("<password|$title>");
+            } elsif (_($self, 'rbUseProxyJump')->get_active) {
+                _($self, 'entryCfgJumpConnIP')->set_text("<url|$title>");
+                _($self, 'entryCfgJumpConnUser')->set_text("<username|$title>");
+                _($self, 'entryCfgJumpConnPass')->set_text("<password|$title>");
+            }
+        }
+    });
+
     return 1;
 }
 
@@ -753,7 +779,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgAuthUserPass')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass');
     _($self, 'rbCfgAuthPublicKey')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey');
     _($self, 'rbCfgAuthManual')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'manual');
-    $self->__checkRBAuth;
+    $self->__checkRBAuth();
 
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
         _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
@@ -791,6 +817,8 @@ sub _updateGUIPreferences {
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
     }
+
+    _updateCfgProxyKeePass($self);
 
     return 1;
 }
@@ -899,7 +927,6 @@ sub _saveConfiguration {
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
-        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
     }
 
@@ -926,6 +953,7 @@ sub _saveConfiguration {
     # Other options...
     ##################
     $$self{_CFG}{'environments'}{$uuid}{'options'} = $$self{_SPECIFIC}->get_cfg();
+    $$self{_CFG}{'environments'}{$uuid}{'connection options'} = $$self{_SPECIFIC}->get_cfg_array();
     $$self{_CFG}{'environments'}{$uuid}{'terminal options'} = $$self{_TERMOPTS}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'variables'} = $$self{_VARIABLES}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'local before'} = $$self{_PRE_EXEC}->get_cfg();
@@ -958,6 +986,12 @@ sub _closeConfiguration {
     my $self = shift;
 
     $$self{_WINDOWEDIT}->hide();
+}
+
+sub _updateCfgProxyKeePass {
+    my $self = shift;
+
+    _($self, 'btnEditNetworkSettingsCheckKPX')->set_sensitive($$self{'_CFG'}{'defaults'}{'keepass'}{'use_keepass'} && (_($self, 'rbUseProxyAlways')->get_active() || _($self, 'rbUseProxyJump')->get_active()));
 }
 
 # END: Define PRIVATE CLASS functions

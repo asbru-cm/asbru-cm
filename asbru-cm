@@ -3,7 +3,7 @@
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -110,6 +110,7 @@ our $CFG_FILE_OLD   = "pac.yml";
 our $CFG_FILE       = "$CFG_DIR/$CFG_FILE_NAME";
 our $BACKUP_DIR     = "bak";
 our $APP_NAME       = PACUtils::_appName();
+our $ASBRU_LANG     = 'en_US.UTF-8'; # no i18n support yet
 our $ASBRU;
 our $VERBOSE        = 0;
 # END: Define GLOBAL variables
@@ -128,6 +129,10 @@ foreach my $arg (@ARGV) {
         $ENV{'VERBOSE'} = 1;
     }
 }
+
+# Detect language
+print STDERR "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n";
+$ENV{'LANG'} = $ASBRU_LANG;
 
 # Check for Unity's systray-whitelist presence of 'asbru'
 my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
@@ -159,8 +164,8 @@ if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /
     if ($VERBOSE) {
         print "INFO: Migration of alternate directory\n";
     }
-    system "rm -Rf $CFG_DIR_OLD";
-    system "mv -f $CFG_DIR $CFG_DIR.migration";
+    system "rm -Rf \"$CFG_DIR_OLD\"";
+    system "mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
     config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
@@ -183,6 +188,7 @@ for (my $n = 1; $n < 5; $n++) {
     }
 }
 
+# Detect desktop
 getDesktopEnvironment();
 
 # Check if configuration is valid
@@ -278,12 +284,12 @@ sub CheckConfigurationFile {
             };
             if (!$@ && $cfg) {
                 print "INFO: Found valid file $CFG_FILE_NAME.$n, recovering...\n";
-                system "mv -f $CFG_FILE $BACKUP_CFG_FILE.$now.bad";
-                system "cp -fp $BACKUP_CFG_FILE.$n $CFG_FILE";
+                system "mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
+                system "cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
                 $OK = 1;
                 last;
             } else {
-                system "mv -f $BACKUP_CFG_FILE.$n $BACKUP_CFG_FILE.$n.$now.bad";
+                system "mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
             }
         }
         if (!$OK) {
@@ -300,12 +306,12 @@ sub CheckConfigurationFile {
         for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
             my $p = $n-1; # previous
             if (-e "$BACKUP_CFG_FILE.$p") {
-                system "cp -fp $BACKUP_CFG_FILE.$p $BACKUP_CFG_FILE.$n";
+                system "cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
             }
         }
     }
     # Save current known configuration
-    system "cp -fp $CFG_FILE $BACKUP_CFG_FILE.0";
+    system "cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
 }
 
 sub _wPopUP {

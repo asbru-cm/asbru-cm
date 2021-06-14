@@ -20,6 +20,7 @@ The general format of the mask is `<[(Name|Type):]VALUE>`.
 |USER              |Connection USER                    |
 |PASS              |Connection Password                |
 |UUID              |Connection UUID                    |
+|SOCKS5_PORT        |Socks5 tunnel port                  |
 |TIMESTAMP         |Elapsed time in seconds since epoch|
 |DATE_Y            |Year                               |
 |DATE_M            |Month                              |

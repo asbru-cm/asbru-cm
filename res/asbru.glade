@@ -3,7 +3,7 @@
 
 This file is part of Ásbrú Connection Manager.
 
-Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 Copyright (C) 2010-2016 David Torrejon Vaquerizas
 
 Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -26,7 +26,7 @@ If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-license-type gplv3 -->
   <!-- interface-name \303\201sbr\303\272 Connection Manager -->
   <!-- interface-description \303\201sbr\303\272 Connection Manager is a user interface that helps organizing remote terminal sessions and automating repetitive tasks. https://www.asbru-cm.net/ -->
-  <!-- interface-copyright 2017-2020 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
+  <!-- interface-copyright 2017-2021 \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <!-- interface-authors \303\201sbr\303\272 Connection Manager team (https://asbru-cm.net), 2010-2016 David Torrejon Vaquerizas -->
   <object class="GtkAdjustment" id="adjConnPort">
     <property name="lower">1</property>
@@ -157,12 +157,72 @@ If not, see <http://www.gnu.org/licenses/>.
                             <property name="margin_bottom">5</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkFrame" id="frameConnection">
+                              <object class="GtkBox" id="vboxConnectionHost">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="border_width">2</property>
-                                <property name="label_xalign">0</property>
-                                <property name="shadow_type">none</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label91">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">&lt;b&gt; Host&lt;/b&gt;</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton" id="linkHelpConn1">
+                                        <property name="label" translatable="yes">Help</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="focus_on_click">False</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="tooltip_text" translatable="yes">Open Online Help</property>
+                                        <property name="relief">none</property>
+                                        <property name="always_show_image">True</property>
+                                        <property name="uri">https://docs.asbru-cm.net/Manual/Connections/SSH/</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="pack_type">end</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btnCheckKPX">
+                                        <property name="label" translatable="yes">KeePass</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="tooltip_markup" translatable="yes">Search KeePass database</property>
+                                        <property name="halign">end</property>
+                                        <property name="always_show_image">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">12</property>
+                                        <property name="pack_type">end</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
                                 <child>
                                   <object class="GtkAlignment" id="alignConnection">
                                     <property name="visible">True</property>
@@ -251,7 +311,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
                                                             <property name="receives_default">False</property>
-                                                            <property name="xalign">0.5</property>
+                                                            <property name="xalign">0</property>
                                                             <property name="draw_indicator">True</property>
                                                           </object>
                                                           <packing>
@@ -407,8 +467,9 @@ If not, see <http://www.gnu.org/licenses/>.
                                                             <property name="width_request">150</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
-                                                            <property name="has_tooltip">True</property>
-                                                            <property name="tooltip_text" translatable="yes">Port number to connect to</property>
+                                                            <property name="tooltip_text" translatable="yes">Port number to connect to.
+
+For some connection types that support it, port can be left empty or set to 0.  In that case, no port will be explicitely specified and the default port will be used.  This can be useful if you have your SSH details defined in your ~/.ssh/config, as an example.</property>
                                                             <property name="valign">start</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="activates_default">True</property>
@@ -419,6 +480,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                             <property name="adjustment">adjConnPort</property>
                                                             <property name="snap_to_ticks">True</property>
                                                             <property name="numeric">True</property>
+                                                            <property name="value">22</property>
                                                           </object>
                                                           <packing>
                                                             <property name="expand">True</property>
@@ -432,25 +494,6 @@ If not, see <http://www.gnu.org/licenses/>.
                                                         <property name="fill">True</property>
                                                         <property name="padding">2</property>
                                                         <property name="position">1</property>
-                                                      </packing>
-                                                    </child>
-                                                    <child>
-                                                      <object class="GtkLinkButton" id="linkHelpConn1">
-                                                        <property name="label" translatable="yes">Help</property>
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">True</property>
-                                                        <property name="focus_on_click">False</property>
-                                                        <property name="receives_default">True</property>
-                                                        <property name="tooltip_text" translatable="yes">Open Online Help</property>
-                                                        <property name="relief">none</property>
-                                                        <property name="always_show_image">True</property>
-                                                        <property name="uri">https://docs.asbru-cm.net/Manual/Connections/SSH/</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="pack_type">end</property>
-                                                        <property name="position">2</property>
                                                       </packing>
                                                     </child>
                                                   </object>
@@ -520,29 +563,48 @@ If not, see <http://www.gnu.org/licenses/>.
                                           <object class="GtkBox" id="hbox50">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="halign">start</property>
                                             <child>
-                                              <object class="GtkCheckButton" id="cbCfgStartupLaunch">
-                                                <property name="label" translatable="yes">Launch at startup</property>
-                                                <property name="use_action_appearance">False</property>
+                                              <object class="GtkBox">
                                                 <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">False</property>
-                                                <property name="has_tooltip">True</property>
-                                                <property name="tooltip_text" translatable="yes">If checked, this session will be executed upon startup</property>
-                                                <property name="halign">start</property>
-                                                <property name="xalign">0</property>
-                                                <property name="draw_indicator">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin_right">8</property>
+                                                <child>
+                                                  <object class="GtkCheckButton" id="cbCfgStartupLaunch">
+                                                    <property name="label" translatable="yes"> </property>
+                                                    <property name="use_action_appearance">False</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="receives_default">False</property>
+                                                    <property name="has_tooltip">True</property>
+                                                    <property name="tooltip_text" translatable="yes">If checked, this session will be executed upon startup</property>
+                                                    <property name="xalign">0</property>
+                                                    <property name="draw_indicator">True</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="label" translatable="yes">Launch at startup</property>
+                                                    <property name="use_markup">True</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">1</property>
+                                                  </packing>
+                                                </child>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
                                                 <property name="fill">True</property>
-                                                <property name="padding">2</property>
-                                                <property name="position">0</property>
+                                                <property name="position">1</property>
                                               </packing>
-                                            </child>
-                                            <child>
-                                              <placeholder/>
                                             </child>
                                             <child>
                                               <object class="GtkCheckButton" id="cbCfgAutoreconnect">
@@ -553,7 +615,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
                                                 <property name="tooltip_text" translatable="yes">If checked, reconnect this session when disconnection happens with exit status &lt;&gt; 0</property>
-                                                <property name="xalign">0.5</property>
+                                                <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                               </object>
                                               <packing>
@@ -566,6 +628,7 @@ If not, see <http://www.gnu.org/licenses/>.
                                               <object class="GtkLabel" id="label89">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
+                                                <property name="margin_left">8</property>
                                                 <property name="label" translatable="yes">Wait </property>
                                               </object>
                                               <packing>
@@ -637,14 +700,11 @@ Applies to automated actions:
                                       </object>
                                     </child>
                                   </object>
-                                </child>
-                                <child type="label">
-                                  <object class="GtkLabel" id="label91">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">&lt;b&gt; Host&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
                                 </child>
                               </object>
                               <packing>
@@ -662,6 +722,7 @@ Applies to automated actions:
                                   <object class="GtkBox" id="hboxAuthMethodTitle">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="margin_bottom">4</property>
                                     <child>
                                       <object class="GtkLabel" id="label94">
                                         <property name="visible">True</property>
@@ -675,25 +736,6 @@ Applies to automated actions:
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkButton" id="btnCheckKPX">
-                                        <property name="label" translatable="yes">KeePass</property>
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">True</property>
-                                        <property name="tooltip_markup" translatable="yes">Search KeePass database</property>
-                                        <property name="halign">end</property>
-                                        <property name="always_show_image">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">True</property>
-                                        <property name="fill">True</property>
-                                        <property name="padding">12</property>
-                                        <property name="pack_type">end</property>
-                                        <property name="position">2</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -712,11 +754,60 @@ Applies to automated actions:
                                         <property name="can_focus">False</property>
                                         <property name="orientation">vertical</property>
                                         <child>
-                                          <object class="GtkFrame" id="frame6">
+                                          <object class="GtkBox" id="vboxAuthUserPass">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label_xalign">0</property>
-                                            <property name="shadow_type">none</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <object class="GtkBox" id="hboxAuthUserPassManual">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <child>
+                                                  <object class="GtkRadioButton" id="rbCfgAuthUserPass">
+                                                    <property name="label" translatable="yes">User / Password </property>
+                                                    <property name="use_action_appearance">False</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="receives_default">False</property>
+                                                    <property name="tooltip_text" translatable="yes">Use a user name and a password to authenticate to the target server.</property>
+                                                    <property name="xalign">0</property>
+                                                    <property name="active">True</property>
+                                                    <property name="draw_indicator">True</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkRadioButton" id="rbCfgAuthManual">
+                                                    <property name="label" translatable="yes">Manual</property>
+                                                    <property name="use_action_appearance">False</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="receives_default">False</property>
+                                                    <property name="tooltip_text" translatable="yes">Do not auto-login nor check for EXPECT.
+
+If left blank, the current user name will be used to login on the remote machine.</property>
+                                                    <property name="xalign">0</property>
+                                                    <property name="active">True</property>
+                                                    <property name="draw_indicator">True</property>
+                                                    <property name="group">rbCfgAuthUserPass</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">True</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">2</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
                                             <child>
                                               <object class="GtkAlignment" id="alignUserPass">
                                                 <property name="visible">True</property>
@@ -752,8 +843,9 @@ Applies to automated actions:
                                                             <object class="GtkEntry" id="entryUser">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
-                                                            <property name="has_tooltip">True</property>
-                                                            <property name="tooltip_text" translatable="yes">Username to use for connecting</property>
+                                                            <property name="tooltip_text" translatable="yes">The user to log in as on the remote machine.
+
+Can be left blank to use the currenlty connected user name.</property>
                                                             <property name="invisible_char">•</property>
                                                             <property name="activates_default">True</property>
                                                             <property name="primary_icon_activatable">False</property>
@@ -774,7 +866,7 @@ Applies to automated actions:
                                                           </packing>
                                                         </child>
                                                         <child>
-                                                          <object class="GtkBox" id="hbox51">
+                                                          <object class="GtkBox" id="hboxAuthPassword">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
                                                             <child>
@@ -854,23 +946,15 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                                   </object>
                                                 </child>
                                               </object>
-                                            </child>
-                                            <child type="label">
-                                              <object class="GtkRadioButton" id="rbCfgAuthUserPass">
-                                                <property name="label" translatable="yes">User / Password </property>
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">False</property>
-                                                <property name="tooltip_text" translatable="yes">Use a user name and a password to authenticate to the target server.</property>
-                                                <property name="xalign">0</property>
-                                                <property name="active">True</property>
-                                                <property name="draw_indicator">True</property>
-                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">2</property>
+                                              </packing>
                                             </child>
                                           </object>
                                           <packing>
-                                            <property name="expand">True</property>
+                                            <property name="expand">False</property>
                                             <property name="fill">True</property>
                                             <property name="position">0</property>
                                           </packing>
@@ -885,7 +969,7 @@ Use &lt;&lt;ASK_PASS&gt;&gt; to use ask user for password on every connection )<
                                           <packing>
                                             <property name="expand">False</property>
                                             <property name="fill">True</property>
-                                            <property name="position">1</property>
+                                            <property name="position">2</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1084,7 +1168,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">2</property>
+                                            <property name="position">3</property>
                                           </packing>
                                         </child>
                                         <child>
@@ -1096,50 +1180,6 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">3</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkBox" id="alignManual__">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text" translatable="yes">Do no automate any password (anyway, if a username is provided, it will be passed as well)</property>
-                                            <child>
-                                              <object class="GtkRadioButton" id="rbCfgAuthManual">
-                                                <property name="label" translatable="yes">Manual</property>
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">False</property>
-                                                <property name="xalign">0</property>
-                                                <property name="draw_indicator">True</property>
-                                                <property name="group">rbCfgAuthUserPass</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">0</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel" id="alignManual">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">&lt;i&gt;Do not auto-login nor check for EXPECT. Manual user and/or password enter.&lt;/i&gt;</property>
-                                                <property name="use_markup">True</property>
-                                                <property name="xalign">0</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">1</property>
-                                              </packing>
-                                            </child>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">True</property>
                                             <property name="fill">True</property>
                                             <property name="position">4</property>
                                           </packing>
@@ -1161,7 +1201,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                           <packing>
                                             <property name="expand">True</property>
                                             <property name="fill">True</property>
-                                            <property name="position">5</property>
+                                            <property name="position">6</property>
                                           </packing>
                                         </child>
                                       </object>
@@ -1328,7 +1368,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">0</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                             <child>
@@ -1408,7 +1448,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                             <child>
@@ -1447,7 +1487,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                             <child>
@@ -1660,6 +1700,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="tooltip_text" translatable="yes">Logfile pattern:
 
 &lt;UUID&gt; -&gt; UUID for this connection
+&lt;SOCKS5_PORT&gt; -&gt; Socks5 tunnel port
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -1673,7 +1714,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
 &lt;USER&gt; -&gt; Username for first jump
 </property>
                                                 <property name="invisible_char">•</property>
-                                                <property name="text" translatable="yes">&lt;UUID&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
+                                                <property name="text" translatable="yes">&lt;UUID&gt;_&lt;SOCKS5_PORT&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
                                                 <property name="caps_lock_warning">False</property>
                                                 <property name="primary_icon_activatable">False</property>
                                                 <property name="secondary_icon_activatable">False</property>
@@ -1711,7 +1752,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">3</property>
+                                <property name="position">4</property>
                               </packing>
                             </child>
                             <child>
@@ -1754,7 +1795,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">4</property>
+                                <property name="position">5</property>
                               </packing>
                             </child>
                             <child>
@@ -1768,7 +1809,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">5</property>
+                                <property name="position">6</property>
                               </packing>
                             </child>
                           </object>
@@ -1822,21 +1863,70 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">11</property>
                             <child>
-                              <object class="GtkRadioButton" id="rbUseProxyIfCFG">
-                                <property name="label" translatable="yes">Use global proxy options</property>
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">If selected, use settings defined in the Preferences &gt; Network Settings.</property>
-                                <property name="halign">start</property>
-                                <property name="xalign">0</property>
-                                <property name="active">True</property>
-                                <property name="draw_indicator">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkRadioButton" id="rbUseProxyIfCFG">
+                                    <property name="label" translatable="yes">Use global proxy options</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="tooltip_text" translatable="yes">If selected, use settings defined in the Preferences &gt; Network Settings.</property>
+                                    <property name="halign">start</property>
+                                    <property name="xalign">0</property>
+                                    <property name="active">True</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLinkButton" id="linkHelpNetwokSettings">
+                                    <property name="label" translatable="yes">Help</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="focus_on_click">False</property>
+                                    <property name="receives_default">True</property>
+                                    <property name="tooltip_text" translatable="yes">Open Online Help</property>
+                                    <property name="relief">none</property>
+                                    <property name="always_show_image">True</property>
+                                    <property name="uri">https://docs.asbru-cm.net/Manual/Preferences/Networking/</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="btnEditNetworkSettingsCheckKPX">
+                                    <property name="label" translatable="yes">KeePass</property>
+                                    <property name="use_action_appearance">False</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <property name="tooltip_markup" translatable="yes">Search KeePass database</property>
+                                    <property name="halign">end</property>
+                                    <property name="always_show_image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">12</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">0</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                             <child>
@@ -1854,7 +1944,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                             <child>
@@ -5837,6 +5927,7 @@ sudo -p sudo_prompt_string ...</property>
                                         <property name="tooltip_text" translatable="yes">Logfile pattern:
 
 &lt;UUID&gt; -&gt; UUID for this connection
+&lt;SOCKS5_PORT&gt; -&gt; Socks5 tunnel port
 &lt;TIMESTAMP&gt; -&gt; time since epoc
 &lt;DATE_Y&gt; -&gt; Year(4 digits)
 &lt;DATE_M&gt; -&gt; Month(2 digits)
@@ -5850,7 +5941,7 @@ sudo -p sudo_prompt_string ...</property>
 &lt;USER&gt; -&gt; Username for first jump
 </property>
                                         <property name="invisible_char">•</property>
-                                        <property name="text" translatable="yes">&lt;UUID&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
+                                        <property name="text" translatable="yes">&lt;UUID&gt;_&lt;SOCKS5_PORT&gt;_&lt;NAME&gt;_&lt;DATE_Y&gt;&lt;DATE_M&gt;&lt;DATE_D&gt;_&lt;TIME_H&gt;&lt;TIME_M&gt;&lt;TIME_S&gt;.txt</property>
                                         <property name="caps_lock_warning">False</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>

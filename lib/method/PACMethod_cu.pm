@@ -3,7 +3,7 @@ package PACMethod_cu;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -57,6 +57,7 @@ sub new
     $self->{container} = shift;
 
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
 
@@ -70,9 +71,10 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
-    my $method = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
 
     my $options = _parseCfgToOptions($$self{cfg});
 
@@ -84,6 +86,15 @@ sub update
     $$self{gui}{chNoStop}->set_active($$options{'nostop'} // 0);
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg
@@ -178,7 +189,7 @@ sub _buildGUI
             $w{entryLine}->set_tooltip_text("[-l|--line] : Line to use to connect. Ex: /dev/ttyUSB0");
 
             $w{hbox1}->pack_start(Gtk3::Label->new(' Speed: '), 0, 1, 0);
-            $w{spSpeed} = Gtk3::SpinButton->new_with_range(1, 999999, 1);
+            $w{spSpeed} = Gtk3::SpinButton->new_with_range(1, 1999999, 1);
             $w{hbox1}->pack_start($w{spSpeed}, 0, 1, 0);
             $w{spSpeed}->set_tooltip_text("[-s|--speed] : Speed to use to connect. Ex: 9660");
             $w{spSpeed}->set_value(9660);

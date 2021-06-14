@@ -1,6 +1,8 @@
-# Templates
-
 This article has been written by [Hans Peyrot](https://github.com/hanspr)
+
+# Connection Templates
+
+## How can I create a connection template ?
 
 A recurring question of users is if there is a possibility to have "Templates" for connections so you do not have to reconfigure everything.
 

@@ -150,6 +150,12 @@ fi
 
 
 %changelog
+* Sat Feb 27 2021 Ásbrú Project Team <contact@asbru-cm.net> 6.3.2
+- 6.3.2 Release
+* Mon Feb 22 2021 Ásbrú Project Team <contact@asbru-cm.net> 6.3.1
+- 6.3.1 Release
+* Tue Feb 16 2021 Ásbrú Project Team <contact@asbru-cm.net> 6.3.0
+- 6.3.0 Release
 * Sat Nov 07 2020 Ásbrú Project Team <contact@asbru-cm.net> 6.2.2
 - 6.2.2 release
 - Moved repositories from Packagecloud to Cloudsmith

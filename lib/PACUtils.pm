@@ -3,7 +3,7 @@ package PACUtils;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -121,7 +121,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.3.0';
+our $APPVERSION = '6.4.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -417,7 +417,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -489,7 +489,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -559,7 +559,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -684,7 +684,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -765,9 +765,6 @@ sub _getMethods {
             if (! _($self, 'entryIP')->get_chars(0, -1)) {
                 push(@faults, 'IP/Hostname cannot be empty');
             }
-            if (! _($self, 'entryPort')->get_chars(0, -1)) {
-                push(@faults, 'Port cannot be empty');
-            }
             if (_($self, 'rbCfgAuthUserPass')->get_active() && !_($self, 'entryUser')->get_chars(0, -1)) {
                 push(@faults, 'User name cannot be empty if User/Password authentication method selected');
             }
@@ -784,6 +781,7 @@ sub _getMethods {
             _($self, 'imageConnOptions')->set_from_pixbuf($pixbuf);
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
+            _($self, 'entryPort')->set_range(0, 65536);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 22);
             _($self, 'labelIP')->set_text('Host: ');
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
@@ -804,7 +802,7 @@ sub _getMethods {
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -870,7 +868,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -936,7 +934,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -1075,7 +1073,7 @@ sub _getMethods {
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignAuthMethod')->set_sensitive(1);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -2070,7 +2068,7 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'color red'} //=  '#cccc00000000';
     $$cfg{'defaults'}{'color white'} //=  '#d3d3d7d7cfcf';
     $$cfg{'defaults'}{'color yellow'} //=  '#c4c4a0a00000';
-    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>]|\:\/\s*$';
+    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>~→]|\:\/\s*$';
     $$cfg{'defaults'}{'username prompt'} //= '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
     $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
     $$cfg{'defaults'}{'hostkey changed prompt'} //= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
@@ -2532,7 +2530,7 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} = 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} = '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} = '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>]|\:\/\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>~→]|\:\/\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}  = 'block';
@@ -2861,13 +2859,14 @@ sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
+    my $uuid_tmp = shift;
     my $asbru_conn = shift;
     my $kpxc = shift;
     my $ret = $string;
     my %V = ();
     my %out;
     my $pos = -1;
-    my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
+    my @LOCAL_VARS = ('UUID','SOCKS5_PORT','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
     my $parent;
 
     if ($uuid) {
@@ -2886,8 +2885,18 @@ sub _subst {
         $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
         $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
-        $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
-        $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        if ($$CFG{'environments'}{$uuid}{'auth type'} eq 'publickey') {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{'passphrase user'};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{passphrase};
+        } else {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        }
+        if ($$CFG{'environments'}{$uuid}{'method'} =~ /ssh/i && $$CFG{'environments'}{$uuid}{'connection options'}{'randomSocksTunnel'} && defined($uuid_tmp) && defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
+          $V{'SOCKS5_PORT'} = $PACMain::SOCKS5PORTS{$uuid_tmp};
+        } else {
+          $V{'SOCKS5_PORT'} = "";
+        }
     }
     $V{'TIMESTAMP'} = time;
     ($V{'DATE_Y'},$V{'DATE_M'},$V{'DATE_D'},$V{'TIME_H'},$V{'TIME_M'},$V{'TIME_S'}) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));

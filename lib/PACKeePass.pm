@@ -3,7 +3,7 @@ package PACKeePass;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -775,7 +775,7 @@ sub _setCapabilities {
         return 0;
     }
     if ($$self{_VERBOSE}) {
-        print "DEBUG:KEYPASS: testCapabilities\n";
+        print "DEBUG:KEEPASS: testCapabilities\n";
     }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};

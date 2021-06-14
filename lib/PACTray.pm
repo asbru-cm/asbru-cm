@@ -3,7 +3,7 @@ package PACTray;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -121,7 +121,8 @@ sub _setupCallbacks {
             return 1;
         }
 
-        if ($$self{_MAIN}{_GUI}{main}->get_visible()) {
+        # If main window is at top level, hides it (otherwise shows it)
+        if ($$self{_MAIN}{_GUI}{main}->get_visible() && $$self{_MAIN}{_GUI}{main}->is_active()) {
             # Trigger the "lock" procedure
             if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
                 $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(1);

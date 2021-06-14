@@ -3,7 +3,7 @@ package PACMain;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2020 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -121,6 +121,7 @@ my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, da
 
 our %RUNNING;
 our %FUNCS;
+our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
 
 # END: Define GLOBAL CLASS variables
@@ -236,7 +237,6 @@ sub new {
     }
 
     # Start iconified is option set or command line option --iconified
-
     if (($$self{_CFG}{defaults}{'start iconified'}) || (grep({ /^--iconified$/ } @{ $$self{_OPTS} }))) {
         $$self{_CMDLINETRAY} = 1;
     }
@@ -373,7 +373,9 @@ sub start {
     );
 
     # Show main interface
-    $$self{_GUI}{main}->show_all();
+    if (!$$self{_CMDLINETRAY}) {
+        $$self{_GUI}{main}->show();
+    }
 
     # Apply Layout as early as possible
     $self->_ApplyLayout($$self{_CFG}{'defaults'}{'layout'});
@@ -1006,7 +1008,7 @@ sub _initGUI {
 
     # Load window size/position, and treeconnections size
     $self->_loadGUIData();
-    if ($$self{_CFG}{defaults}{'start main maximized'}) {
+    if ($$self{_CFG}{defaults}{'start main maximized'} && $$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{main}->set_position('center');
         $$self{_GUI}{main}->maximize();
     } else {
@@ -1063,8 +1065,15 @@ sub _initGUI {
     $FUNCS{_METHODS} = $$self{_METHODS};
     $FUNCS{_MAIN} = $self;
 
-    # To show_all, or not to show_all... that's the question!! :)
-    $$self{_GUI}{main}->show_all() unless $$self{_CMDLINETRAY};
+    # Show the main window if not initially hidden in the systray
+    if (!$$self{_CMDLINETRAY}) {
+        if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+            $$self{_GUI}{vboxCommandPanel}->show_all();
+            $$self{_GUI}{hpane}->show();
+        } else {
+            $$self{_GUI}{main}->show_all();
+        }
+    }
     $$self{_GUI}{hpane}->set_position($$self{_GUI}{hpanepos} // -1);
     $$self{_GUI}{_vboxSearch}->hide();
 
@@ -1077,10 +1086,11 @@ sub _initGUI {
         $self->_updateGUIFavourites();
     } elsif ($$self{_CFG}{'defaults'}{'start PAC tree on'} eq 'history') {
         $$self{_GUI}{nbTree}->set_current_page(2);
-        $self->_updateGUIClusters();
+        $self->_updateGUIHistory();
     } else {
         $$self{_GUI}{nbTree}->set_current_page(3);
-        $self->_updateGUIHistory();
+        $self->_updateClustersList();
+        $self->_updateGUIClusters();
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
@@ -1095,6 +1105,7 @@ sub _initGUI {
         if ($x > 0 || $y > 0) {
             $$self{_GUI}{posx} = $x;
             $$self{_GUI}{posy} = $y;
+            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
         }
     }
 
@@ -1114,7 +1125,7 @@ sub _setupCallbacks {
             $$self{_GUI}{connQuickBtn}->clicked();
         } elsif ($command eq 'start-uuid') {
             $self->_launchTerminals([ [ $message ] ]);
-        } elsif ($command eq'show-conn') {
+        } elsif ($command eq 'show-conn') {
             $self->_showConnectionsList();
         } elsif ($command eq 'edit-uuid') {
             my $uuid = $message;
@@ -1540,7 +1551,9 @@ sub _setupCallbacks {
         $self->_startCluster($sel[0]);
     });
 
-    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
+    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub {
+        $self->_updateGUIClusters();
+    });
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -2279,36 +2292,8 @@ sub _setupCallbacks {
 
         $$self{_PREVTAB} = $nb->get_current_page();
 
-        my $tab_page = $nb->get_nth_page($pnum);
+        $self->_doFocusPage($pnum);
 
-        $$self{_HAS_FOCUS} = '';
-        foreach my $tmp_uuid (keys %RUNNING) {
-            my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
-
-            if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
-                next;
-            }
-
-            my $uuid = $RUNNING{$tmp_uuid}{uuid};
-            my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
-            if ($path) {
-                $$self{_GUI}{treeConnections}->expand_to_path($path);
-                $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            }
-
-            $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
-
-            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
-                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
-                    }
-                };
-                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
-            }
-            $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
-            last;
-        }
         $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
@@ -3118,12 +3103,12 @@ sub _showAboutWindow {
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
         "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
-        "copyright" => "Copyright (C) 2017-2020 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
+        "copyright" => "Copyright (C) 2017-2021 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
 Ásbrú Connection Manager
 
-Copyright (C) 2017-2020 Ásbrú Connection Manager team <https://asbru-cm.net>
+Copyright (C) 2017-2021 Ásbrú Connection Manager team <https://asbru-cm.net>
 Copyright (C) 2010-2016 David Torrejón Vaquerizas
 
 This program is free software: you can redistribute it and/or modify
@@ -3255,7 +3240,7 @@ sub _launchTerminals {
 
     # Start all created terminals
     foreach my $t (@new_terminals) {
-        if ($$t{_TABBED}) {
+        if ($$t{_TABBED} && !$$self{_CMDLINETRAY}) {
             $$self{_GUI}{_PACTABS}->present();
         }
 
@@ -3281,7 +3266,7 @@ sub _launchTerminals {
         $$self{_GUI}{main}->set_sensitive(1);
     }
 
-    if ($$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
+    if (!$$self{_CMDLINETRAY} && $$self{_CFG}{'defaults'}{'open connections in tabs'} && $$self{_CFG}{'defaults'}{'tabs in main window'}) {
         $self->_showConnectionsList(0);
     }
     if (@new_terminals) {
@@ -3994,12 +3979,32 @@ sub _delNodes {
 
 sub _showConnectionsList {
     my $self = shift;
-    my $move = shift // 1;
+    my $force = shift // 1;
 
-    $$self{_GUI}{main}->show();
+    if ($force) {
+        # Force hidden state so that the show operation is properly handled
+        # (otherwise the window may remain in the 'scratchpad' / 'withdrawn' state, as with i3wm)
+        $$self{_GUI}{main}->hide();
+        $$self{_GUI}{main}->show();
+    }
+
+    # Ensure compact panel is shown (could still be hidden if started iconified)
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        $$self{_GUI}{vboxCommandPanel}->show_all();
+        $$self{_GUI}{hpane}->show();
+    }
+
+    # The first first display when started iconified must be a show_all
+    if ($$self{_CMDLINETRAY} == 1) {
+        $$self{_GUI}{main}->show_all();
+        $$self{_CMDLINETRAY} = 2;
+    }
+    
+
+    # Do show the main window
     $$self{_GUI}{main}->present();
 
-    if ($move) {
+    if ($force) {
         $$self{_GUI}{main}->move($$self{_GUI}{posx} // 0, $$self{_GUI}{posy} // 0);
     }
 }
@@ -4026,11 +4031,29 @@ sub _doToggleDisplayConnectionsList {
     my $self = shift;
 
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{showConnBtn}->get_active() ? $PACMain::FUNCS{_MAIN}->_showConnectionsList() : $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
-    } else {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
-            $$self{_GUI}{treeConnections}->grab_focus();
+            $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+        } else {
+            $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
+        }
+    } else {
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{vboxCommandPanel}->show();
+        } else {
+            $$self{_GUI}{vboxCommandPanel}->hide();
+        }
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            # Remeber that no VTE has te focus anymore
+            $$self{_HAS_FOCUS} = '';
+            # Get the currently displayed tray and move keyboard focus to it
+            my $tree = $self->_getCurrentTree();
+            if ($tree) {
+                $tree->grab_focus();
+            }
+        } else {
+            # Look for the current tab page and move keyboard focus to it
+            my $pnum = $$self{_GUI}{nb}->get_current_page();
+            $self->_doFocusPage($pnum);
         }
     }
 }
@@ -4902,6 +4925,44 @@ sub _getCurrentTree {
     return $tree;
 }
 
+# Forces focus to the terminal inside the focused page
+sub _doFocusPage {
+    my $self = shift;
+    my $pnum = shift;
+    my $tab_page = $$self{_GUI}{nb}->get_nth_page($pnum);
+
+    $$self{_HAS_FOCUS} = '';
+    foreach my $tmp_uuid (keys %RUNNING) {
+        my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
+
+        if (!defined($check_gui) || ($check_gui ne $tab_page)) {
+            next;
+        }
+
+        my $uuid = $RUNNING{$tmp_uuid}{uuid};
+        my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
+        if ($path) {
+            $$self{_GUI}{treeConnections}->expand_to_path($path);
+            $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
+        }
+
+        $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
+
+        if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
+            eval {
+                if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
+                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
+                }
+            };
+            $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
+        }
+        $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
+
+        # When found, do not process further
+        last;
+    }
+}
+
 # END: Define PRIVATE CLASS functions
 ###################################################################
 
@@ -5196,3 +5257,7 @@ Pending
 =head2 sub _getCurrentTree
 
 Returns the currently selected tree (from the left menu)
+
+=head2 sub _doFocusPage
+
+Forces focus to the terminal inside the focused page
