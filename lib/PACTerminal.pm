@@ -2444,6 +2444,10 @@ sub _setTabColour {
 
 sub _updateStatus {
     my $self = shift;
+    my $forwardports = '';
+    if ($self->{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH'){
+        ( $forwardports ) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+    }
 
     if (!defined $$self{_GUI}{status}) {
         return 1;
@@ -2455,9 +2459,9 @@ sub _updateStatus {
 
     # Control CLUSTER status
     if ($$self{_CLUSTER} ne '') {
-        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS}");
+        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS} $forwardports");
     } else {
-        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS}");
+        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS} $forwardports");
     }
 
     if (defined $$self{_GUI}{status}) {
