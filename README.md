@@ -169,4 +169,4 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 [liberapay-badge]: http://img.shields.io/liberapay/patrons/asbru-cm.svg?logo=liberapay
 [liberapay-url]: https://liberapay.com/asbru-cm/donate
 [bitcoin-badge]: https://img.shields.io/badge/bitcoin-19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45-D28138.svg?style=flat-square
-[bitcoin-url]: https://blockchain.info/address/19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45
+[bitcoin-url]: https://blockchain.info/address/19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45 
