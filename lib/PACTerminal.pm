@@ -2444,9 +2444,15 @@ sub _setTabColour {
 
 sub _updateStatus {
     my $self = shift;
-    my $forwardports = '';
+    my $forward_ports = '';
+    
+    # Show forwarding in status bar
     if ($self->{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH'){
-        ( $forwardports ) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+        ( $forward_ports ) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+        $forward_ports =~ s/-L/Local Forwarding:/;
+        $forward_ports =~ s/-R/Remote Forwarding:/;
+        $forward_ports =~ s/-D/Dynamic Forwarding:/;
+        $forward_ports =~ s/(-L|-R|-D) //g
     }
 
     if (!defined $$self{_GUI}{status}) {
@@ -2459,9 +2465,9 @@ sub _updateStatus {
 
     # Control CLUSTER status
     if ($$self{_CLUSTER} ne '') {
-        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS} $forwardports");
+        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS} $forward_ports");
     } else {
-        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS} $forwardports");
+        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS} $forward_ports");
     }
 
     if (defined $$self{_GUI}{status}) {
