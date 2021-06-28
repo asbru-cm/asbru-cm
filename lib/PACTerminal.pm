@@ -2447,12 +2447,16 @@ sub _updateStatus {
     my $forward_ports = '';
     
     # Show forwarding in status bar
-    if ($self->{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH'){
+    if ($self->{CONNECTED} && 
+    	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
+    	$$self{_CFG}{defaults}{'info in status bar'}){
         ( $forward_ports ) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
-        $forward_ports =~ s/-L/Local Forwarding:/;
-        $forward_ports =~ s/-R/Remote Forwarding:/;
-        $forward_ports =~ s/-D/Dynamic Forwarding:/;
-        $forward_ports =~ s/(-L|-R|-D) //g
+        if ($$self{_CFG}{defaults}{'forwarding full names'}){
+            $forward_ports =~ s/-L/Local Forwarding:/;
+            $forward_ports =~ s/-R/Remote Forwarding:/;
+            $forward_ports =~ s/-D/Dynamic Forwarding:/;
+            $forward_ports =~ s/(-L|-R|-D) //g
+        }
     }
 
     if (!defined $$self{_GUI}{status}) {
