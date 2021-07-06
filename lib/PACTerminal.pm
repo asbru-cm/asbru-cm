@@ -3083,7 +3083,7 @@ sub _unsplit {
         if ($_[1]->button != 1) {
             return 0;
         }
-        $self->stop(undef, 1);
+        $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);
     });
     $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}->pack_start($eblbl3, 0, 1, 0);
 
@@ -3091,13 +3091,13 @@ sub _unsplit {
         my ($widget, $event) = @_;
 
         if ($event->button eq 2) {
-            $self->stop(undef, 1);
+            $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);
             return 1;
         } elsif ($event->button ne 3) {
             return 0;
         }
 
-        $self->_tabMenu($event);
+        $PACMain::RUNNING{$uuid_tmp}{terminal}->_tabMenu($event);
         return 1;
     });
 
