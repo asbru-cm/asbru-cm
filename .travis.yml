@@ -3,10 +3,6 @@ dist: bionic
 language: perl
 services:
   - docker
-addons:
-  apt:
-    packages:
-      - docker-ce
 env:
   global:
     - CHANGELOG_NAME=Asbru-CM Team
@@ -38,10 +34,14 @@ env:
     - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=ulyssa PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=focal PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
+before_install:
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    - sudo apt-get update
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3 python3-pip python3-setuptools gpgv
-    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
     - sudo pip3 install --upgrade pip
     - sudo pip3 install --upgrade cloudsmith-cli
 script:
