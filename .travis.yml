@@ -3,6 +3,10 @@ dist: bionic
 language: perl
 services:
   - docker
+addons:
+  apt:
+    packages:
+      - docker-ce
 env:
   global:
     - CHANGELOG_NAME=Asbru-CM Team
@@ -37,6 +41,7 @@ env:
 install:
     - sudo apt-get update
     - sudo apt-get install -y git devscripts debhelper quilt python3 python3-pip python3-setuptools gpgv
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
     - sudo pip3 install --upgrade pip
     - sudo pip3 install --upgrade cloudsmith-cli
 script:
