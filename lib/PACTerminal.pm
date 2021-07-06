@@ -2939,20 +2939,20 @@ sub _unsplit {
 
     my $eblbl3 = Gtk3::EventBox->new();
     $eblbl3->add(Gtk3::Image->new_from_stock('gtk-close', 'menu'));
-    $eblbl3->signal_connect('button_release_event' => sub {$_[1]->button != 1 and return 0; $self->stop(undef, 1);});
+    $eblbl3->signal_connect('button_release_event' => sub {$_[1]->button != 1 and return 0; $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);});
     $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}->pack_start($eblbl3, 0, 1, 0);
 
     $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}{_EBLBL}->signal_connect('button_press_event' => sub {
         my ($widget, $event) = @_;
 
         if ($event->button eq 2) {
-            $self->stop(undef, 1);
+            $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);
             return 1;
         } elsif ($event->button ne 3) {
             return 0;
         }
 
-        $self->_tabMenu($event);
+        $PACMain::RUNNING{$uuid_tmp}{terminal}->_tabMenu($event);
         return 1;
     });
 
