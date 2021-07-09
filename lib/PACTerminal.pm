@@ -2450,7 +2450,10 @@ sub _updateStatus {
     if ($self->{CONNECTED} && 
     	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
     	$$self{_CFG}{defaults}{'info in status bar'}){
-        ( $forward_ports ) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+        ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+        if (! defined $forward_ports){
+            $forward_ports = '';
+        }
         if ($$self{_CFG}{defaults}{'forwarding full names'}){
             $forward_ports =~ s/-L/Local Forwarding:/;
             $forward_ports =~ s/-R/Remote Forwarding:/;
