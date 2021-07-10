@@ -996,7 +996,7 @@ sub _getMethods {
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
-            _($self, 'frameVariables')->set_sensitive(1ic);
+            _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
             _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
