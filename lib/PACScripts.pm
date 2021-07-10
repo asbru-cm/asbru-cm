@@ -41,7 +41,7 @@ use Storable qw (dclone nstore_fd);
 eval {require Gtk3::SourceView2;};
 my $SOURCEVIEW = ! $@;
 
-my $PERL = (system("which perl &>/dev/null") eq 0);
+my $PERL = (system("which perl 1>/dev/null 2>&1") eq 0);
 
 # GTK
 use Gtk3 '-init';

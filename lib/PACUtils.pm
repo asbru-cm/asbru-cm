@@ -368,7 +368,7 @@ sub _getMethods {
         $THEME_DIR = $theme_dir;
     }
 
-    my $rdesktop = (system("which rdesktop &>/dev/null") eq 0);
+    my $rdesktop = (system("which rdesktop 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (rdesktop)'} = {
         'installed' => sub {return $rdesktop ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
         'checkCFG' => sub {
@@ -439,7 +439,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xfreerdp = (system("which xfreerdp &>/dev/null") eq 0);
+    my $xfreerdp = (system("which xfreerdp 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (xfreerdp)'} = {
         'installed' => sub {return $xfreerdp ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
@@ -510,7 +510,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xtightvncviewer = (system("which vncviewer &>/dev/null") eq 0);
+    my $xtightvncviewer = (system("which vncviewer 1>/dev/null 2>&1") eq 0);
     my $tigervnc = (system("vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
     $methods{'VNC'} = {
         'installed' => sub {return $xtightvncviewer || $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
@@ -578,7 +578,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $cu = (system("which cu &>/dev/null") eq 0);
+    my $cu = (system("which cu 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (cu)'} = {
         'installed' => sub {return $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
         'checkCFG' => sub {
@@ -628,7 +628,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $remote_tty = (system("which remote-tty &>/dev/null") eq 0);
+    my $remote_tty = (system("which remote-tty 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (remote-tty)'} = {
         'installed' => sub {return $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
         'checkCFG' => sub {
@@ -694,7 +694,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
-    my $c3270 = (system("which c3270 &>/dev/null") eq 0);
+    my $c3270 = (system("which c3270 1>/dev/null 2>&1") eq 0);
     $methods{'IBM 3270/5250'} = {
         'installed' => sub {return $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
         'checkCFG' => sub {
@@ -746,7 +746,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
-    my $autossh = (system("which autossh &>/dev/null") eq 0);
+    my $autossh = (system("which autossh 1>/dev/null 2>&1") eq 0);
     $methods{'SSH'} = {
         'installed' => sub {return 1;},
         'checkCFG' => sub {
