@@ -809,7 +809,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $mosh = (system("which mosh &>/dev/null") eq 0);
+    my $mosh = (system("which mosh 1>/dev/null 2>&1") eq 0);
     $methods{'MOSH'} = {
         'installed' => sub {return $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
         'checkCFG' => sub {
@@ -874,7 +874,7 @@ sub _getMethods {
         'escape' => ["\c^x."]
     };
 
-    my $cadaver = (system("which cadaver &>/dev/null") eq 0);
+    my $cadaver = (system("which cadaver 1>/dev/null 2>&1") eq 0);
     $methods{'WebDAV'} = {
         'installed' => sub {return $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
         'checkCFG' => sub {
@@ -939,7 +939,7 @@ sub _getMethods {
         'escape' => ["\cc", "quit\n"]
     };
 
-    my $telnet = (system("which telnet &>/dev/null") eq 0);
+    my $telnet = (system("which telnet 1>/dev/null 2>&1") eq 0);
     $methods{'Telnet'} = {
         'installed' => sub {return $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
         'checkCFG' => sub {
@@ -996,7 +996,7 @@ sub _getMethods {
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
-            _($self, 'frameVariables')->set_sensitive(1);
+            _($self, 'frameVariables')->set_sensitive(1ic);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
             _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
             _($self, 'cbAutossh')->set_sensitive(0);
