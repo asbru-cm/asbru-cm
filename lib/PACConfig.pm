@@ -66,7 +66,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '1', -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
