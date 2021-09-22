@@ -147,6 +147,36 @@ curl -1sLf 'https://dl.cloudsmith.io/public/asbru-cm/loki/cfg/setup/bash.rpm.sh'
 sudo dnf install asbru-cm
 ```
 
+## Gentoo
+**Master release**
+
+To install the latest release on a fresh [Gentoo](https://www.gentoo.org/) system, use the following instructions. First install necessary dependencies:
+
+```
+emerge --ask dev-vcs/git
+emerge --ask dev-perl/YAML
+USE="perl" emerge --ask dev-libs/ossp-uuid
+USE="minimal" emerge --ask dev-perl/Type-Tiny-XS
+emerge --ask dev-perl/Crypt-CBC
+emerge --ask dev-perl/Gtk3
+emerge --ask dev-perl/Net-ARP
+emerge --ask dev-perl/Crypt-Blowfish
+emerge --ask dev-perl/Gtk3-SimpleList
+emerge --ask dev-perl/Expect
+```
+
+Because of the [issue](https://github.com/asbru-cm/asbru-cm/issues/816) regarding latest Crypt-CBC, downgrade of that specific package is needed:
+```
+emerge -C dev-perl/Crypt-CBC
+emerge --ask =dev-perl/Crypt-CBC-2.330.0-r2
+```
+
+Finally, clone the repository in convinient place, like ${HOME}/programs/asbru for example:
+```
+mkdir -p ${HOME}/programs/asbru
+git clone https://github.com/asbru-cm/asbru-cm.git ${HOME}/programs/asbru
+```
+
 ## Installation of legacy 5.x
 
 If you need to install the legacy v5 version of Ásbrú Connection Manager (using Gtk2 library), the legacy packages are still available.
