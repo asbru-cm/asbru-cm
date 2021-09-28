@@ -142,7 +142,7 @@ my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -368,10 +368,9 @@ sub _getMethods {
         $THEME_DIR = $theme_dir;
     }
 
-    `which rdesktop 1>/dev/null 2>&1`;
-    my $rdesktop = $?;
+    my $rdesktop = (system("which rdesktop 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (rdesktop)'} = {
-        'installed' => sub {return (! $rdesktop) ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
+        'installed' => sub {return $rdesktop ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -440,10 +439,9 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which xfreerdp 1>/dev/null 2>&1`;
-    my $xfreerdp = $?;
+    my $xfreerdp = (system("which xfreerdp 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (xfreerdp)'} = {
-        'installed' => sub {return (! $xfreerdp) ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
+        'installed' => sub {return $xfreerdp ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -512,12 +510,10 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which vncviewer 1>/dev/null 2>&1`;
-    my $xtightvncviewer = $?;
-    `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
-    my $tigervnc = $?;
+    my $xtightvncviewer = (system("which vncviewer 1>/dev/null 2>&1") eq 0);
+    my $tigervnc = (system("vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
     $methods{'VNC'} = {
-        'installed' => sub {return ! $xtightvncviewer || ! $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
+        'installed' => sub {return $xtightvncviewer || $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
         'checkCFG' => sub {
 
             my $cfg = shift;
@@ -582,10 +578,9 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which cu 1>/dev/null 2>&1`;
-    my $cu = $?;
+    my $cu = (system("which cu 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (cu)'} = {
-        'installed' => sub {return ! $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
+        'installed' => sub {return $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -633,10 +628,9 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    `which remote-tty 1>/dev/null 2>&1`;
-    my $remote_tty = $?;
+    my $remote_tty = (system("which remote-tty 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (remote-tty)'} = {
-        'installed' => sub {return ! $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
+        'installed' => sub {return $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -700,10 +694,9 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
-    `which c3270 1>/dev/null 2>&1`;
-    my $c3270 = $?;
+    my $c3270 = (system("which c3270 1>/dev/null 2>&1") eq 0);
     $methods{'IBM 3270/5250'} = {
-        'installed' => sub {return ! $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
+        'installed' => sub {return $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -753,8 +746,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
-    `which autossh 1>/dev/null 2>&1`;
-    my $autossh = ! $?;
+    my $autossh = (system("which autossh 1>/dev/null 2>&1") eq 0);
     $methods{'SSH'} = {
         'installed' => sub {return 1;},
         'checkCFG' => sub {
@@ -817,10 +809,9 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    `which mosh 1>/dev/null 2>&1`;
-    my $mosh = $?;
+    my $mosh = (system("which mosh 1>/dev/null 2>&1") eq 0);
     $methods{'MOSH'} = {
-        'installed' => sub {return ! $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
+        'installed' => sub {return $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -883,10 +874,9 @@ sub _getMethods {
         'escape' => ["\c^x."]
     };
 
-    `which cadaver 1>/dev/null 2>&1`;
-    my $cadaver = $?;
+    my $cadaver = (system("which cadaver 1>/dev/null 2>&1") eq 0);
     $methods{'WebDAV'} = {
-        'installed' => sub {return ! $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
+        'installed' => sub {return $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -949,10 +939,9 @@ sub _getMethods {
         'escape' => ["\cc", "quit\n"]
     };
 
-    `which telnet 1>/dev/null 2>&1`;
-    my $telnet = $?;
+    my $telnet = (system("which telnet 1>/dev/null 2>&1") eq 0);
     $methods{'Telnet'} = {
-        'installed' => sub {return ! $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
+        'installed' => sub {return $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
         'checkCFG' => sub {
             my $cfg = shift;
             my @faults;

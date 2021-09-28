@@ -66,7 +66,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -248,6 +248,15 @@ sub _setupCallbacks {
             # Set safe values other wise options would be unaccesible
             _($self, 'cbCfgConnectionsAutoHide')->set_active(0);
             _($self, 'cbCfgButtonBarAutoHide')->set_active(0);
+        }
+    });
+    _($self, 'cbCfgStatusBar')->signal_connect('toggled' => sub {
+        _($self, 'rbCfgStatusShort')->set_sensitive(_($self, 'cbCfgStatusBar')->get_active());
+        _($self, 'rbCfgStatusFull')->set_sensitive(_($self, 'cbCfgStatusBar')->get_active());
+        if (!_($self, 'cbCfgStatusBar')->get_active()) {
+            # Set safe values other wise options would be unaccesible
+            _($self, 'rbCfgStatusShort')->set_active(0);
+            _($self, 'rbCfgStatusFull')->set_active(0);
         }
     });
     _($self, 'cbCfgNewInTab')->signal_connect('toggled' => sub {
@@ -802,6 +811,9 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgButtonBarAutoHide')->set_active($$cfg{'defaults'}{'auto hide button bar'});
     _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+    _($self, 'cbCfgStatusBar')->set_active($$cfg{'defaults'}{'info in status bar'});
+    _($self, 'rbCfgStatusShort')->set_active(! $$cfg{'defaults'}{'forwarding short names'});
+    _($self, 'rbCfgStatusFull')->set_active($$cfg{'defaults'}{'forwarding full names'});
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
@@ -1045,6 +1057,9 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'tabs in main window'} = _($self, 'cbCfgTabsInMain')->get_active();
     $$self{_CFG}{'defaults'}{'auto hide connections list'} = _($self, 'cbCfgConnectionsAutoHide')->get_active();
     $$self{_CFG}{'defaults'}{'auto hide button bar'} = _($self, 'cbCfgButtonBarAutoHide')->get_active();
+    $$self{_CFG}{'defaults'}{'info in status bar'} = _($self, 'cbCfgStatusBar')->get_active();
+    $$self{_CFG}{'defaults'}{'forwarding short names'} = _($self, 'rbCfgStatusShort')->get_active();
+    $$self{_CFG}{'defaults'}{'forwarding full names'} = _($self, 'rbCfgStatusFull')->get_active();
     $$self{_CFG}{'defaults'}{'hide on connect'} = _($self, 'cbCfgHideOnConnect')->get_active();
     $$self{_CFG}{'defaults'}{'force split tabs to 50%'} = _($self, 'cbCfgForceSplitSize')->get_active();
     $$self{_CFG}{'defaults'}{'start iconified'} = _($self, 'cbCfgStartIconified')->get_active();

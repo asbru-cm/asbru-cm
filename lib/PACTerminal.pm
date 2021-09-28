@@ -2444,6 +2444,23 @@ sub _setTabColour {
 
 sub _updateStatus {
     my $self = shift;
+    my $forward_ports = '';
+    
+    # Show forwarding in status bar
+    if ($self->{CONNECTED} && 
+    	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
+    	$$self{_CFG}{defaults}{'info in status bar'}){
+        ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
+        if (! defined $forward_ports){
+            $forward_ports = '';
+        }
+        if ($$self{_CFG}{defaults}{'forwarding full names'}){
+            $forward_ports =~ s/-L/Local Forwarding:/;
+            $forward_ports =~ s/-R/Remote Forwarding:/;
+            $forward_ports =~ s/-D/Dynamic Forwarding:/;
+            $forward_ports =~ s/(-L|-R|-D) //g
+        }
+    }
 
     if (!defined $$self{_GUI}{status}) {
         return 1;
@@ -2455,9 +2472,9 @@ sub _updateStatus {
 
     # Control CLUSTER status
     if ($$self{_CLUSTER} ne '') {
-        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS}");
+        $$self{_GUI}{status}->push(0, "[IN CLUSTER: $$self{_CLUSTER}] - Status: $$self{_LAST_STATUS} $forward_ports");
     } else {
-        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS}");
+        $$self{_GUI}{status}->push(0, "Status: $$self{_LAST_STATUS} $forward_ports");
     }
 
     if (defined $$self{_GUI}{status}) {
@@ -3079,7 +3096,7 @@ sub _unsplit {
         if ($_[1]->button != 1) {
             return 0;
         }
-        $self->stop(undef, 1);
+        $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);
     });
     $PACMain::RUNNING{$uuid_tmp}{terminal}{_GUI}{_TABLBL}->pack_start($eblbl3, 0, 1, 0);
 
@@ -3087,13 +3104,13 @@ sub _unsplit {
         my ($widget, $event) = @_;
 
         if ($event->button eq 2) {
-            $self->stop(undef, 1);
+            $PACMain::RUNNING{$uuid_tmp}{terminal}->stop(undef, 1);
             return 1;
         } elsif ($event->button ne 3) {
             return 0;
         }
 
-        $self->_tabMenu($event);
+        $PACMain::RUNNING{$uuid_tmp}{terminal}->_tabMenu($event);
         return 1;
     });
 
