@@ -32,6 +32,7 @@ $|++;
 use FindBin qw ($RealBin $Bin $Script);
 my $REALBIN = $RealBin;
 use lib "$RealBin/lib", "$RealBin/lib/ex";
+use Hash::Merge::Simple qw/ merge /;
 
 # Standard
 use strict;
@@ -4367,7 +4368,7 @@ sub __importNodes {
     # Full export file? (including config!)
     if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__FULL__'}) {
         if (! _wConfirm($$self{_GUI}{main}, "Selected config file is a <b>FULL</b> backup.\nImporting it will result in all current data being <b>substituted</b> by the new one.\n<b>Plus, it REQUIRES restarting the application</b>.\nReplace current configuration?")) {
-            delete $$self{_COPY}{'data'}{'children'};
+            delete $$self{_COPY}{'data'};
             $w->destroy();
             return 1;
         }
@@ -4393,29 +4394,47 @@ sub __importNodes {
         system("(sleep 3; $0) &");
         sleep 2;
         exit 0;
+    }
 
-    # Bad export file
-    } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
-        delete $$self{_COPY}{'data'}{'children'};
-        $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> does not look like a valid exported connection!");
-        return 1;
+    my $imported_cases = 0;
 
-    # Correct partial export file
-    } else {
+    # Connection export file
+    if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
+        $imported_cases++;
         my $i = 0;
         foreach my $child (keys %{ $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}{'children'} }) {
             $self->_pasteNodes($parent_uuid, $child);
             ++$i;
         }
-        $$self{_COPY}{'data'} = {};
-        _decipherCFG($$self{_CFG});
-        $w->destroy();
         _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported:\n<b>$i</b> element(s) added");
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
-        delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        $self->_setCFGChanged(1);
     }
+
+    # Partial configuration export file
+    if (defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__PARTIAL_CONF'}) {
+        $imported_cases++;
+        my $i = 0;
+        foreach my $config (keys %{ $$self{_COPY}{'data'}{'__PAC__EXPORTED__PARTIAL_CONF'} }) {
+            $$self{_CFG}{$config} = merge($$self{_CFG}{$config}, $$self{_COPY}{'data'}{'__PAC__EXPORTED__PARTIAL_CONF'}{$config});
+            ++$i;
+        }
+        $$self{_COPY}{'data'} = {};
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported:\n<b>$i</b> configuration(s) updated on root");
+        delete $$self{_CFG}{'__PAC__EXPORTED__PARTIAL_CONF'};
+    }
+
+    # Bad export file (no cases matched)
+    if (!$imported_cases) {
+        delete $$self{_COPY}{'data'};
+        $w->destroy();
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> does not look like a valid exported connection or configuration file!");
+        return 1;
+    }
+
+    $w->destroy();
+    delete $$self{_COPY}{'data'};
+    _decipherCFG($$self{_CFG});
+    $self->_setCFGChanged(1);
 
     if ($UNITY) {
         $FUNCS{_TRAY}->_setTrayMenu();
