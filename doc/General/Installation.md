@@ -171,7 +171,7 @@ emerge -C dev-perl/Crypt-CBC
 emerge --ask =dev-perl/Crypt-CBC-2.330.0-r2
 ```
 
-Finally, clone the repository in convinient place, like ${HOME}/programs/asbru for example:
+Finally, clone the repository in convenient place, like ${HOME}/programs/asbru for example:
 ```
 mkdir -p ${HOME}/programs/asbru
 git clone https://github.com/asbru-cm/asbru-cm.git ${HOME}/programs/asbru
