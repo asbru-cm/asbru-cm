@@ -93,6 +93,7 @@ my $RES_DIR = "$RealBin/res";
 # Register icons on Gtk
 #&_registerPACIcons;
 
+my $VENDOR_CFG_FILE = "$RealBin/vendor/asbru-conf-default-overrides.yml";
 my $INIT_CFG_FILE = "$RealBin/res/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
@@ -3520,6 +3521,21 @@ sub _readConfiguration {
         $continue = 0;
     }
     # END of removing
+
+    # Default partial vendor config, but since it is partial, do not set $continue to 0.
+    if ($continue && -f "${VENDOR_CFG_FILE}") {
+        my $temp_cfg;
+        if (! ($temp_cfg = YAML::LoadFile($VENDOR_CFG_FILE))) {
+            print STDERR "WARNING: Could not load vendor config file '$VENDOR_CFG_FILE': $!\n";
+        } else {
+            print STDERR "INFO: Using vendor config file '$VENDOR_CFG_FILE'\n";
+            $$self{_CFG} //= {};
+            foreach my $config (keys %{ $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'} }) {
+                $$self{_CFG}{$config} = $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'}{$config};
+            }
+            print STDERR "INFO: Used vendor config file '$VENDOR_CFG_FILE'\n";
+        }
+    }
 
     if ($R_CFG_FILE && $continue) {
          print STDERR "WARN: No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
