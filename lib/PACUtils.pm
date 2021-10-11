@@ -2210,7 +2210,10 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'session logs amount'} = 10;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'use prepend command'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'prepend command'} = '';
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'use postpend command'} = 0;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'postpend command'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'quote command'} = 0;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'quotepost command'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string active'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string txt'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string intro'} = 1;
@@ -2372,7 +2375,10 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
+        $$cfg{'environments'}{$uuid}{'use postpend command'} //= 0;
+        $$cfg{'environments'}{$uuid}{'postpend command'} //= '';
         $$cfg{'environments'}{$uuid}{'quote command'} //= 0;
+        $$cfg{'environments'}{$uuid}{'quotepost command'} //= 0;
         $$cfg{'environments'}{$uuid}{'send string active'} //= 0;
         $$cfg{'environments'}{$uuid}{'send string txt'} //= '';
         $$cfg{'environments'}{$uuid}{'send string intro'} //= 1;
