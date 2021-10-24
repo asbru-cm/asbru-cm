@@ -3219,7 +3219,7 @@ sub _launchTerminals {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
-            _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1);
+            # _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1);
             next;
         }
         my $pset = $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} ? 'tab' : 'window';
