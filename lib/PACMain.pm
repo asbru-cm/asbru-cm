@@ -258,7 +258,7 @@ sub new {
         if (!defined $pass) {
             exit 0;
         }
-        if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
+        if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
@@ -2421,7 +2421,7 @@ sub _unlockAsbru {
     my $self = shift;
 
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
-    if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
+    if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
