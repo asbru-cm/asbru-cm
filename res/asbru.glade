@@ -1466,8 +1466,6 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <property name="tooltip_text" translatable="yes">Postpend this command after the string to be launched
 eg.: putting '| tc' in an SSH connection, results in executing:
 ssh -l user@10.10.10.10 | ct
-Or(manual): LD_PATH=/my/favourite/path
-Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                     <child>
                                       <object class="GtkCheckButton" id="cbEditPostpendCommand">
                                         <property name="label" translatable="yes">Postpend command </property>
