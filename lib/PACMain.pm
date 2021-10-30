@@ -117,10 +117,11 @@ my $NEW_VERSION = 0;
 my $NEW_CHANGES = '';
 our $_NO_SPLASH = 0;
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 our %RUNNING;
 our %FUNCS;
+our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
 
 # END: Define GLOBAL CLASS variables
@@ -182,6 +183,11 @@ sub new {
 
     if (grep({ /^--verbose$/ } @{ $$self{_OPTS} })) {
         $$self{_VERBOSE} = 1;
+    }
+
+    # Show some info about dependencies
+    if ($$self{_VERBOSE}) {
+        print STDERR "INFO: Crypt::CBC version is ${Crypt::CBC::VERSION}\n";
     }
 
     # Read the config/connections file...
@@ -252,7 +258,7 @@ sub new {
         if (!defined $pass) {
             exit 0;
         }
-        if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
+        if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
@@ -1550,7 +1556,9 @@ sub _setupCallbacks {
         $self->_startCluster($sel[0]);
     });
 
-    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
+    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub {
+        $self->_updateGUIClusters();
+    });
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -2289,36 +2297,8 @@ sub _setupCallbacks {
 
         $$self{_PREVTAB} = $nb->get_current_page();
 
-        my $tab_page = $nb->get_nth_page($pnum);
+        $self->_doFocusPage($pnum);
 
-        $$self{_HAS_FOCUS} = '';
-        foreach my $tmp_uuid (keys %RUNNING) {
-            my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
-
-            if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
-                next;
-            }
-
-            my $uuid = $RUNNING{$tmp_uuid}{uuid};
-            my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
-            if ($path) {
-                $$self{_GUI}{treeConnections}->expand_to_path($path);
-                $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            }
-
-            $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
-
-            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
-                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
-                    }
-                };
-                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
-            }
-            $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
-            last;
-        }
         $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
@@ -2441,7 +2421,7 @@ sub _unlockAsbru {
     my $self = shift;
 
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
-    if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
+    if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
@@ -3239,7 +3219,9 @@ sub _launchTerminals {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
-            _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1);
+            if ($$self{_VERBOSE}) {
+                print STDERR "DEBUG: Ignoring group [{$uuid} while trying to launch a terminal.\n";
+            }
             next;
         }
         my $pset = $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} ? 'tab' : 'window';
@@ -4056,11 +4038,29 @@ sub _doToggleDisplayConnectionsList {
     my $self = shift;
 
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{showConnBtn}->get_active() ? $PACMain::FUNCS{_MAIN}->_showConnectionsList() : $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
-    } else {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
-            $$self{_GUI}{treeConnections}->grab_focus();
+            $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+        } else {
+            $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
+        }
+    } else {
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{vboxCommandPanel}->show();
+        } else {
+            $$self{_GUI}{vboxCommandPanel}->hide();
+        }
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            # Remeber that no VTE has te focus anymore
+            $$self{_HAS_FOCUS} = '';
+            # Get the currently displayed tray and move keyboard focus to it
+            my $tree = $self->_getCurrentTree();
+            if ($tree) {
+                $tree->grab_focus();
+            }
+        } else {
+            # Look for the current tab page and move keyboard focus to it
+            my $pnum = $$self{_GUI}{nb}->get_current_page();
+            $self->_doFocusPage($pnum);
         }
     }
 }
@@ -4932,6 +4932,44 @@ sub _getCurrentTree {
     return $tree;
 }
 
+# Forces focus to the terminal inside the focused page
+sub _doFocusPage {
+    my $self = shift;
+    my $pnum = shift;
+    my $tab_page = $$self{_GUI}{nb}->get_nth_page($pnum);
+
+    $$self{_HAS_FOCUS} = '';
+    foreach my $tmp_uuid (keys %RUNNING) {
+        my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
+
+        if (!defined($check_gui) || ($check_gui ne $tab_page)) {
+            next;
+        }
+
+        my $uuid = $RUNNING{$tmp_uuid}{uuid};
+        my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
+        if ($path) {
+            $$self{_GUI}{treeConnections}->expand_to_path($path);
+            $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
+        }
+
+        $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
+
+        if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
+            eval {
+                if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
+                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
+                }
+            };
+            $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
+        }
+        $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
+
+        # When found, do not process further
+        last;
+    }
+}
+
 # END: Define PRIVATE CLASS functions
 ###################################################################
 
@@ -5226,3 +5264,7 @@ Pending
 =head2 sub _getCurrentTree
 
 Returns the currently selected tree (from the left menu)
+
+=head2 sub _doFocusPage
+
+Forces focus to the terminal inside the focused page

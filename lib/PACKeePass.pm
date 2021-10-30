@@ -775,7 +775,7 @@ sub _setCapabilities {
         return 0;
     }
     if ($$self{_VERBOSE}) {
-        print "DEBUG:KEYPASS: testCapabilities\n";
+        print "DEBUG:KEEPASS: testCapabilities\n";
     }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};

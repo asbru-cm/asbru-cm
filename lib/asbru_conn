@@ -136,8 +136,7 @@ $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE'
 # Check some command line options
 defined $$CFG{'environments'}{$UUID} or die("ERROR: Profile '$UUID' does not exist!!");
 
-`which autossh 1>/dev/null 2>&1`;
-my $autossh_bin = ! $?;
+my $autossh_bin = (system("which autossh 1>/dev/null 2>&1") eq 0);
 
 # Shorten some variables
 my $DEBUG = $$CFG{'defaults'}{'debug'};
@@ -199,25 +198,35 @@ open_socket();
 # Use keepass ?
 my $kpxc;
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-    my ($ok);
+    sub _dieMissingKeePassEntry {
+        my $entry = shift;
+
+        die("$COLOR{'err'}ERROR$COLOR{'norm'} Unable to find entry $COLOR{'log'}$entry$COLOR{'norm'} in the configured KeePass database $COLOR{'log'}$$CFG{'defaults'}{'keepass'}{database}]$COLOR{'norm'}.\n");
+    }
+
+    my $ok;
     $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});
     if ($AUTH eq 'publickey') {
+        my $ORIG_PASSPHRASE = $PASSPHRASE;
         ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
         if (!$ok) {
-            die "$PASSPHRASE";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE);
         }
+        my $ORIG_PASSPHRASE_USER = $PASSPHRASE_USER;
         ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
         if (!$ok) {
-            die "$PASSPHRASE_USER";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE_USER);
         }
     } else {
+        my $ORIG_USER = $USER;
         ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
         if (!$ok) {
-            die "$USER";
+            _dieMissingKeePassEntry($ORIG_USER);
         }
+        my $ORIG_PASS = $PASS;
         ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
         if (!$ok) {
-            die "$PASS";
+            _dieMissingKeePassEntry($ORIG_PASS);
         }
     }
     # Makes sure the KeePass password is not exposed in the spawned process
@@ -388,7 +397,7 @@ sub subst {
     }
 
     # Reuse most of the implementation in PACUtils.pm
-    $string = _subst($string,$CFG,$UUID,1,$kpxc);
+    $string = _subst($string,$CFG,$UUID,$TMP_UUID,1,$kpxc);
 
     # Use local wEnterValue routine
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
@@ -850,8 +859,7 @@ sub _getProxyCmd {
     my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
 
     if ($proxy_user ne '') {
-        `which ncat 1>/dev/null 2>&1`;
-        if (! $?) {
+        if (system("which ncat 1>/dev/null 2>&1") eq 0) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
@@ -1082,6 +1090,11 @@ if (defined $METHOD) {
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
         _setProxy('ssh');
+
+        if (defined $$CFG{'tmp'}{'randomSocksTunnel'}) {
+          $CONNECT_OPTS .= ' -D localhost:' . $$CFG{'tmp'}{'randomSocksTunnel'};
+        }
+
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }

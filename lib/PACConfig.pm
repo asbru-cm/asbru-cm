@@ -26,8 +26,8 @@ $|++;
 ###################################################################
 # Import Modules
 use utf8;
-binmode STDOUT,':utf8';
-binmode STDERR,':utf8';
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 
 # Standard
 use strict;
@@ -66,7 +66,7 @@ my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -159,15 +159,15 @@ sub _initGUI {
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
     _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
-    foreach my $o ('MO','TO') {
-        foreach my $t ('BE','LF','AD') {
+    foreach my $o ('MO', 'TO') {
+        foreach my $t ('BE', 'LF', 'AD') {
             _($self, "linkHelp$o$t")->set_label('');
             _($self, "linkHelp$o$t")->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
         }
     }
-    foreach my $t ('linkHelpLocalShell','linkHelpGlobalNetwork') {
-        _($self,$t)->set_label('');
-        _($self,$t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
+    foreach my $t ('linkHelpLocalShell', 'linkHelpGlobalNetwork') {
+        _($self, $t)->set_label('');
+        _($self, $t)->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     }
 
     # Option currently disabled
@@ -188,7 +188,7 @@ sub _initGUI {
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
     _($self, 'alignCmdLocal')->add(($$self{_CMD_LOCAL} = PACExecEntry->new(undef, undef, 'local'))->{container});
     _($self, 'alignKeePass')->add(($$self{_KEEPASS} = PACKeePass->new(1, $$self{_CFG}{defaults}{keepass}))->{container});
-    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings},$$self{_WINDOWCONFIG}))->{container});
+    _($self, 'alignKeyBindings')->add(($$self{_KEYBINDS} = PACKeyBindings->new($$self{_CFG}{defaults}{keybindings}, $$self{_WINDOWCONFIG}))->{container});
     _($self, 'nbPreferences')->show_all();
 
     _($self, 'btnCfgProxyCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
@@ -248,6 +248,15 @@ sub _setupCallbacks {
             # Set safe values other wise options would be unaccesible
             _($self, 'cbCfgConnectionsAutoHide')->set_active(0);
             _($self, 'cbCfgButtonBarAutoHide')->set_active(0);
+        }
+    });
+    _($self, 'cbCfgStatusBar')->signal_connect('toggled' => sub {
+        _($self, 'rbCfgStatusShort')->set_sensitive(_($self, 'cbCfgStatusBar')->get_active());
+        _($self, 'rbCfgStatusFull')->set_sensitive(_($self, 'cbCfgStatusBar')->get_active());
+        if (!_($self, 'cbCfgStatusBar')->get_active()) {
+            # Set safe values other wise options would be unaccesible
+            _($self, 'rbCfgStatusShort')->set_active(0);
+            _($self, 'rbCfgStatusFull')->set_active(0);
         }
     });
     _($self, 'cbCfgNewInTab')->signal_connect('toggled' => sub {
@@ -465,27 +474,27 @@ sub _setupCallbacks {
     # Layout signal
     _($self, 'comboLayout')->signal_connect('changed' => sub {
         if (_($self, 'comboLayout')->get_active_text() eq 'Traditional') {
-            _($self,'frameTabsInMainWindow')->show();
-            _($self,'frameTabsInMainWindow')->show();
-            _($self,'cbCfgStartMainMaximized')->show();
-            _($self,'cbCfgRememberSize')->show();
-            _($self,'cbCfgSaveOnExit')->show();
-            _($self,'cbCfgStartIconified')->show();
-            _($self,'cbCfgCloseToTray')->show();
-            _($self,'cbCfgShowTreeTitles')->show();
-            _($self,'cbCfgShowTreeTitles')->set_active(1);
+            _($self, 'frameTabsInMainWindow')->show();
+            _($self, 'frameTabsInMainWindow')->show();
+            _($self, 'cbCfgStartMainMaximized')->show();
+            _($self, 'cbCfgRememberSize')->show();
+            _($self, 'cbCfgSaveOnExit')->show();
+            _($self, 'cbCfgStartIconified')->show();
+            _($self, 'cbCfgCloseToTray')->show();
+            _($self, 'cbCfgShowTreeTitles')->show();
+            _($self, 'cbCfgShowTreeTitles')->set_active(1);
         } else {
-            _($self,'frameTabsInMainWindow')->hide();
-            _($self,'cbCfgStartMainMaximized')->hide();
-            _($self,'cbCfgRememberSize')->hide();
-            _($self,'cbCfgSaveOnExit')->hide();
-            _($self,'cbCfgSaveOnExit')->set_active(1);
-            _($self,'cbCfgAutoSave')->set_active(1);
-            _($self,'cbCfgShowTreeTitles')->hide();
-            _($self,'cbCfgShowTreeTitles')->set_active(0);
+            _($self, 'frameTabsInMainWindow')->hide();
+            _($self, 'cbCfgStartMainMaximized')->hide();
+            _($self, 'cbCfgRememberSize')->hide();
+            _($self, 'cbCfgSaveOnExit')->hide();
+            _($self, 'cbCfgSaveOnExit')->set_active(1);
+            _($self, 'cbCfgAutoSave')->set_active(1);
+            _($self, 'cbCfgShowTreeTitles')->hide();
+            _($self, 'cbCfgShowTreeTitles')->set_active(0);
             if (!$PACMain::STRAY) {
-                _($self,'cbCfgStartIconified')->hide();
-                _($self,'cbCfgCloseToTray')->hide();
+                _($self, 'cbCfgStartIconified')->hide();
+                _($self, 'cbCfgCloseToTray')->hide();
             }
         }
     });
@@ -529,6 +538,37 @@ sub _setupCallbacks {
                 _($self, 'entryCfgJumpPass')->set_text("<password|$title>");
             }
         }
+    });
+
+    # Monitor the main notebook and detects when we are switching to the keybindings frame
+    # When the keybindings frame is shown, all 'mnemonics' has to be disabled to avoid conflicts when assigning keyboard shortcuts
+    # When another frame is shown, original mnemonics are restored
+    # DevNote: did not find a way to ignore the mnemonic, if use 'mnemonic_activate' ; the shortcut was not processed by the keybindings frame at all
+    my $hasMnemonics = 1;
+    my $labelClose = _($self, 'label86')->get_label();
+    my $textClose = _($self, 'label86')->get_text();
+    my $labelSave = _($self, 'label16')->get_label();
+    my $textSave = _($self, 'label16')->get_text();
+    my $labelReset = _($self, 'btnResetDefaults')->get_label();
+    my $textReset = $labelReset =~ s/_//r;
+    _($self, 'nbPreferences')->signal_connect('switch_page' => sub {
+        my ($nb, $frame, $data) = @_;
+        if ($frame eq _($self, 'frameKeyBindings')) {
+            if ($hasMnemonics) {
+                _($self, 'label86')->set_text($textClose);
+                _($self, 'label16')->set_text($textSave);
+                _($self, 'btnResetDefaults')->set_label($textReset);
+                $hasMnemonics = 0;
+            }
+        } else {
+            if (!$hasMnemonics) {
+                _($self, 'label86')->set_text_with_mnemonic($labelClose);
+                _($self, 'label16')->set_text_with_mnemonic($labelSave);
+                _($self, 'btnResetDefaults')->set_label($labelReset);
+                $hasMnemonics = 1;
+            }
+        }
+        return 0;
     });
 
     return 1;
@@ -622,12 +662,12 @@ sub cleanUpPersonalData {
     $SIG{__WARN__} = sub{};
     print STDERR "SAVED IN : $file\nOUT: $out\n";
     # Remove all personal information
-    open(F,"<:utf8",$file);
-    open(D,">:utf8",$out);
+    open(F, "<:utf8", $file);
+    open(D, ">:utf8", $out);
     my $C = 0;
     while (my $line = <F>) {
         my $next = 0;
-        foreach my $key ('name','send','ip','user','prepend command','postpend_command','database','gui password','sudo password') {
+        foreach my $key ('name', 'send', 'ip', 'user', 'prepend command', 'postpend_command', 'database', 'gui password', 'sudo password') {
             if ($line =~ /^[\t ]+$key:/) {
                 $line =~ s/$key:.+/$key: 'removed'/;
                 $next = 1;
@@ -726,8 +766,8 @@ sub _resetDefaults {
 sub _updateGUIPreferences {
     my $self = shift;
     my $cfg = shift // $$self{_CFG};
-    my %layout = ('Traditional',0,'Compact',1);
-    my %theme = ('default',0,'asbru-color',1,'asbru-dark',2,'system',3);
+    my %layout = ('Traditional', 0, 'Compact', 1);
+    my %theme = ('default', 0, 'asbru-color', 1, 'asbru-dark', 2, 'system', 3);
 
     if (!defined $$cfg{'defaults'}{'layout'}) {
         $$cfg{'defaults'}{'layout'} = 'Traditional';
@@ -771,10 +811,13 @@ sub _updateGUIPreferences {
     _($self, 'cbCfgButtonBarAutoHide')->set_active($$cfg{'defaults'}{'auto hide button bar'});
     _($self, 'cbCfgButtonBarAutoHide')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
     _($self, 'cbCfgPreventMOShowTree')->set_sensitive(_($self, 'cbCfgTabsInMain')->get_active());
+    _($self, 'cbCfgStatusBar')->set_active($$cfg{'defaults'}{'info in status bar'});
+    _($self, 'rbCfgStatusShort')->set_active(! $$cfg{'defaults'}{'forwarding short names'});
+    _($self, 'rbCfgStatusFull')->set_active($$cfg{'defaults'}{'forwarding full names'});
     _($self, 'entryCfgPrompt')->set_text($$cfg{'defaults'}{'command prompt'});
     _($self, 'entryCfgUserPrompt')->set_text($$cfg{'defaults'}{'username prompt'});
     _($self, 'entryCfgPasswordPrompt')->set_text($$cfg{'defaults'}{'password prompt'});
-    _($self, 'entryCfgPasswordPrompt')->select_region(0,0);
+    _($self, 'entryCfgPasswordPrompt')->select_region(0, 0);
     _($self, 'entryCfgHostKeyVerification')->set_text($$cfg{'defaults'}{'hostkey changed prompt'});
     _($self, 'entryCfgPressAnyKey')->set_text($$cfg{'defaults'}{'press any key prompt'});
     _($self, 'entryCfgRemoteHostChanged')->set_text($$cfg{'defaults'}{'remote host changed prompt'});
@@ -951,10 +994,10 @@ sub _updateGUIPreferences {
 
     # Hide show options not available on choosen layout
     if ($$cfg{'defaults'}{'layout'} eq 'Compact') {
-        _($self,'frameTabsInMainWindow')->hide();
-        _($self,'cbCfgStartMainMaximized')->hide();
-        _($self,'cbCfgRememberSize')->hide();
-        _($self,'cbCfgSaveOnExit')->hide();
+        _($self, 'frameTabsInMainWindow')->hide();
+        _($self, 'cbCfgStartMainMaximized')->hide();
+        _($self, 'cbCfgRememberSize')->hide();
+        _($self, 'cbCfgSaveOnExit')->hide();
         _($self, 'cbCfgCloseToTray')->hide();
         if ($$cfg{'defaults'}{'close to tray'} == 0) {
             # Force close to tray on Compact mode
@@ -962,7 +1005,7 @@ sub _updateGUIPreferences {
             $$cfg{'defaults'}{'close to tray'} = 1;
         }
         if (!$PACMain::STRAY) {
-            _($self,'cbCfgStartIconified')->hide();
+            _($self, 'cbCfgStartIconified')->hide();
         }
     }
 
@@ -1014,6 +1057,9 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'tabs in main window'} = _($self, 'cbCfgTabsInMain')->get_active();
     $$self{_CFG}{'defaults'}{'auto hide connections list'} = _($self, 'cbCfgConnectionsAutoHide')->get_active();
     $$self{_CFG}{'defaults'}{'auto hide button bar'} = _($self, 'cbCfgButtonBarAutoHide')->get_active();
+    $$self{_CFG}{'defaults'}{'info in status bar'} = _($self, 'cbCfgStatusBar')->get_active();
+    $$self{_CFG}{'defaults'}{'forwarding short names'} = _($self, 'rbCfgStatusShort')->get_active();
+    $$self{_CFG}{'defaults'}{'forwarding full names'} = _($self, 'rbCfgStatusFull')->get_active();
     $$self{_CFG}{'defaults'}{'hide on connect'} = _($self, 'cbCfgHideOnConnect')->get_active();
     $$self{_CFG}{'defaults'}{'force split tabs to 50%'} = _($self, 'cbCfgForceSplitSize')->get_active();
     $$self{_CFG}{'defaults'}{'start iconified'} = _($self, 'cbCfgStartIconified')->get_active();
@@ -1186,7 +1232,7 @@ sub _saveConfiguration {
             mkdir($autostart_dir);
         }
         if (-d $autostart_dir) {
-            open(F, ">:utf8","$autostart_dir/asbru_start.desktop");
+            open(F, ">:utf8", "$autostart_dir/asbru_start.desktop");
             print F join("\n", @PACUtils::PACDESKTOP);
             close F;
             $$self{_CFG}{'defaults'}{'start at session startup'} = 1;

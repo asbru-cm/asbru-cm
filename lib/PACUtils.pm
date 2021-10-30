@@ -121,7 +121,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.3.3';
+our $APPVERSION = '6.4.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `/bin/uname -m 2>&1`;
@@ -142,7 +142,7 @@ my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -368,10 +368,9 @@ sub _getMethods {
         $THEME_DIR = $theme_dir;
     }
 
-    `which rdesktop 1>/dev/null 2>&1`;
-    my $rdesktop = $?;
+    my $rdesktop = (system("which rdesktop 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (rdesktop)'} = {
-        'installed' => sub {return (! $rdesktop) ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
+        'installed' => sub {return $rdesktop ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -417,7 +416,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -440,10 +439,9 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which xfreerdp 1>/dev/null 2>&1`;
-    my $xfreerdp = $?;
+    my $xfreerdp = (system("which xfreerdp 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (xfreerdp)'} = {
-        'installed' => sub {return (! $xfreerdp) ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
+        'installed' => sub {return $xfreerdp ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -489,7 +487,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -512,12 +510,10 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which vncviewer 1>/dev/null 2>&1`;
-    my $xtightvncviewer = $?;
-    `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
-    my $tigervnc = $?;
+    my $xtightvncviewer = (system("which vncviewer 1>/dev/null 2>&1") eq 0);
+    my $tigervnc = (system("vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
     $methods{'VNC'} = {
-        'installed' => sub {return ! $xtightvncviewer || ! $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
+        'installed' => sub {return $xtightvncviewer || $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
         'checkCFG' => sub {
 
             my $cfg = shift;
@@ -559,7 +555,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -582,10 +578,9 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    `which cu 1>/dev/null 2>&1`;
-    my $cu = $?;
+    my $cu = (system("which cu 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (cu)'} = {
-        'installed' => sub {return ! $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
+        'installed' => sub {return $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -633,10 +628,9 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    `which remote-tty 1>/dev/null 2>&1`;
-    my $remote_tty = $?;
+    my $remote_tty = (system("which remote-tty 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (remote-tty)'} = {
-        'installed' => sub {return ! $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
+        'installed' => sub {return $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -684,7 +678,7 @@ sub _getMethods {
             _($self, 'alignUserPass')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'userpass');
             _($self, 'framePublicKey')->set_sensitive(0);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthManual')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'entryPassphrase')->set_text('');
             _($self, 'fileCfgPublicKey')->unselect_all();
@@ -700,10 +694,9 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
-    `which c3270 1>/dev/null 2>&1`;
-    my $c3270 = $?;
+    my $c3270 = (system("which c3270 1>/dev/null 2>&1") eq 0);
     $methods{'IBM 3270/5250'} = {
-        'installed' => sub {return ! $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
+        'installed' => sub {return $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -753,8 +746,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
-    `which autossh 1>/dev/null 2>&1`;
-    my $autossh = ! $?;
+    my $autossh = (system("which autossh 1>/dev/null 2>&1") eq 0);
     $methods{'SSH'} = {
         'installed' => sub {return 1;},
         'checkCFG' => sub {
@@ -802,7 +794,7 @@ sub _getMethods {
             _($self, 'framePublicKey')->set_sensitive(1);
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -817,10 +809,9 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    `which mosh 1>/dev/null 2>&1`;
-    my $mosh = $?;
+    my $mosh = (system("which mosh 1>/dev/null 2>&1") eq 0);
     $methods{'MOSH'} = {
-        'installed' => sub {return ! $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
+        'installed' => sub {return $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -868,7 +859,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -883,10 +874,9 @@ sub _getMethods {
         'escape' => ["\c^x."]
     };
 
-    `which cadaver 1>/dev/null 2>&1`;
-    my $cadaver = $?;
+    my $cadaver = (system("which cadaver 1>/dev/null 2>&1") eq 0);
     $methods{'WebDAV'} = {
-        'installed' => sub {return ! $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
+        'installed' => sub {return $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
         'checkCFG' => sub {
             my $cfg = shift;
 
@@ -934,7 +924,7 @@ sub _getMethods {
             _($self, 'entryPassphrase')->set_text($$cfg{passphrase} // '');
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -949,10 +939,9 @@ sub _getMethods {
         'escape' => ["\cc", "quit\n"]
     };
 
-    `which telnet 1>/dev/null 2>&1`;
-    my $telnet = $?;
+    my $telnet = (system("which telnet 1>/dev/null 2>&1") eq 0);
     $methods{'Telnet'} = {
-        'installed' => sub {return ! $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
+        'installed' => sub {return $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
         'checkCFG' => sub {
             my $cfg = shift;
             my @faults;
@@ -1073,7 +1062,7 @@ sub _getMethods {
             _($self, 'fileCfgPublicKey')->set_filename($$cfg{'public key'} // '');
             _($self, 'rbCfgAuthPublicKey')->set_active($$cfg{'auth type'} eq 'publickey');
             _($self, 'alignAuthMethod')->set_sensitive(1);
-            _($self, 'alignManual')->set_sensitive(1);
+            _($self, 'rbCfgAuthManual')->set_sensitive(1);
             _($self, 'rbCfgAuthUserPass')->set_active($$cfg{'auth type'} eq 'manual');
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
@@ -2865,13 +2854,14 @@ sub _subst {
     my $string = shift;
     my $CFG = shift;
     my $uuid = shift;
+    my $uuid_tmp = shift;
     my $asbru_conn = shift;
     my $kpxc = shift;
     my $ret = $string;
     my %V = ();
     my %out;
     my $pos = -1;
-    my @LOCAL_VARS = ('UUID','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
+    my @LOCAL_VARS = ('UUID','SOCKS5_PORT','TIMESTAMP','DATE_Y','DATE_M','DATE_D','TIME_H','TIME_M','TIME_S','NAME','TITLE','IP','PORT','USER','PASS');
     my $parent;
 
     if ($uuid) {
@@ -2890,8 +2880,18 @@ sub _subst {
         $V{'TITLE'} = $$CFG{'environments'}{$uuid}{title};
         $V{'IP'}    = $$CFG{'environments'}{$uuid}{ip};
         $V{'PORT'}  = $$CFG{'environments'}{$uuid}{port};
-        $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
-        $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        if ($$CFG{'environments'}{$uuid}{'auth type'} eq 'publickey') {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{'passphrase user'};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{passphrase};
+        } else {
+            $V{'USER'}  = $$CFG{'environments'}{$uuid}{user};
+            $V{'PASS'}  = $$CFG{'environments'}{$uuid}{pass};
+        }
+        if ($$CFG{'environments'}{$uuid}{'method'} =~ /ssh/i && $$CFG{'environments'}{$uuid}{'connection options'}{'randomSocksTunnel'} && defined($uuid_tmp) && defined($PACMain::SOCKS5PORTS{$uuid_tmp})) {
+          $V{'SOCKS5_PORT'} = $PACMain::SOCKS5PORTS{$uuid_tmp};
+        } else {
+          $V{'SOCKS5_PORT'} = "";
+        }
     }
     $V{'TIMESTAMP'} = time;
     ($V{'DATE_Y'},$V{'DATE_M'},$V{'DATE_D'},$V{'TIME_H'},$V{'TIME_M'},$V{'TIME_S'}) = split('_', strftime("%Y_%m_%d_%H_%M_%S", localtime));

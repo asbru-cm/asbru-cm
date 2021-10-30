@@ -55,6 +55,7 @@ sub new {
     $self->{container} = shift;
 
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
 
@@ -67,8 +68,10 @@ sub new {
 sub update {
     my $self = shift;
     my $cfg = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
 
     my $options = _parseCfgToOptions($$self{cfg});
 
@@ -79,6 +82,15 @@ sub update {
     $$self{gui}{sbUDPPort2}->set_value($$options{udpPort2});
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg {
