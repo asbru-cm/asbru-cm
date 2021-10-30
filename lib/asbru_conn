@@ -170,7 +170,10 @@ my $TITLE = $$CFG{'environments'}{$UUID}{'title'};
 my $EXPECT = defined $$CFG{'environments'}{$UUID}{'expect'};
 my $USE_PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use prepend command'};
 my $PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'prepend command'};
+my $USE_POSTPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use postpend command'};
+my $POSTPEND_COMMAND = $$CFG{'environments'}{$UUID}{'postpend command'};
 my $QUOTE_COMMAND = $$CFG{'environments'}{$UUID}{'quote command'} && $USE_PREPEND_COMMAND;
+my $QUOTEPOST_COMMAND = $$CFG{'environments'}{$UUID}{'quotepost command'} && $USE_POSTPEND_COMMAND;
 my $MANUAL = ($$CFG{'environments'}{$UUID}{'auth type'} // '') eq 'manual';
 my $TMP_UUID = $$CFG{'tmp'}{'uuid'};
 my $LOG_FILE = $$CFG{'tmp'}{'log file'};
@@ -1298,11 +1301,23 @@ if ($QUOTE_COMMAND) {
 if ($QUOTE_COMMAND) {
     $connection_txt = qq|"$connection_cmd"|;
 }
+if ($QUOTEPOST_COMMAND) {
+    $connection_cmd = qq|"$connection_cmd"|;
+}
+if ($QUOTEPOST_COMMAND) {
+    $connection_txt = qq|"$connection_cmd"|;
+}
 if ($USE_PREPEND_COMMAND) {
     $connection_cmd = "$PREPEND_COMMAND $connection_cmd";
 }
 if ($USE_PREPEND_COMMAND) {
     $connection_txt = "$PREPEND_COMMAND $connection_txt";
+}
+if ($USE_POSTPEND_COMMAND) {
+    $connection_cmd = "$connection_cmd $POSTPEND_COMMAND ";
+}
+if ($USE_POSTPEND_COMMAND) {
+    $connection_txt = "$connection_txt $POSTPEND_COMMAND ";
 }
 
 # Check for 'sudo' use

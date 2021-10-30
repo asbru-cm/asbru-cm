@@ -378,6 +378,12 @@ sub _setupCallbacks {
         _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
     });
 
+    # Capture "Postpend command" checkbox
+    _($self, 'cbEditPostpendCommand')->signal_connect(toggled => sub {
+        _($self, 'entryEditPostpendCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
+        _($self, 'cbCfgQuotePostCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
+    });
+
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
         if (!$ENV{'KPXC_MP'} && $$self{_CFG}{defaults}{keepass}{password}) {
@@ -509,7 +515,7 @@ sub _setupCallbacks {
     });
 
     # Capture right mouse click to show custom context menu
-    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
+    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'EditPostpendCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
 
             return 0 unless $event->button eq 3;
@@ -703,8 +709,13 @@ sub _updateGUIPreferences {
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
     _($self, 'entryEditPrependCommand')->set_text($$self{_CFG}{'environments'}{$uuid}{'prepend command'} // '');
     _($self, 'entryEditPrependCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
+    _($self, 'cbEditPostpendCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use postpend command'} // 0);
+    _($self, 'entryEditPostpendCommand')->set_text($$self{_CFG}{'environments'}{$uuid}{'postpend command'} // '');
+    _($self, 'entryEditPostpendCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     _($self, 'cbCfgQuoteCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'quote command'} // 0);
     _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
+    _($self, 'cbCfgQuotePostCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'quotepost command'} // 0);
+    _($self, 'cbCfgQuotePostCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     _($self, 'vboxEditSaveSessionLogs')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'entryEditLogFileName')->set_text($$self{_CFG}{'environments'}{$uuid}{'session log pattern'});
     _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'});
@@ -891,7 +902,10 @@ sub _saveConfiguration {
     }
     $$self{_CFG}{'environments'}{$uuid}{'use prepend command'} = _($self, 'cbEditPrependCommand')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'prepend command'} = _($self, 'entryEditPrependCommand')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'use postpend command'} = _($self, 'cbEditPostpendCommand')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'postpend command'} = _($self, 'entryEditPostpendCommand')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'quote command'} = _($self, 'cbCfgQuoteCommand')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'quotepost command'} = _($self, 'cbCfgQuotePostCommand')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'use sudo'} = _($self, 'cbEditUseSudo')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'save session logs'} = _($self, 'cbEditSaveSessionLogs')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'session log pattern'} = _($self, 'entryEditLogFileName')->get_chars(0, -1);
