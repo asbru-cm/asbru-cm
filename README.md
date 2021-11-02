@@ -158,8 +158,8 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 
 <a href="https://cloudsmith.com/"><img height="46" widht="158" alt="Fast, secure development and distribution. Universal, web-scale package management" src="https://www.asbru-cm.net/assets/img/misc/cloudsmith-logo-color.png" /></a>
 
-[travis-badge]: https://travis-ci.com/asbru-cm/asbru-cm.svg?branch=master
-[travis-url]: https://travis-ci.com/asbru-cm/asbru-cm
+[travis-badge]: https://api.travis-ci.com/asbru-cm/asbru-cm.svg?branch=master
+[travis-url]: https://app.travis-ci.com/github/asbru-cm/asbru-cm
 [license-badge]: https://img.shields.io/badge/License-GPL--3-blue.svg?style=flat
 [license-url]: LICENSE
 [deb-badge]: https://img.shields.io/badge/Packages-Debian-blue.svg?style=flat
@@ -169,4 +169,4 @@ The repositories for our RPM and DEB builds are thankfully sponsored by [package
 [liberapay-badge]: http://img.shields.io/liberapay/patrons/asbru-cm.svg?logo=liberapay
 [liberapay-url]: https://liberapay.com/asbru-cm/donate
 [bitcoin-badge]: https://img.shields.io/badge/bitcoin-19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45-D28138.svg?style=flat-square
-[bitcoin-url]: https://blockchain.info/address/19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45
+[bitcoin-url]: https://blockchain.info/address/19ZsvCafwRCwQSPcvfzgyiHD3Viptb4F45 

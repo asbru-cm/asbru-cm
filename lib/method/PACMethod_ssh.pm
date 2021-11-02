@@ -51,24 +51,24 @@ use Gtk3 '-init';
 my %SSH_VERSION = (1 => 0, 2 => 1, 'any' => 2);
 my %IP_PROTOCOL = (4 => 0, 6 => 1, 'any' => 2);
 my %SSH_ADV_OPTS = (
-    'A' => ['AddressFamily'],
+    'A' => ['AddKeysToAgent','AddressFamily'],
     'B' => ['BatchMode', 'BindAddress'],
-    'C' => ['CanonicalDomains', 'CanonicalizeFallbackLocal', 'CanonicalizeHostname', 'CanonicalizeMaxDots', 'CanonicalizePermittedCNAMEs', 'ChallengeResponseAuthentication', 'CheckHostIP', 'Cipher', 'Ciphers', 'ClearAllForwardings', 'Compression', 'CompressionLevel', 'ConnectionAttempts', 'ConnectTimeout', 'ControlMaster', 'ControlPath', 'ControlPersist'],
+    'C' => ['CanonicalDomains', 'CanonicalizeFallbackLocal', 'CanonicalizeHostname', 'CanonicalizeMaxDots', 'CanonicalizePermittedCNAMEs', 'CASignatureAlgorithms', 'CertificateFile', 'ChallengeResponseAuthentication', 'CheckHostIP', 'Cipher', 'Ciphers', 'ClearAllForwardings', 'Compression', 'CompressionLevel', 'ConnectionAttempts', 'ConnectTimeout', 'ControlMaster', 'ControlPath', 'ControlPersist'],
     'D' => ['DynamicForward'],
     'E' => ['EscapeChar', 'ExitOnForwardFailure'],
-    'F' => ['ForwardAgent', 'ForwardX11', 'ForwardX11Timeout', 'ForwardX11Trusted'],
-    'G' => ['GatewayPorts', 'GlobalKnownHostsFile', 'GSSAPIAuthentication', 'GSSAPIDelegateCredentials'],
+    'F' => ['FingerprintHash', 'ForwardAgent', 'ForwardX11', 'ForwardX11Timeout', 'ForwardX11Trusted'],
+    'G' => ['GatewayPorts', 'GlobalKnownHostsFile', 'GSSAPIAuthentication', 'GSSAPIKeyExchange', 'GSSAPIClientIdentity', 'GSSAPIDelegateCredentials', 'GSSAPIKexAlgorithms', 'GSSAPIRenewalForcesRekey', 'GSSAPIServerIdentity', 'GSSAPITrustDns'],
     'H' => ['HashKnownHosts', 'Host', 'HostbasedAuthentication', 'HostKeyAlgorithms', 'HostKeyAlias', 'HostName'],
-    'I' => ['IdentityAgent', 'IdentityFile', 'IdentitiesOnly', 'IPQoS'],
+    'I' => ['IdentitiesOnly', 'IdentityAgent', 'IdentityFile', 'IPQoS'],
     'K' => ['KbdInteractiveAuthentication', 'KbdInteractiveDevices', 'KexAlgorithms'],
     'L' => ['LocalCommand', 'LocalForward', 'LogLevel'],
     'M' => ['MACs', 'Match'],
     'N' => ['NoHostAuthenticationForLocalhost', 'NumberOfPasswordPrompts'],
-    'P' => ['PasswordAuthentication', 'PermitLocalCommand', 'PKCS11Provider', 'Port', 'PreferredAuthentications', 'Protocol', 'ProxyCommand', 'ProxyUseFdpass', 'PubkeyAuthentication'],
-    'R' => ['RekeyLimit', 'RemoteForward', 'RequestTTY', 'RhostsRSAAuthentication', 'RSAAuthentication'],
-    'S' => ['SendEnv', 'ServerAliveInterval', 'ServerAliveCountMax', 'StrictHostKeyChecking'],
+    'P' => ['PasswordAuthentication', 'PermitLocalCommand', 'PKCS11Provider', 'Port', 'PreferredAuthentications', 'Protocol', 'ProxyCommand', 'ProxyJump', 'ProxyUseFdpass', 'PubkeyAcceptedKeyTypes', 'PubkeyAuthentication'],
+    'R' => ['RekeyLimit', 'RemoteCommand', 'RemoteForward', 'RequestTTY', 'RhostsRSAAuthentication', 'RSAAuthentication'],
+    'S' => ['SendEnv', 'ServerAliveInterval', 'ServerAliveCountMax', 'SetEnv', 'StreamLocalBindMask', 'StreamLocalBindUnlink', 'StrictHostKeyChecking'],
     'T' => ['TCPKeepAlive', 'Tunnel', 'TunnelDevice'],
-    'U' => ['UsePrivilegedPort', 'User', 'UserKnownHostsFile'],
+    'U' => ['UpdateHostKeys', 'UsePrivilegedPort', 'User', 'UserKnownHostsFile'],
     'V' => ['VerifyHostKeyDNS', 'VisualHostKey'],
     'X' => ['XAuthLocation']
 );

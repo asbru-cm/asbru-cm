@@ -667,7 +667,7 @@ sub cleanUpPersonalData {
     my $C = 0;
     while (my $line = <F>) {
         my $next = 0;
-        foreach my $key ('name', 'send', 'ip', 'user', 'prepend command', 'database', 'gui password', 'sudo password') {
+        foreach my $key ('name', 'send', 'ip', 'user', 'prepend command', 'postpend_command', 'database', 'gui password', 'sudo password') {
             if ($line =~ /^[\t ]+$key:/) {
                 $line =~ s/$key:.+/$key: 'removed'/;
                 $next = 1;

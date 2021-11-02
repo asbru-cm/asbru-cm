@@ -1417,9 +1417,87 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="fill">True</property>
                                         <property name="position">1</property>
                                       </packing>
-                                    </child>
+			            </child>
                                     <child>
                                       <object class="GtkCheckButton" id="cbCfgQuoteCommand">
+                                        <property name="label" translatable="yes">Surround connection command with quotes</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">If cheked, the resulting connectino command (eg: ssh -L 10123:localhost:10456 -l user1 10.10.10.1) will be surrounded with double quotes ("), in order to provide some more compatibility to the "Prepend command"  (eg: gksudo requires the given command to be quoted)</property>
+                                        <property name="halign">start</property>
+                                        <property name="xalign">0.5</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+    		                            </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="vbox63">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkBox" id="hbox59">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">Postpend this command after the string to be launched
+eg.: putting '| tc' in an SSH connection, results in executing:
+ssh -l user@10.10.10.10 | ct</property>
+                                    <child>
+                                      <object class="GtkCheckButton" id="cbEditPostpendCommand">
+                                        <property name="label" translatable="yes">Postpend command </property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="xalign">0.5</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="entryEditPostpendCommand">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="activates_default">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="cbCfgQuotePostCommand">
                                         <property name="label" translatable="yes">Surround connection command with quotes</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
@@ -1452,7 +1530,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox" id="hbox59">
+                              <object class="GtkBox" id="hbox60">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <child>
@@ -1631,7 +1709,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <child>
-                                                  <object class="GtkBox" id="hbox60">
+                                                  <object class="GtkBox" id="hbox61">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <child>
@@ -1675,7 +1753,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkBox" id="hbox61">
+                                          <object class="GtkBox" id="hbox62">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="border_width">2</property>
@@ -1756,7 +1834,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox" id="hbox62">
+                              <object class="GtkBox" id="hbox63">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="margin_top">6</property>
@@ -1818,7 +1896,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                           </packing>
                         </child>
                         <child type="tab">
-                          <object class="GtkBox" id="hbox63">
+                          <object class="GtkBox" id="hbox64">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>

@@ -258,7 +258,7 @@ sub new {
         if (!defined $pass) {
             exit 0;
         }
-        if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
+        if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
@@ -2421,7 +2421,7 @@ sub _unlockAsbru {
     my $self = shift;
 
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
-    if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
+    if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
@@ -3219,7 +3219,9 @@ sub _launchTerminals {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
-            _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1);
+            if ($$self{_VERBOSE}) {
+                print STDERR "DEBUG: Ignoring group [{$uuid} while trying to launch a terminal.\n";
+            }
             next;
         }
         my $pset = $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} ? 'tab' : 'window';
