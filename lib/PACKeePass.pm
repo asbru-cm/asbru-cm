@@ -705,10 +705,10 @@ sub _buildKeePassGUI {
         my ($fc) = @_;
         if (defined $fc->get_filename()) {
             $$self{cfg}{pathcli} = decode('utf8',$fc->get_filename());
-            $CLI = $fc->get_filename();
+            $CLI = decode('utf8',$fc->get_filename());
             $self->_setCapabilities();
             $self->_updateUsage();
-            if ($CLI ne $fc->get_filename()) {
+            if ($CLI ne decode('utf8',$fc->get_filename())) {
                 # Remove selected file name, setCapabilities failed with this file
                 $fc->set_uri("file://$ENV{'HOME'}");
                 $fc->unselect_uri("file://$ENV{'HOME'}");
