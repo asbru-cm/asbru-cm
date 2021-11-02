@@ -123,7 +123,7 @@ our %RUNNING;
 our %FUNCS;
 our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
-
+my $LAST_COPIED_NODES;
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -1342,7 +1342,7 @@ sub _setupCallbacks {
 
             return 1;
         });
-        
+
     }
 
     # Capture mouse motion and show the connections list if the cursor is near the borders of the "info" panel
@@ -1613,6 +1613,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'paste') {
             map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
         } elsif ($action eq 'edit_node') {
             if (!$is_root) {
                 $$self{_GUI}{connEditBtn}->clicked();
@@ -4006,7 +4007,7 @@ sub _showConnectionsList {
         $$self{_GUI}{main}->show_all();
         $$self{_CMDLINETRAY} = 2;
     }
-    
+
 
     # Do show the main window
     $$self{_GUI}{main}->present();
@@ -4071,6 +4072,7 @@ sub _copyNodes {
     my $parent = shift // '__PAC__COPY__';
     my $sel_uuids = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs() ];
 
+    $LAST_COPIED_NODES = [@{ $sel_uuids }];
     # Empty the copy-vault
     $$self{_COPY}{'data'} = {};
     $$self{_COPY}{'cut'} = $cut;
