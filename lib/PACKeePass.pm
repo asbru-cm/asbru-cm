@@ -300,7 +300,7 @@ sub get_cfg {
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
     $hash{database} = decode('utf8',$$self{frame}{'fcbKeePassFile'}->get_filename());
     $hash{pathcli} = decode('utf8',$$self{frame}{'fcbCliFile'}->get_filename());
-    $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
+    $hash{keyfile} = decode('utf8',$$self{frame}{'fcbKeePassKeyFile'}->get_filename());
     if ((!defined $hash{database})||(-d $hash{database})||(!-e $hash{database})) {
         $hash{database} = '';
         $$self{disable_keepassxc} = 1;
