@@ -261,14 +261,6 @@ $$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
 
-# Test if we can avoid openning consecutive port forwarders
-if ($CONNECT_OPTS =~ /(-[LR] .+?)( |$)/) {
-    my $x = `ps a | grep ssh `;
-    if ($x =~ /$1/) {
-        $CONNECT_OPTS =~ s/(-[LR] .+?)( |$)//g;
-    }
-}
-
 my %_W;
 my $INT = 0;
 
