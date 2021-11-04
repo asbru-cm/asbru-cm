@@ -300,7 +300,7 @@ sub get_cfg {
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
     $hash{database} = decode('utf8',$$self{frame}{'fcbKeePassFile'}->get_filename());
     $hash{pathcli} = decode('utf8',$$self{frame}{'fcbCliFile'}->get_filename());
-    $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
+    $hash{keyfile} = decode('utf8',$$self{frame}{'fcbKeePassKeyFile'}->get_filename());
     if ((!defined $hash{database})||(-d $hash{database})||(!-e $hash{database})) {
         $hash{database} = '';
         $$self{disable_keepassxc} = 1;
@@ -705,10 +705,10 @@ sub _buildKeePassGUI {
         my ($fc) = @_;
         if (defined $fc->get_filename()) {
             $$self{cfg}{pathcli} = decode('utf8',$fc->get_filename());
-            $CLI = $fc->get_filename();
+            $CLI = decode('utf8',$fc->get_filename());
             $self->_setCapabilities();
             $self->_updateUsage();
-            if ($CLI ne $fc->get_filename()) {
+            if ($CLI ne decode('utf8',$fc->get_filename())) {
                 # Remove selected file name, setCapabilities failed with this file
                 $fc->set_uri("file://$ENV{'HOME'}");
                 $fc->unselect_uri("file://$ENV{'HOME'}");
