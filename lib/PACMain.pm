@@ -2985,6 +2985,7 @@ sub _treeConnections_menu {
                 $self->_pasteNodes($sel[0], $child);
             }
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
             return 1;
         }
     });
@@ -3494,7 +3495,7 @@ sub _readConfiguration {
     if ($continue && (! -f "${CFG_FILE}.prev3") && (-f $CFG_FILE)) {
         print STDERR "INFO: Migrating config file to v3...\n";
         PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Migrating config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
-        $$self{_CFG} = _cfgCheckMigrationV3;
+        $$self{_CFG} = _cfgCheckMigrationV3();
         copy($CFG_FILE, "${CFG_FILE}.prev3") or die "ERROR: Could not copy pre v.3 cfg file '$CFG_FILE' to '$CFG_FILE.prev3': $!";
         nstore($$self{_CFG}, $CFG_FILE_NFREEZE) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
         if ($R_CFG_FILE) {
