@@ -264,7 +264,10 @@ my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
 # Test if we can avoid openning consecutive port forwarders
 if ($CONNECT_OPTS =~ /(-[LR] .+?)( |$)/) {
     my $x = `ps a | grep ssh `;
-    if ($x =~ /$1/) {
+    my $y = $1;
+    if ($x =~ /$y/) {
+        $y =~ s/-[LR] //g;
+        print "$COLOR{'log'}Skip tunnel opening $y, already open in different terminal. $COLOR{'norm'}\n\n";
         $CONNECT_OPTS =~ s/(-[LR] .+?)( |$)//g;
     }
 }
