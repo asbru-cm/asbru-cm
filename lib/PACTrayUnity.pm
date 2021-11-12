@@ -36,10 +36,29 @@ use FindBin qw ($RealBin $Bin $Script);
 
 # GTK
 use Gtk3 '-init';
-eval {require Gtk3::AppIndicator;}; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
+#eval {require Gtk3::AppIndicator;}; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
 
 # PAC modules
 use PACUtils;
+eval {
+	Glib::Object::Introspection->setup(
+		basename => 'AppIndicator3',
+		version  => '0.1',
+		package  => 'AppIndicator',
+	);
+};
+if ($@) {
+	eval {
+		Glib::Object::Introspection->setup(
+			basename => 'AyatanaAppIndicator3',
+			version  => '0.1',
+			package  => 'AppIndicator',
+		);
+	};
+	if ($@) {
+		die "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
+	}
+}
 
 # END: Import Modules
 ###################################################################
@@ -94,9 +113,9 @@ sub DESTROY {
 sub _initGUI {
     my $self = shift;
 
-    $$self{_TRAY} = Gtk3::AppIndicator->new('pac', $TRAYICON);
+    $$self{_TRAY} = AppIndicator::Indicator->new('asbru-cm', $TRAYICON,'application-status');
     $$self{_TRAY}->set_icon_theme_path($RealBin . '/res');
-    $$self{_TRAY}->set_active;
+    $$self{_TRAY}->set_status('active');
     $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = ! $@;
     return 1;
 }
@@ -121,13 +140,13 @@ sub _setTrayMenu {
         # Check if show password is required
         if ($$self{_MAIN}{_CFG}{'defaults'}{'use gui password'} && $$self{_MAIN}{_CFG}{'defaults'}{'use gui password tray'}) {
             # Trigger the "unlock" procedure
-            $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_active(0);
+            $$self{_MAIN}{_GUI}{lockApplicationBtn}->set_status(0);
             if (! $$self{_MAIN}{_GUI}{lockApplicationBtn}->get_active()) {
-                $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
+                $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_status('active') : $$self{_TRAY}->set_passive();
                 $$self{_MAIN}->_showConnectionsList();
             }
         } else {
-            $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
+            $$self{_MAIN}{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_status('active') : $$self{_TRAY}->set_passive();
             $$self{_MAIN}->_showConnectionsList();
         }
     }});

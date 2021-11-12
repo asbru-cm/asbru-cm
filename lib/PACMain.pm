@@ -2172,7 +2172,7 @@ sub _setupCallbacks {
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_active();
+                    $$self{_TRAY}{_TRAY}->set_status('active');
                 } else {
                     $$self{_TRAY}{_TRAY}->set_visible(1);
                 }
@@ -2334,7 +2334,7 @@ sub _setupCallbacks {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
             if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_active();
+                $$self{_TRAY}{_TRAY}->set_status('active');
             } else {
                 $$self{_TRAY}{_TRAY}->set_visible(1);
             }
@@ -3341,7 +3341,7 @@ sub _quitProgram {
 
     # Hide every GUI component has already finished
     if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_passive();
+        $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
     }
@@ -3824,7 +3824,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
+        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_status('active') : $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
     }
