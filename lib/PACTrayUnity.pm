@@ -36,7 +36,6 @@ use FindBin qw ($RealBin $Bin $Script);
 
 # GTK
 use Gtk3 '-init';
-#eval {require Gtk3::AppIndicator;}; $@ and die; # Tricky way to bypass "rpmbuild" necessity to mark this package as a depencency for the RPM... :(
 
 # PAC modules
 use PACUtils;
