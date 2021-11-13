@@ -50,7 +50,15 @@ use PACTree;
 ###################################################################
 # Define GLOBAL CLASS variables
 
-
+my %EMULATIONS = (
+    #                 F1         F2         F3         F4         F5         F6         F7         F8         F9         F10        F11        F12        F13        F14        F15        F16        F17        F18        F19        F20        F21          F22          F23          F24
+    'X11R6', ['',"\x1B[11~","\x1B[12~","\x1B[13~","\x1B[14~","\x1B[15~","\x1B[17~","\x1B[18~","\x1B[19~","\x1B[20~","\x1B[21~","\x1B[23~","\x1B[24~","\x1B[25~","\x1B[26~","\x1B[28~","\x1B[29~","\x1B[31~","\x1B[32~","\x1B[33~","\x1B[34~","\x1B[20;2~","\x1B[21;2~","\x1B[23;2~","\x1B[24;2~"],
+    'VT100', ['',"\x1BOP"  ,"\x1BOQ"  ,"\x1BOR"  ,"\x1B02"],
+    'VT220'. ['',""        ,""        ,""        ,""       ,""         ,"\x1B[17~","\x1B[18~","\x1B[19~","\x1B[20~","\x1B[21~","\x1B[23~","\x1B[24~"],
+    'rxvt',  ['',"\x1B[11~","\x1B[12~","\x1B[13~","\x1B[14~","\x1B[15~","\x1B[17~","\x1B[18~","\x1B[19~","\x1B[20~","\x1B[21~","\x1B[23~","\x1B[24~","\x1BO2P" ,"\x1BO2Q" ,"\x1BO2R" ,"\x1BO2S" ,"\x1B[15;2~","\x1B[17;2~","\x1B[18;2~","\x1B[19;2~","\x1B[23\$","\x1B[24\$","\x1B[11^","\x1B[12^"],
+    'MGT',   ['',"\x1BOP"  ,"\x1BOQ"  ,"\x1BOR"  ,"\x1BOS"  ,"\x1B[15~","\x1B[17~","\x1B[18~","\x1B[19~","\x1B[20~","\x1B[21~","\x1B[23~","\x1B[24~","\x1B[25~","\x1B[26~","\x1B[28~","\x1B[29~","\x1B[31~","\x1B[32~","\x1B[33~","\x1B[34~"],
+    'screen',['',"\x1BOP"  ,"\x1BOQ"  ,"\x1BOR"  ,"\x1BOS"  ,"\x1B[15~","\x1B[17~","\x1B[18~","\x1B[19~","\x1B[20~","\x1B[21~","\x1B[23~","\x1B[24~","\x1B[25~","\x1B[26~","\x1B[28~","\x1B[29~","\x1B[31~","\x1B[32~","\x1B[33~","\x1B[34~"]
+);
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -67,6 +75,7 @@ sub new {
     $self->{container} = undef;
     $self->{hotkey} = {};
     $self->{verbose} = 0;
+
     _buildGUI($self);
 
     bless($self, $class);
@@ -74,7 +83,7 @@ sub new {
 }
 
 sub GetKeyMask {
-    my ($self, $widget, $event) = @_;
+    my ($self, $widget, $event, $emulation) = @_;
     my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
     my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
     my $state   = $event->get_state();
@@ -85,7 +94,6 @@ sub GetKeyMask {
     if ($self->{verbose}) {
         print "INFO: GETKEYMASK: $keyval, $unicode, $ctrl / $shift\n";
     }
-
     # Test special keys
     if ($keyval =~ /^KP_(.+)/) {
         # Unify keypad and keyboard to be the same
@@ -104,7 +112,11 @@ sub GetKeyMask {
     } elsif (!$unicode && ($keyval =~ /F\d+|Page_Down|Page_Up|Home|End|Insert|Left|Right|Up|Down|Scroll_Lock|Pause|Break/)) {
         if ("$alt$ctrl$shift") {
             return ($keyval, 0, "$alt$ctrl$shift+$keyval");
-        } elsif ($keyval =~ /F\d+/) {
+        } elsif ($keyval =~ /F(\d+)$/) {
+            my $pos = $1;
+            if ($emulation && @{$EMULATIONS{$emulation}}[$pos]) {
+                return ('fkey', @{$EMULATIONS{$emulation}}[$pos], $keyval);
+            }
             return ($keyval, 0, $keyval);
         }
         return ($keyval, 0, '');
@@ -117,7 +129,7 @@ sub GetKeyMask {
 }
 
 sub GetAction {
-    my ($self, $window, $widget, $event, $uuid) = @_;
+    my ($self, $window, $widget, $event, $uuid, $emulation) = @_;
     my $cfg = $self->{cfg};
     my $hk  = $self->{hotkey};
 
@@ -127,7 +139,10 @@ sub GetAction {
     if (!$cfg) {
         return wantarray ? (0, '') : '';
     }
-    my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event);
+    if (!defined $emulation) {
+        $emulation = 0;
+    }
+    my ($keyval, $unicode, $keymask) = $self->GetKeyMask($widget, $event, $emulation);
     if (!$keymask) {
         return wantarray ? ($keyval, '') : $keyval;
     }
@@ -137,6 +152,9 @@ sub GetAction {
         return wantarray ? ($$hk{$uuid}{$window}{$keymask}[1], $keymask) : $$hk{$uuid}{$window}{$keymask}[1];
     } elsif ($$hk{$window}{$keymask}) {
         return wantarray ? ($$hk{$window}{$keymask}[1], $keymask) : $$hk{$window}{$keymask}[1];
+    }
+    if ($emulation && $keyval eq 'fkey') {
+        return ('fkey', $unicode);
     }
     return wantarray ? ($keymask, '') : $keymask;
 }
