@@ -67,7 +67,6 @@ sub new {
     $self->{container} = undef;
     $self->{hotkey} = {};
     $self->{verbose} = 0;
-
     _buildGUI($self);
 
     bless($self, $class);

@@ -1034,11 +1034,9 @@ sub _initGUI {
     $$self{_CONFIG}{_WINDOWCONFIG}->set_transient_for($$self{_GUI}{main});
 
     # Get the KeePass object from configuration
-    $$self{_CONFIG}{_KEEPASS}{_VERBOSE} = $$self{_VERBOSE};
     $FUNCS{_KEEPASS} = $$self{_CONFIG}{_KEEPASS};
 
     # Get the KeyBindings object from configuration
-    $$self{_CONFIG}{_KEYBINDS}{_VERBOSE} = $$self{_VERBOSE};
     $FUNCS{_KEYBINDS} = $$self{_CONFIG}{_KEYBINDS};
 
     # Add some key bindings to existing button tooltip
