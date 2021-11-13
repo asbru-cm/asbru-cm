@@ -1033,6 +1033,9 @@ sub _setupCallbacks {
     # Capture keypresses on VTE
     $$self{_GUI}{_VTE}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
+        #TODO: remove, they are not used any more
+        #my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
+        #my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
         my ($action, $keymask);
 
         if (defined $$self{_KEYS_RECEIVE}) {
