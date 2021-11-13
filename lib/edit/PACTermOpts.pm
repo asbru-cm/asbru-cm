@@ -48,17 +48,27 @@ use PACUtils;
 # Define GLOBAL CLASS variables
 
 my %CURSOR_SHAPE = (
-    'block' => 0,
-    'ibeam' => 1,
+    'block'     => 0,
+    'ibeam'     => 1,
     'underline' => 2
 );
 
 my %BACKSPACE_BINDING = (
-    'auto' => 0,
+    'auto'            => 0,
     'ascii-backspace' => 1,
-    'ascii-delete' => 2,
+    'ascii-delete'    => 2,
     'delete-sequence' => 3,
-    'tty' => 4
+    'tty'             => 4
+);
+
+my %TERMINAL_EMULATION = (
+    'xterm'  => 0,
+    'X11R6'  => 1,
+    'VT100'  => 2,
+    'VT200'  => 3,
+    'rxvt'   => 4,
+    'MGT'    => 5,
+    'screen' => 6
 );
 
 # END: Define GLOBAL CLASS variables
@@ -136,6 +146,8 @@ sub update {
 
     $$self{gui}{comboEncoding}->set_active(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_MAP}{$$cfg{'terminal character encoding'} // 'UTF-8'}) // -1);
 
+    $$self{gui}{comboEmulation}->set_active($TERMINAL_EMULATION{$$cfg{'terminal emulation'} // 'xterm'} // '0');
+
     return 1;
 }
 
@@ -170,6 +182,7 @@ sub get_cfg {
     $options{'terminal window hsize'} = $$self{gui}{spCfgNewWindowWidth}->get_value;
     $options{'terminal window vsize'} = $$self{gui}{spCfgNewWindowHeight}->get_value;
     $options{'terminal character encoding'} = $$self{gui}{comboEncoding}->get_active_text;
+    $options{'terminal emulation'} = $$self{gui}{comboEmulation}->get_active_text;
     $options{'terminal backspace'} = $$self{gui}{comboBackspace}->get_active_text;
 
     return \%options;
@@ -379,8 +392,11 @@ sub _buildTermOptsGUI {
     $frameBackspace->add($w{comboBackspace});
     $frameBackspace->set_shadow_type('GTK_SHADOW_NONE');
 
+    $w{hboxchar} = Gtk3::HBox->new(0,0);
+    $w{vbox1}->pack_start($w{hboxchar},0,1,5);
+
     my $frameEncoding = Gtk3::Frame->new(' Character Encoding  ');
-    $w{vbox1}->pack_start($frameEncoding, 1, 1, 0);
+    $w{hboxchar}->pack_start($frameEncoding, 1, 1, 0);
 
     my $vboxEnc = Gtk3::VBox->new(0, 0);
     $frameEncoding->add($vboxEnc);
@@ -388,6 +404,23 @@ sub _buildTermOptsGUI {
 
     $w{comboEncoding} = Gtk3::ComboBoxText->new;
     $vboxEnc->pack_start($w{comboEncoding}, 0, 1, 0);
+
+    my $frameEmulations = Gtk3::Frame->new(' Terminal Emulation ');
+    $w{hboxchar}->pack_start($frameEmulations, 1, 1, 0);
+
+    my $vboxEmulation = Gtk3::VBox->new(0, 0);
+    $frameEmulations->add($vboxEmulation);
+    $frameEmulations->set_shadow_type('GTK_SHADOW_NONE');
+
+    $w{comboEmulation} = Gtk3::ComboBoxText->new;
+    $vboxEmulation->pack_start($w{comboEmulation}, 0, 1, 0);
+    $w{comboEmulation}->append_text('xterm');
+    $w{comboEmulation}->append_text('X11R6');
+    $w{comboEmulation}->append_text('VT100');
+    $w{comboEmulation}->append_text('VT200');
+    $w{comboEmulation}->append_text('rxvt');
+    $w{comboEmulation}->append_text('MGT');
+    $w{comboEmulation}->append_text('screen');
 
     my $sep = Gtk3::HSeparator->new;
     $w{vbox1}->pack_start($sep, 0, 1, 5);
