@@ -135,7 +135,6 @@ sub update {
     $$self{gui}{comboBackspace}->set_active($BACKSPACE_BINDING{$$cfg{'terminal backspace'} // 'auto'} // '0');
 
     $$self{gui}{comboEncoding}->set_active(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_MAP}{$$cfg{'terminal character encoding'} // 'UTF-8'}) // -1);
-    $$self{gui}{lblEncoding}->set_text(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_HASH}{$$cfg{'terminal character encoding'} // 'RFC 3629'}) // '');
 
     return 1;
 }
@@ -390,9 +389,6 @@ sub _buildTermOptsGUI {
     $w{comboEncoding} = Gtk3::ComboBoxText->new;
     $vboxEnc->pack_start($w{comboEncoding}, 0, 1, 0);
 
-    $w{lblEncoding} = Gtk3::Label->new('');
-    $vboxEnc->pack_start($w{lblEncoding}, 1, 1, 0);
-
     my $sep = Gtk3::HSeparator->new;
     $w{vbox1}->pack_start($sep, 0, 1, 5);
 
@@ -404,21 +400,31 @@ sub _buildTermOptsGUI {
     $$self{gui} = \%w;
 
     # Populate the Encodings combobox
-    foreach my $enc (sort {uc($a) cmp uc($b)} keys %{$PACMain::FUNCS{_CONFIG}{_ENCODINGS_ARRAY}}) {$w{comboEncoding}->append_text($enc);}
+    foreach my $enc (sort {uc($a) cmp uc($b)} keys %{$PACMain::FUNCS{_CONFIG}{_ENCODINGS_ARRAY}}) {
+        $w{comboEncoding}->append_text($enc);
+    }
 
     # Populate the Backspace binding combobox
-    foreach my $key ('auto', 'ascii-backspace', 'ascii-delete', 'delete-sequence', 'tty') {$w{comboBackspace}->append_text($key);}
+    foreach my $key ('auto', 'ascii-backspace', 'ascii-delete', 'delete-sequence', 'tty') {
+        $w{comboBackspace}->append_text($key);
+    }
 
     # Setup some callbacks
-    $w{cbUsePersonal}->signal_connect('toggled' => sub {$w{vbox1}->set_sensitive($w{cbUsePersonal}->get_active);});
-    $w{cbTabBackColor}->signal_connect('toggled' => sub {$w{colorTabBack}->set_sensitive($w{cbTabBackColor}->get_active);});
-    $w{cbBoldAsText}->signal_connect('toggled' => sub {$w{colorBold}->set_sensitive(! $w{cbBoldAsText}->get_active);});
-    $w{comboEncoding}->signal_connect('changed' => sub {$w{lblEncoding}->set_text($PACMain::FUNCS{_CONFIG}{_ENCODINGS_HASH}{$w{comboEncoding}->get_active_text} // '');});
-    $w{cbCfgNewInWindow}->signal_connect('toggled' => sub {$w{hboxWidthHeight}->set_sensitive($w{cbCfgNewInWindow}->get_active); return 1;});
+    $w{cbUsePersonal}->signal_connect('toggled' => sub {
+        $w{vbox1}->set_sensitive($w{cbUsePersonal}->get_active);
+    });
+    $w{cbTabBackColor}->signal_connect('toggled' => sub {
+        $w{colorTabBack}->set_sensitive($w{cbTabBackColor}->get_active);
+    });
+    $w{cbBoldAsText}->signal_connect('toggled' => sub {
+        $w{colorBold}->set_sensitive(! $w{cbBoldAsText}->get_active);
+    });
+    $w{cbCfgNewInWindow}->signal_connect('toggled' => sub {
+        $w{hboxWidthHeight}->set_sensitive($w{cbCfgNewInWindow}->get_active); return 1;
+    });
     $w{btnResetDefaults}->signal_connect('clicked' => sub {
         my %default_cfg;
         defined $default_cfg{'defaults'}{1} or 1;
-
         PACUtils::_cfgSanityCheck(\%default_cfg);
         $self->update(\%default_cfg);
     });
