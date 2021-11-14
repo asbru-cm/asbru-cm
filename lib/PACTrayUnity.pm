@@ -42,23 +42,23 @@ use PACUtils;
 
 # AppIndicator
 eval {
-	Glib::Object::Introspection->setup(
-		basename => 'AppIndicator3',
-		version  => '0.1',
-		package  => 'AppIndicator',
-	);
+    Glib::Object::Introspection->setup(
+        basename => 'AppIndicator3',
+        version  => '0.1',
+        package  => 'AppIndicator',
+    );
 };
 if ($@) {
-	eval {
-		Glib::Object::Introspection->setup(
-			basename => 'AyatanaAppIndicator3',
-			version  => '0.1',
-			package  => 'AppIndicator',
-		);
-	};
-	if ($@) {
-		warn "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
-	}
+    eval {
+        Glib::Object::Introspection->setup(
+            basename => 'AyatanaAppIndicator3',
+            version  => '0.1',
+            package  => 'AppIndicator',
+        );
+    };
+    if ($@) {
+        warn "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
+    }
 }
 
 # END: Import Modules
