@@ -541,15 +541,15 @@ sub stop {
         }
     }
 
+    if ($$self{_CLUSTER} ne '') {
+        $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
+
     # Send any configured keypress to close the forked binary
     if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
         foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
             _vteFeedChild($$self{_GUI}{_VTE}, $esc);
         }
-    }
-
-    if ($$self{_CLUSTER} ne '') {
-        $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
     _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
