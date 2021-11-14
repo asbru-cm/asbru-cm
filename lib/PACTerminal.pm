@@ -548,6 +548,10 @@ sub stop {
         }
     }
 
+    if ($$self{_CLUSTER} ne '') {
+        $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
+
     _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
 
     $$self{CONNECTED} = 0;
@@ -2445,9 +2449,9 @@ sub _setTabColour {
 sub _updateStatus {
     my $self = shift;
     my $forward_ports = '';
-    
+
     # Show forwarding in status bar
-    if ($self->{CONNECTED} && 
+    if ($self->{CONNECTED} &&
     	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
     	$$self{_CFG}{defaults}{'info in status bar'}){
         ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
