@@ -417,7 +417,7 @@ sub _buildTermOptsGUI {
     $w{comboEmulation}->append_text('xterm');
     $w{comboEmulation}->append_text('X11R6');
     $w{comboEmulation}->append_text('VT100');
-    $w{comboEmulation}->append_text('VT200');
+    $w{comboEmulation}->append_text('VT220');
     $w{comboEmulation}->append_text('rxvt');
     $w{comboEmulation}->append_text('MGT');
     $w{comboEmulation}->append_text('screen');
