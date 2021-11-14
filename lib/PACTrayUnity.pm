@@ -58,6 +58,7 @@ if ($@) {
     };
     if ($@) {
         warn "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
+        return 0;
     }
 }
 
