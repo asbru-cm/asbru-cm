@@ -1844,7 +1844,7 @@ elsif (!$MANUAL) {
                     return 1;
                 }
 
-                select(undef, undef, undef, 0.25);
+                select(undef, undef, undef, 0.05);
                 $EXP->restart_timeout_upon_receive(1);
                 for(my $i = 0; $i < scalar(@{$$CFG{'environments'}{$UUID}{'expect'}}); $i++) {
                     my $hash = $$CFG{'environments'}{$UUID}{'expect'}[$i];
