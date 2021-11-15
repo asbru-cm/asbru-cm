@@ -1100,11 +1100,11 @@ sub _initGUI {
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
         # Update GUI
         Gtk3::main_iteration() while Gtk3::events_pending();
 
-        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my @geo = $$self{_TRAY}->get_geometry();
         my $x = $geo[2]{x};
         my $y = $geo[2]{y};
 
