@@ -541,6 +541,10 @@ sub stop {
         }
     }
 
+    if ($$self{_CLUSTER} ne '') {
+        $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
+    }
+
     # Send any configured keypress to close the forked binary
     if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
         foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
@@ -2445,9 +2449,9 @@ sub _setTabColour {
 sub _updateStatus {
     my $self = shift;
     my $forward_ports = '';
-    
+
     # Show forwarding in status bar
-    if ($self->{CONNECTED} && 
+    if ($self->{CONNECTED} &&
     	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
     	$$self{_CFG}{defaults}{'info in status bar'}){
         ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;

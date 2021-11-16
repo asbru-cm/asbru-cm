@@ -1100,11 +1100,11 @@ sub _initGUI {
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
         # Update GUI
         Gtk3::main_iteration() while Gtk3::events_pending();
 
-        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my @geo = $$self{_TRAY}->get_geometry();
         my $x = $geo[2]{x};
         my $y = $geo[2]{y};
 
@@ -2182,7 +2182,7 @@ sub _setupCallbacks {
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_active();
+                    $$self{_TRAY}{_TRAY}->set_status('active');
                 } else {
                     $$self{_TRAY}{_TRAY}->set_visible(1);
                 }
@@ -2316,7 +2316,7 @@ sub _setupCallbacks {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
             if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_active();
+                $$self{_TRAY}{_TRAY}->set_status('active');
             } else {
                 $$self{_TRAY}{_TRAY}->set_visible(1);
             }
@@ -2985,6 +2985,7 @@ sub _treeConnections_menu {
                 $self->_pasteNodes($sel[0], $child);
             }
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
             return 1;
         }
     });
@@ -3325,7 +3326,7 @@ sub _quitProgram {
 
     # Hide every GUI component has already finished
     if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_passive();
+        $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
     }
@@ -3494,7 +3495,7 @@ sub _readConfiguration {
     if ($continue && (! -f "${CFG_FILE}.prev3") && (-f $CFG_FILE)) {
         print STDERR "INFO: Migrating config file to v3...\n";
         PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Migrating config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
-        $$self{_CFG} = _cfgCheckMigrationV3;
+        $$self{_CFG} = _cfgCheckMigrationV3();
         copy($CFG_FILE, "${CFG_FILE}.prev3") or die "ERROR: Could not copy pre v.3 cfg file '$CFG_FILE' to '$CFG_FILE.prev3': $!";
         nstore($$self{_CFG}, $CFG_FILE_NFREEZE) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
         if ($R_CFG_FILE) {
@@ -3823,7 +3824,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
+        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_status('active') : $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
     }
