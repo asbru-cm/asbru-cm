@@ -2704,15 +2704,17 @@ sub _cipherCFG {
     my $cfg = shift;
 
     foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
-        if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
+        if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1' && $$cfg{'defaults'}{'global variables'}{$var}{'value'}) {
             $$cfg{'defaults'}{'global variables'}{$var}{'value'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'global variables'}{$var}{'value'}));
         }
     }
 
-    if (defined $$cfg{'defaults'}{'keepass'}) {
+    if (defined $$cfg{'defaults'}{'keepass'} && $$cfg{'defaults'}{'keepass'}{'password'}) {
         $$cfg{'defaults'}{'keepass'}{'password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'keepass'}{'password'}));
     }
-    $$cfg{'defaults'}{'sudo password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'sudo password'}));
+    if ($$cfg{'defaults'}{'sudo password'}) {
+        $$cfg{'defaults'}{'sudo password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'sudo password'}));
+    }
 
     foreach my $uuid (keys %{$$cfg{'environments'}}) {
         if ($uuid =~ /^HASH/go) {
@@ -2723,17 +2725,21 @@ sub _cipherCFG {
             delete $$cfg{'environments'}{$uuid}{'pass'};
             next;
         }
-        $$cfg{'environments'}{$uuid}{'pass'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'pass'}));
-        $$cfg{'environments'}{$uuid}{'passphrase'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'passphrase'}));
+        if ($$cfg{'environments'}{$uuid}{'pass'}) {
+            $$cfg{'environments'}{$uuid}{'pass'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'pass'}));
+        }
+        if ($$cfg{'environments'}{$uuid}{'passphrase'}) {
+            $$cfg{'environments'}{$uuid}{'passphrase'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'environments'}{$uuid}{'passphrase'}));
+        }
 
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'expect'}}) {
-            if ($$hash{'hidden'} eq '1') {
+            if ($$hash{'hidden'} eq '1' && $$hash{'send'}) {
                 $$hash{'send'} = $CIPHER->encrypt_hex(encode('UTF-8',$$hash{'send'}));
             }
         }
 
         foreach my $hash (@{$$cfg{'environments'}{$uuid}{'variables'}}) {
-            if ($$hash{'hide'} eq '1') {
+            if ($$hash{'hide'} eq '1' && $$hash{'txt'}) {
                 $$hash{'txt'} = $CIPHER->encrypt_hex(encode('UTF-8',$$hash{'txt'}));
             }
         }
