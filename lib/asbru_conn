@@ -1628,6 +1628,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 } else {
                     ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                     $avoid_first_expectation = 1;
+                    $jump = 1;
                     $i = --$on_match;
                 }
             }]
@@ -1837,7 +1838,7 @@ elsif (!$MANUAL) {
                 $EXP->clear_accum();
                 exp_continue();
             } else {
-                my $avoid_first_expectation = 1;
+                my $avoid_first_expectation = 0;
 
                 # Do we have to do complex expects?
                 if (!$EXPECT || !$CONNECTED) {
@@ -1923,6 +1924,7 @@ elsif (!$MANUAL) {
                             } else {
                                 ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                                 $avoid_first_expectation = 1;
+                                $jump = 1;
                                 $i = --$on_match;
                             }
                         }]
