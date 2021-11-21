@@ -261,6 +261,17 @@ $$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
 
+# Test if we can avoid openning consecutive port forwarders
+if ($CONNECT_OPTS =~ /(-[LR] .+?)( |$)/) {
+    my $x = `ps a | grep ssh `;
+    my $y = $1;
+    if ($x =~ /$y/) {
+        $y =~ s/-[LR] //g;
+        print "$COLOR{'log'}Skip tunnel opening $y, already open in different terminal. $COLOR{'norm'}\n\n";
+        $CONNECT_OPTS =~ s/(-[LR] .+?)( |$)//g;
+    }
+}
+
 my %_W;
 my $INT = 0;
 
@@ -1617,6 +1628,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 } else {
                     ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                     $avoid_first_expectation = 1;
+                    $jump = 1;
                     $i = --$on_match;
                 }
             }]
@@ -1826,7 +1838,7 @@ elsif (!$MANUAL) {
                 $EXP->clear_accum();
                 exp_continue();
             } else {
-                my $avoid_first_expectation = 1;
+                my $avoid_first_expectation = 0;
 
                 # Do we have to do complex expects?
                 if (!$EXPECT || !$CONNECTED) {
@@ -1911,6 +1923,7 @@ elsif (!$MANUAL) {
                             } else {
                                 ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                                 $avoid_first_expectation = 1;
+                                $jump = 1;
                                 $i = --$on_match;
                             }
                         }]

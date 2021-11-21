@@ -756,8 +756,11 @@ sub _setupCallbacks {
             }
         }
 
+        for (my $i=$total-1;$i>=0;$i--) {
+            splice @{$$self{_WINDOWCLUSTER}{treeClustered1}->{data}},$select[$i],1;
+        }
+        $$self{CLUSTERS} = $self->getCFGClusters();
         $self->_updateButtons1;
-        $self->_updateGUI1;
 
         #$PACMain::{FUNCS}{_MAIN}{_CFG}{tmp}{changed} = 1;
         $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);

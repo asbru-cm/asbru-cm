@@ -88,6 +88,20 @@ sub DESTROY {
     return 1;
 }
 
+# Returns TRUE if the tray icon is currently visible
+sub is_visible {
+    my $self = shift;
+
+    return $$self{_TRAY}->get_visible();
+}
+
+# Returns size and placement of the tray icon
+sub get_geometry {
+    my $self = shift;
+
+    return $$self{_TRAY}->get_geometry();
+}
+
 # END: Define PUBLIC CLASS methods
 ###################################################################
 

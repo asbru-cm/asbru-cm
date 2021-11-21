@@ -148,6 +148,7 @@ sub new {
     $self->{EMBED_CHECK_COUNT} = 0;
     $self->{EMBED_CHECK_TIMEOUT} = 250; # in milliseconds
     $self->{EMBED_CHECK_TIMEOUT_ID} = undef;
+    $self->{VTE_EMULATION} = $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'use personal settings'} ? $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'terminal emulation'} // 0 : 0;
 
     ++$_C;
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
@@ -539,6 +540,10 @@ sub stop {
         if ($$self{CONNECTED}) {
             $self->_wPrePostExec('local after');
         }
+    }
+
+    if ($$self{_CLUSTER} ne '') {
+        $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
     # Send any configured keypress to close the forked binary
@@ -1032,8 +1037,6 @@ sub _setupCallbacks {
     # Capture keypresses on VTE
     $$self{_GUI}{_VTE}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
-        my $keyval  = Gtk3::Gdk::keyval_name($event->keyval) // '';
-        my $unicode = Gtk3::Gdk::keyval_to_unicode($event->keyval); # 0 if not a character
         my ($action, $keymask);
 
         if (defined $$self{_KEYS_RECEIVE}) {
@@ -1047,9 +1050,11 @@ sub _setupCallbacks {
                 return 1;
             }
         }
-
-        ($action, $keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event, $$self{_UUID});
-
+        ($action, $keymask) = $PACMain::FUNCS{_KEYBINDS}->GetAction('terminal', $widget, $event, $$self{_UUID}, $$self{VTE_EMULATION});
+        if ($$self{VTE_EMULATION} && $action eq 'fkey') {
+            _vteFeedChild($$self{_GUI}{_VTE}, $keymask);
+            return 1;
+        }
         if (!$action) {
             return 0;
         } elsif ($action eq 'Return' && !$$self{CONNECTED} && !$$self{CONNECTING}) {
@@ -2445,9 +2450,9 @@ sub _setTabColour {
 sub _updateStatus {
     my $self = shift;
     my $forward_ports = '';
-    
+
     # Show forwarding in status bar
-    if ($self->{CONNECTED} && 
+    if ($self->{CONNECTED} &&
     	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
     	$$self{_CFG}{defaults}{'info in status bar'}){
         ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;

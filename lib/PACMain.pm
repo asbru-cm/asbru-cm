@@ -92,6 +92,7 @@ my $RES_DIR = "$RealBin/res";
 # Register icons on Gtk
 #&_registerPACIcons;
 
+my $VENDOR_CFG_FILE = "$RealBin/vendor/asbru-conf-default-overrides.yml";
 my $INIT_CFG_FILE = "$RealBin/res/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
@@ -123,7 +124,7 @@ our %RUNNING;
 our %FUNCS;
 our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
-
+my $LAST_COPIED_NODES;
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -1099,11 +1100,11 @@ sub _initGUI {
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
         # Update GUI
         Gtk3::main_iteration() while Gtk3::events_pending();
 
-        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my @geo = $$self{_TRAY}->get_geometry();
         my $x = $geo[2]{x};
         my $y = $geo[2]{y};
 
@@ -1342,7 +1343,7 @@ sub _setupCallbacks {
 
             return 1;
         });
-        
+
     }
 
     # Capture mouse motion and show the connections list if the cursor is near the borders of the "info" panel
@@ -1613,6 +1614,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'paste') {
             map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
         } elsif ($action eq 'edit_node') {
             if (!$is_root) {
                 $$self{_GUI}{connEditBtn}->clicked();
@@ -2180,7 +2182,7 @@ sub _setupCallbacks {
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
                 if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_active();
+                    $$self{_TRAY}{_TRAY}->set_status('active');
                 } else {
                     $$self{_TRAY}{_TRAY}->set_visible(1);
                 }
@@ -2314,7 +2316,7 @@ sub _setupCallbacks {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
             if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_active();
+                $$self{_TRAY}{_TRAY}->set_status('active');
             } else {
                 $$self{_TRAY}{_TRAY}->set_visible(1);
             }
@@ -2983,6 +2985,7 @@ sub _treeConnections_menu {
                 $self->_pasteNodes($sel[0], $child);
             }
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
             return 1;
         }
     });
@@ -3323,7 +3326,7 @@ sub _quitProgram {
 
     # Hide every GUI component has already finished
     if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_passive();
+        $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
     }
@@ -3492,7 +3495,7 @@ sub _readConfiguration {
     if ($continue && (! -f "${CFG_FILE}.prev3") && (-f $CFG_FILE)) {
         print STDERR "INFO: Migrating config file to v3...\n";
         PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Migrating config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
-        $$self{_CFG} = _cfgCheckMigrationV3;
+        $$self{_CFG} = _cfgCheckMigrationV3();
         copy($CFG_FILE, "${CFG_FILE}.prev3") or die "ERROR: Could not copy pre v.3 cfg file '$CFG_FILE' to '$CFG_FILE.prev3': $!";
         nstore($$self{_CFG}, $CFG_FILE_NFREEZE) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
         if ($R_CFG_FILE) {
@@ -3501,6 +3504,21 @@ sub _readConfiguration {
         $continue = 0;
     }
     # END of removing
+
+    # Default partial vendor config, but since it is partial, do not set $continue to 0.
+    if ($continue && -f "${VENDOR_CFG_FILE}") {
+        my $temp_cfg;
+        if (! ($temp_cfg = YAML::LoadFile($VENDOR_CFG_FILE))) {
+            print STDERR "WARNING: Could not load vendor config file '$VENDOR_CFG_FILE': $!\n";
+        } else {
+            print STDERR "INFO: Using vendor config file '$VENDOR_CFG_FILE'\n";
+            $$self{_CFG} //= {};
+            foreach my $config (keys %{ $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'} }) {
+                $$self{_CFG}{$config} = $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'}{$config};
+            }
+            print STDERR "INFO: Used vendor config file '$VENDOR_CFG_FILE'\n";
+        }
+    }
 
     if ($R_CFG_FILE && $continue) {
          print STDERR "WARN: No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
@@ -3806,7 +3824,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
     if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
+        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_status('active') : $$self{_TRAY}{_TRAY}->set_status('passive');
     } else {
         $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
     }
@@ -4006,7 +4024,7 @@ sub _showConnectionsList {
         $$self{_GUI}{main}->show_all();
         $$self{_CMDLINETRAY} = 2;
     }
-    
+
 
     # Do show the main window
     $$self{_GUI}{main}->present();
@@ -4071,6 +4089,7 @@ sub _copyNodes {
     my $parent = shift // '__PAC__COPY__';
     my $sel_uuids = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs() ];
 
+    $LAST_COPIED_NODES = [@{ $sel_uuids }];
     # Empty the copy-vault
     $$self{_COPY}{'data'} = {};
     $$self{_COPY}{'cut'} = $cut;
