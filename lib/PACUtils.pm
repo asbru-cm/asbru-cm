@@ -2703,12 +2703,14 @@ sub _updateSSHToIPv6 {
 sub _cipherCFG {
     my $cfg = shift;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q','12345678'));
+    }
     foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
         if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
             $$cfg{'defaults'}{'global variables'}{$var}{'value'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'global variables'}{$var}{'value'}));
         }
     }
-
     if (defined $$cfg{'defaults'}{'keepass'}) {
         $$cfg{'defaults'}{'keepass'}{'password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'keepass'}{'password'}));
     }
@@ -2746,6 +2748,9 @@ sub _decipherCFG {
     my $cfg = shift;
     my $single_uuid = shift // 0;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q','12345678'));
+    }
     if (! $single_uuid) {
         foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
             if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
