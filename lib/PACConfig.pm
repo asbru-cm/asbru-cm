@@ -65,8 +65,8 @@ my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
-
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -333,8 +333,11 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
+            if (!$CIPHER->salt()) {
+                $CIPHER->salt(pack('Q',$SALT));
+            }
             my $pass = _wEnterValue($$self{_WINDOWCONFIG}, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
-            if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
+            if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
                 _($self, 'hboxCfgPACPassword')->set_sensitive(1);

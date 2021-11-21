@@ -142,7 +142,8 @@ my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -2704,7 +2705,7 @@ sub _cipherCFG {
     my $cfg = shift;
 
     if (!$CIPHER->salt()) {
-        $CIPHER->salt(pack('Q','12345678'));
+        $CIPHER->salt(pack('Q',$SALT));
     }
     foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
         if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
@@ -2749,7 +2750,7 @@ sub _decipherCFG {
     my $single_uuid = shift // 0;
 
     if (!$CIPHER->salt()) {
-        $CIPHER->salt(pack('Q','12345678'));
+        $CIPHER->salt(pack('Q',$SALT));
     }
     if (! $single_uuid) {
         foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
