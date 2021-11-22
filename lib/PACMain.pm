@@ -4236,6 +4236,8 @@ sub __dupNodes {
         $$cfg{$new_txt_uuid}{'name'} = "$$self{_CFG}{'environments'}{$uuid}{'name'} - copy";
     }
     $$cfg{$parent}{'children'}{$new_txt_uuid} = 1;
+    $$cfg{$new_txt_uuid}{'cluster'} = [];
+    $$cfg{$new_txt_uuid}{'_protected'} = 0;
 
     # Delete screenshots and statistics on duplicated node
     $$cfg{$new_txt_uuid}{'screenshots'} = ();
