@@ -241,7 +241,7 @@ sub LoadHotKeys {
     foreach my $w (@what) {
         foreach my $hash (@{$$CFG{$w}}) {
             if ($$hash{keybind}) {
-                my $lf  = $$hash{intro} ? "\n" : '';
+                my $lf  = $$hash{intro} & $w ne 'local commands' ? "\n" : '';
                 my $ask = $$hash{confirm} ? "?" : '';
                 $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$w", "$ask$$hash{txt}$lf", $uuid);
             }
