@@ -117,8 +117,8 @@ my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
 my $NEW_CHANGES = '';
 our $_NO_SPLASH = 0;
-
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 our %RUNNING;
 our %FUNCS;
@@ -258,6 +258,9 @@ sub new {
         }
         if (!defined $pass) {
             exit 0;
+        }
+        if (!$CIPHER->salt()) {
+            $CIPHER->salt(pack('Q',$SALT));
         }
         if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
@@ -2422,6 +2425,9 @@ sub _lockAsbru {
 sub _unlockAsbru {
     my $self = shift;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q',$SALT));
+    }
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
     if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
