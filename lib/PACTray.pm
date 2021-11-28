@@ -51,6 +51,7 @@ my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $TRAYICON = "$RealBin/res/asbru-logo-tray.png";
 my $GROUPICON_ROOT = _pixBufFromFile("$RealBin/res/themes/default/asbru_group.svg");
+my $CALLBACKS_INITIALIZED = 0;
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -73,9 +74,6 @@ sub new {
 
     # Build the GUI
     _initGUI($self) or return 0;
-
-    # Setup callbacks
-    _setupCallbacks($self);
 
     bless($self, $class);
     return $self;
@@ -100,6 +98,31 @@ sub get_geometry {
     my $self = shift;
 
     return $$self{_TRAY}->get_geometry();
+}
+
+# Enable the tray menu
+sub set_tray_menu {
+    my $self = shift;
+
+    if ($CALLBACKS_INITIALIZED) {
+        # Already done, nothing to do
+        return 0;
+    }
+
+    $self->_setupCallbacks();
+
+    $CALLBACKS_INITIALIZED = 1;
+    return 1;
+}
+
+# Make the tray icon active/inactive (aka 'shown/hidden')
+sub set_active() {
+    my $self = shift;
+    $$self{_TRAY}->set_visible(1);
+}
+sub set_passive() {
+    my $self = shift;
+    $$self{_TRAY}->set_visible(0);
 }
 
 # END: Define PUBLIC CLASS methods

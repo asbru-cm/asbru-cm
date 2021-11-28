@@ -53,21 +53,7 @@ use Gtk3 -init;
 
 # PAC modules
 use PACUtils;
-our $UNITY = 1;
-our $STRAY = 1;
-$@ = '';
-eval {
-    require 'PACTrayUnity.pm';
-};
-if ($@) {
-    $UNITY = 0;
-    eval {
-        require 'PACTray.pm';
-    };
-    if ($@) {
-        $STRAY = 0;
-    }
-}
+use PACTray;
 use PACTerminal;
 use PACEdit;
 use PACConfig;
@@ -119,6 +105,9 @@ my $NEW_CHANGES = '';
 our $_NO_SPLASH = 0;
 my $SALT = '12345678';
 my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+
+our $UNITY = 0; # Are we in a Unity environment?
+our $STRAY = 1; # Are we using a system tray icon?
 
 our %RUNNING;
 our %FUNCS;
@@ -320,6 +309,19 @@ sub new {
     # Setup known connection methods
     %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
 
+    # Dynamically load the Tray icon class related to the current environment/settings
+    if ($ENV{'ASBRU_DESKTOP'} !~ /withtray/) {
+        print("INFO: Trying to loading Unity specific tray icon package...\n");
+        $@ = '';
+        $UNITY = 1;
+        eval {
+            require 'PACTrayUnity.pm';
+        };
+        if ($@) {
+            $UNITY = 0;
+        }
+    }
+
     bless($self, $class);
 
     return $self;
@@ -355,9 +357,8 @@ sub start {
     PACUtils::_splash(1, "Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     $self->_loadTreeConfiguration('__PAC__ROOT__');
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    # Enable tray menu
+    $FUNCS{_TRAY}->set_tray_menu();
 
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
 
@@ -1417,9 +1418,7 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1460,9 +1459,7 @@ sub _setupCallbacks {
         }
 
         $self->_setCFGChanged(1);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_updateGUIWithUUID($node_uuid);
         return 1;
     });
@@ -1489,9 +1486,7 @@ sub _setupCallbacks {
         map $$self{_GUI}{treeConnections}->_delNode($_), @del;
         # Delete selected node from the configuration
         $self->_delNodes(@del);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1863,9 +1858,7 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -2322,11 +2315,7 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('delete_event' => sub {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
-            if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_status('active');
-            } else {
-                $$self{_TRAY}{_TRAY}->set_visible(1);
-            }
+            $$self{_TRAY}->set_active();
             # Trigger the "lock" procedure ?
             if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                 $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -2391,7 +2380,7 @@ sub _setFavourite {
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($b ? 'on' : 'off'), 'button'));
     $$self{_GUI}{connFavourite}->set_active($b);
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
     }
     $self->_setCFGChanged(1);
 }
@@ -3335,11 +3324,7 @@ sub _quitProgram {
     $$self{_GUI}{main}->signal_handler_disconnect($$self{_SIGNALS}{_WINDOWSTATEVENT}) if $$self{_SIGNALS}{_WINDOWSTATEVENT};
 
     # Hide every GUI component has already finished
-    if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_status('passive');
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
-    }
+    $$self{_TRAY}->set_passive();
     $$self{_SCRIPTS}{_WINDOWSCRIPTS}{main}->hide();    # Hide scripts window
     $$self{_CLUSTER}{_WINDOWCLUSTER}{main}->hide();    # Hide clusters window
     $$self{_PCC}{_WINDOWPCC}{main}->hide();    # Hide PCC window
@@ -3833,11 +3818,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
-    if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_status('active') : $$self{_TRAY}{_TRAY}->set_status('passive');
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
-    }
+    !$$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
 
     $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
 
@@ -4216,8 +4197,8 @@ sub _pasteNodes {
         delete $$self{_COPY}{'data'}{$uuid};
     }
 
-    if ($first and $UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+    if ($first) {
+        $FUNCS{_TRAY}->set_tray_menu();
     }
 
     $self->_setCFGChanged(1);
@@ -4448,9 +4429,7 @@ sub __importNodes {
         $self->_setCFGChanged(1);
     }
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    $FUNCS{_TRAY}->set_tray_menu();
 
     return 1;
 }

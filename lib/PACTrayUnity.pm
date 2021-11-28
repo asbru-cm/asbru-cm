@@ -121,6 +121,24 @@ sub get_geometry {
     return ({}, {}, {x => 0, y => 0});
 }
 
+# Enable the tray menu
+sub set_tray_menu {
+    my $self = shift;
+
+    return $self->_setTrayMenu();
+}
+
+# Make the tray icon active/inactive (aka 'shown/hidden')
+sub set_active() {
+    my $self = shift;
+    $$self{_TRAY}->set_status('active');
+}
+sub set_passive() {
+    my $self = shift;
+    $$self{_TRAY}->set_status('passive');
+}
+
+
 # END: Define PUBLIC CLASS methods
 ###################################################################
 
