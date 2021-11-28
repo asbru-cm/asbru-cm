@@ -692,6 +692,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'} // '');
     # Jump Server
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
+    _($self, 'entryCfgJumpConnPort')->set_range(0, 65536);
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     _($self, 'entryCfgJumpConnPass')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
