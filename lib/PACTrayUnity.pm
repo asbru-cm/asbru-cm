@@ -57,7 +57,7 @@ if ($@) {
         );
     };
     if ($@) {
-        warn "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
+        warn "WARNING: AppIndicator is missing --> there might be no icon showing up in the status bar when running Unity!\n";
         return 0;
     }
 }
@@ -130,7 +130,7 @@ sub get_geometry {
 sub _initGUI {
     my $self = shift;
 
-    $$self{_TRAY} = AppIndicator::Indicator->new('asbru-cm', $TRAYICON,'application-status');
+    $$self{_TRAY} = AppIndicator::Indicator->new('asbru-cm', $TRAYICON, 'application-status');
     $$self{_TRAY}->set_icon_theme_path($RealBin . '/res');
     $$self{_TRAY}->set_status('active');
     $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = ! $@;
@@ -171,7 +171,7 @@ sub _setTrayMenu {
     push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow();} });
     push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram();} });
 
-    $$self{_TRAY}->set_menu(_wPopUpMenu(\@m, $event, 'below calling widget', 'get_menu_ref') );
+    $$self{_TRAY}->set_menu(_wPopUpMenu(\@m, $event, 'below calling widget', 'get_menu_ref'));
 
     return 1;
 }

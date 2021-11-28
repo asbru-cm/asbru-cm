@@ -1060,7 +1060,7 @@ sub _initGUI {
     $FUNCS{_PCC} = $$self{_PCC} = PACPCC->new(\%RUNNING);
 
     # Build Tray icon
-    $FUNCS{_TRAY} = $$self{_TRAY} = ! $UNITY ? PACTray->new($self) : PACTrayUnity->new($self);
+    $FUNCS{_TRAY} = $$self{_TRAY} = $UNITY ? PACTrayUnity->new($self) : PACTray->new($self);
 
     # Build PIPE object
     $FUNCS{_PIPE} = $$self{_PIPE} = PACPipe->new(\%RUNNING);
@@ -1417,7 +1417,9 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        if ($UNITY) {
+            $FUNCS{_TRAY}->_setTrayMenu();
+        }
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1861,7 +1863,9 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        if ($UNITY) {
+            $FUNCS{_TRAY}->_setTrayMenu();
+        }
         $self->_setCFGChanged(1);
         return 1;
     });

@@ -229,7 +229,6 @@ sub getDesktopEnvironment {
     foreach my $d ('gnome-shell','cinnamon','lxde','xfce') {
         $c = `pgrep -c '$d'`;
         chop $c;
-        #print STDERR "TEST: pgrep -c '$d' = $c\n";
         if ($c) {
             $ENV{'ASBRU_DESKTOP'} = $d;
             last;

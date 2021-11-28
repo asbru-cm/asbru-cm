@@ -1683,7 +1683,7 @@ sub _wPopUpMenu {
     my $below = shift // '0';
     my $ref = shift // '0';
 
-    if (defined $WIDGET_POPUP && $WIDGET_POPUP->get_visible) {
+    if (defined $WIDGET_POPUP && $WIDGET_POPUP->get_visible()) {
         return 1;
     }
 
@@ -1781,7 +1781,7 @@ sub _wPopUpMenu {
 
     sub _pos {
         my $h = $_[0]->size_request->height;
-        my $ymax = $event->get_screen->get_height();
+        my $ymax = $event->get_screen()->get_height();
         my ($x, $y) = $event->window->get_origin();
         my $dy = $event->window->get_height();
 
