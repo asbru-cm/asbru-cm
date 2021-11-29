@@ -2181,11 +2181,7 @@ sub _setupCallbacks {
                 $self->_quitProgram();
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
-                if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_status('active');
-                } else {
-                    $$self{_TRAY}{_TRAY}->set_visible(1);
-                }
+                $$self{_TRAY}->set_active();
                 # Trigger the "lock" procedure ?
                 if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                     $$self{_GUI}{lockApplicationBtn}->set_active(1);
