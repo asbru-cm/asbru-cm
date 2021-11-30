@@ -148,9 +148,9 @@ sub GetAction {
     }
     if ($$cfg{$window}{$keymask}) {
         return wantarray ? ($$cfg{$window}{$keymask}[1], $keymask) : $$cfg{$window}{$keymask}[1];
-    } elsif ($uuid && $$hk{$uuid}{$window}{$keymask}) {
+    } elsif ($uuid && $$hk{$uuid}{$window}{$keymask} && $$hk{$uuid}{$window}{$keymask}[1]) {
         return wantarray ? ($$hk{$uuid}{$window}{$keymask}[1], $keymask) : $$hk{$uuid}{$window}{$keymask}[1];
-    } elsif ($$hk{$window}{$keymask}) {
+    } elsif ($$hk{$window}{$keymask} && $$hk{$window}{$keymask}[1]) {
         return wantarray ? ($$hk{$window}{$keymask}[1], $keymask) : $$hk{$window}{$keymask}[1];
     }
     if ($emulation && $keyval eq 'fkey') {
