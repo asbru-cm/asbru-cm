@@ -1023,6 +1023,9 @@ sub _setupCallbacks {
 
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
         if ($$self{_CFG}{defaults}{'change main title'}) {
             $$self{_NOTEBOOKWINDOW}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
         }
