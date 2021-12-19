@@ -468,23 +468,7 @@ sub start {
         $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
-    # Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
-    defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
-    $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'} and $$self{_SEND_STRING} = Glib::Timeout->add_seconds(
-        $$self{_CFG}{environments}{$$self{_UUID}}{'send string every'},
-        sub {
-            if (not $$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
-                return 1;
-            }
-
-            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
-            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
-
-            return 1;
-        }
-    );
+    $self->_startSendStringTimeout();
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $self->{_PARENTWINDOW}, $$self{_UUID_TMP});
     $$self{_GUI}{_VTE}->grab_focus();
@@ -650,6 +634,27 @@ sub unlock {
 
 ###################################################################
 # START: Private functions definitions
+
+# Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
+sub _startSendStringTimeout {
+    my $self = shift;
+    defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
+    $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'} and $$self{_SEND_STRING} = Glib::Timeout->add_seconds(
+        $$self{_CFG}{environments}{$$self{_UUID}}{'send string every'},
+        sub {
+            if (not $$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
+                return 1;
+            }
+
+            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
+            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
+            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
+            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
+
+            return 1;
+        }
+    );
+}
 
 # Find out a free local TCP port
 sub _getLocalPort {
@@ -1039,6 +1044,10 @@ sub _setupCallbacks {
         my ($widget, $event) = @_;
         my ($action, $keymask);
 
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
+
         if (defined $$self{_KEYS_RECEIVE}) {
             return 1;
         }
@@ -1218,6 +1227,9 @@ sub _setupCallbacks {
     });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {
         $$self{_NEW_DATA} = 1;
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
         $self->_setTabColour();
     });
 
@@ -2290,19 +2302,7 @@ sub _vteMenu {
                         Glib::Source->remove($$self{_SEND_STRING});
                         undef $$self{_SEND_STRING};
                     } else {
-                        defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
-                        $$self{_SEND_STRING} = Glib::Timeout->add_seconds($$self{_CFG}{environments}{$$self{_UUID}}{'send string every'}, sub {
-                            if (!$$self{CONNECTED}) {
-                                return 1;
-                            }
-
-                            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
-                            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-                            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-                            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
-
-                            return 1;
-                        });
+                        $self->_startSendStringTimeout();
                     }
                 }
             },

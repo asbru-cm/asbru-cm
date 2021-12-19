@@ -2208,6 +2208,7 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string txt'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string intro'} = 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string every'} = 60;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'send string only when idle'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'embed'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'mac'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'autoreconnect'} = 0;
@@ -2373,6 +2374,7 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'send string txt'} //= '';
         $$cfg{'environments'}{$uuid}{'send string intro'} //= 1;
         $$cfg{'environments'}{$uuid}{'send string every'} //= 60;
+        $$cfg{'environments'}{$uuid}{'send string only when idle'} //= 0;
         $$cfg{'environments'}{$uuid}{'embed'} //= 0;
         $$cfg{'environments'}{$uuid}{'mac'} //= '';
         $$cfg{'environments'}{$uuid}{'autoreconnect'} //= 0;
