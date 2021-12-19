@@ -569,6 +569,7 @@ sub stop {
     if (defined $$self{_SEND_STRING}) {
         eval {
             Glib::Source->remove($$self{_SEND_STRING});
+            undef $$self{_SEND_STRING};
         };
     }
     $self->_stopEmbedKidnapTimeout();
@@ -1357,6 +1358,7 @@ sub _setupCallbacks {
         if (defined $$self{_SEND_STRING}) {
             eval {
                 Glib::Source->remove($$self{_SEND_STRING});
+                undef $$self{_SEND_STRING};
             };
         }
         $self->_stopEmbedKidnapTimeout();
