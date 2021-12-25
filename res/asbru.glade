@@ -1344,6 +1344,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">•</property>
                                         <property name="activates_default">True</property>
+                                        <property name="width_chars">5</property>
                                         <property name="text" translatable="yes">0</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
@@ -1359,10 +1360,12 @@ If not specified or invalid, the default SSH private key of your system will be 
                                     </child>
                                     <child>
                                       <object class="GtkCheckButton" id="cbSendStringOnlyWhenIdle">
-                                        <property name="label" translatable="yes">Only when Idle</property>
+                                        <property name="label" translatable="yes">Idle Only</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">Restart the timer each time the terminal is updated or focused, effectively preventing the string from being sent unless the terminal has been idle for the configured period.</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
                                       <packing>
