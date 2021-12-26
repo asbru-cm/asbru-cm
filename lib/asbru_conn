@@ -1582,7 +1582,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
         if (!$active) {
             next;
         }
-        my $jump = 0;
+        my $skip_command = 0;
 
         if ($time_out >= 0) {
             $TIMEOUT_CMD = $time_out;
@@ -1607,7 +1607,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 } else {
                     ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                     $i = --$on_fail;
-                    $jump = 1;
+                    $skip_command = 1;
                 }
             }],
 
@@ -1620,7 +1620,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
                 if ($on_match == -1) {
-                    $jump = 0;
+                    $skip_command = 0;
                 } elsif ($on_match == -2) {
                     $end = 1;
                     $CONNECTED = 1;
@@ -1628,13 +1628,12 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 } else {
                     ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                     $avoid_first_expectation = 1;
-                    $jump = 1;
                     $i = --$on_match;
                 }
             }]
         );
         last if $end;
-        next if $jump;
+        next if $skip_command;
         $avoid_first_expectation = 0;
         if (!$CONNECTED) {
             last;
@@ -1861,7 +1860,7 @@ elsif (!$MANUAL) {
                         next;
                     }
 
-                    my $jump = 0;
+                    my $skip_command = 0;
 
                     if ($time_out >= 0) {
                         $TIMEOUT_CMD = $time_out;
@@ -1885,7 +1884,7 @@ elsif (!$MANUAL) {
                             } else {
                                 ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                                 $i = --$on_fail;
-                                $jump = 1;
+                                $skip_command = 1;
                             }
                         }],
 
@@ -1915,7 +1914,7 @@ elsif (!$MANUAL) {
 
                         [($avoid_first_expectation) ? '' : $pattern, sub {
                             if ($on_match == -1) {
-                                $jump = 0;
+                                $skip_command = 0;
                             } elsif ($on_match == -2) {
                                 $end = 1;
                                 $CONNECTED = 1;
@@ -1923,7 +1922,6 @@ elsif (!$MANUAL) {
                             } else {
                                 ctrl("EXPECT:ON_MATCH:found pattern '$pattern'. Jumping to '$on_match'");
                                 $avoid_first_expectation = 1;
-                                $jump = 1;
                                 $i = --$on_match;
                             }
                         }]
@@ -1931,7 +1929,7 @@ elsif (!$MANUAL) {
                     if ($end) {
                         last;
                     }
-                    if ($jump) {
+                    if ($skip_command) {
                         next;
                     }
                     $avoid_first_expectation = 0;
@@ -2078,7 +2076,7 @@ $SIG{'HUP'} = sub {
         if (!$active) {
             next;
         }
-        my $jump = 0;
+        my $skip_command = 0;
 
         if ($time_out >= 0) {
             $TIMEOUT_CMD = $time_out;
@@ -2103,7 +2101,7 @@ $SIG{'HUP'} = sub {
                 } else {
                     ctrl("CHAIN:EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                     $i = --$on_fail;
-                    $jump = 1;
+                    $skip_command = 1;
                 }
             }],
 
@@ -2134,7 +2132,7 @@ $SIG{'HUP'} = sub {
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
                 if ($on_match == -1) {
-                    $jump = 0;
+                    $skip_command = 0;
                 } elsif ($on_match == -2) {
                     $end = 1;
                     $CONNECTED = 1;
@@ -2149,7 +2147,7 @@ $SIG{'HUP'} = sub {
         if ($end) {
             last;
         }
-        if ($jump) {
+        if ($skip_command) {
             next;
         }
         $avoid_first_expectation = 0;
