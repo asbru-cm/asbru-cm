@@ -66,7 +66,7 @@ The first one to match will __"send"__ the configured sequence of characters to 
 
 In the example above the sequence would be:
 
-+ Wait for a command prompt with the simbol `~`
++ Wait for a command prompt with the symbol `~`
 + Then send to the terminal : `ssh otherbox`
 + Wait then for a string : `username`
 + Then send :`myuser`
@@ -94,8 +94,8 @@ Users that have been using the same configuration file since the original projec
 The issue manifests as :
 
 1. SSH to new host
-2. Wait for the warning with the prompt   
-   `Are you sure you want to continue connecting (yes/no/[fingerprint])? yes/no`   
+2. Wait for the warning with the prompt
+   `Are you sure you want to continue connecting (yes/no/[fingerprint])? yes/no`
    `Please type 'yes', 'no' or the fingerprint: `
 3. __DISCONNECTED__
 
