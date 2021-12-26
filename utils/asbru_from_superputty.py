@@ -163,6 +163,7 @@ elementTemplate = """{uuid}:
   socks5 tunnel active: ''
   send string active: ''
   send string every: 60
+  send string only when idle: 0
   send string intro: 1
   send string txt: ''
   session log pattern: <UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt

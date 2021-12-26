@@ -40,13 +40,12 @@
 
 ![](images/ssh2.png)
 
-+ __Create SOCKS tunnel__ : Append '-D <<random port>>' to this ssh connection and use the port to open an application using <SOCKS5_PORT> as a parameter.
 + __Programmatically send a string__ : Send a specified regex expression every selected seconds to the terminal.
+    + _Idle Only_: Restart the timer (from `Every X seconds field`) each time the terminal is updated or focused., effectively preventing the string from being sent unless the terminal has been idle for the configured period.
 + __Prepend command__ : Add this command before the ssh command connection string.
 + __Start next script when connection is launched__ : * Pending
 + __Auto save session logs__ : Save session log at the end of the session. Select the location.
-    - Log patter name: Define the pattern to name your session file.
-
+    + _Log pattern name_: Define the pattern to name your session file.
 
 ## Network Settings
 

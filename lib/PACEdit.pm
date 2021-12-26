@@ -740,6 +740,7 @@ sub _updateGUIPreferences {
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'cbEditSendStringIntro')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string intro'});
+    _($self, 'cbSendStringOnlyWhenIdle')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string only when idle'});
     _($self, 'entryEditSendString')->set_text($$self{_CFG}{'environments'}{$uuid}{'send string txt'} // '');
     _($self, 'entryEditSendStringSeconds')-> set_value($$self{_CFG}{'environments'}{$uuid}{'send string every'} // 0);
     _($self, 'cbCfgAutoreconnect')->set_active($$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} // 0);
@@ -922,6 +923,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'send string active'} = _($self, 'cbEditSendString')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = _($self, 'entryEditSendString')->get_chars(0,-1);
     $$self{_CFG}{'environments'}{$uuid}{'send string intro'} = _($self, 'cbEditSendStringIntro')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'send string only when idle'} = _($self, 'cbSendStringOnlyWhenIdle')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string every'} = _($self, 'entryEditSendStringSeconds')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} = _($self, 'cbCfgAutoreconnect')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'startup launch'} = _($self, 'cbCfgStartupLaunch')->get_active();
