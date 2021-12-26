@@ -230,6 +230,14 @@ our @PACDESKTOP = (
     'X-GNOME-Autostart-enabled=true',
 );
 
+# Default configuration on application first startup
+our $DEFAULT_COMMAND_PROMPT = '(([#%:>~\$\] ])(?!\g{-1})){3,4}|(\w[@\/]\w|sftp).*?[#%>~\$\]]|([\w\-\.]+)[%>\$\]]( |\033)|^[#%\$>\:\]~] *$';
+our $DEFAULT_USERNAME_PROMPT = '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
+our $DEFAULT_PASSWORD_PROMPT = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+our $DEFAULT_HOSTKEYCHANGED_PROMPT = '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
+our $DEFAULT_PRESSANYKEY_PROMPT = '.*(any key to continue|tecla para continuar).*';
+our $DEFAULT_REMOTEHOSTCHANGED_PROMPT = '.*ffending .*key in (.+?)\:(\d+).*';
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -2058,12 +2066,12 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'color red'} //=  '#cccc00000000';
     $$cfg{'defaults'}{'color white'} //=  '#d3d3d7d7cfcf';
     $$cfg{'defaults'}{'color yellow'} //=  '#c4c4a0a00000';
-    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>~→]|\:\/\s*$';
-    $$cfg{'defaults'}{'username prompt'} //= '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
-    $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
-    $$cfg{'defaults'}{'hostkey changed prompt'} //= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
-    $$cfg{'defaults'}{'press any key prompt'} //= '.*(any key to continue|tecla para continuar).*';
-    $$cfg{'defaults'}{'remote host changed prompt'} //= '.*ffending .*key in (.+?)\:(\d+).*';
+    $$cfg{'defaults'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+    $$cfg{'defaults'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+    $$cfg{'defaults'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
+    $$cfg{'defaults'}{'hostkey changed prompt'} //= $DEFAULT_HOSTKEYCHANGED_PROMPT;
+    $$cfg{'defaults'}{'press any key prompt'} //= $DEFAULT_PRESSANYKEY_PROMPT;
+    $$cfg{'defaults'}{'remote host changed prompt'} //= $DEFAULT_REMOTEHOSTCHANGED_PROMPT;
     $$cfg{'defaults'}{'sudo prompt'} //= '[__PAC__SUDO__PROMPT__]';
     $$cfg{'defaults'}{'sudo password'} //= '<<ASK_PASS>>';
     $$cfg{'defaults'}{'sudo show password'} //= 0;
@@ -2229,9 +2237,9 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'use tab back color'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'back color'} //= '#000000000000'; # Black
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
@@ -2528,9 +2536,9 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} = 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} = '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} = '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>~→]|\:\/\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = $DEFAULT_COMMAND_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = $DEFAULT_USERNAME_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = $DEFAULT_PASSWORD_PROMPT;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}  = 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
@@ -2551,9 +2559,9 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} //= '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'} //= 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
