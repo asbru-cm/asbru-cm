@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${LD_LIBRARY_PATH}"
+
+exec "${APPDIR}/usr/bin/perl" "${APPDIR}/opt/asbru-cm/asbru-cm"
