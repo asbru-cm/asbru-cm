@@ -1,5 +1,9 @@
 #!/bin/sh
 
-export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${APPDIR}/usr/lib/perl5/core_perl/CORE/:${LD_LIBRARY_PATH}"
+export PERL5LIB="${APPDIR}/usr/local/lib/perl5/site_perl:${APPDIR}/usr/local/share/perl5/site_perl:${APPDIR}/usr/lib/perl5/vendor_perl:${APPDIR}/usr/share/perl5/vendor_perl:${APPDIR}/usr/lib/perl5/core_perl:${APPDIR}/usr/share/perl5/core_perl"
+export GI_TYPELIB_PATH="${APPDIR}/usr/lib/girepository-1.0"
+
+cd "${APPDIR}" || exit 1
 
 exec "${APPDIR}/usr/bin/perl" "${APPDIR}/opt/asbru-cm/asbru-cm"

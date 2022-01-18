@@ -2,6 +2,8 @@
 
 # This file should be ran from the project's root directory as cwd.
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/ ;)
 set -euo pipefail
 IFS=$'\n\t'
@@ -10,4 +12,19 @@ IFS=$'\n\t'
 set -x
 
 docker build --tag=asbru-cm-appimage-maker --file=dist/appimage-raw/Dockerfile .
-docker run --privileged=true -it asbru-cm-appimage-maker //bin/bash < container_make_appimage.sh
+
+mkdir -p "${SCRIPT_DIR}/build"
+
+CIDFILE_PATH="${SCRIPT_DIR}/build/appimage-maker.cid"
+
+rm -f "${CIDFILE_PATH}"
+
+docker run --cidfile "${CIDFILE_PATH}" --privileged=true -i asbru-cm-appimage-maker //bin/bash < "${SCRIPT_DIR}/container_make_appimage.sh"
+
+CONTAINER_ID="$(cat "${CIDFILE_PATH}")"
+rm -f "${CIDFILE_PATH}"
+
+rm -f "${SCRIPT_DIR}/Asbru-CM.AppImage"
+docker cp "${CONTAINER_ID}:/Asbru-CM.AppImage" "${SCRIPT_DIR}/build/Asbru-CM.AppImage"
+
+docker rm "${CONTAINER_ID}"

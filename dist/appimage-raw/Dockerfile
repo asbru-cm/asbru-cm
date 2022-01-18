@@ -69,11 +69,12 @@ COPY --from=stripped-builder /lib/. /lib/
 COPY --from=stripped-builder /usr/lib/. /usr/lib/
 COPY --from=stripped-builder /usr/local/lib/. /usr/local/lib/
 COPY --from=stripped-builder /usr/local/share/. /usr/local/share/
+COPY --from=stripped-builder /usr/share/. /usr/share/
 
 FROM common as appimage-tools
 
 # Install some needed stuff for AppImage packaging
-RUN apk add fuse file appstream dos2unix
+RUN apk add fuse file appstream dos2unix patchelf
 
 RUN ping -c 2 "objects.githubusercontent.com" && \
     wget "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage" && \
@@ -92,6 +93,7 @@ COPY --from=merged-buildlibs /lib/. /var/appimage-dir/lib/
 COPY --from=merged-buildlibs /usr/lib/. /var/appimage-dir/usr/lib/
 COPY --from=merged-buildlibs /usr/local/lib/. /var/appimage-dir/usr/local/lib/
 COPY --from=merged-buildlibs /usr/local/share/. /var/appimage-dir/usr/local/share/
+COPY --from=merged-buildlibs /usr/share/. /var/appimage-dir/usr/share/
 
 # Copy Bins
 COPY --from=merged-buildlibs /usr/bin/. /var/appimage-dir/usr/bin
