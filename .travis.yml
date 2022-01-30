@@ -25,6 +25,7 @@ env:
     - OS=fedora DIST=32 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=33 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=34 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=35 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
     - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
@@ -36,6 +37,7 @@ env:
     - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=ulyssa PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=uma PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
+    - OS=linuxmint DIST=una PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=focal PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=hirsute PACKAGE=deb DOCKER_IMAGE=ubuntu-hirsute PACKAGECLOUD=false
     - OS=elementary DIST=odin PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
