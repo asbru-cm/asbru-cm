@@ -42,7 +42,7 @@ use Encode qw (encode decode);
 use IO::Socket::INET;
 use Time::HiRes qw (gettimeofday);
 use PACKeePass;
-use List::Util qw(min max);
+use List::Util qw (min max);
 
 # GTK
 use Gtk3 '-init';
@@ -164,24 +164,24 @@ sub new {
     }
     $self->{_TMPCFG} = "$CFG_DIR/tmp/$$self{_UUID_TMP}freeze";
 
-    $self->{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
+    $self->{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
     while (-f $$self{_TMPPIPE}) {
         ++$_C;
-        $$self{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
+        $$self{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
     }
     unlink $$self{_TMPPIPE};
 
-    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
+    $self->{_TMPSOCKET} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.socket";
     while (-f $$self{_TMPSOCKET}) {
         ++$_C;
-        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
+        $$self{_TMPSOCKET} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.socket";
     }
     unlink $$self{_TMPSOCKET};
 
-    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
+    $self->{_TMPSOCKETEXEC} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.exec.socket";
     while (-f $$self{_TMPSOCKETEXEC}) {
         ++$_C;
-        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
+        $$self{_TMPSOCKETEXEC} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.exec.socket";
     }
     unlink $$self{_TMPSOCKETEXEC};
 
@@ -595,6 +595,7 @@ sub stop {
     unlink($$self{_TMPCFG});
     unlink($$self{_TMPPIPE});
     unlink($$self{_TMPSOCKET});
+    unlink($$self{_TMPSOCKETEXEC});
     if (!($self->{_CFG}{'defaults'}{'save session logs'} || $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'})) {
         unlink($$self{_LOGFILE});
     }
@@ -2458,8 +2459,8 @@ sub _updateStatus {
 
     # Show forwarding in status bar
     if ($self->{CONNECTED} &&
-    	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
-    	$$self{_CFG}{defaults}{'info in status bar'}){
+        $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
+        $$self{_CFG}{defaults}{'info in status bar'}){
         ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
         if (! defined $forward_ports){
             $forward_ports = '';

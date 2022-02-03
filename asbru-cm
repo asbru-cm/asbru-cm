@@ -34,7 +34,8 @@ BEGIN {
         print "Usage: $0 [options]\n";
         print "Options:\n";
         print "\t--help : show this message\n";
-        print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config/\n";
+        print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config for Ásbrú configuration files/\n";
+        print "\t--temp-dir=path : path to store temporary socket files (default is system temporary directory)\n";
         print "\t--no-backup : do no create alternative config files as a backup (faster shutdown)\n";
         print "\t--start-shell : start a local terminal\n";
         print "\t--password=<pwd> : automatically logon with given password without prompting user\n";
@@ -68,6 +69,8 @@ BEGIN {
                 # Relative path to ~./config
                 $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/$path";
             }
+        } elsif ($arg =~ /^-{1,2}temp-dir=\s*(.+)$/i) {
+            $ENV{"ASBRU_TMP"} = $1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
             print STDERR "INFO: bad start up parameter $arg\n";
         }
@@ -92,6 +95,7 @@ use File::Copy;
 use YAML qw (LoadFile);
 use PACMain;
 use PACUtils qw (_appName);
+use File::Temp qw (tempdir);
 
 # Standard
 use strict;
@@ -175,7 +179,7 @@ if (!-d $CFG_DIR) {
 }
 
 # Create all subdirectories
-foreach my $subdir ('autostart','screenshots','session_logs','scripts','sockets','tmp','bak') {
+foreach my $subdir ('autostart','screenshots','session_logs','scripts','tmp','bak') {
     if (!-d "$CFG_DIR/$subdir") {
         mkdir("$CFG_DIR/$subdir");
     }
@@ -186,6 +190,17 @@ for (my $n = 1; $n < 5; $n++) {
     if ((!-e "$CFG_DIR/scripts/sample$n.pl") && (-e "$RealBin/res/sample$n.pl")) {
         copy("$RealBin/res/sample$n.pl", "$CFG_DIR/scripts/");
     }
+}
+
+# Default directory for temporary socket files
+if (!defined($ENV{"ASBRU_TMP"})) {
+    $ENV{"ASBRU_TMP"} = File::Temp::tempdir('asbru-cm-XXXX', TMPDIR => 1, CLEANUP => 1);
+}
+if (!-d $ENV{"ASBRU_TMP"}) {
+    mkdir($ENV{"ASBRU_TMP"});
+}
+if ($VERBOSE) {
+    print "INFO: Path for temporary socket files: " . $ENV{"ASBRU_TMP"} . "\n";
 }
 
 # Detect desktop
