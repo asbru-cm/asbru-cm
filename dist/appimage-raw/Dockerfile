@@ -70,6 +70,7 @@ COPY --from=stripped-builder /usr/lib/. /usr/lib/
 COPY --from=stripped-builder /usr/local/lib/. /usr/local/lib/
 COPY --from=stripped-builder /usr/local/share/. /usr/local/share/
 COPY --from=stripped-builder /usr/share/. /usr/share/
+COPY --from=stripped-builder /etc/. /etc/
 
 FROM common as appimage-tools
 
@@ -94,6 +95,7 @@ COPY --from=merged-buildlibs /usr/lib/. /var/appimage-dir/usr/lib/
 COPY --from=merged-buildlibs /usr/local/lib/. /var/appimage-dir/usr/local/lib/
 COPY --from=merged-buildlibs /usr/local/share/. /var/appimage-dir/usr/local/share/
 COPY --from=merged-buildlibs /usr/share/. /var/appimage-dir/usr/share/
+COPY --from=merged-buildlibs /etc/xdg/. /var/appimage-dir/etc/xdg/
 
 # Copy Bins
 COPY --from=merged-buildlibs /usr/bin/. /var/appimage-dir/usr/bin
