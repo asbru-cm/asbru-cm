@@ -882,29 +882,30 @@ sub _getProxyCmd {
 
 sub _openSshTunnel {
     my ($uuid) = @_;
+    my $TMP_DIR = $ENV{"ASBRU_TMP"};
 
     if ($GETCMD) {
-        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         return 0;
     }
     $proxy_jump = 2;
 
-    if (-e "$CFG_DIR/tmp/$uuid.ctl") {
+    if (-e "$TMP_DIR/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
-        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -T -O check jumpserver 2>&1`;
+        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
     # Check if port we want to bind is not alreay in use
     $LPORT = _getLocalPort($PORT);
-    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
 
 sub _openSocksTunnel {
-    my $pipe = "$CFG_DIR/tmp/pipe_$UUID";
+    my $pipe = $ENV{"ASBRU_TMP"}."/pipe_$UUID";
 
     $LPORT = _getLocalPort($PORT);
     $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
@@ -1046,8 +1047,8 @@ sub askPassword {
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
-    my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
-    my $sock = "$CFG_DIR/tmp/$uuid.ctl";
+    my $pipe = $ENV{"ASBRU_TMP"}."/pipe_$uuid";
+    my $sock = $ENV{"ASBRU_TMP"}."/$uuid.ctl";
     my $cmd_file = "$CFG_DIR/tmp/cmd_$uuid.run";
 
     if (-e $cmd_file) {
@@ -1160,7 +1161,7 @@ if (defined $METHOD) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
         if ($proxy_jump) {
-            $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -o Proxyjump=jumpserver " . ($USER ? "$USER@" : '') . "$IP";
+            $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -o Proxyjump=jumpserver server";
         } else {
             $connection_cmd = "$METHOD $key -P $PORT $CONNECT_OPTS " . ($USER ? "$USER@" : '') . "$IP";
         }
