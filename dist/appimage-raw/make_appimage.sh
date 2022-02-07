@@ -24,7 +24,11 @@ docker run --cidfile "${CIDFILE_PATH}" --privileged=true -i asbru-cm-appimage-ma
 CONTAINER_ID="$(cat "${CIDFILE_PATH}")"
 rm -f "${CIDFILE_PATH}"
 
-rm -f "${SCRIPT_DIR}/Asbru-CM.AppImage"
-docker cp "${CONTAINER_ID}:/Asbru-CM.AppImage" "${SCRIPT_DIR}/build/Asbru-CM.AppImage"
+APPIMAGE_DESTINATION="${SCRIPT_DIR}/build/Asbru-CM.AppImage"
+
+rm -f "${APPIMAGE_DESTINATION}"
+docker cp "${CONTAINER_ID}:/Asbru-CM.AppImage" "${APPIMAGE_DESTINATION}"
 
 docker rm "${CONTAINER_ID}"
+
+chmod a+x "${APPIMAGE_DESTINATION}"
