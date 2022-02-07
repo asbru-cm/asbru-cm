@@ -44,6 +44,8 @@ use Time::HiRes qw (gettimeofday);
 use PACKeePass;
 use List::Util qw(min max);
 
+use Config;
+
 # GTK
 use Gtk3 '-init';
 use Gtk3::SimpleList;
@@ -68,7 +70,6 @@ my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
-my $PERL_BIN = '/usr/bin/perl';
 my $PAC_CONN = "$RealBin/lib/asbru_conn";
 
 my $SHELL_BIN = -x '/bin/sh' ? '/bin/sh' : '/bin/bash';
@@ -437,13 +438,22 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
+    print STDERR "WARN: FORKING.\n";
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
+        # TODO: Shell needs to be invoked with external env, but then re-invoke internal env right after!
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "('$^X' $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
     } else {
-        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        @args = [$^X, $^X, $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
     }
-    if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
-        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
+    # TODO: Use $$self{_CFG}{'defaults'}{'shell directory'} -- workaround for cwd-based exec ELF header for AppImage :/
+    #my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef;
+    my $subCwd = undef;
+    my $spawnSyncResult = undef;
+    eval { 
+        $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
+    };
+    if (!$spawnSyncResult || $@) {
+        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!! at: $@";
         $$self{CONNECTING} = 0;
         return 0;
     }
@@ -1462,7 +1472,7 @@ sub _watchConnectionData {
             }
 
         } elsif ($data =~ /^EXPLORER:(.+)/go) {
-            system("xdg-open '$1' &");
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} xdg-open '$1' &");
         } elsif ($data =~ /^PIPE_WAIT\[(.+?)\]\[(.+)\]/go) {
             my $time = $1;
             my $prompt = $2;
@@ -3300,7 +3310,7 @@ sub _pipeExecOutput {
         open(F, ">:utf8", $$self{_TMPPIPE});
         print F $out;
         close F;
-        $out = `cat $$self{_TMPPIPE} | $cmd 2>&1`;
+        $out = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cat $$self{_TMPPIPE} | $cmd 2>&1`;
     }
     $$self{_EXEC}{OUT} = $out;
     $PACMain::FUNCS{_PIPE}->show();

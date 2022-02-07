@@ -219,7 +219,7 @@ sub _buildScreenshotsGUI {
     });
 
     $w{btnopenfolder}->signal_connect('clicked', sub {
-        system("/usr/bin/xdg-open $CFG_DIR/screenshots");}
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open $CFG_DIR/screenshots");}
     );
 
     my @targets = (Gtk3::TargetEntry->new('STRING', [], 0) );

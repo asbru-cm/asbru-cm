@@ -659,7 +659,7 @@ sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
 
-    system "mv -f $file $file.txt";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $file $file.txt";
     $file .= ".txt";
 
     $SIG{__WARN__} = sub{};
