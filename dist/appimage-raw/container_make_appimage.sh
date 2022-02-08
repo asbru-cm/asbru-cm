@@ -14,6 +14,8 @@ ln -s ./opt/asbru-cm/res/asbru-logo.svg /var/appimage-dir/asbru-cm.svg
 ln -s ./opt/asbru-cm/res/asbru-logo-256.png /var/appimage-dir/.DirIcon
 ln -s ./opt/asbru-cm/dist/appimage-raw/AppRun /var/appimage-dir/AppRun
 
+chmod a+x /var/appimage-dir/AppRun
+
 dos2unix /var/appimage-dir/opt/asbru-cm/res/asbru-cm.desktop /var/appimage-dir/opt/asbru-cm/res/asbru-logo.svg /var/appimage-dir/opt/asbru-cm/dist/appimage-raw/AppRun
 
 if [[ "${USE_APPSTREAM}" -eq 1 ]]; then
