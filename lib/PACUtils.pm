@@ -364,7 +364,7 @@ sub _pixBufFromFile {
     };
 
     if ($@) {
-        print STDERR "WARN: Error while loading pixBuf from file '$file': $@"
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
     return $gdkpixbuf;
