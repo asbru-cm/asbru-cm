@@ -1082,9 +1082,7 @@ sub logTime {
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
 BEGIN{
-    print STDERR "WARN: Executing X11::GUITest use\n";
     eval("use X11::GUITest qw (GetWindowPos GetWindowName)");
-    print STDERR "WARN: Executed X11::GUITest use. at: $@\n";
     $module_guitest = $@ ? "N" : "Y";
 }
 # END OF : Procedures definition
@@ -1694,7 +1692,7 @@ elsif (!$MANUAL) {
 
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
-            print STDERR "WARN: Found sudo prompt"
+            print STDERR "WARN: Found sudo prompt";
             if ($CONNECTED) {
                 $EXP->exp_continue();
             }
