@@ -438,7 +438,6 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
-    print STDERR "WARN: FORKING.\n";
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
         # TODO: Shell needs to be invoked with external env, but then re-invoke internal env right after!
         @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "('$^X' $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
