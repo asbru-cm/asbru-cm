@@ -339,7 +339,7 @@ sub _scale {
         $gdkpixbuf = ref($file) ? $file : Gtk3::Gdk::Pixbuf->new_from_file($file)
     };
     if ($@) {
-        print STDERR "WARN: Error while loading pixBuf from file '$file': $@"
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
 
