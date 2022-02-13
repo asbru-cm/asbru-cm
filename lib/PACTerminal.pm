@@ -438,21 +438,25 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
+    my $spawn_env;
+    # TODO: Use $$self{_CFG}{'defaults'}{'shell directory'} -- workaround for cwd-based exec ELF header for AppImage :/
+    my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : '.';
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
         # TODO: Shell needs to be invoked with external env, but then re-invoke internal env right after!
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "('$^X' $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($ENV{'ASBRU_ENV_FOR_INTERNAL'} '$^X' '$PAC_CONN' '$$self{_TMPCFG}' '$$self{_UUID}' '$isCluster'; exit)"];
+        $spawn_env = $ENV{'ASBRU_ENV_FOR_EXTERNAL'};
     } else {
         @args = [$^X, $^X, $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        $spawn_env = "";
     }
-    # TODO: Use $$self{_CFG}{'defaults'}{'shell directory'} -- workaround for cwd-based exec ELF header for AppImage :/
-    #my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef;
-    my $subCwd = undef;
+    $spawn_env .= " ASBRU_SUB_CWD='$subCwd'";
+    my @arr_spawn_env = $self->_convertEnv($spawn_env);
     my $spawnSyncResult = undef;
-    eval { 
-        $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
+    eval {
+        $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, \@arr_spawn_env, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
     };
     if (!$spawnSyncResult || $@) {
-        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!! at: $@";
+        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster $subCwd'!! at: $@";
         $$self{CONNECTING} = 0;
         return 0;
     }
@@ -485,6 +489,17 @@ sub start {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     }
     return 1;
+}
+
+# Converts env vars string list to array
+sub _convertEnv {
+    my $self = shift;
+    my $env_string = shift;
+    my @matches = ();
+    while ($env_string =~ /(?<envName>\w+)=(?<envValue>(?<quot>['"]?)[^']*?\k{quot})/g) {
+        push @matches, "$+{envName}=$+{envValue}";
+    }
+    return @matches;
 }
 
 # Stop and close GUI

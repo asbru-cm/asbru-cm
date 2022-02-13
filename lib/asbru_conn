@@ -1253,9 +1253,9 @@ if (defined $METHOD) {
         }
         my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
-        if (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+        if (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep RealVNC`) {
             $method = 'RealVNC';
-        } elsif (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        } elsif (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep TigerVNC`) {
             $method = 'TigerVNC';
         }
         _setProxy($method);
@@ -1386,6 +1386,8 @@ if ($METHOD ne 'PACShell') {
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
+my $external_dir = $ENV{'ASBRU_SUB_CWD'} // '.';
+$do_connection_cmd = "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cd '$external_dir' && $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $do_connection_cmd";
 $EXP->spawn("$do_connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
@@ -1692,7 +1694,6 @@ elsif (!$MANUAL) {
 
         # Found sudo prompt
         ["\Q$SUDO_PROMPT\E", sub {
-            print STDERR "WARN: Found sudo prompt";
             if ($CONNECTED) {
                 $EXP->exp_continue();
             }
