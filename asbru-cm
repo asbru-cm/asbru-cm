@@ -242,7 +242,7 @@ sub getDesktopEnvironment {
     my $c;
     # An attempt to find desktop environment
     foreach my $d ('gnome-shell','cinnamon','lxde','xfce','unity') {
-        $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps -o 'comm=' | grep '$d' | wc -l`;
+        $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps -eo 'comm=' | grep '$d' | wc -l`;
         if ($c + 0) {
             $ENV{'ASBRU_DESKTOP'} = $d;
             last;
