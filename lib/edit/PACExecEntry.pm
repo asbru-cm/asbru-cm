@@ -361,7 +361,7 @@ sub _buildExec {
             }
         };
 
-        system(_subst($cmd, $PACMain::FUNCS{_MAIN}{_CFG}) . ' &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} " . _subst($cmd, $PACMain::FUNCS{_MAIN}{_CFG}) . ' &');
 
         return 1;
     }) if ($$self{'where'} eq 'local');

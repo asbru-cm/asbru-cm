@@ -417,7 +417,7 @@ sub _showImage {
     my $file = shift;
 
     if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots use external viewer'}) {
-        system($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'},$file);
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} " . $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'}, $file);
         return 1;
     }
 

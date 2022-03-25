@@ -439,10 +439,8 @@ sub start {
     # Start and fork our connector
     my @args;
     my $spawn_env;
-    # TODO: Use $$self{_CFG}{'defaults'}{'shell directory'} -- workaround for cwd-based exec ELF header for AppImage :/
     my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : '.';
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        # TODO: Shell needs to be invoked with external env, but then re-invoke internal env right after!
         @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($ENV{'ASBRU_ENV_FOR_INTERNAL'} '$^X' '$PAC_CONN' '$$self{_TMPCFG}' '$$self{_UUID}' '$isCluster'; exit)"];
         $spawn_env = $ENV{'ASBRU_ENV_FOR_EXTERNAL'};
     } else {
@@ -3306,7 +3304,7 @@ sub _execute {
         $tmp{cmd} = $cmd;
         nstore_fd(\%tmp, $$self{_SOCKET_CLIENT}) or die "ERROR:$!";
     } elsif ($where eq 'local') {
-        system($cmd . ' &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd &");
     }
 
     return 1;
@@ -3325,7 +3323,7 @@ sub _pipeExecOutput {
         open(F, ">:utf8", $$self{_TMPPIPE});
         print F $out;
         close F;
-        $out = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cat $$self{_TMPPIPE} | $cmd 2>&1`;
+        $out = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cat $$self{_TMPPIPE} | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd 2>&1`;
     }
     $$self{_EXEC}{OUT} = $out;
     $PACMain::FUNCS{_PIPE}->show();
@@ -3419,7 +3417,7 @@ sub _wPrePostExec {
             Gtk3::main_iteration while Gtk3::events_pending;
 
             # Launch the local command
-            system($cmd);
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd");
         }
 
         # Change mouse cursor (to normal)

@@ -3721,7 +3721,7 @@ sub _makeDesktopFile {
 
     if (! $$cfg{'defaults'}{'show favourites in unity'}) {
         unlink "$ENV{HOME}/.local/share/applications/asbru.desktop";
-        system('/usr/bin/xdg-desktop-menu forceupdate &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
         return 1;
     }
 
@@ -3766,7 +3766,7 @@ sub _makeDesktopFile {
     open F, ">$ENV{HOME}/.local/share/applications/asbru.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
-    system('/usr/bin/xdg-desktop-menu forceupdate &');
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
 
     return 1;
 }
