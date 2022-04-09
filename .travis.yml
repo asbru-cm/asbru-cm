@@ -9,7 +9,6 @@ env:
     - CHANGELOG_EMAIL=contact@asbru-cm.net
     - PRODUCT=asbru-cm
   jobs:
-    - OS=debian DIST=jessie PACKAGE=deb PACKAGECLOUD=true
     - OS=debian DIST=stretch PACKAGE=deb PACKAGECLOUD=true
     - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true PACKAGECLOUD=true
     - OS=debian DIST=bullseye PACKAGE=deb PACKAGECLOUD=true
