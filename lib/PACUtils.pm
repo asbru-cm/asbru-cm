@@ -1557,7 +1557,7 @@ sub _wEnterValue {
     }
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
-    my $val = '';
+    my $val = undef;
 
     if (@list) {
         if ($ok eq 'ok') {
