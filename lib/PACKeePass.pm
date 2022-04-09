@@ -33,6 +33,7 @@ $|++;
 # Standard
 use strict;
 use warnings;
+use version;
 
 use Encode;
 use FindBin qw ($RealBin $Bin $Script);
@@ -530,11 +531,17 @@ sub _locateEntries {
     my ($pid,$cfg);
     my $timestamp;
     my @out;
+    my $search_command;
 
     if ($$self{cfg}) {
         $cfg = $$self{cfg};
     } else {
         $cfg = $self->get_cfg();
+    }
+    if (version->parse($$self{kpxc_version}) >= version->parse("2.7.0")) {
+        $search_command = 'search';
+    } else {
+        $search_command = 'locate';
     }
     $timestamp = stat($$cfg{database})->mtime;
     if (!@KPXC_LIST || $$self{'last_timestamp'} != $timestamp) {
@@ -544,7 +551,7 @@ sub _locateEntries {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} ${search_command} $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
             print Writer "$KPXC_MP\n";
             close Writer;
             @KPXC_LIST = <Reader>;
