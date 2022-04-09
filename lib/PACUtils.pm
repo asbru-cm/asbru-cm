@@ -2124,8 +2124,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'save session logs'} //= 0;
     $$cfg{'defaults'}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
     $$cfg{'defaults'}{'session logs folder'} //= "$CFG_DIR/session_logs";
-    # TODO : Remove, this is from a previous migration path
-    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
     $$cfg{'defaults'}{'session logs amount'} //= 10;
     $$cfg{'defaults'}{'screenshots external viewer'} //= '/usr/bin/xdg-open';
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
@@ -2369,8 +2367,6 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'save session logs'} //= 0;
         $$cfg{'environments'}{$uuid}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
         $$cfg{'environments'}{$uuid}{'session logs folder'} //= "$CFG_DIR/session_logs";
-        # TODO : Remove, this is from a previous migration path
-        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
