@@ -48,6 +48,8 @@ use Crypt::CBC;
 use SortedTreeStore;
 use Vte;
 
+use Config;
+
 # GTK
 use Gtk3 -init;
 
@@ -3354,7 +3356,7 @@ sub _quitProgram {
         $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
         $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
     };
-    chdir(${CFG_DIR}) and system("rm -rf sockets/* tmp/*");  # Delete temporal files
+    chdir(${CFG_DIR}) and system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
     Gtk3->main_quit();
@@ -4397,10 +4399,16 @@ sub __importNodes {
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
-        system("(sleep 3; $0) &");
-        sleep 2;
-        exit 0;
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b>!", 0);
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        print STDERR "[DEBUG] Restarting using executable '$^X' with arg '$0'";
+        exec($^X, $0) or print STDERR "[ERROR] Couldn't exec {$^X} $0: $!";
+        exit 1;
 
     # Bad export file
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {

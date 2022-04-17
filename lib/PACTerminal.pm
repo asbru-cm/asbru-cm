@@ -44,6 +44,8 @@ use Time::HiRes qw (gettimeofday);
 use PACKeePass;
 use List::Util qw (min max);
 
+use Config;
+
 # GTK
 use Gtk3 '-init';
 use Gtk3::SimpleList;
@@ -68,7 +70,6 @@ my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
-my $PERL_BIN = '/usr/bin/perl';
 my $PAC_CONN = "$RealBin/lib/asbru_conn";
 
 my $SHELL_BIN = -x '/bin/sh' ? '/bin/sh' : '/bin/bash';
@@ -437,13 +438,23 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
+    my $spawn_env;
+    my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : '.';
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($ENV{'ASBRU_ENV_FOR_INTERNAL'} '$^X' '$PAC_CONN' '$$self{_TMPCFG}' '$$self{_UUID}' '$isCluster'; exit)"];
+        $spawn_env = $ENV{'ASBRU_ENV_FOR_EXTERNAL'};
     } else {
-        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        @args = [$^X, $^X, $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        $spawn_env = "";
     }
-    if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
-        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
+    $spawn_env .= " ASBRU_SUB_CWD='$subCwd'";
+    my @arr_spawn_env = $self->_convertEnv($spawn_env);
+    my $spawnSyncResult = undef;
+    eval {
+        $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, \@arr_spawn_env, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
+    };
+    if (!$spawnSyncResult || $@) {
+        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster $subCwd'!! at: $@";
         $$self{CONNECTING} = 0;
         return 0;
     }
@@ -476,6 +487,17 @@ sub start {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     }
     return 1;
+}
+
+# Converts env vars string list to array
+sub _convertEnv {
+    my $self = shift;
+    my $env_string = shift;
+    my @matches = ();
+    while ($env_string =~ /(?<envName>\w+)=(?<envValue>(?<quot>['"]?)[^']*?\k{quot})/g) {
+        push @matches, "$+{envName}=$+{envValue}";
+    }
+    return @matches;
 }
 
 # Stop and close GUI
@@ -1463,7 +1485,7 @@ sub _watchConnectionData {
             }
 
         } elsif ($data =~ /^EXPLORER:(.+)/go) {
-            system("xdg-open '$1' &");
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} xdg-open '$1' &");
         } elsif ($data =~ /^PIPE_WAIT\[(.+?)\]\[(.+)\]/go) {
             my $time = $1;
             my $prompt = $2;
@@ -3282,7 +3304,7 @@ sub _execute {
         $tmp{cmd} = $cmd;
         nstore_fd(\%tmp, $$self{_SOCKET_CLIENT}) or die "ERROR:$!";
     } elsif ($where eq 'local') {
-        system($cmd . ' &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd &");
     }
 
     return 1;
@@ -3301,7 +3323,7 @@ sub _pipeExecOutput {
         open(F, ">:utf8", $$self{_TMPPIPE});
         print F $out;
         close F;
-        $out = `cat $$self{_TMPPIPE} | $cmd 2>&1`;
+        $out = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cat $$self{_TMPPIPE} | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd 2>&1`;
     }
     $$self{_EXEC}{OUT} = $out;
     $PACMain::FUNCS{_PIPE}->show();
@@ -3395,7 +3417,7 @@ sub _wPrePostExec {
             Gtk3::main_iteration while Gtk3::events_pending;
 
             # Launch the local command
-            system($cmd);
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd");
         }
 
         # Change mouse cursor (to normal)

@@ -136,7 +136,7 @@ $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE'
 # Check some command line options
 defined $$CFG{'environments'}{$UUID} or die("ERROR: Profile '$UUID' does not exist!!");
 
-my $autossh_bin = (system("which autossh 1>/dev/null 2>&1") eq 0);
+my $autossh_bin = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which autossh 1>/dev/null 2>&1") eq 0);
 
 # Shorten some variables
 my $DEBUG = $$CFG{'defaults'}{'debug'};
@@ -263,7 +263,7 @@ my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
 
 # Test if we can avoid openning consecutive port forwarders
 if ($CONNECT_OPTS =~ /(-[LR] .+?)( |$)/) {
-    my $x = `ps a | grep ssh `;
+    my $x = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps a | grep ssh `;
     my $y = $1;
     if ($x =~ /$y/) {
         $y =~ s/-[LR] //g;
@@ -449,7 +449,7 @@ sub subst {
     # Replace '<CMD:#>' with the result of executing 'cmd'
     while ($string =~ /<CMD:(.+?)>/go) {
         my $var = $1;
-        my $output = `$var 2>&1`;
+        my $output = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $var 2>&1`;
         chomp $output;
         $string =~ s/<CMD:\Q$var\E>/$output/g;
     }
@@ -870,7 +870,7 @@ sub _getProxyCmd {
     my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
 
     if ($proxy_user ne '') {
-        if (system("which ncat 1>/dev/null 2>&1") eq 0) {
+        if (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which ncat 1>/dev/null 2>&1") eq 0) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
@@ -892,14 +892,14 @@ sub _openSshTunnel {
 
     if (-e "$TMP_DIR/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
-        my $check = `ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
+        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
     # Check if port we want to bind is not alreay in use
     $LPORT = _getLocalPort($PORT);
-    system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
@@ -915,8 +915,8 @@ sub _openSocksTunnel {
     }
 
     unlink($pipe);
-    system("mkfifo $pipe");
-    system("nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mkfifo $pipe");
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
@@ -1056,7 +1056,7 @@ sub _hardClose {
     }
 
     if ($proxy_jump == 2 && -e $sock) {
-        system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
+        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
     }
     if (-e $pipe) {
         unlink($pipe);
@@ -1083,7 +1083,6 @@ sub logTime {
 my $module_guitest;
 BEGIN{
     eval("use X11::GUITest qw (GetWindowPos GetWindowName)");
-
     $module_guitest = $@ ? "N" : "Y";
 }
 # END OF : Procedures definition
@@ -1254,15 +1253,15 @@ if (defined $METHOD) {
         }
         my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
-        if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+        if (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep RealVNC`) {
             $method = 'RealVNC';
-        } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        } elsif (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep TigerVNC`) {
             $method = 'TigerVNC';
         }
         _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
-            system("echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
@@ -1387,6 +1386,8 @@ if ($METHOD ne 'PACShell') {
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
+my $external_dir = $ENV{'ASBRU_SUB_CWD'} // '.';
+$do_connection_cmd = "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cd '$external_dir' && $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $do_connection_cmd";
 $EXP->spawn("$do_connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
@@ -1755,11 +1756,11 @@ elsif (!$MANUAL) {
             $CONNECTED = 0;
             if ($ACCEPT_KEY) {
                 ctrl("HOSTKEY:deleting offending hostkey by configuration and Restarting connection");
-                open(F, `echo $known_hosts 2>&1`) or die "ERROR: could not open for reading '$known_hosts' ($!)";
+                open(F, `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo $known_hosts 2>&1`) or die "ERROR: could not open for reading '$known_hosts' ($!)";
                 my @data = <F>;
                 close F;
                 splice(@data, $line - 1, 1);
-                open(F, '>' . `echo $known_hosts 2>&1`) or die "ERROR: could not open for writing '$known_hosts' ($!)";
+                open(F, '>' . `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo $known_hosts 2>&1`) or die "ERROR: could not open for writing '$known_hosts' ($!)";
                 print F @data;
                 close F;
                 ctrl('RESTART');

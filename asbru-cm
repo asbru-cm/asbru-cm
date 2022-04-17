@@ -139,13 +139,13 @@ print STDERR "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n
 $ENV{'LANG'} = $ASBRU_LANG;
 
 # Check for Unity's systray-whitelist presence of 'asbru'
-my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
+my $wl = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
 
 if (($? eq 0) && (!grep(/'asbru'/, $wl))) {
     print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";
     $wl =~ s/'\s*]/', 'asbru']/;
-    `gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
+    `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
 }
 
 # Set up configuration directories
@@ -168,8 +168,8 @@ if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /
     if ($VERBOSE) {
         print "INFO: Migration of alternate directory\n";
     }
-    system "rm -Rf \"$CFG_DIR_OLD\"";
-    system "mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -Rf \"$CFG_DIR_OLD\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
     config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
@@ -228,7 +228,7 @@ sub config_migration {
     my $status;
 
     if (-e "$PATH/utils/pac2asbru.pl") {
-        if ($status = system("$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
+        if ($status = system("'$^X' $PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
             print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }
@@ -242,9 +242,8 @@ sub getDesktopEnvironment {
     my $c;
     # An attempt to find desktop environment
     foreach my $d ('gnome-shell','cinnamon','lxde','xfce','unity') {
-        $c = `pgrep -c '$d'`;
-        chop $c;
-        if ($c) {
+        $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps -eo 'comm=' | grep '$d' | wc -l`;
+        if ($c + 0) {
             $ENV{'ASBRU_DESKTOP'} = $d;
             last;
         }
@@ -298,12 +297,12 @@ sub CheckConfigurationFile {
             };
             if (!$@ && $cfg) {
                 print "INFO: Found valid file $CFG_FILE_NAME.$n, recovering...\n";
-                system "mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
-                system "cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
                 $OK = 1;
                 last;
             } else {
-                system "mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
             }
         }
         if (!$OK) {
@@ -320,12 +319,12 @@ sub CheckConfigurationFile {
         for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
             my $p = $n-1; # previous
             if (-e "$BACKUP_CFG_FILE.$p") {
-                system "cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
             }
         }
     }
     # Save current known configuration
-    system "cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
 }
 
 sub _wPopUP {
@@ -337,7 +336,7 @@ sub _wPopUP {
     $msg =~ s/\n/&cr;/g;
     $msg =~ s/\"/&dquot;/g;
     $msg =~ s/\'/&squot;/g;
-    return `$PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
+    return `'$^X' $PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
 }
 
 END {

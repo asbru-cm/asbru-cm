@@ -266,7 +266,7 @@ sub _setupCallbacks {
         _($self, 'hboxWidthHeight')->set_sensitive(_($self, 'cbCfgNewInWindow')->get_active());
     });
     _($self, 'btnCfgOpenSessionLogs')->signal_connect('clicked' => sub {
-        system('/usr/bin/xdg-open ' . (_($self, 'btnCfgSaveSessionLogs')->get_current_folder()));
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open " . (_($self, 'btnCfgSaveSessionLogs')->get_current_folder()));
     });
     _($self, 'btnCloseConfig')->signal_connect('clicked' => sub {
         $self->_closeConfiguration();
@@ -659,7 +659,7 @@ sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
 
-    system "mv -f $file $file.txt";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $file $file.txt";
     $file .= ".txt";
 
     $SIG{__WARN__} = sub{};

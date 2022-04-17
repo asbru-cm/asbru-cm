@@ -796,7 +796,7 @@ sub _setCapabilities {
     if ($$self{_VERBOSE}) {
         print "DEBUG:KEEPASS: $CLI $$self{kpxc_cli}\n";
     }
-    $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
+    $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
@@ -814,7 +814,7 @@ sub _setCapabilities {
             # Test if we have a system wide installation
             $$self{kpxc_cli} = '';
             $CLI = 'keepassxc-cli';
-            $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
+            $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI -v 2>/dev/null`;
             $$self{kpxc_version} =~ s/\n//g;
             if (!$$self{kpxc_version}) {
                 # We do not have keepassxc-cli available, the user defined is not working
@@ -824,7 +824,7 @@ sub _setCapabilities {
             }
         }
     }
-    $c = `$CLI $$self{kpxc_cli} -h show 2>&1`;
+    $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -h show 2>&1`;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
     }

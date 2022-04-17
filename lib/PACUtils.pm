@@ -124,7 +124,7 @@ our $APPNAME = 'Ásbrú Connection Manager';
 our $APPVERSION = '6.4.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
-my $ARCH_TMP = `/bin/uname -m 2>&1`;
+my $ARCH_TMP = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/uname -m 2>&1`;
 if ($ARCH_TMP =~ /x86_64/gio) {
     $ARCH = 64;
 } elsif ($ARCH_TMP =~ /ppc64/gio) {
@@ -339,6 +339,7 @@ sub _scale {
         $gdkpixbuf = ref($file) ? $file : Gtk3::Gdk::Pixbuf->new_from_file($file)
     };
     if ($@) {
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
 
@@ -363,6 +364,7 @@ sub _pixBufFromFile {
     };
 
     if ($@) {
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
     return $gdkpixbuf;
@@ -377,7 +379,7 @@ sub _getMethods {
         $THEME_DIR = $theme_dir;
     }
 
-    my $rdesktop = (system("which rdesktop 1>/dev/null 2>&1") eq 0);
+    my $rdesktop = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which rdesktop 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (rdesktop)'} = {
         'installed' => sub {return $rdesktop ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
         'checkCFG' => sub {
@@ -448,7 +450,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xfreerdp = (system("which xfreerdp 1>/dev/null 2>&1") eq 0);
+    my $xfreerdp = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which xfreerdp 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (xfreerdp)'} = {
         'installed' => sub {return $xfreerdp ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
@@ -519,8 +521,8 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xtightvncviewer = (system("which vncviewer 1>/dev/null 2>&1") eq 0);
-    my $tigervnc = (system("vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
+    my $xtightvncviewer = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which vncviewer 1>/dev/null 2>&1") eq 0);
+    my $tigervnc = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
     $methods{'VNC'} = {
         'installed' => sub {return $xtightvncviewer || $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
         'checkCFG' => sub {
@@ -587,7 +589,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $cu = (system("which cu 1>/dev/null 2>&1") eq 0);
+    my $cu = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which cu 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (cu)'} = {
         'installed' => sub {return $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
         'checkCFG' => sub {
@@ -637,7 +639,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $remote_tty = (system("which remote-tty 1>/dev/null 2>&1") eq 0);
+    my $remote_tty = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which remote-tty 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (remote-tty)'} = {
         'installed' => sub {return $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
         'checkCFG' => sub {
@@ -703,7 +705,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
-    my $c3270 = (system("which c3270 1>/dev/null 2>&1") eq 0);
+    my $c3270 = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which c3270 1>/dev/null 2>&1") eq 0);
     $methods{'IBM 3270/5250'} = {
         'installed' => sub {return $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
         'checkCFG' => sub {
@@ -755,7 +757,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
-    my $autossh = (system("which autossh 1>/dev/null 2>&1") eq 0);
+    my $autossh = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which autossh 1>/dev/null 2>&1") eq 0);
     $methods{'SSH'} = {
         'installed' => sub {return 1;},
         'checkCFG' => sub {
@@ -818,7 +820,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $mosh = (system("which mosh 1>/dev/null 2>&1") eq 0);
+    my $mosh = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which mosh 1>/dev/null 2>&1") eq 0);
     $methods{'MOSH'} = {
         'installed' => sub {return $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
         'checkCFG' => sub {
@@ -883,7 +885,7 @@ sub _getMethods {
         'escape' => ["\c^x."]
     };
 
-    my $cadaver = (system("which cadaver 1>/dev/null 2>&1") eq 0);
+    my $cadaver = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which cadaver 1>/dev/null 2>&1") eq 0);
     $methods{'WebDAV'} = {
         'installed' => sub {return $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
         'checkCFG' => sub {
@@ -948,7 +950,7 @@ sub _getMethods {
         'escape' => ["\cc", "quit\n"]
     };
 
-    my $telnet = (system("which telnet 1>/dev/null 2>&1") eq 0);
+    my $telnet = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which telnet 1>/dev/null 2>&1") eq 0);
     $methods{'Telnet'} = {
         'installed' => sub {return $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
         'checkCFG' => sub {
@@ -2978,7 +2980,7 @@ sub _subst {
         # Replace '<CMD:.+>' with the result of executing 'cmd'
         while ($string =~ /<CMD:(.+?)>/go) {
             my $var = $1;
-            my $output = `$var`;
+            my $output = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $var`;
             chomp $output;
             if ($output =~ /\R/go) {
                 $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
@@ -3715,7 +3717,7 @@ sub _makeDesktopFile {
 
     if (! $$cfg{'defaults'}{'show favourites in unity'}) {
         unlink "$ENV{HOME}/.local/share/applications/asbru.desktop";
-        system('/usr/bin/xdg-desktop-menu forceupdate &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
         return 1;
     }
 
@@ -3760,7 +3762,7 @@ sub _makeDesktopFile {
     open F, ">$ENV{HOME}/.local/share/applications/asbru.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
-    system('/usr/bin/xdg-desktop-menu forceupdate &');
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
 
     return 1;
 }

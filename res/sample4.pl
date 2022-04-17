@@ -45,10 +45,10 @@ sub CONNECTION
 	}
 	
 	# Use local system 'echo' to write output to a file (this system call is *blocking*)
-	system( "echo \"$out\" > /tmp/$TERMINAL{name}.command" );
+	system( "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"$out\" > /tmp/$TERMINAL{name}.command" );
 	
 	# Finally, start a program in OUR PC with captured output (in background '&', so it is non-blocking)
-	system( "nohup gedit --new-document /tmp/$TERMINAL{name}.command &" );
+	system( "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} nohup gedit --new-document /tmp/$TERMINAL{name}.command &" );
 	
 	return 1;
 }
