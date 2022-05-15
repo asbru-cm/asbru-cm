@@ -39,7 +39,6 @@ env:
     - OS=linuxmint DIST=una PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=focal PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=hirsute PACKAGE=deb DOCKER_IMAGE=ubuntu-hirsute PACKAGECLOUD=false
-    - OS=pop DIST=impish PACKAGE=deb REPACK_DEB=yes DOCKER_IMAGE=ubuntu-impish PACKAGECLOUD=false
     - OS=elementary DIST=odin PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
 before_install:
     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
