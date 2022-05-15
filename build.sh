@@ -24,7 +24,7 @@ fi
 
 if [ "${PACKAGE}" == "deb" ] && [ "${REPACK_DEB}" == "yes" ] ; then
   DEBFILE=${PRODUCT}_${VERSION}-1_all.deb
-  DEBFILE_OLD=$(basename ${DEBFILE} .deb).old.deb
+  DEBFILE_OLD=$(basename ${DEBFILE} .deb).deb.old
   echo "Repacking debian file [${DEBFILE}] to have XY format."
   pushd build
   mv ${DEBFILE} ${DEBFILE_OLD}
