@@ -16,18 +16,14 @@ env:
     - OS=ubuntu DIST=bionic PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=focal PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=impish PACKAGE=deb REPACK_DEB=yes PACKAGECLOUD=true
-    - OS=ubuntu DIST=jammy DOCKER_REPO=asbru/asbru-cm PACKAGE=deb REPACK_DEB=yes PACKAGECLOUD=true
-    - OS=fedora DIST=29 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=fedora DIST=30 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=fedora DIST=31 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=ubuntu DIST=jammy PACKAGE=deb REPACK_DEB=yes PACKAGECLOUD=true
     - OS=fedora DIST=32 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=33 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=34 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=35 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=36 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=linuxmint DIST=sonya PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
-    - OS=linuxmint DIST=sylvia PACKAGE=deb DOCKER_IMAGE=debian-stretch PACKAGECLOUD=true
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
     - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
     - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
@@ -38,6 +34,8 @@ env:
     - OS=linuxmint DIST=una PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=focal PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=hirsute PACKAGE=deb DOCKER_IMAGE=ubuntu-hirsute PACKAGECLOUD=false
+    - OS=pop DIST=impish PACKAGE=deb REPACK_DEB=yes DOCKER_IMAGE=ubuntu-impish PACKAGECLOUD=false
+    - OS=pop DIST=jammy PACKAGE=deb REPACK_DEB=yes DOCKER_IMAGE=ubuntu-jammy PACKAGECLOUD=false
     - OS=elementary DIST=odin PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
 before_install:
     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
