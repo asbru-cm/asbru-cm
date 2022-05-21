@@ -2,6 +2,22 @@
 
 Here you can find important news on the project
 
+## 21.05.2022
+
+We are pleased to announce a bug fix release (6.3.3) of Ásbrú Connection Manager that addresses several issues:
+
+- Closing one tab in cluster disconnects whole cluster ([#634](https://github.com/asbru-cm/asbru-cm/pull/634))
+- Power Cluster Controller (PCC) can't close multiple exploded tabs ([#791](https://github.com/asbru-cm/asbru-cm/pull/791))
+- Error when using an entry of a KeePass database with a pipe ("|") on title ([#794](https://github.com/asbru-cm/asbru-cm/pull/794))
+- KeepassXC password exposed on asbru-cm local shell terminal ([#801](https://github.com/asbru-cm/asbru-cm/pull/801))
+- Add support for PubkeyAcceptedKeyTypes option ([#853](https://github.com/asbru-cm/asbru-cm/pull/853))
+- Can't close tab after doing split-unsplit ([#871](https://github.com/asbru-cm/asbru-cm/pull/871))
+- SFTP via jumphost to target with private key instead of password doesn't work ([#913](https://github.com/asbru-cm/asbru-cm/pull/913))
+- Settings password set if dialogs canceled ([#922](https://github.com/asbru-cm/asbru-cm/pull/922))
+- Support for KeepassXC 2.7.0 (and above) ([#924](https://github.com/asbru-cm/asbru-cm/pull/924))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
+
 ## 27.02.2021
 
 We are pleased to announce a bug fix release (6.3.2) of Ásbrú Connection Manager that addresses several issues:
