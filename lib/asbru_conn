@@ -806,14 +806,14 @@ sub _setProxy {
         $proxy_user = $$CFG{'environments'}{$UUID}{'jump user'};
         $proxy_pass = $$CFG{'environments'}{$UUID}{'jump pass'};
         open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
-        print CFG qq“Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
-        print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n“;
+        print CFG qq"Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n";
+        print CFG qq"\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n";
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
             print CFG "IdentityFile $$CFG{'environments'}{$UUID}{'jump key'}\n";
         }
         if ($method =~ /ssh/i) {
             # Second server is only important for SSH JumpHost
-            print CFG qq“\nHost server\nHostName $IP\nUser $user\nPort $PORT\n“;
+            print CFG qq"\nHost server\nHostName $IP\nUser $user\nPort $PORT\n";
             if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
                 print CFG "IdentityFile $PUBKEY\n";
             }
@@ -832,14 +832,14 @@ sub _setProxy {
             $proxy_user = $$CFG{'defaults'}{'jump user'};
             $proxy_pass = $$CFG{'defaults'}{'jump pass'};
             open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
-            print CFG qq“Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n“;
-            print CFG qq“\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n“;
+            print CFG qq"Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n";
+            print CFG qq"\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n";
             if ($$CFG{'defaults'}{'jump key'}) {
                 print CFG "IdentityFile $$CFG{'defaults'}{'jump key'}\n";
             }
             if ($method =~ /ssh/i) {
                 # Second server is only important for SSH JumpHost
-                print CFG qq“\nHost server\nHostName $IP\nUser $user\nPort $PORT\n“;
+                print CFG qq"\nHost server\nHostName $IP\nUser $user\nPort $PORT\n";
                 if (($PUBKEY)&&($$CFG{'environments'}{$UUID}{'auth type'} eq 'publickey')) {
                     print CFG "IdentityFile $PUBKEY\n";
                 }
@@ -2437,4 +2437,3 @@ Steps
 =head1 Perl particulars
 
     select(undef, undef, undef, 0.5)        ===>  sleep(500ms);
-
