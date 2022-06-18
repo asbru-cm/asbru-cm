@@ -8,13 +8,13 @@ export ASBRU_ENV_FOR_EXTERNAL="$(getCompressedEnv)"
 
 export ASBRU_IS_APPIMAGE="1"
 
-export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${APPDIR}/usr/lib/perl5/core_perl/CORE/:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${APPDIR}/usr/lib/perl5/core_perl/CORE/"
 
 export PERL5LIB="${APPDIR}/usr/local/lib/perl5/site_perl:${APPDIR}/usr/local/share/perl5/site_perl:${APPDIR}/usr/lib/perl5/vendor_perl:${APPDIR}/usr/share/perl5/vendor_perl:${APPDIR}/usr/lib/perl5/core_perl:${APPDIR}/usr/share/perl5/core_perl"
 
 export GI_TYPELIB_PATH="${APPDIR}/usr/lib/girepository-1.0"
 
-export XDG_DATA_DIRS="${APPDIR}/usr/local/share/:${APPDIR}/usr/share/:${XDG_DATA_DIRS}"
+export XDG_DATA_DIRS="${APPDIR}/usr/local/share/:${APPDIR}/usr/share/"
 export XDG_CONFIG_DIRS="${APPDIR}/etc/xdg"
 
 export GTK_PATH="${APPDIR}/usr/lib/gtk-3.0"
