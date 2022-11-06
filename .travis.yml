@@ -17,11 +17,10 @@ env:
     - OS=ubuntu DIST=focal PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=impish PACKAGE=deb REPACK_DEB=yes PACKAGECLOUD=true
     - OS=ubuntu DIST=jammy PACKAGE=deb REPACK_DEB=yes PACKAGECLOUD=true
-    - OS=fedora DIST=32 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=fedora DIST=33 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=34 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=35 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=fedora DIST=36 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
+    - OS=fedora DIST=36 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=37 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
     - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
@@ -32,6 +31,7 @@ env:
     - OS=linuxmint DIST=ulyssa PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=uma PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=una PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
+    - OS=linuxmint DIST=vanessa PACKAGE=deb DOCKER_IMAGE=ubuntu-jammy PACKAGECLOUD=false
     - OS=pop DIST=focal PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=pop DIST=hirsute PACKAGE=deb DOCKER_IMAGE=ubuntu-hirsute PACKAGECLOUD=false
     - OS=pop DIST=impish PACKAGE=deb REPACK_DEB=yes DOCKER_IMAGE=ubuntu-impish PACKAGECLOUD=false
