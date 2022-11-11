@@ -2714,6 +2714,7 @@ sub _tabMenu {
 
     # Show a popup with the opened tabs (if tabbed!!)
     my @submenu_goto;
+    my %submenu_goto_labels;
     foreach my $uuid (keys %PACMain::RUNNING) {
         if (!defined $PACMain::RUNNING{$uuid}{terminal}{_SPLIT}) {
             next;
@@ -2722,13 +2723,29 @@ sub _tabMenu {
         if ($uuid eq $$self{_UUID} || $i < 0) {
             next;
         }
+        # Remember the number of times we encountered the same label
+        my $label = $PACMain::RUNNING{$uuid}{terminal}{_TITLE};
+        if (!defined $submenu_goto_labels{$label}) {
+            $submenu_goto_labels{$label} = 0;
+        }
+        $submenu_goto_labels{$label}++;
+
+        # Add new entry into the list
         push(@submenu_goto,
-        {
-            label => "$i: $PACMain::RUNNING{$uuid}{terminal}{_TITLE}",
-            code => sub {
-                $$self{_NOTEBOOK}->set_current_page($i);
+            {
+                label => $label,
+                page_number => $i,
+                code => sub {
+                    $$self{_NOTEBOOK}->set_current_page($i);
+                }
             }
-        });
+        );
+    }
+    foreach my $submenu_goto_entry (@submenu_goto) {
+        # If multiple tabs with the same name, add the page number to be able to identify them
+        if ($submenu_goto_labels{$submenu_goto_entry->{label}} > 1) {
+            $submenu_goto_entry->{label} .= ' (#' . $submenu_goto_entry->{page_number} . ')';
+        }
     }
     @submenu_goto = sort {$$a{label} cmp $$b{label}} @submenu_goto;
     push(@vte_menu_items,
