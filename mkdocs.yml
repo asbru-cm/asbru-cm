@@ -54,6 +54,10 @@ nav:
       - Clusters: Managing/Clusters.md
       - Templates: Managing/Templates.md
       - Expect: Managing/Expect.md
+      - Jump Server: Managing/JumpServer.md
+      - Incognito Browser: Managing/IncognitoBrowser.md
+      - Redistributing: General/Redistribution.md
+      - AppImage Packaging: General/AppImagePackaging.md
   - 4. Contributing:
       - Contributing: Contributing/index.md
       - Coding standards: Contributing/CODING_STANDARD.md

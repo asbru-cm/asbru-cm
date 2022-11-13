@@ -87,8 +87,8 @@ $METHODS{'RDP (rdesktop)'} = "PACMethod_rdesktop"->new($CONTAINER);
 eval {require "$RealBin/lib/method/PACMethod_xfreerdp.pm";}; die $@ if $@;
 $METHODS{'RDP (xfreerdp)'} = "PACMethod_xfreerdp"->new($CONTAINER);
 
-my $tigervnc = `vncviewer --help 2>&1 | /bin/grep TigerVNC`;
-my $realvnc = `vncviewer --help 2>&1 | /bin/grep RealVNC`;
+my $tigervnc = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep TigerVNC`;
+my $realvnc = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep RealVNC`;
 
 if ($tigervnc) {
     # Use TigerVNC
@@ -139,7 +139,7 @@ sub change {
 
     $$self{container}->foreach(sub {$_[0]->destroy;});
     $METHODS{$$self{_METHOD}}->_buildGUI();
-    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'});
+    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'}, $$self{_CFG}{"$$self{_METHOD} options"});
 
     return 1;
 }
@@ -157,9 +157,13 @@ sub update {
         return 0;
     }
 
-    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'});
+    $METHODS{$$self{_METHOD}}->update($$self{_CFG}{'options'}, $$self{_CFG}{'connection options'});
 
     return 1;
+}
+
+sub get_cfg_array {
+    return $METHODS{$_[0]{_METHOD}}->get_cfg_array();
 }
 
 sub get_cfg {

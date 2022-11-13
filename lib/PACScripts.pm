@@ -37,11 +37,10 @@ use Encode qw (encode);
 use File::Copy;
 use File::Basename;
 use Storable qw (dclone nstore_fd);
+use Config;
 
 eval {require Gtk3::SourceView2;};
 my $SOURCEVIEW = ! $@;
-
-my $PERL = `which perl 2>&1`;
 
 # GTK
 use Gtk3 '-init';
@@ -344,7 +343,7 @@ sub show {
     $self->_updateGUI;
 
     # Setup a timer to check syntax of selected script
-    (! defined $$self{_TIMER_CHECK} && $PERL) and $$self{_TIMER_CHECK} = Glib::Timeout->add_seconds(1, sub {
+    (! defined $$self{_TIMER_CHECK}) and $$self{_TIMER_CHECK} = Glib::Timeout->add_seconds(1, sub {
         return 1 unless $$self{_WINDOWSCRIPTS}{main}->get_property('has-toplevel-focus') && $$self{_SYNTAX_CHANGED};
 
         my $selection = $$self{_WINDOWSCRIPTS}{treeScripts}->get_selection;
@@ -363,7 +362,7 @@ sub show {
         my $tmpfile = $CFG_DIR . '/tmp/' . $name . '.check';
         $self->_saveFile($sel[0], $tmpfile);
 
-        my @lines = `perl -cw $tmpfile 2>&1`;
+        my @lines = `'$^X' -cw $tmpfile 2>&1`;
         my $err = $?;
         my $result = pop(@lines); chomp $result;
         $result =~ s/^\Q$tmpfile\E\s+(.+)$/$1/g;

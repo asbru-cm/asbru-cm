@@ -58,6 +58,7 @@ sub new {
     $self->{container} = shift;
 
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
 
@@ -70,9 +71,10 @@ sub new {
 sub update {
     my $self = shift;
     my $cfg = shift;
-    my $method = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
 
     my $options = _parseCfgToOptions($$self{cfg});
 
@@ -107,6 +109,15 @@ sub update {
     foreach my $hash (@{$$options{redirDisk}}) {$self->_buildRedir($hash);}
 
     return 1;
+}
+
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    return \%options_array;
 }
 
 sub get_cfg {
@@ -428,7 +439,8 @@ sub _buildGUI {
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{redirDisk}}, {'redirDiskShare' => $ENV{'USER'}, 'redirDiskPath' => $ENV{'HOME'}});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -480,7 +492,8 @@ sub _buildRedir {
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listRedir}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 

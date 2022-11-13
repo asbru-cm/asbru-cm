@@ -136,8 +136,7 @@ $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE'
 # Check some command line options
 defined $$CFG{'environments'}{$UUID} or die("ERROR: Profile '$UUID' does not exist!!");
 
-`which autossh 1>/dev/null 2>&1`;
-my $autossh_bin = ! $?;
+my $autossh_bin = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which autossh 1>/dev/null 2>&1") eq 0);
 
 # Shorten some variables
 my $DEBUG = $$CFG{'defaults'}{'debug'};
@@ -171,7 +170,10 @@ my $TITLE = $$CFG{'environments'}{$UUID}{'title'};
 my $EXPECT = defined $$CFG{'environments'}{$UUID}{'expect'};
 my $USE_PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use prepend command'};
 my $PREPEND_COMMAND = $$CFG{'environments'}{$UUID}{'prepend command'};
+my $USE_POSTPEND_COMMAND = $$CFG{'environments'}{$UUID}{'use postpend command'};
+my $POSTPEND_COMMAND = $$CFG{'environments'}{$UUID}{'postpend command'};
 my $QUOTE_COMMAND = $$CFG{'environments'}{$UUID}{'quote command'} && $USE_PREPEND_COMMAND;
+my $QUOTEPOST_COMMAND = $$CFG{'environments'}{$UUID}{'quotepost command'} && $USE_POSTPEND_COMMAND;
 my $MANUAL = ($$CFG{'environments'}{$UUID}{'auth type'} // '') eq 'manual';
 my $TMP_UUID = $$CFG{'tmp'}{'uuid'};
 my $LOG_FILE = $$CFG{'tmp'}{'log file'};
@@ -196,25 +198,35 @@ open_socket();
 # Use keepass ?
 my $kpxc;
 if ($$CFG{'defaults'}{'keepass'}{'use_keepass'}) {
-    my ($ok);
+    sub _dieMissingKeePassEntry {
+        my $entry = shift;
+
+        die("$COLOR{'err'}ERROR$COLOR{'norm'} Unable to find entry $COLOR{'log'}$entry$COLOR{'norm'} in the configured KeePass database $COLOR{'log'}$$CFG{'defaults'}{'keepass'}{database}]$COLOR{'norm'}.\n");
+    }
+
+    my $ok;
     $kpxc = PACKeePass->new(0, $$CFG{'defaults'}{'keepass'});
     if ($AUTH eq 'publickey') {
+        my $ORIG_PASSPHRASE = $PASSPHRASE;
         ($PASSPHRASE, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE);
         if (!$ok) {
-            die "$PASSPHRASE";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE);
         }
+        my $ORIG_PASSPHRASE_USER = $PASSPHRASE_USER;
         ($PASSPHRASE_USER, $ok) = $kpxc->getFieldValueFromString($PASSPHRASE_USER);
         if (!$ok) {
-            die "$PASSPHRASE_USER";
+            _dieMissingKeePassEntry($ORIG_PASSPHRASE_USER);
         }
     } else {
+        my $ORIG_USER = $USER;
         ($USER, $ok) = $kpxc->getFieldValueFromString($USER);
         if (!$ok) {
-            die "$USER";
+            _dieMissingKeePassEntry($ORIG_USER);
         }
+        my $ORIG_PASS = $PASS;
         ($PASS, $ok) = $kpxc->getFieldValueFromString($PASS);
         if (!$ok) {
-            die "$PASS";
+            _dieMissingKeePassEntry($ORIG_PASS);
         }
     }
     # Makes sure the KeePass password is not exposed in the spawned process
@@ -248,6 +260,17 @@ $$CFG{'defaults'}{'proxy pass'} = subst($$CFG{'defaults'}{'proxy pass'});
 
 # Build initial SSH connection command
 my $CONNECT_OPTS = $$CFG{'environments'}{$UUID}{'options'} || '';
+
+# Test if we can avoid openning consecutive port forwarders
+if ($CONNECT_OPTS =~ /(-[LR] .+?)( |$)/) {
+    my $x = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps a | grep ssh `;
+    my $y = $1;
+    if ($x =~ /$y/) {
+        $y =~ s/-[LR] //g;
+        print "$COLOR{'log'}Skip tunnel opening $y, already open in different terminal. $COLOR{'norm'}\n\n";
+        $CONNECT_OPTS =~ s/(-[LR] .+?)( |$)//g;
+    }
+}
 
 my %_W;
 my $INT = 0;
@@ -385,7 +408,7 @@ sub subst {
     }
 
     # Reuse most of the implementation in PACUtils.pm
-    $string = _subst($string,$CFG,$UUID,1,$kpxc);
+    $string = _subst($string,$CFG,$UUID,$TMP_UUID,1,$kpxc);
 
     # Use local wEnterValue routine
     # Replace '<ASK:#>' with user provided data for 'cmd' execution
@@ -426,7 +449,7 @@ sub subst {
     # Replace '<CMD:#>' with the result of executing 'cmd'
     while ($string =~ /<CMD:(.+?)>/go) {
         my $var = $1;
-        my $output = `$var 2>&1`;
+        my $output = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $var 2>&1`;
         chomp $output;
         $string =~ s/<CMD:\Q$var\E>/$output/g;
     }
@@ -847,8 +870,7 @@ sub _getProxyCmd {
     my ($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass) = @_;
 
     if ($proxy_user ne '') {
-        `which ncat 1>/dev/null 2>&1`;
-        if (! $?) {
+        if (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which ncat 1>/dev/null 2>&1") eq 0) {
             return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
         }
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
@@ -860,29 +882,32 @@ sub _getProxyCmd {
 
 sub _openSshTunnel {
     my ($uuid) = @_;
+    my $TMP_DIR = $ENV{"ASBRU_TMP"};
+
+    # Get a local port that is not alreay in use
+    $LPORT = _getLocalPort($PORT);
 
     if ($GETCMD) {
-        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         return 0;
     }
     $proxy_jump = 2;
 
-    if (-e "$CFG_DIR/tmp/$uuid.ctl") {
+    if (-e "$TMP_DIR/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
-        my $check = `ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -T -O check jumpserver 2>&1`;
+        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
-    # Check if port we want to bind is not alreay in use
-    $LPORT = _getLocalPort($PORT);
-    system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$CFG_DIR/tmp/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    # Start SSH tunnel
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
 
 sub _openSocksTunnel {
-    my $pipe = "$CFG_DIR/tmp/pipe_$UUID";
+    my $pipe = $ENV{"ASBRU_TMP"}."/pipe_$UUID";
 
     $LPORT = _getLocalPort($PORT);
     $proxy_cmd = _getProxyCmd($proxy_type, $proxy_ip, $proxy_port, $proxy_user, $proxy_pass);
@@ -892,8 +917,8 @@ sub _openSocksTunnel {
     }
 
     unlink($pipe);
-    system("mkfifo $pipe");
-    system("nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mkfifo $pipe");
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} nc -l -p $LPORT <$pipe | $proxy_cmd $IP $PORT >$pipe &");
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
@@ -1024,8 +1049,8 @@ sub askPassword {
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
-    my $pipe = "$CFG_DIR/tmp/pipe_$uuid";
-    my $sock = "$CFG_DIR/tmp/$uuid.ctl";
+    my $pipe = $ENV{"ASBRU_TMP"}."/pipe_$uuid";
+    my $sock = $ENV{"ASBRU_TMP"}."/$uuid.ctl";
     my $cmd_file = "$CFG_DIR/tmp/cmd_$uuid.run";
 
     if (-e $cmd_file) {
@@ -1033,7 +1058,7 @@ sub _hardClose {
     }
 
     if ($proxy_jump == 2 && -e $sock) {
-        system "ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
+        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
     }
     if (-e $pipe) {
         unlink($pipe);
@@ -1060,7 +1085,6 @@ sub logTime {
 my $module_guitest;
 BEGIN{
     eval("use X11::GUITest qw (GetWindowPos GetWindowName)");
-
     $module_guitest = $@ ? "N" : "Y";
 }
 # END OF : Procedures definition
@@ -1079,6 +1103,11 @@ if (defined $METHOD) {
     ##############################################
     if (($METHOD =~ /^.*ssh.*$/) || ($METHOD eq 'SSH')) {
         _setProxy('ssh');
+
+        if (defined $$CFG{'tmp'}{'randomSocksTunnel'}) {
+          $CONNECT_OPTS .= ' -D localhost:' . $$CFG{'tmp'}{'randomSocksTunnel'};
+        }
+
         if ($METHOD ne 'autossh') {
             $METHOD = 'ssh';
         }
@@ -1226,15 +1255,15 @@ if (defined $METHOD) {
         }
         my $method = 'VNC';
         $CONNECT_OPTS =~ s/\s*-embed//go;
-        if (`vncviewer --help 2>&1 | /bin/grep RealVNC`) {
+        if (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep RealVNC`) {
             $method = 'RealVNC';
-        } elsif (`vncviewer --help 2>&1 | /bin/grep TigerVNC`) {
+        } elsif (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep TigerVNC`) {
             $method = 'TigerVNC';
         }
         _setProxy($method);
         if ($method eq 'TigerVNC') {
             my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
-            system("echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
                 $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
@@ -1285,11 +1314,23 @@ if ($QUOTE_COMMAND) {
 if ($QUOTE_COMMAND) {
     $connection_txt = qq|"$connection_cmd"|;
 }
+if ($QUOTEPOST_COMMAND) {
+    $connection_cmd = qq|"$connection_cmd"|;
+}
+if ($QUOTEPOST_COMMAND) {
+    $connection_txt = qq|"$connection_cmd"|;
+}
 if ($USE_PREPEND_COMMAND) {
     $connection_cmd = "$PREPEND_COMMAND $connection_cmd";
 }
 if ($USE_PREPEND_COMMAND) {
     $connection_txt = "$PREPEND_COMMAND $connection_txt";
+}
+if ($USE_POSTPEND_COMMAND) {
+    $connection_cmd = "$connection_cmd $POSTPEND_COMMAND ";
+}
+if ($USE_POSTPEND_COMMAND) {
+    $connection_txt = "$connection_txt $POSTPEND_COMMAND ";
 }
 
 # Check for 'sudo' use
@@ -1347,6 +1388,8 @@ if ($METHOD ne 'PACShell') {
 
 # Spawn the session
 ctrl("SPAWNING:$connection_txt");
+my $external_dir = $ENV{'ASBRU_SUB_CWD'} // '.';
+$do_connection_cmd = "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cd '$external_dir' && $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $do_connection_cmd";
 $EXP->spawn("$do_connection_cmd 2>&1") or die "Cannot spawn '$connection_cmd: $!\n";
 ctrl("SPAWNED:'$connection_txt' (PID:$$)");
 
@@ -1543,7 +1586,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
         if (!$active) {
             next;
         }
-        my $jump = 0;
+        my $skip_command = 0;
 
         if ($time_out >= 0) {
             $TIMEOUT_CMD = $time_out;
@@ -1568,7 +1611,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
                 } else {
                     ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                     $i = --$on_fail;
-                    $jump = 1;
+                    $skip_command = 1;
                 }
             }],
 
@@ -1581,7 +1624,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
                 if ($on_match == -1) {
-                    $jump = 0;
+                    $skip_command = 0;
                 } elsif ($on_match == -2) {
                     $end = 1;
                     $CONNECTED = 1;
@@ -1594,7 +1637,7 @@ elsif (($METHOD =~ /^.*generic$/) || ($METHOD eq 'Generic Command') || ($METHOD 
             }]
         );
         last if $end;
-        next if $jump;
+        next if $skip_command;
         $avoid_first_expectation = 0;
         if (!$CONNECTED) {
             last;
@@ -1715,11 +1758,11 @@ elsif (!$MANUAL) {
             $CONNECTED = 0;
             if ($ACCEPT_KEY) {
                 ctrl("HOSTKEY:deleting offending hostkey by configuration and Restarting connection");
-                open(F, `echo $known_hosts 2>&1`) or die "ERROR: could not open for reading '$known_hosts' ($!)";
+                open(F, `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo $known_hosts 2>&1`) or die "ERROR: could not open for reading '$known_hosts' ($!)";
                 my @data = <F>;
                 close F;
                 splice(@data, $line - 1, 1);
-                open(F, '>' . `echo $known_hosts 2>&1`) or die "ERROR: could not open for writing '$known_hosts' ($!)";
+                open(F, '>' . `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo $known_hosts 2>&1`) or die "ERROR: could not open for writing '$known_hosts' ($!)";
                 print F @data;
                 close F;
                 ctrl('RESTART');
@@ -1798,7 +1841,7 @@ elsif (!$MANUAL) {
                 $EXP->clear_accum();
                 exp_continue();
             } else {
-                my $avoid_first_expectation = 1;
+                my $avoid_first_expectation = 0;
 
                 # Do we have to do complex expects?
                 if (!$EXPECT || !$CONNECTED) {
@@ -1821,7 +1864,7 @@ elsif (!$MANUAL) {
                         next;
                     }
 
-                    my $jump = 0;
+                    my $skip_command = 0;
 
                     if ($time_out >= 0) {
                         $TIMEOUT_CMD = $time_out;
@@ -1845,7 +1888,7 @@ elsif (!$MANUAL) {
                             } else {
                                 ctrl("EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                                 $i = --$on_fail;
-                                $jump = 1;
+                                $skip_command = 1;
                             }
                         }],
 
@@ -1875,7 +1918,7 @@ elsif (!$MANUAL) {
 
                         [($avoid_first_expectation) ? '' : $pattern, sub {
                             if ($on_match == -1) {
-                                $jump = 0;
+                                $skip_command = 0;
                             } elsif ($on_match == -2) {
                                 $end = 1;
                                 $CONNECTED = 1;
@@ -1890,7 +1933,7 @@ elsif (!$MANUAL) {
                     if ($end) {
                         last;
                     }
-                    if ($jump) {
+                    if ($skip_command) {
                         next;
                     }
                     $avoid_first_expectation = 0;
@@ -2037,7 +2080,7 @@ $SIG{'HUP'} = sub {
         if (!$active) {
             next;
         }
-        my $jump = 0;
+        my $skip_command = 0;
 
         if ($time_out >= 0) {
             $TIMEOUT_CMD = $time_out;
@@ -2062,7 +2105,7 @@ $SIG{'HUP'} = sub {
                 } else {
                     ctrl("CHAIN:EXPECT:ON_FAIL:timeout expecting '$pattern'. Jumping to '$on_fail'");
                     $i = --$on_fail;
-                    $jump = 1;
+                    $skip_command = 1;
                 }
             }],
 
@@ -2093,7 +2136,7 @@ $SIG{'HUP'} = sub {
 
             [($avoid_first_expectation) ? '' : $pattern, sub {
                 if ($on_match == -1) {
-                    $jump = 0;
+                    $skip_command = 0;
                 } elsif ($on_match == -2) {
                     $end = 1;
                     $CONNECTED = 1;
@@ -2108,7 +2151,7 @@ $SIG{'HUP'} = sub {
         if ($end) {
             last;
         }
-        if ($jump) {
+        if ($skip_command) {
             next;
         }
         $avoid_first_expectation = 0;

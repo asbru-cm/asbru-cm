@@ -34,7 +34,8 @@ BEGIN {
         print "Usage: $0 [options]\n";
         print "Options:\n";
         print "\t--help : show this message\n";
-        print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config/\n";
+        print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config for Ásbrú configuration files/\n";
+        print "\t--temp-dir=path : path to store temporary socket files (default is system temporary directory)\n";
         print "\t--no-backup : do no create alternative config files as a backup (faster shutdown)\n";
         print "\t--start-shell : start a local terminal\n";
         print "\t--password=<pwd> : automatically logon with given password without prompting user\n";
@@ -68,6 +69,8 @@ BEGIN {
                 # Relative path to ~./config
                 $ENV{"ASBRU_CFG"} = "$ENV{'HOME'}/.config/$path";
             }
+        } elsif ($arg =~ /^-{1,2}temp-dir=\s*(.+)$/i) {
+            $ENV{"ASBRU_TMP"} = $1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
             print STDERR "INFO: bad start up parameter $arg\n";
         }
@@ -81,6 +84,12 @@ BEGIN {
     # Workaround to unexpected SSH disconnections due to wrong handling of the WINCH event in some Gnome versions
     # See https://www.perlmonks.org/?node_id=11109454
     delete $ENV{'GTK_OVERLAY_SCROLLING'};
+
+    # Ensure ASBRU_ENV_FOR_EXTERNAL is defined
+    # (it should be defined when running inside AppImage, otherwise must remain empty)
+    if (!defined($ENV{'ASBRU_ENV_FOR_EXTERNAL'})) {
+        $ENV{'ASBRU_ENV_FOR_EXTERNAL'} = "";
+    }
 }
 
 ###################################################################
@@ -92,6 +101,7 @@ use File::Copy;
 use YAML qw (LoadFile);
 use PACMain;
 use PACUtils qw (_appName);
+use File::Temp qw (tempdir);
 
 # Standard
 use strict;
@@ -135,13 +145,13 @@ print STDERR "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n
 $ENV{'LANG'} = $ASBRU_LANG;
 
 # Check for Unity's systray-whitelist presence of 'asbru'
-my $wl = `gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
+my $wl = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} gsettings get com.canonical.Unity.Panel systray-whitelist 2>/dev/null`;
 chomp $wl;
 
 if (($? eq 0) && (!grep(/'asbru'/, $wl))) {
     print "INFO: Adding 'asbru' to Unity's 'systray-whitelist'\n";
     $wl =~ s/'\s*]/', 'asbru']/;
-    `gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
+    `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} gsettings set com.canonical.Unity.Panel systray-whitelist "$wl"`;
 }
 
 # Set up configuration directories
@@ -164,8 +174,8 @@ if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /
     if ($VERBOSE) {
         print "INFO: Migration of alternate directory\n";
     }
-    system "rm -Rf \"$CFG_DIR_OLD\"";
-    system "mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -Rf \"$CFG_DIR_OLD\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$CFG_DIR\" \"$CFG_DIR.migration\"";
     config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
@@ -175,7 +185,7 @@ if (!-d $CFG_DIR) {
 }
 
 # Create all subdirectories
-foreach my $subdir ('autostart','screenshots','session_logs','scripts','sockets','tmp','bak') {
+foreach my $subdir ('autostart','screenshots','session_logs','scripts','tmp','bak') {
     if (!-d "$CFG_DIR/$subdir") {
         mkdir("$CFG_DIR/$subdir");
     }
@@ -186,6 +196,17 @@ for (my $n = 1; $n < 5; $n++) {
     if ((!-e "$CFG_DIR/scripts/sample$n.pl") && (-e "$RealBin/res/sample$n.pl")) {
         copy("$RealBin/res/sample$n.pl", "$CFG_DIR/scripts/");
     }
+}
+
+# Default directory for temporary socket files
+if (!defined($ENV{"ASBRU_TMP"})) {
+    $ENV{"ASBRU_TMP"} = File::Temp::tempdir('asbru-cm-XXXX', TMPDIR => 1, CLEANUP => 1);
+}
+if (!-d $ENV{"ASBRU_TMP"}) {
+    mkdir($ENV{"ASBRU_TMP"});
+}
+if ($VERBOSE) {
+    print "INFO: Path for temporary socket files: " . $ENV{"ASBRU_TMP"} . "\n";
 }
 
 # Detect desktop
@@ -213,7 +234,7 @@ sub config_migration {
     my $status;
 
     if (-e "$PATH/utils/pac2asbru.pl") {
-        if ($status = system("$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
+        if ($status = system("'$^X' $PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
             print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }
@@ -226,11 +247,9 @@ sub config_migration {
 sub getDesktopEnvironment {
     my $c;
     # An attempt to find desktop environment
-    foreach my $d ('gnome-shell','cinnamon','lxde','xfce') {
-        $c = `pgrep -c '$d'`;
-        chop $c;
-        #print STDERR "TEST: pgrep -c '$d' = $c\n";
-        if ($c) {
+    foreach my $d ('gnome-shell','cinnamon','lxde','xfce','unity') {
+        $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ps -eo 'comm=' | grep '$d' | wc -l`;
+        if ($c + 0) {
             $ENV{'ASBRU_DESKTOP'} = $d;
             last;
         }
@@ -242,7 +261,7 @@ sub getDesktopEnvironment {
         if (defined $ENV{'XDG_SESSION_DESKTOP'}) {
             $ENV{'ASBRU_DESKTOP'} .= ":$ENV{'XDG_SESSION_DESKTOP'}";
         }
-        foreach my $extension ('unite@hardpixel.eu','top-icons@gnome-shell-extensions.gcampax.github.com') {
+        foreach my $extension ('unite@hardpixel.eu', 'top-icons@gnome-shell-extensions.gcampax.github.com', 'appindicatorsupport@rgcjonas.gmail.com') {
             if (-e "$ENV{'HOME'}/.local/share/gnome-shell/extensions/$extension" || -e "/usr/share/gnome-shell/extensions/$extension") {
                 $ENV{'ASBRU_DESKTOP'} .= '-withtray';
                 last;
@@ -284,12 +303,12 @@ sub CheckConfigurationFile {
             };
             if (!$@ && $cfg) {
                 print "INFO: Found valid file $CFG_FILE_NAME.$n, recovering...\n";
-                system "mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
-                system "cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$CFG_FILE\" \"$BACKUP_CFG_FILE.$now.bad\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$BACKUP_CFG_FILE.$n\" \"$CFG_FILE\"";
                 $OK = 1;
                 last;
             } else {
-                system "mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f \"$BACKUP_CFG_FILE.$n\" \"$BACKUP_CFG_FILE.$n.$now.bad\"";
             }
         }
         if (!$OK) {
@@ -306,12 +325,12 @@ sub CheckConfigurationFile {
         for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
             my $p = $n-1; # previous
             if (-e "$BACKUP_CFG_FILE.$p") {
-                system "cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$BACKUP_CFG_FILE.$p\" \"$BACKUP_CFG_FILE.$n\"";
             }
         }
     }
     # Save current known configuration
-    system "cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
 }
 
 sub _wPopUP {
@@ -323,7 +342,7 @@ sub _wPopUP {
     $msg =~ s/\n/&cr;/g;
     $msg =~ s/\"/&dquot;/g;
     $msg =~ s/\'/&squot;/g;
-    return `$PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
+    return `'$^X' $PATH/utils/asbru_confirm.pl '$type' '$title' '$msg' `;
 }
 
 END {

@@ -87,6 +87,7 @@ sub new
 
     $self->{container} = shift;
     $self->{cfg} = undef;
+    $self->{cfg_array} = undef;
     $self->{gui} = undef;
     $self->{frame} = {};
     $self->{list} = [];
@@ -103,8 +104,12 @@ sub update
 {
     my $self = shift;
     my $cfg = shift;
+    my $cfg_array = shift;
 
     defined $cfg and $$self{cfg} = $cfg;
+    defined $cfg_array and $$self{cfg_array} = $cfg_array;
+
+    $$self{gui}{chRandomSocksTunnel}->set_active($$cfg_array{randomSocksTunnel});
 
     my $options = _parseCfgToOptions($$self{cfg});
 
@@ -117,10 +122,10 @@ sub update
     $$self{gui}{chForwardAgent}->set_active($$options{forwardAgent});
 
     # Destroy previuos widgets
-    $$self{gui}{vbForward}->foreach(sub {$_[0]->destroy;});
-    $$self{gui}{vbRemote}->foreach(sub {$_[0]->destroy;});
-    $$self{gui}{vbDynamic}->foreach(sub {$_[0]->destroy;});
-    $$self{gui}{vbAdvOpt}->foreach(sub {$_[0]->destroy;});
+    $$self{gui}{vbForward}->foreach(sub {$_[0]->destroy();});
+    $$self{gui}{vbRemote}->foreach(sub {$_[0]->destroy();});
+    $$self{gui}{vbDynamic}->foreach(sub {$_[0]->destroy();});
+    $$self{gui}{vbAdvOpt}->foreach(sub {$_[0]->destroy();});
 
     # Empty parent's forward ports widgets' list
     $$self{list} = [];
@@ -129,15 +134,15 @@ sub update
     $$self{listAdvOpt} = [];
 
     # Now, add the -new?- local forward widgets
-    if ($$self{gui}{rbOrderLI}->get_active) {
+    if ($$self{gui}{rbOrderLI}->get_active()) {
         foreach my $hash (sort {$$a{localIP} cmp $$b{localIP}} @{$$options{forwardPort}}) {
             $self->_buildForward($hash);
         }
-    } elsif ($$self{gui}{rbOrderLP}->get_active) {
+    } elsif ($$self{gui}{rbOrderLP}->get_active()) {
         foreach my $hash (sort {$$a{localPort} <=> $$b{localPort}} @{$$options{forwardPort}}) {
             $self->_buildForward($hash);
         }
-    } elsif ($$self{gui}{rbOrderRI}->get_active) {
+    } elsif ($$self{gui}{rbOrderRI}->get_active()) {
         foreach my $hash (sort {$$a{remoteIP} cmp $$b{remoteIP}} @{$$options{forwardPort}}) {
             $self->_buildForward($hash);
         }
@@ -145,15 +150,15 @@ sub update
     $$self{gui}{lblLocal}->set_markup('Local Port Forwarding (<b>' . (scalar(@{$$self{list}})) . '</b>)');
 
     # Now, add the -new?- remote forward widgets
-    if ($$self{gui}{rbOrderLI2}->get_active) {
+    if ($$self{gui}{rbOrderLI2}->get_active()) {
         foreach my $hash (sort {$$a{localIP} cmp $$b{localIP}} @{$$options{remotePort}}) {
             $self->_buildRemote($hash);
         }
-    } elsif ($$self{gui}{rbOrderLP2}->get_active) {
+    } elsif ($$self{gui}{rbOrderLP2}->get_active()) {
         foreach my $hash (sort {$$a{localPort} <=> $$b{localPort}} @{$$options{remotePort}}) {
             $self->_buildRemote($hash);
         }
-    } elsif ($$self{gui}{rbOrderRI2}->get_active) {
+    } elsif ($$self{gui}{rbOrderRI2}->get_active()) {
         foreach my $hash (sort {$$a{remoteIP} cmp $$b{remoteIP}} @{$$options{remotePort}}) {
             $self->_buildRemote($hash);
         }
@@ -161,11 +166,11 @@ sub update
     $$self{gui}{lblRemote}->set_markup('Remote Port Forwarding (<b>' . (scalar(@{$$self{listRemote}})) . '</b>)');
 
     # Now, add the -new?- dynamic socks widgets
-    if ($$self{gui}{rbOrderLI3}->get_active) {
+    if ($$self{gui}{rbOrderLI3}->get_active()) {
         foreach my $hash (sort {$$a{dynamicIP} cmp $$b{dynamicIP}} @{$$options{dynamicForward}}) {
             $self->_buildDynamic($hash);
         }
-    } elsif ($$self{gui}{rbOrderLP3}->get_active) {
+    } elsif ($$self{gui}{rbOrderLP3}->get_active()) {
         foreach my $hash (sort {$$a{dynamicPort} <=> $$b{dynamicPort}} @{$$options{dynamicForward}}) {
             $self->_buildDynamic($hash);
         }
@@ -181,19 +186,30 @@ sub update
     return 1;
 }
 
+sub get_cfg_array
+{
+    my $self = shift;
+
+    my %options_array;
+
+    $options_array{randomSocksTunnel} = $$self{gui}{chRandomSocksTunnel}->get_active();
+
+    return \%options_array;
+}
+
 sub get_cfg
 {
     my $self = shift;
 
     my %options;
 
-    $options{sshVersion} = $$self{gui}{cbSSHVersion}->get_active_text;
-    $options{ipVersion} = $$self{gui}{cbSSHProtocol}->get_active_text;
-    $options{noRemoteCmd} = $$self{gui}{chNoRemoteCmd}->get_active;
-    $options{forwardX} = $$self{gui}{chForwardX}->get_active;
-    $options{useCompression} = $$self{gui}{chUseCompression}->get_active;
-    $options{allowRemoteConnection} = $$self{gui}{chAllowPortConnect}->get_active;
-    $options{forwardAgent} = $$self{gui}{chForwardAgent}->get_active;
+    $options{sshVersion} = $$self{gui}{cbSSHVersion}->get_active_text();
+    $options{ipVersion} = $$self{gui}{cbSSHProtocol}->get_active_text();
+    $options{noRemoteCmd} = $$self{gui}{chNoRemoteCmd}->get_active();
+    $options{forwardX} = $$self{gui}{chForwardX}->get_active();
+    $options{useCompression} = $$self{gui}{chUseCompression}->get_active();
+    $options{allowRemoteConnection} = $$self{gui}{chAllowPortConnect}->get_active();
+    $options{forwardAgent} = $$self{gui}{chForwardAgent}->get_active();
     $options{forwardPort} = ();
     $options{localPort} = ();
     $options{dynamicForward} = ();
@@ -281,8 +297,8 @@ sub _parseCfgToOptions
     $options{_optionL} =
     $options{_optionR} = sub {
         my ($optionName,$forwardSpec) = @_;
-        #                                                              [-L [bind_address:]port:host:hostport]
-        my (undef,$bind_address,$port,$host,$hostport) = $forwardSpec=~m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
+        #                                                                [-L [bind_address:]port:host:hostport]
+        my (undef,$bind_address,$port,$host,$hostport) = $forwardSpec =~ m/((.+)(?:\/|:))*(\d+):([^:]*):(\d+)/;
 
         push @{$options{($optionName eq "_optionL" ? "forwardPort" : "remotePort")}},
             {
@@ -295,7 +311,7 @@ sub _parseCfgToOptions
     $options{_optionD} = sub {
         my (undef,$forwardSpec) = @_;
         #                                                [-D [bind_address:]port]
-        my (undef,$bind_address,$port) = $forwardSpec=~m/((.+)(?:\/|:))*(\d+)/;
+        my (undef,$bind_address,$port) = $forwardSpec =~ m/((.+)(?:\/|:))*(\d+)/;
         push @{$options{dynamicForward}},
             {
                 'dynamicIP'   => $bind_address // '',
@@ -375,7 +391,6 @@ sub _buildGUI
     my $self = shift;
 
     my $container = $self->{container};
-    my $cfg = $self->{cfg};
 
     my %w;
 
@@ -406,7 +421,7 @@ sub _buildGUI
     $hb123->pack_start($lblsshv, 1, 1, 0);
     $hb123->set_tooltip_text('-(1|2|any) : Use SSH v1, v2 or any  of them');
 
-    $w{cbSSHVersion} = Gtk3::ComboBoxText->new;
+    $w{cbSSHVersion} = Gtk3::ComboBoxText->new();
     $hb123->pack_start($w{cbSSHVersion}, 0, 1, 0);
     foreach my $ssh_version (sort {$a cmp $b} keys %SSH_VERSION) {
         $w{cbSSHVersion}->append_text($ssh_version);
@@ -420,7 +435,7 @@ sub _buildGUI
     $hb456->pack_start($lblipv, 1, 1, 0);
     $hb456->set_tooltip_text('-(4|6) : Uses IPv4, IPv6 or no specification (ip based)');
 
-    $w{cbSSHProtocol} = Gtk3::ComboBoxText->new;
+    $w{cbSSHProtocol} = Gtk3::ComboBoxText->new();
     $hb456->pack_start($w{cbSSHProtocol}, 0, 1, 0);
     foreach my $ip_protocol (sort {$a cmp $b} keys %IP_PROTOCOL) {
         $w{cbSSHProtocol}->append_text($ip_protocol);
@@ -463,10 +478,14 @@ sub _buildGUI
     $hbox2->pack_start($w{chNoRemoteCmd}, 1, 1, 0);
     $w{chNoRemoteCmd}->set_tooltip_text('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)');
 
+    $w{chRandomSocksTunnel} = Gtk3::CheckButton->new_with_label('Create random SOCKS tunnel');
+    $hbox2->pack_start($w{chRandomSocksTunnel}, 1, 1, 0);
+    $w{chRandomSocksTunnel}->set_tooltip_text('Creates a SOCKS tunnel on a random port at connection startup.  Variable SOCKS5_PORT will contain the random port.  You can use it to start local commands and launch any other programs.');
+
     $w{hbox4} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hbox4}, 1, 1, 0);
 
-    $w{nb} = Gtk3::Notebook->new;
+    $w{nb} = Gtk3::Notebook->new();
     $w{hbox4}->pack_start($w{nb}, 1, 1, 0);
 
     $w{vbox2} = Gtk3::VBox->new(0, 0);
@@ -501,12 +520,12 @@ sub _buildGUI
     $w{vbox2}->pack_start($w{btnadd}, 0, 1, 0);
 
     # Build a scrolled window
-    $w{sw} = Gtk3::ScrolledWindow->new;
+    $w{sw} = Gtk3::ScrolledWindow->new();
     $w{vbox2}->pack_start($w{sw}, 1, 1, 0);
     $w{sw}->set_policy('automatic', 'automatic');
     $w{sw}->set_shadow_type('none');
 
-    $w{vp} = Gtk3::Viewport->new;
+    $w{vp} = Gtk3::Viewport->new();
     $w{sw}->add($w{vp});
     $w{vp}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -546,12 +565,12 @@ sub _buildGUI
     $w{vbox3}->pack_start($w{btnaddRemote}, 0, 1, 0);
 
     # Build a scrolled window
-    $w{swRemote} = Gtk3::ScrolledWindow->new;
+    $w{swRemote} = Gtk3::ScrolledWindow->new();
     $w{vbox3}->pack_start($w{swRemote}, 1, 1, 0);
     $w{swRemote}->set_policy('automatic', 'automatic');
     $w{swRemote}->set_shadow_type('none');
 
-    $w{vpRemote} = Gtk3::Viewport->new;
+    $w{vpRemote} = Gtk3::Viewport->new();
     $w{swRemote}->add($w{vpRemote});
     $w{vpRemote}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -587,12 +606,12 @@ sub _buildGUI
     $w{vbox33}->pack_start($w{btnaddDynamic}, 0, 1, 0);
 
     # Build a scrolled window
-    $w{swDynamic} = Gtk3::ScrolledWindow->new;
+    $w{swDynamic} = Gtk3::ScrolledWindow->new();
     $w{vbox33}->pack_start($w{swDynamic}, 1, 1, 0);
     $w{swDynamic}->set_policy('automatic', 'automatic');
     $w{swDynamic}->set_shadow_type('none');
 
-    $w{vpDynamic} = Gtk3::Viewport->new;
+    $w{vpDynamic} = Gtk3::Viewport->new();
     $w{swDynamic}->add($w{vpDynamic});
     $w{vpDynamic}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -611,12 +630,12 @@ sub _buildGUI
     $w{vboxAdvOpt}->pack_start($w{btnaddAdvOpt}, 0, 1, 0);
 
     # Build a scrolled window
-    $w{swAdvOpt} = Gtk3::ScrolledWindow->new;
+    $w{swAdvOpt} = Gtk3::ScrolledWindow->new();
     $w{vboxAdvOpt}->pack_start($w{swAdvOpt}, 1, 1, 0);
     $w{swAdvOpt}->set_policy('automatic', 'automatic');
     $w{swAdvOpt}->set_shadow_type('none');
 
-    $w{vpAdvOpt} = Gtk3::Viewport->new;
+    $w{vpAdvOpt} = Gtk3::Viewport->new();
     $w{swAdvOpt}->add($w{vpAdvOpt});
     $w{vpAdvOpt}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -646,7 +665,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{forwardPort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -662,7 +682,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{remotePort}}, {'localIP' => '', 'localPort' => $local_port, 'remoteIP' => 'localhost', 'remotePort' => 1});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -677,7 +698,8 @@ sub _buildGUI
         }
         push(@{$$opt_hash{dynamicForward}}, {'dynamicIP' => 'localhost', 'dynamicPort' => $local_port});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -686,7 +708,8 @@ sub _buildGUI
         my $opt_hash = _parseCfgToOptions($$self{cfg});
         push(@{$$opt_hash{advancedOption}}, {'option' => 'SSH option (right-click here to show list)', 'value' => 'value'});
         $$self{cfg} = _parseOptionsToCfg($opt_hash);
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -715,7 +738,7 @@ sub _buildForward
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryPFLocalIP} = Gtk3::Entry->new;
+    $w{entryPFLocalIP} = Gtk3::Entry->new();
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
@@ -733,7 +756,7 @@ sub _buildForward
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryPFRemoteIP} = Gtk3::Entry->new;
+    $w{entryPFRemoteIP} = Gtk3::Entry->new();
     $w{frPFRemoteIP}->add($w{entryPFRemoteIP});
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
@@ -753,7 +776,7 @@ sub _buildForward
 
     # Add built control to main container
     $$self{gui}{vbForward}->pack_start($w{hbox}, 0, 1, 0);
-    $$self{gui}{vbForward}->show_all;
+    $$self{gui}{vbForward}->show_all();
 
     $$self{list}[$w{position}] = \%w;
 
@@ -764,7 +787,8 @@ sub _buildForward
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{list}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -833,7 +857,7 @@ sub _buildRemote
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryPFLocalIP} = Gtk3::Entry->new;
+    $w{entryPFLocalIP} = Gtk3::Entry->new();
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
@@ -851,7 +875,7 @@ sub _buildRemote
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryPFRemoteIP} = Gtk3::Entry->new;
+    $w{entryPFRemoteIP} = Gtk3::Entry->new();
     $w{frPFRemoteIP}->add($w{entryPFRemoteIP});
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
@@ -871,7 +895,7 @@ sub _buildRemote
 
     # Add built control to main container
     $$self{gui}{vbRemote}->pack_start($w{hbox}, 0, 1, 0);
-    $$self{gui}{vbRemote}->show_all;
+    $$self{gui}{vbRemote}->show_all();
 
     $$self{listRemote}[$w{position}] = \%w;
 
@@ -883,7 +907,8 @@ sub _buildRemote
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listRemote}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -952,7 +977,7 @@ sub _buildDynamic
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryPFLocalIP} = Gtk3::Entry->new;
+    $w{entryPFLocalIP} = Gtk3::Entry->new();
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
@@ -973,7 +998,7 @@ sub _buildDynamic
 
     # Add built control to main container
     $$self{gui}{vbDynamic}->pack_start($w{hbox}, 0, 1, 0);
-    $$self{gui}{vbDynamic}->show_all;
+    $$self{gui}{vbDynamic}->show_all();
 
     $$self{listDynamic}[$w{position}] = \%w;
 
@@ -985,7 +1010,8 @@ sub _buildDynamic
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listDynamic}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 
@@ -1035,7 +1061,7 @@ sub _buildAdvOpt
     $w{hbox}->pack_start($w{frAdvOptOption}, 1, 1, 0);
     $w{frAdvOptOption}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryAdvOptOption} = Gtk3::Entry->new;
+    $w{entryAdvOptOption} = Gtk3::Entry->new();
     $w{frAdvOptOption}->add($w{entryAdvOptOption});
     $w{entryAdvOptOption}->set_size_request(30, 20);
     $w{entryAdvOptOption}->set_text($option);
@@ -1044,7 +1070,7 @@ sub _buildAdvOpt
     $w{hbox}->pack_start($w{frAdvOptValue}, 1, 1, 0);
     $w{frAdvOptValue}->set_shadow_type('GTK_SHADOW_NONE');
 
-    $w{entryAdvOptValue} = Gtk3::Entry->new;
+    $w{entryAdvOptValue} = Gtk3::Entry->new();
     $w{frAdvOptValue}->add($w{entryAdvOptValue});
     $w{entryAdvOptValue}->set_size_request(30, 20);
     $w{entryAdvOptValue}->set_text($value);
@@ -1055,7 +1081,7 @@ sub _buildAdvOpt
 
     # Add built control to main container
     $$self{gui}{vbAdvOpt}->pack_start($w{hbox}, 0, 1, 0);
-    $$self{gui}{vbAdvOpt}->show_all;
+    $$self{gui}{vbAdvOpt}->show_all();
     $$self{listAdvOpt}[$w{position}] = \%w;
 
     # Setup some callbacks
@@ -1064,7 +1090,8 @@ sub _buildAdvOpt
         $$self{cfg} = $self->get_cfg();
         splice(@{$$self{listAdvOpt}}, $w{position}, 1);
         $$self{cfg} = $self->get_cfg();
-        $self->update($$self{cfg});
+        $$self{cfg_array} = $self->get_cfg_array();
+        $self->update($$self{cfg}, $$self{cfg_array});
         return 1;
     });
 

@@ -48,26 +48,14 @@ use Crypt::CBC;
 use SortedTreeStore;
 use Vte;
 
+use Config;
+
 # GTK
 use Gtk3 -init;
 
 # PAC modules
 use PACUtils;
-our $UNITY = 1;
-our $STRAY = 1;
-$@ = '';
-eval {
-    require 'PACTrayUnity.pm';
-};
-if ($@) {
-    $UNITY = 0;
-    eval {
-        require 'PACTray.pm';
-    };
-    if ($@) {
-        $STRAY = 0;
-    }
-}
+use PACTray;
 use PACTerminal;
 use PACEdit;
 use PACConfig;
@@ -92,6 +80,7 @@ my $RES_DIR = "$RealBin/res";
 # Register icons on Gtk
 #&_registerPACIcons;
 
+my $VENDOR_CFG_FILE = "$RealBin/vendor/asbru-conf-default-overrides.yml";
 my $INIT_CFG_FILE = "$RealBin/res/asbru.yml";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
@@ -116,13 +105,17 @@ my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
 my $NEW_CHANGES = '';
 our $_NO_SPLASH = 0;
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => '12345678') or die "ERROR: $!";
+our $UNITY = 0; # Are we in a Unity environment?
+our $STRAY = 1; # Are we using a system tray icon?
 
 our %RUNNING;
 our %FUNCS;
+our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
-
+my $LAST_COPIED_NODES;
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -182,6 +175,11 @@ sub new {
 
     if (grep({ /^--verbose$/ } @{ $$self{_OPTS} })) {
         $$self{_VERBOSE} = 1;
+    }
+
+    # Show some info about dependencies
+    if ($$self{_VERBOSE}) {
+        print STDERR "INFO: Crypt::CBC version is ${Crypt::CBC::VERSION}\n";
     }
 
     # Read the config/connections file...
@@ -252,7 +250,10 @@ sub new {
         if (!defined $pass) {
             exit 0;
         }
-        if ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
+        if (!$CIPHER->salt()) {
+            $CIPHER->salt(pack('Q',$SALT));
+        }
+        if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
         }
@@ -310,6 +311,19 @@ sub new {
     # Setup known connection methods
     %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
 
+    # Dynamically load the Tray icon class related to the current environment/settings
+    if ($ENV{'ASBRU_DESKTOP'} !~ /withtray/) {
+        print("INFO: Trying to loading Unity specific tray icon package...\n");
+        $@ = '';
+        $UNITY = 1;
+        eval {
+            require 'PACTrayUnity.pm';
+        };
+        if ($@) {
+            $UNITY = 0;
+        }
+    }
+
     bless($self, $class);
 
     return $self;
@@ -345,9 +359,8 @@ sub start {
     PACUtils::_splash(1, "Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     $self->_loadTreeConfiguration('__PAC__ROOT__');
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    # Enable tray menu
+    $FUNCS{_TRAY}->set_tray_menu();
 
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
 
@@ -1050,7 +1063,7 @@ sub _initGUI {
     $FUNCS{_PCC} = $$self{_PCC} = PACPCC->new(\%RUNNING);
 
     # Build Tray icon
-    $FUNCS{_TRAY} = $$self{_TRAY} = ! $UNITY ? PACTray->new($self) : PACTrayUnity->new($self);
+    $FUNCS{_TRAY} = $$self{_TRAY} = $UNITY ? PACTrayUnity->new($self) : PACTray->new($self);
 
     # Build PIPE object
     $FUNCS{_PIPE} = $$self{_PIPE} = PACPipe->new(\%RUNNING);
@@ -1093,11 +1106,11 @@ sub _initGUI {
     }
 
     # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}{_TRAY}->get_visible()) {
+    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
         # Update GUI
         Gtk3::main_iteration() while Gtk3::events_pending();
 
-        my @geo = $$self{_TRAY}{_TRAY}->get_geometry();
+        my @geo = $$self{_TRAY}->get_geometry();
         my $x = $geo[2]{x};
         my $y = $geo[2]{y};
 
@@ -1336,7 +1349,7 @@ sub _setupCallbacks {
 
             return 1;
         });
-        
+
     }
 
     # Capture mouse motion and show the connections list if the cursor is near the borders of the "info" panel
@@ -1407,7 +1420,7 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1448,9 +1461,7 @@ sub _setupCallbacks {
         }
 
         $self->_setCFGChanged(1);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_updateGUIWithUUID($node_uuid);
         return 1;
     });
@@ -1477,9 +1488,7 @@ sub _setupCallbacks {
         map $$self{_GUI}{treeConnections}->_delNode($_), @del;
         # Delete selected node from the configuration
         $self->_delNodes(@del);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1550,7 +1559,9 @@ sub _setupCallbacks {
         $self->_startCluster($sel[0]);
     });
 
-    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub { $self->_updateGUIClusters(); });
+    $$self{_GUI}{treeClusters}->get_selection()->signal_connect('changed' => sub {
+        $self->_updateGUIClusters();
+    });
     $$self{_GUI}{treeClusters}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
 
@@ -1605,6 +1616,7 @@ sub _setupCallbacks {
         } elsif ($action eq 'paste') {
             map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
         } elsif ($action eq 'edit_node') {
             if (!$is_root) {
                 $$self{_GUI}{connEditBtn}->clicked();
@@ -1848,7 +1860,7 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -2171,11 +2183,7 @@ sub _setupCallbacks {
                 $self->_quitProgram();
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
-                if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_active();
-                } else {
-                    $$self{_TRAY}{_TRAY}->set_visible(1);
-                }
+                $$self{_TRAY}->set_active();
                 # Trigger the "lock" procedure ?
                 if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                     $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -2289,36 +2297,8 @@ sub _setupCallbacks {
 
         $$self{_PREVTAB} = $nb->get_current_page();
 
-        my $tab_page = $nb->get_nth_page($pnum);
+        $self->_doFocusPage($pnum);
 
-        $$self{_HAS_FOCUS} = '';
-        foreach my $tmp_uuid (keys %RUNNING) {
-            my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
-
-            if ((!defined $check_gui) || ($check_gui ne $tab_page)) {
-                next;
-            }
-
-            my $uuid = $RUNNING{$tmp_uuid}{uuid};
-            my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
-            if ($path) {
-                $$self{_GUI}{treeConnections}->expand_to_path($path);
-                $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
-            }
-
-            $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
-
-            if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
-                eval {
-                    if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
-                        $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
-                    }
-                };
-                $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
-            }
-            $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
-            last;
-        }
         $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
@@ -2333,11 +2313,7 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('delete_event' => sub {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
-            if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_active();
-            } else {
-                $$self{_TRAY}{_TRAY}->set_visible(1);
-            }
+            $$self{_TRAY}->set_active();
             # Trigger the "lock" procedure ?
             if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                 $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -2402,7 +2378,7 @@ sub _setFavourite {
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($b ? 'on' : 'off'), 'button'));
     $$self{_GUI}{connFavourite}->set_active($b);
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
     }
     $self->_setCFGChanged(1);
 }
@@ -2440,8 +2416,11 @@ sub _lockAsbru {
 sub _unlockAsbru {
     my $self = shift;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q',$SALT));
+    }
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
-    if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'})) {
+    if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
         _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
         return 0;
@@ -3003,6 +2982,7 @@ sub _treeConnections_menu {
                 $self->_pasteNodes($sel[0], $child);
             }
             $$self{_COPY}{'data'} = {};
+            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
             return 1;
         }
     });
@@ -3239,7 +3219,9 @@ sub _launchTerminals {
             _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> does not exist in DDBB\nNot starting connection!", 1);
             next;
         } elsif ($$self{_CFG}{'environments'}{$uuid}{_is_group} || ($uuid eq '__PAC__ROOT__')) {
-            _wMessage($$self{_GUI}{main}, "ERROR: UUID <b>$uuid</b> is a GROUP\nNot starting anything!", 1);
+            if ($$self{_VERBOSE}) {
+                print STDERR "DEBUG: Ignoring group [{$uuid} while trying to launch a terminal.\n";
+            }
             next;
         }
         my $pset = $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} ? 'tab' : 'window';
@@ -3340,11 +3322,7 @@ sub _quitProgram {
     $$self{_GUI}{main}->signal_handler_disconnect($$self{_SIGNALS}{_WINDOWSTATEVENT}) if $$self{_SIGNALS}{_WINDOWSTATEVENT};
 
     # Hide every GUI component has already finished
-    if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_passive();
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
-    }
+    $$self{_TRAY}->set_passive();
     $$self{_SCRIPTS}{_WINDOWSCRIPTS}{main}->hide();    # Hide scripts window
     $$self{_CLUSTER}{_WINDOWCLUSTER}{main}->hide();    # Hide clusters window
     $$self{_PCC}{_WINDOWPCC}{main}->hide();    # Hide PCC window
@@ -3378,7 +3356,7 @@ sub _quitProgram {
         $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
         $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
     };
-    chdir(${CFG_DIR}) and system("rm -rf sockets/* tmp/*");  # Delete temporal files
+    chdir(${CFG_DIR}) and system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
     Gtk3->main_quit();
@@ -3510,7 +3488,7 @@ sub _readConfiguration {
     if ($continue && (! -f "${CFG_FILE}.prev3") && (-f $CFG_FILE)) {
         print STDERR "INFO: Migrating config file to v3...\n";
         PACUtils::_splash(1, "$APPNAME (v$APPVERSION):Migrating config...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
-        $$self{_CFG} = _cfgCheckMigrationV3;
+        $$self{_CFG} = _cfgCheckMigrationV3();
         copy($CFG_FILE, "${CFG_FILE}.prev3") or die "ERROR: Could not copy pre v.3 cfg file '$CFG_FILE' to '$CFG_FILE.prev3': $!";
         nstore($$self{_CFG}, $CFG_FILE_NFREEZE) or die"ERROR: Could not save config file '$CFG_FILE_NFREEZE': $!";
         if ($R_CFG_FILE) {
@@ -3519,6 +3497,21 @@ sub _readConfiguration {
         $continue = 0;
     }
     # END of removing
+
+    # Default partial vendor config, but since it is partial, do not set $continue to 0.
+    if ($continue && -f "${VENDOR_CFG_FILE}") {
+        my $temp_cfg;
+        if (! ($temp_cfg = YAML::LoadFile($VENDOR_CFG_FILE))) {
+            print STDERR "WARNING: Could not load vendor config file '$VENDOR_CFG_FILE': $!\n";
+        } else {
+            print STDERR "INFO: Using vendor config file '$VENDOR_CFG_FILE'\n";
+            $$self{_CFG} //= {};
+            foreach my $config (keys %{ $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'} }) {
+                $$self{_CFG}{$config} = $temp_cfg->{'__PAC__EXPORTED__PARTIAL_CONF'}{$config};
+            }
+            print STDERR "INFO: Used vendor config file '$VENDOR_CFG_FILE'\n";
+        }
+    }
 
     if ($R_CFG_FILE && $continue) {
          print STDERR "WARN: No configuration file in (remote) '$CFG_DIR', creating a new one...\n";
@@ -3823,11 +3816,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
-    if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_active() : $$self{_TRAY}{_TRAY}->set_passive();
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
-    }
+    !$$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
 
     $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
 
@@ -4024,7 +4013,7 @@ sub _showConnectionsList {
         $$self{_GUI}{main}->show_all();
         $$self{_CMDLINETRAY} = 2;
     }
-    
+
 
     # Do show the main window
     $$self{_GUI}{main}->present();
@@ -4056,11 +4045,29 @@ sub _doToggleDisplayConnectionsList {
     my $self = shift;
 
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
-        $$self{_GUI}{showConnBtn}->get_active() ? $PACMain::FUNCS{_MAIN}->_showConnectionsList() : $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
-    } else {
-        $$self{_GUI}{showConnBtn}->get_active() ? $$self{_GUI}{vboxCommandPanel}->show() : $$self{_GUI}{vboxCommandPanel}->hide();
         if ($$self{_GUI}{showConnBtn}->get_active()) {
-            $$self{_GUI}{treeConnections}->grab_focus();
+            $PACMain::FUNCS{_MAIN}->_showConnectionsList();
+        } else {
+            $PACMain::FUNCS{_MAIN}->_hideConnectionsList();
+        }
+    } else {
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            $$self{_GUI}{vboxCommandPanel}->show();
+        } else {
+            $$self{_GUI}{vboxCommandPanel}->hide();
+        }
+        if ($$self{_GUI}{showConnBtn}->get_active()) {
+            # Remeber that no VTE has te focus anymore
+            $$self{_HAS_FOCUS} = '';
+            # Get the currently displayed tray and move keyboard focus to it
+            my $tree = $self->_getCurrentTree();
+            if ($tree) {
+                $tree->grab_focus();
+            }
+        } else {
+            # Look for the current tab page and move keyboard focus to it
+            my $pnum = $$self{_GUI}{nb}->get_current_page();
+            $self->_doFocusPage($pnum);
         }
     }
 }
@@ -4071,6 +4078,7 @@ sub _copyNodes {
     my $parent = shift // '__PAC__COPY__';
     my $sel_uuids = shift // [ $$self{_GUI}{treeConnections}->_getSelectedUUIDs() ];
 
+    $LAST_COPIED_NODES = [@{ $sel_uuids }];
     # Empty the copy-vault
     $$self{_COPY}{'data'} = {};
     $$self{_COPY}{'cut'} = $cut;
@@ -4187,8 +4195,8 @@ sub _pasteNodes {
         delete $$self{_COPY}{'data'}{$uuid};
     }
 
-    if ($first and $UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+    if ($first) {
+        $FUNCS{_TRAY}->set_tray_menu();
     }
 
     $self->_setCFGChanged(1);
@@ -4217,6 +4225,8 @@ sub __dupNodes {
         $$cfg{$new_txt_uuid}{'name'} = "$$self{_CFG}{'environments'}{$uuid}{'name'} - copy";
     }
     $$cfg{$parent}{'children'}{$new_txt_uuid} = 1;
+    $$cfg{$new_txt_uuid}{'cluster'} = [];
+    $$cfg{$new_txt_uuid}{'_protected'} = 0;
 
     # Delete screenshots and statistics on duplicated node
     $$cfg{$new_txt_uuid}{'screenshots'} = ();
@@ -4389,10 +4399,16 @@ sub __importNodes {
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
-        system("(sleep 3; $0) &");
-        sleep 2;
-        exit 0;
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b>!", 0);
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        print STDERR "[DEBUG] Restarting using executable '$^X' with arg '$0'";
+        exec($^X, $0) or print STDERR "[ERROR] Couldn't exec {$^X} $0: $!";
+        exit 1;
 
     # Bad export file
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
@@ -4417,9 +4433,7 @@ sub __importNodes {
         $self->_setCFGChanged(1);
     }
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    $FUNCS{_TRAY}->set_tray_menu();
 
     return 1;
 }
@@ -4932,6 +4946,44 @@ sub _getCurrentTree {
     return $tree;
 }
 
+# Forces focus to the terminal inside the focused page
+sub _doFocusPage {
+    my $self = shift;
+    my $pnum = shift;
+    my $tab_page = $$self{_GUI}{nb}->get_nth_page($pnum);
+
+    $$self{_HAS_FOCUS} = '';
+    foreach my $tmp_uuid (keys %RUNNING) {
+        my $check_gui = $RUNNING{$tmp_uuid}{terminal}{_SPLIT} ? $RUNNING{$tmp_uuid}{terminal}{_SPLIT_VPANE} : $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VBOX};
+
+        if (!defined($check_gui) || ($check_gui ne $tab_page)) {
+            next;
+        }
+
+        my $uuid = $RUNNING{$tmp_uuid}{uuid};
+        my $path = $$self{_GUI}{treeConnections}->_getPath($uuid);
+        if ($path) {
+            $$self{_GUI}{treeConnections}->expand_to_path($path);
+            $$self{_GUI}{treeConnections}->set_cursor($path, undef, 0);
+        }
+
+        $RUNNING{$tmp_uuid}{terminal}->_setTabColour();
+
+        if (!$RUNNING{$tmp_uuid}{terminal}{EMBED}) {
+            eval {
+                if (defined $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()) {
+                    $RUNNING{$tmp_uuid}{terminal}{FOCUS}->get_window()->focus(time);
+                }
+            };
+            $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE}->grab_focus();
+        }
+        $$self{_HAS_FOCUS} = $RUNNING{$tmp_uuid}{terminal}{_GUI}{_VTE};
+
+        # When found, do not process further
+        last;
+    }
+}
+
 # END: Define PRIVATE CLASS functions
 ###################################################################
 
@@ -5226,3 +5278,7 @@ Pending
 =head2 sub _getCurrentTree
 
 Returns the currently selected tree (from the left menu)
+
+=head2 sub _doFocusPage
+
+Forces focus to the terminal inside the focused page

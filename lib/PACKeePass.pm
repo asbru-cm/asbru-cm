@@ -299,9 +299,9 @@ sub get_cfg {
 
     my %hash;
     $hash{use_keepass} = $$self{frame}{'cbUseKeePass'}->get_active();
-    $hash{database} = $$self{frame}{'fcbKeePassFile'}->get_filename();
-    $hash{pathcli} = $$self{frame}{'fcbCliFile'}->get_filename();
-    $hash{keyfile} = $$self{frame}{'fcbKeePassKeyFile'}->get_filename();
+    $hash{database} = decode('utf8',$$self{frame}{'fcbKeePassFile'}->get_filename());
+    $hash{pathcli} = decode('utf8',$$self{frame}{'fcbCliFile'}->get_filename());
+    $hash{keyfile} = decode('utf8',$$self{frame}{'fcbKeePassKeyFile'}->get_filename());
     if ((!defined $hash{database})||(-d $hash{database})||(!-e $hash{database})) {
         $hash{database} = '';
         $$self{disable_keepassxc} = 1;
@@ -714,11 +714,11 @@ sub _buildKeePassGUI {
     $w{fcbCliFile}->signal_connect('selection-changed' => sub {
         my ($fc) = @_;
         if (defined $fc->get_filename()) {
-            $$self{cfg}{pathcli} = $fc->get_filename();
-            $CLI = $fc->get_filename();
+            $$self{cfg}{pathcli} = decode('utf8',$fc->get_filename());
+            $CLI = decode('utf8',$fc->get_filename());
             $self->_setCapabilities();
             $self->_updateUsage();
-            if ($CLI ne $fc->get_filename()) {
+            if ($CLI ne decode('utf8',$fc->get_filename())) {
                 # Remove selected file name, setCapabilities failed with this file
                 $fc->set_uri("file://$ENV{'HOME'}");
                 $fc->unselect_uri("file://$ENV{'HOME'}");
@@ -785,7 +785,7 @@ sub _setCapabilities {
         return 0;
     }
     if ($$self{_VERBOSE}) {
-        print "DEBUG:KEYPASS: testCapabilities\n";
+        print "DEBUG:KEEPASS: testCapabilities\n";
     }
     if ((defined $$self{cfg})&&($$self{cfg}{pathcli})&&(-e $$self{cfg}{pathcli})) {
         $CLI = $$self{cfg}{pathcli};
@@ -796,7 +796,7 @@ sub _setCapabilities {
     if ($$self{_VERBOSE}) {
         print "DEBUG:KEEPASS: $CLI $$self{kpxc_cli}\n";
     }
-    $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
+    $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
@@ -814,7 +814,7 @@ sub _setCapabilities {
             # Test if we have a system wide installation
             $$self{kpxc_cli} = '';
             $CLI = 'keepassxc-cli';
-            $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
+            $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI -v 2>/dev/null`;
             $$self{kpxc_version} =~ s/\n//g;
             if (!$$self{kpxc_version}) {
                 # We do not have keepassxc-cli available, the user defined is not working
@@ -824,7 +824,7 @@ sub _setCapabilities {
             }
         }
     }
-    $c = `$CLI $$self{kpxc_cli} -h show 2>&1`;
+    $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -h show 2>&1`;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
     }

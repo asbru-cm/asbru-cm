@@ -60,10 +60,10 @@ sub CONNECTION
 	my $out = $COMMON{del_esc}( $TERMINAL{out1} );
 	
 	# Use local system 'echo' to write output to a file (this system call is *blocking*)
-	system( "echo \"$out\" > $TERMINAL{name}.uptime" );
+	system( "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"$out\" > $TERMINAL{name}.uptime" );
 	
 	# Finally, start a program in OUR PC with captured output (in background '&', so it is non-blocking)
-	system( "gedit --new-document $TERMINAL{name}.uptime &" );
+	system( "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} gedit --new-document $TERMINAL{name}.uptime &" );
 	
 	return 1;
 }

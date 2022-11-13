@@ -1,6 +1,8 @@
 This article has been written by [Hans Peyrot](https://github.com/hanspr)
 
-# Why do you need a cluster ?
+# Clusters Management
+
+## Why do you need a cluster ?
 
 This is more an admin tool than programmers, you can use it to type common commands to servers that are identical or at least very similar, this allows you to:
 
@@ -13,7 +15,7 @@ As an example, I program remote Raspeberri Pi that are connected to electronic s
 
 And there are some other more complicated uses when add to the terminals tunnels, expect, etc. All those tunnels will open simultaneously too.
 
-# Create a cluster
+## Create a cluster
 
 In ```Clusters```, click on the ```Add``` button a provide the name of your new cluster:
 
@@ -42,7 +44,7 @@ So anything you write on one will be simultaneously typed in the others.
 
 ![imagen](https://user-images.githubusercontent.com/1572396/67621699-fa3f6a00-f7d7-11e9-8bca-1cdde9285516.png)
 
-# Power Cluster Management
+## Power Cluster Management
 
 The Power Cluster Management (aka PCC), is used on 2 conditions:
 

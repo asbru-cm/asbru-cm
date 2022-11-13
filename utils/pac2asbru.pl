@@ -28,6 +28,8 @@ binmode STDERR, ":utf8";
 use FindBin qw ($RealBin $Bin $Script);
 use lib "$RealBin/lib", "$RealBin/lib/ex", "$RealBin/lib/edit";
 
+use Config;
+
 our $VERBOSE        = $ARGV[2];
 our $CFG_DIR        = $ENV{"ASBRU_CFG"};
 our $BACKUP_DIR     = "bak";
@@ -67,7 +69,7 @@ sub migrate {
                 if ($VERBOSE) {
                     print "  - Recover none standard directory $old_dir -> $new_dir\n";
                 }
-                system "mv -f $old_dir $new_dir";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $old_dir $new_dir";
             }
             exit 1;
         }
@@ -84,25 +86,25 @@ sub migrate {
         my $m = $n+1;
         if (-e "$old_dir.old$n") {
             if (-e "$old_dir.old$m") {
-                system "rm -Rf $old_dir.old$m";
+                system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -Rf $old_dir.old$m";
             }
-            system "mv -f $old_dir.old$n $old_dir.old$m";
+            system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $old_dir.old$n $old_dir.old$m";
         }
     }
     if (-e "$old_dir.old") {
-        system "mv -f $old_dir.old $old_dir.old0";
+        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $old_dir.old $old_dir.old0";
     }
-    system "cp -rfpL $old_dir $old_dir.old";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -rfpL $old_dir $old_dir.old";
     if ($VERBOSE) {
         print "  - Create $new_dir\n";
     }
-    system "mv $old_dir $new_dir";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv $old_dir $new_dir";
     foreach my $f ('pac.yml', 'pac_notray.notified', 'pac.pcc', 'pac.yml.gui', 'pac.yml.tree', 'pac_start.desktop', 'pac.dumper') {
         my $n = $f;
         $n =~ s/pac/asbru/;
         if (-e "$new_dir/$f") {
             if ($VERBOSE) {print "  - move $f -> $n\n";}
-            system "mv -f $new_dir/$f $new_dir/$n";
+            system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $new_dir/$f $new_dir/$n";
         }
     }
     foreach my $f ('pac_start.desktop') {
@@ -112,7 +114,7 @@ sub migrate {
             if ($VERBOSE) {
                 print "  - mv $f -> $n\n";
             }
-            system "mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
+            system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $new_dir/autostart/$f $new_dir/autostart/$n";
         }
     }
     # Rename Backups
@@ -122,7 +124,7 @@ sub migrate {
     }
     for (my $n=0; $n < 10; $n++) {
         if (-e "$BACKUP_CFG_FILE.$n") {
-            system "mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
+            system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $BACKUP_CFG_FILE.$n $CFG_DIR/$BACKUP_DIR/$CFG_FILE_NAME.$n";
         }
     }
     # Rename screenshost
@@ -134,7 +136,7 @@ sub migrate {
         if ($f =~ /\.png/) {
             my $n = $f;
             $n =~ s/pac/asbru/;
-            system "mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
+            system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $new_dir/screenshots/$f $new_dir/screenshots/$n";
         }
     }
     # Process pac.yml
@@ -153,10 +155,10 @@ sub migrate {
     }
     close YMLO;
     close YMLN;
-    system "mv -f $new_dir/asbru.yml.new $new_dir/asbru.yml";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $new_dir/asbru.yml.new $new_dir/asbru.yml";
     # Remove nfreeze
     if ($VERBOSE) {print "  - Remove nfreeze files to be recreated\n";}
-    system "rm -f $new_dir/*.nfreeze";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -f $new_dir/*.nfreeze";
     return 0;
 
     # Set warning message, do not worrie about tabs, spaces at the beggining
@@ -190,5 +192,5 @@ sub _wPopUP {
     $msg =~ s/\n/&cr;/g;
     $msg =~ s/\"/&dquot;/g;
     $msg =~ s/\'/&squot;/g;
-    return `$PATH/asbru_confirm.pl '$type' '$title' '$msg' `;
+    return `'$^X' $PATH/asbru_confirm.pl '$type' '$title' '$msg' `;
 }

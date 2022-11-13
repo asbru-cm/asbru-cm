@@ -42,6 +42,8 @@ use Storable qw (dclone nstore nstore_fd fd_retrieve);
 use Encode;
 use Glib::IO; # GSettings
 
+use Config;
+
 # GTK
 use Gtk3 '-init';
 use Gtk3::SimpleList;
@@ -276,9 +278,9 @@ sub __checkRBAuth {
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
 
-    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active());
+    _($self, 'alignUserPass')->set_sensitive(_($self, 'rbCfgAuthUserPass')->get_active() || _($self, 'rbCfgAuthManual')->get_active());
     _($self, 'alignPublicKey')->set_sensitive(_($self, 'rbCfgAuthPublicKey')->get_active());
-    _($self, 'alignManual')->set_sensitive(_($self, 'rbCfgAuthManual')->get_active());
+    _($self, 'hboxAuthPassword')->set_sensitive(!_($self, 'rbCfgAuthManual')->get_active());
 
     return 1;
 }
@@ -311,9 +313,9 @@ sub _setupCallbacks {
     });
 
     # Capture "User/Pass" connection radiobutton state change
-    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth;});
-    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth;});
+    _($self, 'rbCfgAuthUserPass')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthPublicKey')->signal_connect(toggled => sub {$self->__checkRBAuth();});
+    _($self, 'rbCfgAuthManual')->signal_connect(toggled => sub {$self->__checkRBAuth();});
 
     # Capture 'show password' checkbox toggled state
     _($self, 'cbConnShowPass')->signal_connect('toggled' => sub {
@@ -349,7 +351,7 @@ sub _setupCallbacks {
             $folder = "$CFG_DIR/session_logs";
             _($self, 'btnEditSaveSessionLogs')->get_current_folder($folder);
         }
-        system("/usr/bin/xdg-open $folder");
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open $folder");
     });
 
     # Capture 'Get Command line' button clicked
@@ -363,7 +365,7 @@ sub _setupCallbacks {
                 $kpxc->getMasterPassword($$self{_WINDOWEDIT});
             }
         }
-        my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
+        my $cmd = `'$^X' "$RealBin/lib/asbru_conn" "$CFG_DIR/asbru.nfreeze" "$$self{_UUID}" 0 1`;
         _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1, 'w-info');
     });
 
@@ -376,6 +378,12 @@ sub _setupCallbacks {
     _($self, 'cbEditPrependCommand')->signal_connect(toggled => sub {
         _($self, 'entryEditPrependCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
         _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
+    });
+
+    # Capture "Postpend command" checkbox
+    _($self, 'cbEditPostpendCommand')->signal_connect(toggled => sub {
+        _($self, 'entryEditPostpendCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
+        _($self, 'cbCfgQuotePostCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     });
 
     # Capture 'check keepassx' button clicked
@@ -509,7 +517,7 @@ sub _setupCallbacks {
     });
 
     # Capture right mouse click to show custom context menu
-    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
+    foreach my $w ('IP', 'Port', 'User', 'Password', 'EditPrependCommand', 'EditPostpendCommand', 'TabWindowTitle', 'UserPassphrase', 'Passphrase','CfgProxyConnUser','CfgProxyConnPassword','CfgJumpConnUser','CfgJumpConnPass','CfgProxyConnIP','CfgJumpConnIP') {_($self, "entry$w")->signal_connect('button_press_event' => sub {
             my ($widget, $event) = @_;
 
             return 0 unless $event->button eq 3;
@@ -686,6 +694,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'} // '');
     # Jump Server
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
+    _($self, 'entryCfgJumpConnPort')->set_range(0, 65536);
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     _($self, 'entryCfgJumpConnPass')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
@@ -703,8 +712,13 @@ sub _updateGUIPreferences {
     _($self, 'cbEditPrependCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use prepend command'} // 0);
     _($self, 'entryEditPrependCommand')->set_text($$self{_CFG}{'environments'}{$uuid}{'prepend command'} // '');
     _($self, 'entryEditPrependCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
+    _($self, 'cbEditPostpendCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'use postpend command'} // 0);
+    _($self, 'entryEditPostpendCommand')->set_text($$self{_CFG}{'environments'}{$uuid}{'postpend command'} // '');
+    _($self, 'entryEditPostpendCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     _($self, 'cbCfgQuoteCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'quote command'} // 0);
     _($self, 'cbCfgQuoteCommand')->set_sensitive(_($self, 'cbEditPrependCommand')->get_active());
+    _($self, 'cbCfgQuotePostCommand')->set_active($$self{_CFG}{'environments'}{$uuid}{'quotepost command'} // 0);
+    _($self, 'cbCfgQuotePostCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     _($self, 'vboxEditSaveSessionLogs')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'save session logs'});
     _($self, 'entryEditLogFileName')->set_text($$self{_CFG}{'environments'}{$uuid}{'session log pattern'});
     _($self, 'btnEditSaveSessionLogs')->set_current_folder($$self{_CFG}{'environments'}{$uuid}{'session logs folder'});
@@ -728,6 +742,7 @@ sub _updateGUIPreferences {
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'cbEditSendStringIntro')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string intro'});
+    _($self, 'cbSendStringOnlyWhenIdle')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string only when idle'});
     _($self, 'entryEditSendString')->set_text($$self{_CFG}{'environments'}{$uuid}{'send string txt'} // '');
     _($self, 'entryEditSendStringSeconds')-> set_value($$self{_CFG}{'environments'}{$uuid}{'send string every'} // 0);
     _($self, 'cbCfgAutoreconnect')->set_active($$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} // 0);
@@ -779,7 +794,7 @@ sub _updateGUIPreferences {
     _($self, 'rbCfgAuthUserPass')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass');
     _($self, 'rbCfgAuthPublicKey')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'publickey');
     _($self, 'rbCfgAuthManual')->set_active($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'manual');
-    $self->__checkRBAuth;
+    $self->__checkRBAuth();
 
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
         _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
@@ -794,7 +809,7 @@ sub _updateGUIPreferences {
     # Show Jump options in network settings (only for SSH method)
     if ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /SSH|SFTP/i) {
         # Control SSH capabilities
-        my $ssh = `ssh 2>&1`;
+        my $ssh = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh 2>&1`;
         $ssh =~ s/\n//g;
         $ssh =~ s/[ \t][ \t]+/ /g;
         if ($ssh =~ /-J /) {
@@ -891,7 +906,10 @@ sub _saveConfiguration {
     }
     $$self{_CFG}{'environments'}{$uuid}{'use prepend command'} = _($self, 'cbEditPrependCommand')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'prepend command'} = _($self, 'entryEditPrependCommand')->get_chars(0, -1);
+    $$self{_CFG}{'environments'}{$uuid}{'use postpend command'} = _($self, 'cbEditPostpendCommand')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'postpend command'} = _($self, 'entryEditPostpendCommand')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'quote command'} = _($self, 'cbCfgQuoteCommand')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'quotepost command'} = _($self, 'cbCfgQuotePostCommand')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'use sudo'} = _($self, 'cbEditUseSudo')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'save session logs'} = _($self, 'cbEditSaveSessionLogs')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'session log pattern'} = _($self, 'entryEditLogFileName')->get_chars(0, -1);
@@ -907,6 +925,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'send string active'} = _($self, 'cbEditSendString')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = _($self, 'entryEditSendString')->get_chars(0,-1);
     $$self{_CFG}{'environments'}{$uuid}{'send string intro'} = _($self, 'cbEditSendStringIntro')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'send string only when idle'} = _($self, 'cbSendStringOnlyWhenIdle')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string every'} = _($self, 'entryEditSendStringSeconds')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} = _($self, 'cbCfgAutoreconnect')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'startup launch'} = _($self, 'cbCfgStartupLaunch')->get_active();
@@ -927,7 +946,6 @@ sub _saveConfiguration {
     } else {
         $$self{_CFG}{'environments'}{$uuid}{'passphrase user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'passphrase'} = '';
-        $$self{_CFG}{'environments'}{$uuid}{'user'} = '';
         $$self{_CFG}{'environments'}{$uuid}{'pass'} = '';
     }
 
@@ -954,6 +972,7 @@ sub _saveConfiguration {
     # Other options...
     ##################
     $$self{_CFG}{'environments'}{$uuid}{'options'} = $$self{_SPECIFIC}->get_cfg();
+    $$self{_CFG}{'environments'}{$uuid}{'connection options'} = $$self{_SPECIFIC}->get_cfg_array();
     $$self{_CFG}{'environments'}{$uuid}{'terminal options'} = $$self{_TERMOPTS}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'variables'} = $$self{_VARIABLES}->get_cfg();
     $$self{_CFG}{'environments'}{$uuid}{'local before'} = $$self{_PRE_EXEC}->get_cfg();

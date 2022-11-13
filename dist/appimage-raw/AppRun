@@ -1,0 +1,36 @@
+#!/bin/sh
+
+getCompressedEnv() {
+    echo "LD_LIBRARY_PATH='${LD_LIBRARY_PATH}' PERL5LIB='${PERL5LIB}' GI_TYPELIB_PATH='${GI_TYPELIB_PATH}' XDG_DATA_DIRS='${XDG_DATA_DIRS}' XDG_CONFIG_DIRS='${XDG_CONFIG_DIRS}' GTK_PATH='${GTK_PATH}' GTK_EXE_PREFIX='${GTK_EXE_PREFIX}' GTK_DATA_PREFIX='${GTK_DATA_PREFIX}' GTK_EXE_PREFIX='${GTK_EXE_PREFIX}' GDK_PIXBUF_MODULE_FILE='${GDK_PIXBUF_MODULE_FILE}' GTK_IM_MODULE='${GTK_IM_MODULE}' GTK_IM_MODULE_FILE='${GTK_IM_MODULE_FILE}' PANGO_LIBDIR='${PANGO_LIBDIR}'"
+}
+
+export ASBRU_ENV_FOR_EXTERNAL="$(getCompressedEnv)"
+
+export ASBRU_IS_APPIMAGE="1"
+
+export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${APPDIR}/usr/local/lib:${APPDIR}/usr/local/share:${APPDIR}/lib:${APPDIR}/usr/lib/perl5/core_perl/CORE/"
+
+export PERL5LIB="${APPDIR}/usr/local/lib/perl5/site_perl:${APPDIR}/usr/local/share/perl5/site_perl:${APPDIR}/usr/lib/perl5/vendor_perl:${APPDIR}/usr/share/perl5/vendor_perl:${APPDIR}/usr/lib/perl5/core_perl:${APPDIR}/usr/share/perl5/core_perl"
+
+export GI_TYPELIB_PATH="${APPDIR}/usr/lib/girepository-1.0"
+
+export XDG_DATA_DIRS="${APPDIR}/usr/local/share/:${APPDIR}/usr/share/"
+export XDG_CONFIG_DIRS="${APPDIR}/etc/xdg"
+
+export GTK_PATH="${APPDIR}/usr/lib/gtk-3.0"
+export GTK_EXE_PREFIX="${APPDIR}/usr"
+export GTK_DATA_PREFIX="${APPDIR}/usr"
+
+export GDK_PIXBUF_MODULEDIR="${APPDIR}/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders"
+export GDK_PIXBUF_MODULE_FILE="${APPDIR}/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+
+export GTK_IM_MODULE="${APPDIR}/usr/lib/gtk-3.0/3.0.0/immodules"
+export GTK_IM_MODULE_FILE="${APPDIR}/usr/lib/gtk-3.0/3.0.0/immodules.cache"
+
+export PANGO_LIBDIR="${APPDIR}/usr/lib"
+
+export ASBRU_ENV_FOR_INTERNAL="$(getCompressedEnv)"
+
+cd "${APPDIR}" || exit 1
+
+exec "${APPDIR}/usr/bin/perl" "${APPDIR}/opt/asbru-cm/asbru-cm" $@

@@ -48,17 +48,27 @@ use PACUtils;
 # Define GLOBAL CLASS variables
 
 my %CURSOR_SHAPE = (
-    'block' => 0,
-    'ibeam' => 1,
+    'block'     => 0,
+    'ibeam'     => 1,
     'underline' => 2
 );
 
 my %BACKSPACE_BINDING = (
-    'auto' => 0,
+    'auto'            => 0,
     'ascii-backspace' => 1,
-    'ascii-delete' => 2,
+    'ascii-delete'    => 2,
     'delete-sequence' => 3,
-    'tty' => 4
+    'tty'             => 4
+);
+
+my %TERMINAL_EMULATION = (
+    'xterm'  => 0,
+    'X11R6'  => 1,
+    'VT100'  => 2,
+    'VT200'  => 3,
+    'rxvt'   => 4,
+    'MGT'    => 5,
+    'screen' => 6
 );
 
 # END: Define GLOBAL CLASS variables
@@ -98,9 +108,9 @@ sub update {
     $$self{gui}{cbUsePersonal}->set_active(1); # Just to force 'toggled' signal to trigger that callback and update GUI
     $$self{gui}{cbUsePersonal}->set_active($$cfg{'use personal settings'} // 0);
 
-    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // '[#%\$>~→]|\:\/\s*$');
-    $$self{gui}{entryCfgUserPrompt}->set_text($$cfg{'username prompt'} // '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$');
-    $$self{gui}{entryCfgPasswordPrompt}->set_text($$cfg{'password prompt'} // '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$');
+    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // $PACUtils::DEFAULT_COMMAND_PROMPT);
+    $$self{gui}{entryCfgUserPrompt}->set_text($$cfg{'username prompt'} // $PACUtils::DEFAULT_USERNAME_PROMPT);
+    $$self{gui}{entryCfgPasswordPrompt}->set_text($$cfg{'password prompt'} // $PACUtils::DEFAULT_PASSWORD_PROMPT);
 
     $$self{gui}{cbTabBackColor}->set_active($$cfg{'use tab back color'} // 0);
     _updateWidgetColor($self, $cfg, $$self{gui}{colorTabBack}, 'tab back color', '#000000000000');
@@ -135,7 +145,8 @@ sub update {
     $$self{gui}{comboBackspace}->set_active($BACKSPACE_BINDING{$$cfg{'terminal backspace'} // 'auto'} // '0');
 
     $$self{gui}{comboEncoding}->set_active(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_MAP}{$$cfg{'terminal character encoding'} // 'UTF-8'}) // -1);
-    $$self{gui}{lblEncoding}->set_text(($PACMain::FUNCS{_CONFIG}{_ENCODINGS_HASH}{$$cfg{'terminal character encoding'} // 'RFC 3629'}) // '');
+
+    $$self{gui}{comboEmulation}->set_active($TERMINAL_EMULATION{$$cfg{'terminal emulation'} // 'xterm'} // '0');
 
     return 1;
 }
@@ -171,6 +182,7 @@ sub get_cfg {
     $options{'terminal window hsize'} = $$self{gui}{spCfgNewWindowWidth}->get_value;
     $options{'terminal window vsize'} = $$self{gui}{spCfgNewWindowHeight}->get_value;
     $options{'terminal character encoding'} = $$self{gui}{comboEncoding}->get_active_text;
+    $options{'terminal emulation'} = $$self{gui}{comboEmulation}->get_active_text;
     $options{'terminal backspace'} = $$self{gui}{comboBackspace}->get_active_text;
 
     return \%options;
@@ -380,8 +392,11 @@ sub _buildTermOptsGUI {
     $frameBackspace->add($w{comboBackspace});
     $frameBackspace->set_shadow_type('GTK_SHADOW_NONE');
 
+    $w{hboxchar} = Gtk3::HBox->new(0,0);
+    $w{vbox1}->pack_start($w{hboxchar},0,1,5);
+
     my $frameEncoding = Gtk3::Frame->new(' Character Encoding  ');
-    $w{vbox1}->pack_start($frameEncoding, 1, 1, 0);
+    $w{hboxchar}->pack_start($frameEncoding, 1, 1, 0);
 
     my $vboxEnc = Gtk3::VBox->new(0, 0);
     $frameEncoding->add($vboxEnc);
@@ -390,8 +405,22 @@ sub _buildTermOptsGUI {
     $w{comboEncoding} = Gtk3::ComboBoxText->new;
     $vboxEnc->pack_start($w{comboEncoding}, 0, 1, 0);
 
-    $w{lblEncoding} = Gtk3::Label->new('');
-    $vboxEnc->pack_start($w{lblEncoding}, 1, 1, 0);
+    my $frameEmulations = Gtk3::Frame->new(' Terminal Emulation ');
+    $w{hboxchar}->pack_start($frameEmulations, 1, 1, 0);
+
+    my $vboxEmulation = Gtk3::VBox->new(0, 0);
+    $frameEmulations->add($vboxEmulation);
+    $frameEmulations->set_shadow_type('GTK_SHADOW_NONE');
+
+    $w{comboEmulation} = Gtk3::ComboBoxText->new;
+    $vboxEmulation->pack_start($w{comboEmulation}, 0, 1, 0);
+    $w{comboEmulation}->append_text('xterm');
+    $w{comboEmulation}->append_text('X11R6');
+    $w{comboEmulation}->append_text('VT100');
+    $w{comboEmulation}->append_text('VT220');
+    $w{comboEmulation}->append_text('rxvt');
+    $w{comboEmulation}->append_text('MGT');
+    $w{comboEmulation}->append_text('screen');
 
     my $sep = Gtk3::HSeparator->new;
     $w{vbox1}->pack_start($sep, 0, 1, 5);
@@ -404,21 +433,31 @@ sub _buildTermOptsGUI {
     $$self{gui} = \%w;
 
     # Populate the Encodings combobox
-    foreach my $enc (sort {uc($a) cmp uc($b)} keys %{$PACMain::FUNCS{_CONFIG}{_ENCODINGS_ARRAY}}) {$w{comboEncoding}->append_text($enc);}
+    foreach my $enc (sort {uc($a) cmp uc($b)} keys %{$PACMain::FUNCS{_CONFIG}{_ENCODINGS_ARRAY}}) {
+        $w{comboEncoding}->append_text($enc);
+    }
 
     # Populate the Backspace binding combobox
-    foreach my $key ('auto', 'ascii-backspace', 'ascii-delete', 'delete-sequence', 'tty') {$w{comboBackspace}->append_text($key);}
+    foreach my $key ('auto', 'ascii-backspace', 'ascii-delete', 'delete-sequence', 'tty') {
+        $w{comboBackspace}->append_text($key);
+    }
 
     # Setup some callbacks
-    $w{cbUsePersonal}->signal_connect('toggled' => sub {$w{vbox1}->set_sensitive($w{cbUsePersonal}->get_active);});
-    $w{cbTabBackColor}->signal_connect('toggled' => sub {$w{colorTabBack}->set_sensitive($w{cbTabBackColor}->get_active);});
-    $w{cbBoldAsText}->signal_connect('toggled' => sub {$w{colorBold}->set_sensitive(! $w{cbBoldAsText}->get_active);});
-    $w{comboEncoding}->signal_connect('changed' => sub {$w{lblEncoding}->set_text($PACMain::FUNCS{_CONFIG}{_ENCODINGS_HASH}{$w{comboEncoding}->get_active_text} // '');});
-    $w{cbCfgNewInWindow}->signal_connect('toggled' => sub {$w{hboxWidthHeight}->set_sensitive($w{cbCfgNewInWindow}->get_active); return 1;});
+    $w{cbUsePersonal}->signal_connect('toggled' => sub {
+        $w{vbox1}->set_sensitive($w{cbUsePersonal}->get_active);
+    });
+    $w{cbTabBackColor}->signal_connect('toggled' => sub {
+        $w{colorTabBack}->set_sensitive($w{cbTabBackColor}->get_active);
+    });
+    $w{cbBoldAsText}->signal_connect('toggled' => sub {
+        $w{colorBold}->set_sensitive(! $w{cbBoldAsText}->get_active);
+    });
+    $w{cbCfgNewInWindow}->signal_connect('toggled' => sub {
+        $w{hboxWidthHeight}->set_sensitive($w{cbCfgNewInWindow}->get_active); return 1;
+    });
     $w{btnResetDefaults}->signal_connect('clicked' => sub {
         my %default_cfg;
         defined $default_cfg{'defaults'}{1} or 1;
-
         PACUtils::_cfgSanityCheck(\%default_cfg);
         $self->update(\%default_cfg);
     });
