@@ -884,6 +884,9 @@ sub _openSshTunnel {
     my ($uuid) = @_;
     my $TMP_DIR = $ENV{"ASBRU_TMP"};
 
+    # Get a local port that is not alreay in use
+    $LPORT = _getLocalPort($PORT);
+
     if ($GETCMD) {
         $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         return 0;
@@ -897,8 +900,7 @@ sub _openSshTunnel {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
-    # Check if port we want to bind is not alreay in use
-    $LPORT = _getLocalPort($PORT);
+    # Start SSH tunnel
     system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
