@@ -8,7 +8,7 @@ License:    GPLv3+
 URL:        https://asbru-cm.net
 Source0:    https://github.com/asbru-cm/asbru-cm/archive/%{version}.tar.gz
 BuildArch:  noarch
-Autoreq:    no 
+Autoreq:    no
 Requires:   perl
 Requires:   perl(Carp)
 Requires:   perl(Compress::Raw::Zlib)
@@ -150,6 +150,8 @@ fi
 
 
 %changelog
+* Sun Nov 13 2022 Ásbrú Project Team <contact@asbru-cm.net> 6.4.0
+- 6.4.0 Release
 * Sat May 21 2022 Ásbrú Project Team <contact@asbru-cm.net> 6.3.3
 - 6.3.3 Release
 * Sat Feb 27 2021 Ásbrú Project Team <contact@asbru-cm.net> 6.3.2
