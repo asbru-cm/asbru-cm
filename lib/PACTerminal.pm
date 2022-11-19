@@ -454,7 +454,7 @@ sub start {
         $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, \@arr_spawn_env, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
     };
     if (!$spawnSyncResult || $@) {
-        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster $subCwd'!! at: $@";
+        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster'!! at: $@";
         $$self{CONNECTING} = 0;
         return 0;
     }
@@ -1362,15 +1362,22 @@ sub _setupCallbacks {
         $$self{CONNECTING} = 0;
 
         # Show a "reconnect" message
-        my $string = "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        my $string = "DISCONNECTED";
+        my $can_reconnect = true;
         if (!defined($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'})) {
             # Likely the session has been deleted from 'environments', there is no way to restart this session
             $string = "THIS CONNECTION IS NOT AVAILABLE ANYMORE";
+            $can_reconnect = false;
         } elsif ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic') {
-            $string = "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)";
+            $string = "EXECUTION FINISHED";
         }
+        $string  = "\r\n${COL_RED}${string} (" . (localtime(time)) . ")${COL_RESET}\r\n";
+        if ($can_reconnect) {
+            $string .= " - press ${COL_YELL}ENTER${COL_RESET} to reconnect\r\n";
+        }
+        $string .= " - press ${COL_YELL}" . $PACMain::FUNCS{_KEYBINDS}->GetStringAccelerator('terminal', 'close') . "${COL_RESET} to close the terminal\r\n\n";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, $string);
         }
 
         # Switch to the message window
