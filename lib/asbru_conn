@@ -1678,6 +1678,7 @@ elsif ($METHOD eq 'PACShell') {
 }
 elsif (!$MANUAL) {
     my $end = 0;
+    my $return = $METHOD eq 'telnet' ? "\r" : "\n";  # which return caracter to use
 
     # Expect password/confirmation prompt...
     my ($matched_pattern_position, $error, $successfully_matching_string, $before_match, $after_match) = $EXP->expect($TIMEOUT_CONNECT,
@@ -1781,7 +1782,7 @@ elsif (!$MANUAL) {
             $USER_COUNT++;
             $USER = subst($USER);
             ctrl("LOGIN:$USER");
-            send_slow($EXP, "$USER\n");
+            send_slow($EXP, "${USER}${return}");
             exp_continue();
         }],
 
@@ -1806,7 +1807,7 @@ elsif (!$MANUAL) {
                 if ($password) {
                     $EXP->log_stdout(0);
                     $password = subst($password);
-                    send_slow($EXP, "$password\n", 'hide');
+                    send_slow($EXP, "${password}${return}", 'hide');
                     $EXP->log_stdout(1);
                     ctrl("PASSWORD:Sent (not shown)");
                     if (!$proxy_jump) {
