@@ -234,7 +234,7 @@ sub config_migration {
     my $status;
 
     if (-e "$PATH/utils/pac2asbru.pl") {
-        if ($status = system("'$^X' $PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
+        if ($status = system($^X, "$PATH/utils/pac2asbru.pl", $old_dir, $new_dir, $VERBOSE)) {
             print "INFO: Migration aborted or errors occured, execute with --verbose to see more information ($status)\n";
             exit 0;
         }
