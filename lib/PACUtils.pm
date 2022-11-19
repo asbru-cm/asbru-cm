@@ -121,7 +121,7 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.4.1';
+our $APPVERSION = '6.5.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
 my $ARCH_TMP = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/uname -m 2>&1`;
