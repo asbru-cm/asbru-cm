@@ -260,7 +260,6 @@ sub new {
     }
 
     # Check if only one instance is allowed
-
     if ($$self{_APP}->get_is_remote()) {
         print "INFO: Ásbrú is already running.\n";
 
@@ -313,7 +312,7 @@ sub new {
 
     # Dynamically load the Tray icon class related to the current environment/settings
     if ($ENV{'ASBRU_DESKTOP'} !~ /withtray/) {
-        print("INFO: Trying to loading Unity specific tray icon package...\n");
+        print("INFO: Trying to load Unity specific tray icon package...\n");
         $@ = '';
         $UNITY = 1;
         eval {
@@ -4881,10 +4880,11 @@ sub _ApplyLayout {
 # Test various options supported by the VTE library
 # to centralize all tests concerning VTE into a single function
 sub _setVteCapabilities {
+    local $SIG{__WARN__} = sub {};
+
     my $self = shift;
     my $vte = Vte::Terminal->new();
 
-    local $SIG{__WARN__} = sub {};
     $$self{_Vte}{major_version} = Vte::get_major_version();
     $$self{_Vte}{minor_version} = Vte::get_minor_version();
 
