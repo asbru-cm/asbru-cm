@@ -62,7 +62,7 @@ my $SCRIPTS_DIR = "$CFG_DIR/scripts";
 my @CMD;
 my $CFG_FILE;
 my $CFG;
-my $IS_CLUSTER;
+my $IS_CLUSTER = 0;
 my $UUID;
 my $GETCMD = 0;
 my $CONNECTED = 0;
@@ -127,8 +127,10 @@ $SIG{'QUIT'} = \&__disconnect;
 # Retrieve command line options
 $CFG_FILE = shift;
 $UUID = shift or die "$COLOR{'err'}ERROR: You must provide a profile to connect to!!$COLOR{'norm'}";
-$IS_CLUSTER = shift // 0;
-$GETCMD = shift // 0;
+if ($UUID ne '__PAC_SHELL__') {
+    $IS_CLUSTER = shift // 0;
+    $GETCMD = shift // 0;
+}
 
 # Load the 'freezed' configuration
 $CFG = retrieve($CFG_FILE) or die "ERROR: Could not load config file '$CFG_FILE': $!";
