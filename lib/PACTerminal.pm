@@ -1363,11 +1363,11 @@ sub _setupCallbacks {
 
         # Show a "reconnect" message
         my $string = "DISCONNECTED";
-        my $can_reconnect = true;
+        my $can_reconnect = 1;
         if (!defined($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'})) {
             # Likely the session has been deleted from 'environments', there is no way to restart this session
             $string = "THIS CONNECTION IS NOT AVAILABLE ANYMORE";
-            $can_reconnect = false;
+            $can_reconnect = 0;
         } elsif ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic') {
             $string = "EXECUTION FINISHED";
         }
@@ -1375,7 +1375,7 @@ sub _setupCallbacks {
         if ($can_reconnect) {
             $string .= " - press ${COL_YELL}ENTER${COL_RESET} to reconnect\r\n";
         }
-        $string .= " - press ${COL_YELL}" . $PACMain::FUNCS{_KEYBINDS}->GetStringAccelerator('terminal', 'close') . "${COL_RESET} to close the terminal\r\n\n";
+        $string .= " - press ${COL_YELL}" . $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'close', 2) . "${COL_RESET} to close the terminal\r\n\n";
         if (defined $$self{_GUI}{_VTE}) {
             _vteFeed($$self{_GUI}{_VTE}, $string);
         }

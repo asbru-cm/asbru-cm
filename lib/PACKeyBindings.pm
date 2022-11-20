@@ -193,7 +193,10 @@ sub ListKeyBindings {
 }
 
 sub GetAccelerator {
-    my ($self, $window, $action) = @_;
+    my $self = shift;
+    my $window = shift;
+    my $action = shift;
+    my $style = shift // 1;
     my $cfg = $self->{cfg};
     my $kbs = $$cfg{$window};
     my $acc = '';
@@ -207,19 +210,23 @@ sub GetAccelerator {
             if ($kb =~ /^undef-/) {
                 next;
             }
-            if ($kb =~ /Ctrl/) {
-                $acc .= '<control>';
+            if ($style == 1) {
+                if ($kb =~ /Ctrl/) {
+                    $acc .= '<control>';
+                }
+                if ($kb =~ /Alt/) {
+                    $acc .= '<alt>';
+                }
+                if ($kb =~ /Shift/) {
+                    $acc .= '<shift>';
+                }
+                if ($key =~ /[A-Z]/) {
+                    $acc .= '<shift>';
+                }
+                $acc .= $key;
+            } else {
+                $acc = $self->stringifyKeybind($kb);
             }
-            if ($kb =~ /Alt/) {
-                $acc .= '<alt>';
-            }
-            if ($kb =~ /Shift/) {
-                $acc .= '<shift>';
-            }
-            if ($key =~ /[A-Z]/) {
-                $acc .= '<shift>';
-            }
-            $acc .= $key;
             last;
         }
     }
