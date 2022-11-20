@@ -162,7 +162,7 @@ sub new {
     }
 
     $_NO_SPLASH = grep({ /^(--no-splash)|(--list-uuids)|(--dump-uuid)/go } @{ $$self{_OPTS} });
-    $_NO_SPLASH ||= $$self{_APP}->get_is_remote;
+    $_NO_SPLASH ||= $$self{_APP}->get_is_remote();
 
     # Show splash-screen while loading
     PACUtils::_splash(1, "Starting $PACUtils::APPNAME (v$PACUtils::APPVERSION)", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
@@ -279,10 +279,7 @@ sub new {
         }
 
         if (! $getout) {
-            if ($$self{_CFG}{'defaults'}{'allow more instances'}) {
-                print "INFO: Starting '$0' in READ ONLY mode!\n";
-                $ENV{"ASBRU_IS_READONLY"} = 1;
-            } elsif (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
+            if (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: No more instances allowed!\n";
                 _sendAppMessage($$self{_APP}, 'show-conn');
                 Gtk3::Gdk::notify_startup_complete();

@@ -75,7 +75,7 @@ BEGIN {
         } elsif ($arg =~ /^-{1,2}readonly$/i) {
             $ENV{"ASBRU_IS_READONLY"} = 1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
-            print STDERR "INFO: bad start up parameter $arg\n";
+            print "INFO: bad start up parameter $arg\n";
         }
     }
     if (!$ENV{"ASBRU_CFG"}) {
@@ -105,6 +105,7 @@ use YAML qw (LoadFile);
 use PACMain;
 use PACUtils qw (_appName);
 use File::Temp qw (tempdir);
+use Fcntl qw(:flock);
 
 # Standard
 use strict;
@@ -132,7 +133,6 @@ our $VERBOSE        = 0;
 ###################################################################
 
 # START: MAIN program
-# Load PACMain now, so it can read the global $CFG_DIR
 print "INFO: $APP_NAME ($Script) started with PID $$\n";
 $ENV{'VERBOSE'} = 0;
 
@@ -144,7 +144,7 @@ foreach my $arg (@ARGV) {
 }
 
 # Detect language
-print STDERR "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n";
+print "INFO: Language detected : $ENV{'LANG'}, forcing to ${ASBRU_LANG}\n";
 $ENV{'LANG'} = $ASBRU_LANG;
 
 # Check for Unity's systray-whitelist presence of 'asbru'
@@ -189,10 +189,23 @@ if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
 }
 
-# Check that the configuration directory is writable (if not in readonly mode)
+# Check that the configuration directory is writable (if not, start in readonly mode)
 if (!-w $CFG_DIR && !$ENV{"ASBRU_IS_READONLY"}) {
-    print "WARNING: Config direcory '${CFG_DIR}' is not writable, forcing readonly mode.\n";
+    print "WARN: Config direcory '${CFG_DIR}' is not writable, forcing readonly mode.\n";
     $ENV{"ASBRU_IS_READONLY"} = 1;
+}
+
+# Lock the configuration directory (so that no other instance can run on the same config dir)
+my $lock_file_name = "$CFG_DIR/lock";
+if (!$ENV{"ASBRU_IS_READONLY"}) {
+    # Lock configuration directory
+    open (ASBRU_LOCK_FH, '>>', $lock_file_name) or die "ERROR: Unable to open lock file '$lock_file_name'.";
+    if (!flock(ASBRU_LOCK_FH, LOCK_EX|LOCK_NB)) {
+        print STDERR "WARN: This instance cannot exclusively lock the configuration file, start in readonly mode.\n";
+        $ENV{"ASBRU_IS_READONLY"} = 1;
+    } elsif ($VERBOSE) {
+        print "INFO: Locking configuration file with '$lock_file_name'.\n";
+    }
 }
 
 # Create all subdirectories
@@ -281,7 +294,7 @@ sub getDesktopEnvironment {
             }
         }
     }
-    print STDERR "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
+    print "INFO: Desktop environment detected : $ENV{'ASBRU_DESKTOP'}\n";
 }
 
 sub CheckConfigurationFile {
@@ -361,7 +374,17 @@ sub _wPopUP {
 }
 
 END {
-    $ENV{"ASBRU_CFG"} = '';
+    # Unset all environment variables
+    delete $ENV{"ASBRU_CFG"};
+    delete $ENV{"ASBRU_TMP"};
+    delete $ENV{"ASBRU_IS_READONLY"};
+    delete $ENV{'ASBRU_ENV_FOR_EXTERNAL'};
+
+    # Release lock file
+    close(ASBRU_LOCK_FH);
+    if (-f $lock_file_name) {
+        unlink($lock_file_name);
+    }
 }
 
 # END: MAIN program
