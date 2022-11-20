@@ -311,7 +311,7 @@ sub new {
     %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
 
     # Dynamically load the Tray icon class related to the current environment/settings
-    if ($ENV{'ASBRU_DESKTOP'} !~ /withtray/) {
+    if ($ENV{'ASBRU_DESKTOP'} eq 'unity') {
         print("INFO: Trying to load Unity specific tray icon package...\n");
         $@ = '';
         $UNITY = 1;
