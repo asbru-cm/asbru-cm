@@ -128,8 +128,6 @@ sub new {
 
     my $self = {};
 
-    print STDERR "INFO: Config directory is '$CFG_DIR'\n";
-
     $SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
         print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
         _quitProgram($self, 'force');
@@ -148,7 +146,6 @@ sub new {
     $self->{_UPDATING} = 0;
     $self->{_CMDLINETRAY} = 0;
     $self->{_SHOWFINDTREE} = 0;
-    $self->{_READONLY} = 0;
     $self->{_HAS_FOCUS} = '';
     $self->{_VERBOSE} = 0;
     $self->{_Vte} = undef;
@@ -284,7 +281,7 @@ sub new {
         if (! $getout) {
             if ($$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: Starting '$0' in READ ONLY mode!\n";
-                $$self{_READONLY} = 1;
+                $ENV{"ASBRU_IS_READONLY"} = 1;
             } elsif (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: No more instances allowed!\n";
                 _sendAppMessage($$self{_APP}, 'show-conn');
@@ -295,11 +292,6 @@ sub new {
             Gtk3::Gdk::notify_startup_complete();
             return 0;
         }
-    }
-
-    if (grep(/^--readonly$/, @{ $$self{_OPTS} })) {
-        print "INFO: Starting '$0' in READ ONLY mode!\n";
-        $$self{_READONLY} = 1;
     }
 
     # Gtk style
@@ -368,8 +360,13 @@ sub start {
 
     # If version is lower than current, update and save the new one
     if ($APPVERSION gt $$self{_CFG}{defaults}{version}) {
+        print "INFO: Upgrading configuration file from version '" . $$self{_CFG}{defaults}{version} . "' to version '$APPVERSION'.\n";
         $$self{_CFG}{defaults}{version} = $APPVERSION;
-        $self->_saveConfiguration();
+        if ($ENV{"ASBRU_IS_READONLY"}) {
+            print "WARNING: Running in readonly mode, unable to upgrade configuration file.\n";
+        } else {
+            $self->_saveConfiguration();
+        }
     }
 
     # Load information about last expanded groups
@@ -928,6 +925,10 @@ sub _initGUI {
     $$self{_GUI}{saveBtn}->set_sensitive(0);
     $$self{_GUI}{saveBtn}->set_tooltip_text('Save the latest configuration changes, see also the "Automatically save every configuration change" field under "Preferences"->"Main Options"');
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{saveBtn}, 1, 1, 0);
+    if ($ENV{"ASBRU_IS_READONLY"}) {
+        $$self{_GUI}{saveBtn}->set_label('READ ONLY INSTANCE');
+        $$self{_GUI}{saveBtn}->set_sensitive(0);
+    }
 
     # Create "Lock/Unlock" button
     $$self{_GUI}{lockApplicationBtn} = Gtk3::ToggleButton->new();
@@ -959,7 +960,7 @@ sub _initGUI {
     $$self{_GUI}{quitBtn}->set_tooltip_text('Close all terminals and terminate the application');
 
     # Setup some window properties.
-    $$self{_GUI}{main}->set_title("$APPNAME" . ($$self{_READONLY} ? ' - READ ONLY MODE' : ''));
+    $$self{_GUI}{main}->set_title("$APPNAME" . ($ENV{"ASBRU_IS_READONLY"} ? ' - READ ONLY MODE' : ''));
     Gtk3::Window::set_default_icon_from_file($APPICON);
     $$self{_GUI}{main}->set_default_size($$self{_GUI}{sw} // 600, $$self{_GUI}{sh} // 480);
     $$self{_GUI}{main}->set_resizable(1);
@@ -2331,7 +2332,12 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('destroy' => sub { exit 0; });
 
     # Save GUI size/position/... *before* it hides
-    $$self{_GUI}{main}->signal_connect('unmap_event' => sub { $self->_saveGUIData(); return 0; });
+    $$self{_GUI}{main}->signal_connect('unmap_event' => sub {
+        if (!$ENV{"ASBRU_IS_READONLY"}) {
+            $self->_saveGUIData();
+        }
+        return 0;
+    });
 
     $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide() unless $$self{_SHOWFINDTREE}; });
 
@@ -3328,7 +3334,7 @@ sub _quitProgram {
     $$self{_GUI}{main}->hide();    # Hide main window
     $$self{_GUI}{_PACTABS}->hide();    # Hide TABs window
 
-    if ($$self{_READONLY}) {
+    if ($ENV{"ASBRU_IS_READONLY"}) {
         Gtk3->main_quit();
         return 1;
     }
@@ -3347,15 +3353,24 @@ sub _quitProgram {
     # Once everything is hidden, we may last any time in our final I/O
     delete $$self{_CFG}{environments}{'__PAC_SHELL__'};    # Delete PACShell environment
     delete $$self{_CFG}{environments}{'__PAC__QUICK__CONNECT__'}; # Delete quick connect environment
-    $self->_saveTreeExpanded();                       # Save Tree opened/closed  groups
-    $self->_saveConfiguration() if $save;             # Save config, if applies
-    $$self{_GUI}{statistics}->purge($$self{_CFG});    # Purge trash statistics
-    $$self{_GUI}{statistics}->saveStats();            # Save statistics
-    unless (grep(/^--no-backup$/, @{ $$self{_OPTS} })) {
-        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
-        $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
+    if ($save) {
+        # Save config, including tree and stats
+        $self->_saveConfiguration();
+    }
+    # Purge trash statistics
+    $$self{_GUI}{statistics}->purge($$self{_CFG});
+    if (!$save && !$ENV{"ASBRU_IS_READONLY"}) {
+        # Save tree positions & statistics
+        $self->_saveTreeExpanded();
+        $$self{_GUI}{statistics}->saveStats();
+        # Delete old temporary files
+        chdir($CFG_DIR) and system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -rf sockets tmp");
+    }
+    unless (grep(/^--no-backup$/, @{ $$self{_OPTS} }) || $ENV{"ASBRU_IS_READONLY"}) {
+        # Export as YAML file & perl data
+        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);
+        $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER);
     };
-    chdir(${CFG_DIR}) and system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
     Gtk3->main_quit();
@@ -3577,12 +3592,17 @@ sub __recurLoadTree {
 sub _saveTreeExpanded {
     my $self = shift;
     my $tree = shift // $$self{_GUI}{treeConnections};
+    my $filename = "$CFG_FILE.tree";
 
     my $selection = $tree->get_selection();
     my $modelsort = $tree->get_model();
     my $model = $modelsort->get_model();
 
-    open(F,">:utf8","$CFG_FILE.tree") or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
+    if ($$self{_VERBOSE}) {
+        print "INFO: Saving tree configuration to '$filename'.\n";
+    }
+
+    open(F, ">:utf8", $filename) or die "ERROR: Could not save Tree Config file '$filename'.";
     $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $uuid = $store->get_value($iter, 2);
@@ -3627,11 +3647,15 @@ sub _saveTreeExpanded {
 sub _loadTreeExpanded {
     my $self = shift;
     my $tree = shift // $$self{_GUI}{treeConnections};
+    my $filename = "$CFG_FILE.tree";
 
     my %TREE_TABS;
 
-    if (-f "$CFG_FILE.tree") {
-        open(F,"<:utf8","$CFG_FILE.tree") or die "ERROR: Could not read Tree Config file '$CFG_FILE.tree': $!";;
+    if (-f $filename) {
+        if ($$self{_VERBOSE}) {
+            print "INFO: Loading tree configuration from '$filename'.\n";
+        }
+        open(F,"<:utf8", $filename) or die "ERROR: Could not read Tree Config file '$filename'.";;
         foreach my $uuid (<F>) {
 
             chomp $uuid;
@@ -4786,7 +4810,7 @@ sub _setCFGChanged {
     my $self = shift;
     my $stat = shift;
 
-    if ($$self{_READONLY}) {
+    if ($ENV{"ASBRU_IS_READONLY"}) {
         $$self{_GUI}{saveBtn}->set_label('READ ONLY INSTANCE');
         $$self{_GUI}{saveBtn}->set_sensitive(0);
     } elsif ($$self{_CFG}{defaults}{'auto save'}) {
@@ -5022,7 +5046,6 @@ B<UUID> = 'asbru_PID' + I<pid number> + '_n' + I<Counter>
     _GUI            : Access to Gtk elements of the application (defined at _initGUI)
     _TABSINWINDOW   : 0 No , 1 Yes
     _UPDATING       : 0 No , 1 Yes
-    _READONLY       : 0 No , 1 Yes
     _HAS_FOCUS      : VTE Object with the current focus
     _GUILOCKED      : 0 No , 1 Yes
     _PING           : Access to Net::Ping object

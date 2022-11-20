@@ -1321,10 +1321,10 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
 
         $$self{_SELECTED} = '';
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(0);
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(0);
         $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(0);
         $$self{_SYNTAX_CHANGED} = 0;
@@ -1341,13 +1341,13 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
             $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
         $$self{_SELECTED} = $sel[0];
-        $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $self->_loadFile($sel[0]);
         $$self{_SYNTAX_CHANGED} = 1;
     } elsif (scalar(@sel) > 1) {
@@ -1362,12 +1362,12 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
 
         $$self{_SELECTED} = '';
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(0);
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $$self{_SYNTAX_CHANGED} = 0;
 
         $$self{_WINDOWSCRIPTS}{gui}{status}->set_markup('');

@@ -212,6 +212,15 @@ sub _initGUI {
         _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\nTray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>.");
     }
 
+    # Disable save button if in readonly mode
+    if ($ENV{"ASBRU_IS_READONLY"}) {
+        _($self, 'btnSaveConfig')->set_sensitive(0);
+        _($self, 'btnSaveConfig')->set_tooltip_text('You cannot save the preferences in readonly mode.');
+    } else {
+        _($self, 'btnSaveConfig')->set_sensitive(1);
+        _($self, 'btnSaveConfig')->set_tooltip_text('Save the current configuration.');
+    }
+
     # Show preferences
     _updateGUIPreferences($self);
 

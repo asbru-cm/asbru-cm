@@ -35,7 +35,7 @@ BEGIN {
         print "Options:\n";
         print "\t--help : show this message\n";
         print "\t--config-dir=path : absolute '/path' or relative 'path' to ~/.config for Ásbrú configuration files/\n";
-        print "\t--temp-dir=path : path to store temporary socket files (default is system temporary directory)\n";
+        print "\t--temp-dir=path : path to store temporary files (default is system temporary directory)\n";
         print "\t--no-backup : do no create alternative config files as a backup (faster shutdown)\n";
         print "\t--start-shell : start a local terminal\n";
         print "\t--password=<pwd> : automatically logon with given password without prompting user\n";
@@ -57,7 +57,8 @@ BEGIN {
         exit 0;
     }
 
-    # Check if user wants to use a different configuration directory
+    # Check if user wants to use a different configuration directory or startup in readonly mode
+    $ENV{"ASBRU_IS_READONLY"} = 0;
     foreach my $arg (@ARGV) {
         if ($arg =~ /^-{1,2}config-dir=\s*(.+)$/i) {
             my $path = $1;
@@ -71,6 +72,8 @@ BEGIN {
             }
         } elsif ($arg =~ /^-{1,2}temp-dir=\s*(.+)$/i) {
             $ENV{"ASBRU_TMP"} = $1;
+        } elsif ($arg =~ /^-{1,2}readonly$/i) {
+            $ENV{"ASBRU_IS_READONLY"} = 1;
         } elsif ($arg !~ /-{1,2}[\w\-]+/i) {
             print STDERR "INFO: bad start up parameter $arg\n";
         }
@@ -179,22 +182,32 @@ if ($CFG_DIR ne $CFG_DIR_OLD && -e $CFG_DIR_OLD && !-e $CFG_DIR && $CFG_DIR =~ /
     config_migration($CFG_DIR_OLD, $CFG_DIR);
 }
 
+print "INFO: Config directory is '${CFG_DIR}'.\n";
+
 # Create Ásbrú configuration directory (if necessary)
 if (!-d $CFG_DIR) {
     mkdir($CFG_DIR);
 }
 
-# Create all subdirectories
-foreach my $subdir ('autostart','screenshots','session_logs','scripts','tmp','bak') {
-    if (!-d "$CFG_DIR/$subdir") {
-        mkdir("$CFG_DIR/$subdir");
-    }
+# Check that the configuration directory is writable (if not in readonly mode)
+if (!-w $CFG_DIR && !$ENV{"ASBRU_IS_READONLY"}) {
+    print "WARNING: Config direcory '${CFG_DIR}' is not writable, forcing readonly mode.\n";
+    $ENV{"ASBRU_IS_READONLY"} = 1;
 }
 
-# Copy sample files if they do not exist
-for (my $n = 1; $n < 5; $n++) {
-    if ((!-e "$CFG_DIR/scripts/sample$n.pl") && (-e "$RealBin/res/sample$n.pl")) {
-        copy("$RealBin/res/sample$n.pl", "$CFG_DIR/scripts/");
+# Create all subdirectories
+if (!$ENV{"ASBRU_IS_READONLY"}) {
+    foreach my $subdir ('autostart','screenshots','session_logs','scripts',$BACKUP_DIR) {
+        if (!-d "$CFG_DIR/$subdir") {
+            mkdir("$CFG_DIR/$subdir");
+        }
+    }
+
+    # Copy sample files if they do not exist
+    for (my $n = 1; $n < 5; $n++) {
+        if ((!-e "$CFG_DIR/scripts/sample$n.pl") && (-e "$RealBin/res/sample$n.pl")) {
+            copy("$RealBin/res/sample$n.pl", "$CFG_DIR/scripts/");
+        }
     }
 }
 
@@ -206,7 +219,7 @@ if (!-d $ENV{"ASBRU_TMP"}) {
     mkdir($ENV{"ASBRU_TMP"});
 }
 if ($VERBOSE) {
-    print "INFO: Path for temporary socket files: " . $ENV{"ASBRU_TMP"} . "\n";
+    print "INFO: Path for temporary files: " . $ENV{"ASBRU_TMP"} . "\n";
 }
 
 # Detect desktop
@@ -321,7 +334,7 @@ sub CheckConfigurationFile {
     }
 
     # Backup file already exists, roll previous backups
-    if (-e "$BACKUP_CFG_FILE.0") {
+    if (!$ENV{"ASBRU_IS_READONLY"} && -e "$BACKUP_CFG_FILE.0") {
         for (my $n=$MAX_BACKUP_FILES-1; $n > 0; $n--) {
             my $p = $n-1; # previous
             if (-e "$BACKUP_CFG_FILE.$p") {
@@ -330,7 +343,9 @@ sub CheckConfigurationFile {
         }
     }
     # Save current known configuration
-    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
+    if (!$ENV{"ASBRU_IS_READONLY"}) {
+        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cp -fp \"$CFG_FILE\" \"$BACKUP_CFG_FILE.0\"";
+    }
 }
 
 sub _wPopUP {

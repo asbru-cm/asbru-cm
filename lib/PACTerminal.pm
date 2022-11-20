@@ -161,9 +161,9 @@ sub new {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     } else {
-        $self->{_LOGFILE} = "$CFG_DIR/tmp/$$self{_UUID_TMP}.txt";
+        $self->{_LOGFILE} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}.txt";
     }
-    $self->{_TMPCFG} = "$CFG_DIR/tmp/$$self{_UUID_TMP}freeze";
+    $self->{_TMPCFG} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}freeze";
 
     $self->{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
     while (-f $$self{_TMPPIPE}) {

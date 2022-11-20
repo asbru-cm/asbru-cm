@@ -224,7 +224,9 @@ sub readStats {
     return $@ ? 0 : 1;
 }
 
-sub saveStats {return nstore($_[0]{statistics}, $STATS_FILE);}
+sub saveStats {
+    return nstore($_[0]{statistics}, $STATS_FILE);
+}
 
 sub start {
     my $self = shift;

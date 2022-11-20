@@ -807,7 +807,7 @@ sub _setProxy {
         $proxy_port = $$CFG{'environments'}{$UUID}{'jump port'};
         $proxy_user = $$CFG{'environments'}{$UUID}{'jump user'};
         $proxy_pass = $$CFG{'environments'}{$UUID}{'jump pass'};
-        open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+        open(CFG,">:utf8","${ENV{'ASBRU_TMP'}}/$UUID.conf");
         print CFG qq"Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n";
         print CFG qq"\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n";
         if ($$CFG{'environments'}{$UUID}{'jump key'}) {
@@ -833,7 +833,7 @@ sub _setProxy {
             $proxy_port = $$CFG{'defaults'}{'jump port'};
             $proxy_user = $$CFG{'defaults'}{'jump user'};
             $proxy_pass = $$CFG{'defaults'}{'jump pass'};
-            open(CFG,">:utf8","$CFG_DIR/tmp/$UUID.conf");
+            open(CFG,">:utf8","${ENV{'ASBRU_TMP'}}/$UUID.conf");
             print CFG qq"Host *\n$ssh_config\nProtocol 2\nCompression yes\nTCPKeepAlive yes\nServerAliveInterval 60\nPreferredAuthentications publickey,hostbased,keyboard-interactive,password\n";
             print CFG qq"\nHost jumpserver\nHostName $proxy_ip\nPort $proxy_port\nUser $proxy_user\n";
             if ($$CFG{'defaults'}{'jump key'}) {
@@ -890,20 +890,20 @@ sub _openSshTunnel {
     $LPORT = _getLocalPort($PORT);
 
     if ($GETCMD) {
-        $proxy_get .= "\nssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+        $proxy_get .= "\nssh -F \"$TMP_DIR/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
         return 0;
     }
     $proxy_jump = 2;
 
     if (-e "$TMP_DIR/$uuid.ctl") {
         # Avoid open a second terminal with the same UUID
-        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
+        my $check = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$TMP_DIR/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -T -O check jumpserver 2>&1`;
         if ($check =~ /=\d+/) {
             die "$COLOR{'err'}Can not duplicate VNC/RDP connections$COLOR{'norm'}\nConfigure a different second connection.\n\n";
         }
     }
     # Start SSH tunnel
-    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$TMP_DIR/$uuid.conf\" -S \"$TMP_DIR/$uuid.ctl\" -f -N -T -M -L $LPORT:$IP:$PORT jumpserver";
     $IP = '127.0.0.1';
     $PORT = $LPORT;
 }
@@ -1051,16 +1051,17 @@ sub askPassword {
 # Place any thing that has to be done before a hard_close; and finally do the hard_close
 sub _hardClose {
     my ($EXP, $uuid)  = @_;
-    my $pipe = $ENV{"ASBRU_TMP"}."/pipe_$uuid";
-    my $sock = $ENV{"ASBRU_TMP"}."/$uuid.ctl";
-    my $cmd_file = "$CFG_DIR/tmp/cmd_$uuid.run";
+    my $TMP_DIR = $ENV{"ASBRU_TMP"};
+    my $pipe = "$TMP_DIR/pipe_$uuid";
+    my $sock = "$TMP_DIR/$uuid.ctl";
+    my $cmd_file = "$TMP_DIR/cmd_$uuid.run";
 
     if (-e $cmd_file) {
         unlink($cmd_file);
     }
 
     if ($proxy_jump == 2 && -e $sock) {
-        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$CFG_DIR/tmp/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
+        system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh -F \"$TMP_DIR/$uuid.conf\" -S \"$sock\" -T -O exit jumpserver";
     }
     if (-e $pipe) {
         unlink($pipe);
@@ -1132,9 +1133,9 @@ if (defined $METHOD) {
             if ($$CFG{'environments'}{$UUID}{'pseudo jump'}) {
                 # Pseudo jump, connect to the first server and then we will send the second connection command over the second server
                 $connection_cmd2 = $connection_cmd;
-                $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS jumpserver";
+                $connection_cmd = "$METHOD -F \"${ENV{'ASBRU_TMP'}}/$UUID.conf\" $CONNECT_OPTS jumpserver";
             } else {
-                $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -J jumpserver server";
+                $connection_cmd = "$METHOD -F \"${ENV{'ASBRU_TMP'}}/$UUID.conf\" $CONNECT_OPTS -J jumpserver server";
             }
         }
         $connection_txt = $connection_cmd;
@@ -1163,7 +1164,7 @@ if (defined $METHOD) {
             $key = '-o "PreferredAuthentications=password,keyboard-interactive"';
         }
         if ($proxy_jump) {
-            $connection_cmd = "$METHOD -F \"$CFG_DIR/tmp/$UUID.conf\" $CONNECT_OPTS -o Proxyjump=jumpserver server";
+            $connection_cmd = "$METHOD -F \"${ENV{'ASBRU_TMP'}}/$UUID.conf\" $CONNECT_OPTS -o Proxyjump=jumpserver server";
         } else {
             $connection_cmd = "$METHOD $key -P $PORT $CONNECT_OPTS " . ($USER ? "$USER@" : '') . "$IP";
         }
@@ -1264,7 +1265,7 @@ if (defined $METHOD) {
         }
         _setProxy($method);
         if ($method eq 'TigerVNC') {
-            my $pfile = "$CFG_DIR/tmp/asbru_conn_{$$}_$UUID";
+            my $pfile = "${ENV{'ASBRU_TMP'}}/asbru_conn_{$$}_$UUID";
             system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
             if (defined $$CFG{'tmp'}{'xid'}) {
                 $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
@@ -1377,7 +1378,7 @@ if (open(LOG,">:raw",$LOG_FILE)) {
 
 # Prepare command file that is only accessible to the user
 my $do_connection_cmd = $connection_cmd;
-my $cmd_file = "$CFG_DIR/tmp/cmd_${UUID}_" . int(rand(123456789)) . ".run";
+my $cmd_file = "${ENV{'ASBRU_TMP'}}/cmd_${UUID}_" . int(rand(123456789)) . ".run";
 if ($METHOD ne 'PACShell') {
     if (open(my $CMD, ">:utf8", $cmd_file)) {
         chmod(0400, $CMD);
