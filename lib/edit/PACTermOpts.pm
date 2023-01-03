@@ -3,7 +3,7 @@ package PACTermOpts;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -108,9 +108,9 @@ sub update {
     $$self{gui}{cbUsePersonal}->set_active(1); # Just to force 'toggled' signal to trigger that callback and update GUI
     $$self{gui}{cbUsePersonal}->set_active($$cfg{'use personal settings'} // 0);
 
-    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // '[#%\$>~→]|\:\/\s*$');
-    $$self{gui}{entryCfgUserPrompt}->set_text($$cfg{'username prompt'} // '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$');
-    $$self{gui}{entryCfgPasswordPrompt}->set_text($$cfg{'password prompt'} // '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$');
+    $$self{gui}{entryCfgPrompt}->set_text($$cfg{'command prompt'} // $PACUtils::DEFAULT_COMMAND_PROMPT);
+    $$self{gui}{entryCfgUserPrompt}->set_text($$cfg{'username prompt'} // $PACUtils::DEFAULT_USERNAME_PROMPT);
+    $$self{gui}{entryCfgPasswordPrompt}->set_text($$cfg{'password prompt'} // $PACUtils::DEFAULT_PASSWORD_PROMPT);
 
     $$self{gui}{cbTabBackColor}->set_active($$cfg{'use tab back color'} // 0);
     _updateWidgetColor($self, $cfg, $$self{gui}{colorTabBack}, 'tab back color', '#000000000000');

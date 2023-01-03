@@ -3,7 +3,7 @@ package PACUtils;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -121,10 +121,10 @@ require Exporter;
 # Define GLOBAL CLASS variables
 
 our $APPNAME = 'Ásbrú Connection Manager';
-our $APPVERSION = '6.4.0';
+our $APPVERSION = '6.5.0';
 our $DEBUG_LEVEL = 1;
 our $ARCH = '';
-my $ARCH_TMP = `/bin/uname -m 2>&1`;
+my $ARCH_TMP = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/uname -m 2>&1`;
 if ($ARCH_TMP =~ /x86_64/gio) {
     $ARCH = 64;
 } elsif ($ARCH_TMP =~ /ppc64/gio) {
@@ -142,7 +142,8 @@ my $SPLASH_IMG = "$RES_DIR/asbru-logo-400.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $CFG_FILE = "$CFG_DIR/asbru.yml";
 my $R_CFG_FILE = $PACMain::R_CFG_FILE;
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 my %WINDOWSPLASH;
 my %WINDOWPROGRESS;
@@ -228,6 +229,14 @@ our @PACDESKTOP = (
     'Categories=Applications;Network;',
     'X-GNOME-Autostart-enabled=true',
 );
+
+# Default configuration on application first startup
+our $DEFAULT_COMMAND_PROMPT = '(([#%:>~\$\] ])(?!\g{-1})){3,4}|(\w[@\/]\w|sftp).*?[#%>~\$\]]|([\w\-\.]+)[%>\$\]]( |\033)|^[#%\$>\:\]~] *$';
+our $DEFAULT_USERNAME_PROMPT = '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
+our $DEFAULT_PASSWORD_PROMPT = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+our $DEFAULT_HOSTKEYCHANGED_PROMPT = '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
+our $DEFAULT_PRESSANYKEY_PROMPT = '.*(any key to continue|tecla para continuar).*';
+our $DEFAULT_REMOTEHOSTCHANGED_PROMPT = '.*ffending .*key in (.+?)\:(\d+).*';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -330,6 +339,7 @@ sub _scale {
         $gdkpixbuf = ref($file) ? $file : Gtk3::Gdk::Pixbuf->new_from_file($file)
     };
     if ($@) {
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
 
@@ -354,6 +364,7 @@ sub _pixBufFromFile {
     };
 
     if ($@) {
+        print STDERR "WARN: Error while loading pixBuf from file '$file': $@";
         return 0;
     }
     return $gdkpixbuf;
@@ -368,7 +379,7 @@ sub _getMethods {
         $THEME_DIR = $theme_dir;
     }
 
-    my $rdesktop = (system("which rdesktop 1>/dev/null 2>&1") eq 0);
+    my $rdesktop = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which rdesktop 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (rdesktop)'} = {
         'installed' => sub {return $rdesktop ? 1 : "No 'rdesktop' binary found.\nTo use this option, please, install :'rdesktop'";},
         'checkCFG' => sub {
@@ -439,7 +450,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xfreerdp = (system("which xfreerdp 1>/dev/null 2>&1") eq 0);
+    my $xfreerdp = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which xfreerdp 1>/dev/null 2>&1") eq 0);
     $methods{'RDP (xfreerdp)'} = {
         'installed' => sub {return $xfreerdp ? 1 : "No 'xfreerdp' binary found.\nTo use this option, please, install:\n'freerdp2-x11'";},
         'checkCFG' => sub {
@@ -510,8 +521,8 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $xtightvncviewer = (system("which vncviewer 1>/dev/null 2>&1") eq 0);
-    my $tigervnc = (system("vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
+    my $xtightvncviewer = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which vncviewer 1>/dev/null 2>&1") eq 0);
+    my $tigervnc = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | /bin/grep -q TigerVNC") eq 0);
     $methods{'VNC'} = {
         'installed' => sub {return $xtightvncviewer || $tigervnc ? 1 : "No 'vncviewer' binary found.\nTo use this option, please, install any of:\n'xtightvncviewer' or 'tigervnc'\n'tigervnc' is preferred, since it allows embedding its window into Ásbrú Connection Manager.";},
         'checkCFG' => sub {
@@ -578,7 +589,7 @@ sub _getMethods {
         'escape' => ["\cc"]
     };
 
-    my $cu = (system("which cu 1>/dev/null 2>&1") eq 0);
+    my $cu = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which cu 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (cu)'} = {
         'installed' => sub {return $cu ? 1 : "No 'cu' binary found.\nTo use this option, please, install 'cu'.";},
         'checkCFG' => sub {
@@ -628,7 +639,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $remote_tty = (system("which remote-tty 1>/dev/null 2>&1") eq 0);
+    my $remote_tty = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which remote-tty 1>/dev/null 2>&1") eq 0);
     $methods{'Serial (remote-tty)'} = {
         'installed' => sub {return $remote_tty ? 1 : "No 'remote-tty' binary found.\nTo use this option, please, install 'remote-tty'.";},
         'checkCFG' => sub {
@@ -694,7 +705,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_remote-tty.jpg", 16, 16, 0)
     };
 
-    my $c3270 = (system("which c3270 1>/dev/null 2>&1") eq 0);
+    my $c3270 = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which c3270 1>/dev/null 2>&1") eq 0);
     $methods{'IBM 3270/5250'} = {
         'installed' => sub {return $c3270 ? 1 : "No 'c3270' binary found.\nTo use this option, please, install 'c3270' or 'x3270-text'.";},
         'checkCFG' => sub {
@@ -746,7 +757,7 @@ sub _getMethods {
         'icon' => Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$THEME_DIR/asbru_method_3270.jpg", 16, 16, 0)
     };
 
-    my $autossh = (system("which autossh 1>/dev/null 2>&1") eq 0);
+    my $autossh = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which autossh 1>/dev/null 2>&1") eq 0);
     $methods{'SSH'} = {
         'installed' => sub {return 1;},
         'checkCFG' => sub {
@@ -809,7 +820,7 @@ sub _getMethods {
         'escape' => ['~.']
     };
 
-    my $mosh = (system("which mosh 1>/dev/null 2>&1") eq 0);
+    my $mosh = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which mosh 1>/dev/null 2>&1") eq 0);
     $methods{'MOSH'} = {
         'installed' => sub {return $mosh ? 1 : "No 'mosh' binary found.\nTo use this option, please, install 'mosh'.";},
         'checkCFG' => sub {
@@ -874,7 +885,7 @@ sub _getMethods {
         'escape' => ["\c^x."]
     };
 
-    my $cadaver = (system("which cadaver 1>/dev/null 2>&1") eq 0);
+    my $cadaver = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which cadaver 1>/dev/null 2>&1") eq 0);
     $methods{'WebDAV'} = {
         'installed' => sub {return $cadaver ? 1 : "No 'cadaver' binary found.\nTo use this option, please, install 'cadaver'.";},
         'checkCFG' => sub {
@@ -939,7 +950,7 @@ sub _getMethods {
         'escape' => ["\cc", "quit\n"]
     };
 
-    my $telnet = (system("which telnet 1>/dev/null 2>&1") eq 0);
+    my $telnet = (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which telnet 1>/dev/null 2>&1") eq 0);
     $methods{'Telnet'} = {
         'installed' => sub {return $telnet ? 1 : "No 'telnet' binary found.\nTo use this option, please, install 'telnet' or 'telnet-ssl'.";},
         'checkCFG' => sub {
@@ -1546,7 +1557,7 @@ sub _wEnterValue {
     }
     $w{window}{data}->show_all();
     my $ok = $w{window}{data}->run();
-    my $val = '';
+    my $val = undef;
 
     if (@list) {
         if ($ok eq 'ok') {
@@ -1682,7 +1693,7 @@ sub _wPopUpMenu {
     my $below = shift // '0';
     my $ref = shift // '0';
 
-    if (defined $WIDGET_POPUP && $WIDGET_POPUP->get_visible) {
+    if (defined $WIDGET_POPUP && $WIDGET_POPUP->get_visible()) {
         return 1;
     }
 
@@ -1780,7 +1791,7 @@ sub _wPopUpMenu {
 
     sub _pos {
         my $h = $_[0]->size_request->height;
-        my $ymax = $event->get_screen->get_height();
+        my $ymax = $event->get_screen()->get_height();
         my ($x, $y) = $event->window->get_origin();
         my $dy = $event->window->get_height();
 
@@ -2057,12 +2068,12 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'color red'} //=  '#cccc00000000';
     $$cfg{'defaults'}{'color white'} //=  '#d3d3d7d7cfcf';
     $$cfg{'defaults'}{'color yellow'} //=  '#c4c4a0a00000';
-    $$cfg{'defaults'}{'command prompt'} //= '[#%\$>~→]|\:\/\s*$';
-    $$cfg{'defaults'}{'username prompt'} //= '([lL]ogin|[uU]suario|([uU]ser-?)*[nN]ame.*|[uU]ser)\s*:\s*$';
-    $$cfg{'defaults'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
-    $$cfg{'defaults'}{'hostkey changed prompt'} //= '^.+ontinue connecting \(([^/]+)\/([^/]+)(?:[^)]+)?\)\?\s*$';
-    $$cfg{'defaults'}{'press any key prompt'} //= '.*(any key to continue|tecla para continuar).*';
-    $$cfg{'defaults'}{'remote host changed prompt'} //= '.*ffending .*key in (.+?)\:(\d+).*';
+    $$cfg{'defaults'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+    $$cfg{'defaults'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+    $$cfg{'defaults'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
+    $$cfg{'defaults'}{'hostkey changed prompt'} //= $DEFAULT_HOSTKEYCHANGED_PROMPT;
+    $$cfg{'defaults'}{'press any key prompt'} //= $DEFAULT_PRESSANYKEY_PROMPT;
+    $$cfg{'defaults'}{'remote host changed prompt'} //= $DEFAULT_REMOTEHOSTCHANGED_PROMPT;
     $$cfg{'defaults'}{'sudo prompt'} //= '[__PAC__SUDO__PROMPT__]';
     $$cfg{'defaults'}{'sudo password'} //= '<<ASK_PASS>>';
     $$cfg{'defaults'}{'sudo show password'} //= 0;
@@ -2115,8 +2126,6 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'save session logs'} //= 0;
     $$cfg{'defaults'}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
     $$cfg{'defaults'}{'session logs folder'} //= "$CFG_DIR/session_logs";
-    # TODO : Remove, this is from a previous migration path
-    #$$cfg{'defaults'}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
     $$cfg{'defaults'}{'session logs amount'} //= 10;
     $$cfg{'defaults'}{'screenshots external viewer'} //= '/usr/bin/xdg-open';
     $$cfg{'defaults'}{'screenshots use external viewer'}//= 0;
@@ -2207,6 +2216,7 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string txt'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string intro'} = 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'send string every'} = 60;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'send string only when idle'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'embed'} = 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'mac'} = '';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'autoreconnect'} = 0;
@@ -2227,9 +2237,9 @@ sub _cfgSanityCheck {
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'use tab back color'} //= 0;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'back color'} //= '#000000000000'; # Black
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+    $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'cursor shape'} //= 'block';
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'open in tab'} //= 1;
     $$cfg{'environments'}{'__PAC_SHELL__'}{'terminal options'}{'terminal font'} //= 'Monospace 9';
@@ -2359,8 +2369,6 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'save session logs'} //= 0;
         $$cfg{'environments'}{$uuid}{'session log pattern'} //= '<UUID>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt';
         $$cfg{'environments'}{$uuid}{'session logs folder'} //= "$CFG_DIR/session_logs";
-        # TODO : Remove, this is from a previous migration path
-        #$$cfg{'environments'}{$uuid}{'session logs folder'} =~ s/\/\.pac\//\/\.config\/asbru\//g;
         $$cfg{'environments'}{$uuid}{'session logs amount'} //= 10;
         $$cfg{'environments'}{$uuid}{'use prepend command'} //= 0;
         $$cfg{'environments'}{$uuid}{'prepend command'} //= '';
@@ -2372,6 +2380,7 @@ sub _cfgSanityCheck {
         $$cfg{'environments'}{$uuid}{'send string txt'} //= '';
         $$cfg{'environments'}{$uuid}{'send string intro'} //= 1;
         $$cfg{'environments'}{$uuid}{'send string every'} //= 60;
+        $$cfg{'environments'}{$uuid}{'send string only when idle'} //= 0;
         $$cfg{'environments'}{$uuid}{'embed'} //= 0;
         $$cfg{'environments'}{$uuid}{'mac'} //= '';
         $$cfg{'environments'}{$uuid}{'autoreconnect'} //= 0;
@@ -2525,9 +2534,9 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} = 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} = '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} = '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = '[#%\$>~→]|\:\/\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} = $DEFAULT_COMMAND_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} = $DEFAULT_USERNAME_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} = $DEFAULT_PASSWORD_PROMPT;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'}  = 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} = 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} = 'Monospace 9';
@@ -2548,9 +2557,9 @@ sub _cfgSanityCheck {
             $$cfg{'environments'}{$uuid}{'terminal options'}{'use tab back color'} //= 0;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'tab back color'} //= '#000000000000'; # Black
             $$cfg{'environments'}{$uuid}{'terminal options'}{'back color'} //= '#000000000000'; # Black
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} //= '(\]\#|\$\s)+';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} //= '([lL]ogin|[uU]suario|[uU]ser-?[nN]ame|[uU]ser):\s*$';
-            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= '([pP]ass|[pP]ass[wW]or[dt](\s+for\s+|\w+@[\w\-\.]+)*|[cC]ontrase.a|Enter passphrase for key \'.+\')\s*:\s*$';
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'command prompt'} //= $DEFAULT_COMMAND_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'username prompt'} //= $DEFAULT_USERNAME_PROMPT;
+            $$cfg{'environments'}{$uuid}{'terminal options'}{'password prompt'} //= $DEFAULT_PASSWORD_PROMPT;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'cursor shape'} //= 'block';
             $$cfg{'environments'}{$uuid}{'terminal options'}{'open in tab'} //= 1;
             $$cfg{'environments'}{$uuid}{'terminal options'}{'terminal font'} //= 'Monospace 9';
@@ -2703,12 +2712,14 @@ sub _updateSSHToIPv6 {
 sub _cipherCFG {
     my $cfg = shift;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q',$SALT));
+    }
     foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
         if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
             $$cfg{'defaults'}{'global variables'}{$var}{'value'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'global variables'}{$var}{'value'}));
         }
     }
-
     if (defined $$cfg{'defaults'}{'keepass'}) {
         $$cfg{'defaults'}{'keepass'}{'password'} = $CIPHER->encrypt_hex(encode('UTF-8',$$cfg{'defaults'}{'keepass'}{'password'}));
     }
@@ -2746,6 +2757,9 @@ sub _decipherCFG {
     my $cfg = shift;
     my $single_uuid = shift // 0;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q',$SALT));
+    }
     if (! $single_uuid) {
         foreach my $var (keys %{$$cfg{'defaults'}{'global variables'}}) {
             if ($$cfg{'defaults'}{'global variables'}{$var}{'hidden'} eq '1') {
@@ -2966,7 +2980,7 @@ sub _subst {
         # Replace '<CMD:.+>' with the result of executing 'cmd'
         while ($string =~ /<CMD:(.+?)>/go) {
             my $var = $1;
-            my $output = `$var`;
+            my $output = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $var`;
             chomp $output;
             if ($output =~ /\R/go) {
                 $string =~ s/<CMD:\Q$var\E>/echo "$output"/g;
@@ -3703,7 +3717,7 @@ sub _makeDesktopFile {
 
     if (! $$cfg{'defaults'}{'show favourites in unity'}) {
         unlink "$ENV{HOME}/.local/share/applications/asbru.desktop";
-        system('/usr/bin/xdg-desktop-menu forceupdate &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
         return 1;
     }
 
@@ -3748,7 +3762,7 @@ sub _makeDesktopFile {
     open F, ">$ENV{HOME}/.local/share/applications/asbru.desktop" or return 0;
     print F "$d\n$dal\n$da\n";
     close F;
-    system('/usr/bin/xdg-desktop-menu forceupdate &');
+    system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-desktop-menu forceupdate &");
 
     return 1;
 }

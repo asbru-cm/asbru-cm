@@ -3,7 +3,7 @@ package PACScreenshots;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -219,7 +219,7 @@ sub _buildScreenshotsGUI {
     });
 
     $w{btnopenfolder}->signal_connect('clicked', sub {
-        system("/usr/bin/xdg-open $CFG_DIR/screenshots");}
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open $CFG_DIR/screenshots");}
     );
 
     my @targets = (Gtk3::TargetEntry->new('STRING', [], 0) );
@@ -417,7 +417,7 @@ sub _showImage {
     my $file = shift;
 
     if ($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots use external viewer'}) {
-        system($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'},$file);
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} " . $PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'screenshots external viewer'}, $file);
         return 1;
     }
 

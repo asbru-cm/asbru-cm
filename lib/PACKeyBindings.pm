@@ -3,7 +3,7 @@ package PACKeyBindings;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -148,9 +148,9 @@ sub GetAction {
     }
     if ($$cfg{$window}{$keymask}) {
         return wantarray ? ($$cfg{$window}{$keymask}[1], $keymask) : $$cfg{$window}{$keymask}[1];
-    } elsif ($uuid && $$hk{$uuid}{$window}{$keymask}) {
+    } elsif ($uuid && $$hk{$uuid}{$window}{$keymask} && $$hk{$uuid}{$window}{$keymask}[1]) {
         return wantarray ? ($$hk{$uuid}{$window}{$keymask}[1], $keymask) : $$hk{$uuid}{$window}{$keymask}[1];
-    } elsif ($$hk{$window}{$keymask}) {
+    } elsif ($$hk{$window}{$keymask} && $$hk{$window}{$keymask}[1]) {
         return wantarray ? ($$hk{$window}{$keymask}[1], $keymask) : $$hk{$window}{$keymask}[1];
     }
     if ($emulation && $keyval eq 'fkey') {
@@ -193,7 +193,10 @@ sub ListKeyBindings {
 }
 
 sub GetAccelerator {
-    my ($self, $window, $action) = @_;
+    my $self = shift;
+    my $window = shift;
+    my $action = shift;
+    my $style = shift // 1;
     my $cfg = $self->{cfg};
     my $kbs = $$cfg{$window};
     my $acc = '';
@@ -207,19 +210,23 @@ sub GetAccelerator {
             if ($kb =~ /^undef-/) {
                 next;
             }
-            if ($kb =~ /Ctrl/) {
-                $acc .= '<control>';
+            if ($style == 1) {
+                if ($kb =~ /Ctrl/) {
+                    $acc .= '<control>';
+                }
+                if ($kb =~ /Alt/) {
+                    $acc .= '<alt>';
+                }
+                if ($kb =~ /Shift/) {
+                    $acc .= '<shift>';
+                }
+                if ($key =~ /[A-Z]/) {
+                    $acc .= '<shift>';
+                }
+                $acc .= $key;
+            } else {
+                $acc = $self->stringifyKeybind($kb);
             }
-            if ($kb =~ /Alt/) {
-                $acc .= '<alt>';
-            }
-            if ($kb =~ /Shift/) {
-                $acc .= '<shift>';
-            }
-            if ($key =~ /[A-Z]/) {
-                $acc .= '<shift>';
-            }
-            $acc .= $key;
             last;
         }
     }
@@ -241,7 +248,7 @@ sub LoadHotKeys {
     foreach my $w (@what) {
         foreach my $hash (@{$$CFG{$w}}) {
             if ($$hash{keybind}) {
-                my $lf  = $$hash{intro} ? "\n" : '';
+                my $lf  = $$hash{intro} && $w ne 'local commands' ? "\n" : '';
                 my $ask = $$hash{confirm} ? "?" : '';
                 $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$w", "$ask$$hash{txt}$lf", $uuid);
             }

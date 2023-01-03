@@ -3,7 +3,7 @@ package PACScripts;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -37,11 +37,10 @@ use Encode qw (encode);
 use File::Copy;
 use File::Basename;
 use Storable qw (dclone nstore_fd);
+use Config;
 
 eval {require Gtk3::SourceView2;};
 my $SOURCEVIEW = ! $@;
-
-my $PERL = (system("which perl 1>/dev/null 2>&1") eq 0);
 
 # GTK
 use Gtk3 '-init';
@@ -344,7 +343,7 @@ sub show {
     $self->_updateGUI;
 
     # Setup a timer to check syntax of selected script
-    (! defined $$self{_TIMER_CHECK} && $PERL) and $$self{_TIMER_CHECK} = Glib::Timeout->add_seconds(1, sub {
+    (! defined $$self{_TIMER_CHECK}) and $$self{_TIMER_CHECK} = Glib::Timeout->add_seconds(1, sub {
         return 1 unless $$self{_WINDOWSCRIPTS}{main}->get_property('has-toplevel-focus') && $$self{_SYNTAX_CHANGED};
 
         my $selection = $$self{_WINDOWSCRIPTS}{treeScripts}->get_selection;
@@ -363,7 +362,7 @@ sub show {
         my $tmpfile = $CFG_DIR . '/tmp/' . $name . '.check';
         $self->_saveFile($sel[0], $tmpfile);
 
-        my @lines = `perl -cw $tmpfile 2>&1`;
+        my @lines = `'$^X' -cw $tmpfile 2>&1`;
         my $err = $?;
         my $result = pop(@lines); chomp $result;
         $result =~ s/^\Q$tmpfile\E\s+(.+)$/$1/g;
@@ -1322,10 +1321,10 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
 
         $$self{_SELECTED} = '';
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(0);
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(0);
         $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(0);
         $$self{_SYNTAX_CHANGED} = 0;
@@ -1342,13 +1341,13 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
             $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
         }
         $$self{_SELECTED} = $sel[0];
-        $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $self->_loadFile($sel[0]);
         $$self{_SYNTAX_CHANGED} = 1;
     } elsif (scalar(@sel) > 1) {
@@ -1363,12 +1362,12 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
 
         $$self{_SELECTED} = '';
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(0);
-        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
-        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $PACMain::FUNCS{_MAIN}{_READONLY});
+        $$self{_WINDOWSCRIPTS}{gui}{btnadd}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnreload}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnclose}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
+        $$self{_WINDOWSCRIPTS}{gui}{btnsave}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
         $$self{_SYNTAX_CHANGED} = 0;
 
         $$self{_WINDOWSCRIPTS}{gui}{status}->set_markup('');

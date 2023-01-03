@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 
+<!-- Generated with glade 3.22.2 
 
 This file is part of Ásbrú Connection Manager.
 
@@ -75,7 +75,7 @@ If not, see <http://www.gnu.org/licenses/>.
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child>
@@ -1344,6 +1344,7 @@ If not specified or invalid, the default SSH private key of your system will be 
                                         <property name="can_focus">True</property>
                                         <property name="invisible_char">•</property>
                                         <property name="activates_default">True</property>
+                                        <property name="width_chars">5</property>
                                         <property name="text" translatable="yes">0</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
@@ -1355,6 +1356,22 @@ If not specified or invalid, the default SSH private key of your system will be 
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
                                         <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="cbSendStringOnlyWhenIdle">
+                                        <property name="label" translatable="yes">Idle Only</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text" translatable="yes">Restart the timer each time the terminal is updated or focused, effectively preventing the string from being sent unless the terminal has been idle for the configured period.</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">4</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -1417,7 +1434,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="fill">True</property>
                                         <property name="position">1</property>
                                       </packing>
-			            </child>
+                                    </child>
                                     <child>
                                       <object class="GtkCheckButton" id="cbCfgQuoteCommand">
                                         <property name="label" translatable="yes">Surround connection command with quotes</property>
@@ -1436,7 +1453,7 @@ Or(Global Variable): DISPLAY=&lt;GV:DISPLAY&gt;</property>
                                         <property name="fill">True</property>
                                         <property name="position">2</property>
                                       </packing>
-    		                            </child>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -3365,7 +3382,7 @@ Connect to server and open a new local connection instead</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child>
@@ -5028,12 +5045,12 @@ Otherwise, only the icon will be shown and save screen space.</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <child>
-                                <object class="GtkBox" id="vbox38">
+                                  <object class="GtkBox" id="vbox38">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="orientation">vertical</property>
                                     <child>
-                                    <object class="GtkRadioButton" id="rbCfgStatusFull">
+                                      <object class="GtkRadioButton" id="rbCfgStatusFull">
                                         <property name="label" translatable="yes">Use full names (Local Forwarding, Remote Forwarding, Dynamic Forwarding)</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
@@ -5042,15 +5059,15 @@ Otherwise, only the icon will be shown and save screen space.</property>
                                         <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
-                                    </object>
-                                    <packing>
+                                      </object>
+                                      <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
                                         <property name="position">0</property>
-                                    </packing>
+                                      </packing>
                                     </child>
                                     <child>
-                                    <object class="GtkRadioButton" id="rbCfgStatusShort">
+                                      <object class="GtkRadioButton" id="rbCfgStatusShort">
                                         <property name="label" translatable="yes">Use abreviatures (-L, -R, -D)</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
@@ -5059,19 +5076,19 @@ Otherwise, only the icon will be shown and save screen space.</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">rbCfgStatusFull</property>
-                                    </object>
-                                    <packing>
+                                      </object>
+                                      <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
                                         <property name="position">1</property>
-                                    </packing>
+                                      </packing>
                                     </child>
-                                </object>
-                                <packing>
+                                  </object>
+                                  <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">0</property>
-                                </packing>
+                                  </packing>
                                 </child>
                               </object>
                             </child>

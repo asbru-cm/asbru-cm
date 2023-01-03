@@ -3,7 +3,7 @@ package PACEdit;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -41,6 +41,8 @@ use YAML qw (LoadFile DumpFile);
 use Storable qw (dclone nstore nstore_fd fd_retrieve);
 use Encode;
 use Glib::IO; # GSettings
+
+use Config;
 
 # GTK
 use Gtk3 '-init';
@@ -349,7 +351,7 @@ sub _setupCallbacks {
             $folder = "$CFG_DIR/session_logs";
             _($self, 'btnEditSaveSessionLogs')->get_current_folder($folder);
         }
-        system("/usr/bin/xdg-open $folder");
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open $folder");
     });
 
     # Capture 'Get Command line' button clicked
@@ -363,7 +365,7 @@ sub _setupCallbacks {
                 $kpxc->getMasterPassword($$self{_WINDOWEDIT});
             }
         }
-        my $cmd = `"$RealBin/lib/asbru_conn" $CFG_DIR/asbru.nfreeze $$self{_UUID} 0 1`;
+        my $cmd = `'$^X' "$RealBin/lib/asbru_conn" "$CFG_DIR/asbru.nfreeze" "$$self{_UUID}" 0 1`;
         _wMessage($$self{_WINDOWEDIT}, $cmd, 1, 1, 'w-info');
     });
 
@@ -692,6 +694,7 @@ sub _updateGUIPreferences {
     _($self, 'entryCfgProxyConnPassword')->set_text($$self{_CFG}{'environments'}{$uuid}{'proxy pass'} // '');
     # Jump Server
     _($self, 'entryCfgJumpConnIP')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump ip'} // '');
+    _($self, 'entryCfgJumpConnPort')->set_range(0, 65536);
     _($self, 'entryCfgJumpConnPort')->set_value($$self{_CFG}{'environments'}{$uuid}{'jump port'} // 22);
     _($self, 'entryCfgJumpConnUser')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump user'} // '');
     _($self, 'entryCfgJumpConnPass')->set_text($$self{_CFG}{'environments'}{$uuid}{'jump pass'} // '');
@@ -739,6 +742,7 @@ sub _updateGUIPreferences {
     _($self, 'cbEditSendString')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'hboxEditSendString')->set_sensitive($$self{_CFG}{'environments'}{$uuid}{'send string active'});
     _($self, 'cbEditSendStringIntro')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string intro'});
+    _($self, 'cbSendStringOnlyWhenIdle')->set_active($$self{_CFG}{'environments'}{$uuid}{'send string only when idle'});
     _($self, 'entryEditSendString')->set_text($$self{_CFG}{'environments'}{$uuid}{'send string txt'} // '');
     _($self, 'entryEditSendStringSeconds')-> set_value($$self{_CFG}{'environments'}{$uuid}{'send string every'} // 0);
     _($self, 'cbCfgAutoreconnect')->set_active($$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} // 0);
@@ -805,7 +809,7 @@ sub _updateGUIPreferences {
     # Show Jump options in network settings (only for SSH method)
     if ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /SSH|SFTP/i) {
         # Control SSH capabilities
-        my $ssh = `ssh 2>&1`;
+        my $ssh = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} ssh 2>&1`;
         $ssh =~ s/\n//g;
         $ssh =~ s/[ \t][ \t]+/ /g;
         if ($ssh =~ /-J /) {
@@ -921,6 +925,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'send string active'} = _($self, 'cbEditSendString')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string txt'} = _($self, 'entryEditSendString')->get_chars(0,-1);
     $$self{_CFG}{'environments'}{$uuid}{'send string intro'} = _($self, 'cbEditSendStringIntro')->get_active();
+    $$self{_CFG}{'environments'}{$uuid}{'send string only when idle'} = _($self, 'cbSendStringOnlyWhenIdle')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'send string every'} = _($self, 'entryEditSendStringSeconds')->get_chars(0, -1);
     $$self{_CFG}{'environments'}{$uuid}{'autoreconnect'} = _($self, 'cbCfgAutoreconnect')->get_active();
     $$self{_CFG}{'environments'}{$uuid}{'startup launch'} = _($self, 'cbCfgStartupLaunch')->get_active();

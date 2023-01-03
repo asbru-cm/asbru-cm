@@ -3,7 +3,7 @@ package PACTrayUnity;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -57,7 +57,7 @@ if ($@) {
         );
     };
     if ($@) {
-        warn "WARNING: AppIndicator is missing --> there will be no icon showing up in the status bar when running Unity!\n\n";
+        warn "WARNING: AppIndicator is missing --> there might be no icon showing up in the status bar when running Unity!\n";
         return 0;
     }
 }
@@ -72,7 +72,7 @@ my $APPNAME = $PACUtils::APPNAME;
 my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = $RealBin . '/res/asbru-logo-64.png';
 my $TRAYICON = $RealBin . '/res/asbru-logo-tray.png';
-my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/themes/default/asbru_group.png');
+my $GROUPICON_ROOT = _pixBufFromFile($RealBin . '/res/themes/default/asbru_group.svg');
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -121,6 +121,24 @@ sub get_geometry {
     return ({}, {}, {x => 0, y => 0});
 }
 
+# Enable the tray menu
+sub set_tray_menu {
+    my $self = shift;
+
+    return $self->_setTrayMenu();
+}
+
+# Make the tray icon active/inactive (aka 'shown/hidden')
+sub set_active() {
+    my $self = shift;
+    $$self{_TRAY}->set_status('active');
+}
+sub set_passive() {
+    my $self = shift;
+    $$self{_TRAY}->set_status('passive');
+}
+
+
 # END: Define PUBLIC CLASS methods
 ###################################################################
 
@@ -130,7 +148,7 @@ sub get_geometry {
 sub _initGUI {
     my $self = shift;
 
-    $$self{_TRAY} = AppIndicator::Indicator->new('asbru-cm', $TRAYICON,'application-status');
+    $$self{_TRAY} = AppIndicator::Indicator->new('asbru-cm', $TRAYICON, 'application-status');
     $$self{_TRAY}->set_icon_theme_path($RealBin . '/res');
     $$self{_TRAY}->set_status('active');
     $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = ! $@;
@@ -171,7 +189,7 @@ sub _setTrayMenu {
     push(@m, {label => 'About', stockicon => 'gtk-about', code => sub {$$self{_MAIN}->_showAboutWindow();} });
     push(@m, {label => 'Exit', stockicon => 'gtk-quit', code => sub {$$self{_MAIN}->_quitProgram();} });
 
-    $$self{_TRAY}->set_menu(_wPopUpMenu(\@m, $event, 'below calling widget', 'get_menu_ref') );
+    $$self{_TRAY}->set_menu(_wPopUpMenu(\@m, $event, 'below calling widget', 'get_menu_ref'));
 
     return 1;
 }

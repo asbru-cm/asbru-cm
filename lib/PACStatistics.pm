@@ -3,7 +3,7 @@ package PACStatistics;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -224,7 +224,9 @@ sub readStats {
     return $@ ? 0 : 1;
 }
 
-sub saveStats {return nstore($_[0]{statistics}, $STATS_FILE);}
+sub saveStats {
+    return nstore($_[0]{statistics}, $STATS_FILE);
+}
 
 sub start {
     my $self = shift;

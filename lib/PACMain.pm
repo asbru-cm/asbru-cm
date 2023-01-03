@@ -3,7 +3,7 @@ package PACMain;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -48,26 +48,14 @@ use Crypt::CBC;
 use SortedTreeStore;
 use Vte;
 
+use Config;
+
 # GTK
 use Gtk3 -init;
 
 # PAC modules
 use PACUtils;
-our $UNITY = 1;
-our $STRAY = 1;
-$@ = '';
-eval {
-    require 'PACTrayUnity.pm';
-};
-if ($@) {
-    $UNITY = 0;
-    eval {
-        require 'PACTray.pm';
-    };
-    if ($@) {
-        $STRAY = 0;
-    }
-}
+use PACTray;
 use PACTerminal;
 use PACEdit;
 use PACConfig;
@@ -117,8 +105,11 @@ my $CHECK_VERSION = 0;
 my $NEW_VERSION = 0;
 my $NEW_CHANGES = '';
 our $_NO_SPLASH = 0;
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+our $UNITY = 0; # Are we in a Unity environment?
+our $STRAY = 1; # Are we using a system tray icon?
 
 our %RUNNING;
 our %FUNCS;
@@ -136,8 +127,6 @@ sub new {
     my @argv = @_;
 
     my $self = {};
-
-    print STDERR "INFO: Config directory is '$CFG_DIR'\n";
 
     $SIG{'TERM'} = $SIG{'STOP'} = $SIG{'QUIT'} = $SIG{'INT'} = sub {
         print STDERR "INFO: Signal '$_[0]' received. Exiting Ásbrú...\n";
@@ -157,7 +146,6 @@ sub new {
     $self->{_UPDATING} = 0;
     $self->{_CMDLINETRAY} = 0;
     $self->{_SHOWFINDTREE} = 0;
-    $self->{_READONLY} = 0;
     $self->{_HAS_FOCUS} = '';
     $self->{_VERBOSE} = 0;
     $self->{_Vte} = undef;
@@ -174,7 +162,7 @@ sub new {
     }
 
     $_NO_SPLASH = grep({ /^(--no-splash)|(--list-uuids)|(--dump-uuid)/go } @{ $$self{_OPTS} });
-    $_NO_SPLASH ||= $$self{_APP}->get_is_remote;
+    $_NO_SPLASH ||= $$self{_APP}->get_is_remote();
 
     # Show splash-screen while loading
     PACUtils::_splash(1, "Starting $PACUtils::APPNAME (v$PACUtils::APPVERSION)", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
@@ -259,6 +247,9 @@ sub new {
         if (!defined $pass) {
             exit 0;
         }
+        if (!$CIPHER->salt()) {
+            $CIPHER->salt(pack('Q',$SALT));
+        }
         if ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'})) {
             _wMessage(undef, 'ERROR: Wrong password!!');
             exit 0;
@@ -266,7 +257,6 @@ sub new {
     }
 
     # Check if only one instance is allowed
-
     if ($$self{_APP}->get_is_remote()) {
         print "INFO: Ásbrú is already running.\n";
 
@@ -289,10 +279,7 @@ sub new {
         }
 
         if (! $getout) {
-            if ($$self{_CFG}{'defaults'}{'allow more instances'}) {
-                print "INFO: Starting '$0' in READ ONLY mode!\n";
-                $$self{_READONLY} = 1;
-            } elsif (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
+            if (! $$self{_CFG}{'defaults'}{'allow more instances'}) {
                 print "INFO: No more instances allowed!\n";
                 _sendAppMessage($$self{_APP}, 'show-conn');
                 Gtk3::Gdk::notify_startup_complete();
@@ -304,11 +291,6 @@ sub new {
         }
     }
 
-    if (grep(/^--readonly$/, @{ $$self{_OPTS} })) {
-        print "INFO: Starting '$0' in READ ONLY mode!\n";
-        $$self{_READONLY} = 1;
-    }
-
     # Gtk style
     my $css_provider = Gtk3::CssProvider->new();
     $css_provider->load_from_path("$THEME_DIR/asbru.css");
@@ -316,6 +298,19 @@ sub new {
 
     # Setup known connection methods
     %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
+
+    # Dynamically load the Tray icon class related to the current environment/settings
+    if ($ENV{'ASBRU_DESKTOP'} eq 'unity') {
+        print("INFO: Trying to load Unity specific tray icon package...\n");
+        $@ = '';
+        $UNITY = 1;
+        eval {
+            require 'PACTrayUnity.pm';
+        };
+        if ($@) {
+            $UNITY = 0;
+        }
+    }
 
     bless($self, $class);
 
@@ -352,9 +347,8 @@ sub start {
     PACUtils::_splash(1, "Loading Connections...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
     $self->_loadTreeConfiguration('__PAC__ROOT__');
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    # Enable tray menu
+    $FUNCS{_TRAY}->set_tray_menu();
 
     PACUtils::_splash(1, "Finalizing...", ++$PAC_START_PROGRESS, $PAC_START_TOTAL);
 
@@ -363,8 +357,13 @@ sub start {
 
     # If version is lower than current, update and save the new one
     if ($APPVERSION gt $$self{_CFG}{defaults}{version}) {
+        print "INFO: Upgrading configuration file from version '" . $$self{_CFG}{defaults}{version} . "' to version '$APPVERSION'.\n";
         $$self{_CFG}{defaults}{version} = $APPVERSION;
-        $self->_saveConfiguration();
+        if ($ENV{"ASBRU_IS_READONLY"}) {
+            print "WARNING: Running in readonly mode, unable to upgrade configuration file.\n";
+        } else {
+            $self->_saveConfiguration();
+        }
     }
 
     # Load information about last expanded groups
@@ -923,6 +922,10 @@ sub _initGUI {
     $$self{_GUI}{saveBtn}->set_sensitive(0);
     $$self{_GUI}{saveBtn}->set_tooltip_text('Save the latest configuration changes, see also the "Automatically save every configuration change" field under "Preferences"->"Main Options"');
     $$self{_GUI}{hbuttonbox1}->pack_start($$self{_GUI}{saveBtn}, 1, 1, 0);
+    if ($ENV{"ASBRU_IS_READONLY"}) {
+        $$self{_GUI}{saveBtn}->set_label('READ ONLY INSTANCE');
+        $$self{_GUI}{saveBtn}->set_sensitive(0);
+    }
 
     # Create "Lock/Unlock" button
     $$self{_GUI}{lockApplicationBtn} = Gtk3::ToggleButton->new();
@@ -954,7 +957,7 @@ sub _initGUI {
     $$self{_GUI}{quitBtn}->set_tooltip_text('Close all terminals and terminate the application');
 
     # Setup some window properties.
-    $$self{_GUI}{main}->set_title("$APPNAME" . ($$self{_READONLY} ? ' - READ ONLY MODE' : ''));
+    $$self{_GUI}{main}->set_title("$APPNAME" . ($ENV{"ASBRU_IS_READONLY"} ? ' - READ ONLY MODE' : ''));
     Gtk3::Window::set_default_icon_from_file($APPICON);
     $$self{_GUI}{main}->set_default_size($$self{_GUI}{sw} // 600, $$self{_GUI}{sh} // 480);
     $$self{_GUI}{main}->set_resizable(1);
@@ -1057,7 +1060,7 @@ sub _initGUI {
     $FUNCS{_PCC} = $$self{_PCC} = PACPCC->new(\%RUNNING);
 
     # Build Tray icon
-    $FUNCS{_TRAY} = $$self{_TRAY} = ! $UNITY ? PACTray->new($self) : PACTrayUnity->new($self);
+    $FUNCS{_TRAY} = $$self{_TRAY} = $UNITY ? PACTrayUnity->new($self) : PACTray->new($self);
 
     # Build PIPE object
     $FUNCS{_PIPE} = $$self{_PIPE} = PACPipe->new(\%RUNNING);
@@ -1414,7 +1417,7 @@ sub _setupCallbacks {
         # Now, expand parent's group and focus the new connection
         $$self{_GUI}{treeConnections}->_setTreeFocus($txt_uuid);
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1455,9 +1458,7 @@ sub _setupCallbacks {
         }
 
         $self->_setCFGChanged(1);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_updateGUIWithUUID($node_uuid);
         return 1;
     });
@@ -1484,9 +1485,7 @@ sub _setupCallbacks {
         map $$self{_GUI}{treeConnections}->_delNode($_), @del;
         # Delete selected node from the configuration
         $self->_delNodes(@del);
-        if ($UNITY) {
-            $FUNCS{_TRAY}->_setTrayMenu();
-        }
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -1858,7 +1857,7 @@ sub _setupCallbacks {
 
         $$self{_EDIT}->show($txt_uuid, 'new');
 
-        $UNITY and $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
         $self->_setCFGChanged(1);
         return 1;
     });
@@ -2181,11 +2180,7 @@ sub _setupCallbacks {
                 $self->_quitProgram();
             } elsif ($$self{_CFG}{defaults}{'when no more tabs'} == 2) {
                 #hide
-                if ($UNITY) {
-                    $$self{_TRAY}{_TRAY}->set_status('active');
-                } else {
-                    $$self{_TRAY}{_TRAY}->set_visible(1);
-                }
+                $$self{_TRAY}->set_active();
                 # Trigger the "lock" procedure ?
                 if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                     $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -2315,11 +2310,7 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('delete_event' => sub {
         if ($$self{_CFG}{defaults}{'close to tray'}) {
             # Show tray icon
-            if ($UNITY) {
-                $$self{_TRAY}{_TRAY}->set_status('active');
-            } else {
-                $$self{_TRAY}{_TRAY}->set_visible(1);
-            }
+            $$self{_TRAY}->set_active();
             # Trigger the "lock" procedure ?
             if ($$self{_CFG}{'defaults'}{'use gui password'} && $$self{_CFG}{'defaults'}{'use gui password tray'}) {
                 $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -2338,7 +2329,12 @@ sub _setupCallbacks {
     $$self{_GUI}{main}->signal_connect('destroy' => sub { exit 0; });
 
     # Save GUI size/position/... *before* it hides
-    $$self{_GUI}{main}->signal_connect('unmap_event' => sub { $self->_saveGUIData(); return 0; });
+    $$self{_GUI}{main}->signal_connect('unmap_event' => sub {
+        if (!$ENV{"ASBRU_IS_READONLY"}) {
+            $self->_saveGUIData();
+        }
+        return 0;
+    });
 
     $$self{_GUI}{_vboxSearch}->signal_connect('map' => sub { $$self{_GUI}{_vboxSearch}->hide() unless $$self{_SHOWFINDTREE}; });
 
@@ -2384,7 +2380,7 @@ sub _setFavourite {
     $$self{_GUI}{connFavourite}->set_image(Gtk3::Image->new_from_stock('asbru-favourite-' . ($b ? 'on' : 'off'), 'button'));
     $$self{_GUI}{connFavourite}->set_active($b);
     if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+        $FUNCS{_TRAY}->set_tray_menu();
     }
     $self->_setCFGChanged(1);
 }
@@ -2422,6 +2418,9 @@ sub _lockAsbru {
 sub _unlockAsbru {
     my $self = shift;
 
+    if (!$CIPHER->salt()) {
+        $CIPHER->salt(pack('Q',$SALT));
+    }
     my $pass = _wEnterValue($$self{_GUI}{main}, 'GUI Unlock', 'Enter current GUI Password to remove protection...', undef, 0, 'asbru-protected');
     if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
         $$self{_GUI}{lockApplicationBtn}->set_active(1);
@@ -3111,12 +3110,12 @@ sub _showAboutWindow {
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
         "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
-        "copyright" => "Copyright (C) 2017-2021 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
+        "copyright" => "Copyright (C) 2017-2022 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
 Ásbrú Connection Manager
 
-Copyright (C) 2017-2021 Ásbrú Connection Manager team <https://asbru-cm.net>
+Copyright (C) 2017-2022 Ásbrú Connection Manager team <https://asbru-cm.net>
 Copyright (C) 2010-2016 David Torrejón Vaquerizas
 
 This program is free software: you can redistribute it and/or modify
@@ -3325,18 +3324,14 @@ sub _quitProgram {
     $$self{_GUI}{main}->signal_handler_disconnect($$self{_SIGNALS}{_WINDOWSTATEVENT}) if $$self{_SIGNALS}{_WINDOWSTATEVENT};
 
     # Hide every GUI component has already finished
-    if ($UNITY) {
-        $$self{_TRAY}{_TRAY}->set_status('passive');
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(0);     # Hide tray icon?
-    }
+    $$self{_TRAY}->set_passive();
     $$self{_SCRIPTS}{_WINDOWSCRIPTS}{main}->hide();    # Hide scripts window
     $$self{_CLUSTER}{_WINDOWCLUSTER}{main}->hide();    # Hide clusters window
     $$self{_PCC}{_WINDOWPCC}{main}->hide();    # Hide PCC window
     $$self{_GUI}{main}->hide();    # Hide main window
     $$self{_GUI}{_PACTABS}->hide();    # Hide TABs window
 
-    if ($$self{_READONLY}) {
+    if ($ENV{"ASBRU_IS_READONLY"}) {
         Gtk3->main_quit();
         return 1;
     }
@@ -3355,15 +3350,24 @@ sub _quitProgram {
     # Once everything is hidden, we may last any time in our final I/O
     delete $$self{_CFG}{environments}{'__PAC_SHELL__'};    # Delete PACShell environment
     delete $$self{_CFG}{environments}{'__PAC__QUICK__CONNECT__'}; # Delete quick connect environment
-    $self->_saveTreeExpanded();                       # Save Tree opened/closed  groups
-    $self->_saveConfiguration() if $save;             # Save config, if applies
-    $$self{_GUI}{statistics}->purge($$self{_CFG});    # Purge trash statistics
-    $$self{_GUI}{statistics}->saveStats();            # Save statistics
-    unless (grep(/^--no-backup$/, @{ $$self{_OPTS} })) {
-        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);        # Export as YAML file
-        $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER); # Export as Perl data
+    if ($save) {
+        # Save config, including tree and stats
+        $self->_saveConfiguration();
+    }
+    # Purge trash statistics
+    $$self{_GUI}{statistics}->purge($$self{_CFG});
+    if (!$save && !$ENV{"ASBRU_IS_READONLY"}) {
+        # Save tree positions & statistics
+        $self->_saveTreeExpanded();
+        $$self{_GUI}{statistics}->saveStats();
+        # Delete old temporary files
+        chdir($CFG_DIR) and system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} rm -rf sockets tmp");
+    }
+    unless (grep(/^--no-backup$/, @{ $$self{_OPTS} }) || $ENV{"ASBRU_IS_READONLY"}) {
+        # Export as YAML file & perl data
+        $$self{_CONFIG}->_exporter('yaml', $CFG_FILE);
+        $$self{_CONFIG}->_exporter('perl', $CFG_FILE_DUMPER);
     };
-    chdir(${CFG_DIR}) and system("rm -rf sockets/* tmp/*");  # Delete temporal files
 
     # And finish every GUI
     Gtk3->main_quit();
@@ -3585,12 +3589,17 @@ sub __recurLoadTree {
 sub _saveTreeExpanded {
     my $self = shift;
     my $tree = shift // $$self{_GUI}{treeConnections};
+    my $filename = "$CFG_FILE.tree";
 
     my $selection = $tree->get_selection();
     my $modelsort = $tree->get_model();
     my $model = $modelsort->get_model();
 
-    open(F,">:utf8","$CFG_FILE.tree") or die "ERROR: Could not save Tree Config file '$CFG_FILE.tree': $!";
+    if ($$self{_VERBOSE}) {
+        print "INFO: Saving tree configuration to '$filename'.\n";
+    }
+
+    open(F, ">:utf8", $filename) or die "ERROR: Could not save Tree Config file '$filename'.";
     $modelsort->foreach(sub {
         my ($store, $path, $iter, $tmp) = @_;
         my $uuid = $store->get_value($iter, 2);
@@ -3635,11 +3644,15 @@ sub _saveTreeExpanded {
 sub _loadTreeExpanded {
     my $self = shift;
     my $tree = shift // $$self{_GUI}{treeConnections};
+    my $filename = "$CFG_FILE.tree";
 
     my %TREE_TABS;
 
-    if (-f "$CFG_FILE.tree") {
-        open(F,"<:utf8","$CFG_FILE.tree") or die "ERROR: Could not read Tree Config file '$CFG_FILE.tree': $!";;
+    if (-f $filename) {
+        if ($$self{_VERBOSE}) {
+            print "INFO: Loading tree configuration from '$filename'.\n";
+        }
+        open(F,"<:utf8", $filename) or die "ERROR: Could not read Tree Config file '$filename'.";;
         foreach my $uuid (<F>) {
 
             chomp $uuid;
@@ -3823,11 +3836,7 @@ sub _updateGUIPreferences {
     $$self{_GUI}{scroll1}->set_overlay_scrolling($$self{_CFG}{'defaults'}{'tree overlay scrolling'});
     $$self{_GUI}{descView}->modify_font(Pango::FontDescription::from_string($$self{_CFG}{'defaults'}{'info font'}));
 
-    if ($UNITY) {
-        (! $$self{_GUI}{main}->get_visible || $$self{_CFG}{defaults}{'show tray icon'}) ? $$self{_TRAY}{_TRAY}->set_status('active') : $$self{_TRAY}{_TRAY}->set_status('passive');
-    } else {
-        $$self{_TRAY}{_TRAY}->set_visible(! $$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'});
-    }
+    !$$self{_GUI}{main}->get_visible() || $$self{_CFG}{defaults}{'show tray icon'} ? $$self{_TRAY}->set_active() : $$self{_TRAY}->set_passive();
 
     $$self{_GUI}{lockApplicationBtn}->set_sensitive($$self{_CFG}{'defaults'}{'use gui password'});
 
@@ -4206,8 +4215,8 @@ sub _pasteNodes {
         delete $$self{_COPY}{'data'}{$uuid};
     }
 
-    if ($first and $UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
+    if ($first) {
+        $FUNCS{_TRAY}->set_tray_menu();
     }
 
     $self->_setCFGChanged(1);
@@ -4236,6 +4245,8 @@ sub __dupNodes {
         $$cfg{$new_txt_uuid}{'name'} = "$$self{_CFG}{'environments'}{$uuid}{'name'} - copy";
     }
     $$cfg{$parent}{'children'}{$new_txt_uuid} = 1;
+    $$cfg{$new_txt_uuid}{'cluster'} = [];
+    $$cfg{$new_txt_uuid}{'_protected'} = 0;
 
     # Delete screenshots and statistics on duplicated node
     $$cfg{$new_txt_uuid}{'screenshots'} = ();
@@ -4408,10 +4419,16 @@ sub __importNodes {
         $self->_setCFGChanged(1);
         delete $$self{_CFG}{'__PAC__EXPORTED__'};
         delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};
-        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b> (wait 3 seconds...)", 0);
-        system("(sleep 3; $0) &");
-        sleep 2;
-        exit 0;
+        _wMessage($$self{_WINDOWCONFIG}, "File <b>$file</b> succesfully imported.\n now <b>restarting</b>!", 0);
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        sleep 1;
+        Gtk3::main_iteration() while Gtk3::events_pending();
+        print STDERR "[DEBUG] Restarting using executable '$^X' with arg '$0'";
+        exec($^X, $0) or print STDERR "[ERROR] Couldn't exec {$^X} $0: $!";
+        exit 1;
 
     # Bad export file
     } elsif (! defined $$self{_COPY}{'data'}{'__PAC__EXPORTED__'}) {
@@ -4436,9 +4453,7 @@ sub __importNodes {
         $self->_setCFGChanged(1);
     }
 
-    if ($UNITY) {
-        $FUNCS{_TRAY}->_setTrayMenu();
-    }
+    $FUNCS{_TRAY}->set_tray_menu();
 
     return 1;
 }
@@ -4792,7 +4807,7 @@ sub _setCFGChanged {
     my $self = shift;
     my $stat = shift;
 
-    if ($$self{_READONLY}) {
+    if ($ENV{"ASBRU_IS_READONLY"}) {
         $$self{_GUI}{saveBtn}->set_label('READ ONLY INSTANCE');
         $$self{_GUI}{saveBtn}->set_sensitive(0);
     } elsif ($$self{_CFG}{defaults}{'auto save'}) {
@@ -4886,10 +4901,11 @@ sub _ApplyLayout {
 # Test various options supported by the VTE library
 # to centralize all tests concerning VTE into a single function
 sub _setVteCapabilities {
+    local $SIG{__WARN__} = sub {};
+
     my $self = shift;
     my $vte = Vte::Terminal->new();
 
-    local $SIG{__WARN__} = sub {};
     $$self{_Vte}{major_version} = Vte::get_major_version();
     $$self{_Vte}{minor_version} = Vte::get_minor_version();
 
@@ -5027,7 +5043,6 @@ B<UUID> = 'asbru_PID' + I<pid number> + '_n' + I<Counter>
     _GUI            : Access to Gtk elements of the application (defined at _initGUI)
     _TABSINWINDOW   : 0 No , 1 Yes
     _UPDATING       : 0 No , 1 Yes
-    _READONLY       : 0 No , 1 Yes
     _HAS_FOCUS      : VTE Object with the current focus
     _GUILOCKED      : 0 No , 1 Yes
     _PING           : Access to Net::Ping object

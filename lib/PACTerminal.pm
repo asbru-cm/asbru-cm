@@ -3,7 +3,7 @@ package PACTerminal;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -42,7 +42,9 @@ use Encode qw (encode decode);
 use IO::Socket::INET;
 use Time::HiRes qw (gettimeofday);
 use PACKeePass;
-use List::Util qw(min max);
+use List::Util qw (min max);
+
+use Config;
 
 # GTK
 use Gtk3 '-init';
@@ -68,7 +70,6 @@ my $APPVERSION = $PACUtils::APPVERSION;
 my $APPICON = "$RealBin/res/asbru-logo-64.png";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 
-my $PERL_BIN = '/usr/bin/perl';
 my $PAC_CONN = "$RealBin/lib/asbru_conn";
 
 my $SHELL_BIN = -x '/bin/sh' ? '/bin/sh' : '/bin/bash';
@@ -160,28 +161,28 @@ sub new {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     } else {
-        $self->{_LOGFILE} = "$CFG_DIR/tmp/$$self{_UUID_TMP}.txt";
+        $self->{_LOGFILE} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}.txt";
     }
-    $self->{_TMPCFG} = "$CFG_DIR/tmp/$$self{_UUID_TMP}freeze";
+    $self->{_TMPCFG} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}freeze";
 
-    $self->{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
+    $self->{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
     while (-f $$self{_TMPPIPE}) {
         ++$_C;
-        $$self{_TMPPIPE} = "$CFG_DIR/tmp/asbru_PID{$$}_n$_C.pipe";
+        $$self{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
     }
     unlink $$self{_TMPPIPE};
 
-    $self->{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
+    $self->{_TMPSOCKET} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.socket";
     while (-f $$self{_TMPSOCKET}) {
         ++$_C;
-        $$self{_TMPSOCKET} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.socket";
+        $$self{_TMPSOCKET} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.socket";
     }
     unlink $$self{_TMPSOCKET};
 
-    $self->{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
+    $self->{_TMPSOCKETEXEC} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.exec.socket";
     while (-f $$self{_TMPSOCKETEXEC}) {
         ++$_C;
-        $$self{_TMPSOCKETEXEC} = "$CFG_DIR/sockets/asbru_PID{$$}_n$_C.exec.socket";
+        $$self{_TMPSOCKETEXEC} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.exec.socket";
     }
     unlink $$self{_TMPSOCKETEXEC};
 
@@ -437,13 +438,23 @@ sub start {
     my $isCluster = $$self{_CLUSTER} ? 1 : 0;
     # Start and fork our connector
     my @args;
+    my $spawn_env;
+    my $subCwd = $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : '.';
     if ($$self{_CFG}{'defaults'}{'use login shell to connect'}) {
-        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($PERL_BIN $PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster; exit)"];
+        @args = [$SHELL_BIN, $SHELL_NAME, '-l', '-c', "($ENV{'ASBRU_ENV_FOR_INTERNAL'} '$^X' '$PAC_CONN' '$$self{_TMPCFG}' '$$self{_UUID}' '$isCluster'; exit)"];
+        $spawn_env = $ENV{'ASBRU_ENV_FOR_EXTERNAL'};
     } else {
-        @args = [$PERL_BIN, 'perl', $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        @args = [$^X, $^X, $PAC_CONN, $$self{_TMPCFG}, $$self{_UUID}, $isCluster];
+        $spawn_env = "";
     }
-    if (!$$self{_GUI}{_VTE}->spawn_sync([], $method eq 'PACShell' ? $$self{_CFG}{'defaults'}{'shell directory'} : undef, @args, undef, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef)) {
-        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID}'!!";
+    $spawn_env .= " ASBRU_SUB_CWD='$subCwd'";
+    my @arr_spawn_env = $self->_convertEnv($spawn_env);
+    my $spawnSyncResult = undef;
+    eval {
+        $spawnSyncResult = $$self{_GUI}{_VTE}->spawn_sync([], undef, @args, \@arr_spawn_env, 'G_SPAWN_FILE_AND_ARGV_ZERO', undef, undef, undef);
+    };
+    if (!$spawnSyncResult || $@) {
+        $$self{ERROR} = "ERROR: VTE could not fork command '$PAC_CONN $$self{_TMPCFG} $$self{_UUID} $isCluster'!! at: $@";
         $$self{CONNECTING} = 0;
         return 0;
     }
@@ -468,23 +479,7 @@ sub start {
         $PACMain::FUNCS{_CLUSTER}->addToCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
-    # Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
-    defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
-    $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'} and $$self{_SEND_STRING} = Glib::Timeout->add_seconds(
-        $$self{_CFG}{environments}{$$self{_UUID}}{'send string every'},
-        sub {
-            if (not $$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
-                return 1;
-            }
-
-            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
-            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
-
-            return 1;
-        }
-    );
+    $self->_startSendStringTimeout();
 
     $$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script'} and $PACMain::FUNCS{_SCRIPTS}->_execScript($$self{_CFG}{'environments'}{$$self{_UUID}}{'startup script name'}, $self->{_PARENTWINDOW}, $$self{_UUID_TMP});
     $$self{_GUI}{_VTE}->grab_focus();
@@ -492,6 +487,17 @@ sub start {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     }
     return 1;
+}
+
+# Converts env vars string list to array
+sub _convertEnv {
+    my $self = shift;
+    my $env_string = shift;
+    my @matches = ();
+    while ($env_string =~ /(?<envName>\w+)=(?<envValue>(?<quot>['"]?)[^']*?\k{quot})/g) {
+        push @matches, "$+{envName}=$+{envValue}";
+    }
+    return @matches;
 }
 
 # Stop and close GUI
@@ -585,6 +591,7 @@ sub stop {
     if (defined $$self{_SEND_STRING}) {
         eval {
             Glib::Source->remove($$self{_SEND_STRING});
+            undef $$self{_SEND_STRING};
         };
     }
     $self->_stopEmbedKidnapTimeout();
@@ -610,6 +617,7 @@ sub stop {
     unlink($$self{_TMPCFG});
     unlink($$self{_TMPPIPE});
     unlink($$self{_TMPSOCKET});
+    unlink($$self{_TMPSOCKETEXEC});
     if (!($self->{_CFG}{'defaults'}{'save session logs'} || $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'})) {
         unlink($$self{_LOGFILE});
     }
@@ -650,6 +658,27 @@ sub unlock {
 
 ###################################################################
 # START: Private functions definitions
+
+# Create a Glib timeout to programatically send a given string to the connected terminal (if so is configured!)
+sub _startSendStringTimeout {
+    my $self = shift;
+    defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
+    $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'} and $$self{_SEND_STRING} = Glib::Timeout->add_seconds(
+        $$self{_CFG}{environments}{$$self{_UUID}}{'send string every'},
+        sub {
+            if (not $$self{CONNECTED} && $$self{_CFG}{environments}{$$self{_UUID}}{'send string active'}) {
+                return 1;
+            }
+
+            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
+            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
+            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
+            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
+
+            return 1;
+        }
+    );
+}
 
 # Find out a free local TCP port
 sub _getLocalPort {
@@ -1017,6 +1046,9 @@ sub _setupCallbacks {
 
     # Capture focus-in
     $$self{_GUI}{_VTE}->signal_connect('focus_in_event' => sub {
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
         if ($$self{_CFG}{defaults}{'change main title'}) {
             $$self{_NOTEBOOKWINDOW}->set_title("@{[__($$self{_TITLE})]}  - $APPNAME");
         }
@@ -1038,6 +1070,10 @@ sub _setupCallbacks {
     $$self{_GUI}{_VTE}->signal_connect('key_press_event' => sub {
         my ($widget, $event) = @_;
         my ($action, $keymask);
+
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
 
         if (defined $$self{_KEYS_RECEIVE}) {
             return 1;
@@ -1218,6 +1254,9 @@ sub _setupCallbacks {
     });
     $$self{_GUI}{_VTE}->signal_connect('cursor_moved' => sub {
         $$self{_NEW_DATA} = 1;
+        if($$self{_CFG}{environments}{$$self{_UUID}}{'send string only when idle'}) {
+            $self->_startSendStringTimeout();
+        }
         $self->_setTabColour();
     });
 
@@ -1323,15 +1362,22 @@ sub _setupCallbacks {
         $$self{CONNECTING} = 0;
 
         # Show a "reconnect" message
-        my $string = "DISCONNECTED (PRESS <ENTER> TO RECONNECT)";
+        my $string = "DISCONNECTED";
+        my $can_reconnect = 1;
         if (!defined($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'})) {
             # Likely the session has been deleted from 'environments', there is no way to restart this session
             $string = "THIS CONNECTION IS NOT AVAILABLE ANYMORE";
+            $can_reconnect = 0;
         } elsif ($$self{_CFG}{'environments'}{$$self{_UUID}}{'method'} eq 'generic') {
-            $string = "EXECUTION FINISHED (PRESS <ENTER> TO EXECUTE AGAIN)";
+            $string = "EXECUTION FINISHED";
         }
+        $string  = "\r\n${COL_RED}${string} (" . (localtime(time)) . ")${COL_RESET}\r\n";
+        if ($can_reconnect) {
+            $string .= " - press ${COL_YELL}ENTER${COL_RESET} to reconnect\r\n";
+        }
+        $string .= " - press ${COL_YELL}" . $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'close', 2) . "${COL_RESET} to close the terminal\r\n\n";
         if (defined $$self{_GUI}{_VTE}) {
-            _vteFeed($$self{_GUI}{_VTE}, "\r\n${COL_RED}$string (" . (localtime(time)) . ")${COL_RESET}\r\n\n");
+            _vteFeed($$self{_GUI}{_VTE}, $string);
         }
 
         # Switch to the message window
@@ -1345,6 +1391,7 @@ sub _setupCallbacks {
         if (defined $$self{_SEND_STRING}) {
             eval {
                 Glib::Source->remove($$self{_SEND_STRING});
+                undef $$self{_SEND_STRING};
             };
         }
         $self->_stopEmbedKidnapTimeout();
@@ -1445,7 +1492,7 @@ sub _watchConnectionData {
             }
 
         } elsif ($data =~ /^EXPLORER:(.+)/go) {
-            system("xdg-open '$1' &");
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} xdg-open '$1' &");
         } elsif ($data =~ /^PIPE_WAIT\[(.+?)\]\[(.+)\]/go) {
             my $time = $1;
             my $prompt = $2;
@@ -2290,19 +2337,7 @@ sub _vteMenu {
                         Glib::Source->remove($$self{_SEND_STRING});
                         undef $$self{_SEND_STRING};
                     } else {
-                        defined $$self{_SEND_STRING} and Glib::Source->remove($$self{_SEND_STRING});
-                        $$self{_SEND_STRING} = Glib::Timeout->add_seconds($$self{_CFG}{environments}{$$self{_UUID}}{'send string every'}, sub {
-                            if (!$$self{CONNECTED}) {
-                                return 1;
-                            }
-
-                            my $txt = $$self{_CFG}{environments}{$$self{_UUID}}{'send string txt'};
-                            my $intro = $$self{_CFG}{environments}{$$self{_UUID}}{'send string intro'};
-                            $txt = _subst($txt, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-                            _vteFeedChild($$self{_GUI}{_VTE}, $txt . ($intro ? "\n" : ''));
-
-                            return 1;
-                        });
+                        $self->_startSendStringTimeout();
                     }
                 }
             },
@@ -2453,8 +2488,8 @@ sub _updateStatus {
 
     # Show forwarding in status bar
     if ($self->{CONNECTED} &&
-    	$$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
-    	$$self{_CFG}{defaults}{'info in status bar'}){
+        $$self{_CFG}{environments}{$$self{_UUID}}{method} eq 'SSH' &&
+        $$self{_CFG}{defaults}{'info in status bar'}){
         ($forward_ports) = $$self{_CFG}{environments}{$$self{_UUID}}{options} =~ /((-L|-D|-R)(.+))/;
         if (! defined $forward_ports){
             $forward_ports = '';
@@ -2686,6 +2721,7 @@ sub _tabMenu {
 
     # Show a popup with the opened tabs (if tabbed!!)
     my @submenu_goto;
+    my %submenu_goto_labels;
     foreach my $uuid (keys %PACMain::RUNNING) {
         if (!defined $PACMain::RUNNING{$uuid}{terminal}{_SPLIT}) {
             next;
@@ -2694,13 +2730,29 @@ sub _tabMenu {
         if ($uuid eq $$self{_UUID} || $i < 0) {
             next;
         }
+        # Remember the number of times we encountered the same label
+        my $label = $PACMain::RUNNING{$uuid}{terminal}{_TITLE};
+        if (!defined $submenu_goto_labels{$label}) {
+            $submenu_goto_labels{$label} = 0;
+        }
+        $submenu_goto_labels{$label}++;
+
+        # Add new entry into the list
         push(@submenu_goto,
-        {
-            label => "$i: $PACMain::RUNNING{$uuid}{terminal}{_TITLE}",
-            code => sub {
-                $$self{_NOTEBOOK}->set_current_page($i);
+            {
+                label => $label,
+                page_number => $i,
+                code => sub {
+                    $$self{_NOTEBOOK}->set_current_page($i);
+                }
             }
-        });
+        );
+    }
+    foreach my $submenu_goto_entry (@submenu_goto) {
+        # If multiple tabs with the same name, add the page number to be able to identify them
+        if ($submenu_goto_labels{$submenu_goto_entry->{label}} > 1) {
+            $submenu_goto_entry->{label} .= ' (#' . $submenu_goto_entry->{page_number} . ')';
+        }
     }
     @submenu_goto = sort {$$a{label} cmp $$b{label}} @submenu_goto;
     push(@vte_menu_items,
@@ -3276,7 +3328,7 @@ sub _execute {
         $tmp{cmd} = $cmd;
         nstore_fd(\%tmp, $$self{_SOCKET_CLIENT}) or die "ERROR:$!";
     } elsif ($where eq 'local') {
-        system($cmd . ' &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd &");
     }
 
     return 1;
@@ -3295,7 +3347,7 @@ sub _pipeExecOutput {
         open(F, ">:utf8", $$self{_TMPPIPE});
         print F $out;
         close F;
-        $out = `cat $$self{_TMPPIPE} | $cmd 2>&1`;
+        $out = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} cat $$self{_TMPPIPE} | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd 2>&1`;
     }
     $$self{_EXEC}{OUT} = $out;
     $PACMain::FUNCS{_PIPE}->show();
@@ -3389,7 +3441,7 @@ sub _wPrePostExec {
             Gtk3::main_iteration while Gtk3::events_pending;
 
             # Launch the local command
-            system($cmd);
+            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd");
         }
 
         # Change mouse cursor (to normal)

@@ -2,6 +2,51 @@
 
 Here you can find important news on the project
 
+## 13.11.2022
+
+We are pleased to announce a new version (6.4.0) of Ásbrú Connection Manager that brings some new important features:
+
+- Support for AppImage ([#804](https://github.com/asbru-cm/asbru-cm/issues/804))
+- Add "postpend" command ([#850](https://github.com/asbru-cm/asbru-cm/issues/850))
+- Support vendor configuration ([#860](https://github.com/asbru-cm/asbru-cm/pull/860))
+- Add SSH option that create random SOCKS tunnel on connection startup ([#771](https://github.com/asbru-cm/asbru-cm/issues/771))
+
+And other improvements or bugfixes:
+
+- Sort open connections alphabetically in the "Goto Tabs" submenu ([#962](https://github.com/asbru-cm/asbru-cm/issues/962))
+- Support configuration directory to be in a smb/cifs shared directory ([#909](https://github.com/asbru-cm/asbru-cm/issues/909))
+- Programatically send string only when Idle ([#902](https://github.com/asbru-cm/asbru-cm/pull/902))
+- Show nicer warning when a tunnel has already be open in another terminal ([#862](https://github.com/asbru-cm/asbru-cm/pull/863))
+- Rearrange authentication user/password and manual mode ([#788](https://github.com/asbru-cm/asbru-cm/issues/788))
+- Improve display of keybindings ([#787](https://github.com/asbru-cm/asbru-cm/issues/787))
+- Improve show/hide connections list behaviour ([#786](https://github.com/asbru-cm/asbru-cm/issues/786))
+- Show better error message when KeePassXC lookup fails ([#770](https://github.com/asbru-cm/asbru-cm/issues/770))
+- Support for Crypt::CBC 3.04 ([#816](https://github.com/asbru-cm/asbru-cm/issues/816))
+- Display local port when showing jump server command line ([#982](https://github.com/asbru-cm/asbru-cm/issues/982))
+- Accept 0 as port number for Jump Server ([#888](https://github.com/asbru-cm/asbru-cm/issues/888))
+- Fix tray icon ([#870](https://github.com/asbru-cm/asbru-cm/issues/870))
+- Allow multiple copy/paste of the same node, with mouse ([#729](https://github.com/asbru-cm/asbru-cm/issues/729))
+- Fix read of KeePass file in a folder with cyrillic letter ([#859](https://github.com/asbru-cm/asbru-cm/issues/859))
+- Do not reset connection list when removing an element from a cluster ([#862](https://github.com/asbru-cm/asbru-cm/pull/862))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
+
+## 21.05.2022
+
+We are pleased to announce a bug fix release (6.3.3) of Ásbrú Connection Manager that addresses several issues:
+
+- Closing one tab in cluster disconnects whole cluster ([#634](https://github.com/asbru-cm/asbru-cm/pull/634))
+- Power Cluster Controller (PCC) can't close multiple exploded tabs ([#791](https://github.com/asbru-cm/asbru-cm/pull/791))
+- Error when using an entry of a KeePass database with a pipe ("|") on title ([#794](https://github.com/asbru-cm/asbru-cm/pull/794))
+- KeepassXC password exposed on asbru-cm local shell terminal ([#801](https://github.com/asbru-cm/asbru-cm/pull/801))
+- Add support for PubkeyAcceptedKeyTypes option ([#853](https://github.com/asbru-cm/asbru-cm/pull/853))
+- Can't close tab after doing split-unsplit ([#871](https://github.com/asbru-cm/asbru-cm/pull/871))
+- SFTP via jumphost to target with private key instead of password doesn't work ([#913](https://github.com/asbru-cm/asbru-cm/pull/913))
+- Settings password set if dialogs canceled ([#922](https://github.com/asbru-cm/asbru-cm/pull/922))
+- Support for KeepassXC 2.7.0 (and above) ([#924](https://github.com/asbru-cm/asbru-cm/pull/924))
+
+Please share this information so we can get even more contributors to continue our efforts making Ásbrú Connection Manager even better !
+
 ## 27.02.2021
 
 We are pleased to announce a bug fix release (6.3.2) of Ásbrú Connection Manager that addresses several issues:

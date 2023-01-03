@@ -3,7 +3,7 @@ package PACExecEntry;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -361,7 +361,7 @@ sub _buildExec {
             }
         };
 
-        system(_subst($cmd, $PACMain::FUNCS{_MAIN}{_CFG}) . ' &');
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} " . _subst($cmd, $PACMain::FUNCS{_MAIN}{_CFG}) . ' &');
 
         return 1;
     }) if ($$self{'where'} eq 'local');

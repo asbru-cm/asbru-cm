@@ -3,7 +3,7 @@ package PACConfig;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -65,8 +65,8 @@ my $GLADE_FILE = "$RealBin/res/asbru.glade";
 my $CFG_DIR = $ENV{"ASBRU_CFG"};
 my $RES_DIR = "$RealBin/res";
 my $THEME_DIR = "$RES_DIR/themes/default";
-
-my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', '12345678'), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
+my $SALT = '12345678';
+my $CIPHER = Crypt::CBC->new(-key => 'PAC Manager (David Torrejon Vaquerizas, david.tv@gmail.com)', -cipher => 'Blowfish', -salt => pack('Q', $SALT), -pbkdf => 'opensslv1', -nodeprecate => 1) or die "ERROR: $!";
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -212,6 +212,15 @@ sub _initGUI {
         _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\nTray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>.");
     }
 
+    # Disable save button if in readonly mode
+    if ($ENV{"ASBRU_IS_READONLY"}) {
+        _($self, 'btnSaveConfig')->set_sensitive(0);
+        _($self, 'btnSaveConfig')->set_tooltip_text('You cannot save the preferences in readonly mode.');
+    } else {
+        _($self, 'btnSaveConfig')->set_sensitive(1);
+        _($self, 'btnSaveConfig')->set_tooltip_text('Save the current configuration.');
+    }
+
     # Show preferences
     _updateGUIPreferences($self);
 
@@ -266,7 +275,7 @@ sub _setupCallbacks {
         _($self, 'hboxWidthHeight')->set_sensitive(_($self, 'cbCfgNewInWindow')->get_active());
     });
     _($self, 'btnCfgOpenSessionLogs')->signal_connect('clicked' => sub {
-        system('/usr/bin/xdg-open ' . (_($self, 'btnCfgSaveSessionLogs')->get_current_folder()));
+        system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} /usr/bin/xdg-open " . (_($self, 'btnCfgSaveSessionLogs')->get_current_folder()));
     });
     _($self, 'btnCloseConfig')->signal_connect('clicked' => sub {
         $self->_closeConfiguration();
@@ -333,8 +342,11 @@ sub _setupCallbacks {
                 $PACMain::FUNCS{_MAIN}->_setCFGChanged(1);
             }
         } else {
+            if (!$CIPHER->salt()) {
+                $CIPHER->salt(pack('Q',$SALT));
+            }
             my $pass = _wEnterValue($$self{_WINDOWCONFIG}, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
-            if ((! defined $pass) || ($CIPHER->encrypt_hex($pass) ne $$self{_CFG}{'defaults'}{'gui password'}) ) {
+            if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
                 _($self, 'hboxCfgPACPassword')->set_sensitive(1);
@@ -656,7 +668,7 @@ sub cleanUpPersonalData {
     my $file = shift;
     my $out = $file;
 
-    system "mv -f $file $file.txt";
+    system "$ENV{'ASBRU_ENV_FOR_EXTERNAL'} mv -f $file $file.txt";
     $file .= ".txt";
 
     $SIG{__WARN__} = sub{};

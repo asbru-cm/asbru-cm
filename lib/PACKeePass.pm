@@ -3,7 +3,7 @@ package PACKeePass;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2021 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejon Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -33,6 +33,7 @@ $|++;
 # Standard
 use strict;
 use warnings;
+use version;
 
 use Encode;
 use FindBin qw ($RealBin $Bin $Script);
@@ -530,11 +531,20 @@ sub _locateEntries {
     my ($pid,$cfg);
     my $timestamp;
     my @out;
+    my $search_command;
+    my $search_term;
 
     if ($$self{cfg}) {
         $cfg = $$self{cfg};
     } else {
         $cfg = $self->get_cfg();
+    }
+    if (version->parse($$self{kpxc_version}) >= version->parse("2.7.0")) {
+        $search_command = 'search';
+        $search_term = '';
+    } else {
+        $search_command = 'locate';
+        $search_term = '/';
     }
     $timestamp = stat($$cfg{database})->mtime;
     if (!@KPXC_LIST || $$self{'last_timestamp'} != $timestamp) {
@@ -544,7 +554,7 @@ sub _locateEntries {
             no warnings 'once';
             open(SAVERR,">&STDERR");
             open(STDERR,"> /dev/null");
-            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} locate $$self{kpxc_keyfile_opt} '$$cfg{database}' '/'");
+            $pid = open2(*Reader,*Writer,"$CLI $$self{kpxc_cli} ${search_command} $$self{kpxc_keyfile_opt} '$$cfg{database}' '${search_term}'");
             print Writer "$KPXC_MP\n";
             close Writer;
             @KPXC_LIST = <Reader>;
@@ -786,7 +796,7 @@ sub _setCapabilities {
     if ($$self{_VERBOSE}) {
         print "DEBUG:KEEPASS: $CLI $$self{kpxc_cli}\n";
     }
-    $$self{kpxc_version} = `$CLI $$self{kpxc_cli} -v 2>/dev/null`;
+    $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -v 2>/dev/null`;
     $$self{kpxc_version} =~ s/\n//g;
     if ($$self{kpxc_version} !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
         # Invalid version number, user did not select a valid KeePassXC file
@@ -804,7 +814,7 @@ sub _setCapabilities {
             # Test if we have a system wide installation
             $$self{kpxc_cli} = '';
             $CLI = 'keepassxc-cli';
-            $$self{kpxc_version} = `$CLI -v 2>/dev/null`;
+            $$self{kpxc_version} = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI -v 2>/dev/null`;
             $$self{kpxc_version} =~ s/\n//g;
             if (!$$self{kpxc_version}) {
                 # We do not have keepassxc-cli available, the user defined is not working
@@ -814,7 +824,7 @@ sub _setCapabilities {
             }
         }
     }
-    $c = `$CLI $$self{kpxc_cli} -h show 2>&1`;
+    $c = `$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $CLI $$self{kpxc_cli} -h show 2>&1`;
     if ($c =~ /--key-file/) {
         $$self{kpxc_keyfile} = '--key-file';
     }
