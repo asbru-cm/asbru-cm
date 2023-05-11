@@ -1137,11 +1137,11 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 
         my @sel = _getSelectedRows($selection);
         return 1 unless scalar(@sel);
-        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". (scalar(@sel) ) . " Ásbrú Scripts?");
-
+        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". (scalar(@sel) ) . " Ásbrú Scripts?");        
+        
         # Delete selected files
         foreach my $path (@sel) {
-            my ($file, $name) = $model->get_value($model->get_iter($path) );
+            my ($file, $name) = $model->get_value($model->get_iter($path), (0));
             unlink($file);
         }
 
