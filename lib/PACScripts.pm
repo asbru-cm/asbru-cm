@@ -1141,7 +1141,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         
         # Delete selected files
         foreach my $path (@sel) {
-            my ($file, $name) = $model->get_value($model->get_iter($path), (0));
+            my ($file, $name) = $model->get_value($model->get_iter($path), 0);
             unlink($file);
         }
 
