@@ -86,6 +86,7 @@ sub update {
     $$self{gui}{spQuality}->set_value($$options{quality});
     $$self{gui}{spCompressLevel}->set_value($$options{compressLevel});
     $$self{gui}{cbColours}->set_active($REVCOLOURS{$$options{colours}});
+    $$self{gui}{chShowDotNoCursor}->set_active($$options{showDotCursor});
 
     return 1;
 }
@@ -110,6 +111,7 @@ sub get_cfg {
     $options{quality} = $$self{gui}{spQuality}->get_value;
     $options{compressLevel} = $$self{gui}{spCompressLevel}->get_value;
     $options{colours} = $$self{gui}{cbColours}->get_active_text;
+    $options{showDotCursor} = $$self{gui}{chShowDotNoCursor}->get_active;
 
     return _parseOptionsToCfg(\%options);
 }
@@ -143,6 +145,7 @@ sub _parseCfgToOptions {
         $opt =~ /^ViewOnly=(\d+)$/go        and    $hash{viewOnly} = $1;
         $opt =~ /^CompressLevel=(\d+)$/go    and    $hash{compressLevel} = $1;
         $opt =~ /^QualityLevel=(\d+)$/go    and    $hash{quality} = $1;
+        $opt =~ /^DotWhenNoCursor=(\d+)$/go        and    $hash{showDotCursor} = $1;
     }
 
     return \%hash;
@@ -160,6 +163,7 @@ sub _parseOptionsToCfg {
     $txt .= ' -ViewOnly='        . ($$hash{viewOnly}    || '0');
     $txt .= ' -CompressLevel='    . $$hash{compressLevel};
     $txt .= ' -QualityLevel='    . $$hash{quality};
+    $txt .= ' -DotWhenNoCursor=' . ($$hash{showDotCursor}    || '0');
 
     return $txt;
 }
@@ -225,6 +229,10 @@ sub _buildGUI {
     $w{chViewOnly} = Gtk3::CheckButton->new_with_label('View Only');
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
     $w{chViewOnly}->set_tooltip_text('[-ViewOnly] : View only mode');
+
+    $w{chShowDotNoCursor} = Gtk3::CheckButton->new_with_label('Show dot as cursor');
+    $w{hbox2}->pack_start($w{chShowDotNoCursor}, 0, 1, 0);
+    $w{chShowDotNoCursor}->set_tooltip_text('[-DotWhenNoCursor] : Show the dot cursor when the server sends an invisible cursor');
 
     $$self{gui} = \%w;
 
