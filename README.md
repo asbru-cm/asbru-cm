@@ -56,6 +56,13 @@ To do so, execute the following commands:
   sudo dnf install asbru-cm
   ````
 
+[!NOTE]
+  In case Fedora > 37, please add the following environment
+
+  ```
+  -E version=37
+  ```
+
 - Pacman-based (e.g. Arch Linux, Manjaro)
 
   ````
