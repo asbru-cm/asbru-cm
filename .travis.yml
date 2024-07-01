@@ -22,6 +22,7 @@ env:
     - OS=fedora DIST=37 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
     - OS=fedora DIST=38 PACKAGE=rpm PACKAGECLOUD=true
     - OS=fedora DIST=39 PACKAGE=rpm PACKAGECLOUD=true
+    - OS=fedora DIST=40 PACKAGE=rpm DOCKER_REPO=asbru/asbru-cm PACKAGECLOUD=true
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
     - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
