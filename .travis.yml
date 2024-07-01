@@ -9,7 +9,6 @@ env:
     - CHANGELOG_EMAIL=contact@asbru-cm.net
     - PRODUCT=asbru-cm
   jobs:
-    - OS=debian DIST=stretch PACKAGE=deb PACKAGECLOUD=true
     - OS=debian DIST=buster PACKAGE=deb EXECUTE_BUILD_DOCS=true PACKAGECLOUD=true
     - OS=debian DIST=bullseye PACKAGE=deb PACKAGECLOUD=true
     - OS=ubuntu DIST=xenial PACKAGE=deb PACKAGECLOUD=true
@@ -24,10 +23,6 @@ env:
     - OS=fedora DIST=39 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=7 PACKAGE=rpm PACKAGECLOUD=true
     - OS=el DIST=8 PACKAGE=rpm PACKAGECLOUD=true
-    - OS=linuxmint DIST=tara PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
-    - OS=linuxmint DIST=tessa PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
-    - OS=linuxmint DIST=tina PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
-    - OS=linuxmint DIST=tricia PACKAGE=deb DOCKER_IMAGE=ubuntu-bionic PACKAGECLOUD=true
     - OS=linuxmint DIST=ulyana PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=ulyssa PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
     - OS=linuxmint DIST=uma PACKAGE=deb DOCKER_IMAGE=ubuntu-focal PACKAGECLOUD=false
