@@ -2590,7 +2590,7 @@ sub _treeConnections_menu_lite {
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
-    foreach my $var (map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
+    foreach my $var (map{ ($_->{hide} ? '<hidden>' : $_->{txt}) // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
         my $j = $i;
         push(@var_submenu, {
             label => '<V:' . $j . '> = ' . $var,
@@ -2853,7 +2853,7 @@ sub _treeConnections_menu {
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
-    foreach my $var (map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
+    foreach my $var (map{ ($_->{hide} ? '<hidden>' : $_->{txt}) // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
         my $j = $i;
         push(@var_submenu, {
             label => '<V:' . $j . '> = ' . $var,
