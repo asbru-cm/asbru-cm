@@ -2299,7 +2299,10 @@ sub _setupCallbacks {
 
         $self->_doFocusPage($pnum);
 
-        $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
+        # Show/hide the button bar
+        $$self{_GUI}{hbuttonbox1}->set_visible($pnum == 0 || !$$self{'_CFG'}{'defaults'}{'auto hide button bar'});
+
+        # Show/hide the connections list
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
             $$self{_GUI}{showConnBtn}->set_active(1);

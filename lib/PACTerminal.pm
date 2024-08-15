@@ -817,12 +817,10 @@ sub _initGUI {
     # Only in traditional mode, show additional buttons
     if ($$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         # Create a checkbox to show/hide the button bar
-        $$self{_GUI}{btnShowButtonBar} = Gtk3::ToggleButton->new();
+        $$self{_GUI}{btnShowButtonBar} = Gtk3::Button->new();
         $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
         $$self{_GUI}{btnShowButtonBar}->set('can-focus' => 0);
         $$self{_GUI}{btnShowButtonBar}->set_tooltip_text('Show/Hide button bar');
-        $$self{_GUI}{btnShowButtonBar}->set_active($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 0 : 1);
-        $$self{_GUI}{btnShowButtonBar}->set_inconsistent(0);
         $$self{_GUI}{bottombox}->pack_end($$self{_GUI}{btnShowButtonBar}, 0, 1, 4);
 
         # Create a button to show the info tab
@@ -990,13 +988,15 @@ sub _setupCallbacks {
 
     # Show Bar (if any)
     if ($$self{_GUI}{btnShowButtonBar}) {
-        $$self{_GUI}{btnShowButtonBar}->signal_connect('toggled', sub {
-            if ($$self{_GUI}{btnShowButtonBar}->get_active()) {
+        $$self{_GUI}{btnShowButtonBar}->signal_connect('clicked', sub {
+            if ($$self{'_CFG'}{'defaults'}{'auto hide button bar'}) {
                 $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->show();
+                $$self{'_CFG'}{'defaults'}{'auto hide button bar'} = 0;
             } else {
                 $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock('asbru-buttonbar-show', 'GTK_ICON_SIZE_BUTTON'));
                 $PACMain::FUNCS{_MAIN}{_GUI}{hbuttonbox1}->hide();
+                $$self{'_CFG'}{'defaults'}{'auto hide button bar'} = 1;
             };
         });
     }
@@ -2468,6 +2468,10 @@ sub _setTabColour {
     } else {
         defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL}->set_icon_from_file($$self{CONNECTED} ? "$RealBin/res/asbru_terminal64x64.png" : "$RealBin/res/asbru_terminal_x64x64.png");
     }
+
+    # Set correct icon for hide/show button bar button
+    # (it may have changed in another terminal)
+    $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
 
     # Once checked the availability of new data, reset its value
     $$self{_NEW_DATA} = 0;
