@@ -1172,6 +1172,8 @@ sub _setupCallbacks {
             if (not $$self{_UUID} eq '__PAC_SHELL__') {
                 $PACMain::FUNCS{_EDIT}->show($$self{_UUID});
             }
+        } elsif ($action eq 'rename-tab') {
+            $self->_renameTab();
         } elsif ($action =~ /zoom/) {
             $self->_zoomHandler($action);
         } elsif ($action =~ /HOTKEY_CMD:(\w+)/) {
@@ -2174,7 +2176,7 @@ sub _vteMenu {
     # Copy Connection Password
     if (($$self{_CFG}{environments}{$$self{_UUID}}{'pass'} ne '')||($$self{_CFG}{environments}{$$self{_UUID}}{'passphrase'} ne '')) {
         push(@vte_menu_items, {
-            label => 'Copy Connection Password',
+            label => 'Copy connection password',
             stockicon => 'gtk-copy',
             sensitive => $$self{CONNECTED},
             code => sub {
@@ -2208,7 +2210,7 @@ sub _vteMenu {
     # Paste Special
     push(@vte_menu_items,
     {
-        label => 'Paste and Delete...',
+        label => 'Paste and delete...',
         stockicon => 'gtk-paste',
         shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'paste-delete'),
         tooltip => 'Paste clipboard contents, but remove any Perl RegExp matching string from the appearing prompt GUI',
@@ -2228,9 +2230,12 @@ sub _vteMenu {
 
     # Add find string
     push(@vte_menu_items, {separator => 1});
-    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find', shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'find-terminal'), code => sub {
-        $self->_wFindInTerminal(); return 1;
-    }});
+    push(@vte_menu_items, {label => 'Find...', stockicon => 'gtk-find',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'find-terminal'),
+        code => sub {
+            $self->_wFindInTerminal(); return 1;
+        }
+    });
 
     # Add save session log
     push(@vte_menu_items, {label => 'Save session log...', stockicon => 'gtk-save', code => sub {
@@ -2243,18 +2248,12 @@ sub _vteMenu {
     }});
 
     # Add change temporary tab label
-    push(@vte_menu_items, {label => 'Temporary TAB Label change...', stockicon => 'gtk-edit', code => sub {
-        # Prepare the input window
-        my $new_label = _wEnterValue(
-            $$self{_PARENTWINDOW},
-            "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
-            'Enter the new temporal label:', $$self{_TITLE}
-        );
-        if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
-            $$self{_TITLE} = $new_label;
+    push(@vte_menu_items, {label => 'Temporary tab name change...', stockicon => 'gtk-edit',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'rename-tab'),
+        code => sub {
+            $self->_renameTab();
         }
-        $self->_setTabColour();
-    }});
+    });
 
     # Change title with guessed hostname
     push(@vte_menu_items, {label => 'Set title with guessed hostname', sensitive => ($$self{CONNECTED} && ! $$self{CONNECTING}), code => sub {
@@ -2375,7 +2374,7 @@ sub _vteMenu {
             },
             # Disconnect and restart session
             {
-                label => 'Disconnect and Restart session',
+                label => 'Disconnect and restart session',
                 stockicon => 'gtk-refresh',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'restart'),
                 sensitive => $$self{CONNECTED} && $$self{_PID},
@@ -2385,7 +2384,7 @@ sub _vteMenu {
             },
             # Close terminal
             {
-                label => 'Close Terminal',
+                label => 'Close terminal',
                 stockicon => 'gtk-close',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'close'),
                 code => sub {
@@ -2394,7 +2393,7 @@ sub _vteMenu {
             },
             # Close all terminals
             {
-                label => 'Close All Terminals',
+                label => 'Close all terminals',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'closeallterminals'),
                 stockicon => 'gtk-close',
                 sensitive => $self->_hasOtherTerminals(),
@@ -2404,7 +2403,7 @@ sub _vteMenu {
             },
             # Close disconnected terminals
             {
-                label => 'Close Disconnected Terminals',
+                label => 'Close disconnected terminals',
                 stockicon => 'gtk-close',
                 shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'close-disconected'),
                 sensitive => $self->_hasDisconnectedTerminals(),
@@ -2822,7 +2821,7 @@ sub _tabMenu {
             @submenu_split_v = sort {$$a{label} cmp $$b{label}} @submenu_split_v;
             @submenu_split_h = sort {$$a{label} cmp $$b{label}} @submenu_split_h;
 
-            push(@vte_menu_items, {label => 'Detach TAB to a new Window', stockicon => 'gtk-fullscreen', code => sub {
+            push(@vte_menu_items, {label => 'Detach tab to a new window', stockicon => 'gtk-fullscreen', code => sub {
                 _tabToWin($self);
                 return 1;
             }});
@@ -2954,20 +2953,12 @@ sub _tabMenu {
     }});
 
     # Add change temporary tab label
-    push(@vte_menu_items, {label => 'Temporary TAB Label change...', stockicon => 'gtk-edit', code => sub {
-        # Prepare the input window
-        my $new_label = _wEnterValue(
-            $$self{_PARENTWINDOW},
-            "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
-            'Enter the new temporal label:',
-            $$self{_TITLE}
-        );
-
-        if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
-            $$self{_TITLE} = $new_label;
+    push(@vte_menu_items, {label => 'Temporary tab name change...', stockicon => 'gtk-edit',
+        shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'rename-tab'),
+        code => sub {
+            $self->_renameTab();
         }
-        $self->_setTabColour();
-    }});
+    });
 
     # Add a submenu with available connections
     push(@vte_menu_items, {separator => 1});
@@ -3237,6 +3228,21 @@ sub _setupTabDND {
     });
 
     return 1;
+}
+
+sub _renameTab() {
+    my $self = shift;
+
+    # Prepare the input window
+    my $new_label = _wEnterValue(
+        $$self{_PARENTWINDOW},
+        "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
+        'Enter the new temporal label:', $$self{_TITLE}
+    );
+    if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
+        $$self{_TITLE} = $new_label;
+    }
+    $self->_setTabColour();
 }
 
 sub _saveSessionLog {

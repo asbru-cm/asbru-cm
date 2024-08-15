@@ -535,6 +535,7 @@ sub _getDefaultConfig {
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal',          'zoomreset',           'Zoom reset text'];
     $$cfg{'terminal'}{'Ctrl+ampersand'}= ['Terminal',          'cisco',               'Send Cisco interrupt keypress'];
     $$cfg{'terminal'}{'AltCtrl+s'}     = ['Terminal',          'sftp',                'Open SFTP session'];
+    $$cfg{'terminal'}{'Ctrl+E'}        = ['Terminal',          'rename-tab',          'Rename a terminal session'];
 
     return $cfg;
 }
