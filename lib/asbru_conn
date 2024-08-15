@@ -1257,6 +1257,7 @@ if (defined $METHOD) {
             $PASS = wEnterValue('<b>Manual Password requested</b>', "Enter Password for '$NAME'", '', 0) // '';
         }
         my $method = 'VNC';
+        my $vncviewer_cmd = "LC_ALL=C $METHOD";
         $CONNECT_OPTS =~ s/\s*-embed//go;
         if (`$ENV{'ASBRU_ENV_FOR_EXTERNAL'} vncviewer --help 2>&1 | $ENV{'ASBRU_ENV_FOR_EXTERNAL'} /bin/grep RealVNC`) {
             $method = 'RealVNC';
@@ -1268,23 +1269,23 @@ if (defined $METHOD) {
             my $pfile = "${ENV{'ASBRU_TMP'}}/asbru_conn_{$$}_$UUID";
             system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} echo \"" . _doShellEscape($PASS) . "\" | vncpasswd -f > \"$pfile\"");
             if (defined $$CFG{'tmp'}{'xid'}) {
-                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
-                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
+                $connection_cmd = "$vncviewer_cmd $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
+                $connection_txt = "$vncviewer_cmd $CONNECT_OPTS -PasswordFile=\"$pfile\" -Parent=$$CFG{'tmp'}{'xid'} $IP:$PORT";
             } else {
-                $connection_cmd = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
-                $connection_txt = "$METHOD $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
+                $connection_cmd = "$vncviewer_cmd $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
+                $connection_txt = "$vncviewer_cmd $CONNECT_OPTS -PasswordFile=\"$pfile\" $IP:$PORT";
             }
         } elsif ($method eq 'RealVNC') {
             my $user = $USER ? "UserName=$USER" : '';
 
-            $connection_cmd = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
-            $connection_txt = "$METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_cmd = "$vncviewer_cmd $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "$vncviewer_cmd $CONNECT_OPTS $user $IP:$PORT";
             $METHOD = "Real$METHOD";
         } else {
             my $user = '';
 
-            $connection_cmd = "echo \"" . _doShellEscape($PASS) . "\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
-            $connection_txt = "echo \"<<hidden_password>>\" | $METHOD $CONNECT_OPTS $user $IP:$PORT";
+            $connection_cmd = "echo \"" . _doShellEscape($PASS) . "\" | $vncviewer_cmd $CONNECT_OPTS $user $IP:$PORT";
+            $connection_txt = "echo \"<<hidden_password>>\" | $vncviewer_cmd $CONNECT_OPTS $user $IP:$PORT";
         }
     }
     ##############################################
