@@ -42,7 +42,7 @@ use IPC::Open3;
 use File::stat;
 
 # GTK
-use Gtk3 '-init';
+use Gtk3;
 
 # PAC modules
 use PACUtils;

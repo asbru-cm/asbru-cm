@@ -44,7 +44,7 @@ use PACKeePass;
 use PACUtils;
 use POSIX qw(strftime);
 
-use Gtk3 '-init';
+use Gtk3;
 
 binmode STDOUT;
 binmode STDERR;

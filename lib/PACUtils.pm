@@ -48,7 +48,7 @@ use Encode;
 use DynaLoader; # Required for PACTerminal and PACShell modules
 
 # GTK
-use Gtk3 '-init';
+use Gtk3;
 use Gtk3::Gdk;
 use Wnck; # for the windows list
 
