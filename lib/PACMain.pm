@@ -1274,7 +1274,8 @@ sub _setupCallbacks {
             # User cancelled the drop operation (or time out), do not process further
             # (only consider valid DnD that did not end up onto a valid target
             if ($_[2] ne 'no-target') {
-                return 0;
+                delete $$self{'DND'}{'selection'};
+                return 1;
             }
 
             # Drop happened out of window: launch terminals
