@@ -1300,8 +1300,10 @@ sub _setupCallbacks {
                 delete $$self{'DND'}{'selection'};
                 return 1;
             }
+
             # Drop happened inside of window: finish
-            return 0;
+            delete $$self{'DND'}{'selection'};
+            return 1;
         });
 
         $$self{_GUI}{$what}->signal_connect('drag_drop' => sub {
