@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for reading this document and showing your interest in contributing to this project.
-Contributing is very easy however we have some very basic rules whe kindly ask to follow.
+Contributing is very easy however we have some very basic rules we kindly ask to follow.
 
 When contributing to this repository, please first discuss the change you wish to make via issue.
 This ensures that everybody can see what you are actually working on and will prevent unnecessary work for everybody.
@@ -9,6 +9,7 @@ This ensures that everybody can see what you are actually working on and will pr
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
 ## Contributor Agreement
+
 By contributing code to Ásbrú Connection Manager, you assert that:
 
 * You have the rights to include the code, either as its original author, or due to it being released to you under a compatible license.
