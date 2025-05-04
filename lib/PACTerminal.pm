@@ -154,14 +154,15 @@ sub new {
     ++$_C;
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
 
+    # By default, there is no session logs
+    $self->{_LOGFILE} = '/dev/null';
+    # If enabled at the session or global level, define the session logs file accordingly
     if ($self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'environments'}{$$self{_UUID}}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     } elsif ($self->{_CFG}{'defaults'}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-    } else {
-        $self->{_LOGFILE} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}.txt";
     }
     $self->{_TMPCFG} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}freeze";
 
