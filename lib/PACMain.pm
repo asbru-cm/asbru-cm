@@ -1274,7 +1274,8 @@ sub _setupCallbacks {
             # User cancelled the drop operation (or time out), do not process further
             # (only consider valid DnD that did not end up onto a valid target
             if ($_[2] ne 'no-target') {
-                return 0;
+                delete $$self{'DND'}{'selection'};
+                return 1;
             }
 
             # Drop happened out of window: launch terminals
@@ -1299,8 +1300,10 @@ sub _setupCallbacks {
                 delete $$self{'DND'}{'selection'};
                 return 1;
             }
+
             # Drop happened inside of window: finish
-            return 0;
+            delete $$self{'DND'}{'selection'};
+            return 1;
         });
 
         $$self{_GUI}{$what}->signal_connect('drag_drop' => sub {
@@ -2296,7 +2299,10 @@ sub _setupCallbacks {
 
         $self->_doFocusPage($pnum);
 
-        $$self{_GUI}{hbuttonbox1}->set_visible(($pnum == 0) || ($pnum && ! $$self{'_CFG'}{'defaults'}{'auto hide button bar'}));
+        # Show/hide the button bar
+        $$self{_GUI}{hbuttonbox1}->set_visible($pnum == 0 || !$$self{'_CFG'}{'defaults'}{'auto hide button bar'});
+
+        # Show/hide the connections list
         if (($pnum == 0)&&($$self{_CFG}{'defaults'}{'auto hide connections list'})) {
             # Info Tab, show connection list
             $$self{_GUI}{showConnBtn}->set_active(1);
@@ -2590,7 +2596,7 @@ sub _treeConnections_menu_lite {
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
-    foreach my $var (map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
+    foreach my $var (map{ ($_->{hide} ? '<hidden>' : $_->{txt}) // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
         my $j = $i;
         push(@var_submenu, {
             label => '<V:' . $j . '> = ' . $var,
@@ -2853,7 +2859,7 @@ sub _treeConnections_menu {
     # Quick Edit variables
     my @var_submenu;
     my $i = 0;
-    foreach my $var (map{ $_->{txt} // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
+    foreach my $var (map{ ($_->{hide} ? '<hidden>' : $_->{txt}) // '' } @{ $$self{_CFG}{'environments'}{$sel[0]}{'variables'} }) {
         my $j = $i;
         push(@var_submenu, {
             label => '<V:' . $j . '> = ' . $var,
