@@ -175,6 +175,126 @@ sub _delNode {
     return 1;
 }
 
+sub _focusPrevious {
+    my $self        = shift;
+    my $uuid        = shift;
+    my $who         = shift;
+    my $NEXT        = 0;
+    my $pg_expanded = 0;
+    my $pg_depth    = 0;
+    my $focus       = undef;
+
+    if (!$uuid) {
+        return 0;
+    }
+    my $model = $self->get_model();
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            my $group     = 0;
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            my $expanded = $self->row_expanded($path);
+            my $str      = $path->to_string();
+            my $depth    = () = $str =~ /:/g;
+            if ($elem_uuid eq $uuid) {
+                return 1;
+            }
+            if ($group && $pg_expanded) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_depth    = $depth;
+                $pg_expanded = $expanded;
+            } elsif ($group && $depth <= $pg_depth) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_expanded = $expanded;
+                $pg_depth    = $depth;
+            } elsif ((!$group && $depth <= $pg_depth) || (!$group && $pg_expanded && $depth > $pg_depth)) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_depth    = $depth;
+                $pg_expanded = 0;
+            }
+            return 0;
+        }
+    );
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            if ($$focus{uuid} eq $elem_uuid) {
+                $self->set_cursor($path, undef, 0);
+                return 1;
+            }
+            return 0;
+        }
+    );
+    return 0;
+}
+
+sub _focusNext {
+    my $self  = shift;
+    my $uuid  = shift;
+    my $who   = shift;
+    my $NEXT  = 0;
+    my $level = -1;
+
+    if (!$uuid) {
+        return 0;
+    }
+    my $model = $self->get_model();
+    $model->foreach(
+        sub {
+            my ($name, $elem_uuid);
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            my $group = 0;
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            my $expanded = $self->row_expanded($path);
+            my $str      = $path->to_string();
+            my $depth    = () = $str =~ /:/g;
+            if ($who && $uuid eq '__PAC__ROOT__') {
+                $NEXT  = 1;
+                $level = 99;
+            }
+            if ($who == 2) {
+
+            }
+            if ($NEXT) {
+                if ($depth <= $level) {
+                    $self->set_cursor($path, undef, 0);
+                    return 1;
+                }
+                return 0;
+            }
+            if ($elem_uuid eq $uuid) {
+                if ($group && !$expanded) {
+                    $level = $depth;
+                } else {
+                    $level = 99;
+                }
+                $NEXT = 1;
+            }
+            return 0;
+        }
+    );
+    return 0;
+}
+
 sub _setTreeFocus {
     my $self = shift;
     my $uuid = shift;
