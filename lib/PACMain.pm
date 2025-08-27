@@ -1750,7 +1750,7 @@ sub _setupCallbacks {
                     $self->_launchTerminals(\@idx);
                 }
                 return 1;
-            } elsif ($action eq 'Escape') {
+            } elsif ($action eq 'Escape' && $$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
                 $$self{_GUI}{nodeClose}->clicked();
                 return 1;
             } elsif ($action eq 'Alt+k' || $action eq 'Ctrl+j') {
