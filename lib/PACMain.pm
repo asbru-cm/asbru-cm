@@ -3143,41 +3143,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 sub _startCluster {
-    my $self = shift;
+    my $self    = shift;
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClusters();
+    my $clulist = $$self{_CLUSTER}->getCFGClustersByTitle();
 
-    if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
-        my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
-        my $host = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{host}/;
-        my $title = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{title}/;
-        my $desc = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}/;
-        foreach my $uuid (keys %{ $$self{_CFG}{environments} }) {
-            if ($uuid eq '__PAC__ROOT__' || $$self{_CFG}{environments}{$uuid}{_is_group}) {
-                next;
-            }
-            if (($name ne '')&&($$self{_CFG}{environments}{$uuid}{name} !~ /$name/)) {
-                next;
-            }
-            if (($host ne '')&&($$self{_CFG}{environments}{$uuid}{ip} !~ /$host/)) {
-                next;
-            }
-            if (($title ne '')&&($$self{_CFG}{environments}{$uuid}{title} !~ /$title/)) {
-                next;
-            }
-            if (($desc ne '')&&($$self{_CFG}{environments}{$uuid}{description} !~ /$desc/)) {
-                next;
-            }
-            push(@idx, [ $uuid, undef, $cluster ]);
-        }
-    } else {
-        foreach my $uuid (keys %{ $$clulist{$cluster} }) {
-            push(@idx, [ $uuid, undef, $cluster ]);
-        }
+    foreach my $key (sort keys %{ $$clulist{$cluster} }) {
+        push(@idx, [ $$clulist{$cluster}{$key}, undef, $cluster ]);
     }
-    if ((scalar(@idx) >= 10)&&(!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
+    if ((scalar(@idx) >= 10) && (!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
         return 1;
     } elsif (!@idx) {
         _wMessage($$self{_GUI}{main}, "Cluster <b>$cluster</b> contains no elements");
