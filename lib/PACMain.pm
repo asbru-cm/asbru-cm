@@ -594,31 +594,6 @@ sub _initGUI {
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_entrySearch}, 0, 1, 0);
     $$self{_GUI}{_entrySearch}->grab_focus();
 
-    $$self{_GUI}{_hboxSearch} = Gtk3::HBox->new(1, 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_hboxSearch}, 0, 1, 0);
-
-    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new('Previous');
-    $$self{_GUI}{_btnPrevSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-previous', 'button'));
-    $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnPrevSearch}, 0, 1, 0);
-    $$self{_GUI}{_btnPrevSearch}->set('can_focus', 0);
-    $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-
-    $$self{_GUI}{_btnNextSearch} = Gtk3::Button->new('Next');
-    $$self{_GUI}{_btnNextSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-next', 'button'));
-    $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnNextSearch}, 0, 1, 0);
-    $$self{_GUI}{_btnNextSearch}->set('can_focus', 0);
-    $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
-
-    $$self{_GUI}{_rbSearchName} = Gtk3::RadioButton->new_with_label('incremental search', 'Name');
-    $$self{_GUI}{_rbSearchName}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchName}, 0, 1, 0);
-    $$self{_GUI}{_rbSearchHost} = Gtk3::RadioButton->new_with_label_from_widget($$self{_GUI}{_rbSearchName}, 'IP / Host');
-    $$self{_GUI}{_rbSearchHost}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchHost}, 0, 1, 0);
-    $$self{_GUI}{_rbSearchDesc} = Gtk3::RadioButton->new_with_label_from_widget($$self{_GUI}{_rbSearchName}, 'Description');
-    $$self{_GUI}{_rbSearchDesc}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchDesc}, 0, 1, 0);
-
     # Create a scrolled2 scrolled window to contain the favourites tree
     $$self{_GUI}{scroll2} = Gtk3::ScrolledWindow->new();
     $$self{_GUI}{nbFavTab} = Gtk3::HBox->new(0, 0);
@@ -1922,15 +1897,11 @@ sub _setupCallbacks {
             $$self{_GUI}{_vboxSearch}->hide();
             $$self{_GUI}{treeConnections}->grab_focus();
             return 1;
-        }
-        # Capture 'up arrow'  keypress to move to previous ocurrence
-        elsif ($action eq 'Up') {
-            $$self{_GUI}{_btnPrevSearch}->clicked();
+        } elsif ($action eq 'Up' || $action eq 'Shift+ISO_Left_Tab') {
+            $self->_searchBackward();
             return 1;
-        }
-        # Capture 'down arrow'  keypress to move to next ocurrence
-        elsif ($action eq 'Down') {
-            $$self{_GUI}{_btnNextSearch}->clicked();
+        } elsif ($action eq 'Down' || $action eq 'Tab') {
+            $self->_searchForward();
             return 1;
         }
         return 0
@@ -1940,6 +1911,7 @@ sub _setupCallbacks {
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         if ((scalar(@sel)==1)&&($sel[0] ne '__PAC__ROOT__')&&(!$$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})&&($$self{_GUI}{_entrySearch}->get_chars(0, -1) ne '')) {
             $$self{_GUI}{connExecBtn}->clicked();
+            $$self{_GUI}{treeConnections}->collapse_all();
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('focus_out_event' => sub {
@@ -1947,75 +1919,19 @@ sub _setupCallbacks {
         $$self{_GUI}{_vboxSearch}->hide();
         $$self{_GUI}{_entrySearch}->set_text('');
     });
-    foreach my $what ('Name', 'Host', 'Desc') {
-        $$self{_GUI}{"_rbSearch" . $what}->signal_connect('toggled' => sub {
-            my $text = $$self{_GUI}{_entrySearch}->get_chars(0, -1);
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
-            if ($text eq '') {
-                return 0;
-            }
-            my $where = 'name';
-            $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
-            $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
-            $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
-            $$self{_GUI}{_ACTUAL} = 0;
-            if (@{ $$self{_GUI}{_RESULT} }) {
-                $$self{_GUI}{_btnPrevSearch}->set_sensitive(1);
-                $$self{_GUI}{_btnNextSearch}->set_sensitive(1);
-                $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
-            }
-            return 0;
-        });
-    }
     $$self{_GUI}{_entrySearch}->signal_connect('changed' => sub {
         my $text = $$self{_GUI}{_entrySearch}->get_chars(0, -1);
-        $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-        $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
         if ($text eq '') {
             return 0;
         }
-        my $where = 'name';
-        $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
-        $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
-        $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
+        $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections});
         $$self{_GUI}{_ACTUAL} = 0;
         if (@{ $$self{_GUI}{_RESULT} }) {
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(1);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(1);
             $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
         } else {
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
             $$self{_GUI}{treeConnections}->_setTreeFocus('__PAC__ROOT__');
         }
         return 0;
-    });
-
-    $$self{_GUI}{_btnPrevSearch}->signal_connect('clicked' => sub {
-        if (!@{$$self{_GUI}{_RESULT}}) {
-            return 1;
-        }
-        if ($$self{_GUI}{_ACTUAL} == 0) {
-            $$self{_GUI}{_ACTUAL} = $#{$$self{_GUI}{_RESULT}};
-        } else {
-            $$self{_GUI}{_ACTUAL}--;
-        }
-        $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[$$self{_GUI}{_ACTUAL}]);
-        return 1;
-    });
-
-    $$self{_GUI}{_btnNextSearch}->signal_connect('clicked' => sub {
-        if (!@{$$self{_GUI}{_RESULT}}) {
-            return 1;
-        }
-        if ($$self{_GUI}{_ACTUAL} == $#{ $$self{_GUI}{_RESULT} }) {
-            $$self{_GUI}{_ACTUAL} = 0;
-        } else {
-            $$self{_GUI}{_ACTUAL}++;
-        }
-        $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
-        return 1;
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
@@ -2374,6 +2290,33 @@ sub _setupCallbacks {
     return 1;
 }
 
+sub _searchBackward {
+    my ($self) = @_;
+    if (!@{ $$self{_GUI}{_RESULT} }) {
+        return 1;
+    }
+    if ($$self{_GUI}{_ACTUAL} == 0) {
+        $$self{_GUI}{_ACTUAL} = $#{ $$self{_GUI}{_RESULT} };
+    } else {
+        $$self{_GUI}{_ACTUAL}--;
+    }
+    $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
+}
+
+sub _searchForward {
+    my ($self) = @_;
+    if (!@{ $$self{_GUI}{_RESULT} }) {
+        return 1;
+    }
+    if ($$self{_GUI}{_ACTUAL} == $#{ $$self{_GUI}{_RESULT} }) {
+        $$self{_GUI}{_ACTUAL} = 0;
+    } else {
+        $$self{_GUI}{_ACTUAL}++;
+    }
+    $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
+    return 1;
+}
+
 sub _setFavourite {
     my ($self,$b,$tree) = @_;
 
@@ -2462,26 +2405,56 @@ sub _unlockAsbru {
 }
 
 sub __search {
-    my $self = shift;
-    my $text = shift;
-    my $tree = shift;
-    my $where = shift // 'name';
+    my $self   = shift;
+    my $text   = shift;
+    my $tree   = shift;
+    my %groups = ();
+    my $follow = '';
 
     my @result;
     my $model = $tree->get_model();
-    $model->foreach(sub {
-        my ($store, $path, $iter) = @_;
-        my $elem_uuid = $model->get_value($model->get_iter($path), 2);
-        my %elem;
-        $elem{name} = $$self{_CFG}{environments}{$elem_uuid}{name} // '';
-        $elem{host} = $$self{_CFG}{environments}{$elem_uuid}{ip} // '';
-        $elem{desc} = $$self{_CFG}{environments}{$elem_uuid}{description} // '';
-        if ($elem{$where} !~ /$text/gi) {
+    if (length($text) < 2) {
+        return \@result;
+    }
+    my @words = split / /, $text;
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            my $str       = $path->to_string();
+            my $search    = '';
+            my $group     = 0;
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            $name =~ s/<.+?> ?//g;
+            if ($group && !$groups{$str}) {
+                $groups{$str} = $name;
+            }
+            foreach my $g (sort keys %groups) {
+                if ($str =~ /$g/) {
+                    $search .= "$groups{$g} ";
+                }
+            }
+            foreach my $f ('name', 'title', 'ip') {
+                my $v = $$self{_CFG}{environments}{$elem_uuid}{$f} // '';
+                if ($f eq 'ip') {
+                    $v =~ s/\.\w+$//;
+                    $v =~ s/\.(?:com|org|edu|net|info|go[bv])$//;
+                }
+                $search .= "$v ";
+            }
+            chop $search;
+            foreach my $w (@words) {
+                if ($search !~ /$w/i) {
+                    return 0;
+                }
+            }
+            push(@result, $elem_uuid);
             return 0;
         }
-        push(@result, $elem_uuid);
-        return 0;
-    });
+    );
     return \@result;
 }
 
