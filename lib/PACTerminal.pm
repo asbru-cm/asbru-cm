@@ -2392,6 +2392,16 @@ sub _vteMenu {
                     $self->stop(0, 1);
                 }
             },
+            # Close other terminals
+            {
+                label => 'Close Other Terminals',
+                shortcut => $PACMain::FUNCS{_KEYBINDS}->GetAccelerator('terminal', 'closeotherterminals'),
+                stockicon => 'gtk-close',
+                sensitive => $self->_hasOtherTerminals(),
+                code => sub {
+                    $self->_closeOtherTerminals();
+                }
+            },
             # Close all terminals
             {
                 label => 'Close all terminals',
@@ -2983,6 +2993,9 @@ sub _tabMenu {
     }});
     push(@vte_menu_items, {label => 'Close terminal', stockicon => 'gtk-close', code => sub {
         $self->stop(undef, 1);
+    }});
+    push(@vte_menu_items, {label => 'Close other terminals', stockicon => 'gtk-close', code => sub {
+        return $self->_closeOtherTerminals();
     }});
     push(@vte_menu_items, {label => 'Close all terminals', stockicon => 'gtk-close', code => sub {
         return $self->_closeAllTerminals();
@@ -4391,6 +4404,23 @@ sub _disconnectAndRestartTerminal {
             return 0;
         });
     }
+}
+
+sub _closeOtherTerminals {
+    my $self = shift;
+    my @list = keys %PACMain::RUNNING;
+
+    if (!(scalar(@list) > 1 && _wConfirm($$self{_PARENTWINDOW}, "Are you sure you want to close <b>other</b> terminals?"))) {
+        return 1;
+    }
+    foreach my $uuid (@list) {
+        if (ref($PACMain::RUNNING{$uuid}{'terminal'}) =~ /^PACTerminal|PACShell$/go) {
+            if ($self != $PACMain::RUNNING{$uuid}{'terminal'}) {
+                $PACMain::RUNNING{$uuid}{'terminal'}->stop('force', 'deep');
+            }
+        }
+    }
+    return 1;
 }
 
 sub _closeAllTerminals {
