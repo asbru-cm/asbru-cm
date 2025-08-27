@@ -873,7 +873,7 @@ sub _getProxyCmd {
 
     if ($proxy_user ne '') {
         if (system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} which ncat 1>/dev/null 2>&1") eq 0) {
-            return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:$proxy_pass";
+            return "ncat --proxy $proxy_ip:$proxy_port --proxy-type $proxy_type --proxy-auth $proxy_user:\"$proxy_pass\"";
         }
         print("$COLOR{'err'}ERROR$COLOR{'norm'}: ncat is required if using proxy user/password.\nncat is part of the nmap project (https://nmap.org/ncat/).\n");
         die();
