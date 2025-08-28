@@ -2042,12 +2042,10 @@ sub _setupCallbacks {
             return 1;
         }
         foreach my $t ($tree->_getSelectedTerminals()) {
-            print "Node : $$t{'name'} , $$t{'uuid'}\n";
             if (($$self{_CFG}{'environments'}{$$t{uuid}}{'_is_group'}) || ($$t{uuid} eq '__PAC__ROOT__')) {
                 my @children = $$self{_GUI}{treeConnections}->_getChildren($$t{uuid}, 0, 1, 1);
                 foreach my $child (@children) {
                     if (!$$self{_CFG}{'environments'}{$$child{uuid}}{'_is_group'}) {
-                        print "Children: $$child{'name'} , $$child{'uuid'}\n";
                         $tmp{$$child{name}} = $$child{uuid};
                     }
                 }
