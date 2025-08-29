@@ -506,6 +506,7 @@ sub stop {
     my $self = shift;
     my $force = shift // 0;
     my $deep = shift // 0;
+    my $cluster = $$self{_CLUSTER};
 
     my $name = $self->{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $self->{_CFG}{'environments'}{$$self{_UUID}}{'title'};
@@ -579,6 +580,9 @@ sub stop {
 
     # Delete me from the running terminals list
     delete $PACMain::RUNNING{$$self{_UUID_TMP}};
+    if ($cluster) {
+        $PACMain::FUNCS{_MAIN}->_freeClusterColor($cluster);
+    }
     $PACMain::FUNCS{_CLUSTER}->_updateGUI();
 
     if (defined $$self{_SOCKET_CLIENT}) {
@@ -2473,9 +2477,13 @@ sub _setTabColour {
                 $PACMain::RUNNING{$$self{_SPLIT}}{terminal}->_setTabColour(--$i);
             }
         } else {
+            my $cluster_color = '';
+            if ($$self{'_CLUSTER'} && $$self{_CLUSTER_COLOR}) {
+                $cluster_color = "overline='single' overline_color='$$self{'_CLUSTER_COLOR'}'";
+            }
             my $back = $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use tab back color'} ? "background=\"$$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'tab back color'}\"" : '';
             my $fore = 'foreground="' . ($$self{CONNECTED} ? $conn_color : $disconn_color) . '"';
-            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back $fore>@{[__($$self{_TITLE})]}</span>");
+            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $cluster_color $back $fore>@{[__($$self{_TITLE})]}</span>");
         }
     } else {
         defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL}->set_icon_from_file($$self{CONNECTED} ? "$RealBin/res/asbru_terminal64x64.png" : "$RealBin/res/asbru_terminal_x64x64.png");
