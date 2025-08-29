@@ -1075,14 +1075,6 @@ sub _hardClose {
     return 0;
 }
 
-sub logTime {
-    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
-    print LOG "$t : $_[0]";
-    if ($_[0] !~ /\n|\r$/) {
-        print LOG "\n";
-    }
-}
-
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
@@ -1363,19 +1355,7 @@ if ($GETCMD) {
     exit 0;
 }
 
-# Set log file
-# Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
-
-if (open(LOG,">:raw",$LOG_FILE)) {
-    if ($LOG_TIMESTAMP) {
-        $EXP->log_file(\&logTime);
-    } else {
-        close LOG;
-        $EXP->log_file($LOG_FILE);
-    }
-} else {
-    print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
-}
+open_log_file();
 
 # Prepare command file that is only accessible to the user
 my $do_connection_cmd = $connection_cmd;
@@ -2275,9 +2255,38 @@ ctrl("DISCONNECTED");
 
 exit 0;
 
+sub logTime {
+    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
+    print LOG "$t : $_[0]";
+    if ($_[0] !~ /\n|\r$/) {
+        print LOG "\n";
+    }
+}
+
+sub open_log_file {
+    if (!$$CFG{'environments'}{$UUID}{'save session logs'}) {
+        return 1;
+    }
+    # Set log file
+    # Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
+    if (open(LOG,">:raw",$LOG_FILE)) {
+        if ($LOG_TIMESTAMP) {
+            $EXP->log_file(\&logTime);
+        } else {
+            close LOG;
+            $EXP->log_file($LOG_FILE);
+        }
+    } else {
+        print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
+    }
+}
+
 sub close_log_file {
     my $line;
 
+    if (!$$CFG{'environments'}{$UUID}{'save session logs'}) {
+        return 1;
+    }
     if ($LOG_TIMESTAMP) {
         close LOG;
     }
