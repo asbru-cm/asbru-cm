@@ -2433,7 +2433,7 @@ sub __search {
                 $groups{$str} = $name;
             }
             foreach my $g (sort keys %groups) {
-                if ($str =~ /$g/) {
+                if ($str =~ /^$g/) {
                     $search .= "$groups{$g} ";
                 }
             }
