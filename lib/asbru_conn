@@ -181,7 +181,7 @@ my $TMP_UUID = $$CFG{'tmp'}{'uuid'};
 my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
-my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
+my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'remove control chars'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
 my $LPORT;
 
@@ -2264,7 +2264,7 @@ sub logTime {
 }
 
 sub open_log_file {
-    if (!$$CFG{'environments'}{$UUID}{'save session logs'}) {
+    if (!$$CFG{'environments'}{$UUID}{'save session logs'} && !$$CFG{'defaults'}{'save session logs'}) {
         return 1;
     }
     # Set log file
@@ -2284,7 +2284,7 @@ sub open_log_file {
 sub close_log_file {
     my $line;
 
-    if (!$$CFG{'environments'}{$UUID}{'save session logs'}) {
+    if (!$$CFG{'environments'}{$UUID}{'save session logs'} && !$$CFG{'defaults'}{'save session logs'}) {
         return 1;
     }
     if ($LOG_TIMESTAMP) {
