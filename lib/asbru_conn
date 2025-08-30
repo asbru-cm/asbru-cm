@@ -2270,7 +2270,7 @@ sub open_log_file {
     }
     # Set log file
     # Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
-    if (open(LOG,">:raw",$LOG_FILE)) {
+    if (open(LOG,">>:raw",$LOG_FILE)) {
         if ($LOG_TIMESTAMP) {
             $EXP->log_file(\&logTime);
         } else {
