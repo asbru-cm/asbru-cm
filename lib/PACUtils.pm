@@ -3298,11 +3298,9 @@ sub _deleteOldestSessionLog {
 
     my @total;
     foreach my $file (readdir $F) {
-        if ($file !~ /^PAC_\[(.+)_Name_(.+)\]_\[(\d{8})_(\d{6})\]\.txt$/g) {
-            next;
-        }
-        my ($fenv, $fconn, $fdate, $ftime) = ($1, $2, $3, $4);
-        push(@total, "$folder/$file");
+        my $st    = stat("$folder/$file");
+        my $mtime = localtime($st->ctime);
+        push(@total, "$mtime:::>$folder/$file");
     }
 
     close $F;
@@ -3312,8 +3310,9 @@ sub _deleteOldestSessionLog {
     }
 
     my $i = 0;
-    foreach my $file (sort {$a cmp $b} @total) {
-        unlink $file or die "ERROR: Could not delete oldest log file '$file': $!";
+    foreach my $file (sort { $a cmp $b } @total) {
+        print "Borrar $file\n";
+        #unlink $file or die "ERROR: Could not delete oldest log file '$file': $!";
         if ((scalar(@total) - $max) <= $i++) {
             last;
         }
