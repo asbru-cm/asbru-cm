@@ -1521,16 +1521,16 @@ sub _setupCallbacks {
                     $self->_setFavourite(0,$tree);
                 }
                 return 1;
-            } elsif ($action eq 'Alt+k' || $action eq 'Ctrl+j') {
+            } elsif ($action eq 'down') {
                 $$self{_GUI}{$what}->_focusNext($UUID,1);
                 return 1;
-            } elsif ($action eq 'Alt+i' || $action eq 'Ctrl+k') {
+            } elsif ($action eq 'up') {
                 $$self{_GUI}{$what}->_focusPrevious($UUID,1);
                 return 1;
-            } elsif ($action eq 'Alt+s') {
+            } elsif ($action eq 'next') {
                 $self->_rollnbTree(1);
                 return 1;
-            } elsif ($action eq 'Alt+a') {
+            } elsif ($action eq 'previous') {
                 $self->_rollnbTree(-1);
                 return 1;
             }
@@ -1591,16 +1591,16 @@ sub _setupCallbacks {
         if ($action eq 'edit_node') {
             $$self{_CLUSTER}->show($sel[0]);
             return 1;
-        } elsif ($action eq 'Alt+k' || $action eq 'Ctrl+j') {
+        } elsif ($action eq 'down') {
             $$self{_GUI}{treeClusters}->_focusNext($UUID,2);
             return 1;
-        } elsif ($action eq 'Alt+i' || $action eq 'Ctrl+k') {
+        } elsif ($action eq 'up') {
             $$self{_GUI}{treeClusters}->_focusPrevious($UUID,2);
             return 1;
-        } elsif ($action eq 'Alt+s') {
+        } elsif ($action eq 'next') {
             $self->_rollnbTree(1);
             return 1;
-        } elsif ($action eq 'Alt+a') {
+        } elsif ($action eq 'previous') {
             $self->_rollnbTree(-1);
             return 1;
         }
@@ -1615,7 +1615,6 @@ sub _setupCallbacks {
 
             my $is_group = 0;
             my $is_root  = 0;
-            my $UUID     = "";
             foreach my $uuid (@sel) {
                 if ($uuid eq '__PAC__ROOT__') {
                     $is_root = 1;
@@ -1623,8 +1622,8 @@ sub _setupCallbacks {
                 if ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) {
                     $is_group = 1;
                 }
-                $UUID = $uuid;
             }
+            my $UUID = $sel[0];
             my ($action, $keymask) = $FUNCS{_KEYBINDS}->GetAction('treeConnections', $widget, $event);
             if (!$action) {
                 return 0;
@@ -1691,7 +1690,7 @@ sub _setupCallbacks {
             } elsif ($action eq 'Delete') {
                 $$self{_GUI}{nodeDelBtn}->clicked();
                 return 1;
-            } elsif ($action eq 'Left' || $action eq 'Alt+j' ||  $action eq 'Ctrl+h') {
+            } elsif ($action eq 'Left' || $action eq 'left') {
                 my @idx;
                 foreach my $uuid (@sel) {
                     push(@idx, [$uuid]);
@@ -1715,7 +1714,7 @@ sub _setupCallbacks {
                     $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
                 }
                 return 1;
-            } elsif ($action eq 'Right' || $action eq 'Alt+l' ||  $action eq 'Ctrl+l') {
+            } elsif ($action eq 'Right' || $action eq 'right') {
                 my @idx;
                 foreach my $uuid (@sel) {
                     push(@idx, [$uuid]);
@@ -1753,21 +1752,23 @@ sub _setupCallbacks {
             } elsif ($action eq 'Escape' && $$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
                 $$self{_GUI}{nodeClose}->clicked();
                 return 1;
-            } elsif ($action eq 'Alt+k' || $action eq 'Ctrl+j') {
+            } elsif ($action eq 'down') {
                 $$self{_GUI}{treeConnections}->_focusNext($UUID);
                 return 1;
-            } elsif ($action eq 'Alt+i' || $action eq 'Ctrl+k') {
+            } elsif ($action eq 'up') {
                 $$self{_GUI}{treeConnections}->_focusPrevious($UUID);
                 return 1;
-            } elsif ($action eq 'Alt+s') {
+            } elsif ($action eq 'next') {
                 $self->_rollnbTree(1);
                 return 1;
-            } elsif ($action eq 'Alt+a') {
+            } elsif ($action eq 'previous') {
                 $self->_rollnbTree(-1);
                 return 1;
-            } elsif (!$is_group && '23456789' =~ $action) {
+            } elsif (!$is_group && $action =~ /Ctrl\+[23456789]/) {
+                my $n = $action;
+                $n =~ s/\D//g;
                 my @idx;
-                foreach my $j (1 .. int($action)) {
+                foreach my $j (1 .. int($n)) {
                     push(@idx, [$UUID]);
                 }
                 $self->_launchTerminals(\@idx);
