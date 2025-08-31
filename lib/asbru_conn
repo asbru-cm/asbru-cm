@@ -770,7 +770,22 @@ sub _setProxy {
         if ($AUTH eq 'publickey') {
             $user = $PASSPHRASE_USER;
         }
-        if (-e "/etc/ssh/ssh_config") {
+        if (-e "$ENV{HOME}/.ssh/asbru_config") {
+            open (SSHC,"<:utf8","$ENV{HOME}/.ssh/asbru_config");
+            while (my $l = <SSHC>) {
+                $l =~ s/\n//g;
+                $l =~ s/^[\t ]+//;
+                if (!$l) {
+                    next;
+                } elsif ($l =~ /^#/) {
+                    next;
+                } elsif ($l =~ /^Host \*/) {
+                    next;
+                }
+                $ssh_config .= "$l\n";
+            }
+            close SSHC;
+        } elsif (-e "/etc/ssh/ssh_config") {
             open (SSHC,"<:utf8","/etc/ssh/ssh_config");
             while (my $l = <SSHC>) {
                 $l =~ s/\n//g;
