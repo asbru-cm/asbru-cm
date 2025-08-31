@@ -399,7 +399,7 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY} && $$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
+    if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
         $$self{_GUI}{main}->present();
     } else {
         $self->_hideConnectionsList();
@@ -4019,13 +4019,14 @@ sub _showConnectionsList {
         }
         $$self{_GUI}{vboxCommandPanel}->show_all();
         $$self{_GUI}{hpane}->show();
+    } else {
+        # The first first display when started iconified must be a show_all
+        if ($$self{_CMDLINETRAY} == 1) {
+            $$self{_GUI}{main}->show_all();
+            $$self{_CMDLINETRAY} = 2;
+        }
     }
 
-    # The first first display when started iconified must be a show_all
-    if ($$self{_CMDLINETRAY} == 1) {
-        $$self{_GUI}{main}->show_all();
-        $$self{_CMDLINETRAY} = 2;
-    }
 
 
     # Do show the main window
@@ -4835,6 +4836,7 @@ sub _setSafeLayoutOptions {
         # This layout to work implies some configuration settings to work correctly
         $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+        $$self{_CFG}{'defaults'}{'start iconified'} = 1;
         if (!$STRAY) {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
@@ -4872,10 +4874,7 @@ sub _ApplyLayout {
             # Set a good height on smaller screens
             $$self{wheight} = int($H*0.8);
         }
-        # This layout to work implies some configuration settings to work correctly
-        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vboxConnectionPanel','vboxInfo') {
-            $$self{_GUI}{$e}->hide();
-        }
+        $self->_hideCompact();
         if (!$STRAY) {
             if (!$$self{_GUI}{main}->get_visible()) {
                 $self->_showConnectionsList();
@@ -4886,9 +4885,18 @@ sub _ApplyLayout {
             }
             $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
-        $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
-        $$self{_GUI}{main}->resize(220, $$self{wheight});
     }
+}
+
+sub _hideCompact {
+    my $self = shift;
+
+    # This layout to work implies some configuration settings to work correctly
+    foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vboxConnectionPanel','vboxInfo') {
+        $$self{_GUI}{$e}->hide();
+    }
+    $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
+    $$self{_GUI}{main}->resize(220, $$self{wheight});
 }
 
 sub posCompactMenu {
