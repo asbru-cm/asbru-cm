@@ -399,7 +399,7 @@ sub start {
     $$self{_GUI}{statistics}->update('__PAC__ROOT__', $$self{_CFG});
 
     # Is tray available (Gnome or Unity)?
-    if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY}) {
+    if (!$$self{_CFG}{defaults}{'start iconified'} && !$$self{_CMDLINETRAY} && $$self{_CFG}{'defaults'}{'layout'} ne 'Compact') {
         $$self{_GUI}{main}->present();
     } else {
         $self->_hideConnectionsList();
@@ -1100,22 +1100,6 @@ sub _initGUI {
         $$self{_GUI}{nbTree}->set_current_page(3);
         $self->_updateClustersList();
         $self->_updateGUIClusters();
-    }
-
-    # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
-        # Update GUI
-        Gtk3::main_iteration() while Gtk3::events_pending();
-
-        my @geo = $$self{_TRAY}->get_geometry();
-        my $x = $geo[2]{x};
-        my $y = $geo[2]{y};
-
-        if ($x > 0 || $y > 0) {
-            $$self{_GUI}{posx} = $x;
-            $$self{_GUI}{posy} = $y;
-            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
-        }
     }
 
     return 1;
@@ -4030,6 +4014,9 @@ sub _showConnectionsList {
 
     # Ensure compact panel is shown (could still be hidden if started iconified)
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        if (!$$self{_GUI}{posx}) {
+            $self->posCompactMenu();
+        }
         $$self{_GUI}{vboxCommandPanel}->show_all();
         $$self{_GUI}{hpane}->show();
     }
@@ -4901,6 +4888,33 @@ sub _ApplyLayout {
         }
         $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
         $$self{_GUI}{main}->resize(220, $$self{wheight});
+    }
+}
+
+sub posCompactMenu {
+    my $self = shift;
+    if (!$$self{'_GUI'}{posx} && $$self{_TRAY}->is_visible()) {
+        # Update GUI
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        my @geo = $$self{_TRAY}->get_geometry();
+        my $x   = $geo[2]{x};
+        my $y   = $geo[2]{y};
+
+        if ($x > 0 || $y > 0) {
+            my ($w, $h) = $$self{_GUI}{main}->get_size();
+            my $ymax = Gtk3::Gdk::Screen::get_default()->get_height();
+            $w = int($w / 2);
+            if ($y + $h > $ymax) {
+                $y -= $h;
+                if ($y < 0) {
+                    $y = 0;
+                }
+            }
+            $$self{_GUI}{posx} = $x - $w;
+            $$self{_GUI}{posy} = $y;
+            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
+        }
     }
 }
 
