@@ -4872,6 +4872,9 @@ sub _setSafeLayoutOptions {
     }
     $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
     # Validate forground colors for corresponging theme
+
+    #todo: a way to detect system dark or ligth mode so we can set the correct theme if is the wrong one
+
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
