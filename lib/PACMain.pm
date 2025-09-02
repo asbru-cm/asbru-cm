@@ -4884,10 +4884,10 @@ sub _setSafeLayoutOptions {
             $$self{_CFG}{defaults}{'unprotected color'} = '#aaaaaa';
         }
     } else {
-        if ($p_set eq 'foreground' && $p_color gt '#999999') {
+        if ($p_set eq 'foreground' && $p_color gt '#dddddddddddd') {
             $$self{_CFG}{defaults}{'protected color'} = '#000000';
         }
-        if ($p_unset eq 'foreground' && $p_uncolor gt '#999999') {
+        if ($p_unset eq 'foreground' && $p_uncolor gt '#dddddddddddd') {
             $$self{_CFG}{defaults}{'unprotected color'} = '#000000';
         }
     }
