@@ -3245,7 +3245,7 @@ sub _launchTerminals {
         $$self{_CFG}{'defaults'}{'open connections in tabs'} = $where eq 'tab';
         $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} = $where eq 'tab';
 
-        my $t = PACTerminal->new($$self{_CFG}, $uuid, $$self{_GUI}{nb}, $$self{_GUI}{_PACTABS}, $cluster, $manual) or die "ERROR: Could not create object($!)";
+        my $t = PACTerminal->new($$self{_CFG}, $uuid, $$self{_GUI}{nb}, $$self{_GUI}{_PACTABS}, $cluster, $manual, $$self{_NTERMINALS}) or die "ERROR: Could not create object($!)";
         push(@new_terminals, $t);
 
         # Restore previously changed variables
