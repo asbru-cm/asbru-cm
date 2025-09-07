@@ -484,18 +484,12 @@ sub _getDefaultConfig {
     $$cfg{'treeFavourites'}{'Alt+F'}   = ['Favourites Tree',   'del_favourite',       'Remove connection from favourites'];
     $$cfg{'treeFavourites'}{'Alt+i'}   = ['Favourites Tree',   'up',                  'up'];
     $$cfg{'treeFavourites'}{'Alt+k'}   = ['Favourites Tree',   'down',                'down'];
-    $$cfg{'treeFavourites'}{'Alt+a'}   = ['Favourites Tree',   'previous',            'Previous Connection Lis'];
-    $$cfg{'treeFavourites'}{'Alt+s'}   = ['Favourites Tree',   'next',                'Next Connection List'];
     $$cfg{'treeHistory'}{'Alt+e'}      = ['History Tree',      'edit_node',           'Edit selected node'];
     $$cfg{'treeHistory'}{'Alt+i'}      = ['History Tree',      'up',                  'up'];
     $$cfg{'treeHistory'}{'Alt+k'}      = ['History Tree',      'down',                'down'];
-    $$cfg{'treeHistory'}{'Alt+a'}      = ['History Tree',      'previous',            'Previous Connection Lis'];
-    $$cfg{'treeHistory'}{'Alt+s'}      = ['History Tree',      'next',                'Next Connection List'];
     $$cfg{'treeClusters'}{'Alt+e'}     = ['Clusters Tree',     'edit_node',           'Edit selected node'];
     $$cfg{'treeClusters'}{'Alt+i'}     = ['Clusters Tree',     'up',                  'up'];
     $$cfg{'treeClusters'}{'Alt+k'}     = ['Clusters Tree',     'down',                'down'];
-    $$cfg{'treeClusters'}{'Alt+a'}     = ['Clusters Tree',     'previous',            'Previous Connection Lis'];
-    $$cfg{'treeClusters'}{'Alt+s'}     = ['Clusters Tree',     'next',                'Next Connection List'];
     $$cfg{'treeConnections'}{'Alt+e'}  = ['Connections Tree',  'edit_node',           'Edit selected node'];
     $$cfg{'treeConnections'}{'Alt+f'}  = ['Connections Tree',  'add_favourite',       'Add connection to favourites'];
     $$cfg{'treeConnections'}{'Alt+F'}  = ['Connections Tree',  'del_favourite',       'Remove connection from favourites'];
@@ -524,6 +518,8 @@ sub _getDefaultConfig {
     $$cfg{'pacmain'}{'Ctrl+q'}         = ['Main Window',       'quit',                'Exit Ásbrú'];
     $$cfg{'pacmain'}{'Ctrl+T'}         = ['Main Window',       'localshell',          'Open a local shell'];
     $$cfg{'pacmain'}{'Alt+n'}          = ['Main Window',       'showconnections',     'Show/Hide connections list'];
+    $$cfg{'pacmain'}{'Alt+a'}          = ['Main Window',       'previous',            'Previous Connection List'];
+    $$cfg{'pacmain'}{'Alt+s'}          = ['Main Window',       'next',                'Next Connection List'];
     $$cfg{'terminal'}{'F11'}           = ['Terminal',          'fullscreen',          'Go full screen'];
     $$cfg{'terminal'}{'Ctrl+Return'}   = ['Terminal',          'start',               'Start Terminal'];
     $$cfg{'terminal'}{'AltCtrl+x'}     = ['Terminal',          'reset',               'Reset Terminal'];

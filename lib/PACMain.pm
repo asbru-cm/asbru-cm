@@ -1527,12 +1527,6 @@ sub _setupCallbacks {
             } elsif ($action eq 'up') {
                 $$self{_GUI}{$what}->_focusPrevious($UUID,1);
                 return 1;
-            } elsif ($action eq 'next') {
-                $self->_rollnbTree(1);
-                return 1;
-            } elsif ($action eq 'previous') {
-                $self->_rollnbTree(-1);
-                return 1;
             }
             return 0;
         });
@@ -1596,12 +1590,6 @@ sub _setupCallbacks {
             return 1;
         } elsif ($action eq 'up') {
             $$self{_GUI}{treeClusters}->_focusPrevious($UUID,2);
-            return 1;
-        } elsif ($action eq 'next') {
-            $self->_rollnbTree(1);
-            return 1;
-        } elsif ($action eq 'previous') {
-            $self->_rollnbTree(-1);
             return 1;
         }
         return 0;
@@ -1757,12 +1745,6 @@ sub _setupCallbacks {
                 return 1;
             } elsif ($action eq 'up') {
                 $$self{_GUI}{treeConnections}->_focusPrevious($UUID);
-                return 1;
-            } elsif ($action eq 'next') {
-                $self->_rollnbTree(1);
-                return 1;
-            } elsif ($action eq 'previous') {
-                $self->_rollnbTree(-1);
                 return 1;
             } elsif (!$is_group && $action =~ /Ctrl\+[23456789]/) {
                 my $n = $action;
@@ -2430,6 +2412,12 @@ sub _setupCallbacks {
             $$self{_GUI}{shellBtn}->clicked();
         } elsif ($action eq 'showconnections') {
             $$self{_GUI}{showConnBtn}->clicked();
+        } elsif ($action eq 'next') {
+            $self->_rollnbTree(1);
+            return 1;
+        } elsif ($action eq 'previous') {
+            $self->_rollnbTree(-1);
+            return 1;
         } else {
             return 0;
         }
@@ -2464,6 +2452,9 @@ sub _selnbTree {
     } elsif ($page == 2) {
         $self->_updateGUIClusters();
         $$self{_GUI}{treeClusters}->grab_focus();
+    } elsif ($page == 3) {
+        $self->_updateGUIHistory();
+        $$self{_GUI}{treeHistory}->grab_focus();
     } else {
         $self->_showConnectionsList();
         $$self{_GUI}{treeConnections}->grab_focus();
