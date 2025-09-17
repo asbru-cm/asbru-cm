@@ -1207,7 +1207,7 @@ sub _setupCallbacks {
         'button_release_event' => sub {
             my ($widget, $event) = @_;
             my $state = $event->get_state();
-            my $shift = $state * ['shift-mask'];
+            my $shift = $state * ['control-mask'];
 
             if ($event->button eq 1 && $shift) {
                 my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
@@ -1218,7 +1218,7 @@ sub _setupCallbacks {
                     $row += $crow - $rows;
                 }
                 my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
-                if ($string =~ /(https?:\/\/.+?)(?: |$)/ && $col >= $-[0] && $col < $+[1]) {
+                if ($string =~ /(https?:\/\/.+?)(?:[^\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]|$)/ && $col >= $-[0] && $col < $+[1]) {
                     my $url = $1;
                     Gtk3::show_uri_on_window(undef, $url, time);
                 }
