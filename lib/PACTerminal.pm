@@ -1203,6 +1203,29 @@ sub _setupCallbacks {
         return 1;
     });
 
+    $$self{_GUI}{_VTE}->signal_connect(
+        'button_release_event' => sub {
+            my ($widget, $event) = @_;
+            my $state = $event->get_state();
+            my $shift = $state * ['shift-mask'];
+
+            if ($event->button eq 1 && $shift) {
+                my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
+                my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
+                my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
+                my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
+                if ($crow > $rows) {
+                    $row += $crow - $rows;
+                }
+                my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
+                if ($string =~ /(https?:\/\/.+?)(?: |$)/ && $col >= $-[0] && $col < $+[1]) {
+                    my $url = $1;
+                    Gtk3::show_uri_on_window(undef, $url, time);
+                }
+            }
+        }
+    );
+
     # Right mouse click on VTE
     $$self{_GUI}{_VTE}->signal_connect('button_press_event' => sub {
         if ($right_click_deep) {
