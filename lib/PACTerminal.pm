@@ -4580,12 +4580,9 @@ sub _stopEmbedKidnapTimeout {
 sub openLog {
     my $self = shift;
 
-    print "openlog\n";
     if (!$self->{_LOG}{enabled}) {
-        print "no\n";
         return 0;
     }
-    print "$$self{_LOGFILE}\n";
     if (!open(LOG,">>:utf8",$$self{_LOGFILE})) {
         $self->{_LOG}{enabled} = 0;
         return 0;
@@ -4597,22 +4594,19 @@ sub saveLog {
     my $close = shift // 0;
 
     if (!$self->{_LOG}{enabled}) {
-        print "remove?\n";
         return 0;
     }
-    print "******** save lines : $self->{_LOG}{format} : $self->{_LOG}{last_row}\n";
-    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
-    print "rows : $rows\n";
-    if ($rows<0) {
+    my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
+    if ($self->{_LOG}{last_row} == $rows) {
         return 1;
     }
-    print "get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}, 0, $rows, 0)\n";
-    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}, 0, $rows, 0);
+    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}-1, 0, $rows, 0);
     $self->{_LOG}{last_row} = $rows;
     if ($self->{_LOG}{timestamp}) {
-        print LOG logTime(),"\n";
+        print LOG '-'x40,"\n";
+        print LOG 'log timestamp:',logTime(),"\n";
+        print LOG '-'x40,"\n";
     }
-    print ":::\n$string\n:::\n";
     print LOG $string,"\n";
     return 1;
 }
@@ -4620,13 +4614,10 @@ sub saveLog {
 sub closeLog {
     my $self = shift;
 
-    print "closelog\n";
     if (!$self->{_LOG}{enabled}) {
         return 0;
     }
-    print "closing\n";
     $self->saveLog(1);
-    print "closed\n";
     close LOG;
     $self->{_LOG}{enabled} = 0;
 }
