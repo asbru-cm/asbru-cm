@@ -4954,7 +4954,6 @@ sub _setVteCapabilities {
         $$self{_Vte}{get_text_range} = 1;
     }
 
-
     # Tell the world what we found out
     print STDERR "INFO: Virtual terminal emulator (VTE) version is $$self{_Vte}{major_version}.$$self{_Vte}{minor_version}\n";
     if ($$self{_VERBOSE}) {
