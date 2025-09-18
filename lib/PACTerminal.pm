@@ -155,13 +155,12 @@ sub new {
     $self->{_UUID_TMP} = "asbru_PID{$$}_n$_C";
 
     # By default, there is no session logs
-    $self->{_LOG}{enabled} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'} ? $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'} : $self->{_CFG}{'defaults'}{'save session logs'};
-    $self->{_LOG}{timestamp} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'log timestamp'} ? $self->{_CFG}{'environments'}{$$self{_UUID}}{'log timestamp'} : $self->{_CFG}{'defaults'}{'log timestamp'};
+    $self->{_LOGFILE} = '/dev/null';
     # If enabled at the session or global level, define the session logs file accordingly
-    if ($self->{_LOG}{enabled} && $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
+    if ($self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'environments'}{$$self{_UUID}}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'environments'}{$$self{_UUID}}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-    } elsif ($self->{_LOG}{enabled} && $self->{_CFG}{'defaults'}{'save session logs'}) {
+    } elsif ($self->{_CFG}{'defaults'}{'save session logs'}) {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     }
@@ -355,6 +354,7 @@ sub start {
         }
     });
 
+    $$self{_CFG}{'tmp'}{'log file'} = $$self{_LOGFILE};
     $$self{_CFG}{'tmp'}{'socket'} = $$self{_TMPSOCKET};
     $$self{_CFG}{'tmp'}{'socket exec'} = $$self{_TMPSOCKETEXEC};
     $$self{_CFG}{'tmp'}{'uuid'} = $$self{_UUID_TMP};
@@ -487,20 +487,6 @@ sub start {
     if ($PACMain::FUNCS{_MAIN}{_Vte}{has_bright}) {
         $$self{_GUI}{_VTE}->set_bold_is_bright($$self{_CFG}{'defaults'}{'bold is brigth'});
     }
-
-    if ($self->{_LOG}{enabled}) {
-        $self->{_LOG}{last_row} = 0;
-        if ($$self{_LOGFILE} =~ /\.html?$/) {
-            $self->{_LOG}{format} = 'VTE_FORMAT_HTML';
-        } else {
-            $self->{_LOG}{format} = 'VTE_FORMAT_TEXT';
-        }
-        $self->openLog();
-        my $action = sub {
-            $self->saveLog($self);
-        };
-        $self->{_LOG}{timeout} = Glib::Timeout->add(5000, $action);
-    }
     return 1;
 }
 
@@ -543,6 +529,8 @@ sub stop {
         $NPOSX=1;
     }
 
+    # TODO : This coding sequence looks repeated unless is it is necessary to confirm connection that many times
+
     # May be user wants to close without confirmation...
     if ((! $force) && ($self->{CONNECTED})) {
         # Ask for confirmation
@@ -560,8 +548,6 @@ sub stop {
             $self->_wPrePostExec('local after');
         }
     }
-
-    $self->closeLog();
 
     if ($$self{_CLUSTER} ne '') {
         $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
@@ -633,6 +619,9 @@ sub stop {
     unlink($$self{_TMPPIPE});
     unlink($$self{_TMPSOCKET});
     unlink($$self{_TMPSOCKETEXEC});
+    if (!($self->{_CFG}{'defaults'}{'save session logs'} || $self->{_CFG}{'environments'}{$$self{_UUID}}{'save session logs'})) {
+        unlink($$self{_LOGFILE});
+    }
 
     # If I was a temporal UUID, delete me
     if ($$self{_UUID} =~ /^_tmp_/go) {
@@ -3262,10 +3251,6 @@ sub _renameTab() {
 sub _saveSessionLog {
     my $self = shift;
 
-    if (!$$self{_LOGFILE}) {
-        _wMessage("No log file to save");
-        return 0;
-    }
     my $new_file = $$self{_LOGFILE};
     $new_file =~ s/.*\///go;
 
@@ -3288,8 +3273,26 @@ sub _saveSessionLog {
     $new_file = $dialog->get_filename;
     $dialog->destroy();
 
-    # Copy temporal log file to selected path
-    copy($$self{_LOGFILE}, $new_file);
+    my $confirm = _wYesNoCancel($$self{_PARENTWINDOW}, 'Do you want to remove escape sequences from the saved log?');
+
+    if ($confirm eq 'yes') {
+        if (!open(F, "$$self{_LOGFILE}")) {
+            _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not open file '$$self{_LOGFILE}' for reading!! ($!)");
+            return 1;
+        }
+        my @lines = <F>;
+        close F;
+
+        if (!open(F, ">$new_file")) {
+            _wMessage($$self{_PARENTWINDOW}, "ERROR: Could not open file '$new_file' for writting!! ($!)");
+            return 1;
+        }
+        print F _removeEscapeSeqs(join('', @lines));
+        close F;
+    } elsif ($confirm eq 'no') {
+        # Copy temporal log file to selected path
+        copy($$self{_LOGFILE}, $new_file);
+    }
 
     return 1;
 }
@@ -4034,15 +4037,11 @@ sub _wFindInTerminal {
     our %w;
     my $text;
 
-    if (!$$self{_LOGFILE}) {
-        _wMessage("No log file for the current terminal");
-        return 0;
-    }
     if (defined $w{window}) {
         # Load the contents of the textbuffer with the corresponding log file
         if (open(F, "<:utf8", $$self{_LOGFILE})) {
             @{$$self{_TEXT}} = <F>;
-            $text = join('', @{$$self{_TEXT}});
+            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
             close F;
         } else {
             $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
@@ -4228,7 +4227,7 @@ sub _wFindInTerminal {
     # Load the contents of the textbuffer with the corresponding log file
     if (open(F, "<:utf8", $$self{_LOGFILE})) {
         @{$$self{_TEXT}} = <F>;
-        $text = join('', @{$$self{_TEXT}});
+        $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
         close F;
     } else {
         $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
@@ -4575,56 +4574,6 @@ sub _stopEmbedKidnapTimeout {
         Glib::Source->remove($$self{_EMBED_KIDNAP});
         $$self{_EMBED_KIDNAP} = undef;
     }
-}
-
-sub openLog {
-    my $self = shift;
-
-    if (!$self->{_LOG}{enabled}) {
-        return 0;
-    }
-    if (!open(LOG,">>:utf8",$$self{_LOGFILE})) {
-        $self->{_LOG}{enabled} = 0;
-        return 0;
-    }
-}
-
-sub saveLog {
-    my $self = shift;
-    my $close = shift // 0;
-
-    if (!$self->{_LOG}{enabled}) {
-        return 0;
-    }
-    my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
-    if ($self->{_LOG}{last_row} == $rows) {
-        return 1;
-    }
-    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}-1, 0, $rows, 0);
-    $self->{_LOG}{last_row} = $rows;
-    if ($self->{_LOG}{timestamp}) {
-        print LOG '-'x40,"\n";
-        print LOG 'log timestamp:',logTime(),"\n";
-        print LOG '-'x40,"\n";
-    }
-    print LOG $string,"\n";
-    return 1;
-}
-
-sub closeLog {
-    my $self = shift;
-
-    if (!$self->{_LOG}{enabled}) {
-        return 0;
-    }
-    $self->saveLog(1);
-    close LOG;
-    $self->{_LOG}{enabled} = 0;
-}
-
-sub logTime {
-    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
-    return $t;
 }
 
 # END: Private functions definitions
