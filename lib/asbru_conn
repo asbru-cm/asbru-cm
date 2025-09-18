@@ -2244,8 +2244,6 @@ if (defined $EXP->pid) {
 }
 $EXP->hard_close();
 
-close_log_file();
-
 ctrl("DISCONNECTED");
 
 exit 0;
