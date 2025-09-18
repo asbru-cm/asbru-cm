@@ -4600,14 +4600,19 @@ sub saveLog {
         print "remove?\n";
         return 0;
     }
-    print "******** save lines\n";
-    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1 - $close;
+    print "******** save lines : $self->{_LOG}{format} : $self->{_LOG}{last_row}\n";
+    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
+    print "rows : $rows\n";
+    if ($rows<0) {
+        return 1;
+    }
+    print "get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}, 0, $rows, 0)\n";
     my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}, 0, $rows, 0);
     $self->{_LOG}{last_row} = $rows;
     if ($self->{_LOG}{timestamp}) {
         print LOG logTime(),"\n";
     }
-    print "$string\n";
+    print ":::\n$string\n:::\n";
     print LOG $string,"\n";
     return 1;
 }
