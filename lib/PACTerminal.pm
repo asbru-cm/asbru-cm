@@ -718,6 +718,7 @@ sub _initGUI {
 
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
+    # match_regex available after 0.46
     if ($PACMain::FUNCS{_MAIN}{_Vte}{major_version} > 0 || $PACMain::FUNCS{_MAIN}{_Vte}{minor_version} >= 46) {
         my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
         $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
@@ -1207,28 +1208,31 @@ sub _setupCallbacks {
         return 1;
     });
 
-    $$self{_GUI}{_VTE}->signal_connect(
-        'button_release_event' => sub {
-            my ($widget, $event) = @_;
-            my $state = $event->get_state();
-            my $control = $state * ['control-mask'];
+    # get_text_range_format only available after version 0.72
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{major_version} > 0 || $PACMain::FUNCS{_MAIN}{_Vte}{minor_version} >= 72) {
+        $$self{_GUI}{_VTE}->signal_connect(
+            'button_release_event' => sub {
+                my ($widget, $event) = @_;
+                my $state = $event->get_state();
+                my $control = $state * ['control-mask'];
 
-            if ($event->button eq 1 && $control) {
-                my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
-                my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
-                my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
-                my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
-                if ($crow > $rows) {
-                    $row += $crow - $rows;
-                }
-                my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
-                if ($string =~ /$URL_REGEX/ && $col >= $-[0] && $col < $+[1]) {
-                    my $url = $1;
-                    Gtk3::show_uri_on_window(undef, $url, time);
+                if ($event->button eq 1 && $control) {
+                    my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
+                    my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
+                    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
+                    my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
+                    if ($crow > $rows) {
+                        $row += $crow - $rows;
+                    }
+                    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
+                    if ($string =~ /$URL_REGEX/ && $col >= $-[0] && $col < $+[1]) {
+                        my $url = $1;
+                        Gtk3::show_uri_on_window(undef, $url, time);
+                    }
                 }
             }
-        }
-    );
+        );
+    }
 
     # Right mouse click on VTE
     $$self{_GUI}{_VTE}->signal_connect('button_press_event' => sub {
