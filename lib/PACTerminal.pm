@@ -718,9 +718,10 @@ sub _initGUI {
 
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
-    my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
-    $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
-
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{major_version} > 0 || $PACMain::FUNCS{_MAIN}{_Vte}{minor_version} >= 46) {
+        my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
+        $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
+    }
     # , add VTE to the scrolled window and...
     if (!$$self{'EMBED'}) {
         $$self{_GUI}{_VTE}->set_size_request(200, 100);
