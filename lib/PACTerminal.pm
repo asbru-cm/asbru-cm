@@ -490,8 +490,16 @@ sub start {
 
     if ($self->{_LOG}{enabled}) {
         $self->{_LOG}{last_row} = 0;
+        if ($$self{_LOGFILE} =~ /\.html?$/) {
+            $self->{_LOG}{format} = 'VTE_FORMAT_HTML';
+        } else {
+            $self->{_LOG}{format} = 'VTE_FORMAT_TEXT';
+        }
         $self->openLog();
-        $self->{_LOG}{timeout} = Glib::Timeout->add(5000, \&saveLog($self));
+        my $action = sub {
+            $self->saveLog($self);
+        };
+        $self->{_LOG}{timeout} = Glib::Timeout->add(5000, $action);
     }
     return 1;
 }
@@ -524,8 +532,6 @@ sub stop {
         $p_widget->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
     }
 
-    $self->closeLog();
-
     if ($NPOSX>0) {
         $NPOSX--;
         if (($NPOSY>0)&&($NPOSX==0)) {
@@ -554,6 +560,8 @@ sub stop {
             $self->_wPrePostExec('local after');
         }
     }
+
+    $self->closeLog();
 
     if ($$self{_CLUSTER} ne '') {
         $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
@@ -4572,9 +4580,12 @@ sub _stopEmbedKidnapTimeout {
 sub openLog {
     my $self = shift;
 
+    print "openlog\n";
     if (!$self->{_LOG}{enabled}) {
+        print "no\n";
         return 0;
     }
+    print "$$self{_LOGFILE}\n";
     if (!open(LOG,">>:utf8",$$self{_LOGFILE})) {
         $self->{_LOG}{enabled} = 0;
         return 0;
@@ -4582,21 +4593,37 @@ sub openLog {
 }
 
 sub saveLog {
-    my ($self,$close) = @_;
+    my $self = shift;
+    my $close = shift // 0;
 
     if (!$self->{_LOG}{enabled}) {
+        print "remove?\n";
         return 0;
     }
+    print "******** save lines\n";
+    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1 - $close;
+    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format($self->{_LOG}{format}, $self->{_LOG}{last_row}, 0, $rows, 0);
+    $self->{_LOG}{last_row} = $rows;
+    if ($self->{_LOG}{timestamp}) {
+        print LOG logTime(),"\n";
+    }
+    print "$string\n";
+    print LOG $string,"\n";
+    return 1;
 }
 
 sub closeLog {
     my $self = shift;
 
+    print "closelog\n";
     if (!$self->{_LOG}{enabled}) {
         return 0;
     }
+    print "closing\n";
     $self->saveLog(1);
+    print "closed\n";
     close LOG;
+    $self->{_LOG}{enabled} = 0;
 }
 
 sub logTime {
