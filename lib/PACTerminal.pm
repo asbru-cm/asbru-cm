@@ -90,6 +90,7 @@ my $COL_RED   = "\e[1;38;5;1m";
 my $COL_BLUE  = "\e[1;38;5;33m";
 my $COL_YELL  = "\e[1;38;5;11m";
 my $COL_RESET = "\e[0m";
+my $URL_REGEX = '(https?:\/\/[\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]+)';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -717,7 +718,7 @@ sub _initGUI {
 
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
-    my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match('https?:\/\/.+?(?:[^\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]|$)', -1, 2**10), 0);
+    my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
     $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
 
     # , add VTE to the scrolled window and...
@@ -1220,7 +1221,7 @@ sub _setupCallbacks {
                     $row += $crow - $rows;
                 }
                 my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
-                if ($string =~ /(https?:\/\/.+?)(?:[^\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]|$)/ && $col >= $-[0] && $col < $+[1]) {
+                if ($string =~ /$URL_REGEX/ && $col >= $-[0] && $col < $+[1]) {
                     my $url = $1;
                     Gtk3::show_uri_on_window(undef, $url, time);
                 }
