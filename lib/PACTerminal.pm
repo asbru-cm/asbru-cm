@@ -717,7 +717,8 @@ sub _initGUI {
 
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
-    $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match('https?:\/\/.+?(?:[^\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]|$)', -1, 'PCRE2_MULTILINE'), 0);
+    my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match('https?:\/\/.+?(?:[^\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]|$)', -1, 'PCRE2_MULTILINE'), 0);
+    $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
 
     # , add VTE to the scrolled window and...
     if (!$$self{'EMBED'}) {
