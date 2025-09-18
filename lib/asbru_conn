@@ -190,6 +190,10 @@ if (!$RESTART && $IS_CLUSTER) {
     $RESTART = 2;
 }
 
+if (!$LOG_FILE) {
+    $LOG_ENABLED = 0;
+}
+
 # Checks that session ID is still known in 'environements' ; otherwise abort immediately
 if (!defined($NAME)) {
     print("$COLOR{'err'}ERROR: Session '$UUID' is invalid.$COLOR{'norm'}\n");
