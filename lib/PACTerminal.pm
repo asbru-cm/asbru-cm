@@ -165,10 +165,7 @@ sub new {
         $self->{_LOGFILE} = $self->{_CFG}{'defaults'}{'session logs folder'} . '/';
         $self->{_LOGFILE} .= _subst($self->{_CFG}{'defaults'}{'session log pattern'}, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
     }
-    if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
-        # disable asbru_conn log filej
-        $self->{_LOGFILE} = '';
-    }
+
     $self->{_TMPCFG} = "${ENV{'ASBRU_TMP'}}/$$self{_UUID_TMP}freeze";
 
     $self->{_TMPPIPE} = $ENV{"ASBRU_TMP"}."/asbru_PID{$$}_n$_C.pipe";
@@ -359,7 +356,7 @@ sub start {
         }
     });
 
-    $$self{_CFG}{'tmp'}{'log file'} = $$self{_LOGFILE};
+    $$self{_CFG}{'tmp'}{'log file'} = $PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}? '' : $$self{_LOGFILE};
     $$self{_CFG}{'tmp'}{'socket'} = $$self{_TMPSOCKET};
     $$self{_CFG}{'tmp'}{'socket exec'} = $$self{_TMPSOCKETEXEC};
     $$self{_CFG}{'tmp'}{'uuid'} = $$self{_UUID_TMP};
