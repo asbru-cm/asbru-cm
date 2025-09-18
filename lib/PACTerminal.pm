@@ -719,7 +719,7 @@ sub _initGUI {
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
     # match_regex available after 0.46
-    if ($PACMain::FUNCS{_MAIN}{_Vte}{major_version} > 0 || $PACMain::FUNCS{_MAIN}{_Vte}{minor_version} >= 46) {
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{match_regex}) {
         my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
         $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
     }
@@ -1208,8 +1208,7 @@ sub _setupCallbacks {
         return 1;
     });
 
-    # get_text_range_format only available after version 0.72
-    if ($PACMain::FUNCS{_MAIN}{_Vte}{major_version} > 0 || $PACMain::FUNCS{_MAIN}{_Vte}{minor_version} >= 72) {
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
         $$self{_GUI}{_VTE}->signal_connect(
             'button_release_event' => sub {
                 my ($widget, $event) = @_;
