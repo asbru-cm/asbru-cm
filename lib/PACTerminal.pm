@@ -1209,9 +1209,9 @@ sub _setupCallbacks {
         'button_release_event' => sub {
             my ($widget, $event) = @_;
             my $state = $event->get_state();
-            my $shift = $state * ['control-mask'];
+            my $control = $state * ['control-mask'];
 
-            if ($event->button eq 1 && $shift) {
+            if ($event->button eq 1 && $control) {
                 my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
                 my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
                 my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
