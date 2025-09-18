@@ -3294,6 +3294,12 @@ sub _saveSessionLog {
     $new_file = $dialog->get_filename;
     $dialog->destroy();
 
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+        copy($$self{_LOGFILE}, $new_file);
+        return 1;
+    }
+
+    # Save the old way
     my $confirm = _wYesNoCancel($$self{_PARENTWINDOW}, 'Do you want to remove escape sequences from the saved log?');
 
     if ($confirm eq 'yes') {
@@ -4062,7 +4068,11 @@ sub _wFindInTerminal {
         # Load the contents of the textbuffer with the corresponding log file
         if (open(F, "<:utf8", $$self{_LOGFILE})) {
             @{$$self{_TEXT}} = <F>;
-            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+            if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+                $text = join('', @{$$self{_TEXT}});
+            } else {
+                $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+            }
             close F;
         } else {
             $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
@@ -4248,7 +4258,11 @@ sub _wFindInTerminal {
     # Load the contents of the textbuffer with the corresponding log file
     if (open(F, "<:utf8", $$self{_LOGFILE})) {
         @{$$self{_TEXT}} = <F>;
-        $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+        if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+            $text = join('', @{$$self{_TEXT}});
+        } else {
+            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+        }
         close F;
     } else {
         $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
