@@ -178,8 +178,11 @@ my $QUOTE_COMMAND = $$CFG{'environments'}{$UUID}{'quote command'} && $USE_PREPEN
 my $QUOTEPOST_COMMAND = $$CFG{'environments'}{$UUID}{'quotepost command'} && $USE_POSTPEND_COMMAND;
 my $MANUAL = ($$CFG{'environments'}{$UUID}{'auth type'} // '') eq 'manual';
 my $TMP_UUID = $$CFG{'tmp'}{'uuid'};
+my $LOG_FILE = $$CFG{'tmp'}{'log file'};
 my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
+my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
+my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
@@ -1072,6 +1075,14 @@ sub _hardClose {
     return 0;
 }
 
+sub logTime {
+    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
+    print LOG "$t : $_[0]";
+    if ($_[0] !~ /\n|\r$/) {
+        print LOG "\n";
+    }
+}
+
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
@@ -1350,6 +1361,20 @@ if ($GETCMD) {
         print Glib::Markup::escape_text($proxy_get);
     }
     exit 0;
+}
+
+# Set log file
+# Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
+
+if (open(LOG,">:raw",$LOG_FILE)) {
+    if ($LOG_TIMESTAMP) {
+        $EXP->log_file(\&logTime);
+    } else {
+        close LOG;
+        $EXP->log_file($LOG_FILE);
+    }
+} else {
+    print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
 }
 
 # Prepare command file that is only accessible to the user
@@ -2244,9 +2269,44 @@ if (defined $EXP->pid) {
 }
 $EXP->hard_close();
 
+close_log_file();
+
 ctrl("DISCONNECTED");
 
 exit 0;
+
+sub close_log_file {
+    my $line;
+
+    if ($LOG_TIMESTAMP) {
+        close LOG;
+    }
+    if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
+        return 1;
+    }
+    if (!open(FIN,"<:raw",$LOG_FILE)) {
+        ctrl("ERROR: Could not open file '$LOG_FILE' for reading!! ($!)");
+        return 1;
+    }
+    if (!open(FOUT,">:raw","$LOG_FILE.$$")) {
+        ctrl("ERROR: Could not open file '$LOG_FILE.$$' for writting!! ($!)");
+        close FIN;
+        return 1;
+    }
+    while ($line = <FIN>) {
+        my $l = _removeEscapeSeqs($line);
+        if ($LOG_TIMESTAMP) {
+            while ($l =~ s/^(\D.+?)\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /$1/) {}
+            if ($l !~ /^\d{3,4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} : /) {
+                print FOUT ' 'x22;
+            }
+        }
+        print FOUT $l;
+    }
+    close FIN;
+    close FOUT;
+    rename("$LOG_FILE.$$", $LOG_FILE) or ctrl("ERROR: $!");
+}
 
 # END : Main program
 ########################################################
