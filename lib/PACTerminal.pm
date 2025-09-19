@@ -4070,6 +4070,7 @@ sub _wFindInTerminal {
             # Load the contents of the textbuffer from the current terminal
             my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
             ($text, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', 0, 0, $rows, $col);
+            @{ $$self{_TEXT} } = split /\n/, $text;
         } else {
             # Load the contents of the textbuffer with the corresponding log file
             if (open(F, "<:utf8", $$self{_LOGFILE})) {
@@ -4262,6 +4263,7 @@ sub _wFindInTerminal {
         # Load the contents of the textbuffer from the current terminal
         my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
         ($text, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', 0, 0, $rows, $col);
+        @{ $$self{_TEXT} } = split /\n/, $text;
     } else {
         if (open(F, "<:utf8", $$self{_LOGFILE})) {
             @{$$self{_TEXT}} = <F>;
