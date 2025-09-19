@@ -4063,22 +4063,24 @@ sub _wFindInTerminal {
     our $stop = 0;
     our %w;
     my $text;
+    my $l;
 
     if (defined $w{window}) {
-        # Load the contents of the textbuffer with the corresponding log file
-        if (open(F, "<:utf8", $$self{_LOGFILE})) {
-            @{$$self{_TEXT}} = <F>;
-            if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
-                $text = join('', @{$$self{_TEXT}});
-            } else {
-                $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
-            }
-            close F;
+        if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+            # Load the contents of the textbuffer from the current terminal
+            my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
+            ($text, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', 0, 0, $rows, $col);
         } else {
-            $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+            # Load the contents of the textbuffer with the corresponding log file
+            if (open(F, "<:utf8", $$self{_LOGFILE})) {
+                @{$$self{_TEXT}} = <F>;
+                $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+                close F;
+            } else {
+                $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+            }
         }
         $w{window}{buffer}->set_text($text // '');
-
         return $w{window}{data}->present();
     }
 
@@ -4256,16 +4258,22 @@ sub _wFindInTerminal {
     $w{window}{gui}{hboxmain}->set_position(($w{window}{data}->get_size) / 2);
 
     # Load the contents of the textbuffer with the corresponding log file
-    if (open(F, "<:utf8", $$self{_LOGFILE})) {
-        @{$$self{_TEXT}} = <F>;
-        if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
-            $text = join('', @{$$self{_TEXT}});
-        } else {
-            $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
-        }
-        close F;
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+        # Load the contents of the textbuffer from the current terminal
+        my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
+        ($text, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', 0, 0, $rows, $col);
     } else {
-        $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+        if (open(F, "<:utf8", $$self{_LOGFILE})) {
+            @{$$self{_TEXT}} = <F>;
+            if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+                $text = join('', @{$$self{_TEXT}});
+            } else {
+                $text = _removeEscapeSeqs(join('', @{$$self{_TEXT}}));
+            }
+            close F;
+        } else {
+            $text = "ERROR: Could not open file '$$self{_LOGFILE}': $!";
+        }
     }
     $w{window}{buffer}->set_text($text);
 
