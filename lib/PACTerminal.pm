@@ -3272,6 +3272,14 @@ sub _renameTab() {
 sub _saveSessionLog {
     my $self = shift;
 
+    if (!$$self{_LOGFILE} || !$$self{_LOG}{enabled}) {
+        if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+            $$self{_LOGFILE} = "$ENV{HOME}/$$self{'_UUID'}_session.log";
+        } else {
+            _wMessage($$self{_PARENTWINDOW}, "You have disabled logging");
+            return 0;
+        }
+    }
     my $new_file = $$self{_LOGFILE};
     $new_file =~ s/.*\///go;
 
@@ -3295,7 +3303,19 @@ sub _saveSessionLog {
     $dialog->destroy();
 
     if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
-        copy($$self{_LOGFILE}, $new_file);
+        if ($$self{_LOG}{enabled}) {
+            copy($$self{_LOGFILE}, $new_file);
+        } else {
+            my $format = 'VTE_FORMAT_TEXT';
+            if ($new_file =~ /\.html?$/) {
+                $format = 'VTE_FORMAT_HTML';
+            }
+            my ($col, $rows) = $$self{_GUI}{_VTE}->get_cursor_position();
+            my ($text, $l) = $$self{_GUI}{_VTE}->get_text_range_format($format, 0, 0, $rows, $col);
+            open(L,">:utf8",$new_file);
+            print L $text;
+            close L;
+        }
         return 1;
     }
 
