@@ -1223,6 +1223,7 @@ sub _setupCallbacks {
             my $ip = $$self{_CFG}{'environments'}{$uuid}{'ip'};
             my $port = $$self{_CFG}{'environments'}{$uuid}{'port'};
             my $user = $$self{_CFG}{'environments'}{$uuid}{'user'};
+            my $options = $$self{_CFG}{'environments'}{$uuid}{'options'};
 
             my $total_exp = 0;
             foreach my $exp (@{$$self{_CFG}{'environments'}{$uuid}{'expect'}}) {
@@ -1237,8 +1238,30 @@ sub _setupCallbacks {
             $string .= "- <b>Method</b>: $method\n";
             $string .= "- <b>IP / port</b>: @{[__($ip)]}:$port\n";
             $string .= "- <b>User</b>: @{[__($user)]}";
+            if ($method eq "SSH") {
+                my $is_L_fwd = 0;
+                my $is_R_fwd = 0;
+                foreach my $op (split(" ", $options)) {
+                    if ($op eq "-L") {
+                        $is_L_fwd = 1;
+                        next;
+                    }
+                    elsif ($op eq "-R") {
+                        $is_R_fwd = 1;
+                        next;
+                    }
+                    if ($is_L_fwd == 1) {
+                        $string .= "\n- <b>Local forwarding</b>: $op";
+                        $is_L_fwd = 0;
+                    }
+                    elsif ($is_R_fwd == 1) {
+                        $string .= "\n- <b>Remote forwarding</b>: $op";
+                        $is_R_fwd = 0;
+                    }
+                }
+            }
             if ($total_exp) {
-                $string .= "- With $total_exp active <b>Expects</b>";
+                $string .= "\n- With $total_exp active <b>Expects</b>";
             }
             $string = _subst($string, $$self{_CFG}, $uuid);
             $tooltip_widget->set_markup($string);
