@@ -514,7 +514,7 @@ sub stop {
     my $p_widget = $$self{_GUI}{_VBOX};
 
     # Set mouse pointer in case a postexec was executed
-    if ($p_widget->get_window()) {
+    if ($p_widget && $p_widget->get_window()) {
         $p_widget->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
     }
 
@@ -553,14 +553,15 @@ sub stop {
         $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
-    # Send any configured keypress to close the forked binary
-    if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
-        foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
-            _vteFeedChild($$self{_GUI}{_VTE}, $esc);
+    if ($$self{_GUI}{_VTE}) {
+        # Send any configured keypress to close the forked binary
+        if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
+            foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
+                _vteFeedChild($$self{_GUI}{_VTE}, $esc);
+            }
         }
+        _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
     }
-
-    _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
 
     $$self{CONNECTED} = 0;
 
@@ -598,7 +599,7 @@ sub stop {
     $self->_stopEmbedKidnapTimeout();
 
     # Finish the GUI
-    if ($$self{_TABBED}) {
+    if ($$self{_TABBED} && $p_widget) {
         my $p_num = -1;
         if ($$self{_SPLIT}) {
             $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent());
@@ -610,7 +611,7 @@ sub stop {
         if ($p_num >= 0) {
             $$self{_NOTEBOOK}->remove_page($p_num);
         }
-    } else {
+    } elsif ($$self{_WINDOWTERMINAL}) {
         $$self{_WINDOWTERMINAL}->destroy();
         undef($$self{_WINDOWTERMINAL});
     }
