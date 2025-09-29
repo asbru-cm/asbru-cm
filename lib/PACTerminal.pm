@@ -3242,10 +3242,14 @@ sub _renameTab() {
         "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
         'Enter the new temporal label:', $$self{_TITLE}
     );
-    if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
+    if (defined $new_label && $new_label !~ /^\s*$/go) {
         $$self{_TITLE} = $new_label;
+        if ($$self{_TABBED}) {
+            $self->_setTabColour();
+        } else {
+            $$self{_WINDOWTERMINAL}->set_title($$self{_TITLE});
+        }
     }
-    $self->_setTabColour();
 }
 
 sub _saveSessionLog {
