@@ -709,7 +709,8 @@ sub _initGUI {
     # Create treeClusters
     $$self{_GUI}{treeClusters} = PACTree->new(
         'Icon:' => 'pixbuf',
-        'Name:' => 'markup'
+        'Name:' => 'markup',
+        'UUID:' => 'hidden',
     );
     $$self{_GUI}{scrolledclu}->add($$self{_GUI}{treeClusters});
     $$self{_GUI}{treeClusters}->set_enable_tree_lines(0);
@@ -1223,6 +1224,7 @@ sub _setupCallbacks {
             my $ip = $$self{_CFG}{'environments'}{$uuid}{'ip'};
             my $port = $$self{_CFG}{'environments'}{$uuid}{'port'};
             my $user = $$self{_CFG}{'environments'}{$uuid}{'user'};
+            my $options = $$self{_CFG}{'environments'}{$uuid}{'options'};
 
             my $total_exp = 0;
             foreach my $exp (@{$$self{_CFG}{'environments'}{$uuid}{'expect'}}) {
@@ -1237,8 +1239,30 @@ sub _setupCallbacks {
             $string .= "- <b>Method</b>: $method\n";
             $string .= "- <b>IP / port</b>: @{[__($ip)]}:$port\n";
             $string .= "- <b>User</b>: @{[__($user)]}";
+            if ($method eq "SSH") {
+                my $is_L_fwd = 0;
+                my $is_R_fwd = 0;
+                foreach my $op (split(" ", $options)) {
+                    if ($op eq "-L") {
+                        $is_L_fwd = 1;
+                        next;
+                    }
+                    elsif ($op eq "-R") {
+                        $is_R_fwd = 1;
+                        next;
+                    }
+                    if ($is_L_fwd == 1) {
+                        $string .= "\n- <b>Local forwarding</b>: $op";
+                        $is_L_fwd = 0;
+                    }
+                    elsif ($is_R_fwd == 1) {
+                        $string .= "\n- <b>Remote forwarding</b>: $op";
+                        $is_R_fwd = 0;
+                    }
+                }
+            }
             if ($total_exp) {
-                $string .= "- With $total_exp active <b>Expects</b>";
+                $string .= "\n- With $total_exp active <b>Expects</b>";
             }
             $string = _subst($string, $$self{_CFG}, $uuid);
             $tooltip_widget->set_markup($string);
@@ -1507,6 +1531,7 @@ sub _setupCallbacks {
             if (!$action) {
                 return 0;
             }
+            my $UUID = $sel[0];
             if ($action eq 'edit_node' && $sel[0] ne '__PAC_SHELL__') {
                 $$self{_GUI}{connEditBtn}->clicked();
                 return 1;
@@ -1518,6 +1543,12 @@ sub _setupCallbacks {
                     }
                     $self->_setFavourite(0,$tree);
                 }
+                return 1;
+            } elsif ($action eq 'down') {
+                $$self{_GUI}{$what}->_focusNext($UUID,1);
+                return 1;
+            } elsif ($action eq 'up') {
+                $$self{_GUI}{$what}->_focusPrevious($UUID,1);
                 return 1;
             }
             return 0;
@@ -1573,149 +1604,191 @@ sub _setupCallbacks {
         if (!$action) {
             return 0;
         }
+        my $UUID = $sel[0];
         if ($action eq 'edit_node') {
             $$self{_CLUSTER}->show($sel[0]);
             return 1;
+        } elsif ($action eq 'down') {
+            $$self{_GUI}{treeClusters}->_focusNext($UUID,2);
+            return 1;
+        } elsif ($action eq 'up') {
+            $$self{_GUI}{treeClusters}->_focusPrevious($UUID,2);
+            return 1;
         }
+        return 0;
     });
 
     # Capture 'treeconnections' keypress
-    $$self{_GUI}{treeConnections}->signal_connect('key_press_event' => sub {
-        my ($widget, $event) = @_;
-        my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
+    $$self{_GUI}{treeConnections}->signal_connect(
+        'key_press_event' => sub {
+            my ($widget, $event) = @_;
+            my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
 
-        my $is_group = 0;
-        my $is_root = 0;
-        foreach my $uuid (@sel) {
-            if ($uuid eq '__PAC__ROOT__') {
-                $is_root = 1;
-            }
-            if ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) {
-                $is_group = 1;
-            }
-        }
-        my $action = $FUNCS{_KEYBINDS}->GetAction('treeConnections', $widget, $event);
-
-        if (!$action) {
-            return 0;
-        }
-        if ($action eq 'find') {
-            $$self{_SHOWFINDTREE} = 1;
-            $$self{_GUI}{_vboxSearch}->show();
-            $$self{_GUI}{_entrySearch}->grab_focus();
-        } elsif ($action eq 'expand_all') {
-            $$self{_GUI}{treeConnections}->expand_all();
-        } elsif ($action eq 'collaps_all') {
-            $$self{_GUI}{treeConnections}->collapse_all();
-        } elsif ($action eq 'clone') {
-            $self->_cloneNodes();
-        } elsif ($action eq 'copy') {
-            $self->_copyNodes();
-        } elsif ($action eq 'cut') {
-            $self->_cutNodes();
-        } elsif ($action eq 'paste') {
-            map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
-            $$self{_COPY}{'data'} = {};
-            $self->_copyNodes(0,undef,$LAST_COPIED_NODES);
-        } elsif ($action eq 'edit_node') {
-            if (!$is_root) {
-                $$self{_GUI}{connEditBtn}->clicked();
-            }
-        } elsif ($action eq 'connect_node') {
-            if (!$is_root) {
-                $$self{_GUI}{connExecBtn}->clicked();
-            }
-        } elsif ($action eq 'protection') {
-            if (!$is_root) {
-                $self->__treeToggleProtection();
-            }
-        } elsif ($action eq 'rename') {
-            if ((scalar(@sel) == 1) && ($sel[0] ne '__PAC__ROOT__')) {
-                $$self{_GUI}{nodeRenBtn}->clicked();
-            }
-        } elsif ($action eq 'add_favourite' || $action eq 'del_favourite') {
-            if ($$self{_GUI}{connFavourite}->get_sensitive()) {
-                my $tree = $self->_getCurrentTree();
-                if (!$tree->_getSelectedUUIDs()) {
-                    return 1;
-                }
-                if ($action eq 'add_favourite') {
-                    $self->_setFavourite(1,$tree);
-                } else {
-                    $self->_setFavourite(0,$tree);
-                }
-            }
-        } elsif ($action eq 'Delete') {
-            $$self{_GUI}{nodeDelBtn}->clicked();
-        } elsif ($action eq 'Left') {
-            my @idx;
+            my $is_group = 0;
+            my $is_root  = 0;
             foreach my $uuid (@sel) {
-                push(@idx, [ $uuid ]);
-            }
-            if (scalar @idx != 1) {
-                return 0;
-            }
-            my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection();
-            my $model = $tree->get_model();
-            my @paths = _getSelectedRows($selection);
-            my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
-
-            if (($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'})) {
-                if ($tree->row_expanded($$self{_GUI}{treeConnections}->_getPath($uuid))) {
-                    $tree->collapse_row($$self{_GUI}{treeConnections}->_getPath($uuid));
-                } elsif ($uuid ne '__PAC__ROOT__') {
-                    $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
+                if ($uuid eq '__PAC__ROOT__') {
+                    $is_root = 1;
                 }
-            } else {
-                $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
+                if ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) {
+                    $is_group = 1;
+                }
             }
-        } elsif ($action eq 'Right') {
-            my @idx;
-            foreach my $uuid (@sel) {
-                push(@idx, [ $uuid ]);
-            }
-            if (scalar @idx != 1) {
+            my $UUID = $sel[0];
+            my ($action, $keymask) = $FUNCS{_KEYBINDS}->GetAction('treeConnections', $widget, $event);
+            if (!$action) {
                 return 0;
             }
-            my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection();
-            my $model = $tree->get_model();
-            my @paths = _getSelectedRows($selection);
-            my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
-            if (!(($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
-                return 0;
-            }
-            $tree->expand_row($paths[0], 0);
-        } elsif ($action eq 'Return') {
-            my $tree = $$self{_GUI}{treeConnections};
-            my $selection = $tree->get_selection();
-            my $model = $tree->get_model();
-            my @paths = _getSelectedRows($selection);
-            my $uuid = $model->get_value($model->get_iter($paths[0]), 2);
-
-            if ((scalar(@paths) == 1) && (($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
-                $tree->row_expanded($paths[0]) ? $tree->collapse_row($paths[0]) : $tree->expand_row($paths[0], 0);
-            } else {
+            my $char = chr(Gtk3::Gdk::keyval_to_unicode($event->keyval));
+            if ($action eq 'find') {
+                $$self{_SHOWFINDTREE} = 1;
+                $$self{_GUI}{_vboxSearch}->show();
+                $$self{_GUI}{_entrySearch}->grab_focus();
+                return 1;
+            } elsif ($action eq 'expand_all') {
+                $$self{_GUI}{treeConnections}->expand_all();
+                return 1;
+            } elsif ($action eq 'collaps_all') {
+                $$self{_GUI}{treeConnections}->collapse_all();
+                return 1;
+            } elsif ($action eq 'clone') {
+                $self->_cloneNodes();
+                return 1;
+            } elsif ($action eq 'copy') {
+                $self->_copyNodes();
+                return 1;
+            } elsif ($action eq 'cut') {
+                $self->_cutNodes();
+                return 1;
+            } elsif ($action eq 'paste') {
+                map $self->_pasteNodes($sel[0], $_), keys %{ $$self{_COPY}{'data'}{'__PAC__COPY__'}{'children'} };
+                $$self{_COPY}{'data'} = {};
+                $self->_copyNodes(0, undef, $LAST_COPIED_NODES);
+                return 1;
+            } elsif ($action eq 'edit_node') {
+                if (!$is_root) {
+                    $$self{_GUI}{connEditBtn}->clicked();
+                }
+                return 1;
+            } elsif ($action eq 'connect_node') {
+                if (!$is_root) {
+                    $$self{_GUI}{connExecBtn}->clicked();
+                }
+                return 1;
+            } elsif ($action eq 'protection') {
+                if (!$is_root) {
+                    $self->__treeToggleProtection();
+                }
+                return 1;
+            } elsif ($action eq 'rename') {
+                if ((scalar(@sel) == 1) && ($sel[0] ne '__PAC__ROOT__')) {
+                    $$self{_GUI}{nodeRenBtn}->clicked();
+                }
+                return 1;
+            } elsif ($action eq 'add_favourite' || $action eq 'del_favourite') {
+                if ($$self{_GUI}{connFavourite}->get_sensitive()) {
+                    my $tree = $self->_getCurrentTree();
+                    if (!$tree->_getSelectedUUIDs()) {
+                        return 1;
+                    }
+                    if ($action eq 'add_favourite') {
+                        $self->_setFavourite(1, $tree);
+                    } else {
+                        $self->_setFavourite(0, $tree);
+                    }
+                }
+                return 1;
+            } elsif ($action eq 'Delete') {
+                $$self{_GUI}{nodeDelBtn}->clicked();
+                return 1;
+            } elsif ($action eq 'Left' || $action eq 'left') {
                 my @idx;
                 foreach my $uuid (@sel) {
-                    push(@idx,[$uuid]);
+                    push(@idx, [$uuid]);
+                }
+                if (scalar @idx != 1) {
+                    return 0;
+                }
+                my $tree      = $$self{_GUI}{treeConnections};
+                my $selection = $tree->get_selection();
+                my $model     = $tree->get_model();
+                my @paths     = _getSelectedRows($selection);
+                my $uuid      = $model->get_value($model->get_iter($paths[0]), 2);
+
+                if (($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'})) {
+                    if ($tree->row_expanded($$self{_GUI}{treeConnections}->_getPath($uuid))) {
+                        $tree->collapse_row($$self{_GUI}{treeConnections}->_getPath($uuid));
+                    } elsif ($uuid ne '__PAC__ROOT__') {
+                        $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
+                    }
+                } else {
+                    $tree->set_cursor($$self{_GUI}{treeConnections}->_getPath($$self{_CFG}{'environments'}{$uuid}{'parent'}), undef, 0);
+                }
+                return 1;
+            } elsif ($action eq 'Right' || $action eq 'right') {
+                my @idx;
+                foreach my $uuid (@sel) {
+                    push(@idx, [$uuid]);
+                }
+                if (scalar @idx != 1) {
+                    return 0;
+                }
+                my $tree      = $$self{_GUI}{treeConnections};
+                my $selection = $tree->get_selection();
+                my $model     = $tree->get_model();
+                my @paths     = _getSelectedRows($selection);
+                my $uuid      = $model->get_value($model->get_iter($paths[0]), 2);
+                if (!(($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
+                    return 0;
+                }
+                $tree->expand_row($paths[0], 0);
+                return 1;
+            } elsif ($action eq 'Return') {
+                my $tree      = $$self{_GUI}{treeConnections};
+                my $selection = $tree->get_selection();
+                my $model     = $tree->get_model();
+                my @paths     = _getSelectedRows($selection);
+                my $uuid      = $model->get_value($model->get_iter($paths[0]), 2);
+
+                if ((scalar(@paths) == 1) && (($uuid eq '__PAC__ROOT__') || ($$self{_CFG}{'environments'}{$uuid}{'_is_group'}))) {
+                    $tree->row_expanded($paths[0]) ? $tree->collapse_row($paths[0]) : $tree->expand_row($paths[0], 0);
+                } else {
+                    my @idx;
+                    foreach my $uuid (@sel) {
+                        push(@idx, [$uuid]);
+                    }
+                    $self->_launchTerminals(\@idx);
+                }
+                return 1;
+            } elsif ($action eq 'Escape' && $$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+                $$self{_GUI}{nodeClose}->clicked();
+                return 1;
+            } elsif ($action eq 'down') {
+                $$self{_GUI}{treeConnections}->_focusNext($UUID);
+                return 1;
+            } elsif ($action eq 'up') {
+                $$self{_GUI}{treeConnections}->_focusPrevious($UUID);
+                return 1;
+            } elsif (!$is_group && $action =~ /Ctrl\+[23456789]/) {
+                my $n = $action;
+                $n =~ s/\D//g;
+                my @idx;
+                foreach my $j (1 .. int($n)) {
+                    push(@idx, [$UUID]);
                 }
                 $self->_launchTerminals(\@idx);
+                return 1;
+            } elsif ($char =~ /\p{L}|\p{N}/ || $action =~ /dead_/) {
+                $$self{_SHOWFINDTREE} = 1;
+                $$self{_GUI}{_vboxSearch}->show();
+                $$self{_GUI}{_entrySearch}->grab_focus();
+                if ($action !~ /dead_/) {
+                    $$self{_GUI}{_entrySearch}->insert_text(chr($event->keyval), -1, 0);
+                }
+                $$self{_GUI}{_entrySearch}->set_position(-1);
+                return 1;
             }
-        } elsif ($action eq 'Down') {
             return 0;
-        } elsif ($action eq 'Up') {
-            return 0;
-        } elsif (($event->keyval >= 32) && ($event->keyval <= 126)) {
-            # This does not consider other languages
-            $$self{_SHOWFINDTREE} = 1;
-            $$self{_GUI}{_vboxSearch}->show();
-            $$self{_GUI}{_entrySearch}->grab_focus();
-            $$self{_GUI}{_entrySearch}->insert_text(chr($event->keyval), -1, 0);
-            $$self{_GUI}{_entrySearch}->set_position(-1);
-        }
-        return 1;
     });
 
     # Capture 'treeconnections' selected element changed
@@ -2362,6 +2435,12 @@ sub _setupCallbacks {
             $$self{_GUI}{shellBtn}->clicked();
         } elsif ($action eq 'showconnections') {
             $$self{_GUI}{showConnBtn}->clicked();
+        } elsif ($action eq 'next') {
+            $self->_rollnbTree(1);
+            return 1;
+        } elsif ($action eq 'previous') {
+            $self->_rollnbTree(-1);
+            return 1;
         } else {
             return 0;
         }
@@ -2372,6 +2451,37 @@ sub _setupCallbacks {
         return 0;
     });
     return 1;
+}
+
+sub _rollnbTree {
+    my ($self, $direction) = @_;
+    my $max = $$self{_GUI}{nbTree}->get_n_pages()-1;
+    my $page = $$self{_GUI}{nbTree}->get_current_page();
+    $page += $direction;
+    if ($direction > 0 && $page > $max) {
+        $page = 0;
+    } elsif ($direction < 0 && $page < 0) {
+        $page = $max;
+    }
+    $$self{_GUI}{nbTree}->set_current_page($page);
+    $self->_selnbTree($page);
+}
+
+sub _selnbTree {
+    my ($self, $page) = @_;
+    if ($page == 1) {
+        $self->_updateGUIFavourites();
+        $$self{_GUI}{treeFavourites}->grab_focus();
+    } elsif ($page == 2) {
+        $self->_updateGUIClusters();
+        $$self{_GUI}{treeClusters}->grab_focus();
+    } elsif ($page == 3) {
+        $self->_updateGUIHistory();
+        $$self{_GUI}{treeHistory}->grab_focus();
+    } else {
+        $self->_showConnectionsList();
+        $$self{_GUI}{treeConnections}->grab_focus();
+    }
 }
 
 sub _setFavourite {
@@ -3143,41 +3253,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 sub _startCluster {
-    my $self = shift;
+    my $self    = shift;
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClusters();
+    my $clulist = $$self{_CLUSTER}->getCFGClustersByTitle();
 
-    if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
-        my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
-        my $host = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{host}/;
-        my $title = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{title}/;
-        my $desc = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}/;
-        foreach my $uuid (keys %{ $$self{_CFG}{environments} }) {
-            if ($uuid eq '__PAC__ROOT__' || $$self{_CFG}{environments}{$uuid}{_is_group}) {
-                next;
-            }
-            if (($name ne '')&&($$self{_CFG}{environments}{$uuid}{name} !~ /$name/)) {
-                next;
-            }
-            if (($host ne '')&&($$self{_CFG}{environments}{$uuid}{ip} !~ /$host/)) {
-                next;
-            }
-            if (($title ne '')&&($$self{_CFG}{environments}{$uuid}{title} !~ /$title/)) {
-                next;
-            }
-            if (($desc ne '')&&($$self{_CFG}{environments}{$uuid}{description} !~ /$desc/)) {
-                next;
-            }
-            push(@idx, [ $uuid, undef, $cluster ]);
-        }
-    } else {
-        foreach my $uuid (keys %{ $$clulist{$cluster} }) {
-            push(@idx, [ $uuid, undef, $cluster ]);
-        }
+    foreach my $key (sort keys %{ $$clulist{$cluster} }) {
+        push(@idx, [ $$clulist{$cluster}{$key}, undef, $cluster ]);
     }
-    if ((scalar(@idx) >= 10)&&(!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
+    if ((scalar(@idx) >= 10) && (!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
         return 1;
     } elsif (!@idx) {
         _wMessage($$self{_GUI}{main}, "Cluster <b>$cluster</b> contains no elements");
