@@ -80,8 +80,11 @@ my $EXEC_STORM_TIME = 0.2;
 
 my @KPX;
 
-my $NPOSX = 0;
-my $NPOSY = 0;
+my $NPOSXC  = 0;
+my $NPOSYC  = 0;
+my @WINDOWS = ();
+my $NPOSX   = 0;
+my $NPOSY   = 0;
 
 my $right_click_deep = 0;
 
@@ -108,6 +111,7 @@ sub new {
     $self->{_NOTEBOOKWINDOW} = shift;
     $self->{_CLUSTER} = shift // '';
     $self->{_MANUAL} = shift;
+    $self->{_QTY} = shift // 1;
 
     $self->{_TABBED} = $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'use personal settings'} ? $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'open in tab'} // 1 : $self->{_CFG}{'defaults'}{'open connections in tabs'} // 1;
     $self->{_NAME} = $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'name'};
@@ -305,6 +309,11 @@ sub DESTROY {
 sub start {
     my $self = shift;
     $$self{_KEYS_RECEIVE} = shift // undef;
+
+    if ($self->{_CLUSTER} && ($NPOSXC || $NPOSYC)) {
+        $NPOSXC = 0;
+        $NPOSYC = 0;
+    }
 
     if ($$self{CONNECTED} || $$self{CONNECTING}) {
         return 1;
@@ -518,15 +527,23 @@ sub stop {
         $p_widget->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
     }
 
-    if ($NPOSX>0) {
-        $NPOSX--;
-        if (($NPOSY>0)&&($NPOSX==0)) {
-            $NPOSY--;
-            $NPOSX=2;
+    if (!$self->{_CLUSTER}) {
+        for (my $i = 0; $i < $#WINDOWS + 1; $i++) {
+            if ($WINDOWS[$i] eq $$self{_UUID_TMP}) {
+                $WINDOWS[$i] = 0;
+                last;
+            }
         }
-    } elsif ($NPOSY>0) {
+    }
+    if ($NPOSX > 0) {
+        $NPOSX--;
+        if (($NPOSY > 0) && ($NPOSX == 0)) {
+            $NPOSY--;
+            $NPOSX = 2;
+        }
+    } elsif ($NPOSY > 0) {
         $NPOSY--;
-        $NPOSX=1;
+        $NPOSX = 1;
     }
 
     # TODO : This coding sequence looks repeated unless is it is necessary to confirm connection that many times
@@ -929,32 +946,61 @@ sub _initGUI {
     # New WINDOW:
     else
     {
+        my $screen        = Gtk3::Gdk::Screen::get_default();
+        my $monitors      = $screen->get_n_monitors();
+        my $sw            = $screen->get_width();
+        my $conns_per_row = 2 * $monitors;
+        my $conns_per_col = 1;
+        my $nposx         = 0;
+        my $nposy         = 0;
+        my $hsize         = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
+        my $vsize         = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
+
+        if ($self->{_CLUSTER}) {
+            $nposx = $NPOSXC;
+            $nposy = $NPOSYC;
+        } else {
+            if ($$self{_QTY} > 1) {
+                $hsize = int($sw / $conns_per_row);
+            }
+            for (my $i = 0; $i <= $#WINDOWS + 1; $i++) {
+                if (!$WINDOWS[$i]) {
+                    $WINDOWS[$i] = $$self{_UUID_TMP};
+                    $nposx = $i;
+                    last;
+                }
+            }
+            if ($nposx >= $conns_per_row) {
+                $nposy++;
+                $nposx -= $conns_per_row;
+                if ($nposy > 1) {
+                    $nposx = 3;
+                    $nposy = 1;
+                }
+            }
+        }
+
         # Build a new window,
         $$self{_WINDOWTERMINAL} = Gtk3::Window->new();
         $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
 
-        my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
-        my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
-
-        my $conns_per_row = 2;
-        my $conns_per_col = 1;
         if ($self->{_CLUSTER}) {
-            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
-                my $screen = Gtk3::Gdk::Screen::get_default();
-                my $sw = $screen->get_width();
-                my $sh = $screen->get_height() - 100;
-                $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
-                $conns_per_col = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 7 ? 2 : 3;
-                my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
-                my $cols = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_col) || 1;
-                $hsize = int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
-                if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
-                    $vsize = int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $cols)));
+            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS} > 1) {
+                my $cols = 1;
+                my $sh   = $screen->get_height() - 100;
+                my $rows = $PACMain::FUNCS{_MAIN}{_NTERMINALS} <= 2 * $monitors ? 1 : 2;
+                if ($monitors > 1) {
+                    $cols = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 3 ? 2 : 4;
                 } else {
+                    $cols  = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 3 ? 2 : POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / 2);
                     $vsize = $sh;
                 }
+                $hsize         = int($sw / $cols);
+                $vsize         = int($sh / $rows);
+                $conns_per_row = $cols;
+                $conns_per_col = $rows;
             }
         }
         $$self{_WINDOWTERMINAL}->set_default_size($hsize, $vsize);
@@ -963,7 +1009,7 @@ sub _initGUI {
         }
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
-        $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3), 5+($NPOSY*$vsize+($NPOSY*50)));
+        $$self{_WINDOWTERMINAL}->move(($nposx * $hsize + 3), 5 + ($nposy * $vsize + ($nposy * 50)));
 
         if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) || $$self{_CFG}{defaults}{'terminal support transparency'}) {
             _setWindowPaintable($$self{_WINDOWTERMINAL});
@@ -971,10 +1017,14 @@ sub _initGUI {
 
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
-        $NPOSX++;
-        if ($NPOSX == $conns_per_row) {
-            $NPOSY++;
-            $NPOSX = 0;
+        if ($self->{_CLUSTER}) {
+            $nposx++;
+            if ($nposx == $conns_per_row) {
+                $nposy++;
+                $nposx = 0;
+            }
+            $NPOSXC = $nposx;
+            $NPOSYC = $nposy;
         }
         $self->{_PARENTWINDOW} = $$self{_WINDOWTERMINAL};
     }
