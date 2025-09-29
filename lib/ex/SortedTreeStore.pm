@@ -161,9 +161,13 @@ sub __treeSort {
 
     my $groups_1st = $$cfg{'defaults'}{'sort groups first'} // 1;
     my $b_uuid = $treestore->get_value($b_iter, 2);
+    my $a_name = $treestore->get_value($a_iter, 1);
+    my $b_name = $treestore->get_value($b_iter, 1);
     if (!defined $b_uuid) {
         return 0;
     }
+    $a_name =~ s/<.*?> ?//g;
+    $b_name =~ s/<.*?> ?//g;
     # __PAC__ROOT__ must always be the first node!!
     if ($b_uuid eq '__PAC__ROOT__') {
         return 1;
@@ -190,7 +194,7 @@ sub __treeSort {
         }
     }
     # ... then alphabetically
-    return lc($$cfg{'environments'}{$a_uuid}{name}) cmp lc($$cfg{'environments'}{$b_uuid}{name});
+    return lc($a_name) cmp lc($b_name);
 }
 # END: Private functions definitions
 ###################################################################
