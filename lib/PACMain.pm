@@ -116,6 +116,11 @@ our %FUNCS;
 our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
 my $LAST_COPIED_NODES;
+
+my %CLUSTER_COLORS = ('a-red','#FF0000','b-green','#00b53a','c-blue','#008fff','d-orange','#ff8825','e-black','#000000','f-white','#FFFFFF');
+my %CLUSTER_COLOR = ();
+my %CLUSTER_COLOR_TAKEN = ();
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -149,7 +154,6 @@ sub new {
     $self->{_HAS_FOCUS} = '';
     $self->{_VERBOSE} = 0;
     $self->{_Vte} = undef;
-
     @{ $self->{_UNDO} } = ();
     $$self{_GUILOCKED} = 0;
 
@@ -3232,10 +3236,35 @@ sub _startCluster {
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClustersByTitle();
-
-    foreach my $key (sort keys %{ $$clulist{$cluster} }) {
-        push(@idx, [ $$clulist{$cluster}{$key}, undef, $cluster ]);
+    my $clulist = $$self{_CLUSTER}->getCFGClusters();
+    $self->_setClusterColor($cluster);
+    if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
+        my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
+        my $host = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{host}/;
+        my $title = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{title}/;
+        my $desc = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}/;
+        foreach my $uuid (keys %{ $$self{_CFG}{environments} }) {
+            if ($uuid eq '__PAC__ROOT__' || $$self{_CFG}{environments}{$uuid}{_is_group}) {
+                next;
+            }
+            if (($name ne '')&&($$self{_CFG}{environments}{$uuid}{name} !~ /$name/)) {
+                next;
+            }
+            if (($host ne '')&&($$self{_CFG}{environments}{$uuid}{ip} !~ /$host/)) {
+                next;
+            }
+            if (($title ne '')&&($$self{_CFG}{environments}{$uuid}{title} !~ /$title/)) {
+                next;
+            }
+            if (($desc ne '')&&($$self{_CFG}{environments}{$uuid}{description} !~ /$desc/)) {
+                next;
+            }
+            push(@idx, [ $uuid, undef, $cluster ]);
+        }
+    } else {
+        foreach my $uuid (keys %{ $$clulist{$cluster} }) {
+            push(@idx, [ $uuid, undef, $cluster ]);
+        }
     }
     if ((scalar(@idx) >= 10) && (!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
         return 1;
@@ -3245,6 +3274,46 @@ sub _startCluster {
     }
     $self->_launchTerminals(\@idx);
     return 1;
+}
+
+sub _setClusterColor {
+    my ($self,$cluster) = @_;
+    if (!$CLUSTER_COLOR{$cluster}) {
+        foreach my $c (sort keys %CLUSTER_COLORS) {
+            if (!$CLUSTER_COLOR_TAKEN{$c}) {
+                $CLUSTER_COLOR_TAKEN{$c} = $cluster;
+                $CLUSTER_COLOR{$cluster} = $CLUSTER_COLORS{$c};
+                last;
+            }
+        }
+    }
+}
+
+sub _freeClusterColor {
+    my ($self,$cluster) = @_;
+    my $total = 0;
+
+    if (!$CLUSTER_COLOR{$cluster}) {
+        return 0;
+    }
+    foreach my $uuid_tmp (keys %RUNNING) {
+        my $running = $RUNNING{$uuid_tmp}{terminal}{_CLUSTER} // '';
+        if ($running eq $cluster) {
+            $total++;
+            last;
+        }
+    }
+    if ($total) {
+        return;
+    }
+    foreach my $c (sort keys %CLUSTER_COLORS) {
+        my $color_taken = $CLUSTER_COLOR_TAKEN{$c} // '';
+        if ($color_taken eq $cluster) {
+            $CLUSTER_COLOR_TAKEN{$c} = '';
+            last;
+        }
+    }
+    delete $CLUSTER_COLOR{$cluster};
 }
 
 sub _launchTerminals {
@@ -3306,6 +3375,7 @@ sub _launchTerminals {
         $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} = $where eq 'tab';
 
         my $t = PACTerminal->new($$self{_CFG}, $uuid, $$self{_GUI}{nb}, $$self{_GUI}{_PACTABS}, $cluster, $manual) or die "ERROR: Could not create object($!)";
+        $t->{_CLUSTER_COLOR} = $CLUSTER_COLOR{$cluster} // '';
         push(@new_terminals, $t);
 
         # Restore previously changed variables
