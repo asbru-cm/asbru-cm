@@ -66,11 +66,31 @@ sub _getSelectedNames {
     return wantarray ? @selected : scalar(@selected);
 }
 
+sub _getSelectedTerminals {
+    my $self = shift;
+    my $selection = $self->get_selection();
+    my $model = $self->get_model();
+    my @paths = _getSelectedRows($selection);
+    my %selected;
+
+    foreach my $path (@paths) {
+        my $name = $model->get_value($model->get_iter($path), 1);
+        my $uuid = $model->get_value($model->get_iter($path), 2);
+        $name =~s /<.+?> *//g;
+        print "$name = $uuid\n";
+        $selected{name} = $name;
+        $selected{uuid} = $uuid;
+    }
+
+    return \%selected;
+}
+
 sub _getChildren {
     my $self = shift;
     my $uuid = shift;
     my $which = shift // 'all'; # 0:nodes, 1:groups, all:nodes+groups
     my $deep = shift // 0;      # 0:1st_level, 1:all_levels
+    my $hash = shift // 0;
 
     my $modelsort = $self->get_model();
     my $model = $modelsort->get_model();
@@ -83,6 +103,7 @@ sub _getChildren {
         my ($store, $path, $iter, $tmp) = @_;
         my $node_uuid = $store->get_value($iter, 2);
         my $node_name = $store->get_value($iter, 1);
+        $node_name =~s /<.+?> *//g;
 
         if ($node_uuid eq $uuid) {
             $root = $path->to_string();
@@ -92,7 +113,11 @@ sub _getChildren {
         }
 
         if ((($path->to_string() =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__'))) {
-            push(@list, $node_uuid);
+            if ($hash) {
+                push(@list, {name=>$node_name,uuid=>$node_uuid});
+            } else {
+                push(@list, $node_uuid);
+            }
         }
         return $path->to_string() !~ /^$root/g;
     });
