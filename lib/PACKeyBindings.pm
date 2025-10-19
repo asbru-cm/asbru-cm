@@ -219,8 +219,7 @@ sub GetAccelerator {
                 }
                 if ($kb =~ /Shift/) {
                     $acc .= '<shift>';
-                }
-                if ($key =~ /[A-Z]/) {
+                } elsif ($key =~ /\+\p{Uppercase}/) {
                     $acc .= '<shift>';
                 }
                 $acc .= $key;
