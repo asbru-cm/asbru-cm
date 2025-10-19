@@ -771,8 +771,14 @@ sub _setProxy {
         if ($AUTH eq 'publickey') {
             $user = $PASSPHRASE_USER;
         }
-        if (-e "/etc/ssh/ssh_config") {
-            open (SSHC,"<:utf8","/etc/ssh/ssh_config");
+        my $load = '';
+        if (-e "$ENV{HOME}/.ssh/asbru_config") {
+            $load = "$ENV{HOME}/.ssh/asbru_config";
+        } elsif (-e "/etc/ssh/ssh_config") {
+            $load = "/etc/ssh/ssh_config";
+        }
+        if ($load) {
+            open (SSHC,"<:utf8",$load);
             while (my $l = <SSHC>) {
                 $l =~ s/\n//g;
                 $l =~ s/^[\t ]+//;
