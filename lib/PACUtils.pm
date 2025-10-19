@@ -183,7 +183,7 @@ our @DONATORS_LIST = (
     'Yan Lebedev ',
     'Florian Jerusalem',
     'Brendan Bell',
-    'Microflow Software SA De CB',
+    'Microflow Software SA de CV',
     'Giuseppe Massimiani',
     'Рукавков Никита',
     'Miguel Rodriguez Vazquez',
