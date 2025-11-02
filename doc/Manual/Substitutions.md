@@ -77,6 +77,12 @@ When you connect the terminal will prompt you to select an IP from the previous 
 
 ![Ask mask prompt](images/subst2.png)
 
+## ASK_PASS
+
+Will prompt user to enter a value masking the entry with dots, convenient to ask for private information.
+
+`<<ASK_PASS>>`
+
 ## CMD
 
 Will execute a command with the shell and use the output of that command for substitution
