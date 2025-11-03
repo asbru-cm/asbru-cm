@@ -116,6 +116,7 @@ sub update
     $$self{gui}{cbSSHVersion}->set_active($SSH_VERSION{$$options{sshVersion} // 'any'});
     $$self{gui}{cbSSHProtocol}->set_active($IP_PROTOCOL{$$options{ipVersion} // 'any'});
     $$self{gui}{chNoRemoteCmd}->set_active($$options{noRemoteCmd});
+    $$self{gui}{chpseudoTerminal}->set_active($$options{pseudoTerminal});
     $$self{gui}{chForwardX}->set_active($$options{forwardX});
     $$self{gui}{chUseCompression}->set_active($$options{useCompression});
     $$self{gui}{chAllowPortConnect}->set_active($$options{allowRemoteConnection});
@@ -206,6 +207,7 @@ sub get_cfg
     $options{sshVersion} = $$self{gui}{cbSSHVersion}->get_active_text();
     $options{ipVersion} = $$self{gui}{cbSSHProtocol}->get_active_text();
     $options{noRemoteCmd} = $$self{gui}{chNoRemoteCmd}->get_active();
+    $options{pseudoTerminal} = $$self{gui}{chpseudoTerminal}->get_active();
     $options{forwardX} = $$self{gui}{chForwardX}->get_active();
     $options{useCompression} = $$self{gui}{chUseCompression}->get_active();
     $options{allowRemoteConnection} = $$self{gui}{chAllowPortConnect}->get_active();
@@ -287,6 +289,7 @@ sub _parseCfgToOptions
 
     my %options;
     $options{noRemoteCmd} = 0;
+    $options{pseudoTerminal} = 0;
     $options{allowRemoteConnection} = 0;
     $options{forwardAgent} = 0;
     @{$options{forwardPort}} = ();
@@ -335,6 +338,7 @@ sub _parseCfgToOptions
         "optionenableX|X",
         "optiondisablex|x",
         "noRemoteCmd|N",
+        "pseudoTerminal|T",
         "useCompression|C",
         "allowRemoteConnection|g",
         "forwardAgent|A",
@@ -361,6 +365,7 @@ sub _parseOptionsToCfg
     $txt .= ' -' . $$hash{ipVersion} unless $$hash{ipVersion} eq 'any';
     $txt .= ' -' . ($$hash{forwardX} ? 'X' : 'x');
     $txt .= ' -N' if $$hash{noRemoteCmd};
+    $txt .= ' -T' if $$hash{pseudoTerminal};
     $txt .= ' -C' if $$hash{useCompression} ;
     $txt .= ' -g' if $$hash{allowRemoteConnection};
     $txt .= ' -A' if $$hash{forwardAgent};
@@ -477,6 +482,10 @@ sub _buildGUI
     $w{chNoRemoteCmd} = Gtk3::CheckButton->new_with_label('Do NOT execute remote command');
     $hbox2->pack_start($w{chNoRemoteCmd}, 1, 1, 0);
     $w{chNoRemoteCmd}->set_tooltip_text('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)');
+
+    $w{chpseudoTerminal} = Gtk3::CheckButton->new_with_label('Allocate pseudoterminal');
+    $hbox2->pack_start($w{chpseudoTerminal}, 1, 1, 0);
+    $w{chpseudoTerminal}->set_tooltip_text('[-T]: Allocate pseudoterminal');
 
     $w{chRandomSocksTunnel} = Gtk3::CheckButton->new_with_label('Create random SOCKS tunnel');
     $hbox2->pack_start($w{chRandomSocksTunnel}, 1, 1, 0);
