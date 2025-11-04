@@ -483,7 +483,7 @@ sub _buildGUI
     $hbox2->pack_start($w{chNoRemoteCmd}, 1, 1, 0);
     $w{chNoRemoteCmd}->set_tooltip_text('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)');
 
-    $w{chpseudoTerminal} = Gtk3::CheckButton->new_with_label('Allocate pseudoterminal');
+    $w{chpseudoTerminal} = Gtk3::CheckButton->new_with_label('Disable pseudo-terminal allocation');
     $hbox2->pack_start($w{chpseudoTerminal}, 1, 1, 0);
     $w{chpseudoTerminal}->set_tooltip_text('[-T]: Allocate pseudoterminal');
 
