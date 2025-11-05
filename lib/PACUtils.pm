@@ -43,6 +43,7 @@ use Sys::Hostname;
 use Net::ARP;
 use Net::Ping;
 use YAML;
+use File::stat;
 use OSSP::uuid;
 use Encode;
 use DynaLoader; # Required for PACTerminal and PACShell modules
@@ -183,7 +184,7 @@ our @DONATORS_LIST = (
     'Yan Lebedev ',
     'Florian Jerusalem',
     'Brendan Bell',
-    'Microflow Software SA De CB',
+    'Microflow Software SA de CV',
     'Giuseppe Massimiani',
     'Рукавков Никита',
     'Miguel Rodriguez Vazquez',
@@ -3298,32 +3299,32 @@ sub _deleteOldestSessionLog {
     if (!$max) {
         return 1;
     }
-
     opendir(my $F, $folder) or die "ERROR: Could not open folder '$folder' for reading: $!";
 
     my @total;
     foreach my $file (readdir $F) {
-        if ($file !~ /^PAC_\[(.+)_Name_(.+)\]_\[(\d{8})_(\d{6})\]\.txt$/g) {
+        if ($file =~ /^\./ || $file !~ /$uuid/) {
             next;
         }
-        my ($fenv, $fconn, $fdate, $ftime) = ($1, $2, $3, $4);
-        push(@total, "$folder/$file");
+        my $st    = stat("$folder/$file");
+        my $mtime = $st->ctime;
+        push(@total, "${mtime}:::$folder/$file");
     }
 
     close $F;
 
-    if (scalar(@total) lt $max) {
+    if (scalar(@total) < $max) {
         return 1;
     }
-
+    my $diff = scalar(@total) - $max;
     my $i = 0;
-    foreach my $file (sort {$a cmp $b} @total) {
-        unlink $file or die "ERROR: Could not delete oldest log file '$file': $!";
-        if ((scalar(@total) - $max) <= $i++) {
+    foreach my $file (sort { $a cmp $b } @total) {
+        my ($t,$fn) = split/:::/,$file;
+        unlink $fn;
+        if ($diff <= $i++) {
             last;
         }
     }
-
     return 1;
 }
 
