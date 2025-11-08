@@ -3,7 +3,7 @@ package PACTree;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2025 Ásbrú Connection Manager team (https://asbru-cm.net)
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
@@ -66,11 +66,30 @@ sub _getSelectedNames {
     return wantarray ? @selected : scalar(@selected);
 }
 
+sub _getSelectedTerminals {
+    my $self = shift;
+    my $selection = $self->get_selection();
+    my $model = $self->get_model();
+    my @paths = _getSelectedRows($selection);
+    my %selected;
+
+    foreach my $path (@paths) {
+        my $name = $model->get_value($model->get_iter($path), 1);
+        my $uuid = $model->get_value($model->get_iter($path), 2);
+        $name =~s /<.+?> *//g;
+        $selected{name} = $name;
+        $selected{uuid} = $uuid;
+    }
+
+    return \%selected;
+}
+
 sub _getChildren {
     my $self = shift;
     my $uuid = shift;
     my $which = shift // 'all'; # 0:nodes, 1:groups, all:nodes+groups
     my $deep = shift // 0;      # 0:1st_level, 1:all_levels
+    my $hash = shift // 0;
 
     my $modelsort = $self->get_model();
     my $model = $modelsort->get_model();
@@ -83,6 +102,7 @@ sub _getChildren {
         my ($store, $path, $iter, $tmp) = @_;
         my $node_uuid = $store->get_value($iter, 2);
         my $node_name = $store->get_value($iter, 1);
+        $node_name =~s /<.+?> *//g;
 
         if ($node_uuid eq $uuid) {
             $root = $path->to_string();
@@ -92,7 +112,11 @@ sub _getChildren {
         }
 
         if ((($path->to_string() =~ /^$root:/g) && (((defined($$self{children}) || '0') eq $which) || ($which eq 'all') ) && ($node_uuid ne '__PAC__ROOT__'))) {
-            push(@list, $node_uuid);
+            if ($hash) {
+                push(@list, {name=>$node_name,uuid=>$node_uuid});
+            } else {
+                push(@list, $node_uuid);
+            }
         }
         return $path->to_string() !~ /^$root/g;
     });
@@ -173,6 +197,126 @@ sub _delNode {
     });
 
     return 1;
+}
+
+sub _focusPrevious {
+    my $self        = shift;
+    my $uuid        = shift;
+    my $who         = shift;
+    my $NEXT        = 0;
+    my $pg_expanded = 0;
+    my $pg_depth    = 0;
+    my $focus       = undef;
+
+    if (!$uuid) {
+        return 0;
+    }
+    my $model = $self->get_model();
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            my $group     = 0;
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            my $expanded = $self->row_expanded($path);
+            my $str      = $path->to_string();
+            my $depth    = () = $str =~ /:/g;
+            if ($elem_uuid eq $uuid) {
+                return 1;
+            }
+            if ($group && $pg_expanded) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_depth    = $depth;
+                $pg_expanded = $expanded;
+            } elsif ($group && $depth <= $pg_depth) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_expanded = $expanded;
+                $pg_depth    = $depth;
+            } elsif ((!$group && $depth <= $pg_depth) || (!$group && $pg_expanded && $depth > $pg_depth)) {
+                $focus       = { name => $name, str => $str, depth => $depth, uuid => $elem_uuid };
+                $pg_depth    = $depth;
+                $pg_expanded = 0;
+            }
+            return 0;
+        }
+    );
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            if ($$focus{uuid} eq $elem_uuid) {
+                $self->set_cursor($path, undef, 0);
+                return 1;
+            }
+            return 0;
+        }
+    );
+    return 0;
+}
+
+sub _focusNext {
+    my $self  = shift;
+    my $uuid  = shift;
+    my $who   = shift;
+    my $NEXT  = 0;
+    my $level = -1;
+
+    if (!$uuid) {
+        return 0;
+    }
+    my $model = $self->get_model();
+    $model->foreach(
+        sub {
+            my ($name, $elem_uuid);
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            if ($who == 2) {
+                $elem_uuid = $name;
+            }
+            my $group = 0;
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            my $expanded = $self->row_expanded($path);
+            my $str      = $path->to_string();
+            my $depth    = () = $str =~ /:/g;
+            if ($who && $uuid eq '__PAC__ROOT__') {
+                $NEXT  = 1;
+                $level = 99;
+            }
+            if ($who == 2) {
+
+            }
+            if ($NEXT) {
+                if ($depth <= $level) {
+                    $self->set_cursor($path, undef, 0);
+                    return 1;
+                }
+                return 0;
+            }
+            if ($elem_uuid eq $uuid) {
+                if ($group && !$expanded) {
+                    $level = $depth;
+                } else {
+                    $level = 99;
+                }
+                $NEXT = 1;
+            }
+            return 0;
+        }
+    );
+    return 0;
 }
 
 sub _setTreeFocus {
