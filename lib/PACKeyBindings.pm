@@ -187,7 +187,22 @@ sub ListKeyBindings {
         if ($kb =~ /^undef-/) {
             next;
         }
-        $list .= sprintf("<b>%-20s</b>$tab\t%s\n", $kb, $$kbs{$kb}[2]);
+        $list .= sprintf("<b>%-25s</b>$tab\t%s\n", $kb, $$kbs{$kb}[2]);
+    }
+    if ($window eq 'terminal') {
+        my $hk = $self->{hotkey};
+        foreach my $kb (sort keys %$hk) {
+            if ($kb =~ /^undef-/) {
+                next;
+            }
+            foreach my $keymask (sort keys %{ $$hk{$kb} }) {
+                if ($kb eq 'terminal') {
+                    my $cmd = $$hk{$kb}{$keymask}[1];
+                    $cmd =~ s/HOTKEY_CMD://;
+                    $list .= sprintf("<b>%-25s</b>$tab\t%s\n", $self->stringifyKeybind($keymask), $cmd);
+                }
+            }
+        }
     }
     return "$list</span>";
 }
@@ -248,9 +263,10 @@ sub LoadHotKeys {
     foreach my $w (@what) {
         foreach my $hash (@{$$CFG{$w}}) {
             if ($$hash{keybind}) {
+                my $des = $$hash{description} // $w;
                 my $lf  = $$hash{intro} && $w ne 'local commands' ? "\n" : '';
                 my $ask = $$hash{confirm} ? "?" : '';
-                $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$w", "$ask$$hash{txt}$lf", $uuid);
+                $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$des", "$ask$$hash{txt}$lf", $uuid);
             }
         }
     }
