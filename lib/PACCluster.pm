@@ -1633,6 +1633,22 @@ sub getCFGClusters {
     return \%clusters;
 }
 
+sub getCFGClustersByTitle {
+    my $self = shift;
+
+    my $envs = $PACMain::{FUNCS}{_MAIN}{_CFG}{environments};
+    my %clusters;
+
+    foreach my $uuid (keys %{$envs}) {
+        foreach my $cluster (@{ $$envs{$uuid}{cluster} }) {
+            my $name = lc($$envs{$uuid}{title});
+            $clusters{$cluster}{"$name"} = $uuid;
+        }
+    }
+
+    return \%clusters;
+}
+
 sub _comboClustersChanged {
     my $self = shift;
 
