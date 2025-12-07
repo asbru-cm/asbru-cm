@@ -4990,6 +4990,27 @@ sub _setSafeLayoutOptions {
         }
     }
     $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
+
+    # Adapt colors of tree nodes if unreadable for currently selected theme
+    my $p_set = $$self{_CFG}{defaults}{'protected set'};
+    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
+    my $p_color = $$self{_CFG}{defaults}{'protected color'};
+    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'} // '#000000';
+    if ($$self{_CFG}{'defaults'}{'theme'} =~ /dark/) {
+        if ($p_set eq 'foreground' && $p_color lt '#777777777777') {
+            $$self{_CFG}{defaults}{'protected color'} = '#ffffff';
+        }
+        if ($p_unset eq 'foreground' && $p_uncolor lt '#777777777777') {
+            $$self{_CFG}{defaults}{'unprotected color'} = '#aaaaaa';
+        }
+    } else {
+        if ($p_set eq 'foreground' && $p_color gt '#dddddddddddd') {
+            $$self{_CFG}{defaults}{'protected color'} = '#000000';
+        }
+        if ($p_unset eq 'foreground' && $p_uncolor gt '#dddddddddddd') {
+            $$self{_CFG}{defaults}{'unprotected color'} = '#000000';
+        }
+    }
 }
 
 # Apply layout to window and widgets
