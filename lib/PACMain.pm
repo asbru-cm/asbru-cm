@@ -4957,15 +4957,7 @@ sub _setSafeLayoutOptions {
     }
     $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
     # Validate forground colors for corresponging theme
-
-    my $mode = Gtk3::Settings::get_default()->get_property("gtk-theme-name");
-    if ($$self{_CFG}{'defaults'}{'theme'} !~ /system/i) {
-        if ($mode =~ /dark/i && $$self{_CFG}{'defaults'}{'theme'} !~ /dark/i) {
-            $$self{_CFG}{'defaults'}{'theme'} = 'asbru-dark';
-        } elsif ($mode !~ /dark/i && $$self{_CFG}{'defaults'}{'theme'} =~ /dark/i) {
-            $$self{_CFG}{'defaults'}{'theme'} = 'asbru-color';
-        }
-    }
+    
     my $p_set = $$self{_CFG}{defaults}{'protected set'};
     my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
     my $p_color = $$self{_CFG}{defaults}{'protected color'};
