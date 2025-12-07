@@ -1216,7 +1216,8 @@ sub _setupCallbacks {
                 my $control = $state * ['control-mask'];
 
                 if ($event->button eq 1 && $control) {
-                    my ($w, $h)     = $$self{_WINDOWTERMINAL}->get_size();
+                    my $obj = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
+                    my ($w, $h)     = $obj->get_size();
                     my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
                     my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
                     my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
