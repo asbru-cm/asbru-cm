@@ -80,8 +80,11 @@ my $EXEC_STORM_TIME = 0.2;
 
 my @KPX;
 
-my $NPOSX = 0;
-my $NPOSY = 0;
+my $NPOSXC  = 0;
+my $NPOSYC  = 0;
+my @WINDOWS = ();
+my $NPOSX   = 0;
+my $NPOSY   = 0;
 
 my $right_click_deep = 0;
 
@@ -90,6 +93,7 @@ my $COL_RED   = "\e[1;38;5;1m";
 my $COL_BLUE  = "\e[1;38;5;33m";
 my $COL_YELL  = "\e[1;38;5;11m";
 my $COL_RESET = "\e[0m";
+my $URL_REGEX = '(https?:\/\/[\w\-_\.\/~:#\?=&\+,;\@!\$\'\*\%]+)';
 
 # END: Define GLOBAL CLASS variables
 ###################################################################
@@ -108,6 +112,7 @@ sub new {
     $self->{_NOTEBOOKWINDOW} = shift;
     $self->{_CLUSTER} = shift // '';
     $self->{_MANUAL} = shift;
+    $self->{_QTY} = shift // 1;
 
     $self->{_TABBED} = $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'use personal settings'} ? $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'terminal options'}{'open in tab'} // 1 : $self->{_CFG}{'defaults'}{'open connections in tabs'} // 1;
     $self->{_NAME} = $self->{_CFG}{'environments'}{$$self{'_UUID'}}{'name'};
@@ -307,6 +312,11 @@ sub DESTROY {
 sub start {
     my $self = shift;
     $$self{_KEYS_RECEIVE} = shift // undef;
+
+    if ($self->{_CLUSTER} && ($NPOSXC || $NPOSYC)) {
+        $NPOSXC = 0;
+        $NPOSYC = 0;
+    }
 
     if ($$self{CONNECTED} || $$self{CONNECTING}) {
         return 1;
@@ -523,6 +533,7 @@ sub stop {
     my $self = shift;
     my $force = shift // 0;
     my $deep = shift // 0;
+    my $cluster = $$self{_CLUSTER};
 
     my $name = $self->{_CFG}{'environments'}{$$self{_UUID}}{'name'};
     my $title = $self->{_CFG}{'environments'}{$$self{_UUID}}{'title'};
@@ -531,19 +542,27 @@ sub stop {
     my $p_widget = $$self{_GUI}{_VBOX};
 
     # Set mouse pointer in case a postexec was executed
-    if ($p_widget->get_window()) {
+    if ($p_widget && $p_widget->get_window()) {
         $p_widget->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
     }
 
-    if ($NPOSX>0) {
-        $NPOSX--;
-        if (($NPOSY>0)&&($NPOSX==0)) {
-            $NPOSY--;
-            $NPOSX=2;
+    if (!$self->{_CLUSTER}) {
+        for (my $i = 0; $i < $#WINDOWS + 1; $i++) {
+            if ($WINDOWS[$i] eq $$self{_UUID_TMP}) {
+                $WINDOWS[$i] = 0;
+                last;
+            }
         }
-    } elsif ($NPOSY>0) {
+    }
+    if ($NPOSX > 0) {
+        $NPOSX--;
+        if (($NPOSY > 0) && ($NPOSX == 0)) {
+            $NPOSY--;
+            $NPOSX = 2;
+        }
+    } elsif ($NPOSY > 0) {
         $NPOSY--;
-        $NPOSX=1;
+        $NPOSX = 1;
     }
 
     # TODO : This coding sequence looks repeated unless is it is necessary to confirm connection that many times
@@ -574,14 +593,15 @@ sub stop {
         $PACMain::FUNCS{_CLUSTER}->delFromCluster($$self{_UUID_TMP}, $$self{_CLUSTER});
     }
 
-    # Send any configured keypress to close the forked binary
-    if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
-        foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
-            _vteFeedChild($$self{_GUI}{_VTE}, $esc);
+    if ($$self{_GUI}{_VTE}) {
+        # Send any configured keypress to close the forked binary
+        if ($$self{CONNECTED} && defined $$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}) {
+            foreach my $esc (@{$$self{_METHODS}{$$self{_CFG}{'environments'}{$$self{_UUID}}{'method'}}{'escape'}}) {
+                _vteFeedChild($$self{_GUI}{_VTE}, $esc);
+            }
         }
+        _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
     }
-
-    _vteFeedChild($$self{_GUI}{_VTE}, "__PAC__STOP__$$self{_UUID}__$$self{_PID}__");
 
     $$self{CONNECTED} = 0;
 
@@ -600,6 +620,9 @@ sub stop {
 
     # Delete me from the running terminals list
     delete $PACMain::RUNNING{$$self{_UUID_TMP}};
+    if ($cluster) {
+        $PACMain::FUNCS{_MAIN}->_freeClusterColor($cluster);
+    }
     $PACMain::FUNCS{_CLUSTER}->_updateGUI();
 
     if (defined $$self{_SOCKET_CLIENT}) {
@@ -619,7 +642,7 @@ sub stop {
     $self->_stopEmbedKidnapTimeout();
 
     # Finish the GUI
-    if ($$self{_TABBED}) {
+    if ($$self{_TABBED} && $p_widget) {
         my $p_num = -1;
         if ($$self{_SPLIT}) {
             $p_num = $$self{_NOTEBOOK}->page_num($p_widget->get_parent());
@@ -631,7 +654,7 @@ sub stop {
         if ($p_num >= 0) {
             $$self{_NOTEBOOK}->remove_page($p_num);
         }
-    } else {
+    } elsif ($$self{_WINDOWTERMINAL}) {
         $$self{_WINDOWTERMINAL}->destroy();
         undef($$self{_WINDOWTERMINAL});
     }
@@ -738,7 +761,11 @@ sub _initGUI {
 
     # , build a Gnome VTE Terminal,
     $$self{_GUI}{_VTE} = Vte::Terminal->new();
-
+    # match_regex available after 0.46
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{match_regex}) {
+        my $regexid = $$self{_GUI}{_VTE}->match_add_regex(Vte::Regex->new_for_match($URL_REGEX, -1, 2**10), 0);
+        $$self{_GUI}{_VTE}->match_set_cursor($regexid, Gtk3::Gdk::Cursor->new('hand2'));
+    }
     # , add VTE to the scrolled window and...
     if (!$$self{'EMBED'}) {
         $$self{_GUI}{_VTE}->set_size_request(200, 100);
@@ -950,32 +977,61 @@ sub _initGUI {
     # New WINDOW:
     else
     {
+        my $screen        = Gtk3::Gdk::Screen::get_default();
+        my $monitors      = $screen->get_n_monitors();
+        my $sw            = $screen->get_width();
+        my $conns_per_row = 2 * $monitors;
+        my $conns_per_col = 1;
+        my $nposx         = 0;
+        my $nposy         = 0;
+        my $hsize         = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
+        my $vsize         = $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{ $$self{_UUID} }{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
+
+        if ($self->{_CLUSTER}) {
+            $nposx = $NPOSXC;
+            $nposy = $NPOSYC;
+        } else {
+            if ($$self{_QTY} > 1) {
+                $hsize = int($sw / $conns_per_row);
+            }
+            for (my $i = 0; $i <= $#WINDOWS + 1; $i++) {
+                if (!$WINDOWS[$i]) {
+                    $WINDOWS[$i] = $$self{_UUID_TMP};
+                    $nposx = $i;
+                    last;
+                }
+            }
+            if ($nposx >= $conns_per_row) {
+                $nposy++;
+                $nposx -= $conns_per_row;
+                if ($nposy > 1) {
+                    $nposx = 3;
+                    $nposy = 1;
+                }
+            }
+        }
+
         # Build a new window,
         $$self{_WINDOWTERMINAL} = Gtk3::Window->new();
         $$self{_WINDOWTERMINAL}->set_title("$$self{_TITLE} : $APPNAME (v$APPVERSION)");
         $$self{_WINDOWTERMINAL}->set_position('none');
         $$self{_WINDOWTERMINAL}->set_size_request(200, 100);
 
-        my $hsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window hsize'} : $$self{_CFG}{'defaults'}{'terminal windows hsize'};
-        my $vsize = $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} ? $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal window vsize'} : $$self{_CFG}{'defaults'}{'terminal windows vsize'};
-
-        my $conns_per_row = 2;
-        my $conns_per_col = 1;
         if ($self->{_CLUSTER}) {
-            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>1) {
-                my $screen = Gtk3::Gdk::Screen::get_default();
-                my $sw = $screen->get_width();
-                my $sh = $screen->get_height() - 100;
-                $conns_per_row = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 5 ? 2 : 3;
-                $conns_per_col = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 7 ? 2 : 3;
-                my $rows = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_row) || 1;
-                my $cols = POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $conns_per_col) || 1;
-                $hsize = int($sw / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $rows)));
-                if ($PACMain::FUNCS{_MAIN}{_NTERMINALS}>2) {
-                    $vsize = int($sh / (POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / $cols)));
+            if ($PACMain::FUNCS{_MAIN}{_NTERMINALS} > 1) {
+                my $cols = 1;
+                my $sh   = $screen->get_height() - 100;
+                my $rows = $PACMain::FUNCS{_MAIN}{_NTERMINALS} <= 2 * $monitors ? 1 : 2;
+                if ($monitors > 1) {
+                    $cols = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 3 ? 2 : 4;
                 } else {
+                    $cols  = $PACMain::FUNCS{_MAIN}{_NTERMINALS} < 3 ? 2 : POSIX::ceil($PACMain::FUNCS{_MAIN}{_NTERMINALS} / 2);
                     $vsize = $sh;
                 }
+                $hsize         = int($sw / $cols);
+                $vsize         = int($sh / $rows);
+                $conns_per_row = $cols;
+                $conns_per_col = $rows;
             }
         }
         $$self{_WINDOWTERMINAL}->set_default_size($hsize, $vsize);
@@ -984,7 +1040,7 @@ sub _initGUI {
         }
         $$self{_WINDOWTERMINAL}->set_icon_name('gtk-disconnect');
         $$self{_WINDOWTERMINAL}->add($$self{_GUI}{_VBOX});
-        $$self{_WINDOWTERMINAL}->move(($NPOSX*$hsize+3), 5+($NPOSY*$vsize+($NPOSY*50)));
+        $$self{_WINDOWTERMINAL}->move(($nposx * $hsize + 3), 5 + ($nposy * $vsize + ($nposy * 50)));
 
         if (($$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{environments}{$$self{_UUID}}{'terminal options'}{'terminal transparency'} > 0) || $$self{_CFG}{defaults}{'terminal support transparency'}) {
             _setWindowPaintable($$self{_WINDOWTERMINAL});
@@ -992,10 +1048,14 @@ sub _initGUI {
 
         $$self{_WINDOWTERMINAL}->show_all();
         $$self{_WINDOWTERMINAL}->present();
-        $NPOSX++;
-        if ($NPOSX == $conns_per_row) {
-            $NPOSY++;
-            $NPOSX = 0;
+        if ($self->{_CLUSTER}) {
+            $nposx++;
+            if ($nposx == $conns_per_row) {
+                $nposy++;
+                $nposx = 0;
+            }
+            $NPOSXC = $nposx;
+            $NPOSYC = $nposy;
         }
         $self->{_PARENTWINDOW} = $$self{_WINDOWTERMINAL};
     }
@@ -1223,6 +1283,35 @@ sub _setupCallbacks {
         }
         return 1;
     });
+
+    # If 'get_text_range' is supported by Vte (as of 0.72),
+    # add a callback to start the default browser when doing a "ctrl + left-click"
+    # on a valid web link
+    if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
+        $$self{_GUI}{_VTE}->signal_connect(
+            'button_release_event' => sub {
+                my ($widget, $event) = @_;
+                my $state = $event->get_state();
+                my $control = $state * ['control-mask'];
+
+                if ($event->button eq 1 && $control) {
+                    my $obj = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
+                    my ($w, $h)     = $obj->get_size();
+                    my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
+                    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
+                    my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
+                    if ($crow > $rows) {
+                        $row += $crow - $rows;
+                    }
+                    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
+                    if ($string =~ /$URL_REGEX/ && $col >= $-[0] && $col < $+[1]) {
+                        my $url = $1;
+                        Gtk3::show_uri_on_window(undef, $url, time);
+                    }
+                }
+            }
+        );
+    }
 
     # Right mouse click on VTE
     $$self{_GUI}{_VTE}->signal_connect('button_press_event' => sub {
@@ -2494,9 +2583,13 @@ sub _setTabColour {
                 $PACMain::RUNNING{$$self{_SPLIT}}{terminal}->_setTabColour(--$i);
             }
         } else {
+            my $cluster_color = '';
+            if ($$self{'_CLUSTER'} && $$self{_CLUSTER_COLOR}) {
+                $cluster_color = "overline='single' overline_color='$$self{'_CLUSTER_COLOR'}'";
+            }
             my $back = $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use personal settings'} && $$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'use tab back color'} ? "background=\"$$self{_CFG}{'environments'}{$$self{_UUID}}{'terminal options'}{'tab back color'}\"" : '';
             my $fore = 'foreground="' . ($$self{CONNECTED} ? $conn_color : $disconn_color) . '"';
-            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $back $fore>@{[__($$self{_TITLE})]}</span>");
+            $$self{_GUI}{_TABLBL}{_LABEL}->set_markup("<span $cluster_color $back $fore>@{[__($$self{_TITLE})]}</span>");
         }
     } else {
         defined $$self{_WINDOWTERMINAL} and $$self{_WINDOWTERMINAL}->set_icon_from_file($$self{CONNECTED} ? "$RealBin/res/asbru_terminal64x64.png" : "$RealBin/res/asbru_terminal_x64x64.png");
@@ -3263,10 +3356,14 @@ sub _renameTab() {
         "<b>Temporaly renaming label '@{[__($$self{_TITLE})]}'</b>",
         'Enter the new temporal label:', $$self{_TITLE}
     );
-    if ((defined $new_label) && ($new_label !~ /^\s*$/go)) {
+    if (defined $new_label && $new_label !~ /^\s*$/go) {
         $$self{_TITLE} = $new_label;
+        if ($$self{_TABBED}) {
+            $self->_setTabColour();
+        } else {
+            $$self{_WINDOWTERMINAL}->set_title($$self{_TITLE});
+        }
     }
-    $self->_setTabColour();
 }
 
 sub _saveSessionLog {

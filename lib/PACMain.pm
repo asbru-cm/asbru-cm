@@ -3,7 +3,7 @@ package PACMain;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2022 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2025 Ásbrú Connection Manager team (https://asbru-cm.net)
 # Copyright (C) 2010-2016 David Torrejón Vaquerizas
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
@@ -116,6 +116,11 @@ our %FUNCS;
 our %SOCKS5PORTS;
 my @SELECTED_UUIDS;
 my $LAST_COPIED_NODES;
+
+my %CLUSTER_COLORS = ('a-red','#FF0000','b-green','#00b53a','c-blue','#008fff','d-orange','#ff8825','e-black','#000000','f-white','#FFFFFF');
+my %CLUSTER_COLOR = ();
+my %CLUSTER_COLOR_TAKEN = ();
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -149,7 +154,6 @@ sub new {
     $self->{_HAS_FOCUS} = '';
     $self->{_VERBOSE} = 0;
     $self->{_Vte} = undef;
-
     @{ $self->{_UNDO} } = ();
     $$self{_GUILOCKED} = 0;
 
@@ -593,31 +597,6 @@ sub _initGUI {
     $$self{_GUI}{_entrySearch} = Gtk3::Entry->new();
     $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_entrySearch}, 0, 1, 0);
     $$self{_GUI}{_entrySearch}->grab_focus();
-
-    $$self{_GUI}{_hboxSearch} = Gtk3::HBox->new(1, 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_hboxSearch}, 0, 1, 0);
-
-    $$self{_GUI}{_btnPrevSearch} = Gtk3::Button->new('Previous');
-    $$self{_GUI}{_btnPrevSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-previous', 'button'));
-    $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnPrevSearch}, 0, 1, 0);
-    $$self{_GUI}{_btnPrevSearch}->set('can_focus', 0);
-    $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-
-    $$self{_GUI}{_btnNextSearch} = Gtk3::Button->new('Next');
-    $$self{_GUI}{_btnNextSearch}->set_image(Gtk3::Image->new_from_stock('gtk-media-next', 'button'));
-    $$self{_GUI}{_hboxSearch}->pack_start($$self{_GUI}{_btnNextSearch}, 0, 1, 0);
-    $$self{_GUI}{_btnNextSearch}->set('can_focus', 0);
-    $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
-
-    $$self{_GUI}{_rbSearchName} = Gtk3::RadioButton->new_with_label('incremental search', 'Name');
-    $$self{_GUI}{_rbSearchName}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchName}, 0, 1, 0);
-    $$self{_GUI}{_rbSearchHost} = Gtk3::RadioButton->new_with_label_from_widget($$self{_GUI}{_rbSearchName}, 'IP / Host');
-    $$self{_GUI}{_rbSearchHost}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchHost}, 0, 1, 0);
-    $$self{_GUI}{_rbSearchDesc} = Gtk3::RadioButton->new_with_label_from_widget($$self{_GUI}{_rbSearchName}, 'Description');
-    $$self{_GUI}{_rbSearchDesc}->set('can-focus', 0);
-    $$self{_GUI}{_vboxSearch}->pack_start($$self{_GUI}{_rbSearchDesc}, 0, 1, 0);
 
     # Create a scrolled2 scrolled window to contain the favourites tree
     $$self{_GUI}{scroll2} = Gtk3::ScrolledWindow->new();
@@ -1101,22 +1080,6 @@ sub _initGUI {
         $$self{_GUI}{nbTree}->set_current_page(3);
         $self->_updateClustersList();
         $self->_updateGUIClusters();
-    }
-
-    # Ensure the window is placed near the newly created icon (in compact mode only)
-    if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact' && $$self{_TRAY}->is_visible()) {
-        # Update GUI
-        Gtk3::main_iteration() while Gtk3::events_pending();
-
-        my @geo = $$self{_TRAY}->get_geometry();
-        my $x = $geo[2]{x};
-        my $y = $geo[2]{y};
-
-        if ($x > 0 || $y > 0) {
-            $$self{_GUI}{posx} = $x;
-            $$self{_GUI}{posy} = $y;
-            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
-        }
     }
 
     return 1;
@@ -1995,15 +1958,11 @@ sub _setupCallbacks {
             $$self{_GUI}{_vboxSearch}->hide();
             $$self{_GUI}{treeConnections}->grab_focus();
             return 1;
-        }
-        # Capture 'up arrow'  keypress to move to previous ocurrence
-        elsif ($action eq 'Up') {
-            $$self{_GUI}{_btnPrevSearch}->clicked();
+        } elsif ($action eq 'Up' || $action eq 'Shift+ISO_Left_Tab') {
+            $self->_searchBackward();
             return 1;
-        }
-        # Capture 'down arrow'  keypress to move to next ocurrence
-        elsif ($action eq 'Down') {
-            $$self{_GUI}{_btnNextSearch}->clicked();
+        } elsif ($action eq 'Down' || $action eq 'Tab') {
+            $self->_searchForward();
             return 1;
         }
         return 0
@@ -2013,6 +1972,7 @@ sub _setupCallbacks {
         my @sel = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         if ((scalar(@sel)==1)&&($sel[0] ne '__PAC__ROOT__')&&(!$$self{_CFG}{'environments'}{$sel[0]}{'_is_group'})&&($$self{_GUI}{_entrySearch}->get_chars(0, -1) ne '')) {
             $$self{_GUI}{connExecBtn}->clicked();
+            $$self{_GUI}{treeConnections}->collapse_all();
         }
     });
     $$self{_GUI}{_entrySearch}->signal_connect('focus_out_event' => sub {
@@ -2020,75 +1980,19 @@ sub _setupCallbacks {
         $$self{_GUI}{_vboxSearch}->hide();
         $$self{_GUI}{_entrySearch}->set_text('');
     });
-    foreach my $what ('Name', 'Host', 'Desc') {
-        $$self{_GUI}{"_rbSearch" . $what}->signal_connect('toggled' => sub {
-            my $text = $$self{_GUI}{_entrySearch}->get_chars(0, -1);
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
-            if ($text eq '') {
-                return 0;
-            }
-            my $where = 'name';
-            $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
-            $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
-            $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
-            $$self{_GUI}{_ACTUAL} = 0;
-            if (@{ $$self{_GUI}{_RESULT} }) {
-                $$self{_GUI}{_btnPrevSearch}->set_sensitive(1);
-                $$self{_GUI}{_btnNextSearch}->set_sensitive(1);
-                $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
-            }
-            return 0;
-        });
-    }
     $$self{_GUI}{_entrySearch}->signal_connect('changed' => sub {
         my $text = $$self{_GUI}{_entrySearch}->get_chars(0, -1);
-        $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-        $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
         if ($text eq '') {
             return 0;
         }
-        my $where = 'name';
-        $$self{_GUI}{_rbSearchHost}->get_active() and $where = 'host';
-        $$self{_GUI}{_rbSearchDesc}->get_active() and $where = 'desc';
-        $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections}, $where);
+        $$self{_GUI}{_RESULT} = $self->__search($text, $$self{_GUI}{treeConnections});
         $$self{_GUI}{_ACTUAL} = 0;
         if (@{ $$self{_GUI}{_RESULT} }) {
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(1);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(1);
             $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
         } else {
-            $$self{_GUI}{_btnPrevSearch}->set_sensitive(0);
-            $$self{_GUI}{_btnNextSearch}->set_sensitive(0);
             $$self{_GUI}{treeConnections}->_setTreeFocus('__PAC__ROOT__');
         }
         return 0;
-    });
-
-    $$self{_GUI}{_btnPrevSearch}->signal_connect('clicked' => sub {
-        if (!@{$$self{_GUI}{_RESULT}}) {
-            return 1;
-        }
-        if ($$self{_GUI}{_ACTUAL} == 0) {
-            $$self{_GUI}{_ACTUAL} = $#{$$self{_GUI}{_RESULT}};
-        } else {
-            $$self{_GUI}{_ACTUAL}--;
-        }
-        $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[$$self{_GUI}{_ACTUAL}]);
-        return 1;
-    });
-
-    $$self{_GUI}{_btnNextSearch}->signal_connect('clicked' => sub {
-        if (!@{$$self{_GUI}{_RESULT}}) {
-            return 1;
-        }
-        if ($$self{_GUI}{_ACTUAL} == $#{ $$self{_GUI}{_RESULT} }) {
-            $$self{_GUI}{_ACTUAL} = 0;
-        } else {
-            $$self{_GUI}{_ACTUAL}++;
-        }
-        $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
-        return 1;
     });
 
     $$self{_GUI}{showConnBtn}->signal_connect('toggled' => sub {
@@ -2114,19 +2018,21 @@ sub _setupCallbacks {
         if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
-        foreach my $uuid ($tree->_getSelectedUUIDs()) {
-            if (($$self{_CFG}{'environments'}{$uuid}{'_is_group'}) || ($uuid eq '__PAC__ROOT__')) {
-                my @children = $$self{_GUI}{treeConnections}->_getChildren($uuid, 0, 1);
+        foreach my $t ($tree->_getSelectedTerminals()) {
+            if (($$self{_CFG}{'environments'}{$$t{uuid}}{'_is_group'}) || ($$t{uuid} eq '__PAC__ROOT__')) {
+                my @children = $$self{_GUI}{treeConnections}->_getChildren($$t{uuid}, 0, 1, 1);
                 foreach my $child (@children) {
-                    if (!$$self{_CFG}{'environments'}{$child}{'_is_group'}) {
-                        $tmp{$child} = 1;
+                    if (!$$self{_CFG}{'environments'}{$$child{uuid}}{'_is_group'}) {
+                        $tmp{$$child{name}} = $$child{uuid};
                     }
                 }
             } else {
-                $tmp{$uuid} = 1;
+                $tmp{$$t{name}} = $$t{uuid};
             }
         }
-        map push(@idx,[$_]),keys %tmp;
+        foreach my $k (sort keys %tmp) {
+            push(@idx,[$tmp{$k}]);
+        }
         $self->_launchTerminals(\@idx);
     });
     $$self{_GUI}{configBtn}->signal_connect('clicked' => sub {
@@ -2453,6 +2359,33 @@ sub _setupCallbacks {
     return 1;
 }
 
+sub _searchBackward {
+    my ($self) = @_;
+    if (!@{ $$self{_GUI}{_RESULT} }) {
+        return 1;
+    }
+    if ($$self{_GUI}{_ACTUAL} == 0) {
+        $$self{_GUI}{_ACTUAL} = $#{ $$self{_GUI}{_RESULT} };
+    } else {
+        $$self{_GUI}{_ACTUAL}--;
+    }
+    $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
+}
+
+sub _searchForward {
+    my ($self) = @_;
+    if (!@{ $$self{_GUI}{_RESULT} }) {
+        return 1;
+    }
+    if ($$self{_GUI}{_ACTUAL} == $#{ $$self{_GUI}{_RESULT} }) {
+        $$self{_GUI}{_ACTUAL} = 0;
+    } else {
+        $$self{_GUI}{_ACTUAL}++;
+    }
+    $$self{_GUI}{treeConnections}->_setTreeFocus($$self{_GUI}{_RESULT}[ $$self{_GUI}{_ACTUAL} ]);
+    return 1;
+}
+
 sub _rollnbTree {
     my ($self, $direction) = @_;
     my $max = $$self{_GUI}{nbTree}->get_n_pages()-1;
@@ -2572,26 +2505,56 @@ sub _unlockAsbru {
 }
 
 sub __search {
-    my $self = shift;
-    my $text = shift;
-    my $tree = shift;
-    my $where = shift // 'name';
+    my $self   = shift;
+    my $text   = shift;
+    my $tree   = shift;
+    my %groups = ();
+    my $follow = '';
 
     my @result;
     my $model = $tree->get_model();
-    $model->foreach(sub {
-        my ($store, $path, $iter) = @_;
-        my $elem_uuid = $model->get_value($model->get_iter($path), 2);
-        my %elem;
-        $elem{name} = $$self{_CFG}{environments}{$elem_uuid}{name} // '';
-        $elem{host} = $$self{_CFG}{environments}{$elem_uuid}{ip} // '';
-        $elem{desc} = $$self{_CFG}{environments}{$elem_uuid}{description} // '';
-        if ($elem{$where} !~ /$text/gi) {
+    if (length($text) < 2) {
+        return \@result;
+    }
+    my @words = split / /, $text;
+    $model->foreach(
+        sub {
+            my ($store, $path, $iter) = @_;
+            my $name      = $model->get_value($model->get_iter($path), 1);
+            my $elem_uuid = $model->get_value($model->get_iter($path), 2);
+            my $str       = $path->to_string();
+            my $search    = '';
+            my $group     = 0;
+            if ($name =~ /bold/) {
+                $group = 1;
+            }
+            $name =~ s/<.+?> ?//g;
+            if ($group && !$groups{$str}) {
+                $groups{$str} = $name;
+            }
+            foreach my $g (sort keys %groups) {
+                if ($str =~ /^$g/) {
+                    $search .= "$groups{$g} ";
+                }
+            }
+            foreach my $f ('name', 'title', 'ip') {
+                my $v = $$self{_CFG}{environments}{$elem_uuid}{$f} // '';
+                if ($f eq 'ip') {
+                    $v =~ s/\.\w+$//;
+                    $v =~ s/\.(?:com|org|edu|net|info|go[bv])$//;
+                }
+                $search .= "$v ";
+            }
+            chop $search;
+            foreach my $w (@words) {
+                if ($search !~ /$w/i) {
+                    return 0;
+                }
+            }
+            push(@result, $elem_uuid);
             return 0;
         }
-        push(@result, $elem_uuid);
-        return 0;
-    });
+    );
     return \@result;
 }
 
@@ -3257,10 +3220,35 @@ sub _startCluster {
     my $cluster = shift;
 
     my @idx;
-    my $clulist = $$self{_CLUSTER}->getCFGClustersByTitle();
-
-    foreach my $key (sort keys %{ $$clulist{$cluster} }) {
-        push(@idx, [ $$clulist{$cluster}{$key}, undef, $cluster ]);
+    my $clulist = $$self{_CLUSTER}->getCFGClusters();
+    $self->_setClusterColor($cluster);
+    if (defined $$self{_CFG}{defaults}{'auto cluster'}{$cluster}) {
+        my $name = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{name}/;
+        my $host = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{host}/;
+        my $title = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{title}/;
+        my $desc = qr/$$self{_CFG}{defaults}{'auto cluster'}{$cluster}{desc}/;
+        foreach my $uuid (keys %{ $$self{_CFG}{environments} }) {
+            if ($uuid eq '__PAC__ROOT__' || $$self{_CFG}{environments}{$uuid}{_is_group}) {
+                next;
+            }
+            if (($name ne '')&&($$self{_CFG}{environments}{$uuid}{name} !~ /$name/)) {
+                next;
+            }
+            if (($host ne '')&&($$self{_CFG}{environments}{$uuid}{ip} !~ /$host/)) {
+                next;
+            }
+            if (($title ne '')&&($$self{_CFG}{environments}{$uuid}{title} !~ /$title/)) {
+                next;
+            }
+            if (($desc ne '')&&($$self{_CFG}{environments}{$uuid}{description} !~ /$desc/)) {
+                next;
+            }
+            push(@idx, [ $uuid, undef, $cluster ]);
+        }
+    } else {
+        foreach my $uuid (keys %{ $$clulist{$cluster} }) {
+            push(@idx, [ $uuid, undef, $cluster ]);
+        }
     }
     if ((scalar(@idx) >= 10) && (!_wConfirm($$self{_GUI}{main}, "Are you sure you want to start <b>" . (scalar(@idx)) . " terminals from cluster '$cluster'</b> ?"))) {
         return 1;
@@ -3270,6 +3258,46 @@ sub _startCluster {
     }
     $self->_launchTerminals(\@idx);
     return 1;
+}
+
+sub _setClusterColor {
+    my ($self,$cluster) = @_;
+    if (!$CLUSTER_COLOR{$cluster}) {
+        foreach my $c (sort keys %CLUSTER_COLORS) {
+            if (!$CLUSTER_COLOR_TAKEN{$c}) {
+                $CLUSTER_COLOR_TAKEN{$c} = $cluster;
+                $CLUSTER_COLOR{$cluster} = $CLUSTER_COLORS{$c};
+                last;
+            }
+        }
+    }
+}
+
+sub _freeClusterColor {
+    my ($self,$cluster) = @_;
+    my $total = 0;
+
+    if (!$CLUSTER_COLOR{$cluster}) {
+        return 0;
+    }
+    foreach my $uuid_tmp (keys %RUNNING) {
+        my $running = $RUNNING{$uuid_tmp}{terminal}{_CLUSTER} // '';
+        if ($running eq $cluster) {
+            $total++;
+            last;
+        }
+    }
+    if ($total) {
+        return;
+    }
+    foreach my $c (sort keys %CLUSTER_COLORS) {
+        my $color_taken = $CLUSTER_COLOR_TAKEN{$c} // '';
+        if ($color_taken eq $cluster) {
+            $CLUSTER_COLOR_TAKEN{$c} = '';
+            last;
+        }
+    }
+    delete $CLUSTER_COLOR{$cluster};
 }
 
 sub _launchTerminals {
@@ -3331,6 +3359,7 @@ sub _launchTerminals {
         $$self{_CFG}{'environments'}{$uuid}{'terminal options'}{'open in tab'} = $where eq 'tab';
 
         my $t = PACTerminal->new($$self{_CFG}, $uuid, $$self{_GUI}{nb}, $$self{_GUI}{_PACTABS}, $cluster, $manual) or die "ERROR: Could not create object($!)";
+        $t->{_CLUSTER_COLOR} = $CLUSTER_COLOR{$cluster} // '';
         push(@new_terminals, $t);
 
         # Restore previously changed variables
@@ -4115,15 +4144,19 @@ sub _showConnectionsList {
 
     # Ensure compact panel is shown (could still be hidden if started iconified)
     if ($$self{_CFG}{'defaults'}{'layout'} eq 'Compact') {
+        if (!$$self{_GUI}{posx}) {
+            $self->posCompactMenu();
+        }
         $$self{_GUI}{vboxCommandPanel}->show_all();
         $$self{_GUI}{hpane}->show();
+    } else {
+        # The first first display when started iconified must be a show_all
+        if ($$self{_CMDLINETRAY} == 1) {
+            $$self{_GUI}{main}->show_all();
+            $$self{_CMDLINETRAY} = 2;
+        }
     }
 
-    # The first first display when started iconified must be a show_all
-    if ($$self{_CMDLINETRAY} == 1) {
-        $$self{_GUI}{main}->show_all();
-        $$self{_CMDLINETRAY} = 2;
-    }
 
 
     # Do show the main window
@@ -4933,6 +4966,7 @@ sub _setSafeLayoutOptions {
         # This layout to work implies some configuration settings to work correctly
         $$self{_CFG}{'defaults'}{'tabs in main window'} = 0;
         $$self{_CFG}{'defaults'}{'auto hide connections list'} = 0;
+        $$self{_CFG}{'defaults'}{'start iconified'} = 1;
         if (!$STRAY) {
             $$self{_CFG}{'defaults'}{'start iconified'} = 0;
         } else {
@@ -4956,6 +4990,27 @@ sub _setSafeLayoutOptions {
         }
     }
     $$self{_CFG}{'defaults'}{'layout previous'} = $layout;
+
+    # Adapt colors of tree nodes if unreadable for currently selected theme
+    my $p_set = $$self{_CFG}{defaults}{'protected set'};
+    my $p_unset = $$self{_CFG}{defaults}{'unprotected set'} // 'foreground';
+    my $p_color = $$self{_CFG}{defaults}{'protected color'};
+    my $p_uncolor = $$self{_CFG}{defaults}{'unprotected color'} // '#000000';
+    if ($$self{_CFG}{'defaults'}{'theme'} =~ /dark/) {
+        if ($p_set eq 'foreground' && $p_color lt '#777777777777') {
+            $$self{_CFG}{defaults}{'protected color'} = '#ffffff';
+        }
+        if ($p_unset eq 'foreground' && $p_uncolor lt '#777777777777') {
+            $$self{_CFG}{defaults}{'unprotected color'} = '#aaaaaa';
+        }
+    } else {
+        if ($p_set eq 'foreground' && $p_color gt '#dddddddddddd') {
+            $$self{_CFG}{defaults}{'protected color'} = '#000000';
+        }
+        if ($p_unset eq 'foreground' && $p_uncolor gt '#dddddddddddd') {
+            $$self{_CFG}{defaults}{'unprotected color'} = '#000000';
+        }
+    }
 }
 
 # Apply layout to window and widgets
@@ -4970,10 +5025,7 @@ sub _ApplyLayout {
             # Set a good height on smaller screens
             $$self{wheight} = int($H*0.8);
         }
-        # This layout to work implies some configuration settings to work correctly
-        foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vboxConnectionPanel','vboxInfo') {
-            $$self{_GUI}{$e}->hide();
-        }
+        $self->_hideCompact();
         if (!$STRAY) {
             if (!$$self{_GUI}{main}->get_visible()) {
                 $self->_showConnectionsList();
@@ -4984,8 +5036,44 @@ sub _ApplyLayout {
             }
             $$self{_GUI}{main}->set_type_hint('popup-menu');
         }
-        $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
-        $$self{_GUI}{main}->resize(220, $$self{wheight});
+    }
+}
+
+sub _hideCompact {
+    my $self = shift;
+
+    # This layout to work implies some configuration settings to work correctly
+    foreach my $e ('hbuttonbox1','connSearch','connExecBtn','connQuickBtn','connFavourite','vboxConnectionPanel','vboxInfo') {
+        $$self{_GUI}{$e}->hide();
+    }
+    $$self{_GUI}{main}->set_default_size(220, $$self{wheight});
+    $$self{_GUI}{main}->resize(220, $$self{wheight});
+}
+
+sub posCompactMenu {
+    my $self = shift;
+    if (!$$self{'_GUI'}{posx} && $$self{_TRAY}->is_visible()) {
+        # Update GUI
+        Gtk3::main_iteration() while Gtk3::events_pending();
+
+        my @geo = $$self{_TRAY}->get_geometry();
+        my $x   = $geo[2]{x};
+        my $y   = $geo[2]{y};
+
+        if ($x > 0 || $y > 0) {
+            my ($w, $h) = $$self{_GUI}{main}->get_size();
+            my $ymax = Gtk3::Gdk::Screen::get_default()->get_height();
+            $w = int($w / 2);
+            if ($y + $h > $ymax) {
+                $y -= $h;
+                if ($y < 0) {
+                    $y = 0;
+                }
+            }
+            $$self{_GUI}{posx} = $x - $w;
+            $$self{_GUI}{posy} = $y;
+            $$self{_GUI}{main}->move($$self{_GUI}{posx}, $$self{_GUI}{posy});
+        }
     }
 }
 
@@ -5031,10 +5119,16 @@ sub _setVteCapabilities {
         $$self{_Vte}{vte_feed_binary} = 1;
     }
 
+    # Does VTE supports 'match_regex' (as of 0.46)
+    # (to match URLs)
+    $$self{_Vte}{match_regex} = 0;
     if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 46) {
         $$self{_Vte}{match_regex} = 1;
     }
 
+    # Does VTE supports 'get_text_range' (as of 0.72)
+    # (to match URLs)
+    $$self{_Vte}{get_text_range} = 0;
     if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 72) {
         $$self{_Vte}{get_text_range} = 1;
     }
