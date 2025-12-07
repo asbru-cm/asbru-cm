@@ -1263,6 +1263,9 @@ sub _setupCallbacks {
         return 1;
     });
 
+    # If 'get_text_range' is supported by Vte (as of 0.72),
+    # add a callback to start the default browser when doing a "ctrl + left-click"
+    # on a valid web link
     if ($PACMain::FUNCS{_MAIN}{_Vte}{get_text_range}) {
         $$self{_GUI}{_VTE}->signal_connect(
             'button_release_event' => sub {

@@ -5098,10 +5098,16 @@ sub _setVteCapabilities {
         $$self{_Vte}{vte_feed_binary} = 1;
     }
 
+    # Does VTE supports 'match_regex' (as of 0.46)
+    # (to match URLs)
+    $$self{_Vte}{match_regex} = 0;
     if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 46) {
         $$self{_Vte}{match_regex} = 1;
     }
 
+    # Does VTE supports 'get_text_range' (as of 0.72)
+    # (to match URLs)
+    $$self{_Vte}{get_text_range} = 0;
     if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 72) {
         $$self{_Vte}{get_text_range} = 1;
     }
