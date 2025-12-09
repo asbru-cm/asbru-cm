@@ -72,6 +72,14 @@ jobs:
           docker_image: ""
           repack_deb: ""
 
+          # Fedora
+        - os: fedora
+          dist: "43"
+          package: rpm
+          docker_repo: "asbru/asbru-cm"
+          docker_image: ""
+          repack_deb: ""
+
         # Linux Mint (21)
         - os: linuxmint
           dist: vanessa
