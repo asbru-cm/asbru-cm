@@ -209,6 +209,7 @@ jobs:
         if: ${{ inputs.packagecloud_repo != '' && inputs.packagecloud_repo != 'release' }}
         env:
           PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
+          PACkAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
         run: |
           echo "Pruning Packagecloud repo ${PACKAGECLOUD_USER}/${{ inputs.packagecloud_repo }} for ${OS}/${DIST}..."
           python -m pip install -r ./packpack/tools/requirements.txt
