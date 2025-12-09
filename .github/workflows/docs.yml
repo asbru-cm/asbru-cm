@@ -31,7 +31,6 @@ jobs:
       - name: Generate Changelog
         run: |
           github_changelog_generator \
-            --token "${CHANGELOG_GITHUB_TOKEN}" \
             --release-branch master \
             --user asbru-cm \
             --project asbru-cm \
