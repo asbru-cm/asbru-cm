@@ -1,0 +1,13 @@
+name: Build Test Packages
+
+on:
+  push:
+    branches: [ build-test ]
+
+jobs:
+  build-test:
+    uses: ./.github/workflows/package-build.yml
+    with:
+      cloudsmith_dest: test
+      packagecloud_repo: test
+    secrets: inherit

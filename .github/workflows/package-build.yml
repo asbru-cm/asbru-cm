@@ -1,0 +1,96 @@
+name: Package Build (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      cloudsmith_dest:
+        description: "Cloudsmith repo path (test/snapshots/loki/release)"
+        required: true
+        type: string
+      packagecloud_repo:
+        description: "Packagecloud repository name"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: debian
+            dist: bullseye
+            package: deb
+
+          - os: fedora
+            dist: "40"
+            package: rpm
+
+    env:
+      PRODUCT: "asbru-cm"
+      OS: ${{ matrix.os }}
+      DIST: ${{ matrix.dist }}
+      PACKAGE: ${{ matrix.package }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git devscripts debhelper quilt \
+            python3 python3-pip python3-setuptools gpgv
+          sudo pip3 install --upgrade pip
+          sudo pip3 install --upgrade cloudsmith-cli
+
+      - name: Build packages
+        run: ci/build_package.sh
+
+      - name: Upload build artifacts
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.package }}"
+          path: build/*
+
+      - name: Upload to Cloudsmith
+        if: ${{ secrets.CLOUDSMITH_API_KEY != '' }}
+        env:
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          set -euo pipefail
+          DEST="${{ inputs.cloudsmith_dest }}"
+
+          echo "Uploading to Cloudsmith: asbru-cm/${DEST}/${OS}/${DIST}"
+          shopt -s nullglob
+
+          for file in build/*.${PACKAGE}; do
+            echo "Pushing $file..."
+            cloudsmith push "${PACKAGE}" "asbru-cm/${DEST}/${OS}/${DIST}" "$file"
+          done
+
+          if [ "${PACKAGE}" = "deb" ]; then
+            for dsc in build/*.dsc; do
+              echo "Pushing source package $dsc..."
+              cloudsmith push "${PACKAGE}" \
+                "asbru-cm/${DEST}/${OS}/${DIST}" \
+                "$dsc" \
+                --sources-file build/*.debian.tar.*
+            done
+          fi
+
+      # Packagecloud (Action)
+      - name: Upload to Packagecloud
+        if: ${{ secrets.PACKAGECLOUD_USER != '' && secrets.PACKAGECLOUD_TOKEN != '' }}
+        continue-on-error: true
+        uses: computology/packagecloud-github-action@v0.8
+        with:
+          package-name: "build/*.{deb,rpm,dsc}"
+          packagecloud-username: ${{ secrets.PACKAGECLOUD_USER }}
+          packagecloud-reponame: ${{ inputs.packagecloud_repo }}
+          packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
+          packagecloud-token: ${{ secrets.PACKAGECLOUD_TOKEN }}
