@@ -30,16 +30,22 @@ jobs:
           - os: debian
             dist: bullseye
             package: deb
+            docker_repo: ""
+            docker_image: ""
 
           - os: fedora
             dist: "40"
             package: rpm
+            docker_repo: "asbru/asbru-cm"
+            docker_image: ""
 
     env:
       PRODUCT: "asbru-cm"
       OS: ${{ matrix.os }}
       DIST: ${{ matrix.dist }}
       PACKAGE: ${{ matrix.package }}
+      DOCKER_REPO: ${{ matrix.docker_repo }}
+      DOCKER_IMAGE: ${{ matrix.docker_image }}
 
     steps:
       - name: Checkout
@@ -107,7 +113,7 @@ jobs:
           PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
           PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
         with:
-          package-name: "build/*.{deb,rpm,dsc}"
+          package-name: build/*
           packagecloud-username: ${{ env.PACKAGECLOUD_USER }}
           packagecloud-reponame: ${{ inputs.packagecloud_repo }}
           packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
