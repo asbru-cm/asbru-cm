@@ -5,21 +5,27 @@ PRODUCT=${PRODUCT:-asbru-cm}
 
 if [ "${GITHUB_REF_TYPE:-}" = "tag" ] && [ -n "${GITHUB_REF_NAME:-}" ]; then
   RAW_TAG="${GITHUB_REF_NAME}"
-  VERSION="${RAW_TAG#v}"
+  RAW_VERSION="${RAW_TAG#v}"
   CHANNEL="release"
-  echo "Detected tag build. VERSION=${VERSION}, CHANNEL=${CHANNEL}"
+  echo "Detected tag build. RAW_VERSION=${RAW_VERSION}, CHANNEL=${CHANNEL}"
 else
   eval "$(egrep -o 'APPVERSION.*=.*' lib/PACUtils.pm | tr -d '[:space:]')"
   SHORT_SHA="$(git rev-parse --short HEAD)"
-  BRANCH_NAME="${GITHUB_REF_NAME:-unknown}"
-  VERSION="${APPVERSION}+${BRANCH_NAME}.${SHORT_SHA}"
+  BRANCH_NAME="${GITHUB_REF_NAME:-build}"
+  RAW_VERSION="${APPVERSION}+${BRANCH_NAME}.${SHORT_SHA}"
   CHANNEL="${BRANCH_NAME}"
-  echo "Detected branch build. VERSION=${VERSION}, CHANNEL=${CHANNEL}"
+  echo "Detected branch build. RAW_VERSION=${RAW_VERSION}, CHANNEL=${CHANNEL}"
 fi
 
-export VERSION CHANNEL
+SAFE_VERSION="$(printf '%s' "${RAW_VERSION}" | tr '[:upper:]' '[:lower:]')"
+SAFE_VERSION="$(printf '%s' "${SAFE_VERSION}" | tr '-' '.')"
+SAFE_VERSION="$(printf '%s' "${SAFE_VERSION}" | sed 's/[^0-9a-z.+~]/./g')"
 
+export VERSION="${SAFE_VERSION}"
+
+echo "Final VERSION (for packaging): ${VERSION}"
 echo "PACKAGE=${PACKAGE:-unset}, OS=${OS:-unset}, DIST=${DIST:-unset}"
+
 
 cp -r "dist/${PACKAGE}/"* .
 

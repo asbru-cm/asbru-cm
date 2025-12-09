@@ -106,14 +106,40 @@ jobs:
           fi
 
       # Packagecloud Upload
-      - name: Upload to Packagecloud
+      - name: Upload .deb to Packagecloud
         continue-on-error: true
         uses: computology/packagecloud-github-action@v0.8
         env:
           PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
           PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
         with:
-          package-name: build/*
+          package-name: build/*.deb
+          packagecloud-username: ${{ env.PACKAGECLOUD_USER }}
+          packagecloud-reponame: ${{ inputs.packagecloud_repo }}
+          packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
+          packagecloud-token: ${{ env.PACKAGECLOUD_TOKEN }}
+
+      - name: Upload .rpm to Packagecloud
+        continue-on-error: true
+        uses: computology/packagecloud-github-action@v0.8
+        env:
+          PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        with:
+          package-name: build/*.rpm
+          packagecloud-username: ${{ env.PACKAGECLOUD_USER }}
+          packagecloud-reponame: ${{ inputs.packagecloud_repo }}
+          packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
+          packagecloud-token: ${{ env.PACKAGECLOUD_TOKEN }}
+
+      - name: Upload .dsc to Packagecloud
+        continue-on-error: true
+        uses: computology/packagecloud-github-action@v0.8
+        env:
+          PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        with:
+          package-name: build/*.dsc
           packagecloud-username: ${{ env.PACKAGECLOUD_USER }}
           packagecloud-reponame: ${{ inputs.packagecloud_repo }}
           packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
