@@ -1,6 +1,7 @@
 # Ásbrú Connection Manager
 
-[![Travis][travis-badge]][travis-url]
+[![Build & Deploy Docs](https://github.com/asbru-cm/asbru-cm/actions/workflows/docs.yml/badge.svg)](https://github.com/asbru-cm/asbru-cm/actions/workflows/docs.yml)
+[![Build Snapshot/Master Packages](https://github.com/asbru-cm/asbru-cm/actions/workflows/build-snapshots.yml/badge.svg)](https://github.com/asbru-cm/asbru-cm/actions/workflows/build-snapshots.yml)
 [![License][license-badge]][license-url]
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
