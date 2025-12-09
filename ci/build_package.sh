@@ -44,5 +44,30 @@ else
   exit 1
 fi
 
+
+if [ "${PACKAGE}" = "deb" ] && [ "${REPACK_DEB:-}" = "yes" ] ; then
+  DEBFILE="${PRODUCT}_${VERSION}-1_all.deb"
+  DEBFILE_OLD="$(basename "${DEBFILE}" .deb).deb.old"
+
+  echo "Repacking debian file [${DEBFILE}] to have XY format."
+
+  pushd build >/dev/null
+
+  if [ ! -f "${DEBFILE}" ]; then
+    echo "Expected deb file ${DEBFILE} not found in ./build. Available files:"
+    ls -la
+    popd >/dev/null
+    exit 1
+  fi
+
+  mv "${DEBFILE}" "${DEBFILE_OLD}"
+  dpkg-deb -x "${DEBFILE_OLD}" tmp
+  dpkg-deb -e "${DEBFILE_OLD}" tmp/DEBIAN
+  dpkg-deb -b tmp "${DEBFILE}"
+  rm -rf tmp
+
+  popd >/dev/null
+fi
+
 echo "Build done. Artifacts in ./build:"
 ls -la build || true
