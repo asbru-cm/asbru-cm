@@ -45,7 +45,6 @@ install:
     - sudo pip3 install --upgrade cloudsmith-cli
 script:
     - ./build.sh
-    - bash scripts/deploy_docs.sh
 deploy:
   - provider: packagecloud
     skip_cleanup: true

@@ -1,0 +1,93 @@
+name: Build & Deploy Docs
+
+on:
+  push:
+    branches: [ master, build-test ]
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    env:
+      CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Install changelog generator
+        run: |
+          gem install rack -v 1.6.4
+          gem install github_changelog_generator
+
+      - name: Generate Changelog
+        run: |
+          github_changelog_generator \
+            --token "${CHANGELOG_GITHUB_TOKEN}" \
+            --release-branch master \
+            --user asbru-cm \
+            --project asbru-cm \
+            --output doc/General/Changelog.md \
+            --no-unreleased
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+          "mkdocs>=1.5,<2.0" \
+          "mkdocs-material>=9.5,<10" \
+          "pymdown-extensions>=10,<11"
+
+      - name: Prepare docs repo (test vs prod)
+        env:
+          GITHUB_API_KEY: ${{ secrets.DOCS_GITHUB_API_KEY }}
+        run: |
+          if [ -z "${GITHUB_API_KEY}" ]; then
+            echo "GITHUB_API_KEY not set please check DOCS_GITHUB_API_KEY secret"
+            exit 1
+          fi
+          
+          if [ "${GITHUB_REF}" = "refs/heads/build-test" ]; then
+            GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs-test.github.io.git"
+          else
+            GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
+          fi
+          
+          FULL_REPO="https://${GITHUB_API_KEY}${GH_REPO}"
+          
+          rm -rf out
+          mkdir -p out
+          cd out
+          
+          git init
+          git remote add origin "$FULL_REPO"
+          git fetch origin || true
+          git config user.name "asbrucm-docs"
+          git config user.email "actions@asbru-cm.net"
+          
+          git checkout master
+
+      - name: Build MkDocs site
+        run: |
+          mkdocs build --clean
+
+      - name: Commit & Push docs
+        run: |
+          cd out
+          git add -A .
+          git commit -m "GH-Pages update by GitHub Actions after $GITHUB_SHA" || echo "Nothing to commit"
+          git push origin master
+
