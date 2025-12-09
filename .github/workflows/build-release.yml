@@ -1,4 +1,4 @@
-name: Build Snapshot/Master Packages
+name: Build Release Packages
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     uses: ./.github/workflows/package-build.yml
     with:
       cloudsmith_dest: release
-      packagecloud_repo: release
+      packagecloud_repo: asbru-cm
     secrets:
       CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
       PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
