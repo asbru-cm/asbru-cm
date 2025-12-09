@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GITHUB_API_KEY: ${{ secrets.DOCS_GITHUB_API_KEY }}
       CHANGELOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -56,34 +55,39 @@ jobs:
         run: |
           mkdocs build --clean
 
-      - name: Deploy to GitHub Pages repo (test vs prod)
+      - name: Prepare docs repo (test vs prod)
+        env:
+          GITHUB_API_KEY: ${{ secrets.DOCS_GITHUB_API_KEY }}
         run: |
-          echo "GITHUB_REF=${GITHUB_REF}"
-
+          if [ -z "${GITHUB_API_KEY}" ]; then
+            echo "GITHUB_API_KEY not set please check DOCS_GITHUB_API_KEY secret"
+            exit 1
+          fi
+          
           if [ "${GITHUB_REF}" = "refs/heads/build-test" ]; then
-           GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs-test.github.io.git"
-            TARGET_BRANCH="master"   # oder z.B. "build-test"
+            GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs-test.github.io.git"
           else
             GH_REPO="@github.com/asbru-cm-docs/asbrucm-docs.github.io.git"
-            TARGET_BRANCH="master"
           fi
-
+          
           FULL_REPO="https://${GITHUB_API_KEY}${GH_REPO}"
-
+          
+          rm -rf out
+          mkdir -p out
           cd out
-
+          
           git init
-          git remote add origin "$FULL_REPO" || git remote set-url origin "$FULL_REPO"
+          git remote add origin "$FULL_REPO"
           git fetch origin || true
           git config user.name "asbrucm-docs"
-          git config user.email "travis@asbru-cm.net"
+          git config user.email "actions@asbru-cm.net"
+          
+          git checkout master
 
-          if git show-ref --verify --quiet "refs/heads/${TARGET_BRANCH}"; then
-            git checkout "${TARGET_BRANCH}"
-          else
-            git checkout -b "${TARGET_BRANCH}"
-          fi
-
+      - name: Commit & Push docs
+        run: |
+          cd out
           git add -A .
           git commit -m "GH-Pages update by GitHub Actions after $GITHUB_SHA" || echo "Nothing to commit"
-          git push -q origin "${TARGET_BRANCH}"
+          git push origin master
+
