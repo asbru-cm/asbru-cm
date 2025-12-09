@@ -54,6 +54,9 @@ jobs:
           python3 -m pip install --user --upgrade cloudsmith-cli
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Make build script executable
+        run: chmod +x ci/build_package.sh
+
       - name: Build packages
         run: ci/build_package.sh
 
