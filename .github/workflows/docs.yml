@@ -51,10 +51,6 @@ jobs:
           "mkdocs-material>=9.5,<10" \
           "pymdown-extensions>=10,<11"
 
-      - name: Build MkDocs site
-        run: |
-          mkdocs build --clean
-
       - name: Prepare docs repo (test vs prod)
         env:
           GITHUB_API_KEY: ${{ secrets.DOCS_GITHUB_API_KEY }}
@@ -83,6 +79,10 @@ jobs:
           git config user.email "actions@asbru-cm.net"
           
           git checkout master
+
+      - name: Build MkDocs site
+        run: |
+          mkdocs build --clean
 
       - name: Commit & Push docs
         run: |
