@@ -51,8 +51,8 @@ jobs:
           sudo apt-get install -y \
             git devscripts debhelper quilt \
             python3 python3-pip python3-setuptools gpgv
-          sudo pip3 install --upgrade pip
-          sudo pip3 install --upgrade cloudsmith-cli
+          python3 -m pip install --user --upgrade cloudsmith-cli
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Build packages
         run: ci/build_package.sh
