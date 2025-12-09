@@ -80,6 +80,13 @@ jobs:
           docker_image: "ubuntu-jammy"
           repack_deb: ""
 
+        - os: linuxmint
+          dist: wilma
+          package: deb
+          docker_repo: ""
+          docker_image: "ubuntu-noble"
+          repack_deb: ""
+
         # Pop!_OS (22.04)
         - os: pop
           dist: jammy
