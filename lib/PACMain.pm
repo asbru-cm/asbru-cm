@@ -5122,7 +5122,7 @@ sub _setVteCapabilities {
     # Does VTE supports 'match_regex' (as of 0.46)
     # (to match URLs)
     $$self{_Vte}{match_regex} = 0;
-    if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 46) {
+    if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 60) {
         $$self{_Vte}{match_regex} = 1;
     }
 
