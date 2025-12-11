@@ -457,6 +457,11 @@ sub subst {
         $string =~ s/<CMD:\Q$var\E>/$output/g;
     }
 
+    while ($string =~ /<<ASK_PASS>>/go) {
+        my $text = wEnterValue('<b>Manual Password requested</b>', "Password", '', 0) // '';
+        $string =~ s/<<ASK_PASS>>/$text/g;
+    }
+
     return wantarray ? ($string, $pos) : $string;
 }
 
