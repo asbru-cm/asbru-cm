@@ -3037,6 +3037,11 @@ sub _subst {
         }
     }
 
+    # \n \r \t substitution
+    $ret =~ s/\\n/\n/g;
+    $ret =~ s/\\r/\r/g;
+    $ret =~ s/\\t/\t/g;
+
     if ($asbru_conn) {
         return $ret;
     }
