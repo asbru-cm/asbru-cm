@@ -5111,6 +5111,15 @@ sub _setVteCapabilities {
     } or do {
         $$self{_Vte}{vte_feed_child} = 1;
     };
+    # Does VTE supports 'match_regex' (as of 0.46)
+    eval {
+        $vte->match_add_regex(Vte::Regex->new_for_match('.', -1, 2**10), 0);
+    };
+    if ($@) {
+        $$self{_Vte}{match_regex} = 0;
+    } else {
+        $$self{_Vte}{match_regex} = 1;
+    }
 
     # Does VTE supports 1 or 2 parameters for 'feed_child_binary'
     # (1 parameter as of v0.46)
@@ -5119,17 +5128,13 @@ sub _setVteCapabilities {
         $$self{_Vte}{vte_feed_binary} = 1;
     }
 
-    # Does VTE supports 'match_regex' (as of 0.46)
-    # (to match URLs)
-    $$self{_Vte}{match_regex} = 0;
-    if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 60) {
-        $$self{_Vte}{match_regex} = 1;
-    }
-
     # Does VTE supports 'get_text_range' (as of 0.72)
-    # (to match URLs)
-    $$self{_Vte}{get_text_range} = 0;
-    if ($$self{_Vte}{major_version} > 0 || $$self{_Vte}{minor_version} >= 72) {
+    eval {
+        $vte->get_text_range_format('VTE_FORMAT_TEXT', 0, 0, 0, 0);
+    };
+    if ($@) {
+        $$self{_Vte}{get_text_range} = 0;
+    } else {
         $$self{_Vte}{get_text_range} = 1;
     }
 
