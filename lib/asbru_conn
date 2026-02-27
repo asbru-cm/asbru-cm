@@ -184,6 +184,8 @@ my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $LOG_ENABLED = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'save session logs'} : $$CFG{'defaults'}{'save session logs'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'remove control chars'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
+my $MFA_ENABLED = $$CFG{'environments'}{$UUID}{'mfa enabled'} // 0;
+my $MFA_PROMPT = encode('utf8', $$CFG{'environments'}{$UUID}{'mfa prompt'} // 'verification code');
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
@@ -1820,6 +1822,23 @@ elsif (!$MANUAL) {
                 _hardClose($EXP, $UUID);
             }
         }],
+
+        # Found MFA/verification code prompt (if enabled)
+        ($MFA_ENABLED ? (
+            [$MFA_PROMPT, sub {
+                my $mfa_code = wEnterValue('<b>MFA Code Required</b>', "Enter your MFA verification code", '', 0);
+                if (defined $mfa_code) {
+                    $EXP->log_stdout(0);
+                    send_slow($EXP, "$mfa_code\n", 'hide');
+                    $EXP->log_stdout(1);
+                    ctrl("MFA:Sent (not shown)");
+                    exp_continue();
+                } else {
+                    ctrl("CLOSE:MFA:MFA code input cancelled by user");
+                    _hardClose($EXP, $UUID);
+                }
+            }]
+        ) : ()),
 
         # Found user prompt
         [$COMMAND_PROMPT, sub {

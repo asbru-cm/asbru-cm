@@ -386,6 +386,11 @@ sub _setupCallbacks {
         _($self, 'cbCfgQuotePostCommand')->set_sensitive(_($self, 'cbEditPostpendCommand')->get_active());
     });
 
+    # Capture "MFA enabled" checkbox
+    _($self, 'cbEditMFAEnabled')->signal_connect(toggled => sub {
+        _($self, 'hboxEditMFAPrompt')->set_sensitive(_($self, 'cbEditMFAEnabled')->get_active());
+    });
+
     # Capture 'check keepassx' button clicked
     _($self, 'btnCheckKPX')->signal_connect('clicked' => sub {
         if (!$ENV{'KPXC_MP'} && $$self{_CFG}{defaults}{keepass}{password}) {
@@ -752,6 +757,9 @@ sub _updateGUIPreferences {
     _($self, 'entryUUID')->set_text($uuid);
     _($self, 'cbCfgRemoveCtrlChars')->set_active($$self{_CFG}{'environments'}{$uuid}{'remove control chars'});
     _($self, 'cbCfgLogTimestamp')->set_active($$self{_CFG}{'environments'}{$uuid}{'log timestamp'});
+    _($self, 'cbEditMFAEnabled')->set_active($$self{_CFG}{'environments'}{$uuid}{'mfa enabled'} // 0);
+    _($self, 'entryEditMFAPrompt')->set_text($$self{_CFG}{'environments'}{$uuid}{'mfa prompt'} // 'verification code');
+    _($self, 'hboxEditMFAPrompt')->set_sensitive(_($self, 'cbEditMFAEnabled')->get_active());
 
     # Populate 'comboStartScript' combobox
     _($self, 'comboStartScript')->remove_all();
@@ -935,6 +943,8 @@ sub _saveConfiguration {
     $$self{_CFG}{'environments'}{$uuid}{'autossh'} = _($self, 'cbAutossh')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlChars')->get_active;
     $$self{_CFG}{'environments'}{$uuid}{'log timestamp'} = _($self, 'cbCfgLogTimestamp')->get_active;
+    $$self{_CFG}{'environments'}{$uuid}{'mfa enabled'} = _($self, 'cbEditMFAEnabled')->get_active;
+    $$self{_CFG}{'environments'}{$uuid}{'mfa prompt'} = _($self, 'entryEditMFAPrompt')->get_chars(0, -1);
 
     # Remove lefovers from user in : network connections and authentication
     if ($$self{_CFG}{'environments'}{$uuid}{'auth type'} eq 'userpass') {
