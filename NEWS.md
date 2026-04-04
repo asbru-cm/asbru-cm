@@ -2,6 +2,12 @@
 
 Here you can find important news on the project
 
+## 04.04.2026
+
+After almost 4 years we are happy to release version 6.4.1 of Ásbrú Connection Manager.
+
+The main point of this release is to port the application to new major distributions and deprecate older ones.
+
 ## 13.11.2022
 
 We are pleased to announce a new version (6.4.0) of Ásbrú Connection Manager that brings some new important features:

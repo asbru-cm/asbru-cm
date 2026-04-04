@@ -3137,7 +3137,7 @@ sub _showAboutWindow {
         "program_name" => '',  # name is shown in the logo
         "version" => "v$APPVERSION",
         "logo" => _pixBufFromFile("$RES_DIR/asbru-logo-400.png"),
-        "copyright" => "Copyright (C) 2017-2022 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
+        "copyright" => "Copyright (C) 2017-2026 Ásbrú Connection Manager team\nCopyright 2010-2016 David Torrejón Vaquerizas",
         "website" => 'https://asbru-cm.net/',
         "license" => "
 Ásbrú Connection Manager
