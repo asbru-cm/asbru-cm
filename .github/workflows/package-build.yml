@@ -212,3 +212,22 @@ jobs:
           packagecloud-reponame: ${{ inputs.packagecloud_repo }}
           packagecloud-distro: "${{ env.OS }}/${{ env.DIST }}"
           packagecloud-token: ${{ env.PACKAGECLOUD_TOKEN }}
+
+      - name: Prune old Packagecloud packages
+        if: ${{ inputs.packagecloud_repo != '' && inputs.packagecloud_repo != 'release' }}
+        env:
+          PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        run: |
+          python -m pip install -r ./packpack/tools/requirements.txt
+
+          # deb-Pakete aufräumen
+          python ./packpack/tools/packagecloud prune \
+            "${PACKAGECLOUD_USER}/${{ inputs.packagecloud_repo }}" \
+            deb "${OS}" "${DIST}" --keep 5 || true
+
+          # rpm-Pakete aufräumen
+          python ./packpack/tools/packagecloud prune \
+            "${PACKAGECLOUD_USER}/${{ inputs.packagecloud_repo }}" \
+            rpm "${OS}" "${DIST}" --keep 5 || true
+

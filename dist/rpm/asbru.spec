@@ -150,6 +150,8 @@ fi
 
 
 %changelog
+* Sat Apr 04 2026 Ásbrú Project Team <contact@asbru-cm.net> 6.4.1
+- 6.4.1 Release
 * Sun Nov 13 2022 Ásbrú Project Team <contact@asbru-cm.net> 6.4.0
 - 6.4.0 Release
 * Sat May 21 2022 Ásbrú Project Team <contact@asbru-cm.net> 6.3.3

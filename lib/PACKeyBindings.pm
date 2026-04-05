@@ -543,7 +543,7 @@ sub _getDefaultConfig {
     $$cfg{'terminal'}{'Ctrl+I'}        = ['Terminal',          'infotab',             'Show the Info tab'];
     $$cfg{'terminal'}{'Ctrl+F3'}       = ['Terminal',          'find-terminal',       'Find Terminal'];
     $$cfg{'terminal'}{'Alt+n'}         = ['Terminal',          'showconnections',     'Show/Hide connections list'];
-    $$cfg{'terminal'}{'Alt+e'}         = ['Terminal',          'edit_node',           'Edit Connection'];
+    $$cfg{'terminal'}{'Alt+e'}         = ['Terminal',          'edit_node',           'Edit connection'];
     $$cfg{'terminal'}{'Ctrl+plus'}     = ['Terminal',          'zoomin',              'Zoom in text'];
     $$cfg{'terminal'}{'Ctrl+minus'}    = ['Terminal',          'zoomout',             'Zoom out text'];
     $$cfg{'terminal'}{'Ctrl+0'}        = ['Terminal',          'zoomreset',           'Zoom reset text'];

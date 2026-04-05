@@ -15,7 +15,7 @@ Beware that [Loki](https://en.wikipedia.org/wiki/Loki) can sometimes behave in a
 If you do not wish to run third party scripts on your system, you are able to find manual install instructions for every repository on: https://cloudsmith.io/~asbru-cm/repos/
 
 ## Windows 10
-It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/). The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
+It is possible to run Asbru-CM on Windows 10 by enabling WSL and using the application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner). If you do not have [WSLG](https://github.com/microsoft/wslg) support, you will need to install [Xming](http://www.straightrunning.com/XmingNotes/). The GitHub page for [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
 
 ## Ubuntu
 **Master release**

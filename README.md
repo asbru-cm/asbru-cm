@@ -1,6 +1,7 @@
 # Ásbrú Connection Manager
 
-[![Travis][travis-badge]][travis-url]
+[![Build & Deploy Docs](https://github.com/asbru-cm/asbru-cm/actions/workflows/docs.yml/badge.svg)](https://github.com/asbru-cm/asbru-cm/actions/workflows/docs.yml)
+[![Build Snapshot/Master Packages](https://github.com/asbru-cm/asbru-cm/actions/workflows/build-snapshots.yml/badge.svg)](https://github.com/asbru-cm/asbru-cm/actions/workflows/build-snapshots.yml)
 [![License][license-badge]][license-url]
 [![RPM Packages][rpm-badge]][rpm-url]
 [![Debian Packages][deb-badge]][deb-url]
@@ -73,8 +74,19 @@ To do so, execute the following commands:
   
 - Windows
 
-  It is possible to run Asbru-CM on Windows 10 by enabling WSL and installing [Xming](http://www.straightrunning.com/XmingNotes/).
-  The application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
+  - Windows 10 Build 19044 and later, or Windows 11
+ 
+    See https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps
+
+    tl;dr:
+    
+    1. Install or update WSL.
+    2. Follow the installation instructions for Ubuntu above.
+    3. Ásbrú Connection Manager will then be available in the start menu.
+
+  - Windows 10 before Build 19044, or running older WSL
+
+    It is possible to run Asbru-CM on Windows 10 by enabling WSL and using the application [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner). If you do not have [WSLG](https://github.com/microsoft/wslg) support, you will need to install [Xming](http://www.straightrunning.com/XmingNotes/). The GitHub page for [Asbru-CM Runner](https://github.com/SegiH/Asbru-CM-Runner) has detailed instructions on how to do this and allows you to run Asbru-CM on Windows 10 without a console window open in the background.
   
 Once installed on your system, type ````asbru-cm```` in your terminal.
 

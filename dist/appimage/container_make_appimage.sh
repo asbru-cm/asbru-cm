@@ -42,4 +42,4 @@ sed -i 's@/usr/lib/@./usr/lib/@g' /var/appimage-dir/usr/lib/gtk-3.0/3.0.0/immodu
 
 sed -i 's@/usr/lib/@./usr/lib/@g' /var/appimage-dir/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
-ARCH=x86_64 LD_LIBRARY_PATH="/usr/glibc-compat/lib64:/usr/glibc-compat/lib:/usr/lib:/usr/local/lib:/usr/local/share:/lib" /appimagetool-x86_64.AppImage /var/appimage-dir Asbru-CM.AppImage
+ARCH=x86_64 LD_LIBRARY_PATH="/usr/glibc-compat/lib64:/usr/glibc-compat/lib" /appimagetool-x86_64.AppImage /var/appimage-dir Asbru-CM.AppImage
