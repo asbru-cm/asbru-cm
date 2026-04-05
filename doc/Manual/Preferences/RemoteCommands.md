@@ -32,3 +32,17 @@ If we select and execute the "List all" command, that has a global variable assi
 
 ![](images/rc4.png)
 
+## Escape sequences
+
+__asbru 6.4.1+__
+
+The following escape secuences are allowed in the command field: `\n \r \t`
+
+You can use `\n` to send multiple commands per line in regular linux shells.
+
+For example:
+
+```bash
+cd\nrm -Rf temp\nmkdir temp\ncd temp\ntouch out.txt\ncd ..
+```
+

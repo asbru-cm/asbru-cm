@@ -1264,6 +1264,7 @@ sub _setupCallbacks {
             if (!$cmd) {
                 return 0;
             }
+            $cmd = _subst($cmd);
             if ($where eq 'local') {
                 $self->_execute('local', $cmd, $ask);
             } else {
