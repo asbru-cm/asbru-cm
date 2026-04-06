@@ -183,11 +183,33 @@ sub ListKeyBindings {
     my $list = "<b>Keybindings for : $window</b>\n\n<span font_family='monospace'>";
     my $tab = '';
 
+    # List global system key bindings
     foreach my $kb (sort keys %$kbs) {
         if ($kb =~ /^undef-/) {
             next;
         }
-        $list .= sprintf("<b>%-20s</b>$tab\t%s\n", $kb, $$kbs{$kb}[2]);
+        $list .= $self->_getKeyBindingsLine($tab, $kb, $$kbs{$kb}[2]);
+    }
+    # If inside the context of a terminal, look at the keybindings associated with
+    # the global & connection specific commands (both local and global)
+    if ($window eq 'terminal') {
+        my $hk = $self->{hotkey};
+        foreach my $kb (sort keys %$hk) {
+            if ($kb =~ /^undef-/) {
+                next;
+            }
+            foreach my $keymask (sort keys %{ $$hk{$kb} }) {
+                if ($kb eq 'terminal' and scalar(@{$$hk{$kb}{$keymask}}) > 0) {
+                    $list .= $self->_getKeyBindingsLine($tab, $keymask, $$hk{$kb}{$keymask}[1]);
+                } elsif ($keymask eq 'terminal') {
+                    foreach my $conkeymask (sort keys %{ $$hk{$kb}{$keymask} }) {
+                        if (scalar(@{$$hk{$kb}{$keymask}{$conkeymask}}) > 0) {
+                            $list .= $self->_getKeyBindingsLine($tab, $conkeymask, $$hk{$kb}{$keymask}{$conkeymask}[1]);
+                        }
+                    }
+                }
+            }
+        }
     }
     return "$list</span>";
 }
@@ -247,9 +269,10 @@ sub LoadHotKeys {
     foreach my $w (@what) {
         foreach my $hash (@{$$CFG{$w}}) {
             if ($$hash{keybind}) {
+                my $des = $$hash{description} // $w;
                 my $lf  = $$hash{intro} && $w ne 'local commands' ? "\n" : '';
                 my $ask = $$hash{confirm} ? "?" : '';
-                $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$w", "$ask$$hash{txt}$lf", $uuid);
+                $self->RegisterHotKey('terminal', $$hash{keybind}, "HOTKEY_CMD:$des", "$ask$$hash{txt}$lf", $uuid);
             }
         }
     }
@@ -696,6 +719,13 @@ sub _updateKeyBinding {
         $keynew = '';
     }
     $model->set_value($model->get_iter($path), 2, Glib::Object::Introspection::GValueWrapper->new('Glib::String', $self->stringifyKeybind($keynew)));
+}
+
+# Prepare a line to be added to the list of key bindings
+sub _getKeyBindingsLine {
+    my ($self, $tab, $keymask, $cmd) = @_;
+    $cmd =~ s/HOTKEY_CMD://;
+    return sprintf("<b>%-25s</b>$tab\t%s\n", $self->stringifyKeybind($keymask), $cmd);
 }
 
 # END: Private Methods
