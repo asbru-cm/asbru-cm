@@ -38,15 +38,12 @@ RUN apk --no-cache add \
 # Pull dependencies here from base image, from cache, to avoid re-pulls during development as much as possible
 FROM base AS manual-dependency-puller
 RUN apk --no-cache add lftp
-RUN cd /tmp && lftp -c "open ftp://ftp.ossp.org; get pkg/lib/uuid/uuid-1.6.2.tar.gz -o ./ossp-uuid-1.6.2.tar.gz"
 RUN cd /tmp && wget https://cpan.metacpan.org/authors/id/C/CR/CRAZYDJ/Net-ARP-1.0.11.tgz
 
 # Build manual Perl modules here
 FROM builder AS perl-builder
 # Pull dependencies from manual puller
 COPY --from=manual-dependency-puller /tmp/. /tmp
-# Manually compile and install OSSP UUID (no perl package available in APK as of writing)
-RUN cd /tmp && tar -zxvf /tmp/ossp-uuid-1.6.2.tar.gz && cd uuid-1.6.2/ && ./configure && make && make install && cd perl && perl Makefile.PL && make && make install && rm -rf ossp-uuid-1.6.2.tar.gz uuid-1.6.2
 # Manually compile and install Net::ARP with source patch sed
 RUN cd /tmp && tar -zxvf Net-ARP-1.0.11.tgz && cd Net-ARP-1.0.11 && sed -i 's/__THROW//g' arp.h && perl Makefile.PL && make && make install && rm -rf Net-ARP-1.0.11.tgz Net-ARP-1.0.11
 
@@ -71,7 +68,6 @@ RUN cpanm --install Pango
 RUN cpanm --install Gtk3
 RUN cpanm --install Gtk3::SimpleList
 RUN cpanm --install Expect
-RUN cpanm --install App::Info::Lib::OSSPUUID
 RUN cpanm --install Data::UUID
 
 # Remove as much build-only dependencies as possible

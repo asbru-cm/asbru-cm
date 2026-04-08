@@ -44,7 +44,6 @@ use Net::ARP;
 use Net::Ping;
 use YAML;
 use File::stat;
-use OSSP::uuid;
 use Encode;
 use DynaLoader; # Required for PACTerminal and PACShell modules
 

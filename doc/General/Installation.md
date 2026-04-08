@@ -155,7 +155,7 @@ To install the latest release on a fresh [Gentoo](https://www.gentoo.org/) syste
 ```
 emerge --ask dev-vcs/git
 emerge --ask dev-perl/YAML
-USE="perl" emerge --ask dev-libs/ossp-uuid
+emerge --ask dev-perl/Data-UUID
 USE="minimal" emerge --ask dev-perl/Type-Tiny-XS
 emerge --ask dev-perl/Crypt-CBC
 emerge --ask dev-perl/Gtk3
@@ -225,7 +225,7 @@ $ ./asbru-cm
 If you are using a Debian-based system, here are the list of dependency package to install:
 
 ```
-apt install perl libvte-2.91-0 libcairo-perl libglib-perl libpango-perl libsocket6-perl libexpect-perl libnet-proxy-perl libyaml-perl libcrypt-cbc-perl libcrypt-blowfish-perl libgtk3-perl libnet-arp-perl libossp-uuid-perl openssh-client telnet ftp libcrypt-rijndael-perl libxml-parser-perl libcanberra-gtk-module dbus-x11 libx11-guitest-perl libgtk3-simplelist-perl gir1.2-wnck-3.0 gir1.2-vte-2.91
+apt install perl libvte-2.91-0 libcairo-perl libglib-perl libpango-perl libsocket6-perl libexpect-perl libnet-proxy-perl libyaml-perl libcrypt-cbc-perl libcrypt-blowfish-perl libgtk3-perl libnet-arp-perl libdata-uuid-perl openssh-client telnet ftp libcrypt-rijndael-perl libxml-parser-perl libcanberra-gtk-module dbus-x11 libx11-guitest-perl libgtk3-simplelist-perl gir1.2-wnck-3.0 gir1.2-vte-2.91
 ```
 
 ### Legacy v5.x
