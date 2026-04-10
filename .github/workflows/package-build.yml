@@ -136,8 +136,7 @@ jobs:
       - name: Build packages
         run: ci/build_package.sh
 
-      - name: Upload build artifacts (for releases)
-        if: ${{ github.ref_type == 'tag' }}
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: "${{ matrix.os }}-${{ matrix.dist }}-${{ matrix.package }}"
