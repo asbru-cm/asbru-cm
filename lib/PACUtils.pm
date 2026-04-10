@@ -2163,6 +2163,12 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
     $$cfg{'defaults'}{'selection to clipboard'} //= 1;
+    # OSC 52 clipboard support (v3 — Phase 1 PoC defaults)
+    # TEMPORARY: 'allow osc52 write' hardcoded to 1 for PoC testing.
+    # Phase 2 will add the UI checkbox and default this to 0 for production.
+    $$cfg{'defaults'}{'allow osc52 write'}   //= 1;      # TEMPORARY: PoC default, revert to 0 for production
+    $$cfg{'defaults'}{'osc52 max bytes'}     //= 102400; # 100 KB per-sequence cap
+    $$cfg{'defaults'}{'osc52 notifications'} //= 0;      # transient notification on write (Phase 3)
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;
