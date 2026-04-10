@@ -1184,11 +1184,14 @@ sub _osc52_scan_chunk {
     while ($$buf_ref =~ s/\x1b\]52;([cps0-7pq]*);([^\x07\x1b]*?)(?:\x07|\x1b\\)//) {
         my ($targets, $payload) = ($1, $2);
 
+        # Per OSC 52 spec (xterm ctlseqs), an empty targets field means
+        # "use default", which is 'c' (CLIPBOARD). tmux sends empty targets
+        # by default when forwarding mouse selections — this is the common
+        # case and must be accepted, not dropped.
+        $targets = 'c' if $targets eq '';
+
         # Drop the query form — exfiltration vector, never honour
         next if $payload eq '?';
-
-        # Drop if targets field is empty — malformed sequence
-        next if $targets eq '';
 
         # Strict base64 alphabet check.
         # Also provides structural PAC_MSG_START[ / ]PAC_MSG_END injection
