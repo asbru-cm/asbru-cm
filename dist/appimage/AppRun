@@ -29,6 +29,8 @@ export GTK_IM_MODULE_FILE="${APPDIR}/usr/lib/gtk-3.0/3.0.0/immodules.cache"
 
 export PANGO_LIBDIR="${APPDIR}/usr/lib"
 
+export GIO_MODULE_DIR="${APPDIR}/usr/lib/gio/modules"
+
 export ASBRU_ENV_FOR_INTERNAL="$(getCompressedEnv)"
 
 cd "${APPDIR}" || exit 1
