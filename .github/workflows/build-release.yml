@@ -50,9 +50,23 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Collect and rename release packages
+        run: |
+          find artifacts/ -mindepth 2 -maxdepth 2 -type f | while read -r file; do
+            dir=$(basename "$(dirname "$file")")
+            filename=$(basename "$file")
+            ext="${filename##*.}"
+            base="${filename%.*}"
+            case "$filename" in
+              *.deb)  mv "$file" "artifacts/${base}_${dir}.${ext}" ;;
+              *.rpm)  mv "$file" "artifacts/${base}_${dir}.${ext}" ;;
+              *.AppImage) mv "$file" "artifacts/$filename" ;;
+            esac
+          done
+
       - name: Attach artifacts to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

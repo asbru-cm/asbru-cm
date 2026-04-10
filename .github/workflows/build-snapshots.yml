@@ -49,12 +49,34 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Delete old snapshot release assets
+        run: |
+          gh release view snapshot --json assets --jq '.assets[].id' 2>/dev/null | \
+            xargs -I{} gh api --method DELETE /repos/${{ github.repository }}/releases/assets/{}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Collect and rename release packages
+        run: |
+          find artifacts/ -mindepth 2 -maxdepth 2 -type f | while read -r file; do
+            dir=$(basename "$(dirname "$file")")
+            filename=$(basename "$file")
+            ext="${filename##*.}"
+            base="${filename%.*}"
+            case "$filename" in
+              *.deb)  mv "$file" "artifacts/${base}_${dir}.${ext}" ;;
+              *.rpm)  mv "$file" "artifacts/${base}_${dir}.${ext}" ;;
+              *.AppImage) mv "$file" "artifacts/$filename" ;;
+            esac
+          done
+
       - name: Update snapshot release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: snapshot
           name: "Snapshot Build"
           prerelease: true
-          files: artifacts/**/*
+          files: artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
