@@ -181,6 +181,76 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
+
+# ============================================================================
+# File-scoped log filehandle — allows both the wrapper closure below AND
+# sub close_log_file() to access the same handle (v3.2 Erratum B.1).
+# ============================================================================
+my $LOG_FH;
+
+# ============================================================================
+# v3 OSC 52 + session-log wrapper installer
+# Installed HERE (after $LOG_TIMESTAMP at line 183) so that the log_file
+# coderef covers the ENTIRE session lifetime — including pre-login expect()
+# chains that run before the SSH spawn (critic-v2 blocker #1 fix).
+# Must run before any $EXP->expect() call.
+# ============================================================================
+{
+    my $osc52_buf    = '';
+    # TEMPORARY: PoC default, revert to 0 for production
+    my $osc52_active = $$CFG{'defaults'}{'allow osc52 write'} // 1;
+    my $osc52_max    = $$CFG{'defaults'}{'osc52 max bytes'}   // 102400;
+
+    # Open our own filehandle for session logging. This REPLACES the bareword
+    # LOG handle that the original block at lines 1363–1375 opened, so that
+    # close_log_file() can use $LOG_FH instead of the bareword LOG.
+    # Truncate mode ('>') matches original behavior (v3.1 Erratum 3).
+    if (defined $LOG_FILE && $LOG_FILE ne '') {
+        if (open(my $fh, '>:raw', $LOG_FILE)) {
+            $LOG_FH = $fh;
+        } else {
+            print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
+        }
+    }
+
+    my $logger = sub {
+        my ($chunk) = @_;   # Expect calls this with only the chunk
+
+        # (a) Mirror chunk to session log — replaces Expect's native file
+        #     handling and the old logTime sub (v3.2 Erratum B.2).
+        if (defined $LOG_FH) {
+            eval {
+                if ($LOG_TIMESTAMP) {
+                    my $t = encode('utf8', strftime("%Y-%m-%d %H:%M:%S", localtime()));
+                    print $LOG_FH "$t : $chunk";
+                    print $LOG_FH "\n" unless $chunk =~ /[\n\r]$/;
+                } else {
+                    print $LOG_FH $chunk;
+                }
+            };
+            # Intentionally swallow log-write errors so a broken log
+            # never kills the SSH session.
+        }
+
+        # (b) Kill-switch: env var or config flag disables OSC 52 scanning
+        return if $ENV{'ASBRU_OSC52_DISABLE'} && $ENV{'ASBRU_OSC52_DISABLE'} eq '1';
+        return unless $osc52_active;
+
+        # (c) OSC 52 scanner — wrapped in eval so scanner bugs never crash
+        #     asbru_conn (defense-in-depth).
+        eval {
+            _osc52_scan_chunk(\$osc52_buf, $chunk, $osc52_max);
+        };
+        if ($@) {
+            print STDERR "asbru_conn: OSC 52 scanner error: $@\n" if $DEBUG;
+        }
+
+        return;
+    };
+
+    $EXP->log_file($logger);
+}
+
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
