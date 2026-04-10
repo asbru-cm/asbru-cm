@@ -19,7 +19,7 @@ CIDFILE_PATH="${SCRIPT_DIR}/build/appimage-maker.cid"
 
 rm -f "${CIDFILE_PATH}"
 
-docker run --cidfile "${CIDFILE_PATH}" --privileged=true -i asbru-cm-appimage-maker //bin/bash < "${SCRIPT_DIR}/container_make_appimage.sh"
+docker run --cidfile "${CIDFILE_PATH}" --privileged=true -i asbru-cm-appimage-maker /bin/bash < "${SCRIPT_DIR}/container_make_appimage.sh"
 
 CONTAINER_ID="$(cat "${CIDFILE_PATH}")"
 rm -f "${CIDFILE_PATH}"

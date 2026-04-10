@@ -16,7 +16,7 @@ ln -s ./opt/asbru-cm/dist/appimage/AppRun /var/appimage-dir/AppRun
 
 chmod a+x /var/appimage-dir/AppRun
 
-dos2unix /var/appimage-dir/opt/asbru-cm/res/asbru-cm.desktop /var/appimage-dir/opt/asbru-cm/res/asbru-logo.svg /var/appimage-dir/opt/asbru-cm/dist/appimage-raw/AppRun
+dos2unix /var/appimage-dir/opt/asbru-cm/res/asbru-cm.desktop /var/appimage-dir/opt/asbru-cm/res/asbru-logo.svg /var/appimage-dir/opt/asbru-cm/dist/appimage/AppRun
 
 if [[ "${USE_APPSTREAM}" -eq 1 ]]; then
 
@@ -42,4 +42,4 @@ sed -i 's@/usr/lib/@./usr/lib/@g' /var/appimage-dir/usr/lib/gtk-3.0/3.0.0/immodu
 
 sed -i 's@/usr/lib/@./usr/lib/@g' /var/appimage-dir/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
-ARCH=x86_64 LD_LIBRARY_PATH="/usr/glibc-compat/lib64:/usr/glibc-compat/lib" /appimagetool-x86_64.AppImage /var/appimage-dir Asbru-CM.AppImage
+ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 LD_LIBRARY_PATH="/usr/glibc-compat/lib64:/usr/glibc-compat/lib" /appimagetool-x86_64.AppImage /var/appimage-dir Asbru-CM.AppImage

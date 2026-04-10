@@ -56,8 +56,8 @@ FROM perl-builder AS cpan-installer
 RUN apk --no-cache add perl-app-cpanminus --virtual cpanm-installer-packages-step
 # Pinned Dependencies with no tests (tests fail, at least on Alpine, even with all libs setup)
 RUN cpanm --notest --install RURBAN/Net-Ping-2.74.tar.gz
-# Pinned Dependencies with tests
-RUN cpanm --notest --install XAOC/Glib-Object-Introspection-0.049.tar.gz
+# No-test dependencies (tests fail on Alpine)
+RUN cpanm --notest --install Glib::Object::Introspection
 # No-test dependencies (tests fail, at least on Alpine, even with all libs setup)
 RUN cpanm --notest --install Net::Proxy
 # Testable dependencies
@@ -90,7 +90,7 @@ COPY --from=stripped-builder /etc/. /etc/
 FROM common AS appimage-tools
 # Install some needed stuff for AppImage packaging
 
-RUN wget "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage" && \
+RUN wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage" && \
     chmod +x "appimagetool-x86_64.AppImage"
 
 RUN apk add fuse file appstream dos2unix patchelf
