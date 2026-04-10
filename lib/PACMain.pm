@@ -193,6 +193,18 @@ sub new {
     # Test Vte Capabilities
     _setVteCapabilities($self);
 
+    # Auto-select dark theme when system prefers dark color scheme
+    # and the user has not set a theme explicitly.
+    unless ($$self{_CFG}{'defaults'}{'theme'}) {
+        my $gsettings_out = `gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null`;
+        chomp $gsettings_out;
+        my $system_dark = $gsettings_out eq "'prefer-dark'"
+                       || ($ENV{'GTK_THEME'} // '') =~ /:dark\z/i;
+        if ($system_dark) {
+            $$self{_CFG}{'defaults'}{'theme'} = 'asbru-dark';
+        }
+    }
+
     if ($$self{_CFG}{'defaults'}{'theme'}) {
         $THEME_DIR = "$RES_DIR/themes/$$self{_CFG}{'defaults'}{'theme'}";
     }
@@ -299,6 +311,11 @@ sub new {
     my $css_provider = Gtk3::CssProvider->new();
     $css_provider->load_from_path("$THEME_DIR/asbru.css");
     Gtk3::StyleContext::add_provider_for_screen(Gtk3::Gdk::Screen::get_default, $css_provider, 600);
+
+    # Request dark native widgets when using the dark theme
+    if ($THEME_DIR =~ /dark/) {
+        Gtk3::Settings->get_default->set_property('gtk-application-prefer-dark-theme', 1);
+    }
 
     # Setup known connection methods
     %{ $$self{_METHODS} } = _getMethods($self,$$self{_THEME});
