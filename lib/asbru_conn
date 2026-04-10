@@ -1150,6 +1150,85 @@ sub logTime {
     }
 }
 
+# ============================================================================
+# _osc52_scan_chunk — v3.1 OSC 52 scanner (with smarter holdback)
+#
+# Scans terminal output for OSC 52 escape sequences and dispatches the
+# base64 payload to PACTerminal via the existing ctrl() Unix-socket channel.
+#
+# Args:
+#   $buf_ref   — reference to the closure-scoped rolling buffer (SCALAR ref)
+#   $chunk     — new bytes just read from the PTY
+#   $max_bytes — maximum accepted base64 payload length (pre-decode)
+#
+# Security notes:
+#   - Validates base64 alphabet strictly; also defends against
+#     PAC_MSG_START[ / ]PAC_MSG_END injection since '[' and ']' are not
+#     in the base64 alphabet
+#   - Drops query form (52;c;?) — never exfiltrates clipboard contents
+#   - 16 MiB absolute cap prevents DoS via unterminated sequence
+# ============================================================================
+sub _osc52_scan_chunk {
+    my ($buf_ref, $chunk, $max_bytes) = @_;
+
+    # Absolute wall: prevent unbounded buffer growth when an attacker sends
+    # \x1b]52;c; and never sends a terminator.
+    my $ABS_CAP = 16 * 1024 * 1024;  # 16 MiB
+
+    $$buf_ref .= $chunk;
+
+    if (length($$buf_ref) > $ABS_CAP) {
+        # Reset — keep a tail of 1 KB in case we are mid-sequence at the wall
+        $$buf_ref = substr($$buf_ref, -1024);
+        return;
+    }
+
+    # Match complete OSC 52 sequences:
+    #   ESC ] 52 ; <targets> ; <payload> <BEL or ESC-backslash>
+    # Non-greedy payload match stops at the first valid terminator.
+    while ($$buf_ref =~ s/\x1b\]52;([cps0-7pq]*);([^\x07\x1b]*?)(?:\x07|\x1b\\)//) {
+        my ($targets, $payload) = ($1, $2);
+
+        # Drop the query form — exfiltration vector, never honour
+        next if $payload eq '?';
+
+        # Drop if targets field is empty — malformed sequence
+        next if $targets eq '';
+
+        # Strict base64 alphabet check.
+        # Also provides structural PAC_MSG_START[ / ]PAC_MSG_END injection
+        # defense: '[' and ']' are not valid base64 characters so neither
+        # marker can survive this check.
+        next unless $payload =~ /\A[A-Za-z0-9+\/=]*\z/;
+
+        # Size cap on the pre-decode base64 string
+        next if length($payload) > $max_bytes;
+
+        # Dispatch via existing ctrl() channel — verbatim base64 string.
+        # PACTerminal's _handleOsc52Payload decodes it ONCE (no re-encoding
+        # here; critic-v2 blocker #2 fix).
+        ctrl("OSC52:$targets:$payload");
+    }
+
+    # Holdback management (v3.1 Erratum 4 — smarter index-based logic):
+    # Only trim when there is DEFINITELY no partial OSC 52 sequence anywhere
+    # in the buffer. This avoids silent data loss on mid-payload splits.
+    if (length($$buf_ref) > 1024) {
+        my $osc52_start = index($$buf_ref, "\x1b]52;");
+        if ($osc52_start < 0) {
+            # No partial sequence anywhere — keep only the last 16 bytes
+            # (generous margin for the 6-byte partial prefix "\x1b]52;c").
+            $$buf_ref = substr($$buf_ref, -16);
+        } elsif ($osc52_start > 1024) {
+            # Partial sequence exists but there is >1 KB of junk before it —
+            # drop the junk, keep everything from the partial sequence onward.
+            $$buf_ref = substr($$buf_ref, $osc52_start);
+        }
+        # Otherwise: partial sequence is within the first 1 KB — leave the
+        # buffer alone; the scanner will complete the match on the next chunk.
+    }
+}
+
 # If we want a perfect fit of an embedded RDP tab, we can use X11::GUITest if available
 # We should eval in BEGIN or perl warns "Too late to run INIT block"
 my $module_guitest;
