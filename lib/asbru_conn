@@ -2410,9 +2410,15 @@ exit 0;
 sub close_log_file {
     my $line;
 
-    if ($LOG_TIMESTAMP) {
-        close LOG;
+    # Close our file-scoped log handle (replaces the bareword LOG handle that
+    # the original install block at lines 1363-1375 used). The $LOG_TIMESTAMP
+    # guard is no longer needed because $LOG_FH is opened unconditionally by
+    # the v3 wrapper installer (v3.2 Erratum B.3).
+    if (defined $LOG_FH) {
+        close $LOG_FH;
+        $LOG_FH = undef;
     }
+
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
     }
