@@ -90,15 +90,12 @@ COPY --from=stripped-builder /etc/. /etc/
 FROM common AS appimage-tools
 # Install some needed stuff for AppImage packaging
 
-RUN ping -c 2 "objects.githubusercontent.com" && \
-    wget "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage" && \
+RUN wget "https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage" && \
     chmod +x "appimagetool-x86_64.AppImage"
 
 RUN apk add fuse file appstream dos2unix patchelf
 
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-
-RUN ping -c 2 "objects.githubusercontent.com"
 
 RUN wget "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-2.34-r0.apk" && \
     apk add glibc-2.34-r0.apk
