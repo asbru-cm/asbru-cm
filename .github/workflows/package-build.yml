@@ -72,6 +72,11 @@ jobs:
           docker_image: ""
           repack_deb: ""
 
+        #AlmaLinux 9 (EL 9 build)
+        - os: almalinux
+          dist: "9"
+          package: rpm
+
           # Fedora
         - os: fedora
           dist: "43"
