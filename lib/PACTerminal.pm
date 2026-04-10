@@ -1556,6 +1556,10 @@ sub _watchConnectionData {
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
             _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
+        } elsif ($data =~ /^OSC52:([cps0-7pq]+):(.+)$/o) {
+            # NEW — v3 OSC 52 clipboard dispatch (v3.1 Erratum 1: PAC_CONN_MSG, not PAC_MSG_CONN_MSG)
+            my ($targets, $b64) = ($1, $2);
+            $self->_handleOsc52Payload($targets, $b64);
         } elsif ($data eq 'RESTART') {
             $$self{_RESTART} = 1;
         } elsif ($data =~ /^CHAIN:(.+):(.+):(.+):(.+)/go) {
@@ -4516,6 +4520,59 @@ sub _zoomHandler {
     }
 
     return 0;
+}
+
+sub _handleOsc52Payload {
+    my ($self, $targets, $b64) = @_;
+
+    # Defense in depth: re-check the feature flag on the main-process side.
+    # (asbru_conn already checked, but PACTerminal is the trust boundary.)
+    return unless $$self{_CFG}{'defaults'}{'allow osc52 write'};
+
+    # Lazy-load MIME::Base64 with graceful degradation.
+    # MIME::Base64 ships with standard Perl (no extra package needed).
+    eval { require MIME::Base64; };
+    if ($@) {
+        warn "OSC 52: MIME::Base64 not available, clipboard write skipped\n";
+        return;
+    }
+
+    # Decode base64 EXACTLY ONCE — ctrl() carried the verbatim base64 string.
+    # (critic-v2 blocker #2: no "double decode"; asbru_conn sent raw base64.)
+    my $txt;
+    eval { $txt = MIME::Base64::decode_base64($b64); };
+    if ($@ || !defined $txt) {
+        warn "OSC 52: base64 decode failed, dropping sequence\n";
+        return;
+    }
+
+    # Size cap — defense in depth (asbru_conn capped the pre-decode length,
+    # we verify the post-decode length here too).
+    my $max_bytes = $$self{_CFG}{'defaults'}{'osc52 max bytes'} // 102400;
+    if (length($txt) > $max_bytes) {
+        warn "OSC 52: payload exceeds max size (" . length($txt) . " > $max_bytes), dropping\n";
+        return;
+    }
+
+    # Map OSC 52 target character to GTK clipboard atom:
+    #   'c', 's', '0'..'7'  → CLIPBOARD (primary system clipboard)
+    #   'p'                  → PRIMARY   (X11 primary selection)
+    # For mixed targets like "cp", prefer CLIPBOARD.
+    my $atom_name = 'CLIPBOARD';
+    if ($targets =~ /p/ && $targets !~ /c/) {
+        $atom_name = 'PRIMARY';
+    }
+
+    # Use the byte-length idiom from the existing clipboard code (PACTerminal
+    # lines ~1245-1248) to get the correct byte count for set_text().
+    use bytes;
+    my $blen = length($txt);
+    no bytes;
+
+    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern($atom_name, 0));
+    $clipboard->set_text($txt, $blen);
+
+    return 1;
 }
 
 sub _pasteConnectionPassword {
