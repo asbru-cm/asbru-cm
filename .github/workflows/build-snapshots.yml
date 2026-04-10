@@ -14,3 +14,32 @@ jobs:
       CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
       PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
       PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+
+  build-appimage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build AppImage Docker image
+        run: docker build --tag=asbru-cm-appimage-maker --file=dist/appimage/Dockerfile .
+
+      - name: Run AppImage builder
+        run: |
+          CIDFILE=$(mktemp -u)
+          docker run --cidfile "$CIDFILE" --privileged=true -i asbru-cm-appimage-maker /bin/bash \
+            < dist/appimage/container_make_appimage.sh
+          docker cp "$(cat "$CIDFILE"):/Asbru-CM.AppImage" Asbru-CM-snapshot.AppImage
+          docker rm "$(cat "$CIDFILE")"
+          chmod a+x Asbru-CM-snapshot.AppImage
+
+      - name: Update snapshot release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: snapshot
+          name: "Snapshot Build"
+          prerelease: true
+          files: Asbru-CM-snapshot.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

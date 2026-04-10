@@ -11,7 +11,7 @@ IFS=$'\n\t'
 # Too much output can't hurt, it's Bash.
 set -x
 
-docker build --tag=asbru-cm-appimage-maker --file=dist/appimage-raw/Dockerfile .
+docker build --tag=asbru-cm-appimage-maker --file=dist/appimage/Dockerfile .
 
 mkdir -p "${SCRIPT_DIR}/build"
 
