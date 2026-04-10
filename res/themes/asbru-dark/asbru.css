@@ -68,3 +68,19 @@ messagedialog > box {
 .w-confirm {
 }
 
+treeview {
+  color: #e0e0e0;
+  background-color: #2d2d2d;
+}
+treeview:hover {
+  background-color: #3a3a4a;
+}
+treeview:selected {
+  color: #ffffff;
+  background-color: #3465a4;
+}
+treeview header button {
+  color: #cccccc;
+  background-color: #383838;
+  border-bottom: 1px solid #555;
+}

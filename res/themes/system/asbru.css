@@ -37,3 +37,7 @@ tooltip {
 .w-info {
 }
 
+treeview:selected {
+  color: #ffffff;
+  background-color: #3465a4;
+}
