@@ -449,6 +449,12 @@ sub start {
         $spawn_env = "";
     }
     $spawn_env .= " ASBRU_SUB_CWD='$subCwd'";
+    # NEW — Propagate OSC 52 kill-switch if the user set it in their shell
+    # (v3 Fix 1: _convertEnv only parses explicitly listed env vars, so we
+    # must append the kill-switch here for it to reach asbru_conn).
+    if (defined $ENV{'ASBRU_OSC52_DISABLE'} && $ENV{'ASBRU_OSC52_DISABLE'} eq '1') {
+        $spawn_env .= " ASBRU_OSC52_DISABLE='1'";
+    }
     my @arr_spawn_env = $self->_convertEnv($spawn_env);
     my $spawnSyncResult = undef;
     eval {
