@@ -4545,9 +4545,10 @@ sub _handleOsc52Payload {
 
     # Decode base64 EXACTLY ONCE — ctrl() carried the verbatim base64 string.
     # (critic-v2 blocker #2: no "double decode"; asbru_conn sent raw base64.)
-    my $txt;
-    eval { $txt = MIME::Base64::decode_base64($b64); };
-    if ($@ || !defined $txt) {
+    # Note: decode_base64 returns a RAW BYTE string with no UTF8 flag set.
+    my $bytes;
+    eval { $bytes = MIME::Base64::decode_base64($b64); };
+    if ($@ || !defined $bytes) {
         warn "OSC 52: base64 decode failed, dropping sequence\n";
         return;
     }
@@ -4555,9 +4556,26 @@ sub _handleOsc52Payload {
     # Size cap — defense in depth (asbru_conn capped the pre-decode length,
     # we verify the post-decode length here too).
     my $max_bytes = $$self{_CFG}{'defaults'}{'osc52 max bytes'} // 102400;
-    if (length($txt) > $max_bytes) {
-        warn "OSC 52: payload exceeds max size (" . length($txt) . " > $max_bytes), dropping\n";
+    if (length($bytes) > $max_bytes) {
+        warn "OSC 52: payload exceeds max size (" . length($bytes) . " > $max_bytes), dropping\n";
         return;
+    }
+
+    # CRITICAL: Decode the raw UTF-8 bytes into a character string BEFORE
+    # passing to GTK's clipboard. decode_base64 returns bytes with no UTF8
+    # flag; if we pass that directly to Gtk3::Clipboard->set_text, the
+    # GLib Perl binding interprets each byte as a Latin-1 character and
+    # re-encodes to UTF-8, producing mojibake for any non-ASCII content
+    # (e.g. box-drawing chars '│' become 'â'). The existing Asbru clipboard
+    # code at lines 1244-1248 doesn't hit this because it gets a pre-flagged
+    # character string from VTE's wait_for_text() — we have to match that
+    # by decoding here.
+    my $txt;
+    eval { $txt = Encode::decode('UTF-8', $bytes, Encode::FB_DEFAULT); };
+    if ($@ || !defined $txt) {
+        # Not valid UTF-8 (rare for OSC 52 which is almost always text) —
+        # fall back to passing the raw bytes so we don't break binary use cases.
+        $txt = $bytes;
     }
 
     # Map OSC 52 target character to GTK clipboard atom:
