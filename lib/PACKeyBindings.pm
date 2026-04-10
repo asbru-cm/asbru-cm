@@ -516,8 +516,8 @@ sub _getDefaultConfig {
     $$cfg{'treeConnections'}{'Alt+f'}  = ['Connections Tree',  'add_favourite',       'Add connection to favourites'];
     $$cfg{'treeConnections'}{'Alt+F'}  = ['Connections Tree',  'del_favourite',       'Remove connection from favourites'];
     $$cfg{'treeConnections'}{'Ctrl+f'} = ['Connections Tree',  'find',                'Find in connection tree'];
-    $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree',  'expand_all',          'Expand tree completly'];
-    $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree',  'collaps_all',         'Collaps tree completly'];
+    $$cfg{'treeConnections'}{'Ctrl+r'} = ['Connections Tree',  'expand_all',          'Expand tree completely'];
+    $$cfg{'treeConnections'}{'Ctrl+t'} = ['Connections Tree',  'collaps_all',         'Collapse tree completely'];
     $$cfg{'treeConnections'}{'Ctrl+d'} = ['Connections Tree',  'clone',               'Clone connection'];
     $$cfg{'treeConnections'}{'Ctrl+c'} = ['Connections Tree',  'copy',                'Copy node'];
     $$cfg{'treeConnections'}{'Ctrl+x'} = ['Connections Tree',  'cut',                 'Cut node'];
