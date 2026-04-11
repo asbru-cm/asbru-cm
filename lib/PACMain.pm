@@ -55,6 +55,7 @@ use Gtk3 -init;
 
 # PAC modules
 use PACUtils;
+use PACWayland;
 use PACTray;
 use PACTerminal;
 use PACEdit;
@@ -192,6 +193,17 @@ sub new {
 
     # Test Vte Capabilities
     _setVteCapabilities($self);
+
+    # Wayland detection — log session type and ensure GDK_BACKEND=x11 so
+    # GtkSocket-based RDP/VNC embedding works through Xwayland
+    if ($$self{_VERBOSE}) {
+        print STDERR "INFO: Display session: " . PACWayland::status_line() . "\n";
+    }
+    if ( PACWayland::is_wayland() && ( $ENV{GDK_BACKEND} // '' ) ne 'x11' ) {
+        print STDERR "WARN: GDK_BACKEND is not 'x11' on a Wayland session — "
+                   . "RDP/VNC tab embedding may not work. "
+                   . "Launch via .desktop file or set GDK_BACKEND=x11.\n";
+    }
 
     # Auto-select dark theme when system prefers dark color scheme
     # and the user has not set a theme explicitly.

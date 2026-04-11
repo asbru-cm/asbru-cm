@@ -42,6 +42,7 @@ use IO::Socket::INET;
 use Encode;
 use PACKeePass;
 use PACUtils;
+use PACWayland;
 use POSIX qw(strftime);
 
 use Gtk3;
@@ -1219,6 +1220,23 @@ if (defined $METHOD) {
         $HIDE_TERMINAL = 1;
         $METHOD = $1;
         _setProxy('RDP');
+
+        # Wayland: auto-upgrade rdesktop → xfreerdp for reliable embedding.
+        # rdesktop's -X flag is X11-only and fragile under Xwayland.
+        my $_rdp_wayland_upgrade = PACWayland::rdp_client_for_wayland($METHOD);
+        if ($_rdp_wayland_upgrade ne $METHOD) {
+            if ($DEBUG) {
+                print "$COLOR{'log'}INFO: Wayland session — upgrading RDP client: $METHOD → $_rdp_wayland_upgrade$COLOR{'norm'}\n";
+            }
+            $METHOD = $_rdp_wayland_upgrade;
+        }
+
+        # XID safety: guard against impossible geometry (Xwayland timing issues)
+        if (defined $$CFG{'tmp'}{'xid'}) {
+            $$CFG{'tmp'}{'width'}  = 1024 if ($$CFG{'tmp'}{'width'}  // 0) < 200;
+            $$CFG{'tmp'}{'height'} = 768  if ($$CFG{'tmp'}{'height'} // 0) < 150;
+        }
+
         if ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD eq 'rdesktop')) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1227,8 +1245,10 @@ if (defined $METHOD) {
                     $$CFG{'tmp'}{'height'} = $Xheight;
                 }
             }
-            $connection_cmd = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
-            $connection_txt = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
+            # Extra Wayland/Xwayland performance flags for rdesktop
+            my $_rdp_wayland_extra = PACWayland::wayland_rdesktop_opts();
+            $connection_cmd = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $_rdp_wayland_extra $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
+            $connection_txt = "$METHOD -X $$CFG{'tmp'}{'xid'} -g $$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $_rdp_wayland_extra $CONNECT_OPTS" . ($MANUAL ? '' : " -u $USER -p -") . " $IP:$PORT";
         } elsif ((defined $$CFG{'tmp'}{'xid'}) && ($METHOD =~ /^.*freerdp$/)) {
             if ($module_guitest eq 'Y') {
                 my ($xpos, $ypos, $Xwidth, $Xheight, $borderWidth, $_screen) = GetWindowPos($$CFG{'tmp'}{'xid'});
@@ -1245,8 +1265,11 @@ if (defined $METHOD) {
             if ($$CFG{'tmp'}{'height'} <= 1) {
                 $$CFG{'tmp'}{'height'} = 768;
             }
-            $connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
-            $connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'<<hidden_password>>'") . " /v:$IP:$PORT";
+            # /wm-class gives each session a unique X11 class name so multiple
+            # simultaneous RDP windows can be identified without XID collisions
+            my $_wm_class = "/wm-class:asbru-rdp-$UUID";
+            $connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} $_wm_class /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
+            $connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} $_wm_class /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'<<hidden_password>>'") . " /v:$IP:$PORT";
         } elsif (defined $$CFG{'tmp'}{'xid'}) {
             $connection_cmd = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'$PASS'") . " /v:$IP:$PORT";
             $connection_txt = "$METHOD /parent-window:$$CFG{'tmp'}{'xid'} /size:$$CFG{'tmp'}{'width'}x$$CFG{'tmp'}{'height'} $CONNECT_OPTS" . ($MANUAL ? '' : " /u:'$USER' /p:'<<hidden_password>>'") . " /v:$IP:$PORT";
