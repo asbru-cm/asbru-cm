@@ -1,6 +1,6 @@
 # This Dockerfile should be ran from the project's root directory as context path.
 
-FROM alpine:3.13 AS base
+FROM alpine:3.20 AS base
 
 WORKDIR /
 
@@ -15,11 +15,9 @@ RUN apk --no-cache add \
     # Perls
     perl perl-socket6 perl-yaml perl-crypt-cbc perl-glib perl-crypt-rijndael perl-xml-parser perl-io-tty perl-hash-merge-simple \
     # Libs
-    libffi pango gtk+3.0 libcanberra-gtk3 gdk-pixbuf librsvg libwnck3 libx11 libxt libxtst dbus-x11 libuuid gobject-introspection libappindicator \
+    libffi pango gtk+3.0 libcanberra-gtk3 gdk-pixbuf librsvg libwnck3 libx11 libxt libxtst dbus-x11 libuuid gobject-introspection \
     # Binaries (with libs maybe)
     busybox-extras openssl openssh-client lftp vte3 expect bash \
-    # Fonts
-    ttf-ubuntu-font-family \
     # Icons
     adwaita-icon-theme \
     # Virtual
@@ -78,8 +76,8 @@ RUN cpanm --install Data::UUID
 FROM cpan-installer AS stripped-builder
 RUN apk --no-cache del cpanm-installer-packages-step builder-packages-step
 
-FROM common AS merged-buildlibs
 # Copy built libs, merging with common libs.
+FROM common AS merged-buildlibs
 COPY --from=stripped-builder /lib/. /lib/
 COPY --from=stripped-builder /usr/lib/. /usr/lib/
 COPY --from=stripped-builder /usr/local/lib/. /usr/local/lib/
@@ -87,29 +85,11 @@ COPY --from=stripped-builder /usr/local/share/. /usr/local/share/
 COPY --from=stripped-builder /usr/share/. /usr/share/
 COPY --from=stripped-builder /etc/. /etc/
 
-FROM common AS appimage-tools
 # Install some needed stuff for AppImage packaging
-
+FROM common AS appimage-tools
 RUN wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage" && \
     chmod +x "appimagetool-x86_64.AppImage"
-
 RUN apk add fuse file appstream dos2unix patchelf
-
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-
-RUN wget "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-2.34-r0.apk" && \
-    apk add glibc-2.34-r0.apk
-
-RUN wget "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-bin-2.34-r0.apk" && \
-    apk add glibc-bin-2.34-r0.apk
-
-RUN wget "https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-i18n-2.34-r0.apk" && \
-    apk add glibc-i18n-2.34-r0.apk
-
-RUN /usr/glibc-compat/bin/localedef -i en_US -f UTF-8 en_US.UTF-8
-
-#RUN apk add gcompat
-
 FROM appimage-tools AS appimage-assembler
 
 # Create appimage dir
