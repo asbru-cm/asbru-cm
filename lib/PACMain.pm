@@ -4385,7 +4385,7 @@ sub __dupNodes {
 
     # Generate a new UUID for the copied element
     my $new_uuid = Data::UUID->new();
-    my $new_txt_uuid = lc($uuid->create_str());
+    my $new_txt_uuid = lc($new_uuid->create_str());
     undef $new_uuid;
 
     # Clone the node with the NEW UUID
