@@ -49,13 +49,10 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Delete old snapshot release assets
-        run: |
-          gh release view snapshot --json assets --jq '.assets[].id' 2>/dev/null | \
-            xargs -I{} gh api --method DELETE /repos/${{ github.repository }}/releases/assets/{}
+      - name: Delete old snapshot release
+        run: gh release delete snapshot --yes --cleanup-tag 2>/dev/null || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Collect and rename release packages
         run: |
