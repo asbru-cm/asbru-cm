@@ -134,11 +134,18 @@ sub set_passive() {
 sub _initGUI {
     my $self = shift;
 
-    $$self{_TRAY} = Gtk3::StatusIcon->new_from_file($TRAYICON) or die "ERROR: Could not create tray icon: $!";
-    # Tray available (not Gnome-shell)?
-    $$self{_TRAY}->set_property('tooltip-markup', "<b>$APPNAME</b> (v.$APPVERSION)");
-    $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
-    $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = $$self{_TRAY}->is_embedded() ? 1 : 'warning';
+    eval {
+        $$self{_TRAY} = Gtk3::StatusIcon->new_from_file($TRAYICON);
+        $$self{_TRAY}->set_property('tooltip-markup', "<b>$APPNAME</b> (v.$APPVERSION)");
+        $$self{_TRAY}->set_visible($$self{_MAIN}{_CFG}{defaults}{'show tray icon'});
+        $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = $$self{_TRAY}->is_embedded() ? 1 : 'warning';
+    };
+    if ($@) {
+        if ($$self{_MAIN}{_VERBOSE}) {
+            print STDERR "INFO: Gtk3::StatusIcon not available (deprecated in GTK 3.14+): $@\n";
+        }
+        $$self{_MAIN}{_CFG}{'tmp'}{'tray available'} = 0;
+    }
 
     return 1;
 }
