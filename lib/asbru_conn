@@ -197,8 +197,7 @@ my $LOG_FH;
 # ============================================================================
 {
     my $osc52_buf    = '';
-    # TEMPORARY: PoC default, revert to 0 for production
-    my $osc52_active = $$CFG{'defaults'}{'allow osc52 write'} // 1;
+    my $osc52_active = $$CFG{'defaults'}{'allow osc52 write'} // 0;
     my $osc52_max    = $$CFG{'defaults'}{'osc52 max bytes'}   // 102400;
 
     # Open our own filehandle for session logging. This REPLACES the bareword
@@ -1201,6 +1200,17 @@ sub _osc52_scan_chunk {
 
         # Size cap on the pre-decode base64 string
         next if length($payload) > $max_bytes;
+
+        # Debug logging — set ASBRU_OSC52_DEBUG=1 to log every matched sequence
+        # to /tmp/asbru_osc52_debug.log (for user support / bug reports).
+        if ($ENV{'ASBRU_OSC52_DEBUG'}) {
+            if (open(my $dbg, '>>', '/tmp/asbru_osc52_debug.log')) {
+                my $ts = POSIX::strftime('%Y-%m-%d %H:%M:%S', localtime());
+                printf $dbg "[%s] MATCH targets='%s' payload_len=%d payload='%s'\n",
+                    $ts, $targets, length($payload), $payload;
+                close $dbg;
+            }
+        }
 
         # Dispatch via existing ctrl() channel — verbatim base64 string.
         # PACTerminal's _handleOsc52Payload decodes it ONCE (no re-encoding
