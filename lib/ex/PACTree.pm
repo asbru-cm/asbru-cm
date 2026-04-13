@@ -3,7 +3,7 @@ package PACTree;
 ###############################################################################
 # This file is part of Ásbrú Connection Manager
 #
-# Copyright (C) 2017-2025 Ásbrú Connection Manager team (https://asbru-cm.net)
+# Copyright (C) 2017-2026 Ásbrú Connection Manager team (https://asbru-cm.net)
 #
 # Ásbrú Connection Manager is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by
@@ -71,17 +71,20 @@ sub _getSelectedTerminals {
     my $selection = $self->get_selection();
     my $model = $self->get_model();
     my @paths = _getSelectedRows($selection);
-    my %selected;
+    my @selected;
 
     foreach my $path (@paths) {
         my $name = $model->get_value($model->get_iter($path), 1);
         my $uuid = $model->get_value($model->get_iter($path), 2);
         $name =~s /<.+?> *//g;
-        $selected{name} = $name;
-        $selected{uuid} = $uuid;
+
+        push(@selected, {
+            'name' => $name,
+            'uuid' => $uuid
+        });
     }
 
-    return \%selected;
+    return @selected;
 }
 
 sub _getChildren {
