@@ -4685,10 +4685,10 @@ sub _zoomHandler {
 
     if ($action eq 'zoomin') {
         $zoom = 1;
-        $scale += 0.1;
+        $scale = (100*$scale + 10)/100;
     } elsif ($action eq 'zoomout') {
         $zoom = 1;
-        $scale -= 0.1;
+        $scale = (100*$scale - 10)/100;
     } elsif ($action eq 'zoomreset') {
         $zoom = 1;
         $scale = 1;
