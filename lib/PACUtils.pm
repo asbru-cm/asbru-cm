@@ -2163,6 +2163,13 @@ sub _cfgSanityCheck {
     $$cfg{'defaults'}{'append group name'} //= 1;
     $$cfg{'defaults'}{'when no more tabs'} //= 0;
     $$cfg{'defaults'}{'selection to clipboard'} //= 1;
+    # OSC 52 clipboard support — opt-in for security.
+    # Remote programs (tmux, vim, etc.) can write to the local clipboard only
+    # when the user explicitly enables this in Preferences → General.
+    # The ASBRU_OSC52_DISABLE env var overrides the config (kill-switch).
+    $$cfg{'defaults'}{'allow osc52 write'}   //= 0;      # opt-in; user enables in Preferences
+    $$cfg{'defaults'}{'osc52 max bytes'}     //= 102400; # 100 KB per-sequence cap
+    $$cfg{'defaults'}{'osc52 notifications'} //= 0;      # transient notification on write (future)
     $$cfg{'defaults'}{'remove control chars'} //= 0;
     $$cfg{'defaults'}{'allow more instances'} //= 0;
     $$cfg{'defaults'}{'show favourites in unity'} //= 0;

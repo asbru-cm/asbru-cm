@@ -181,6 +181,75 @@ my $SOCK_FILE = $$CFG{'tmp'}{'socket'};
 my $SOCK_EXEC_FILE = $$CFG{'tmp'}{'socket exec'};
 my $REMOVE_CTRL_CHARS = $$CFG{'environments'}{$UUID}{'save session logs'} ? $$CFG{'environments'}{$UUID}{'remove control chars'} : $$CFG{'defaults'}{'remove control chars'};
 my $LOG_TIMESTAMP = $$CFG{'environments'}{$UUID}{'log timestamp'} ? $$CFG{'environments'}{$UUID}{'log timestamp'} : $$CFG{'defaults'}{'log timestamp'};
+
+# ============================================================================
+# File-scoped log filehandle — allows both the wrapper closure below AND
+# sub close_log_file() to access the same handle (v3.2 Erratum B.1).
+# ============================================================================
+my $LOG_FH;
+
+# ============================================================================
+# v3 OSC 52 + session-log wrapper installer
+# Installed HERE (after $LOG_TIMESTAMP at line 183) so that the log_file
+# coderef covers the ENTIRE session lifetime — including pre-login expect()
+# chains that run before the SSH spawn (critic-v2 blocker #1 fix).
+# Must run before any $EXP->expect() call.
+# ============================================================================
+{
+    my $osc52_buf    = '';
+    my $osc52_active = $$CFG{'defaults'}{'allow osc52 write'} // 0;
+    my $osc52_max    = $$CFG{'defaults'}{'osc52 max bytes'}   // 102400;
+
+    # Open our own filehandle for session logging. This REPLACES the bareword
+    # LOG handle that the original block at lines 1363–1375 opened, so that
+    # close_log_file() can use $LOG_FH instead of the bareword LOG.
+    # Truncate mode ('>') matches original behavior (v3.1 Erratum 3).
+    if (defined $LOG_FILE && $LOG_FILE ne '') {
+        if (open(my $fh, '>:raw', $LOG_FILE)) {
+            $LOG_FH = $fh;
+        } else {
+            print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
+        }
+    }
+
+    my $logger = sub {
+        my ($chunk) = @_;   # Expect calls this with only the chunk
+
+        # (a) Mirror chunk to session log — replaces Expect's native file
+        #     handling and the old logTime sub (v3.2 Erratum B.2).
+        if (defined $LOG_FH) {
+            eval {
+                if ($LOG_TIMESTAMP) {
+                    my $t = encode('utf8', strftime("%Y-%m-%d %H:%M:%S", localtime()));
+                    print $LOG_FH "$t : $chunk";
+                    print $LOG_FH "\n" unless $chunk =~ /[\n\r]$/;
+                } else {
+                    print $LOG_FH $chunk;
+                }
+            };
+            # Intentionally swallow log-write errors so a broken log
+            # never kills the SSH session.
+        }
+
+        # (b) Kill-switch: env var or config flag disables OSC 52 scanning
+        return if $ENV{'ASBRU_OSC52_DISABLE'} && $ENV{'ASBRU_OSC52_DISABLE'} eq '1';
+        return unless $osc52_active;
+
+        # (c) OSC 52 scanner — wrapped in eval so scanner bugs never crash
+        #     asbru_conn (defense-in-depth).
+        eval {
+            _osc52_scan_chunk(\$osc52_buf, $chunk, $osc52_max);
+        };
+        if ($@) {
+            print STDERR "asbru_conn: OSC 52 scanner error: $@\n" if $DEBUG;
+        }
+
+        return;
+    };
+
+    $EXP->log_file($logger);
+}
+
 my $LPORT;
 
 if (!$RESTART && $IS_CLUSTER) {
@@ -1072,11 +1141,99 @@ sub _hardClose {
     return 0;
 }
 
-sub logTime {
-    my $t = encode('utf8',strftime "%Y-%m-%d %H:%M:%S", localtime());
-    print LOG "$t : $_[0]";
-    if ($_[0] !~ /\n|\r$/) {
-        print LOG "\n";
+# sub logTime deleted (v3.2 Erratum B.2): timestamp formatting is now
+# inlined in the v3 log_file wrapper closure above. No other callers.
+
+# ============================================================================
+# _osc52_scan_chunk — v3.1 OSC 52 scanner (with smarter holdback)
+#
+# Scans terminal output for OSC 52 escape sequences and dispatches the
+# base64 payload to PACTerminal via the existing ctrl() Unix-socket channel.
+#
+# Args:
+#   $buf_ref   — reference to the closure-scoped rolling buffer (SCALAR ref)
+#   $chunk     — new bytes just read from the PTY
+#   $max_bytes — maximum accepted base64 payload length (pre-decode)
+#
+# Security notes:
+#   - Validates base64 alphabet strictly; also defends against
+#     PAC_MSG_START[ / ]PAC_MSG_END injection since '[' and ']' are not
+#     in the base64 alphabet
+#   - Drops query form (52;c;?) — never exfiltrates clipboard contents
+#   - 16 MiB absolute cap prevents DoS via unterminated sequence
+# ============================================================================
+sub _osc52_scan_chunk {
+    my ($buf_ref, $chunk, $max_bytes) = @_;
+
+    # Absolute wall: prevent unbounded buffer growth when an attacker sends
+    # \x1b]52;c; and never sends a terminator.
+    my $ABS_CAP = 16 * 1024 * 1024;  # 16 MiB
+
+    $$buf_ref .= $chunk;
+
+    if (length($$buf_ref) > $ABS_CAP) {
+        # Reset — keep a tail of 1 KB in case we are mid-sequence at the wall
+        $$buf_ref = substr($$buf_ref, -1024);
+        return;
+    }
+
+    # Match complete OSC 52 sequences:
+    #   ESC ] 52 ; <targets> ; <payload> <BEL or ESC-backslash>
+    # Non-greedy payload match stops at the first valid terminator.
+    while ($$buf_ref =~ s/\x1b\]52;([cps0-7pq]*);([^\x07\x1b]*?)(?:\x07|\x1b\\)//) {
+        my ($targets, $payload) = ($1, $2);
+
+        # Per OSC 52 spec (xterm ctlseqs), an empty targets field means
+        # "use default", which is 'c' (CLIPBOARD). tmux sends empty targets
+        # by default when forwarding mouse selections — this is the common
+        # case and must be accepted, not dropped.
+        $targets = 'c' if $targets eq '';
+
+        # Drop the query form — exfiltration vector, never honour
+        next if $payload eq '?';
+
+        # Strict base64 alphabet check.
+        # Also provides structural PAC_MSG_START[ / ]PAC_MSG_END injection
+        # defense: '[' and ']' are not valid base64 characters so neither
+        # marker can survive this check.
+        next unless $payload =~ /\A[A-Za-z0-9+\/=]*\z/;
+
+        # Size cap on the pre-decode base64 string
+        next if length($payload) > $max_bytes;
+
+        # Debug logging — set ASBRU_OSC52_DEBUG=1 to log every matched sequence
+        # to /tmp/asbru_osc52_debug.log (for user support / bug reports).
+        if ($ENV{'ASBRU_OSC52_DEBUG'}) {
+            if (open(my $dbg, '>>', '/tmp/asbru_osc52_debug.log')) {
+                my $ts = POSIX::strftime('%Y-%m-%d %H:%M:%S', localtime());
+                printf $dbg "[%s] MATCH targets='%s' payload_len=%d payload='%s'\n",
+                    $ts, $targets, length($payload), $payload;
+                close $dbg;
+            }
+        }
+
+        # Dispatch via existing ctrl() channel — verbatim base64 string.
+        # PACTerminal's _handleOsc52Payload decodes it ONCE (no re-encoding
+        # here; critic-v2 blocker #2 fix).
+        ctrl("OSC52:$targets:$payload");
+    }
+
+    # Holdback management (v3.1 Erratum 4 — smarter index-based logic):
+    # Only trim when there is DEFINITELY no partial OSC 52 sequence anywhere
+    # in the buffer. This avoids silent data loss on mid-payload splits.
+    if (length($$buf_ref) > 1024) {
+        my $osc52_start = index($$buf_ref, "\x1b]52;");
+        if ($osc52_start < 0) {
+            # No partial sequence anywhere — keep only the last 16 bytes
+            # (generous margin for the 6-byte partial prefix "\x1b]52;c").
+            $$buf_ref = substr($$buf_ref, -16);
+        } elsif ($osc52_start > 1024) {
+            # Partial sequence exists but there is >1 KB of junk before it —
+            # drop the junk, keep everything from the partial sequence onward.
+            $$buf_ref = substr($$buf_ref, $osc52_start);
+        }
+        # Otherwise: partial sequence is within the first 1 KB — leave the
+        # buffer alone; the scanner will complete the match on the next chunk.
     }
 }
 
@@ -1360,19 +1517,11 @@ if ($GETCMD) {
     exit 0;
 }
 
-# Set log file
-# Only if the target directory is writable; if not writable, we can silently ignore the erroneous log file since the warning has already been raised in the main application
-
-if (open(LOG,">:raw",$LOG_FILE)) {
-    if ($LOG_TIMESTAMP) {
-        $EXP->log_file(\&logTime);
-    } else {
-        close LOG;
-        $EXP->log_file($LOG_FILE);
-    }
-} else {
-    print "\n$COLOR{'err'}ERROR: could not open log file :$LOG_FILE$COLOR{'norm'}\n(check path and permissions)\n\n";
-}
+# NOTE: The log file install block that used to be here (original lines
+# 1363–1375) has been DELETED (v3.1 Erratum 2 / v3.2 Erratum B.2).
+# Session logging is now handled by the v3 log_file wrapper closure
+# installed at the top of the script (after $LOG_TIMESTAMP, line ~184).
+# That closure opens $LOG_FH and handles both timestamped and plain logging.
 
 # Prepare command file that is only accessible to the user
 my $do_connection_cmd = $connection_cmd;
@@ -2274,9 +2423,15 @@ exit 0;
 sub close_log_file {
     my $line;
 
-    if ($LOG_TIMESTAMP) {
-        close LOG;
+    # Close our file-scoped log handle (replaces the bareword LOG handle that
+    # the original install block at lines 1363-1375 used). The $LOG_TIMESTAMP
+    # guard is no longer needed because $LOG_FH is opened unconditionally by
+    # the v3 wrapper installer (v3.2 Erratum B.3).
+    if (defined $LOG_FH) {
+        close $LOG_FH;
+        $LOG_FH = undef;
     }
+
     if (!$LOG_FILE || !$REMOVE_CTRL_CHARS) {
         return 1;
     }
