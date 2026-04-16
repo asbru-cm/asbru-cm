@@ -2482,7 +2482,9 @@ sub _setTabColour {
 
     # Set correct icon for hide/show button bar button
     # (it may have changed in another terminal)
-    $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+    if ($$self{_GUI}{btnShowButtonBar}) {
+        $$self{_GUI}{btnShowButtonBar}->set_image(Gtk3::Image->new_from_stock($$self{_CFG}{'defaults'}{'auto hide button bar'} ? 'asbru-buttonbar-show' : 'asbru-buttonbar-hide', 'GTK_ICON_SIZE_BUTTON'));
+    }
 
     # Once checked the availability of new data, reset its value
     $$self{_NEW_DATA} = 0;
