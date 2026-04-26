@@ -2046,16 +2046,19 @@ sub _setupCallbacks {
         if (!$tree->_getSelectedUUIDs()) {
             return 1;
         }
+        my $c = 0;
         foreach my $t ($tree->_getSelectedTerminals()) {
             if (($$self{_CFG}{'environments'}{$$t{uuid}}{'_is_group'}) || ($$t{uuid} eq '__PAC__ROOT__')) {
                 my @children = $$self{_GUI}{treeConnections}->_getChildren($$t{uuid}, 0, 1, 1);
                 foreach my $child (@children) {
                     if (!$$self{_CFG}{'environments'}{$$child{uuid}}{'_is_group'}) {
-                        $tmp{$$child{name}} = $$child{uuid};
+                        $tmp{"$$child{name}+$c"} = $$child{uuid};
+                        $c++;
                     }
                 }
             } else {
-                $tmp{$$t{name}} = $$t{uuid};
+                $tmp{"$$t{name}+$c"} = $$t{uuid};
+                $c++;
             }
         }
         foreach my $k (sort keys %tmp) {
