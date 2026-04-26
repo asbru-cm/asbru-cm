@@ -31,13 +31,16 @@ cp -r "dist/${PACKAGE}/"* .
 
 mkdir -p build
 
+echo "Preparing packpack..."
+if [ ! -d "./packpack" ]; then
+  git clone https://github.com/packpack/packpack.git packpack
+fi
+
 if [ "${PACKAGE}" = "deb" ]; then
   echo "Building Debian package for ${OS}/${DIST}..."
-  git clone https://github.com/packpack/packpack.git packpack
   ./packpack/packpack
 elif [ "${PACKAGE}" = "rpm" ]; then
   echo "Building RPM package for ${OS}/${DIST}..."
-  git clone https://github.com/packpack/packpack.git packpack
   ./packpack/packpack
 else
   echo "Unknown PACKAGE=${PACKAGE}. Expected 'deb' or 'rpm'."
