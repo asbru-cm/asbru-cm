@@ -1296,17 +1296,8 @@ sub _setupCallbacks {
                 my $control = $state * ['control-mask'];
 
                 if ($event->button eq 1 && $control) {
-                    my $obj = $$self{_TABBED} ? $$self{_NOTEBOOKWINDOW} : $$self{_WINDOWTERMINAL};
-                    my ($w, $h)     = $obj->get_size();
-                    my ($row, $col) = (int($event->y / $$self{_GUI}{_VTE}->get_char_height()), int($event->x / $$self{_GUI}{_VTE}->get_char_width()));
-                    my $rows = $$self{_GUI}{_VTE}->get_row_count() - 1;
-                    my ($ccol, $crow) = $$self{_GUI}{_VTE}->get_cursor_position();
-                    if ($crow > $rows) {
-                        $row += $crow - $rows;
-                    }
-                    my ($string, $l) = $$self{_GUI}{_VTE}->get_text_range_format('VTE_FORMAT_TEXT', $row, 0, $row, int($w / $$self{_GUI}{_VTE}->get_char_width()));
-                    if ($string =~ /$URL_REGEX/ && $col >= $-[0] && $col < $+[1]) {
-                        my $url = $1;
+                    my ($url, $tagid) = $$self{_GUI}{_VTE}->match_check_event($event);
+                    if ($url) {
                         Gtk3::show_uri_on_window(undef, $url, time);
                     }
                 }
