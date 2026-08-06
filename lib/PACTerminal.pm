@@ -449,6 +449,12 @@ sub start {
         $spawn_env = "";
     }
     $spawn_env .= " ASBRU_SUB_CWD='$subCwd'";
+    # NEW — Propagate OSC 52 kill-switch if the user set it in their shell
+    # (v3 Fix 1: _convertEnv only parses explicitly listed env vars, so we
+    # must append the kill-switch here for it to reach asbru_conn).
+    if (defined $ENV{'ASBRU_OSC52_DISABLE'} && $ENV{'ASBRU_OSC52_DISABLE'} eq '1') {
+        $spawn_env .= " ASBRU_OSC52_DISABLE='1'";
+    }
     my @arr_spawn_env = $self->_convertEnv($spawn_env);
     my $spawnSyncResult = undef;
     eval {
@@ -1556,6 +1562,10 @@ sub _watchConnectionData {
         } elsif ($data =~ /^PAC_CONN_MSG:(.+)/go) {
             _wMessage($$self{_PARENTWINDOW}, $1, 1);
             next;
+        } elsif ($data =~ /^OSC52:([cps0-7pq]+):(.+)$/o) {
+            # NEW — v3 OSC 52 clipboard dispatch (v3.1 Erratum 1: PAC_CONN_MSG, not PAC_MSG_CONN_MSG)
+            my ($targets, $b64) = ($1, $2);
+            $self->_handleOsc52Payload($targets, $b64);
         } elsif ($data eq 'RESTART') {
             $$self{_RESTART} = 1;
         } elsif ($data =~ /^CHAIN:(.+):(.+):(.+):(.+)/go) {
@@ -4518,6 +4528,77 @@ sub _zoomHandler {
     }
 
     return 0;
+}
+
+sub _handleOsc52Payload {
+    my ($self, $targets, $b64) = @_;
+
+    # Defense in depth: re-check the feature flag on the main-process side.
+    # (asbru_conn already checked, but PACTerminal is the trust boundary.)
+    return unless $$self{_CFG}{'defaults'}{'allow osc52 write'};
+
+    # Lazy-load MIME::Base64 with graceful degradation.
+    # MIME::Base64 ships with standard Perl (no extra package needed).
+    eval { require MIME::Base64; };
+    if ($@) {
+        warn "OSC 52: MIME::Base64 not available, clipboard write skipped\n";
+        return;
+    }
+
+    # Decode base64 EXACTLY ONCE — ctrl() carried the verbatim base64 string.
+    # (critic-v2 blocker #2: no "double decode"; asbru_conn sent raw base64.)
+    # Note: decode_base64 returns a RAW BYTE string with no UTF8 flag set.
+    my $bytes;
+    eval { $bytes = MIME::Base64::decode_base64($b64); };
+    if ($@ || !defined $bytes) {
+        warn "OSC 52: base64 decode failed, dropping sequence\n";
+        return;
+    }
+
+    # Size cap — defense in depth (asbru_conn capped the pre-decode length,
+    # we verify the post-decode length here too).
+    my $max_bytes = $$self{_CFG}{'defaults'}{'osc52 max bytes'} // 102400;
+    if (length($bytes) > $max_bytes) {
+        warn "OSC 52: payload exceeds max size (" . length($bytes) . " > $max_bytes), dropping\n";
+        return;
+    }
+
+    # CRITICAL: Decode the raw UTF-8 bytes into a character string BEFORE
+    # passing to GTK's clipboard. decode_base64 returns bytes with no UTF8
+    # flag; if we pass that directly to Gtk3::Clipboard->set_text, the
+    # GLib Perl binding interprets each byte as a Latin-1 character and
+    # re-encodes to UTF-8, producing mojibake for any non-ASCII content
+    # (e.g. box-drawing chars '│' become 'â'). The existing Asbru clipboard
+    # code at lines 1244-1248 doesn't hit this because it gets a pre-flagged
+    # character string from VTE's wait_for_text() — we have to match that
+    # by decoding here.
+    my $txt;
+    eval { $txt = Encode::decode('UTF-8', $bytes, Encode::FB_DEFAULT); };
+    if ($@ || !defined $txt) {
+        # Not valid UTF-8 (rare for OSC 52 which is almost always text) —
+        # fall back to passing the raw bytes so we don't break binary use cases.
+        $txt = $bytes;
+    }
+
+    # Map OSC 52 target character to GTK clipboard atom:
+    #   'c', 's', '0'..'7'  → CLIPBOARD (primary system clipboard)
+    #   'p'                  → PRIMARY   (X11 primary selection)
+    # For mixed targets like "cp", prefer CLIPBOARD.
+    my $atom_name = 'CLIPBOARD';
+    if ($targets =~ /p/ && $targets !~ /c/) {
+        $atom_name = 'PRIMARY';
+    }
+
+    # Use the byte-length idiom from the existing clipboard code (PACTerminal
+    # lines ~1245-1248) to get the correct byte count for set_text().
+    use bytes;
+    my $blen = length($txt);
+    no bytes;
+
+    my $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern($atom_name, 0));
+    $clipboard->set_text($txt, $blen);
+
+    return 1;
 }
 
 sub _pasteConnectionPassword {

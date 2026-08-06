@@ -4300,6 +4300,24 @@ If you have the option "Automatically save every configuration change" checked, 
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkCheckButton" id="cbCfgAllowOsc52Write">
+                            <property name="label" translatable="yes">Allow OSC 52 clipboard writes (tmux / remote terminals)</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="tooltip_text" translatable="yes">Lets remote programs (e.g. tmux mouse-select, Neovim) write to the local clipboard via OSC 52 escape sequences. Disable when connecting to untrusted hosts.</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkCheckButton" id="cbCfgAllowMoreInstances">
                             <property name="label" translatable="yes">Allow more than one instance to run at the same time</property>
                             <property name="use_action_appearance">False</property>
@@ -4313,7 +4331,7 @@ If you have the option "Automatically save every configuration change" checked, 
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">1</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>

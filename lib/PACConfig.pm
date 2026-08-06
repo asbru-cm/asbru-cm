@@ -863,6 +863,7 @@ sub _updateGUIPreferences {
     _($self, 'rbOnNoTabsClose')->set_active($$cfg{'defaults'}{'when no more tabs'} == 1);
     _($self, 'rbOnNoTabsHide')->set_active($$cfg{'defaults'}{'when no more tabs'} == 2);
     _($self, 'cbCfgSelectionToClipboard')->set_active($$cfg{'defaults'}{'selection to clipboard'});
+    _($self, 'cbCfgAllowOsc52Write')->set_active($$cfg{'defaults'}{'allow osc52 write'});
     _($self, 'cbCfgRemoveCtrlCharsConf')->set_active($$cfg{'defaults'}{'remove control chars'});
     _($self, 'cbCfgLogTimestam')->set_active($$cfg{'defaults'}{'log timestamp'});
     _($self, 'cbCfgAllowMoreInstances')->set_active($$cfg{'defaults'}{'allow more instances'});
@@ -1179,6 +1180,7 @@ sub _saveConfiguration {
     $$self{_CFG}{'defaults'}{'change main title'} = _($self, 'cbCfgChangeMainTitle')->get_active();
     $$self{_CFG}{'defaults'}{'when no more tabs'} = _($self, 'rbOnNoTabsNothing')->get_active() ? 'last' : 'next';
     $$self{_CFG}{'defaults'}{'selection to clipboard'} = _($self, 'cbCfgSelectionToClipboard')->get_active();
+    $$self{_CFG}{'defaults'}{'allow osc52 write'} = _($self, 'cbCfgAllowOsc52Write')->get_active();
     $$self{_CFG}{'defaults'}{'remove control chars'} = _($self, 'cbCfgRemoveCtrlCharsConf')->get_active();
     $$self{_CFG}{'defaults'}{'log timestamp'} = _($self, 'cbCfgLogTimestam')->get_active();
     $$self{_CFG}{'defaults'}{'allow more instances'} = _($self, 'cbCfgAllowMoreInstances')->get_active();

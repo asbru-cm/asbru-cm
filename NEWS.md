@@ -2,6 +2,23 @@
 
 Here you can find important news on the project
 
+## 12.04.2026
+
+- **OSC 52 clipboard support** — Remote programs running inside Ásbrú sessions (tmux
+  mouse-select, Neovim, Helix, etc.) can now write to the local system clipboard via
+  [OSC 52 escape sequences](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands).
+  This closes the long-standing [issue #631](https://github.com/asbru-cm/asbru-cm/issues/631).
+
+  **How to enable:** Preferences → General → *Allow OSC 52 clipboard writes (tmux / remote terminals)*.
+  The feature is **opt-in** (disabled by default) for security — enable it only when connecting
+  to hosts you trust.
+
+  **Kill-switch:** Set the environment variable `ASBRU_OSC52_DISABLE=1` before launching
+  Ásbrú to disable OSC 52 processing entirely, regardless of the Preferences setting.
+
+  **Debug logging:** Set `ASBRU_OSC52_DEBUG=1` to log every matched OSC 52 sequence to
+  `/tmp/asbru_osc52_debug.log` — useful when reporting issues.
+
 ## 04.04.2026
 
 After almost 4 years we are happy to release version 6.4.1 of Ásbrú Connection Manager.
