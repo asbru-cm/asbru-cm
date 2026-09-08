@@ -33,6 +33,22 @@ use warnings;
 
 use FindBin qw ($RealBin $Bin $Script);
 use lib $RealBin, "$RealBin/ex", "$RealBin/edit";
+
+my $ASBRU_SIGSET;
+BEGIN {
+    # Gtk3/GLib create worker threads (pool-spawner, gmain, gdbus). If a signal
+    # is delivered to one of those threads, the Perl handler runs without an
+    # interpreter context and segfaults (asbru-cm#1126).
+    # Block before loading Gtk3 so those threads inherit the mask; the main
+    # thread unblocks afterwards and becomes the only one that receives them.
+    require POSIX;
+    require Config;
+    my %no;
+    @no{split ' ', $Config::Config{sig_name}} = split ' ', $Config::Config{sig_num};
+    $ASBRU_SIGSET = POSIX::SigSet->new(map { $no{$_} } qw(WINCH USR1 USR2 HUP INT TERM QUIT));
+    POSIX::sigprocmask(POSIX::SIG_BLOCK(), $ASBRU_SIGSET);
+}
+
 use Storable qw (dclone thaw retrieve fd_retrieve nstore_fd);
 use Expect;
 use Glib::IO; # GSettings
@@ -45,6 +61,9 @@ use PACUtils;
 use POSIX qw(strftime);
 
 use Gtk3 '-init';
+
+# GLib threads already exist with the signals blocked; unblock on the main thread only
+POSIX::sigprocmask(POSIX::SIG_UNBLOCK(), $ASBRU_SIGSET);
 
 binmode STDOUT;
 binmode STDERR;
