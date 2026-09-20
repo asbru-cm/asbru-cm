@@ -11,7 +11,7 @@
 + __Use autossh__ : * Pending
 + __TAB/Window Title__ : The name will be assigned to this tab or window. (Useful for password managers, that use the window title to execute macros, or to identify each connection on the taskbar).
 + __Launch on start up__ : If this connection should be launched automatically each time Ásbrú starts for the first time.
-+ __Reconnecton on disconnection__ : If there is a remote disconnection, reconnect automatically.
++ __Reconnection on disconnection__ : If there is a remote disconnection, reconnect automatically.
 
 + __Authentication__
     - __KeePass button__ : If you have KeePass integration available, the button will be enabled. To see the use of this feature read [KeePass Integration](../Preferences/KeePassXC.md)
@@ -91,7 +91,7 @@ The connection __will not__ use the `-J` option from ssh. Instead, it will do th
 + Send an SSH connection string based on your connection settings
 
 !!! important "Important for this to work"
-    Because the connection now is stablished in the __Jump Server__ any keys, hostnames, etc. Has to be available in the Jump server environment for the destination connection to take place.
+    Because the connection now is established in the __Jump Server__ any keys, hostnames, etc. Has to be available in the Jump server environment for the destination connection to take place.
 
     So if you use a private key in your server, you need to provide the key in the destination server. And the path to that key has to be the connection.
 
@@ -105,43 +105,35 @@ This commands will be executed immediately __before__ (Pre) the connection is la
 
 ![](images/ssh9.png)
 
-This commands are executed in the local computer, not on the remote terminal.
+These commands are executed in the local computer, not on the remote terminal.
 
-You may add as many commands as needed.  When the option `Ask` is checked, Ásbrú will ask to confirm which command needs to be executed.  When the option `Default` is checked, the command will be proposed to be executed by default.  If both `Ask` and `Default` are unchecked, the command will never be executed.
+You may add as many commands as needed.  When the option `Ask` is checked, Ásbrú will ask to confirm if you want to execute the command when connecting.
+
+When the option `Wait` is checked, the command will be executed and Asbrú will wait until it finishes. Then connection process will procede.
+
+When the option `Wait` is unchecked, the command will be spawned on a new thread and the connection process will continue.
 
 !!! danger "Important"
     The terminal interaction and login will be frozen until the external application is finished. Or is demonized.
 
-**Variables**
+__Variables__
 
 Variable [substitution](../Substitutions.md) can be used to create dynamic commands.
 
-**Example 1**
+__Example 1__
 
-Before launching the terminal start a __local__ apache server
+Before launching the terminal start your vpn connection
+
+![](images/ssh9.png)
+
+When connecting you will see a message indicating the command execution and if it succeeded or failed.
 
 ![](images/exec9.png)
 
-**Example 2**
-
-After closing the terminal, execute `pdfshufler`
-
-![](images/exec10.png)
-
-Pre exec is configured to ask, is waiting for you to execute an available command from the list.
-
-![](images/exec11.png)
-
-Application is launched and the terminal waits for the end of the execution.
-
-![](images/exec12.png)
-
-We exit the terminal, the terminal is closed and the post exec command is executed.
-
-![](images/exec13.png)
-
 !!! tip "Possible uses"
-    Launch : an IDE, a Database Client (DBeaver), start a local scripts that uploads or downloads files, etc.
+    * connect to a vpn before connecting
+    * launch : an IDE or Database Client
+    * start local scripts that uploads or downloads files, or starts a virtual machine
 
 ## Expect
 

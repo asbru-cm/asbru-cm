@@ -3535,158 +3535,37 @@ sub _wPrePostExec {
     my $self = shift;
     my $when = shift;
 
-    if (!((defined $$self{_CFG}{'environments'}{$$self{_UUID}}{$when} && scalar(@{$$self{_CFG}{'environments'}{$$self{_UUID}}{$when}})))) {
+    if (!((defined $$self{_CFG}{'environments'}{ $$self{_UUID} }{$when} && scalar(@{ $$self{_CFG}{'environments'}{ $$self{_UUID} }{$when} })))) {
         return 1;
     }
-
-    # Build window
-    my %ppe = _ppeGUI($self);
-
-    # Empty the connections tree
-    @{$ppe{window}{gui}{treeview}{data}} = ();
-
-    # Populate the local executions tree
-    my $total = 0;
-    my $total_noask = 0;
-    my $total_ask = 0;
-    foreach my $hash (@{$$self{_CFG}{'environments'}{$$self{_UUID}}{$when}}) {
-        my $ask = $$hash{'ask'} || 0;
-        my $default = $$hash{'default'} || 0;
-        my $command = $$hash{'command'};
+    foreach my $hash (@{ $$self{_CFG}{'environments'}{ $$self{_UUID} }{$when} }) {
+        my $exit_code = 0;
+        my $ask       = $$hash{'ask'}     || 0;
+        my $wait      = $$hash{'default'} || 0;
+        my $command   = $$hash{'command'};
         if ($command eq '') {
             next;
         }
-
-        $total_noask += ! $ask;
-        $total_ask  += $ask;
-
-        push(@{$ppe{window}{gui}{treeview}{data}}, [$default, $command]);
-        ++$total;
-    }
-    if (!$total) {
-        return 1;
-    }
-
-    # Change mouse cursor (to busy) in VTE window
-    $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
-
-    # Now, prepare the local executions window, show it, AND stop until something clicked
-    $ppe{window}{data}->show_all();
-
-    if (($total_noask) && ! $total_ask) {
-        $ppe{window}{btnOk}->activate;
-        return 1;
-    }
-
-    if ($when eq 'local before') {
-        my $ok = $ppe{window}{data}->run;
-    }
-
-    return 1;
-
-    sub _execLocalPPE {
-        my $self = shift;
-        my %ppe = %{shift()};
-
-        # Get total # of commands checked to be executed (for the progress bar)
-        my $t = 0;
-        foreach my $line (@{$ppe{window}{gui}{treeview}{data}}) {
-            my ($def, $cmd) = @{$line};
-            $t += $def;
-        }
-
-        # Change mouse cursor (to busy)
-        $ppe{window}{data}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch'));
-        $ppe{window}{data}->set_sensitive(0);
-
-        my $i = 0;
-        foreach my $line (@{$ppe{window}{gui}{treeview}{data}}) {
-            my ($def, $cmd) = @{$line};
-
-            # Skip unchecked commands
-            if (!$def) {
+        if ($ask) {
+            if (!_wConfirm($$self{_WINDOWTERMINAL}, "Execute <b>'$command'</b> ?")) {
                 next;
             }
-
-            # Replace PAC variables with their corresponding values
-            $cmd = _subst($cmd, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
-
-            # Make some update to progress bar
-            $ppe{window}{gui}{pb}->set_text('Executing: ' . $cmd);
-            $ppe{window}{gui}{pb}->set_fraction(++$i / $t);
-            Gtk3::main_iteration while Gtk3::events_pending;
-
-            # Launch the local command
-            system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd");
         }
-
-        # Change mouse cursor (to normal)
-        $ppe{window}{data}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
-        $ppe{window}{data}->set_sensitive(1);
-
-        return 1;
+        _vteFeed($$self{_GUI}{_VTE}, "${COL_YELL}Execute:${COL_RESET} $command ");
+        my $cmd = _subst($command, $$self{_CFG}, $$self{_UUID}, $$self{_UUID_TMP});
+        # Launch the local command
+        if ($wait) {
+            $exit_code = system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd");
+        } else {
+            $exit_code = system("$ENV{'ASBRU_ENV_FOR_EXTERNAL'} $cmd > /dev/null 2>&1 &");
+        }
+        if ($exit_code) {
+            _vteFeed($$self{_GUI}{_VTE}, "${COL_RED}FAIL${COL_RESET}\r\n");
+        } else {
+            _vteFeed($$self{_GUI}{_VTE}, "${COL_GREEN}OK${COL_RESET}\r\n");
+        }
     }
-
-    sub _ppeGUI {
-        my $self = shift;
-
-        my %w;
-
-        # Create the dialog window,
-        $w{window}{data} = Gtk3::Dialog->new_with_buttons(
-            $self->{_NAME} . " : $APPNAME : Local execution",
-            $self->{_PARENTWINDOW},
-            'modal',
-        );
-        # and setup some dialog properties.
-        $w{window}{data}->set_default_response('ok');
-        $w{window}{data}->set_icon_from_file($APPICON);
-        $w{window}{data}->set_size_request(400, 300);
-        $w{window}{data}->set_resizable(1);
-        $w{window}{btnOk} = $w{window}{data}->add_button('_Ok' , 1);
-        $w{window}{btnCancel} = $w{window}{data}->add_button('_Cancel' , 0);
-
-        # Create frame
-        $w{window}{gui}{frame} = Gtk3::Frame->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{frame}, 1, 1, 0);
-        $w{window}{gui}{frame}->set_label('Select local command(s) to execute:');
-        $w{window}{gui}{frame}->set_border_width(5);
-
-        # Create a GtkScrolledWindow,
-        my $sct = Gtk3::ScrolledWindow->new();
-        $w{window}{gui}{frame}->add($sct);
-
-        $sct->set_shadow_type('none');
-        $sct->set_policy('automatic', 'automatic');
-
-        # Create treeview
-        $w{window}{gui}{treeview} = Gtk3::SimpleList->new_from_treeview (
-            Gtk3::TreeView->new(),
-            ' EXECUTE?' => 'bool',
-            ' LOCAL COMMAND' => 'text'
-        );
-        $sct->add($w{window}{gui}{treeview});
-
-        # Create progress bar
-        $w{window}{gui}{pb} = Gtk3::ProgressBar->new();
-        $w{window}{data}->get_content_area->pack_start($w{window}{gui}{pb}, 0, 1, 5);
-
-        $w{window}{data}->signal_connect('response' => sub {
-            my ($me, $response) = @_;
-            if ($response eq '1') {
-                _execLocalPPE($self, \%w);
-            }
-            $w{window}{data}->destroy();
-            if (defined $$self{_GUI}{_VBOX}) {
-                # Change mouse pointer when pre exec, on post exec, the window might be gone already
-                $$self{_GUI}{_VBOX}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('left-ptr'));
-            }
-            undef %w;
-        });
-
-        return %w;
-    }
-
+    return 1;
 }
 
 sub _wSelectChain {

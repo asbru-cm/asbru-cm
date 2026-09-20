@@ -189,8 +189,8 @@ sub _buildPrePost {
     my $hash = shift;
 
     my $command = $$hash{command} // '';
-    my $def = $$hash{default} // 0;
-    my $ask = $$hash{ask} // 1;
+    my $def = $$hash{default} // 1;
+    my $ask = $$hash{ask} // 0;
 
     my @undo;
     my $undoing = 0;
@@ -208,7 +208,7 @@ sub _buildPrePost {
     $w{ask}->set_active($ask);
 
     # Build checkbox
-    $w{default} = Gtk3::CheckButton->new_with_label('Default: ' . ($def ? 'YES' : 'NO') );
+    $w{default} = Gtk3::CheckButton->new_with_label('Wait: ' . ($def ? 'YES' : 'NO') );
     $w{hbox}->pack_start($w{default}, 0, 1, 0);
     $w{default}->set_active($def);
 
@@ -217,7 +217,6 @@ sub _buildPrePost {
     $w{hbox}->pack_start($w{command}, 1, 1, 0);
     $w{command}->set_icon_from_stock('primary', 'gtk-execute');
     $w{command}->set_text($command);
-    $w{default}->set_sensitive($command ne '');
 
     # Build delete button
     $w{btn} = Gtk3::Button->new_from_stock('gtk-delete');
@@ -234,18 +233,10 @@ sub _buildPrePost {
     # Asign a callback for modifying toggle ask  checkbutton label
     $w{ask}->signal_connect('toggled' => sub {
         $w{ask}->set_property('label', 'Ask: ' . ($w{ask}->get_active ? 'YES' : 'NO') );
-        $w{default}->set_active(! $w{ask}->get_active);
         return 1;
     });
     # Asign a callback for modifying toggle default checkbutton label
     $w{default}->signal_connect('toggled' => sub {$w{default}->set_property('label', 'Default: ' . ($w{default}->get_active ? 'YES' : 'NO') ); return 1;});
-
-    # Capture 'pre_exec' entry chenge (to un/activate default checkbox)
-    $w{command}->signal_connect('changed' => sub {
-        $w{default}->set_active($w{command}->get_chars(0, -1) ne     '');
-        $w{default}->set_sensitive($w{command}->get_chars(0, -1) );
-        return 1;
-    });
 
     # Asign a callback for deleting entry
     $w{btn}->signal_connect('clicked' => sub {
