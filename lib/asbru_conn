@@ -2294,6 +2294,7 @@ if ($CONNECTED) {
     if ($IS_CLUSTER && ($RESTART == 2)) {
         $RESTART = 0;
     }
+    $EXP->slave->clone_winsize_from(\*STDIN);
     $EXP->interact(\*STDIN, "__PAC__STOP__${UUID}__${$}__");
 }
 
