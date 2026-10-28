@@ -140,7 +140,7 @@ sub _buildPrePostGUI {
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/#pre-post-exec');
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     $w{hbox}->pack_start($w{help}, 0, 1, 0);
@@ -203,12 +203,12 @@ sub _buildPrePost {
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
     # Build checkbox
-    $w{ask} = Gtk3::CheckButton->new_with_label('Ask: ' . ($ask ? 'YES' : 'NO') );
+    $w{ask} = Gtk3::CheckButton->new_with_label(_t('Ask: ') . ($ask ? _t('YES') : _t('NO')) );
     $w{hbox}->pack_start($w{ask}, 0, 1, 0);
     $w{ask}->set_active($ask);
 
     # Build checkbox
-    $w{default} = Gtk3::CheckButton->new_with_label('Default: ' . ($def ? 'YES' : 'NO') );
+    $w{default} = Gtk3::CheckButton->new_with_label(_t('Default: ') . ($def ? _t('YES') : _t('NO')) );
     $w{hbox}->pack_start($w{default}, 0, 1, 0);
     $w{default}->set_active($def);
 
@@ -233,12 +233,12 @@ sub _buildPrePost {
 
     # Asign a callback for modifying toggle ask  checkbutton label
     $w{ask}->signal_connect('toggled' => sub {
-        $w{ask}->set_property('label', 'Ask: ' . ($w{ask}->get_active ? 'YES' : 'NO') );
+        $w{ask}->set_property('label', _t('Ask: ') . ($w{ask}->get_active ? _t('YES') : _t('NO')) );
         $w{default}->set_active(! $w{ask}->get_active);
         return 1;
     });
     # Asign a callback for modifying toggle default checkbutton label
-    $w{default}->signal_connect('toggled' => sub {$w{default}->set_property('label', 'Default: ' . ($w{default}->get_active ? 'YES' : 'NO') ); return 1;});
+    $w{default}->signal_connect('toggled' => sub {$w{default}->set_property('label', _t('Default: ') . ($w{default}->get_active ? _t('YES') : _t('NO')) ); return 1;});
 
     # Capture 'pre_exec' entry chenge (to un/activate default checkbox)
     $w{command}->signal_connect('changed' => sub {
@@ -276,7 +276,7 @@ sub _buildPrePost {
             ++$i;
         }
         push(@menu_items, {
-            label => 'User variables...',
+            label => _t('User variables...'),
             sensitive => scalar @{$$self{variables}},
             submenu => \@variables_menu
         });
@@ -291,7 +291,7 @@ sub _buildPrePost {
             });
         }
         push(@menu_items, {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -307,14 +307,14 @@ sub _buildPrePost {
             });
         }
         push(@menu_items, {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Populate with <CMD:*> special string
         push(@menu_items, {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             stockicon => 'gtk-execute',
             code => sub {
                 my $pos = $w{command}->get_property('cursor_position');
@@ -325,22 +325,22 @@ sub _buildPrePost {
 
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
-        push(@int_variables_menu, {label => "UUID",code => sub {$w{command}->insert_text("<UUID>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{command}->insert_text("<SOCKS5_PORT>",-1, $w{command}->get_position());} });
-        push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{command}->insert_text("<TIMESTAMP>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{command}->insert_text("<DATE_Y>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_M",code => sub {$w{command}->insert_text("<DATE_M>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_D",code => sub {$w{command}->insert_text("<DATE_D>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_H",code => sub {$w{command}->insert_text("<TIME_H>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_M",code => sub {$w{command}->insert_text("<TIME_M>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_S",code => sub {$w{command}->insert_text("<TIME_S>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "NAME",code => sub {$w{command}->insert_text("<NAME>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "TITLE",code => sub {$w{command}->insert_text("<TITLE>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "IP",code => sub {$w{command}->insert_text("<IP>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "PORT",code => sub {$w{command}->insert_text("<PORT>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "USER",code => sub {$w{command}->insert_text("<USER>", -1, $w{command}->get_position);} });
-        push(@int_variables_menu, {label => "PASS",code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
-        push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
+        push(@int_variables_menu, {label => _t("UUID"),code => sub {$w{command}->insert_text("<UUID>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("SOCKS5_PORT"),code => sub {$w{command}->insert_text("<SOCKS5_PORT>",-1, $w{command}->get_position());} });
+        push(@int_variables_menu, {label => _t("TIMESTAMP"),code => sub {$w{command}->insert_text("<TIMESTAMP>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_Y"),code => sub {$w{command}->insert_text("<DATE_Y>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_M"),code => sub {$w{command}->insert_text("<DATE_M>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_D"),code => sub {$w{command}->insert_text("<DATE_D>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_H"),code => sub {$w{command}->insert_text("<TIME_H>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_M"),code => sub {$w{command}->insert_text("<TIME_M>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_S"),code => sub {$w{command}->insert_text("<TIME_S>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("NAME"),code => sub {$w{command}->insert_text("<NAME>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("TITLE"),code => sub {$w{command}->insert_text("<TITLE>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("IP"),code => sub {$w{command}->insert_text("<IP>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("PORT"),code => sub {$w{command}->insert_text("<PORT>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("USER"),code => sub {$w{command}->insert_text("<USER>", -1, $w{command}->get_position);} });
+        push(@int_variables_menu, {label => _t("PASS"),code => sub {$w{command}->insert_text("<PASS>", -1, $w{command}->get_position);} });
+        push(@menu_items, {label => _t('Internal variables...'), submenu => \@int_variables_menu});
 
         $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username,password',$w{command},\@menu_items);
 

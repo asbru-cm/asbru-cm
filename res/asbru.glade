@@ -3552,8 +3552,8 @@ Connect to server and open a new local connection instead</property>
                             <property name="has-tooltip">True</property>
                             <property name="active">0</property>
                             <items>
-                              <item id="Traditional" translatable="yes">Traditional</item>
-                              <item id="Compact" translatable="yes">Compact</item>
+                              <item id="Traditional" translatable="no">Traditional</item>
+                              <item id="Compact" translatable="no">Compact</item>
                             </items>
                           </object>
                           <packing>
@@ -3583,10 +3583,10 @@ Connect to server and open a new local connection instead</property>
                             <property name="has-tooltip">True</property>
                             <property name="active">0</property>
                             <items>
-                              <item id="default" translatable="yes">default</item>
-                              <item id="asbru-color" translatable="yes">asbru-color</item>
-                              <item id="asbru-dark" translatable="yes">asbru-dark</item>
-                              <item id="system" translatable="yes">system</item>
+                              <item id="default" translatable="no">default</item>
+                              <item id="asbru-color" translatable="no">asbru-color</item>
+                              <item id="asbru-dark" translatable="no">asbru-dark</item>
+                              <item id="system" translatable="no">system</item>
                             </items>
                           </object>
                           <packing>
@@ -7444,9 +7444,9 @@ Changes apply to next opened connections, not current</property>
                                             <property name="halign">start</property>
                                             <property name="active">0</property>
                                             <items>
-                                              <item id="block" translatable="yes">block</item>
-                                              <item id="ibeam" translatable="yes">ibeam</item>
-                                              <item id="underline" translatable="yes">underline</item>
+                                              <item id="block" translatable="no">block</item>
+                                              <item id="ibeam" translatable="no">ibeam</item>
+                                              <item id="underline" translatable="no">underline</item>
                                             </items>
                                           </object>
                                           <packing>
@@ -8095,11 +8095,11 @@ If you don't use transparency, leave ths option unchecked as it will slightly im
                             <property name="can-focus">False</property>
                             <property name="active">0</property>
                             <items>
-                              <item id="auto" translatable="yes">auto</item>
-                              <item id="ascii-backspace" translatable="yes">ascii-backspace</item>
-                              <item id="ascii-delete" translatable="yes">ascii-delete</item>
-                              <item id="delete-sequence" translatable="yes">delete-sequence</item>
-                              <item id="tty" translatable="yes">tty</item>
+                              <item id="auto" translatable="no">auto</item>
+                              <item id="ascii-backspace" translatable="no">ascii-backspace</item>
+                              <item id="ascii-delete" translatable="no">ascii-delete</item>
+                              <item id="delete-sequence" translatable="no">delete-sequence</item>
+                              <item id="tty" translatable="no">tty</item>
                             </items>
                           </object>
                           <packing>

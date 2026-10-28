@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -155,9 +156,9 @@ sub _buildGUI
 
     $w{vbox} = $container;
 
-        $w{chTolerant} = Gtk3::CheckButton->new_with_label('Tolerant mode');
+        $w{chTolerant} = Gtk3::CheckButton->new_with_label(_t('Tolerant mode'));
         $w{vbox}->pack_start($w{chTolerant}, 0, 1, 0);
-        $w{chTolerant}->set_tooltip_text('[-t] : Allow cd/open into non-WebDAV enabled collection; use if the server or proxy server has WebDAV compliance problems.');
+        $w{chTolerant}->set_tooltip_text(_t('[-t] : Allow cd/open into non-WebDAV enabled collection; use if the server or proxy server has WebDAV compliance problems.'));
 
     $$self{gui} = \%w;
 

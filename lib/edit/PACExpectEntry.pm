@@ -161,7 +161,7 @@ sub _buildExpectGUI {
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/#expect');
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     $w{hbox}->pack_start($w{help}, 0, 1, 0);
@@ -228,7 +228,7 @@ sub _buildExpect {
     $w{position} = scalar @{$$self{list}};
 
     # Make a checkbox to use as frame's label
-    $w{active} = Gtk3::CheckButton->new_with_label('Expect #' . $w{position} . ' ');
+    $w{active} = Gtk3::CheckButton->new_with_label(sprintf(_t('Expect #%s'), $w{position}) . ' ');
     $w{active}->set_active($active);
 
     # Make an container frame
@@ -266,7 +266,7 @@ sub _buildExpect {
     $w{vbox2}->pack_start($w{hboxExpect}, 0, 1, 0);
 
     # Build and add the label
-    $w{hboxExpect}->pack_start(Gtk3::Label->new('Expect: '), 0, 1, 0);
+    $w{hboxExpect}->pack_start(Gtk3::Label->new(_t('Expect: ')), 0, 1, 0);
 
     # Build and add the expect entry
     $w{expect} = Gtk3::Entry->new;
@@ -287,10 +287,10 @@ sub _buildExpect {
     $w{vbox2}->pack_start($w{hboxSend}, 1, 1, 0);
 
     # Build and add the label
-    $w{hboxSend}->pack_start(Gtk3::Label->new('Send('), 0, 1, 0);
+    $w{hboxSend}->pack_start(Gtk3::Label->new(_t('Send(')), 0, 1, 0);
 
     # Build the hide checkbox
-    $w{hidden} = Gtk3::CheckButton->new_with_label('Hide');
+    $w{hidden} = Gtk3::CheckButton->new_with_label(_t('Hide'));
     $w{hboxSend}->pack_start($w{hidden}, 0, 1, 0);
     $w{hidden}->set_active($hide);
 
@@ -305,10 +305,10 @@ sub _buildExpect {
     $w{send}->set_visibility(! $hide);
 
     # Build and add the return checkbox
-    $w{return} = Gtk3::CheckButton->new_with_label('Return');
+    $w{return} = Gtk3::CheckButton->new_with_label(_t('Return'));
     $w{hboxSend}->pack_start($w{return}, 0, 1, 0);
     $w{return}->set_active($return);
-    $w{return}->set_tooltip_text('Sends a <RETURN> (\n) after the string is entered.\nFor IBM 3270 connections, sends a \r\f (Carriage Return and Line Feed)');
+    $w{return}->set_tooltip_text(_t('Sends a <RETURN> (\n) after the string is entered.\nFor IBM 3270 connections, sends a \r\f (Carriage Return and Line Feed)'));
 
     # Add ON_MATCH, ON_FAIL and TIME_OUT entries
 
@@ -316,7 +316,7 @@ sub _buildExpect {
     $w{vbox2}->pack_start($w{vbox33}, 0, 1, 0);
 
     $w{hbox33} = Gtk3::HBox->new(0, 0);
-    $w{hbox33}->set_tooltip_text('If "Expect" IS matched, the "Send" string will be sent and we will "go to" selected Expect number. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)');
+    $w{hbox33}->set_tooltip_text(_t('If "Expect" IS matched, the "Send" string will be sent and we will "go to" selected Expect number. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)'));
     $w{vbox33}->pack_start($w{hbox33}, 0, 1, 0);
 
     $w{cbOnMatch} = Gtk3::CheckButton->new('On MATCH: ');
@@ -327,7 +327,7 @@ sub _buildExpect {
     $w{onmatchhbox}->set_sensitive($w{cbOnMatch}->get_active);
     $w{hbox33}->pack_start($w{onmatchhbox}, 0, 1, 0);
 
-    $w{rbOnMatchGoto} = Gtk3::RadioButton->new_with_label(undef, 'goto ');
+    $w{rbOnMatchGoto} = Gtk3::RadioButton->new_with_label(undef, _t('goto '));
     $w{rbOnMatchGoto}->set_active($on_match > -1);
     $w{onmatchhbox}->pack_start($w{rbOnMatchGoto}, 1, 1, 0);
 
@@ -336,14 +336,14 @@ sub _buildExpect {
     $w{on_match}->set_sensitive($w{rbOnMatchGoto}->get_active);
     $w{onmatchhbox}->pack_start($w{on_match}, 0, 1, 0);
 
-    $w{rbOnMatchStop} = Gtk3::RadioButton->new_with_label_from_widget($w{rbOnMatchGoto}, 'stop');
+    $w{rbOnMatchStop} = Gtk3::RadioButton->new_with_label_from_widget($w{rbOnMatchGoto}, _t('stop'));
     $w{rbOnMatchStop}->set_active($on_match == -2);
     $w{onmatchhbox}->pack_start($w{rbOnMatchStop}, 1, 1, 0);
 
     $w{hbox33}->pack_start(Gtk3::VSeparator->new, 0, 1, 5);
 
     $w{hbox34} = Gtk3::HBox->new(0, 0);
-    $w{hbox34}->set_tooltip_text('If "Expect" IS NOT matched, no string will be sent, and we will "go to" selected Expect. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)');
+    $w{hbox34}->set_tooltip_text(_t('If "Expect" IS NOT matched, no string will be sent, and we will "go to" selected Expect. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)'));
     $w{vbox33}->pack_start($w{hbox34}, 0, 1, 0);
 
     $w{cbOnFail} = Gtk3::CheckButton->new('On FAIL: ');
@@ -354,7 +354,7 @@ sub _buildExpect {
     $w{onfailhbox}->set_sensitive($w{cbOnFail}->get_active);
     $w{hbox34}->pack_start($w{onfailhbox}, 0, 1, 0);
 
-    $w{rbOnFailGoto} = Gtk3::RadioButton->new_with_label(undef, 'goto ');
+    $w{rbOnFailGoto} = Gtk3::RadioButton->new_with_label(undef, _t('goto '));
     $w{rbOnFailGoto}->set_active($on_fail > -1);
     $w{onfailhbox}->pack_start($w{rbOnFailGoto}, 1, 1, 0);
 
@@ -363,7 +363,7 @@ sub _buildExpect {
     $w{on_fail}->set_sensitive($w{rbOnFailGoto}->get_active);
     $w{onfailhbox}->pack_start($w{on_fail}, 0, 1, 0);
 
-    $w{rbOnFailStop} = Gtk3::RadioButton->new_with_label_from_widget($w{rbOnFailGoto}, 'stop');
+    $w{rbOnFailStop} = Gtk3::RadioButton->new_with_label_from_widget($w{rbOnFailGoto}, _t('stop'));
     $w{rbOnFailStop}->set_active($on_fail == -2);
     $w{onfailhbox}->pack_start($w{rbOnFailStop}, 1, 1, 0);
 
@@ -433,7 +433,7 @@ sub _buildExpect {
 
         # Copy
         push(@exec_menu_items, {
-            label => 'Copy',
+            label => _t('Copy'),
             stockicon => 'gtk-copy',
             sensitive => ($w{active}->get_active()),
             code => sub {
@@ -455,7 +455,7 @@ sub _buildExpect {
         });
         # Cut
         push(@exec_menu_items, {
-            label => 'Cut',
+            label => _t('Cut'),
             stockicon => 'gtk-cut',
             sensitive => ($w{active}->get_active()),
             code => sub {
@@ -481,7 +481,7 @@ sub _buildExpect {
         });
         # Paste ?
         push(@exec_menu_items, {
-            label => 'Paste',
+            label => _t('Paste'),
             stockicon => 'gtk-paste',
             sensitive => (defined $self->{_COPY_EXPECT}),
             code => sub {
@@ -504,7 +504,7 @@ sub _buildExpect {
         push(@exec_menu_items, {separator => 1});
         # Delete
         push(@exec_menu_items, {
-            label => 'Delete',
+            label => _t('Delete'),
             stockicon => 'gtk-delete',
             code => sub {
                 $$self{cfg} = $self->get_cfg();
@@ -647,8 +647,8 @@ sub _buildExpect {
 
         # Populate with user defined command prompt
         push(@menu_items, {
-            label => '<command prompt>',
-            tooltip => 'Expect for a sting matching a COMMAND PROMPT (as defined under "Preferences")',
+            label => _t('<command prompt>'),
+            tooltip => _t('Expect for a sting matching a COMMAND PROMPT (as defined under "Preferences")'),
             stockicon => 'asbru-prompt',
             code => sub {$w{expect}->insert_text('<command prompt>', -1, $w{expect}->get_position);}
         });
@@ -665,7 +665,7 @@ sub _buildExpect {
             ++$i;
         }
         push(@menu_items, {
-            label => 'User variables...',
+            label => _t('User variables...'),
             sensitive => scalar @{$$self{variables}},
             submenu => \@variables_menu
         });
@@ -680,15 +680,15 @@ sub _buildExpect {
             });
         }
         push(@menu_items, {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
 
         # Populate with <CMD:*> special string
         push(@menu_items, {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             stockicon => 'gtk-execute',
             code => sub {
                 my $pos = $w{expect}->get_property('cursor_position');
@@ -699,22 +699,22 @@ sub _buildExpect {
 
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
-        push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
-        push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_D",code => sub {$w{send}->insert_text("<DATE_D>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_H",code => sub {$w{send}->insert_text("<TIME_H>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_M",code => sub {$w{send}->insert_text("<TIME_M>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_S",code => sub {$w{send}->insert_text("<TIME_S>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "NAME",code => sub {$w{send}->insert_text("<NAME>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TITLE",code => sub {$w{send}->insert_text("<TITLE>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "IP",code => sub {$w{send}->insert_text("<IP>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "USER",code => sub {$w{send}->insert_text("<USER>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "PORT",code => sub {$w{send}->insert_text("<PORT>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "PASS",code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
-        push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
+        push(@int_variables_menu, {label => _t("UUID"),code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("SOCKS5_PORT"),code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
+        push(@int_variables_menu, {label => _t("TIMESTAMP"),code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_Y"),code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_M"),code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_D"),code => sub {$w{send}->insert_text("<DATE_D>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_H"),code => sub {$w{send}->insert_text("<TIME_H>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_M"),code => sub {$w{send}->insert_text("<TIME_M>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_S"),code => sub {$w{send}->insert_text("<TIME_S>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("NAME"),code => sub {$w{send}->insert_text("<NAME>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TITLE"),code => sub {$w{send}->insert_text("<TITLE>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("IP"),code => sub {$w{send}->insert_text("<IP>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("USER"),code => sub {$w{send}->insert_text("<USER>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("PORT"),code => sub {$w{send}->insert_text("<PORT>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("PASS"),code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
+        push(@menu_items, {label => _t('Internal variables...'), submenu => \@int_variables_menu});
 
         $PACMain::FUNCS{_KEEPASS}->setRigthClickMenuEntry($PACMain::FUNCS{_EDIT}{_WINDOWEDIT},'username,password',$w{expect},\@menu_items);
 
@@ -743,7 +743,7 @@ sub _buildExpect {
             ++$i;
         }
         push(@menu_items, {
-            label => 'User variables...',
+            label => _t('User variables...'),
             sensitive => scalar @{$$self{variables}},
             submenu => \@variables_menu
         });
@@ -758,7 +758,7 @@ sub _buildExpect {
             });
         }
         push(@menu_items, {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -774,14 +774,14 @@ sub _buildExpect {
             });
         }
         push(@menu_items, {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Populate with <ASK:#> special string
         push(@menu_items, {
-            label => 'Interactive user input',
-            tooltip => 'User will be prompted to provide a value with a text box (free data type)',
+            label => _t('Interactive user input'),
+            tooltip => _t('User will be prompted to provide a value with a text box (free data type)'),
             stockicon => 'gtk-dialog-question',
             code => sub {
                 my $pos = $w{send}->get_property('cursor_position');
@@ -792,8 +792,8 @@ sub _buildExpect {
 
         # Populate with <ASK:*|> special string
         push(@menu_items, {
-            label => 'Interactive user choose from list',
-            tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
+            label => _t('Interactive user choose from list'),
+            tooltip => _t('User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)'),
             stockicon => 'gtk-dialog-question',
             code => sub {
                 my $pos = $w{send}->get_property('cursor_position');
@@ -804,8 +804,8 @@ sub _buildExpect {
 
         # Populate with <CMD:*> special string
         push(@menu_items, {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             stockicon => 'gtk-execute',
             code => sub {
                 my $pos = $w{send}->get_property('cursor_position');
@@ -816,27 +816,27 @@ sub _buildExpect {
 
         # Populate with Ásbrú Connection Manager internal variables
         my @int_variables_menu;
-        push(@int_variables_menu, {label => "UUID",code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "SOCKS5_PORT",code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
-        push(@int_variables_menu, {label => "TIMESTAMP",code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_Y",code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_M",code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "DATE_D",code => sub {$w{send}->insert_text("<DATE_D>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_H",code => sub {$w{send}->insert_text("<TIME_H>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_M",code => sub {$w{send}->insert_text("<TIME_M>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TIME_S",code => sub {$w{send}->insert_text("<TIME_S>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "NAME",code => sub {$w{send}->insert_text("<NAME>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "TITLE",code => sub {$w{send}->insert_text("<TITLE>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "IP",code => sub {$w{send}->insert_text("<IP>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "USER",code => sub {$w{send}->insert_text("<USER>", -1, $w{send}->get_position);} });
-        push(@int_variables_menu, {label => "PASS",code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
-        push(@menu_items, {label => 'Internal variables...', submenu => \@int_variables_menu});
+        push(@int_variables_menu, {label => _t("UUID"),code => sub {$w{send}->insert_text("<UUID>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("SOCKS5_PORT"),code => sub {$w{send}->insert_text("<SOCKS5_PORT>",-1, $w{send}->get_position());} });
+        push(@int_variables_menu, {label => _t("TIMESTAMP"),code => sub {$w{send}->insert_text("<TIMESTAMP>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_Y"),code => sub {$w{send}->insert_text("<DATE_Y>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_M"),code => sub {$w{send}->insert_text("<DATE_M>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("DATE_D"),code => sub {$w{send}->insert_text("<DATE_D>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_H"),code => sub {$w{send}->insert_text("<TIME_H>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_M"),code => sub {$w{send}->insert_text("<TIME_M>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TIME_S"),code => sub {$w{send}->insert_text("<TIME_S>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("NAME"),code => sub {$w{send}->insert_text("<NAME>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("TITLE"),code => sub {$w{send}->insert_text("<TITLE>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("IP"),code => sub {$w{send}->insert_text("<IP>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("USER"),code => sub {$w{send}->insert_text("<USER>", -1, $w{send}->get_position);} });
+        push(@int_variables_menu, {label => _t("PASS"),code => sub {$w{send}->insert_text("<PASS>", -1, $w{send}->get_position);} });
+        push(@menu_items, {label => _t('Internal variables...'), submenu => \@int_variables_menu});
 
         if ($PACMain::FUNCS{_KEEPASS}->getUseKeePass()) {
             # Copy User,Password from KeePassXC
             push(@menu_items, {
-                label => 'Add Username KeePassXC',
-                tooltip => 'KeePassXC Username',
+                label => _t('Add Username KeePassXC'),
+                tooltip => _t('KeePassXC Username'),
                 code => sub {
                     my $pos = $w{send}->get_property('cursor_position');
                     my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});
@@ -846,8 +846,8 @@ sub _buildExpect {
                 }
             });
             push(@menu_items, {
-                label => 'Add Password KeePassXC',
-                tooltip => 'KeePassXC Password',
+                label => _t('Add Password KeePassXC'),
+                tooltip => _t('KeePassXC Password'),
                 code => sub {
                     my $pos = $w{send}->get_property('cursor_position');
                     my $selection = $PACMain::FUNCS{_KEEPASS}->listEntries($$self{_WINDOWEDIT});

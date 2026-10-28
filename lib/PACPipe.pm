@@ -109,7 +109,7 @@ sub _initGUI {
     $$self{_WINDOWPIPE}{data} = Gtk3::Window->new;
 
     # and setup some dialog properties.
-    $$self{_WINDOWPIPE}{data}->set_title("$APPNAME : Pipe output");
+    $$self{_WINDOWPIPE}{data}->set_title("$APPNAME : " . _t('Pipe output'));
     $$self{_WINDOWPIPE}{data}->set_position('center');
     $$self{_WINDOWPIPE}{data}->set_icon_from_file($APPICON);
     $$self{_WINDOWPIPE}{data}->set_default_size(640, 480);
@@ -127,7 +127,7 @@ sub _initGUI {
     $$self{_WINDOWPIPE}{gui}{frame1} = Gtk3::Frame->new;
     $$self{_WINDOWPIPE}{gui}{frame1}->set_size_request(200, 200);
     $$self{_WINDOWPIPE}{gui}{hpane}->pack1($$self{_WINDOWPIPE}{gui}{frame1}, 0, 0);
-    (my $lbl1 = Gtk3::Label->new)->set_markup(' <b>Terminals:</b> ');
+    (my $lbl1 = Gtk3::Label->new)->set_markup(_t(' <b>Terminals:</b> '));
     $$self{_WINDOWPIPE}{gui}{frame1}->set_label_widget($lbl1);
     $$self{_WINDOWPIPE}{gui}{frame1}->set_border_width(5);
 
@@ -140,12 +140,12 @@ sub _initGUI {
     $$self{_WINDOWPIPE}{treeTerminals} = Gtk3::SimpleList->new_from_treeview (
         Gtk3::TreeView->new,
         'UUID_TMP' => 'hidden',
-        'NAME' => 'text',
-        'TITLE' => 'text'
+        _t('NAME') => 'text',
+        _t('TITLE') => 'text'
     );
 
     $$self{_WINDOWPIPE}{gui}{scroll2}->add($$self{_WINDOWPIPE}{treeTerminals});
-    $$self{_WINDOWPIPE}{treeTerminals}->set_tooltip_text('List of Terminals where the locally PIPEd command was executed');
+    $$self{_WINDOWPIPE}{treeTerminals}->set_tooltip_text(_t('List of Terminals where the locally PIPEd command was executed'));
     $$self{_WINDOWPIPE}{treeTerminals}->set_headers_visible(1);
     $$self{_WINDOWPIPE}{treeTerminals}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
     my @col_terminals = $$self{_WINDOWPIPE}{treeTerminals}->get_columns;
@@ -160,7 +160,7 @@ sub _initGUI {
     # Create frame 2
     $$self{_WINDOWPIPE}{gui}{frame2} = Gtk3::Frame->new;
     $$self{_WINDOWPIPE}{gui}{vpane}->pack1($$self{_WINDOWPIPE}{gui}{frame2}, 1, 0);
-    (my $lbl2 = Gtk3::Label->new)->set_markup(' <b>Expanded command:</b> ');
+    (my $lbl2 = Gtk3::Label->new)->set_markup(_t(' <b>Expanded command:</b> '));
     $$self{_WINDOWPIPE}{gui}{frame2}->set_label_widget($lbl2);
     $$self{_WINDOWPIPE}{gui}{frame2}->set_border_width(5);
 
@@ -179,7 +179,7 @@ sub _initGUI {
     # Create frame 3
     $$self{_WINDOWPIPE}{gui}{frame3} = Gtk3::Frame->new;
     $$self{_WINDOWPIPE}{gui}{vpane}->pack2($$self{_WINDOWPIPE}{gui}{frame3}, 1, 0);
-    (my $lbl3 = Gtk3::Label->new)->set_markup(' <b>Final output (locally piped):</b> ');
+    (my $lbl3 = Gtk3::Label->new)->set_markup(_t(' <b>Final output (locally piped):</b> '));
     $$self{_WINDOWPIPE}{gui}{frame3}->set_label_widget($lbl3);
     $$self{_WINDOWPIPE}{gui}{frame3}->set_border_width(5);
 
@@ -199,7 +199,7 @@ sub _initGUI {
     $$self{_WINDOWPIPE}{gui}{vbox}->pack_start($$self{_WINDOWPIPE}{gui}{btnbox}, 0, 1, 0);
 
     # Put a 'always on top' checkbutton
-    $$self{_WINDOWPIPE}{gui}{cbaot} = Gtk3::CheckButton->new_with_label('Always On Top');
+    $$self{_WINDOWPIPE}{gui}{cbaot} = Gtk3::CheckButton->new_with_label(_t('Always On Top'));
     $$self{_WINDOWPIPE}{gui}{btnbox}->pack_start($$self{_WINDOWPIPE}{gui}{cbaot}, 0, 1, 0);
 
     # Put a 'refresh' button

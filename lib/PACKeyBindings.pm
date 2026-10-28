@@ -589,13 +589,13 @@ sub _buildGUI {
     $$self{frame} = \%w;
     $w{vbox}->pack_start($w{hbox}, 0, 1, 0);
 
-    $w{btnreset} = Gtk3::Button->new('Set default values');
+    $w{btnreset} = Gtk3::Button->new(_t('Set default values'));
     $w{hbox}->pack_start($w{btnreset}, 0, 0, 0);
 
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeyBindings/');
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
     $w{hbox}->pack_start($w{help}, 1, 1, 0);
@@ -627,7 +627,7 @@ sub _buildGUI {
     $c->set_alignment(0.5, 0.5);
 
     $w{btnreset}->signal_connect('clicked' => sub {
-        if (!_wConfirm($self->{parent}, "Reset all keybindings to there default values?")) {
+        if (!_wConfirm($self->{parent}, _t("Reset all keybindings to there default values?"))) {
             return 1;
         }
         delete $self->{cfg};
@@ -677,7 +677,7 @@ sub _updateKeyBinding {
     }
 
     if ($$cfg{$window}{$keynew}) {
-        _wMessage($self->{parent}, "<i>$keynew</i> already in use by\n\n<b>$$cfg{$window}{$keynew}[0]</b> : $$cfg{$window}{$keynew}[2]");
+        _wMessage($self->{parent}, sprintf(_t("<i>%s</i> already in use by\n\n<b>%s</b> : %s"), $keynew, $$cfg{$window}{$keynew}[0], $$cfg{$window}{$keynew}[2]));
         return 0;
     } elsif (!$undef) {
         my ($free, $msg) = $self->HotKeyIsFree('terminal', $keynew, '', 1);
@@ -704,7 +704,7 @@ sub _updateKeyBinding {
                 } else {
                     $warning = "This keybind will not be available for window <b>$$cfg{$w}{$keynew}[0]</b>\nwhen <b>$other</b> is visible.";
                 }
-                _wMessage($self->{parent}, "<i>" . $self->stringifyKeybind($keynew) . "</i> used in\n\n<b>$$cfg{$w}{$keynew}[0]</b> : $$cfg{$w}{$keynew}[2]\n\n$warning");
+                _wMessage($self->{parent}, sprintf(_t("<i>%s</i> used in\n\n<b>%s</b> : %s"), $self->stringifyKeybind($keynew), $$cfg{$w}{$keynew}[0], $$cfg{$w}{$keynew}[2]) . "\n\n$warning");
             }
         }
     }

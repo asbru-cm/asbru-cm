@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -317,10 +318,10 @@ sub _buildGUI {
         $w{hbox1} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
 
-            $w{frBPP} = Gtk3::Frame->new('BPP:');
+            $w{frBPP} = Gtk3::Frame->new(_t('BPP:'));
             $w{hbox1}->pack_start($w{frBPP}, 0, 1, 0);
             $w{frBPP}->set_shadow_type('GTK_SHADOW_NONE');
-            $w{frBPP}->set_tooltip_text('[/bpp:] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)');
+            $w{frBPP}->set_tooltip_text(_t('[/bpp:] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)'));
 
                 $w{cbBPP} = Gtk3::ComboBoxText->new;
                 $w{frBPP}->add($w{cbBPP});
@@ -328,68 +329,68 @@ sub _buildGUI {
                     $w{cbBPP}->append_text($bpp);
                 };
 
-            $w{chAttachToConsole} = Gtk3::CheckButton->new_with_label('Attach to console');
+            $w{chAttachToConsole} = Gtk3::CheckButton->new_with_label(_t('Attach to console'));
             $w{hbox1}->pack_start($w{chAttachToConsole}, 0, 1, 0);
-            $w{chAttachToConsole}->set_tooltip_text('[/admin] : Attach to admin console of server (requires Windows Server 2003 or newer)');
+            $w{chAttachToConsole}->set_tooltip_text(_t('[/admin] : Attach to admin console of server (requires Windows Server 2003 or newer)'));
 
-            $w{chUseCompression} = Gtk3::CheckButton->new_with_label('Compression');
+            $w{chUseCompression} = Gtk3::CheckButton->new_with_label(_t('Compression'));
             $w{hbox1}->pack_start($w{chUseCompression}, 0, 1, 0);
-            $w{chUseCompression}->set_tooltip_text('[+compression] : Enable compression of the RDP datastream');
+            $w{chUseCompression}->set_tooltip_text(_t('[+compression] : Enable compression of the RDP datastream'));
 
-            $w{chIgnoreCert} = Gtk3::CheckButton->new_with_label('Ignore verification of logon certificate');
+            $w{chIgnoreCert} = Gtk3::CheckButton->new_with_label(_t('Ignore verification of logon certificate'));
             $w{hbox1}->pack_start($w{chIgnoreCert}, 0, 1, 0);
-            $w{chIgnoreCert}->set_tooltip_text("/cert-ignore: ignore verification of logon certificate");
+            $w{chIgnoreCert}->set_tooltip_text(_t("/cert-ignore: ignore verification of logon certificate"));
 
-            $w{chFontSmooth} = Gtk3::CheckButton->new_with_label('Font Smooth');
+            $w{chFontSmooth} = Gtk3::CheckButton->new_with_label(_t('Font Smooth'));
             $w{hbox1}->pack_start($w{chFontSmooth}, 0, 1, 0);
-            $w{chFontSmooth}->set_tooltip_text("+fonts: enable font smoothing");
+            $w{chFontSmooth}->set_tooltip_text(_t("+fonts: enable font smoothing"));
 
-            $w{chNoGrabKbd} = Gtk3::CheckButton->new_with_label('Do not grab keyboard');
+            $w{chNoGrabKbd} = Gtk3::CheckButton->new_with_label(_t('Do not grab keyboard'));
             $w{hbox1}->pack_start($w{chNoGrabKbd}, 0, 1, 0);
-            $w{chNoGrabKbd}->set_tooltip_text("-grab-keyboard: do not grab keyboard");
+            $w{chNoGrabKbd}->set_tooltip_text(_t("-grab-keyboard: do not grab keyboard"));
 
         $w{hbox3} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hbox3}, 0, 1, 5);
 
-            $w{chNoAuth} = Gtk3::CheckButton->new_with_label('No Authentication');
+            $w{chNoAuth} = Gtk3::CheckButton->new_with_label(_t('No Authentication'));
             $w{hbox3}->pack_start($w{chNoAuth}, 0, 1, 0);
-            $w{chNoAuth}->set_tooltip_text("-authentication: disable authentication");
+            $w{chNoAuth}->set_tooltip_text(_t("-authentication: disable authentication"));
 
-            $w{chNoFastPath} = Gtk3::CheckButton->new_with_label('No Fast Path');
+            $w{chNoFastPath} = Gtk3::CheckButton->new_with_label(_t('No Fast Path'));
             $w{hbox3}->pack_start($w{chNoFastPath}, 0, 1, 0);
-            $w{chNoFastPath}->set_tooltip_text("-fast-path: disable fast-path");
+            $w{chNoFastPath}->set_tooltip_text(_t("-fast-path: disable fast-path"));
 
-            $w{chRFX} = Gtk3::CheckButton->new_with_label('Enable RemoteFX');
+            $w{chRFX} = Gtk3::CheckButton->new_with_label(_t('Enable RemoteFX'));
             $w{hbox3}->pack_start($w{chRFX}, 0, 1, 0);
-            $w{chRFX}->set_tooltip_text("/rfx: enable RemoteFX");
+            $w{chRFX}->set_tooltip_text(_t("/rfx: enable RemoteFX"));
 
-            $w{chNSCodec} = Gtk3::CheckButton->new_with_label('Enable NSCodec');
+            $w{chNSCodec} = Gtk3::CheckButton->new_with_label(_t('Enable NSCodec'));
             $w{hbox3}->pack_start($w{chNSCodec}, 0, 1, 0);
-            $w{chNSCodec}->set_tooltip_text("/nsc: enable NSCodec (experimental)");
+            $w{chNSCodec}->set_tooltip_text(_t("/nsc: enable NSCodec (experimental)"));
 
-            $w{chDynamicResolution} = Gtk3::CheckButton->new_with_label('Enable dynamic resolution');
+            $w{chDynamicResolution} = Gtk3::CheckButton->new_with_label(_t('Enable dynamic resolution'));
             $w{hbox3}->pack_start($w{chDynamicResolution}, 0, 1, 0);
-            $w{chDynamicResolution}->set_tooltip_text("/dynamic-resolution: Send resolution updates when the window is resized)");
+            $w{chDynamicResolution}->set_tooltip_text(_t("/dynamic-resolution: Send resolution updates when the window is resized)"));
 
         $w{hbox4} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hbox4}, 0, 1, 5);
 
-            $w{chNoRDP} = Gtk3::CheckButton->new_with_label('Disable RDP encryption');
+            $w{chNoRDP} = Gtk3::CheckButton->new_with_label(_t('Disable RDP encryption'));
             $w{hbox4}->pack_start($w{chNoRDP}, 0, 1, 0);
-            $w{chNoRDP}->set_tooltip_text("-sec-rdp: disable Standard RDP encryption");
+            $w{chNoRDP}->set_tooltip_text(_t("-sec-rdp: disable Standard RDP encryption"));
 
-            $w{chNoTLS} = Gtk3::CheckButton->new_with_label('Disable TLS encryption');
+            $w{chNoTLS} = Gtk3::CheckButton->new_with_label(_t('Disable TLS encryption'));
             $w{hbox4}->pack_start($w{chNoTLS}, 0, 1, 0);
-            $w{chNoTLS}->set_tooltip_text("-sec-tls: disable TLS encryption");
+            $w{chNoTLS}->set_tooltip_text(_t("-sec-tls: disable TLS encryption"));
 
-            $w{chNoNLA} = Gtk3::CheckButton->new_with_label('Disable Network Level Authentication');
+            $w{chNoNLA} = Gtk3::CheckButton->new_with_label(_t('Disable Network Level Authentication'));
             $w{hbox4}->pack_start($w{chNoNLA}, 0, 1, 0);
-            $w{chNoNLA}->set_tooltip_text("-sec-nla: disable network level authentication");
+            $w{chNoNLA}->set_tooltip_text(_t("-sec-nla: disable network level authentication"));
 
-            $w{frTlsSecLevel} = Gtk3::Frame->new('TLS Security Level:');
+            $w{frTlsSecLevel} = Gtk3::Frame->new(_t('TLS Security Level:'));
             $w{hbox4}->pack_start($w{frTlsSecLevel}, 0, 1, 0);
             $w{frTlsSecLevel}->set_shadow_type('GTK_SHADOW_NONE');
-            $w{frTlsSecLevel}->set_tooltip_text('[/tls-seclevel:] : set the TLS security level (0, 1, 2, 3, 4 or 5)');
+            $w{frTlsSecLevel}->set_tooltip_text(_t('[/tls-seclevel:] : set the TLS security level (0, 1, 2, 3, 4 or 5)'));
 
                 $w{cbTlsSecLevel} = Gtk3::ComboBoxText->new;
                 $w{frTlsSecLevel}->add($w{cbTlsSecLevel});
@@ -400,29 +401,29 @@ sub _buildGUI {
         $w{hboxss} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hboxss}, 0, 1, 5);
 
-            $w{lblStartupShell} = Gtk3::Label->new('Startup shell: ');
+            $w{lblStartupShell} = Gtk3::Label->new(_t('Startup shell: '));
             $w{hboxss}->pack_start($w{lblStartupShell}, 0, 1, 0);
 
             $w{entryStartupShell} = Gtk3::Entry->new;
-            $w{entryStartupShell}->set_tooltip_text("[/shell:'startupshell command'] : start given startupshell/command instead of explorer");
+            $w{entryStartupShell}->set_tooltip_text(_t("[/shell:'startupshell command'] : start given startupshell/command instead of explorer"));
             $w{hboxss}->pack_start($w{entryStartupShell}, 1, 1, 5);
 
         $w{hboxoo} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hboxoo}, 0, 1, 5);
 
-            $w{lblOtherOptions} = Gtk3::Label->new('Other options: ');
+            $w{lblOtherOptions} = Gtk3::Label->new(_t('Other options: '));
             $w{hboxoo}->pack_start($w{lblOtherOptions}, 0, 1, 0);
 
             $w{entryOtherOptions} = Gtk3::Entry->new;
-            $w{entryOtherOptions}->set_tooltip_text("Insert other options not implemented in Asbru (launch 'xfreerdp --help' to see them all)");
+            $w{entryOtherOptions}->set_tooltip_text(_t("Insert other options not implemented in Asbru (launch 'xfreerdp --help' to see them all)"));
             $w{hboxoo}->pack_start($w{entryOtherOptions}, 1, 1, 5);
 
         $w{hbox2} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
 
-            $w{frGeometry} = Gtk3::Frame->new(' RDP Window size: ');
+            $w{frGeometry} = Gtk3::Frame->new(_t(' RDP Window size: '));
             $w{hbox2}->pack_start($w{frGeometry}, 1, 1, 0);
-            $w{frGeometry}->set_tooltip_text('[/size] : Amount of screen to use');
+            $w{frGeometry}->set_tooltip_text(_t('[/size] : Amount of screen to use'));
 
                 $w{hboxsize} = Gtk3::VBox->new(0, 5);
                 $w{frGeometry}->add($w{hboxsize});
@@ -430,21 +431,21 @@ sub _buildGUI {
                     $w{hboxfsebpc} = Gtk3::HBox->new(0, 5);
                     $w{hboxsize}->pack_start($w{hboxfsebpc}, 1, 1, 0);
 
-                    $w{chFullscreen} = Gtk3::RadioButton->new_with_label(undef, 'Fullscreen');
+                    $w{chFullscreen} = Gtk3::RadioButton->new_with_label(undef, _t('Fullscreen'));
                     $w{hboxfsebpc}->pack_start($w{chFullscreen}, 1, 1, 0);
-                    $w{chFullscreen}->set_tooltip_text('[/f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)');
+                    $w{chFullscreen}->set_tooltip_text(_t('[/f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)'));
 
-                    $w{chEmbed} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, 'Embed in TAB(*)');
+                    $w{chEmbed} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, _t('Embed in TAB(*)'));
                     $w{hboxfsebpc}->pack_start($w{chEmbed}, 1, 1, 0);
-                    $w{chEmbed}->set_tooltip_text("[-X:xid] : Embed RDP window in an Asbru TAB\n*WARNING*: if embedded windows doesn't fit perfect install Perl module X11::GUITest");
+                    $w{chEmbed}->set_tooltip_text(_t("[-X:xid] : Embed RDP window in an Asbru TAB\n*WARNING*: if embedded windows doesn't fit perfect install Perl module X11::GUITest"));
                     $w{chEmbed}->set_sensitive(1);
                     $w{chEmbed}->set_active(0);
 
                     $w{hbox69} = Gtk3::HBox->new(0, 5);
                     $w{hboxfsebpc}->pack_start($w{hbox69}, 1, 1, 0);
 
-                        $w{chWidthHeight} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, 'Width x Height:');
-                        $w{chWidthHeight}->set_tooltip_text('[/size:WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window');
+                        $w{chWidthHeight} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, _t('Width x Height:'));
+                        $w{chWidthHeight}->set_tooltip_text(_t('[/size:WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window'));
                         $w{hbox69}->pack_start($w{chWidthHeight}, 0, 1, 0);
 
                         $w{hboxWidthHeight} = Gtk3::HBox->new(0, 5);
@@ -459,38 +460,38 @@ sub _buildGUI {
                     $w{hboxPercentage} = Gtk3::HBox->new(0, 5);
                     $w{hboxsize}->pack_start($w{hboxPercentage}, 0, 1, 0);
 
-                        $w{chPercentage} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, 'Screen percentage:');
-                        $w{chPercentage}->set_tooltip_text('[/size:percentage%] : Amount of screen to use');
+                        $w{chPercentage} = Gtk3::RadioButton->new_with_label($w{chFullscreen}, _t('Screen percentage:'));
+                        $w{chPercentage}->set_tooltip_text(_t('[/size:percentage%] : Amount of screen to use'));
                         $w{chPercentage}->set_active(1);
                         $w{hboxPercentage}->pack_start($w{chPercentage}, 0, 1, 0);
 
                         $w{spGeometry} = Gtk3::HScale->new(Gtk3::Adjustment->new(90, 10, 100, 1.0, 1.0, 1.0) );
                         $w{hboxPercentage}->pack_start($w{spGeometry}, 1, 1, 0);
 
-            $w{frKeyboard} = Gtk3::Frame->new('Keyboard layout:');
+            $w{frKeyboard} = Gtk3::Frame->new(_t('Keyboard layout:'));
             $w{hbox2}->pack_start($w{frKeyboard}, 0, 1, 0);
-            $w{frKeyboard}->set_tooltip_text('[/kbd] : Keyboard layout');
+            $w{frKeyboard}->set_tooltip_text(_t('[/kbd] : Keyboard layout'));
 
                 $w{entryKeyboard} = Gtk3::Entry->new;
-                $w{entryKeyboard}->set_tooltip_text("List keyboard layouts launching 'xfreerdp /kbd-list' (0x00000...)");
+                $w{entryKeyboard}->set_tooltip_text(_t("List keyboard layouts launching 'xfreerdp /kbd-list' (0x00000...)"));
                 $w{frKeyboard}->add($w{entryKeyboard});
 
         $w{hboxDomain} = Gtk3::HBox->new(0, 5);
         $w{vbox}->pack_start($w{hboxDomain}, 0, 1, 5);
 
-            $w{hboxDomain}->pack_start(Gtk3::Label->new('Windows Domain: '), 0, 1, 0);
+            $w{hboxDomain}->pack_start(Gtk3::Label->new(_t('Windows Domain: ')), 0, 1, 0);
             $w{entryDomain} = Gtk3::Entry->new;
             $w{hboxDomain}->pack_start($w{entryDomain}, 1, 1, 0);
 
-            $w{cbRedirClipboard} = Gtk3::CheckButton->new_with_label('Clipboard redirect');
+            $w{cbRedirClipboard} = Gtk3::CheckButton->new_with_label(_t('Clipboard redirect'));
             $w{hboxDomain}->pack_start($w{cbRedirClipboard}, 0, 1, 0);
 
-            $w{cbRedirSound} = Gtk3::CheckButton->new_with_label('Sound redirect');
+            $w{cbRedirSound} = Gtk3::CheckButton->new_with_label(_t('Sound redirect'));
             $w{hboxDomain}->pack_start($w{cbRedirSound}, 0, 1, 0);
 
-        $w{frameRedirDisk} = Gtk3::Frame->new(' Disk redirects: ');
+        $w{frameRedirDisk} = Gtk3::Frame->new(_t(' Disk redirects: '));
         $w{vbox}->pack_start($w{frameRedirDisk}, 1, 1, 0);
-        $w{frameRedirDisk}->set_tooltip_text('[/drive:<8_chars_sharename>:<path>] : Redirects a <path> to the share \\tsclient\<8_chars_sharename> on the server');
+        $w{frameRedirDisk}->set_tooltip_text(_t('[/drive:<8_chars_sharename>:<path>] : Redirects a <path> to the share \\tsclient\<8_chars_sharename> on the server'));
 
             $w{vbox_enesimo} = Gtk3::VBox->new(0, 0);
             $w{frameRedirDisk}->add($w{vbox_enesimo},);
@@ -550,7 +551,7 @@ sub _buildRedir {
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-        $w{hbox}->pack_start(Gtk3::Label->new('Share Name (8 chars max.!):'), 0, 1, 0);
+        $w{hbox}->pack_start(Gtk3::Label->new(_t('Share Name (8 chars max.!):')), 0, 1, 0);
         $w{entryRedirShare} = Gtk3::Entry->new;
         $w{hbox}->pack_start($w{entryRedirShare}, 0, 1, 0);
         $w{entryRedirShare}->set_text($redirDiskShare);

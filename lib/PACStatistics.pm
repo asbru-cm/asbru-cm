@@ -79,6 +79,12 @@ sub new {
     return $self;
 }
 
+sub _durationString {
+    my $total_time = shift // 0;
+
+    return sprintf(_t('%d days, %d hours, %d minutes, %d seconds'), int($total_time / 86400), ($total_time / 3600) % 24, ($total_time / 60) % 60, $total_time % 60);
+}
+
 sub update {
     my $self = shift;
     my $uuid = shift;
@@ -125,18 +131,14 @@ sub update {
         }
 
         # Prepare STRINGIFIED data
-        my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400) . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
-        $str_total_time .= $total_time % 60 . ' seconds';
+        my $str_total_time = _durationString($total_time);
 
         $$self{frame}{lblPR}->set_markup(
-            "<span $font><b>All connections</b>\n" .
-            "Total groups:                  <b>$groups</b>\n" .
-            "Total nodes:                   <b>$nodes</b>\n" .
-            "Total connections established: <b>$total_conn</b>\n" .
-            "Total time connected:          <b>$str_total_time</b></span>"
+            "<span $font><b>" . _t('All connections') . "</b>\n" .
+            sprintf("%-30s <b>%s</b>\n", _t('Total groups:'), $groups) .
+            sprintf("%-30s <b>%s</b>\n", _t('Total nodes:'), $nodes) .
+            sprintf("%-30s <b>%s</b>\n", _t('Total connections established:'), $total_conn) .
+            sprintf("%-30s <b>%s</b></span>", _t('Total time connected:'), $str_total_time)
         );
     } elsif ($$cfg{environments}{$uuid}{_is_group}) {
         $$self{frame}{hboxPACRoot}->hide();
@@ -160,18 +162,14 @@ sub update {
         }
 
         # Prepare STRINGIFIED data
-        my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400) . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
-        $str_total_time .= $total_time % 60 . ' seconds';
+        my $str_total_time = _durationString($total_time);
 
         $$self{frame}{lblPG}->set_markup(
-            "<span $font><b>Group: @{[__($name)]}</b>\n" .
-            "Total sub-groups:              <b>$groups</b>\n" .
-            "Total contained nodes:         <b>$nodes</b>\n" .
-            "Total connections established: <b>$total_conn</b>\n" .
-            "Total time connected:          <b>$str_total_time</b></span>"
+            "<span $font><b>" . sprintf(_t('Group: %s'), __($name)) . "</b>\n" .
+            sprintf("%-30s <b>%s</b>\n", _t('Total sub-groups:'), $groups) .
+            sprintf("%-30s <b>%s</b>\n", _t('Total contained nodes:'), $nodes) .
+            sprintf("%-30s <b>%s</b>\n", _t('Total connections established:'), $total_conn) .
+            sprintf("%-30s <b>%s</b></span>", _t('Total time connected:'), $str_total_time)
         );
     } else {
         $$self{frame}{hboxPACRoot}->hide();
@@ -197,21 +195,17 @@ sub update {
         $total_conn = $$self{statistics}{$uuid}{total_conn} // 0;
         $total_time = $$self{statistics}{$uuid}{total_time} // 0;
 
-        my $str_start = $start ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{start}) ) : 'NO DATA AVAILABLE';
-        my $str_stop = $stop ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{stop}) ) : 'NO DATA AVAILABLE';
+        my $str_start = $start ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{start}) ) : _t('NO DATA AVAILABLE');
+        my $str_stop = $stop ? strftime("%Y-%m-%d %H:%M:%S", localtime($$self{statistics}{$uuid}{stop}) ) : _t('NO DATA AVAILABLE');
 
         # Prepare STRINGIFIED data
-        my $str_total_time = '';
-        $str_total_time .= int($total_time / 86400) . ' days, ';
-        $str_total_time .= ($total_time / 3600) % 24 . ' hours, ';
-        $str_total_time .= ($total_time / 60) % 60 . ' minutes, ';
-        $str_total_time .= $total_time % 60 . ' seconds';
+        my $str_total_time = _durationString($total_time);
 
         $$self{frame}{lblPN}->set_markup(
-            "<span $font><b>Connection: @{[__($name)]}</b>\n\n" .
-            "Total connections established: <b>$total_conn</b>\n" .
-            "Last connection:               <b>$str_start</b>\n" .
-            "Total time connected:          <b>$str_total_time</b></span>"
+            "<span $font><b>" . sprintf(_t('Connection: %s'), __($name)) . "</b>\n\n" .
+            sprintf("%-30s <b>%s</b>\n", _t('Total connections established:'), $total_conn) .
+            sprintf("%-30s <b>%s</b>\n", _t('Last connection:'), $str_start) .
+            sprintf("%-30s <b>%s</b></span>", _t('Total time connected:'), $str_total_time)
         );
     }
 
@@ -278,7 +272,7 @@ sub _buildStatisticsGUI {
 
     $w{hboxReset} = Gtk3::HBox->new(0, 5);
     $w{hboxReset}->pack_start(Gtk3::Image->new_from_stock('gtk-refresh', 'menu'), 0, 1, 5);
-    $w{hboxReset}->pack_start(Gtk3::Label->new("Reset\nStatistics"), 0, 1, 5);
+    $w{hboxReset}->pack_start(Gtk3::Label->new(_t("Reset\nStatistics")), 0, 1, 5);
     $w{btnReset} = Gtk3::Button->new();
     $w{btnReset}->set_size_request(155, 0);
     $w{btnReset}->set_valign('GTK_ALIGN_CENTER');
@@ -323,7 +317,7 @@ sub _buildStatisticsGUI {
         my $name = $$cfg{environments}{$uuid}{name};
 
         if ($uuid eq '__PAC__ROOT__') {
-            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset <b>all Ásbrú</b> statistics?\n\nThis action can not be undone!")) {
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, _t("Are you sure you want to reset <b>all Ásbrú</b> statistics?\n\nThis action can not be undone!"))) {
                 foreach my $child (keys %{$$cfg{environments}}) {
                     if ($child eq '__PAC__ROOT__') {
                         next;
@@ -335,7 +329,7 @@ sub _buildStatisticsGUI {
                 }
             }
         } elsif ($$cfg{environments}{$uuid}{_is_group}) {
-            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for group:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, sprintf(_t("Are you sure you want to reset statistics for group:\n\n<b>%s</b>\n\nThis action can not be undone!"), __($name)))) {
                 foreach my $child ($PACMain::FUNCS{_MAIN}{_GUI}{treeConnections}->_getChildren($uuid, 0, 1)) {
                     $$self{statistics}{$child}{start} = 0;
                     $$self{statistics}{$child}{stop} = 0;
@@ -344,7 +338,7 @@ sub _buildStatisticsGUI {
                 }
             }
         } else {
-            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Are you sure you want to reset statistics for connection:\n\n<b>@{[__($name)]}</b>\n\nThis action can not be undone!")) {
+            if (_wConfirm($PACMain::FUNCS{_MAIN}{_GUI}{main}, sprintf(_t("Are you sure you want to reset statistics for connection:\n\n<b>%s</b>\n\nThis action can not be undone!"), __($name)))) {
                 $$self{statistics}{$uuid}{start} = 0;
                 $$self{statistics}{$uuid}{stop} = 0;
                 $$self{statistics}{$uuid}{total_conn} = 0;

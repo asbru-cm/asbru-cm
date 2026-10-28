@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -160,13 +161,13 @@ sub _buildGUI
 
     $w{vbox} = $container;
 
-        $w{chRestricted} = Gtk3::CheckButton->new_with_label('Set restricted mode');
+        $w{chRestricted} = Gtk3::CheckButton->new_with_label(_t('Set restricted mode'));
         $w{vbox}->pack_start($w{chRestricted}, 0, 1, 0);
-        $w{chRestricted}->set_tooltip_text("[-r] : Don't allow changing of logging status, suspending of remote-tty or setting of line options");
+        $w{chRestricted}->set_tooltip_text(_t("[-r] : Don't allow changing of logging status, suspending of remote-tty or setting of line options"));
 
-        $w{ch7Bit} = Gtk3::CheckButton->new_with_label('Set 7bit mode');
+        $w{ch7Bit} = Gtk3::CheckButton->new_with_label(_t('Set 7bit mode'));
         $w{vbox}->pack_start($w{ch7Bit}, 0, 1, 0);
-        $w{ch7Bit}->set_tooltip_text('[-7] : Set 7bit connection mode');
+        $w{ch7Bit}->set_tooltip_text(_t('[-7] : Set 7bit connection mode'));
 
     $$self{gui} = \%w;
 

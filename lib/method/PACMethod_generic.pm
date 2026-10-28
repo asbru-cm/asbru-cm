@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -139,7 +140,7 @@ sub _buildGUI
 
     $w{vbox} = $container;
 
-        $w{vbox}->pack_start(Gtk3::Label->new('No option to configure here.'), 1, 1, 0);
+        $w{vbox}->pack_start(Gtk3::Label->new(_t('No option to configure here.')), 1, 1, 0);
 
     $$self{gui} = \%w;
 

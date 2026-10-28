@@ -153,7 +153,7 @@ sub update {
     $$self{_METHOD} =~ s/-/_/go;
 
     if (! defined $$self{_CFG}{method} || ! defined $METHODS{$$self{_METHOD}}) {
-        _wMessage($PACMain::{FUNCS}{_MAIN}{_WINDOWEDIT}, "Sorry, but connection <b>'$$self{_CFG}{'name'}'</b> of type <b>'$$self{_CFG}{'method'}'</b>, which is not supported in your actual system state.\nPlease, try installing the proper package providing that functionality.");
+        _wMessage($PACMain::{FUNCS}{_MAIN}{_WINDOWEDIT}, sprintf(_t("Sorry, but connection <b>'%s'</b> of type <b>'%s'</b>, which is not supported in your actual system state.\nPlease, try installing the proper package providing that functionality."), $$self{_CFG}{'name'}, $$self{_CFG}{'method'}));
         return 0;
     }
 

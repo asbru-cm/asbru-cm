@@ -59,6 +59,8 @@ require Exporter;
 @EXPORT     = qw(
     _
     __
+    _t
+    _gladeBuilder
     _screenshot
     _scale
     _pixBufFromFile
@@ -238,6 +240,19 @@ our $DEFAULT_HOSTKEYCHANGED_PROMPT = '^.+ontinue connecting \(([^/]+)\/([^/]+)(?
 our $DEFAULT_PRESSANYKEY_PROMPT = '.*(any key to continue|tecla para continuar).*';
 our $DEFAULT_REMOTEHOSTCHANGED_PROMPT = '.*ffending .*key in (.+?)\:(\d+).*';
 
+# Translations (gettext): the user interface follows the language of the
+# environment Ásbrú was started from (Perl reads it before the main script
+# forces LANG for the child processes). Translations live in res/locale,
+# compiled from po/*.po.
+our $TEXT_DOMAIN = 'asbru-cm';
+# Locale::gettext is optional: without it the interface stays in English.
+our $LOCALE_DIR = -d "$RealBin/res/locale" ? "$RealBin/res/locale" : '/usr/share/locale';
+our $HAS_GETTEXT = eval { require Locale::gettext; 1 } // 0;
+if ($HAS_GETTEXT) {
+    Locale::gettext::bindtextdomain($TEXT_DOMAIN, $LOCALE_DIR);
+    Locale::gettext::bind_textdomain_codeset($TEXT_DOMAIN, 'UTF-8');
+}
+
 # END: Define GLOBAL CLASS variables
 ###################################################################
 
@@ -246,6 +261,23 @@ our $DEFAULT_REMOTEHOSTCHANGED_PROMPT = '.*ffending .*key in (.+?)\:(\d+).*';
 
 sub _ {
     return shift->{_GLADE}->get_object(shift);
+};
+
+sub _t {
+    my $str = shift // '';
+
+    return $str if $str eq '' || !$HAS_GETTEXT;
+    return decode('UTF-8', Locale::gettext::dgettext($TEXT_DOMAIN, encode('UTF-8', $str)));
+};
+
+sub _gladeBuilder {
+    my $file = shift;
+
+    my $builder = Gtk3::Builder->new();
+    $builder->set_translation_domain($TEXT_DOMAIN);
+    $builder->add_from_file($file);
+
+    return $builder;
 };
 
 sub __ {
@@ -415,7 +447,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 3389);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'entryUser')->set_sensitive(1);
@@ -442,7 +474,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -486,7 +518,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 3389);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'entryUser')->set_sensitive(1);
@@ -513,7 +545,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -554,7 +586,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 5900);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'vboxAuthMethod')->set_sensitive(1);
@@ -581,7 +613,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(0);
             _($self, 'labelVariables')->set_sensitive(0);
             _($self, 'labelTerminalOptions')->set_sensitive(0);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -609,7 +641,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(0);
             _($self, 'entryPort')->set_value(0);
-            _($self, 'labelIP')->set_text('System / Phone / "dir": ');
+            _($self, 'labelIP')->set_text(_t('System / Phone / "dir": '));
             _($self, 'entryIP')->set_property('tooltip-markup', "Enter string of kind: system | phone | 'dir' or\nleave empty and use the 'Line' option under the 'cu options' tab on the left");
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'entryUser')->set_text('');
@@ -631,7 +663,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -672,7 +704,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(0);
             _($self, 'entryPort')->set_value(0);
-            _($self, 'labelIP')->set_text('TTY Socket: ');
+            _($self, 'labelIP')->set_text(_t('TTY Socket: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'Enter a TTY / Serial socket (eg: /dev/tty*)');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
@@ -698,7 +730,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -729,7 +761,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value(23);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the host to connect to');
             _($self, 'entryUser')->set_text('');
             _($self, 'entryPassword')->set_text('');
@@ -745,7 +777,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'frameRemoteMacros')->set_sensitive(1);
             _($self, 'frameLocalMacros')->set_sensitive(1);
@@ -786,7 +818,7 @@ sub _getMethods {
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_range(0, 65536);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 22);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -812,7 +844,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive($autossh);
             _($self, 'cbAutossh')->set_active($$cfg{'autossh'});
         },
@@ -850,7 +882,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 22);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -877,7 +909,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -915,7 +947,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(0);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 80);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -942,7 +974,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -982,7 +1014,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 23);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryIP')->set_text($$cfg{ip} // '');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
@@ -1009,7 +1041,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1053,7 +1085,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 22);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -1080,7 +1112,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1119,7 +1151,7 @@ sub _getMethods {
             #_($self, 'vboxVarious')->set_sensitive(1);
             _($self, 'framePort')->set_sensitive(1);
             _($self, 'entryPort')->set_value($method eq $$cfg{method} ? $$cfg{port} : 21);
-            _($self, 'labelIP')->set_text('Host: ');
+            _($self, 'labelIP')->set_text(_t('Host: '));
             _($self, 'entryIP')->set_property('tooltip-markup', 'IP or Hostname of the machine to connect to');
             _($self, 'entryUser')->set_text($$cfg{user} // '');
             _($self, 'entryPassword')->set_text($$cfg{pass} // '');
@@ -1145,7 +1177,7 @@ sub _getMethods {
             _($self, 'frameLocalMacros')->set_sensitive(1);
             _($self, 'frameVariables')->set_sensitive(1);
             _($self, 'frameTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1172,7 +1204,7 @@ sub _getMethods {
             _($self, 'imageMethod')->set_from_pixbuf($pixbuf);
             _($self, 'imageConnOptions')->set_from_pixbuf($pixbuf);
             #_($self, 'vboxVarious')->set_sensitive(0);
-            _($self, 'labelIP')->set_text('Full command line: ');
+            _($self, 'labelIP')->set_text(_t('Full command line: '));
             _($self, 'entryIP')->set_property('tooltip-markup', "Full command line to execute, example:\nfirefox http://www.google.es\nor\nxdg-open \$HOME/Pictures/mounaint.jpg\nor\n/bin/bash -login\netc...");
             _($self, 'framePort')->set_sensitive(0);
             _($self, 'entryPort')->set_value(0);
@@ -1195,7 +1227,7 @@ sub _getMethods {
             _($self, 'labelLocalMacros')->set_sensitive(1);
             _($self, 'labelVariables')->set_sensitive(1);
             _($self, 'labelTerminalOptions')->set_sensitive(1);
-            _($self, 'labelCmdLineOptions')->set_markup(" <b>$method</b> command line options");
+            _($self, 'labelCmdLineOptions')->set_markup(sprintf(_t(' <b>%s</b> command line options'), $method));
             _($self, 'cbAutossh')->set_sensitive(0);
             _($self, 'cbAutossh')->set_active(0);
         },
@@ -1338,13 +1370,13 @@ sub _menuFavouriteConnections {
                 stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$uuid}{'description'},
                 submenu => [
-                    {label => 'Start',
+                    {label => _t('Start'),
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
                         code => sub {
                             $PACMain::FUNCS{_MAIN}->_launchTerminals([[$uuid]]);
                         }
                     }, {
-                        label => "Chain with '$$terminal{_NAME}'",
+                        label => sprintf(_t("Chain with '%s'"), $$terminal{_NAME}),
                         stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
                         code => sub {
@@ -1423,13 +1455,13 @@ sub _menuAvailableConnections {
                 stockicon => $PACMain::UNITY ? '' : "asbru-method-$$cfg{'environments'}{$this_uuid}{'method'}",
                 tooltip => $$cfg{'environments'}{$this_uuid}{'description'},
                 submenu => [{
-                        label => 'Start',
+                        label => _t('Start'),
                         stockicon => $PACMain::UNITY ? '' : 'gtk-media-play',
                         code => sub {
                             $PACMain::FUNCS{_MAIN}->_launchTerminals([[$this_uuid]]);
                         }
                     }, {
-                        label => "Chain with '$$terminal{_NAME}'",
+                        label => sprintf(_t("Chain with '%s'"), $$terminal{_NAME}),
                         stockicon => $PACMain::UNITY ? '' : 'asbru-chain',
                         sensitive => $$terminal{CONNECTED},
                         code => sub {
@@ -1639,7 +1671,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl1} = Gtk3::Label->new();
     $w{window}{gui}{hbox1}->pack_start($w{window}{gui}{lbl1}, 0, 1, 0);
-    $w{window}{gui}{lbl1}->set_text('Enter new NAME ');
+    $w{window}{gui}{lbl1}->set_text(_t('Enter new NAME '));
 
     # Create the entry widget
     $w{window}{gui}{entry1} = Gtk3::Entry->new();
@@ -1659,7 +1691,7 @@ sub _wAddRenameNode {
     # Create label
     $w{window}{gui}{lbl2} = Gtk3::Label->new();
     $w{window}{gui}{hbox2}->pack_start($w{window}{gui}{lbl2}, 0, 1, 0);
-    $w{window}{gui}{lbl2}->set_text('Enter new TITLE ');
+    $w{window}{gui}{lbl2}->set_text(_t('Enter new TITLE '));
 
     # Create the entry widget
     $w{window}{gui}{entry2} = Gtk3::Entry->new();
@@ -1840,7 +1872,7 @@ sub _wMessage {
     $windowConfirm->get_style_context()->add_class($class);
     $windowConfirm->set_markup($msg);
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("$APPNAME : Message");
+    $windowConfirm->set_title("$APPNAME : " . _t('Message'));
 
     # The message can be selected by user (eg for copy/paste)
     if ($selectable) {
@@ -1916,7 +1948,7 @@ sub _wProgress {
     if ($progress) {
         my ($partial, $total) = split('/', $progress);
 
-        $WINDOWPROGRESS{lbl1}->set_markup('<b>Please, wait...</b>');
+        $WINDOWPROGRESS{lbl1}->set_markup(_t('<b>Please, wait...</b>'));
         $WINDOWPROGRESS{pb}->set_text($msg);
         $WINDOWPROGRESS{pb}->set_fraction($partial / $total);
 
@@ -1959,7 +1991,7 @@ sub _wConfirm {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'no', 'gtk-ok' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME");
+    $windowConfirm->set_title(_t('Confirm action') . " : $APPNAME");
     $windowConfirm->set_default_response($default);
 
     $windowConfirm->show_all();
@@ -1989,7 +2021,7 @@ sub _wYesNoCancel {
     $windowConfirm->set_markup($msg);
     $windowConfirm->add_buttons('gtk-cancel'=> 'cancel','gtk-no'=> 'no','gtk-yes' => 'yes');
     $windowConfirm->set_icon_name('asbru-app-big');
-    $windowConfirm->set_title("Confirm action : $APPNAME");
+    $windowConfirm->set_title(_t('Confirm action') . " : $APPNAME");
 
     $windowConfirm->show_all();
     my $close = $windowConfirm->run();
@@ -2004,31 +2036,31 @@ sub _wSetPACPassword {
 
     # Ask for old password
     if ($ask_old) {
-        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, 'GUI Password Change', "Please, enter <b>OLD</b> GUI Password...", undef, 0, 'asbru-protected');
+        my $old_pass = _wEnterValue($$self{_WINDOWCONFIG}, _t('GUI Password Change'), _t("Please, enter <b>OLD</b> GUI Password..."), undef, 0, 'asbru-protected');
         if (!defined $old_pass) {
             return 0;
         }
 
         if ($CIPHER->encrypt_hex($old_pass) ne $$self{_CFG}{'defaults'}{'gui password'}) {
-            _wMessage($$self{_WINDOWCONFIG}, "ERROR: Wrong <b>OLD</b> password!!");
+            _wMessage($$self{_WINDOWCONFIG}, _t("ERROR: Wrong <b>OLD</b> password!!"));
             return 0;
         }
     }
 
     # Ask for new password
-    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, enter <b>NEW</b> GUI Password...", undef, 0, 'asbru-protected');
+    my $new_pass1 = _wEnterValue($$self{_WINDOWCONFIG}, _t('<b>GUI Password Change</b>'), _t("Please, enter <b>NEW</b> GUI Password..."), undef, 0, 'asbru-protected');
     if (!defined $new_pass1) {
         return 0;
     }
 
     # Re-type new password
-    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, '<b>GUI Password Change</b>', "Please, <b>confirm NEW</b> GUI Password...", undef, 0, 'asbru-protected');
+    my $new_pass2 = _wEnterValue($$self{_WINDOWCONFIG}, _t('<b>GUI Password Change</b>'), _t("Please, <b>confirm NEW</b> GUI Password..."), undef, 0, 'asbru-protected');
     if (!defined $new_pass2) {
         return 0;
     }
 
     if ($new_pass1 ne $new_pass2) {
-        _wMessage($$self{_WINDOWCONFIG}, '<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!');
+        _wMessage($$self{_WINDOWCONFIG}, _t('<b>ERROR</b>: Provided <b>NEW</b> passwords <span color="red"><b>DO NOT MATCH</b></span>!!!'));
         return 0;
     }
 
@@ -2954,7 +2986,7 @@ sub _subst {
         # Replace '<ASK:#>' with user provided data for 'cmd' execution
         while ($string =~ /<ASK:(\d+?)>/go) {
             my $var = $1;
-            my $val = _wEnterValue(undef, "<b>Variable substitution '$var'</b>" , $string) // return undef;
+            my $val = _wEnterValue(undef, sprintf(_t("<b>Variable substitution '%s'</b>"), $var) , $string) // return undef;
             $string =~ s/<ASK:$var>/$val/g;
             $ret = $string;
         }
@@ -2964,7 +2996,7 @@ sub _subst {
             my $desc = $1;
             my $var = $2;
             my @list = split('\|', $var);
-            ($ret, $pos) = _wEnterValue(undef, "<b>Choose variable value:</b>" , $desc, \@list);
+            ($ret, $pos) = _wEnterValue(undef, _t("<b>Choose variable value:</b>") , $desc, \@list);
             $string =~ s/<ASK:(.+?)\|(.+?)>/$ret/;
             $ret = $string;
         }
@@ -2972,7 +3004,7 @@ sub _subst {
         # Replace '<ASK:*>' with user provided data for 'cmd' execution
         while ($string =~ /<ASK:(.+?)>/go) {
             my $var = $1;
-            my $val = _wEnterValue(undef, "<b>Variable substitution</b>" , "Please, enter a value for:'$var'") // return undef;
+            my $val = _wEnterValue(undef, _t("<b>Variable substitution</b>") , sprintf(_t("Please, enter a value for:'%s'"), $var)) // return undef;
             $string =~ s/<ASK:$var>/$val/g;
             $ret = $string;
         }
@@ -3098,7 +3130,7 @@ sub _wakeOnLan {
     # Create 1st label
     $w{window}{gui}{lblup} = Gtk3::Label->new();
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblup}, 1, 1, 0);
-    $w{window}{gui}{lblup}->set_markup("<b>Enter the following data and press 'OK' to send Magic Packet:</b>");
+    $w{window}{gui}{lblup}->set_markup(_t("<b>Enter the following data and press 'OK' to send Magic Packet:</b>"));
 
     $w{window}{gui}{table} = Gtk3::Table->new(3, 3, 0);
     $w{window}{gui}{table}->set_margin_top(10);
@@ -3108,7 +3140,7 @@ sub _wakeOnLan {
     # Create MAC label
     $w{window}{gui}{lblmac} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblmac}, 0, 1, 0, 1);
-    $w{window}{gui}{lblmac}->set_text('MAC Address: ');
+    $w{window}{gui}{lblmac}->set_text(_t('MAC Address: '));
 
     # Create MAC entry widget
     $w{window}{gui}{entrymac} = Gtk3::Entry->new();
@@ -3124,7 +3156,7 @@ sub _wakeOnLan {
     # Create HOST label
     $w{window}{gui}{lblip} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblip}, 0, 1, 1, 2);
-    $w{window}{gui}{lblip}->set_text('Host: ');
+    $w{window}{gui}{lblip}->set_text(_t('Host: '));
 
     # Create HOST entry widget
     $w{window}{gui}{entryip} = Gtk3::Entry->new();
@@ -3140,7 +3172,7 @@ sub _wakeOnLan {
     # Create PORT label
     $w{window}{gui}{lblport} = Gtk3::Label->new();
     $w{window}{gui}{table}->attach_defaults($w{window}{gui}{lblport}, 0, 1, 2, 3);
-    $w{window}{gui}{lblport}->set_text('Port Number: ');
+    $w{window}{gui}{lblport}->set_text(_t('Port Number: '));
 
     # Create PORT entry widget
     $w{window}{gui}{entryport} = Gtk3::SpinButton->new_with_range(1, 65535, 1);
@@ -3149,7 +3181,7 @@ sub _wakeOnLan {
     $w{window}{gui}{entryport}->set_activates_default(1);
 
     # Send to broadcast
-    $w{window}{gui}{cbbroadcast} = Gtk3::CheckButton->new_with_label('Send to broadcast');
+    $w{window}{gui}{cbbroadcast} = Gtk3::CheckButton->new_with_label(_t('Send to broadcast'));
     $w{window}{gui}{cbbroadcast}->set_active(1);
     $w{window}{gui}{cbbroadcast}->set_sensitive($ip);
     $w{window}{gui}{hbox2} = Gtk3::HBox->new(0, 0);
@@ -3162,7 +3194,7 @@ sub _wakeOnLan {
     $w{window}{gui}{lblstatus} = Gtk3::Label->new();
     $w{window}{gui}{lblstatus}->set_margin_bottom(20);
     $w{window}{data}->get_content_area->pack_start($w{window}{gui}{lblstatus}, 0, 1, 0);
-    $w{window}{gui}{lblstatus}->set_text("Checking MAC for '$ip' ...");
+    $w{window}{gui}{lblstatus}->set_text(sprintf(_t("Checking MAC for '%s' ..."), $ip));
 
     # Show the window
     $w{window}{data}->show_all();
@@ -3216,11 +3248,11 @@ sub _wakeOnLan {
     } elsif (! $ip) {
         $w{window}{gui}{entrymac}->set_text($mac);
         $w{window}{gui}{entrymac}->select_region(0, length($mac));
-        $w{window}{gui}{lblstatus}->set_text('No IP/hostname to test reachability');
+        $w{window}{gui}{lblstatus}->set_text(_t('No IP/hostname to test reachability'));
     } else {
         $w{window}{gui}{entrymac}->set_text($mac);
         $w{window}{gui}{entrymac}->select_region(0, length($mac));
-        $w{window}{gui}{lblstatus}->set_text("Selected saved MAC");
+        $w{window}{gui}{lblstatus}->set_text(_t("Selected saved MAC"));
     }
 
     ##########################################################
@@ -3266,7 +3298,7 @@ sub _wakeOnLan {
     }
 
     if (! send(S, $MAGIC, $SIZE, $paddr)) {
-        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "ERROR: Sending magic packet to $ip (MAC: $mac) failed:\n$!");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, sprintf(_t("ERROR: Sending magic packet to %s (MAC: %s) failed:\n%s"), $ip, $mac, $!));
         return $mac;
     } else {
         send(S, $MAGIC, $SIZE, $paddr);
@@ -3283,7 +3315,7 @@ sub _wakeOnLan {
             send(S, $MAGIC, $SIZE, sockaddr_in(9, $ipaddr));
         }
 
-        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "Wake On Lan 'Magic Packet'\nCORRECTLY sent to " . ($broadcast ? 'BROADCAST' : "IP: $ip") . "\n(MAC: $mac)");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, sprintf(_t("Wake On Lan 'Magic Packet'\nCORRECTLY sent to %s\n(MAC: %s)"), ($broadcast ? 'BROADCAST' : "IP: $ip"), $mac));
     }
 
     return $mac;

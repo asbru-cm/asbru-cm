@@ -155,7 +155,7 @@ sub DESTROY {
 sub show {
     my $self = shift;
 
-    $$self{_WINDOWPCC}{main}->set_title("$APPNAME (v$APPVERSION): Power Cluster Controller");
+    $$self{_WINDOWPCC}{main}->set_title("$APPNAME (v$APPVERSION): " . _t('Power Cluster Controller'));
     $$self{_WINDOWPCC}{main}->show_all;
     $$self{_WINDOWPCC}{main}->present;
 
@@ -198,29 +198,29 @@ sub _initGUI {
     my $hbox1 = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($hbox1, 0, 1, 0);
 
-    my $lblSendTo = Gtk3::Label->new('Send to Cluster: ');
+    my $lblSendTo = Gtk3::Label->new(_t('Send to Cluster: '));
     $hbox1->pack_start($lblSendTo, 0, 1, 0);
 
     $$self{_WINDOWPCC}{comboTerminals} = Gtk3::ComboBoxText->new;
     $hbox1->pack_start($$self{_WINDOWPCC}{comboTerminals}, 1, 1, 0);
     $$self{_WINDOWPCC}{comboTerminals}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{comboTerminals}->set_tooltip_text('Selected cluster will be the one used to send the keystrokes and for both the "Explode" and "Close ALL" buttons');
+    $$self{_WINDOWPCC}{comboTerminals}->set_tooltip_text(_t('Selected cluster will be the one used to send the keystrokes and for both the "Explode" and "Close ALL" buttons'));
 
-    $$self{_WINDOWPCC}{cbSendToAll} = Gtk3::CheckButton->new_with_label('Send to ALL terminals');
+    $$self{_WINDOWPCC}{cbSendToAll} = Gtk3::CheckButton->new_with_label(_t('Send to ALL terminals'));
     $hbox1->pack_start($$self{_WINDOWPCC}{cbSendToAll}, 0, 1, 0);
     $$self{_WINDOWPCC}{cbSendToAll}->set_active(0);
     $$self{_WINDOWPCC}{cbSendToAll}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{cbSendToAll}->set_tooltip_text('If checked, commands will be sent to *EVERY* terminal opened, either clustered or unclustered');
+    $$self{_WINDOWPCC}{cbSendToAll}->set_tooltip_text(_t('If checked, commands will be sent to *EVERY* terminal opened, either clustered or unclustered'));
 
-    $$self{_WINDOWPCC}{btnRestartAll} = Gtk3::Button->new_with_mnemonic('_Restart all');
+    $$self{_WINDOWPCC}{btnRestartAll} = Gtk3::Button->new_with_mnemonic(_t('_Restart all'));
     $hbox1->pack_start($$self{_WINDOWPCC}{btnRestartAll}, 0, 1, 0);
-    $$self{_WINDOWPCC}{btnRestartAll}->set_tooltip_text("Restart (stop->start) *every* terminal in selected cluster");
+    $$self{_WINDOWPCC}{btnRestartAll}->set_tooltip_text(_t("Restart (stop->start) *every* terminal in selected cluster"));
     $$self{_WINDOWPCC}{btnRestartAll}->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
     $$self{_WINDOWPCC}{btnRestartAll}->set('can_focus', 0);
 
-    $$self{_WINDOWPCC}{btnCloseAll} = Gtk3::Button->new_with_mnemonic('Close _ALL');
+    $$self{_WINDOWPCC}{btnCloseAll} = Gtk3::Button->new_with_mnemonic(_t('Close _ALL'));
     $hbox1->pack_start($$self{_WINDOWPCC}{btnCloseAll}, 0, 1, 0);
-    $$self{_WINDOWPCC}{btnCloseAll}->set_tooltip_text("Close *every* terminal in selected cluster");
+    $$self{_WINDOWPCC}{btnCloseAll}->set_tooltip_text(_t("Close *every* terminal in selected cluster"));
     $$self{_WINDOWPCC}{btnCloseAll}->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button') );
     $$self{_WINDOWPCC}{btnCloseAll}->set('can_focus', 0);
 
@@ -229,30 +229,30 @@ sub _initGUI {
     $$self{_WINDOWPCC}{optsbox} = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($$self{_WINDOWPCC}{optsbox}, 0, 1, 0);
 
-    $$self{_WINDOWPCC}{cbPreventSingle} = Gtk3::CheckButton->new_with_label('Prevent single window keys broadcast');
+    $$self{_WINDOWPCC}{cbPreventSingle} = Gtk3::CheckButton->new_with_label(_t('Prevent single window keys broadcast'));
     $$self{_WINDOWPCC}{optsbox}->pack_start($$self{_WINDOWPCC}{cbPreventSingle}, 0, 1, 0);
     $$self{_WINDOWPCC}{cbPreventSingle}->set_active(1);
     $$self{_WINDOWPCC}{cbPreventSingle}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{cbPreventSingle}->set_tooltip_text('If checked, any kestroke over a single connection will not be propagated to the rest of the elements of the selected cluster');
+    $$self{_WINDOWPCC}{cbPreventSingle}->set_tooltip_text(_t('If checked, any kestroke over a single connection will not be propagated to the rest of the elements of the selected cluster'));
 
-    $$self{_WINDOWPCC}{cbAlwaysOnTop} = Gtk3::CheckButton->new_with_label('PCC Window Always on top');
+    $$self{_WINDOWPCC}{cbAlwaysOnTop} = Gtk3::CheckButton->new_with_label(_t('PCC Window Always on top'));
     $$self{_WINDOWPCC}{optsbox}->pack_start($$self{_WINDOWPCC}{cbAlwaysOnTop}, 0, 1, 0);
     $$self{_WINDOWPCC}{cbAlwaysOnTop}->set_active(1);
     $$self{_WINDOWPCC}{cbAlwaysOnTop}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{cbAlwaysOnTop}->set_tooltip_text('If checked, this window will always stay on top (over) the rest of windows');
+    $$self{_WINDOWPCC}{cbAlwaysOnTop}->set_tooltip_text(_t('If checked, this window will always stay on top (over) the rest of windows'));
 
-    $$self{_WINDOWPCC}{cbShowMultiText} = Gtk3::CheckButton->new_with_label('Use Multi-Line Text Entry');
+    $$self{_WINDOWPCC}{cbShowMultiText} = Gtk3::CheckButton->new_with_label(_t('Use Multi-Line Text Entry'));
     $$self{_WINDOWPCC}{optsbox}->pack_start($$self{_WINDOWPCC}{cbShowMultiText}, 0, 1, 0);
     $$self{_WINDOWPCC}{cbShowMultiText}->set_active(0);
     $$self{_WINDOWPCC}{cbShowMultiText}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{cbShowMultiText}->set_tooltip_text('If checked, you will have a bigger text entry to write your commands, ready to be sent to the selected cluster all at once when clicking on any of the buttons below');
+    $$self{_WINDOWPCC}{cbShowMultiText}->set_tooltip_text(_t('If checked, you will have a bigger text entry to write your commands, ready to be sent to the selected cluster all at once when clicking on any of the buttons below'));
 
     $vbox1->pack_start(Gtk3::HSeparator->new, 1, 1, 0);
 
     $$self{_WINDOWPCC}{hboxData} = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($$self{_WINDOWPCC}{hboxData}, 0, 1, 0);
 
-    $$self{_WINDOWPCC}{lblData} = Gtk3::Label->new('Type commands here: ');
+    $$self{_WINDOWPCC}{lblData} = Gtk3::Label->new(_t('Type commands here: '));
     $$self{_WINDOWPCC}{hboxData}->pack_start($$self{_WINDOWPCC}{lblData}, 0, 1, 0);
 
     $$self{_WINDOWPCC}{entryData} = Gtk3::Entry->new;
@@ -260,11 +260,11 @@ sub _initGUI {
     $$self{_WINDOWPCC}{entryData}->set_icon_from_stock('primary', 'gtk-edit');
     $$self{_WINDOWPCC}{entryData}->drag_dest_unset;
 
-    $$self{_WINDOWPCC}{cbApplyOnIntro} = Gtk3::CheckButton->new_with_label('Send on <INTRO>');
+    $$self{_WINDOWPCC}{cbApplyOnIntro} = Gtk3::CheckButton->new_with_label(_t('Send on <INTRO>'));
     $$self{_WINDOWPCC}{hboxData}->pack_start($$self{_WINDOWPCC}{cbApplyOnIntro}, 0, 1, 0);
     $$self{_WINDOWPCC}{cbApplyOnIntro}->set_active(0);
     $$self{_WINDOWPCC}{cbApplyOnIntro}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{cbApplyOnIntro}->set_tooltip_text("If checked, keypresses will appear here, and will be sent on <INTRO> keypress\nOther else, they will not be echoed out, but sent each of them instantly");
+    $$self{_WINDOWPCC}{cbApplyOnIntro}->set_tooltip_text(_t("If checked, keypresses will appear here, and will be sent on <INTRO> keypress\nOther else, they will not be echoed out, but sent each of them instantly"));
 
     $vbox1->pack_start(Gtk3::HSeparator->new, 0, 1, 0);
 
@@ -274,31 +274,31 @@ sub _initGUI {
     my $hbTextBtn = Gtk3::HBox->new(0, 0);
     $$self{_WINDOWPCC}{vboxMultiText}->pack_start($hbTextBtn, 0, 0, 3);
 
-    $$self{_WINDOWPCC}{btnLoadFile} = Gtk3::Button->new_with_mnemonic('_Open');
-    $$self{_WINDOWPCC}{btnLoadFile}->set_tooltip_text('Load a text file');
+    $$self{_WINDOWPCC}{btnLoadFile} = Gtk3::Button->new_with_mnemonic(_t('_Open'));
+    $$self{_WINDOWPCC}{btnLoadFile}->set_tooltip_text(_t('Load a text file'));
     $$self{_WINDOWPCC}{btnLoadFile}->set_image(Gtk3::Image->new_from_stock('gtk-open', 'button') );
     $$self{_WINDOWPCC}{btnLoadFile}->set('can_focus', 0);
     $hbTextBtn->pack_start($$self{_WINDOWPCC}{btnLoadFile}, 0, 0, 5);
 
-    $$self{_WINDOWPCC}{btnSaveAsFile} = Gtk3::Button->new_with_mnemonic('_Save as...');
-    $$self{_WINDOWPCC}{btnSaveAsFile}->set_tooltip_text('Save as a text file');
+    $$self{_WINDOWPCC}{btnSaveAsFile} = Gtk3::Button->new_with_mnemonic(_t('_Save as...'));
+    $$self{_WINDOWPCC}{btnSaveAsFile}->set_tooltip_text(_t('Save as a text file'));
     $$self{_WINDOWPCC}{btnSaveAsFile}->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button') );
     $$self{_WINDOWPCC}{btnSaveAsFile}->set('can_focus', 0);
     $hbTextBtn->pack_start($$self{_WINDOWPCC}{btnSaveAsFile}, 0, 0, 5);
 
-    $$self{_WINDOWPCC}{cbAutoSave} = Gtk3::CheckButton->new_with_label('Auto save/load...');
-    $$self{_WINDOWPCC}{cbAutoSave}->set_tooltip_text('Automatically save/load current text');
+    $$self{_WINDOWPCC}{cbAutoSave} = Gtk3::CheckButton->new_with_label(_t('Auto save/load...'));
+    $$self{_WINDOWPCC}{cbAutoSave}->set_tooltip_text(_t('Automatically save/load current text'));
     $$self{_WINDOWPCC}{cbAutoSave}->set('can_focus', 0);
     $$self{_WINDOWPCC}{cbAutoSave}->set_active($PACMain::FUNCS{_MAIN}{_CFG}{'defaults'}{'autosave PCC text'} // 1);
     $hbTextBtn->pack_start($$self{_WINDOWPCC}{cbAutoSave}, 0, 0, 0);
 
     $hbTextBtn->pack_start(Gtk3::VSeparator->new, 0, 1, 0);
 
-    $hbTextBtn->pack_start(Gtk3::Label->new('Syntax highlight: '), 0, 0, 5);
+    $hbTextBtn->pack_start(Gtk3::Label->new(_t('Syntax highlight: ')), 0, 0, 5);
 
     $$self{_WINDOWPCC}{comboLang} = Gtk3::ComboBoxText->new;
     $hbTextBtn->pack_start($$self{_WINDOWPCC}{comboLang}, 0, 0, 5);
-    $$self{_WINDOWPCC}{btnSaveAsFile}->set_tooltip_text('Force selected language for syntax highlighting');
+    $$self{_WINDOWPCC}{btnSaveAsFile}->set_tooltip_text(_t('Force selected language for syntax highlighting'));
     if ($SOURCEVIEW) {
         $$self{_WINDOWPCC}{comboLang}->append_text($LANG{'id_to_name'}{$_}{'name'})
         foreach sort {lc $a cmp lc $b} keys %{$LANG{'id_to_name'}};
@@ -308,8 +308,8 @@ sub _initGUI {
 
     $hbTextBtn->pack_start(Gtk3::VSeparator->new, 0, 1, 0);
 
-    $$self{_WINDOWPCC}{btnClearFile} = Gtk3::Button->new_with_mnemonic('Clea_r');
-    $$self{_WINDOWPCC}{btnClearFile}->set_tooltip_text('Clear out all the data from the edit box');
+    $$self{_WINDOWPCC}{btnClearFile} = Gtk3::Button->new_with_mnemonic(_t('Clea_r'));
+    $$self{_WINDOWPCC}{btnClearFile}->set_tooltip_text(_t('Clear out all the data from the edit box'));
     $$self{_WINDOWPCC}{btnClearFile}->set_image(Gtk3::Image->new_from_stock('gtk-clear', 'button') );
     $$self{_WINDOWPCC}{btnClearFile}->set('can_focus', 0);
     $hbTextBtn->pack_start($$self{_WINDOWPCC}{btnClearFile}, 0, 0, 5);
@@ -341,32 +341,32 @@ sub _initGUI {
     $$self{_WINDOWPCC}{multiTextView}->set_wrap_mode('GTK_WRAP_WORD');
     $$self{_WINDOWPCC}{multiTextView}->set_sensitive(1);
     $$self{_WINDOWPCC}{multiTextView}->set('can_focus', 1);
-    #$$self{_WINDOWPCC}{multiTextView}->set_tooltip_text('Write here your commands, and execute them in the selected cluster by pressing any of the buttons below');
+    #$$self{_WINDOWPCC}{multiTextView}->set_tooltip_text(_t('Write here your commands, and execute them in the selected cluster by pressing any of the buttons below'));
 
-    $$self{_WINDOWPCC}{frameExec} = Gtk3::Frame->new(' Execute: ');
+    $$self{_WINDOWPCC}{frameExec} = Gtk3::Frame->new(_t(' Execute: '));
     $$self{_WINDOWPCC}{vboxMultiText}->pack_start($$self{_WINDOWPCC}{frameExec}, 0, 1, 0);
     $$self{_WINDOWPCC}{frameExec}->set_shadow_type('etched-in');
 
     my $hbbox0 = Gtk3::HBox->new(1, 0);
     $$self{_WINDOWPCC}{frameExec}->add($hbbox0);
 
-    $$self{_WINDOWPCC}{btnAll} = Gtk3::Button->new_with_mnemonic('A_ll');
-    $$self{_WINDOWPCC}{btnAll}->set_tooltip_text('Send the *all* the text to cluster (<Ctrl><INTRO>)');
+    $$self{_WINDOWPCC}{btnAll} = Gtk3::Button->new_with_mnemonic(_t('A_ll'));
+    $$self{_WINDOWPCC}{btnAll}->set_tooltip_text(_t('Send the *all* the text to cluster (<Ctrl><INTRO>)'));
     $$self{_WINDOWPCC}{btnAll}->set_image(Gtk3::Image->new_from_stock('gtk-media-play', 'button') );
     $$self{_WINDOWPCC}{btnAll}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{btnAll}, 0, 1, 0);
-    $$self{_WINDOWPCC}{btnBlock} = Gtk3::Button->new_with_mnemonic('_Block');
-    $$self{_WINDOWPCC}{btnBlock}->set_tooltip_text('Send current *block* text (that separated with blank lines up and down from the cursor position) to cluster (<Alt><INTRO>)');
+    $$self{_WINDOWPCC}{btnBlock} = Gtk3::Button->new_with_mnemonic(_t('_Block'));
+    $$self{_WINDOWPCC}{btnBlock}->set_tooltip_text(_t('Send current *block* text (that separated with blank lines up and down from the cursor position) to cluster (<Alt><INTRO>)'));
     $$self{_WINDOWPCC}{btnBlock}->set_image(Gtk3::Image->new_from_stock('gtk-indent', 'button') );
     $$self{_WINDOWPCC}{btnBlock}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{btnBlock}, 0, 1, 0);
-    $$self{_WINDOWPCC}{btnSelection} = Gtk3::Button->new_with_mnemonic('_Selection');
-    $$self{_WINDOWPCC}{btnSelection}->set_tooltip_text('Send the *selected* text to cluster');
+    $$self{_WINDOWPCC}{btnSelection} = Gtk3::Button->new_with_mnemonic(_t('_Selection'));
+    $$self{_WINDOWPCC}{btnSelection}->set_tooltip_text(_t('Send the *selected* text to cluster'));
     $$self{_WINDOWPCC}{btnSelection}->set_image(Gtk3::Image->new_from_stock('gtk-select-all', 'button') );
     $$self{_WINDOWPCC}{btnSelection}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{btnSelection}, 0, 1, 0);
-    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label('Use Ásbrú variables');
-    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text('Allow Ásbrú to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)');
+    $$self{_WINDOWPCC}{cbSubstitute} = Gtk3::CheckButton->new_with_label(_t('Use Ásbrú variables'));
+    $$self{_WINDOWPCC}{cbSubstitute}->set_tooltip_text(_t('Allow Ásbrú to replace standard known variables (ie: <GV:var_name>, <CMD:command>, ...)'));
     $$self{_WINDOWPCC}{cbSubstitute}->set_active(1);
     $$self{_WINDOWPCC}{cbSubstitute}->set('can_focus', 0);
     $hbbox0->pack_start($$self{_WINDOWPCC}{cbSubstitute}, 0, 1, 0);
@@ -378,20 +378,20 @@ sub _initGUI {
 
     $$self{_WINDOWPCC}{btnClose} = Gtk3::Button->new_from_stock('gtk-close');
     $$self{_WINDOWPCC}{btnClose}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnClusterAdmin} = Gtk3::Button->new_with_mnemonic('Cl_usters');
+    $$self{_WINDOWPCC}{btnClusterAdmin} = Gtk3::Button->new_with_mnemonic(_t('Cl_usters'));
     $$self{_WINDOWPCC}{btnClusterAdmin}->set('can_focus', 0);
     $$self{_WINDOWPCC}{btnClusterAdmin}->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button') );
-    $$self{_WINDOWPCC}{btnSeparate} = Gtk3::Button->new_with_mnemonic('_Explode');
+    $$self{_WINDOWPCC}{btnSeparate} = Gtk3::Button->new_with_mnemonic(_t('_Explode'));
     $$self{_WINDOWPCC}{btnSeparate}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnSeparate}->set_tooltip_text("Separate and resize clustered windows to fit screen");
+    $$self{_WINDOWPCC}{btnSeparate}->set_tooltip_text(_t("Separate and resize clustered windows to fit screen"));
     $$self{_WINDOWPCC}{btnSeparate}->set_image(Gtk3::Image->new_from_stock('gtk-fullscreen', 'button') );
-    $$self{_WINDOWPCC}{btnReTab} = Gtk3::Button->new_with_mnemonic('Re_Tab');
+    $$self{_WINDOWPCC}{btnReTab} = Gtk3::Button->new_with_mnemonic(_t('Re_Tab'));
     $$self{_WINDOWPCC}{btnReTab}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnReTab}->set_tooltip_text("Put every independent connection window in PAC's main TAB");
+    $$self{_WINDOWPCC}{btnReTab}->set_tooltip_text(_t("Put every independent connection window in PAC's main TAB"));
     $$self{_WINDOWPCC}{btnReTab}->set_image(Gtk3::Image->new_from_stock('gtk-leave-fullscreen', 'button') );
-    $$self{_WINDOWPCC}{btnShowPipe} = Gtk3::Button->new_with_mnemonic('_Piped Output');
+    $$self{_WINDOWPCC}{btnShowPipe} = Gtk3::Button->new_with_mnemonic(_t('_Piped Output'));
     $$self{_WINDOWPCC}{btnShowPipe}->set('can_focus', 0);
-    $$self{_WINDOWPCC}{btnShowPipe}->set_tooltip_text("Show the window with the locally piped data");
+    $$self{_WINDOWPCC}{btnShowPipe}->set_tooltip_text(_t("Show the window with the locally piped data"));
     $$self{_WINDOWPCC}{btnShowPipe}->set_image(Gtk3::Image->new_from_stock('gtk-index', 'button') );
     $hbbox1->set_layout('GTK_BUTTONBOX_EDGE');
     $hbbox1->add($$self{_WINDOWPCC}{btnShowPipe});
@@ -560,7 +560,7 @@ sub _setupCallbacks {
         }
         push(@menu_items,
         {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -582,54 +582,54 @@ sub _setupCallbacks {
         }
         push(@menu_items,
         {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Put an option to ask user for variable substitution
         push(@menu_items,
         {
-            label => 'Runtime substitution (<ASK:change_by_number>)',
+            label => _t('Runtime substitution (<ASK:change_by_number>)'),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor("<ASK:change_by_number>");}
         });
 
         # Populate with <ASK:*|> special string
         push(@menu_items,
         {
-            label => 'Interactive user choose from list',
-            tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
+            label => _t('Interactive user choose from list'),
+            tooltip => _t('User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)'),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor('<ASK:descriptive_line|opt1|opt1|...|optN>');}
         });
 
         # Populate with <CMD:*> special string
         push(@menu_items,
         {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor('<CMD:command_to_launch>');}
         });
 
         # Populate with <TEE:*> special string
         push(@menu_items,
         {
-            label => 'Tee remote output to a local file',
-            tooltip => 'The given command line will be executed, and its output will be saved in provided file (after TEE:...) LOCALLY',
+            label => _t('Tee remote output to a local file'),
+            tooltip => _t('The given command line will be executed, and its output will be saved in provided file (after TEE:...) LOCALLY'),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor('<TEE:local_file>');}
         });
 
         # Populate with <PIPE:*> special string
         push(@menu_items,
         {
-            label => 'Pipe remote output throught local command',
-            tooltip => 'The given command line will be remotely executed, and its output will be piped throught the provide command (after PIPE:...) LOCALLY',
+            label => _t('Pipe remote output throught local command'),
+            tooltip => _t('The given command line will be remotely executed, and its output will be piped throught the provide command (after PIPE:...) LOCALLY'),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor('<PIPE:local_command_to_pipe_through[:pattern_to_expect_at_the_end_of_the_remote_command]>');}
         });
 
         # Populate with <KPXRE...*> special string
         push(@menu_items,
         {
-            label => "KeePass Extended Query",
-            tooltip => "This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression",
+            label => _t("KeePass Extended Query"),
+            tooltip => _t("This allows you to select the value to be returned, based on another value's match againt a Perl Regular Expression"),
             code => sub {$$self{_WINDOWPCC}{multiTextBuffer}->insert_at_cursor("<KPXRE_GET_(title|username|password|url)_WHERE_(title|username|password|url)==Your_RegExp_here==>");}
         });
 
@@ -729,7 +729,7 @@ sub _setupCallbacks {
         # Loading a file should not be undoable.
         my $content = '';
         if (!open(F,"<:utf8",$file)) {
-            _wMessage($$self{_WINDOWPCC}{main}, "ERROR: Can not open for reading '$file' ($!)");
+            _wMessage($$self{_WINDOWPCC}{main}, sprintf(_t("ERROR: Can not open for reading '%s' (%s)"), $file, $!));
             return 1;
         }
         while (my $line = <F>) {
@@ -741,7 +741,7 @@ sub _setupCallbacks {
             $$self{_WINDOWPCC}{multiTextBuffer}->begin_not_undoable_action;
             $$self{_WINDOWPCC}{multiTextBuffer}->set_text($content);
             if ($$self{_WINDOWPCC}{multiTextBuffer}->get_text($$self{_WINDOWPCC}{multiTextBuffer}->get_start_iter, $$self{_WINDOWPCC}{multiTextBuffer}->get_end_iter, 0) eq '') {
-                _wMessage($$self{_WINDOWPCC}{main}, "WARNING: file '$file' is " . (-z $file ? 'empty' : 'not a valid text file!') );
+                _wMessage($$self{_WINDOWPCC}{main}, (-z $file ? sprintf(_t("WARNING: file '%s' is empty"), $file) : sprintf(_t("WARNING: file '%s' is not a valid text file!"), $file)) );
             }
             $$self{_WINDOWPCC}{multiTextBuffer}->end_not_undoable_action;
             $$self{_WINDOWPCC}{multiTextBuffer}->set_modified(0);
@@ -779,7 +779,7 @@ sub _setupCallbacks {
 
         # Loading a file should not be undoable.
         if (!open(F,">:utf8",$file)) {
-            _wMessage($$self{_WINDOWPCC}{main}, "ERROR: Can not open for writting '$file' ($!)");
+            _wMessage($$self{_WINDOWPCC}{main}, sprintf(_t("ERROR: Can not open for writting '%s' (%s)"), $file, $!));
             return 1;
         }
         print F $$self{_WINDOWPCC}{multiTextBuffer}->get_text($$self{_WINDOWPCC}{multiTextBuffer}->get_start_iter, $$self{_WINDOWPCC}{multiTextBuffer}->get_end_iter, 0);
@@ -793,7 +793,7 @@ sub _setupCallbacks {
             my $n = defined $language ? $LANG{'name_to_id'}{$language->get_name // ' <NO HIGHLIGHT>'}{n} : 0;
             $$self{_WINDOWPCC}{comboLang}->set_active($n);
         }
-        _wMessage($$self{_WINDOWPCC}{main}, "Correctly saved file '$file'");
+        _wMessage($$self{_WINDOWPCC}{main}, sprintf(_t("Correctly saved file '%s'"), $file));
         return 1;
     });
 
@@ -816,7 +816,7 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnRestartAll}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
-        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, "Are you sure you want to RESTART <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
+        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, ($cluster ne '' ? sprintf(_t("Are you sure you want to RESTART <b>every</b> terminal in cluster '%s'?"), $cluster) : _t('Are you sure you want to RESTART <b>every</b> terminal?')));
         foreach my $uuid (@list) {
             kill(15, $$self{_RUNNING}{$uuid}{'terminal'}{_PID}) if ($$self{_RUNNING}{$uuid}{'terminal'}{_PID} // 0);
             $$self{_RUNNING}{$uuid}{'terminal'}->start;
@@ -897,7 +897,7 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{btnCloseAll}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text() // '';
         my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
-        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, "Are you sure you want to CLOSE <b>every</b> terminal" . ($cluster ne '' ? " in cluster '$cluster'" : '') . "?");
+        return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, ($cluster ne '' ? sprintf(_t("Are you sure you want to CLOSE <b>every</b> terminal in cluster '%s'?"), $cluster) : _t('Are you sure you want to CLOSE <b>every</b> terminal?')));
         foreach my $uuid (@list) {
             if (defined($$self{_RUNNING}{$uuid}{'terminal'}) && ref($$self{_RUNNING}{$uuid}{terminal}) =~ /^PACTerminal|PACShell$/go) {
                 $$self{_RUNNING}{$uuid}{'terminal'}->stop('force', 'deep');

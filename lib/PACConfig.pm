@@ -127,7 +127,7 @@ sub show {
     if ($update) {
         _updateGUIPreferences($self);
     }
-    $self->{_WINDOWCONFIG}->set_title("Default Global Options : $APPNAME (v$APPVERSION)");
+    $self->{_WINDOWCONFIG}->set_title(sprintf(_t('Default Global Options : %s (v%s)'), $APPNAME, $APPVERSION));
     $$self{_WINDOWCONFIG}->present();
     return 1;
 }
@@ -142,14 +142,14 @@ sub _initGUI {
     my $self = shift;
 
     # Load XML Glade file
-    defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder->new_from_file($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
+    defined $$self{_GLADE} or $$self{_GLADE} = _gladeBuilder($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
 
     # Save main, about and add windows
     $$self{_WINDOWCONFIG} = $$self{_GLADE}->get_object ('windowConfig');
     $$self{_WINDOWCONFIG}->set_size_request(-1, -1);
 
     _($self, 'imgBannerIcon')->set_from_file("$THEME_DIR/asbru-preferences.svg");
-    _($self, 'imgBannerText')->set_text('Preferences');
+    _($self, 'imgBannerText')->set_text(_t('Preferences'));
 
     # Setup the check-button that defined whether PAC is auto-started on session init
     _($self, 'cbCfgAutoStart')->set_active(-f $ENV{'HOME'} . '/.config/autostart/asbru_start.desktop');
@@ -158,7 +158,7 @@ sub _initGUI {
     $$self{_WINDOWCONFIG}->set_icon_name('asbru-app-big');
 
     _($self, 'btnResetDefaults')->set_image(Gtk3::Image->new_from_stock('gtk-undo', 'button'));
-    _($self, 'btnResetDefaults')->set_label('_Reset to DEFAULT values');
+    _($self, 'btnResetDefaults')->set_label(_t('_Reset to DEFAULT values'));
     foreach my $o ('MO', 'TO') {
         foreach my $t ('BE', 'LF', 'AD') {
             _($self, "linkHelp$o$t")->set_label('');
@@ -172,7 +172,7 @@ sub _initGUI {
 
     # Option currently disabled
     #_($self, 'btnCheckVersion')->set_image(Gtk3::Image->new_from_stock('gtk-refresh', 'button') );
-    #_($self, 'btnCheckVersion')->set_label('Check _now');
+    #_($self, 'btnCheckVersion')->set_label(_t('Check _now'));
 
     _($self, 'rbCfgStartTreeConn')->set_image(Gtk3::Image->new_from_stock('asbru-treelist', 'button'));
     _($self, 'rbCfgStartTreeFavs')->set_image(Gtk3::Image->new_from_stock('asbru-favourite-on', 'button'));
@@ -180,9 +180,9 @@ sub _initGUI {
     _($self, 'rbCfgStartTreeCluster')->set_image(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'button'));
     _($self, 'imgKeePassOpts')->set_from_stock('asbru-keepass', 'button');
     _($self, 'btnCfgSetGUIPassword')->set_image(Gtk3::Image->new_from_stock('asbru-protected', 'button'));
-    _($self, 'btnCfgSetGUIPassword')->set_label('Set...');
+    _($self, 'btnCfgSetGUIPassword')->set_label(_t('Set...'));
     _($self, 'btnExportYAML')->set_image(Gtk3::Image->new_from_stock('gtk-save-as', 'button'));
-    _($self, 'btnExportYAML')->set_label('Export config...');
+    _($self, 'btnExportYAML')->set_label(_t('Export config...'));
     _($self, 'alignShellOpts')->add(($$self{_SHELL} = PACTermOpts->new())->{container});
     _($self, 'alignGlobalVar')->add(($$self{_VARIABLES} = PACGlobalVarEntry->new())->{container});
     _($self, 'alignCmdRemote')->add(($$self{_CMD_REMOTE} = PACExecEntry->new(undef, undef, 'remote'))->{container});
@@ -194,7 +194,7 @@ sub _initGUI {
     _($self, 'btnCfgProxyCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
     _($self, 'btnCfgProxyCheckKPX')->set_label('');
 
-    $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
+    $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic(_t('Show _hidden files'));
     _($self, 'btnCfgSaveSessionLogs')->set_extra_widget($$self{cbShowHidden});
 
     _($self, 'spCfgTerminalScrollback')->set_range(-1, 99999);
@@ -209,16 +209,16 @@ sub _initGUI {
     }
 
     if (!$PACMain::STRAY) {
-        _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\nTray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>.");
+        _($self, 'lblRestartRequired')->set_markup(_($self, 'lblRestartRequired')->get_text() . "\n" . _t("Tray icon not available, install an extension for tray functionality, <a href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see online help for more details</a>."));
     }
 
     # Disable save button if in readonly mode
     if ($ENV{"ASBRU_IS_READONLY"}) {
         _($self, 'btnSaveConfig')->set_sensitive(0);
-        _($self, 'btnSaveConfig')->set_tooltip_text('You cannot save the preferences in readonly mode.');
+        _($self, 'btnSaveConfig')->set_tooltip_text(_t('You cannot save the preferences in readonly mode.'));
     } else {
         _($self, 'btnSaveConfig')->set_sensitive(1);
-        _($self, 'btnSaveConfig')->set_tooltip_text('Save the current configuration.');
+        _($self, 'btnSaveConfig')->set_tooltip_text(_t('Save the current configuration.'));
     }
 
     # Show preferences
@@ -318,9 +318,9 @@ sub _setupCallbacks {
         my ($widget, $event) = @_;
         my $format = 'yaml';
         my @type;
-        push(@type, {label => 'Settings as yml', code => sub {$self->_exporter('yaml');} });
-        #push(@type, {label => 'as Perl Data', code => sub {$self->_exporter('perl');} });
-        push(@type, {label => 'Anonymized Data for DEBUG', code => sub {$self->_exporter('debug');} });
+        push(@type, {label => _t('Settings as yml'), code => sub {$self->_exporter('yaml');} });
+        #push(@type, {label => _t('as Perl Data'), code => sub {$self->_exporter('perl');} });
+        push(@type, {label => _t('Anonymized Data for DEBUG'), code => sub {$self->_exporter('debug');} });
         _wPopUpMenu(\@type, $event, 1);
         return 1;
     });
@@ -345,12 +345,12 @@ sub _setupCallbacks {
             if (!$CIPHER->salt()) {
                 $CIPHER->salt(pack('Q',$SALT));
             }
-            my $pass = _wEnterValue($$self{_WINDOWCONFIG}, 'Ásbrú GUI Password Removal', 'Enter current Ásbrú GUI Password to remove protection...', undef, 0, 'asbru-protected');
+            my $pass = _wEnterValue($$self{_WINDOWCONFIG}, _t('Ásbrú GUI Password Removal'), _t('Enter current Ásbrú GUI Password to remove protection...'), undef, 0, 'asbru-protected');
             if ((! defined $pass) || ($pass ne $CIPHER->decrypt_hex($$self{_CFG}{'defaults'}{'gui password'}))) {
                 $$self{_CFGTOGGLEPASS} = 0;
                 _($self, 'cbCfgUseGUIPassword')->set_active(1);
                 _($self, 'hboxCfgPACPassword')->set_sensitive(1);
-                _wMessage($$self{_WINDOWCONFIG}, 'ERROR: Wrong password!!');
+                _wMessage($$self{_WINDOWCONFIG}, _t('ERROR: Wrong password!!'));
                 return 1;
             }
 
@@ -372,7 +372,7 @@ sub _setupCallbacks {
 
         # Populate with <<ASK_PASS>> special string
         push(@menu_items, {
-            label => 'Interactive Password input',
+            label => _t('Interactive Password input'),
             code => sub {
                 _($self, 'entryCfgSudoPassword')->delete_text(0, -1);
                 _($self, 'entryCfgSudoPassword')->insert_text('<<ASK_PASS>>', -1, 0);
@@ -393,7 +393,7 @@ sub _setupCallbacks {
             ++$i;
         }
         push(@menu_items, {
-            label => 'User variables...',
+            label => _t('User variables...'),
             sensitive => scalar @{$$self{variables}},
             submenu => \@variables_menu
         });
@@ -409,7 +409,7 @@ sub _setupCallbacks {
             });
         }
         push(@menu_items, {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -429,14 +429,14 @@ sub _setupCallbacks {
             });
         }
         push(@menu_items, {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Populate with <ASK:#> special string
         push(@menu_items, {
-            label => 'Interactive user input',
-            tooltip => 'User will be prompted to provide a value with a text box (free data type)',
+            label => _t('Interactive user input'),
+            tooltip => _t('User will be prompted to provide a value with a text box (free data type)'),
             code => sub {
                 my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
                 _($self, 'entryCfgSudoPassword')->insert_text('<ASK:number>', -1, _($self, 'entryCfgSudoPassword')->get_position());
@@ -446,8 +446,8 @@ sub _setupCallbacks {
 
         # Populate with <ASK:*|> special string
         push(@menu_items, {
-            label => 'Interactive user choose from list',
-            tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
+            label => _t('Interactive user choose from list'),
+            tooltip => _t('User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)'),
             code => sub {
                 my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
                 _($self, 'entryCfgSudoPassword')->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, _($self, 'entryCfgSudoPassword')->get_position());
@@ -457,8 +457,8 @@ sub _setupCallbacks {
 
         # Populate with <CMD:*> special string
         push(@menu_items, {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             code => sub {
                 my $pos = _($self, 'entryCfgSudoPassword')->get_property('cursor_position');
                 _($self, 'entryCfgSudoPassword')->insert_text('<CMD:command to launch>', -1, _($self, 'entryCfgSudoPassword')->get_position());
@@ -605,9 +605,9 @@ sub _exporter {
         $name = 'debug';
         $suffix = '.yml';
         $func = 'require YAML; YAML::DumpFile($file, $$self{_CFG}) or die "ERROR: Could not save file \'$file\' ($!)";';
-        my $answ = _wConfirm($$self{_WINDOWCONFIG}, "You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>");
+        my $answ = _wConfirm($$self{_WINDOWCONFIG}, _t("You are about to create a file containing an anonymized version of your settings.\n\nThis file will contain your configuration settings without any sensitive personal data in it.  It is only useful for debugging purposes only. Do not use this file for backup purposes.\n\nCare has been taken to remove all personal information but no guarantee is given, you are the only responsible for any disclosed information.\nPlease review the exported data before sharing it with a third party.\n\n<b>Do you wish to continue?</b>"));
         if (!$answ) {
-            _wMessage($$self{_WINDOWCONFIG}, "Export process has been canceled.");
+            _wMessage($$self{_WINDOWCONFIG}, _t("Export process has been canceled."));
             return 1;
         }
     }
@@ -632,7 +632,7 @@ sub _exporter {
             return 1;
         }
         $$self{_WINDOWCONFIG}->get_window()->set_cursor(Gtk3::Gdk::Cursor->new('watch') );
-        $w = _wMessage($$self{_WINDOWCONFIG}, "Please, wait while file '$file' is being created...", 0);
+        $w = _wMessage($$self{_WINDOWCONFIG}, sprintf(_t("Please, wait while file '%s' is being created..."), $file), 0);
         while (Gtk3::events_pending) {
             Gtk3::main_iteration;
         }
@@ -648,10 +648,10 @@ sub _exporter {
             $file = cleanUpPersonalData($file);
         }
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "'$format' file succesfully saved to:\n\n$file");
+        _wMessage($$self{_WINDOWCONFIG}, sprintf(_t("'%s' file succesfully saved to:\n\n%s"), $format, $file));
     } elsif (defined $w) {
         $w->destroy();
-        _wMessage($$self{_WINDOWCONFIG}, "ERROR: Could not save Ásrbú Config file '$file':\n\n$@");
+        _wMessage($$self{_WINDOWCONFIG}, sprintf(_t("ERROR: Could not save Ásbrú Config file '%s':\n\n%s"), $file, $@));
     }
     delete $$self{_CFG}{'__PAC__EXPORTED__'};
     delete $$self{_CFG}{'__PAC__EXPORTED__FULL__'};

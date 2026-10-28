@@ -158,7 +158,7 @@ sub getMasterPassword {
     my $mp = '';
 
     while (!$mp) {
-        $mp = _wEnterValue($parent, 'KeePass database', "Enter your MASTER password to unlock\nyour KeePass file '$$self{cfg}{'database'}'", '', 0, 'asbru-keepass');
+        $mp = _wEnterValue($parent, _t('KeePass database'), sprintf(_t("Enter your MASTER password to unlock\nyour KeePass file '%s'"), $$self{cfg}{'database'}), '', 0, 'asbru-keepass');
         # Test Master Password
         if ($mp) {
             $KPXC_MP = $mp;
@@ -166,7 +166,7 @@ sub getMasterPassword {
             if (!$flg && $msg !~ /ASBRUKeePassXCTEST/) {
                 $KPXC_MP='';
                 $mp = '';
-                _wMessage($parent,"<b>Error keepassxc-cli message</b>\n\n$msg");
+                _wMessage($parent, _t('<b>Error keepassxc-cli message</b>') . "\n\n$msg");
             }
         } else {
             last;
@@ -315,7 +315,7 @@ sub get_cfg {
     if ($$self{disable_keepassxc}) {
         # Avoid saving information that will not work
         if ($from_pref && $hash{use_keepass}) {
-            _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"KeePassXC was disabled, information was incomplete");
+            _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},_t("KeePassXC was disabled, information was incomplete"));
         }
         $hash{use_keepass} = 0;
         $hash{database} = '';
@@ -369,7 +369,7 @@ sub listEntries {
     $w{window}{gui}{hbox}->set_border_width(0);
 
     # Create 1st label
-    $w{window}{gui}{lblsearch} = Gtk3::Label->new('Search database:');
+    $w{window}{gui}{lblsearch} = Gtk3::Label->new(_t('Search database:'));
     $w{window}{gui}{hbox}->pack_start($w{window}{gui}{lblsearch}, 0, 0, 5);
 
     # Search Entry
@@ -451,7 +451,7 @@ sub setRigthClickMenuEntry {
         $lbl = ucfirst($field);
 
         push(@$menu_items, {
-            label => "Add $lbl KeePassXC",
+            label => sprintf(_t('Add %s KeePassXC'), $lbl),
             tooltip => "KeePassXC $lbl",
             code => sub {
                 my $pos = $input->get_property('cursor_position');
@@ -591,7 +591,7 @@ sub _buildKeePassGUI {
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Preferences/KeePassXC/');
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
@@ -604,7 +604,7 @@ sub _buildKeePassGUI {
     $w{hboxkpmain} = Gtk3::HBox->new(0, 4);
     $w{vbox}->pack_start($w{hboxkpmain}, 0, 1, 3);
 
-    $w{dblabel} = Gtk3::Label->new('Database file');
+    $w{dblabel} = Gtk3::Label->new(_t('Database file'));
     $w{dblabel}->set_size_request($width,-1);
     $w{dblabel}->set_xalign(0);
     $w{hboxkpmain}->pack_start($w{dblabel}, 0, 0, 0);
@@ -613,17 +613,17 @@ sub _buildKeePassGUI {
     $w{fcbKeePassFile}->set_show_hidden(0);
     $w{hboxkpmain}->pack_start($w{fcbKeePassFile}, 0, 0, 0);
 
-    $w{btnClearPassFile} = Gtk3::Button->new('Clear');
+    $w{btnClearPassFile} = Gtk3::Button->new(_t('Clear'));
     $w{hboxkpmain}->pack_start($w{btnClearPassFile}, 0, 1, 0);
 
-    $w{hboxkpmain}->pack_start(Gtk3::Label->new('Master Password'), 0, 1, 0);
+    $w{hboxkpmain}->pack_start(Gtk3::Label->new(_t('Master Password')), 0, 1, 0);
     $w{entryKeePassPassword} = Gtk3::Entry->new();
     $w{hboxkpmain}->pack_start($w{entryKeePassPassword}, 1, 1, 5);
     $w{entryKeePassPassword}->set_visibility(0);
 
     # Key file selection
     $w{hboxkpkeyfile} = Gtk3::HBox->new(0, 3);
-    $w{keylabel} = Gtk3::Label->new('Key file');
+    $w{keylabel} = Gtk3::Label->new(_t('Key file'));
     $w{vbox}->pack_start($w{hboxkpkeyfile}, 0, 1, 0);
     $w{hboxkpkeyfile}->pack_start($w{keylabel}, 0, 0, 0);
     $w{keylabel}->set_size_request($width,-1);
@@ -632,7 +632,7 @@ sub _buildKeePassGUI {
     $w{fcbKeePassKeyFile}->set_show_hidden(0);
     $w{hboxkpkeyfile}->pack_start($w{fcbKeePassKeyFile}, 0, 1, 0);
 
-    $w{btnClearkeyfile} = Gtk3::Button->new('Clear');
+    $w{btnClearkeyfile} = Gtk3::Button->new(_t('Clear'));
     $w{hboxkpkeyfile}->pack_start($w{btnClearkeyfile}, 0, 1, 0);
 
     $w{btnClearkeyfile}->signal_connect('clicked' => sub {
@@ -644,13 +644,13 @@ sub _buildKeePassGUI {
     }
 
     # CLI binary selection
-    $w{clilabel} = Gtk3::Label->new('keepassxc-cli binary');
+    $w{clilabel} = Gtk3::Label->new(_t('keepassxc-cli binary'));
     $w{clilabel}->set_size_request($width,-1);
     $w{clilabel}->set_xalign(0);
-    $w{clilabel}->set_tooltip_text("Specify the keepassxc-cli binary file to use.\nIf not specified, the system wide keepassxc-cli will be used.");
+    $w{clilabel}->set_tooltip_text(_t("Specify the keepassxc-cli binary file to use.\nIf not specified, the system wide keepassxc-cli will be used."));
     $w{fcbCliFile} = Gtk3::FileChooserButton->new('','GTK_FILE_CHOOSER_ACTION_OPEN');
     $w{fcbCliFile}->set_show_hidden(0);
-    $w{btnClearclifile} = Gtk3::Button->new('Clear');
+    $w{btnClearclifile} = Gtk3::Button->new(_t('Clear'));
     $w{hboxkpclifile} = Gtk3::HBox->new(0, 3);
     $w{hboxkpclifile}->pack_start($w{clilabel}, 0, 0, 0);
     $w{hboxkpclifile}->pack_start($w{fcbCliFile}, 0, 1, 0);
@@ -659,7 +659,7 @@ sub _buildKeePassGUI {
 
     # Information about the selected keepassxc-cli
     $w{intro_usage} = Gtk3::Label->new();
-    $w{intro_usage}->set_markup("Information about <i>keepassxc-cli</i> currently in use:");
+    $w{intro_usage}->set_markup(_t("Information about <i>keepassxc-cli</i> currently in use:"));
     $w{intro_usage}->set_halign('start');
     $w{intro_usage}->set_margin_top(24);
     $w{usage} = Gtk3::Label->new();
@@ -802,7 +802,7 @@ sub _setCapabilities {
         # Invalid version number, user did not select a valid KeePassXC file
         $$self{kpxc_version} = '';
         $$self{cfg}{pathcli} = '';
-        _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},"<b>Error</b>\n\nFile is not a valid keepassxc-cli binary.");
+        _wMessage($PACMain::FUNCS{_CONFIG}{_WINDOWCONFIG},_t("<b>Error</b>\n\nFile is not a valid keepassxc-cli binary."));
     }
     if (!$$self{kpxc_version}) {
         if ($CLI eq 'keepassxc-cli') {

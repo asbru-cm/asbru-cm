@@ -109,7 +109,7 @@ sub update
     $$self{gui}{vbAdvOpt}->foreach(sub {$_[0]->destroy;});
     # Now, add the -new?- dynamic socks widgets
     foreach my $hash (sort {$$a{option} cmp $$b{option}} @{$$options{advancedOption}}) {$self->_buildAdvOpt($hash);}
-    $$self{gui}{lblAdvOpt}->set_markup('Advanced Options (<b>' . (scalar(@{$$self{listAdvOpt}}) ) . '</b>)');
+    $$self{gui}{lblAdvOpt}->set_markup(sprintf(_t('Advanced Options (<b>%d</b>)'), scalar(@{$$self{listAdvOpt}})));
 
     return 1;
 }
@@ -220,27 +220,27 @@ sub _buildGUI
     $w{hbox1} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
 
-    $w{frSSHVersion} = Gtk3::Frame->new('SSH Version:');
+    $w{frSSHVersion} = Gtk3::Frame->new(_t('SSH Version:'));
     $w{hbox1}->pack_start($w{frSSHVersion}, 0, 1, 0);
     $w{frSSHVersion}->set_shadow_type('GTK_SHADOW_NONE');
-    $w{frSSHVersion}->set_tooltip_text('-(1|any) : Use SSH v1 or let negotiate any of them');
+    $w{frSSHVersion}->set_tooltip_text(_t('-(1|any) : Use SSH v1 or let negotiate any of them'));
 
     $w{cbSSHVersion} = Gtk3::ComboBoxText->new;
     $w{frSSHVersion}->add($w{cbSSHVersion});
     foreach my $ssh_version (sort {$a cmp $b} keys %SSH_VERSION) {$w{cbSSHVersion}->append_text($ssh_version);};
 
-    $w{chUseCompression} = Gtk3::CheckButton->new_with_label('Use Compression');
+    $w{chUseCompression} = Gtk3::CheckButton->new_with_label(_t('Use Compression'));
     $w{hbox1}->pack_start($w{chUseCompression}, 1, 1, 0);
-    $w{chUseCompression}->set_tooltip_text('[-C] : Use or not compression');
+    $w{chUseCompression}->set_tooltip_text(_t('[-C] : Use or not compression'));
 
     $w{vbox}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
 
-    $w{vbox}->pack_start(Gtk3::Label->new('Advanced Options:'), 0, 1, 0);
+    $w{vbox}->pack_start(Gtk3::Label->new(_t('Advanced Options:')), 0, 1, 0);
 
     $w{vboxAdvOpt} = Gtk3::VBox->new(0, 0);
     $w{vbox}->pack_start($w{vboxAdvOpt}, 1, 1, 5);
-    $w{lblAdvOpt} = Gtk3::Label->new('Advanced Options');
-    $w{vboxAdvOpt}->set_tooltip_text('[-o "ssh_option=value"]');
+    $w{lblAdvOpt} = Gtk3::Label->new(_t('Advanced Options'));
+    $w{vboxAdvOpt}->set_tooltip_text(_t('[-o "ssh_option=value"]'));
     $w{vboxAdvOpt}->set_border_width(5);
 
     # Build 'add' button
@@ -296,7 +296,7 @@ sub _buildAdvOpt
     # Make an HBox to contain option, value and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frAdvOptOption} = Gtk3::Frame->new('Option:');
+    $w{frAdvOptOption} = Gtk3::Frame->new(_t('Option:'));
     $w{hbox}->pack_start($w{frAdvOptOption}, 1, 1, 0);
     $w{frAdvOptOption}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -305,7 +305,7 @@ sub _buildAdvOpt
     $w{entryAdvOptOption}->set_size_request(30, 20);
     $w{entryAdvOptOption}->set_text($option);
 
-    $w{frAdvOptValue} = Gtk3::Frame->new('Value:');
+    $w{frAdvOptValue} = Gtk3::Frame->new(_t('Value:'));
     $w{hbox}->pack_start($w{frAdvOptValue}, 1, 1, 0);
     $w{frAdvOptValue}->set_shadow_type('GTK_SHADOW_NONE');
 

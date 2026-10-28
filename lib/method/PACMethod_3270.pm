@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -206,8 +207,8 @@ sub _buildGUI {
 
     $w{vbox} = $container;
 
-    $w{frModel} = Gtk3::Frame->new(' Select display model: ');
-    $w{frModel}->set_tooltip_text('[-model (3278|3279)-(2|3|4|5)] : Selects a display model(3278 BW , 3279 Colour, with different number of rows and columns');
+    $w{frModel} = Gtk3::Frame->new(_t(' Select display model: '));
+    $w{frModel}->set_tooltip_text(_t('[-model (3278|3279)-(2|3|4|5)] : Selects a display model(3278 BW , 3279 Colour, with different number of rows and columns'));
     $w{vbox}->pack_start($w{frModel}, 0, 1, 0);
 
     $w{hboxModel} = Gtk3::HBox->new(0, 0);
@@ -239,97 +240,97 @@ sub _buildGUI {
 
     $w{'rbModel3279-4'}->set_active(1);
 
-    $w{frPrepend} = Gtk3::Frame->new(' Connect method: ');
+    $w{frPrepend} = Gtk3::Frame->new(_t(' Connect method: '));
     $w{vbox}->pack_start($w{frPrepend}, 0, 1, 0);
 
     $w{hboxPrepend} = Gtk3::HBox->new(0, 0);
     $w{frPrepend}->add($w{hboxPrepend});
 
-    $w{rbPrepend} = Gtk3::RadioButton->new_with_label(undef, 'Standard');
+    $w{rbPrepend} = Gtk3::RadioButton->new_with_label(undef, _t('Standard'));
     $w{hboxPrepend}->pack_start($w{rbPrepend}, 0, 1, 0);
-    $w{rbPrepend}->set_tooltip_text('Do not prepend any character [P|S|N|L] to the host. That is, do a standard connection.');
+    $w{rbPrepend}->set_tooltip_text(_t('Do not prepend any character [P|S|N|L] to the host. That is, do a standard connection.'));
 
-    $w{rbPrependP} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, 'Telnet-passthru');
+    $w{rbPrependP} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, _t('Telnet-passthru'));
     $w{hboxPrepend}->pack_start($w{rbPrependP}, 0, 1, 0);
-    $w{rbPrependP}->set_tooltip_text('[P:] : causes the connection to go through the telnet-passthru service rather than directly to the host.');
+    $w{rbPrependP}->set_tooltip_text(_t('[P:] : causes the connection to go through the telnet-passthru service rather than directly to the host.'));
 
-    $w{rbPrependS} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, 'NO Extended Data Stream');
+    $w{rbPrependS} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, _t('NO Extended Data Stream'));
     $w{hboxPrepend}->pack_start($w{rbPrependS}, 0, 1, 0);
-    $w{rbPrependS}->set_tooltip_text('[S:] : Removes the "extended data stream" option reported to the host.');
+    $w{rbPrependS}->set_tooltip_text(_t('[S:] : Removes the "extended data stream" option reported to the host.'));
 
-    $w{rbPrependN} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, 'NO TN3270E support');
+    $w{rbPrependN} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, _t('NO TN3270E support'));
     $w{hboxPrepend}->pack_start($w{rbPrependN}, 0, 1, 0);
-    $w{rbPrependN}->set_tooltip_text('[N:] : Turns off TN3270E support for the session.');
+    $w{rbPrependN}->set_tooltip_text(_t('[N:] : Turns off TN3270E support for the session.'));
 
-    $w{rbPrependL} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, 'Use SSL Tunnel');
+    $w{rbPrependL} = Gtk3::RadioButton->new_with_label($w{rbPrepend}, _t('Use SSL Tunnel'));
     $w{hboxPrepend}->pack_start($w{rbPrependL}, 0, 1, 0);
-    $w{rbPrependL}->set_tooltip_text('[L:] : Causes c3270 to first create an SSL tunnel to the host, and then create a TN3270 session inside the tunnel.');
+    $w{rbPrependL}->set_tooltip_text(_t('[L:] : Causes c3270 to first create an SSL tunnel to the host, and then create a TN3270 session inside the tunnel.'));
 
     $w{rbPrepend}->set_active(1);
 
     $w{hboxSwitch1} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxSwitch1}, 0, 1, 0);
 
-    $w{chAllBold} = Gtk3::CheckButton->new_with_label('ALL characters in bold');
+    $w{chAllBold} = Gtk3::CheckButton->new_with_label(_t('ALL characters in bold'));
     $w{hboxSwitch1}->pack_start($w{chAllBold}, 0, 1, 0);
-    $w{chAllBold}->set_tooltip_text('[-allbold] : Forces all characters to be displayed in bold.');
+    $w{chAllBold}->set_tooltip_text(_t('[-allbold] : Forces all characters to be displayed in bold.'));
 
-    $w{chCbreak} = Gtk3::CheckButton->new_with_label('Use cbreak mode');
+    $w{chCbreak} = Gtk3::CheckButton->new_with_label(_t('Use cbreak mode'));
     $w{hboxSwitch1}->pack_start($w{chCbreak}, 0, 1, 0);
-    $w{chCbreak}->set_tooltip_text('[-cbreak] : Causes c3270 to operate in cbreak mode, instead of raw mode.');
+    $w{chCbreak}->set_tooltip_text(_t('[-cbreak] : Causes c3270 to operate in cbreak mode, instead of raw mode.'));
 
-    $w{chNoprompt} = Gtk3::CheckButton->new_with_label('Disable command-prompt mode');
+    $w{chNoprompt} = Gtk3::CheckButton->new_with_label(_t('Disable command-prompt mode'));
     $w{hboxSwitch1}->pack_start($w{chNoprompt}, 0, 1, 0);
-    $w{chNoprompt}->set_tooltip_text('[-noprompt] : Disables command-prompt mode.');
+    $w{chNoprompt}->set_tooltip_text(_t('[-noprompt] : Disables command-prompt mode.'));
 
-    $w{chMono} = Gtk3::CheckButton->new_with_label('Force Monochrome');
+    $w{chMono} = Gtk3::CheckButton->new_with_label(_t('Force Monochrome'));
     $w{hboxSwitch1}->pack_start($w{chMono}, 0, 1, 0);
-    $w{chMono}->set_tooltip_text('[-mono] : Prevents c3270 from using color, ignoring any color capabilities reported by the terminal.');
+    $w{chMono}->set_tooltip_text(_t('[-mono] : Prevents c3270 from using color, ignoring any color capabilities reported by the terminal.'));
 
     $w{vbox}->pack_start(Gtk3::HSeparator->new, 0, 1, 5);
 
     $w{hboxSwitch2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hboxSwitch2}, 0, 1, 0);
 
-    $w{lblEBCDIC} = Gtk3::Label->new('EBCDIC character set:');
+    $w{lblEBCDIC} = Gtk3::Label->new(_t('EBCDIC character set:'));
     $w{hboxSwitch2}->pack_start($w{lblEBCDIC}, 0, 1, 0);
 
     $w{entryEBCDIC} = Gtk3::Entry->new;
-    $w{entryEBCDIC}->set_tooltip_text('[-charset <name>] : Specifies an EBCDIC host character set.');
+    $w{entryEBCDIC}->set_tooltip_text(_t('[-charset <name>] : Specifies an EBCDIC host character set.'));
     $w{hboxSwitch2}->pack_start($w{entryEBCDIC}, 1, 1, 0);
 
-    $w{lblIM} = Gtk3::Label->new(' Input Method:');
+    $w{lblIM} = Gtk3::Label->new(_t(' Input Method:'));
     $w{hboxSwitch2}->pack_start($w{lblIM}, 0, 1, 0);
 
     $w{entryIM} = Gtk3::Entry->new;
-    $w{entryIM}->set_tooltip_text('[-im <method>] : Specifies the name of the input method to use for multi-byte input.');
+    $w{entryIM}->set_tooltip_text(_t('[-im <method>] : Specifies the name of the input method to use for multi-byte input.'));
     $w{hboxSwitch2}->pack_start($w{entryIM}, 1, 1, 0);
 
     $w{hboxSwitch3} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxSwitch3}, 0, 1, 0);
 
-    $w{lblKM} = Gtk3::Label->new('Keyboard Map:');
+    $w{lblKM} = Gtk3::Label->new(_t('Keyboard Map:'));
     $w{hboxSwitch3}->pack_start($w{lblKM}, 0, 1, 0);
 
     $w{entryKM} = Gtk3::Entry->new;
-    $w{entryKM}->set_tooltip_text('[-keymap <name>] : Specifies a keyboard map to be found in the resource c3270.keymap.name or the file name.');
+    $w{entryKM}->set_tooltip_text(_t('[-keymap <name>] : Specifies a keyboard map to be found in the resource c3270.keymap.name or the file name.'));
     $w{hboxSwitch3}->pack_start($w{entryKM}, 1, 1, 0);
 
-    $w{lblLU} = Gtk3::Label->new(' Printer LU:');
+    $w{lblLU} = Gtk3::Label->new(_t(' Printer LU:'));
     $w{hboxSwitch3}->pack_start($w{lblLU}, 0, 1, 0);
 
     $w{entryLU} = Gtk3::Entry->new;
-    $w{entryLU}->set_tooltip_text('[-printerlu <luname>] : Causes c3270 to automatically start a pr3287 printer session.');
+    $w{entryLU}->set_tooltip_text(_t('[-printerlu <luname>] : Causes c3270 to automatically start a pr3287 printer session.'));
     $w{hboxSwitch3}->pack_start($w{entryLU}, 1, 1, 0);
 
     $w{hboxSwitch4} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hboxSwitch4}, 0, 1, 0);
 
-    $w{lblTN} = Gtk3::Label->new('Terminal Name:');
+    $w{lblTN} = Gtk3::Label->new(_t('Terminal Name:'));
     $w{hboxSwitch4}->pack_start($w{lblTN}, 0, 1, 0);
 
     $w{entryTN} = Gtk3::Entry->new;
-    $w{entryTN}->set_tooltip_text('[-tn <name>] : Specifies  the terminal name to be transmitted over the telnet connection.  The default name is IBM-model_name-E.');
+    $w{entryTN}->set_tooltip_text(_t('[-tn <name>] : Specifies  the terminal name to be transmitted over the telnet connection.  The default name is IBM-model_name-E.'));
     $w{hboxSwitch4}->pack_start($w{entryTN}, 1, 1, 0);
 
     $$self{gui} = \%w;

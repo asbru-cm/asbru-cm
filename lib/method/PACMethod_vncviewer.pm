@@ -33,6 +33,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -184,22 +185,22 @@ sub _buildGUI {
     $w{hboxReal} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
     $w{lblClient} = Gtk3::Label->new();
-    $w{lblClient}->set_markup('<b>VNC configuration</b>');
+    $w{lblClient}->set_markup(_t('<b>VNC configuration</b>'));
     $w{hboxReal}->pack_start($w{lblClient}, 0, 0, 0);
 
     $w{hbox1} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1}, 0, 1, 5);
 
-    $w{frCompressLevel} = Gtk3::Frame->new('Compression level (1: min, 10: max) :');
+    $w{frCompressLevel} = Gtk3::Frame->new(_t('Compression level (1: min, 10: max) :'));
     $w{hbox1}->pack_start($w{frCompressLevel}, 1, 1, 0);
-    $w{frCompressLevel}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
+    $w{frCompressLevel}->set_tooltip_text(_t('[-g] : Percentage of the whole screen to use'));
 
     $w{spCompressLevel} = Gtk3::HScale->new(Gtk3::Adjustment->new(8, 1, 11, 1.0, 1.0, 1.0) );
     $w{frCompressLevel}->add($w{spCompressLevel});
 
-    $w{frQuality} = Gtk3::Frame->new('Picture quality (1: min, 10: max) :');
+    $w{frQuality} = Gtk3::Frame->new(_t('Picture quality (1: min, 10: max) :'));
     $w{hbox1}->pack_start($w{frQuality}, 1, 1, 0);
-    $w{frQuality}->set_tooltip_text('[-g] : Percentage of the whole screen to use');
+    $w{frQuality}->set_tooltip_text(_t('[-g] : Percentage of the whole screen to use'));
 
     $w{spQuality} = Gtk3::HScale->new(Gtk3::Adjustment->new(5, 1, 11, 1.0, 1.0, 1.0) );
     $w{frQuality}->add($w{spQuality});
@@ -207,25 +208,25 @@ sub _buildGUI {
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
 
-    $w{chFullScreen} = Gtk3::RadioButton->new_with_label(undef, 'Fullscreen');
+    $w{chFullScreen} = Gtk3::RadioButton->new_with_label(undef, _t('Fullscreen'));
     $w{hbox2}->pack_start($w{chFullScreen}, 0, 1, 0);
-    $w{chFullScreen}->set_tooltip_text('[-fullscreen] : Fullscreen window');
+    $w{chFullScreen}->set_tooltip_text(_t('[-fullscreen] : Fullscreen window'));
 
-    $w{chNaturalSize} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, 'Natural Size');
+    $w{chNaturalSize} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, _t('Natural Size'));
     $w{hbox2}->pack_start($w{chNaturalSize}, 0, 1, 0);
 
-    $w{chListen} = Gtk3::CheckButton->new_with_label('Listen');
+    $w{chListen} = Gtk3::CheckButton->new_with_label(_t('Listen'));
     $w{hbox2}->pack_start($w{chListen}, 0, 1, 0);
-    $w{chListen}->set_tooltip_text('[-listen] : Listen for incoming connections');
+    $w{chListen}->set_tooltip_text(_t('[-listen] : Listen for incoming connections'));
 
-    $w{chViewOnly} = Gtk3::CheckButton->new_with_label('View Only');
+    $w{chViewOnly} = Gtk3::CheckButton->new_with_label(_t('View Only'));
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
-    $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
+    $w{chViewOnly}->set_tooltip_text(_t('[-viewonly] : View only mode'));
 
-    $w{frDepth} = Gtk3::Frame->new('Colour depth (bpp):');
+    $w{frDepth} = Gtk3::Frame->new(_t('Colour depth (bpp):'));
     $w{hbox2}->pack_start($w{frDepth}, 0, 1, 0);
     $w{frDepth}->set_shadow_type('GTK_SHADOW_NONE');
-    $w{frDepth}->set_tooltip_text('[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits per pixel)');
+    $w{frDepth}->set_tooltip_text(_t('[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits per pixel)'));
 
     $w{cbDepth} = Gtk3::ComboBoxText->new;
     $w{frDepth}->add($w{cbDepth});

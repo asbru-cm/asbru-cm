@@ -115,7 +115,7 @@ sub show {
     $ICON_ON = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_terminal16x16.png", 16, 16, 0);
     $ICON_OFF = Gtk3::Gdk::Pixbuf->new_from_file_at_scale("$RES_DIR/asbru_terminal_x16x16.png", 16, 16, 0);
 
-    $$self{_WINDOWCLUSTER}{main}->set_title("Cluster Administration : $APPNAME (v$APPVERSION)");
+    $$self{_WINDOWCLUSTER}{main}->set_title(sprintf(_t('Cluster Administration : %s (v%s)'), $APPNAME, $APPVERSION));
     $$self{_WINDOWCLUSTER}{main}->set_position('center');
     $$self{_WINDOWCLUSTER}{main}->show_all;
     $$self{_WINDOWCLUSTER}{main}->present;
@@ -257,7 +257,7 @@ sub _initGUI {
 
     my $tablbl1 = Gtk3::HBox->new(0, 0);
     my $lbl1 = Gtk3::Label->new;
-    $lbl1->set_markup('<b>RUNNING CLUSTERS </b>');
+    $lbl1->set_markup(_t('<b>RUNNING CLUSTERS </b>'));
     $tablbl1->pack_start($lbl1, 0, 1, 0);
     $tablbl1->pack_start(Gtk3::Image->new_from_stock('asbru-terminal-ok-small', 'menu'), 0, 1, 0);
     $tablbl1->show_all;
@@ -268,10 +268,10 @@ sub _initGUI {
     my $hbox1 = Gtk3::HBox->new(0, 0);
     $vbox1->pack_start($hbox1, 1, 1, 0);
 
-    my $frame0 = Gtk3::Frame->new(' Unclustered Terminals');
+    my $frame0 = Gtk3::Frame->new(_t(' Unclustered Terminals'));
     $hbox1->pack_start($frame0, 1, 1, 0);
     my $frame0lbl = Gtk3::Label->new;
-    $frame0lbl->set_markup(' <b>Clustered Terminals</b> ');
+    $frame0lbl->set_markup(_t(' <b>Clustered Terminals</b> '));
     $frame0->set_label_widget($frame0lbl);
 
     # Terminals list
@@ -281,13 +281,13 @@ sub _initGUI {
 
     $$self{_WINDOWCLUSTER}{treeTerminals} = Gtk3::SimpleList->new_from_treeview (
         Gtk3::TreeView->new,
-        'Opened Terminal(s):' => 'text',
+        _t('Opened Terminal(s):') => 'text',
         'UUID:' => 'hidden',
-        'Status' => 'pixbuf'
+        _t('Status') => 'pixbuf'
     );
 
     $scroll1->add($$self{_WINDOWCLUSTER}{treeTerminals});
-    $$self{_WINDOWCLUSTER}{treeTerminals}->set_tooltip_text('List of available-unclustered connections');
+    $$self{_WINDOWCLUSTER}{treeTerminals}->set_tooltip_text(_t('List of available-unclustered connections'));
     $$self{_WINDOWCLUSTER}{treeTerminals}->set_headers_visible(0);
     $$self{_WINDOWCLUSTER}{treeTerminals}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
     my @col_terminals = $$self{_WINDOWCLUSTER}{treeTerminals}->get_columns;
@@ -298,14 +298,14 @@ sub _initGUI {
     my $vbox2 = Gtk3::VBox->new(0, 0);
     $hbox1->pack_start($vbox2, 0, 1, 0);
 
-    $$self{_WINDOWCLUSTER}{btnadd} = Gtk3::Button->new_with_label("Add to\nCluster");
+    $$self{_WINDOWCLUSTER}{btnadd} = Gtk3::Button->new_with_label(_t("Add to\nCluster"));
     $vbox2->pack_start($$self{_WINDOWCLUSTER}{btnadd}, 1, 1, 0);
     $$self{_WINDOWCLUSTER}{btnadd}->set_image(Gtk3::Image->new_from_stock('gtk-go-forward', 'GTK_ICON_SIZE_BUTTON') );
     $$self{_WINDOWCLUSTER}{btnadd}->set_image_position('GTK_POS_BOTTOM');
     $$self{_WINDOWCLUSTER}{btnadd}->set_relief('GTK_RELIEF_NONE');
     $$self{_WINDOWCLUSTER}{btnadd}->set_sensitive(0);
 
-    $$self{_WINDOWCLUSTER}{btndel} = Gtk3::Button->new_with_label("Del from\nCluster");
+    $$self{_WINDOWCLUSTER}{btndel} = Gtk3::Button->new_with_label(_t("Del from\nCluster"));
     $vbox2->pack_start($$self{_WINDOWCLUSTER}{btndel}, 1, 1, 0);
     $$self{_WINDOWCLUSTER}{btndel}->set_image(Gtk3::Image->new_from_stock('gtk-go-back', 'GTK_ICON_SIZE_BUTTON') );
     $$self{_WINDOWCLUSTER}{btndel}->set_image_position('GTK_POS_TOP');
@@ -316,10 +316,10 @@ sub _initGUI {
     my $vbox3 = Gtk3::VBox->new(0, 0);
     $hbox1->pack_start($vbox3, 1, 1, 0);
 
-    my $frame1 = Gtk3::Frame->new(' Active Clusters');
+    my $frame1 = Gtk3::Frame->new(_t(' Active Clusters'));
     $vbox3->pack_start($frame1, 0, 1, 0);
     my $frame1lbl = Gtk3::Label->new();
-    $frame1lbl->set_markup(' <b>Active Clusters</b> ');
+    $frame1lbl->set_markup(_t(' <b>Active Clusters</b> '));
     $frame1->set_label_widget($frame1lbl);
 
     my $vbox4 = Gtk3::VBox->new(0, 0);
@@ -345,10 +345,10 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{delCluster}->set('can-focus' => 0);
     $$self{_WINDOWCLUSTER}{delCluster}->set_sensitive(0);
 
-    my $frame2 = Gtk3::Frame->new(' Terminals');
+    my $frame2 = Gtk3::Frame->new(_t(' Terminals'));
     $vbox3->pack_start($frame2, 1, 1, 0);
     my $frame2lbl = Gtk3::Label->new();
-    $frame2lbl->set_markup(' <b>Terminals in selected Cluster</b> ');
+    $frame2lbl->set_markup(_t(' <b>Terminals in selected Cluster</b> '));
     $frame2->set_label_widget($frame2lbl);
 
     my $vbox5 = Gtk3::VBox->new(0, 0);
@@ -360,13 +360,13 @@ sub _initGUI {
 
     $$self{_WINDOWCLUSTER}{treeClustered} = Gtk3::SimpleList->new_from_treeview (
         Gtk3::TreeView->new,
-        'Terminal(s) in cluster:' => 'text',
+        _t('Terminal(s) in cluster:') => 'text',
         'UUID:' => 'hidden',
-        'Status' => 'pixbuf'
+        _t('Status') => 'pixbuf'
     );
     $scroll2->add($$self{_WINDOWCLUSTER}{treeClustered});
     $$self{_WINDOWCLUSTER}{treeClustered}->set_headers_visible(0);
-    $$self{_WINDOWCLUSTER}{treeClustered}->set_tooltip_text('List of connections included in the selected cluster above');
+    $$self{_WINDOWCLUSTER}{treeClustered}->set_tooltip_text(_t('List of connections included in the selected cluster above'));
     $$self{_WINDOWCLUSTER}{treeClustered}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
     $$self{_WINDOWCLUSTER}{treeClustered}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
     my @col_cluster = $$self{_WINDOWCLUSTER}{treeClustered}->get_columns;
@@ -375,7 +375,7 @@ sub _initGUI {
 
     my $tablbl2 = Gtk3::HBox->new(0, 0);
     my $lbl2 = Gtk3::Label->new;
-    $lbl2->set_markup('<b>Saved Clusters </b>');
+    $lbl2->set_markup(_t('<b>Saved Clusters </b>'));
     $tablbl2->pack_start($lbl2, 0, 1, 0);
     $tablbl2->pack_start(Gtk3::Image->new_from_stock('asbru-cluster-manager', 'menu'), 0, 1, 0);
     $tablbl2->show_all;
@@ -416,14 +416,14 @@ sub _initGUI {
     my $vboxclu1 = Gtk3::VBox->new(0, 0);
     $hboxclu->pack_start($vboxclu1, 0, 1, 0);
 
-    $$self{_WINDOWCLUSTER}{btnadd1} = Gtk3::Button->new_with_label("Add to\nCluster");
+    $$self{_WINDOWCLUSTER}{btnadd1} = Gtk3::Button->new_with_label(_t("Add to\nCluster"));
     $vboxclu1->pack_start($$self{_WINDOWCLUSTER}{btnadd1}, 1, 1, 0);
     $$self{_WINDOWCLUSTER}{btnadd1}->set_image(Gtk3::Image->new_from_stock('gtk-go-forward', 'GTK_ICON_SIZE_BUTTON') );
     $$self{_WINDOWCLUSTER}{btnadd1}->set_image_position('GTK_POS_BOTTOM');
     $$self{_WINDOWCLUSTER}{btnadd1}->set_relief('GTK_RELIEF_NONE');
     $$self{_WINDOWCLUSTER}{btnadd1}->set_sensitive(0);
 
-    $$self{_WINDOWCLUSTER}{btndel1} = Gtk3::Button->new_with_label("Del from\nCluster");
+    $$self{_WINDOWCLUSTER}{btndel1} = Gtk3::Button->new_with_label(_t("Del from\nCluster"));
     $vboxclu1->pack_start($$self{_WINDOWCLUSTER}{btndel1}, 1, 1, 0);
     $$self{_WINDOWCLUSTER}{btndel1}->set_image(Gtk3::Image->new_from_stock('gtk-go-back', 'GTK_ICON_SIZE_BUTTON') );
     $$self{_WINDOWCLUSTER}{btndel1}->set_image_position('GTK_POS_TOP');
@@ -434,10 +434,10 @@ sub _initGUI {
     my $vbox3clu = Gtk3::VBox->new(0, 0);
     $hboxclu->pack_start($vbox3clu, 0, 1, 0);
 
-    my $frame1clu = Gtk3::Frame->new(' Configured Clusters');
+    my $frame1clu = Gtk3::Frame->new(_t(' Configured Clusters'));
     $vbox3clu->pack_start($frame1clu, 0, 1, 0);
     my $frame1lblclu = Gtk3::Label->new;
-    $frame1lblclu->set_markup(' <b>Configured Clusters</b> ');
+    $frame1lblclu->set_markup(_t(' <b>Configured Clusters</b> '));
     $frame1clu->set_label_widget($frame1lblclu);
 
     my $vbox4clu = Gtk3::VBox->new(0, 0);
@@ -460,7 +460,7 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{renCluster1} = Gtk3::Button->new;
     $hbuttonbox1clu->add($$self{_WINDOWCLUSTER}{renCluster1});
     $$self{_WINDOWCLUSTER}{renCluster1}->set_image(Gtk3::Image->new_from_stock('gtk-edit', 'button') );
-    $$self{_WINDOWCLUSTER}{renCluster1}->set_label('Rename');
+    $$self{_WINDOWCLUSTER}{renCluster1}->set_label(_t('Rename'));
     $$self{_WINDOWCLUSTER}{renCluster1}->set('can-focus' => 0);
 
     $$self{_WINDOWCLUSTER}{delCluster1} = Gtk3::Button->new_from_stock('gtk-delete');
@@ -468,10 +468,10 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{delCluster1}->set('can-focus' => 0);
     $$self{_WINDOWCLUSTER}{delCluster1}->set_sensitive(0);
 
-    my $frame2clu = Gtk3::Frame->new(' Terminals');
+    my $frame2clu = Gtk3::Frame->new(_t(' Terminals'));
     $vbox3clu->pack_start($frame2clu, 1, 1, 0);
     my $frame2lblclu = Gtk3::Label->new;
-    $frame2lblclu->set_markup(' <b>Terminals in selected cluster</b> ');
+    $frame2lblclu->set_markup(_t(' <b>Terminals in selected cluster</b> '));
     $frame2clu->set_label_widget($frame2lblclu);
 
     my $vbox5clu = Gtk3::VBox->new(0, 0);
@@ -483,19 +483,19 @@ sub _initGUI {
 
     $$self{_WINDOWCLUSTER}{treeClustered1} = Gtk3::SimpleList->new_from_treeview (
         Gtk3::TreeView->new,
-        'Terminal(s) in cluster:' => 'text',
+        _t('Terminal(s) in cluster:') => 'text',
         'UUID:' => 'hidden'
     );
     $scroll2clu->add($$self{_WINDOWCLUSTER}{treeClustered1});
     $$self{_WINDOWCLUSTER}{treeClustered1}->set_headers_visible(0);
-    $$self{_WINDOWCLUSTER}{treeClustered1}->set_tooltip_text('List of connections included in the selected cluster above');
+    $$self{_WINDOWCLUSTER}{treeClustered1}->set_tooltip_text(_t('List of connections included in the selected cluster above'));
     $$self{_WINDOWCLUSTER}{treeClustered1}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
     $$self{_WINDOWCLUSTER}{treeClustered1}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
 
     # Add an "autocluster" tab
     my $tablbl3 = Gtk3::HBox->new(0, 0);
     my $lbl3 = Gtk3::Label->new;
-    $lbl3->set_markup('<b>Auto Clusters </b>');
+    $lbl3->set_markup(_t('<b>Auto Clusters </b>'));
     $tablbl3->pack_start($lbl3, 0, 1, 0);
     $tablbl3->pack_start(Gtk3::Image->new_from_stock('asbru-cluster-manager2', 'menu'), 0, 1, 0);
     $tablbl3->show_all;
@@ -516,7 +516,7 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{renAC} = Gtk3::Button->new;
     $hboxaclistbtns->add($$self{_WINDOWCLUSTER}{renAC});
     $$self{_WINDOWCLUSTER}{renAC}->set_image(Gtk3::Image->new_from_stock('gtk-edit', 'button') );
-    $$self{_WINDOWCLUSTER}{renAC}->set_label('Rename');
+    $$self{_WINDOWCLUSTER}{renAC}->set_label(_t('Rename'));
     $$self{_WINDOWCLUSTER}{renAC}->set('can-focus' => 0);
 
     $$self{_WINDOWCLUSTER}{delAC} = Gtk3::Button->new_from_stock('gtk-delete');
@@ -529,7 +529,7 @@ sub _initGUI {
     $vboxaclist->pack_start($scrollaclist, 1, 1, 0);
     $$self{_WINDOWCLUSTER}{treeAutocluster} = Gtk3::SimpleList->new_from_treeview (
         Gtk3::TreeView->new,
-        'AUTOCLUSTER' => 'text',
+        _t('AUTOCLUSTER') => 'text',
     );
     $scrollaclist->add($$self{_WINDOWCLUSTER}{treeAutocluster});
     $$self{_WINDOWCLUSTER}{treeAutocluster}->set_headers_visible(1);
@@ -540,36 +540,36 @@ sub _initGUI {
     my $frameac = Gtk3::Frame->new;
     $hboxautoclu->pack_start($frameac, 1, 1, 0);
     my $frameaclbl = Gtk3::Label->new;
-    $frameaclbl->set_markup(' <b>Auto Matching Properties</b> ');
+    $frameaclbl->set_markup(_t(' <b>Auto Matching Properties</b> '));
     $frameac->set_label_widget($frameaclbl);
-    $frameac->set_tooltip_text("These entries accept Regular Expressions,like:\n^server\\d+\nor\nconn.*\\d{1,3}\$\nor any other Perl RegExp");
+    $frameac->set_tooltip_text(_t("These entries accept Regular Expressions,like:\n^server\\d+\nor\nconn.*\\d{1,3}\$\nor any other Perl RegExp"));
 
     my $vboxacprops = Gtk3::VBox->new;
     $frameac->add($vboxacprops);
 
     my $hboxacpname = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacpname, 0, 1, 0);
-    $hboxacpname->pack_start(Gtk3::Label->new('Name') , 0, 1, 0);
+    $hboxacpname->pack_start(Gtk3::Label->new(_t('Name')) , 0, 1, 0);
     $hboxacpname->pack_start($$self{_WINDOWCLUSTER}{entryname} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacptitle = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacptitle, 0, 1, 0);
-    $hboxacptitle->pack_start(Gtk3::Label->new('Title') , 0, 1, 0);
+    $hboxacptitle->pack_start(Gtk3::Label->new(_t('Title')) , 0, 1, 0);
     $hboxacptitle->pack_start($$self{_WINDOWCLUSTER}{entrytitle} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacphost = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacphost, 0, 1, 0);
-    $hboxacphost->pack_start(Gtk3::Label->new('IP/Host') , 0, 1, 0);
+    $hboxacphost->pack_start(Gtk3::Label->new(_t('IP/Host')) , 0, 1, 0);
     $hboxacphost->pack_start($$self{_WINDOWCLUSTER}{entryhost} = Gtk3::Entry->new, 1, 1, 0);
 
     my $hboxacpdesc = Gtk3::HBox->new; $vboxacprops->pack_start($hboxacpdesc, 0, 1, 0);
-    $hboxacpdesc->pack_start(Gtk3::Label->new('Description') , 0, 1, 0);
+    $hboxacpdesc->pack_start(Gtk3::Label->new(_t('Description')) , 0, 1, 0);
     $hboxacpdesc->pack_start($$self{_WINDOWCLUSTER}{entrydesc} = Gtk3::Entry->new, 1, 1, 0);
 
     $$self{_WINDOWCLUSTER}{btnCheckAC} = Gtk3::Button->new;
     $$self{_WINDOWCLUSTER}{btnCheckAC}->set_image(Gtk3::Image->new_from_stock('gtk-find', 'button') );
-    $$self{_WINDOWCLUSTER}{btnCheckAC}->set_label('Check Auto Cluster conditions');
+    $$self{_WINDOWCLUSTER}{btnCheckAC}->set_label(_t('Check Auto Cluster conditions'));
     $$self{_WINDOWCLUSTER}{btnCheckAC}->set('can-focus', 0);
     $vboxacprops->pack_start($$self{_WINDOWCLUSTER}{btnCheckAC} , 1, 1, 5);
 
-    $$self{_WINDOWCLUSTER}{buttonPCC} = Gtk3::Button->new_with_mnemonic('_Power Cluster Controller');
+    $$self{_WINDOWCLUSTER}{buttonPCC} = Gtk3::Button->new_with_mnemonic(_t('_Power Cluster Controller'));
     $$self{_WINDOWCLUSTER}{buttonPCC}->set_image(Gtk3::Image->new_from_stock('gtk-justify-fill', 'button') );
     $vbox0->pack_start($$self{_WINDOWCLUSTER}{buttonPCC}, 0, 1, 5);
 
@@ -603,7 +603,7 @@ sub _setupCallbacks {
 
         my $cluster = $$self{_WINDOWCLUSTER}{comboClusters}->get_active_text;
         if (! $cluster) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, _t("Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster"));
             return 0;
         }
 
@@ -690,7 +690,7 @@ sub _setupCallbacks {
         }
 
         if (! ($total && (defined $cluster) && ($cluster ne '') )) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, _t("Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster"));
             return 1;
         }
 
@@ -773,12 +773,12 @@ sub _setupCallbacks {
 
     # Capture 'add cluster' button clicked
     $$self{_WINDOWCLUSTER}{addCluster}->signal_connect('clicked' => sub {
-        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, _t('Enter a name for the <b>New Cluster</b>'));
 
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
         } elsif (defined $$self{_CLUSTERS}{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster '%s' already exists!!"), $new_cluster));
         }
 
         # Empty the environments combobox
@@ -802,17 +802,17 @@ sub _setupCallbacks {
 
     # Capture 'add cluster 1' button clicked
     $$self{_WINDOWCLUSTER}{addCluster1}->signal_connect('clicked' => sub {
-        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, _t('Enter a name for the <b>New Cluster</b>'));
 
         if ((!defined $new_cluster)||($new_cluster =~ /^\s*$/go)) {
             return 1;
         }
         if (defined $$self{CLUSTERS}{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster '%s' already exists!!"), $new_cluster));
             return 1;
         }
         if (defined $PACMain::{FUNCS}{_MAIN}{_CFG}{defaults}{'auto cluster'}{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Auto Cluster name '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Auto Cluster name '%s' already exists!!"), $new_cluster));
             return 1;
         }
 
@@ -844,13 +844,13 @@ sub _setupCallbacks {
     # Capture 'rename cluster 1' button clicked
     $$self{_WINDOWCLUSTER}{renCluster1}->signal_connect('clicked' => sub {
         my $old_cluster = $$self{_WINDOWCLUSTER}{comboClusters1}->get_active_text;
-        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, "Enter a <b>NEW</b> name for cluster <b>$old_cluster</b>", undef, $old_cluster);
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, sprintf(_t('Enter a <b>NEW</b> name for cluster <b>%s</b>'), $old_cluster), undef, $old_cluster);
 
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
         }
         if (defined $$self{CLUSTERS}{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster name '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster name '%s' already exists!!"), $new_cluster));
             return 1;
         }
 
@@ -885,7 +885,7 @@ sub _setupCallbacks {
         # Get the string of the active cluster
         my $cluster = $$self{_WINDOWCLUSTER}{comboClusters}->get_active_text();
 
-        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, "Delete cluster <b>'$cluster'</b>?")) {
+        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Delete cluster <b>'%s'</b>?"), $cluster))) {
             return 1;
         }
 
@@ -922,7 +922,7 @@ sub _setupCallbacks {
         # Get the string of the active cluster
         my $cluster = $$self{_WINDOWCLUSTER}{comboClusters1}->get_active_text // '';
 
-        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, "Delete cluster <b>'$cluster'</b>?")) {
+        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Delete cluster <b>'%s'</b>?"), $cluster))) {
             return 1;
         }
 
@@ -949,7 +949,7 @@ sub _setupCallbacks {
                 $i++;
             }
         }
-        if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, "Remove running terminals from deleted cluster <b>'$cluster'</b>?")) {
+        if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Remove running terminals from deleted cluster <b>'%s'</b>?"), $cluster))) {
             foreach my $uuid (keys %{$$self{_RUNNING}}) {
                 if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} ne $cluster) {
                     next;
@@ -990,14 +990,14 @@ sub _setupCallbacks {
         my $total = $$self{_WINDOWCLUSTER}{treeTerminals}->get_selected_indices;
         my @select = $$self{_WINDOWCLUSTER}{treeTerminals}->get_selected_indices;
         if (!($total && (defined $cluster) && ($cluster ne ''))) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, _t("Before Adding a Terminal to a Cluster, you MUST either:\n - Select an existing CLUSTER\n...or...\n - Create a NEW Cluster"));
 
-            $cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter a name for the <b>New Cluster</b>');
+            $cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, _t('Enter a name for the <b>New Cluster</b>'));
 
             if ((!defined $cluster) || ($cluster =~ /^\s*$/go) ) {
                 return 1;
             } elsif (defined $$self{_CLUSTERS}{$cluster}) {
-                _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster '$cluster' already exists!!");
+                _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster '%s' already exists!!"), $cluster));
                 return 1;
             }
 
@@ -1192,17 +1192,17 @@ sub _setupCallbacks {
     });
 
     $$self{_WINDOWCLUSTER}{addAC}->signal_connect('clicked' => sub {
-        my $new_ac = _wEnterValue($$self{_WINDOWCLUSTER}{main}, 'Enter new <b>AUTO CLUSTER</b> name');
+        my $new_ac = _wEnterValue($$self{_WINDOWCLUSTER}{main}, _t('Enter new <b>AUTO CLUSTER</b> name'));
         if ((! defined $new_ac) || ($new_ac =~ /^\s*$/go)) {
             return 1;
         }
         if (defined $PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$new_ac}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "AutoCluster name '$new_ac' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Auto Cluster name '%s' already exists!!"), $new_ac));
             return 1;
         }
         my $clusters = $self->getCFGClusters;
         if (defined $$clusters{$new_ac}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster name '$new_ac' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster name '%s' already exists!!"), $new_ac));
             return 1;
         }
 
@@ -1228,17 +1228,17 @@ sub _setupCallbacks {
         }
         my $sel = $selected[0];
         my $old_cluster = $$self{_WINDOWCLUSTER}{treeAutocluster}{data}[$sel][0];
-        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, "Enter a <b>NEW</b> name for Auto Cluster <b>$old_cluster</b>", undef, $old_cluster);
+        my $new_cluster = _wEnterValue($$self{_WINDOWCLUSTER}{main}, sprintf(_t('Enter a <b>NEW</b> name for Auto Cluster <b>%s</b>'), $old_cluster), undef, $old_cluster);
         if ((! defined $new_cluster) || ($new_cluster =~ /^\s*$/go)) {
             return 1;
         }
         my $clusters = $self->getCFGClusters;
         if (defined $$clusters{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Cluster name '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Cluster name '%s' already exists!!"), $new_cluster));
             return 1;
         }
         if (defined $PACMain::{FUNCS}{_MAIN}{_CFG}{defaults}{'auto cluster'}{$new_cluster}) {
-            _wMessage($$self{_WINDOWCLUSTER}{main}, "Auto Cluster name '$new_cluster' already exists!!");
+            _wMessage($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Auto Cluster name '%s' already exists!!"), $new_cluster));
             return 1;
         }
 
@@ -1260,7 +1260,7 @@ sub _setupCallbacks {
         }
         my $sel = $selected[0];
         my $cluster = $$self{_WINDOWCLUSTER}{treeAutocluster}{data}[$sel][0];
-        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, "Are you sure you want to delete Auto Cluster <b>$cluster</b>?")) {
+        if (!_wConfirm($$self{_WINDOWCLUSTER}{main}, sprintf(_t('Are you sure you want to delete Auto Cluster <b>%s</b>?'), $cluster))) {
             return 1;
         }
         delete $PACMain::FUNCS{_MAIN}{_CFG}{defaults}{'auto cluster'}{$cluster};
@@ -1273,7 +1273,7 @@ sub _setupCallbacks {
                 $i++;
             }
         }
-        if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, "Remove running terminals from deleted cluster <b>'$cluster'</b>?")) {
+        if ($i && _wConfirm($$self{_WINDOWCLUSTER}{main}, sprintf(_t("Remove running terminals from deleted cluster <b>'%s'</b>?"), $cluster))) {
             foreach my $uuid (keys %{$$self{_RUNNING}}) {
                 if ($$self{_RUNNING}{$uuid}{terminal}{_CLUSTER} ne $cluster) {
                     next;
@@ -1340,9 +1340,9 @@ sub _setupCallbacks {
             'none',
             ''
         );
-        $windowConfirm->set_markup("Terminals matching Auto Cluster <b>$cluster</b> conditions:$cond");
+        $windowConfirm->set_markup(sprintf(_t('Terminals matching Auto Cluster <b>%s</b> conditions:'), $cluster) . $cond);
         $windowConfirm->set_icon_name('asbru-app-big');
-        $windowConfirm->set_title("$APPNAME (v$APPVERSION) : Auto Cluster matching");
+        $windowConfirm->set_title("$APPNAME (v$APPVERSION) : " . _t('Auto Cluster matching'));
         $windowConfirm->add_buttons('gtk-ok' => 'ok');
         $windowConfirm->set_size_request(640, 400);
 
@@ -1353,7 +1353,7 @@ sub _setupCallbacks {
         $hboxjarl->pack_start($scroll, 0, 1, 0);
         $scroll->set_policy('never', 'automatic');
 
-        my $tree = Gtk3::SimpleList->new_from_treeview (Gtk3::TreeView->new, 'Icon' => 'pixbuf', 'Terminal(s) matching' => 'text', 'UUID' => 'hidden');
+        my $tree = Gtk3::SimpleList->new_from_treeview (Gtk3::TreeView->new, _t('Icon') => 'pixbuf', _t('Terminal(s) matching') => 'text', 'UUID' => 'hidden');
         $scroll->add($tree);
         $tree->set_headers_visible(0);
         $tree->get_selection->set_mode('GTK_SELECTION_SINGLE');
@@ -1408,7 +1408,7 @@ sub _setupCallbacks {
         });
 
         my $lbltotal = Gtk3::Label->new;
-        $lbltotal->set_markup("Conditions for Auto Cluster <b>$cluster</b> match <b>" . (scalar(@{$$tree{data}}) ) . '</b> connections');
+        $lbltotal->set_markup(sprintf(_t('Conditions for Auto Cluster <b>%s</b> match <b>%d</b> connections'), $cluster, scalar(@{$$tree{data}})));
         $windowConfirm->get_content_area->pack_start($lbltotal, 0, 1, 0);
 
         $windowConfirm->show_all;
@@ -1467,7 +1467,7 @@ sub addToCluster {
         $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('asbru-cluster-manager', 'button');
     }
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
-        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("In CLUSTER: $cluster");
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text(sprintf(_t('In CLUSTER: %s'), $cluster));
     }
     $$self{_RUNNING}{$uuid}{'terminal'}->_updateStatus;
     $self->_updateGUI;
@@ -1484,7 +1484,7 @@ sub delFromCluster {
         $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_from_stock('asbru-cluster-manager-off', 'button');
     }
     if (defined $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}) {
-        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text("Unclustered");
+        $$self{_RUNNING}{$uuid}{'terminal'}{_GUI}{statusCluster}->set_tooltip_text(_t("Unclustered"));
     }
     $$self{_RUNNING}{$uuid}{'terminal'}->_updateStatus;
     $self->_updateGUI;

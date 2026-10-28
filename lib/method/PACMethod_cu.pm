@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -183,38 +184,38 @@ sub _buildGUI
         $w{hbox1} = Gtk3::HBox->new(0, 0);
         $w{vbox}->pack_start($w{hbox1}, 0, 1, 0);
 
-            $w{hbox1}->pack_start(Gtk3::Label->new('Line: '), 0, 1, 0);
+            $w{hbox1}->pack_start(Gtk3::Label->new(_t('Line: ')), 0, 1, 0);
             $w{entryLine} = Gtk3::Entry->new();
             $w{hbox1}->pack_start($w{entryLine}, 0, 1, 0);
-            $w{entryLine}->set_tooltip_text("[-l|--line] : Line to use to connect. Ex: /dev/ttyUSB0");
+            $w{entryLine}->set_tooltip_text(_t("[-l|--line] : Line to use to connect. Ex: /dev/ttyUSB0"));
 
-            $w{hbox1}->pack_start(Gtk3::Label->new(' Speed: '), 0, 1, 0);
+            $w{hbox1}->pack_start(Gtk3::Label->new(_t(' Speed: ')), 0, 1, 0);
             $w{spSpeed} = Gtk3::SpinButton->new_with_range(1, 1999999, 1);
             $w{hbox1}->pack_start($w{spSpeed}, 0, 1, 0);
-            $w{spSpeed}->set_tooltip_text("[-s|--speed] : Speed to use to connect. Ex: 9660");
+            $w{spSpeed}->set_tooltip_text(_t("[-s|--speed] : Speed to use to connect. Ex: 9660"));
             $w{spSpeed}->set_value(9660);
 
-            $w{hbox1}->pack_start(Gtk3::Label->new(' Port: '), 0, 1, 0);
+            $w{hbox1}->pack_start(Gtk3::Label->new(_t(' Port: ')), 0, 1, 0);
             $w{entryPort} = Gtk3::Entry->new();
             $w{hbox1}->pack_start($w{entryPort}, 0, 1, 0);
-            $w{entryPort}->set_tooltip_text("[-p|--port] : Port to connect");
+            $w{entryPort}->set_tooltip_text(_t("[-p|--port] : Port to connect"));
 
-            $w{hbox1}->pack_start(Gtk3::Label->new(' Parity: '), 0, 1, 0);
+            $w{hbox1}->pack_start(Gtk3::Label->new(_t(' Parity: ')), 0, 1, 0);
             $w{cbParity} = Gtk3::ComboBoxText->new;
-            $w{cbParity}->set_tooltip_text("-(e|o|none) : Use 'even', 'odd' or 'no' parity");
+            $w{cbParity}->set_tooltip_text(_t("-(e|o|none) : Use 'even', 'odd' or 'no' parity"));
             $w{hbox1}->pack_start($w{cbParity}, 0, 1, 0);
             foreach my $parity (sort {$a cmp $b} keys %PARITY) {$w{cbParity}->append_text($parity);};
 
         $w{hbox2} = Gtk3::HBox->new(0, 0);
         $w{vbox}->pack_start($w{hbox2}, 0, 1, 0);
 
-            $w{chHalfDuplex} = Gtk3::CheckButton->new_with_label('Half Duplex');
+            $w{chHalfDuplex} = Gtk3::CheckButton->new_with_label(_t('Half Duplex'));
             $w{hbox2}->pack_start($w{chHalfDuplex}, 0, 1, 0);
-            $w{chHalfDuplex}->set_tooltip_text("[-h] : Echo characters locally (half-duplex mode)");
+            $w{chHalfDuplex}->set_tooltip_text(_t("[-h] : Echo characters locally (half-duplex mode)"));
 
-            $w{chNoStop} = Gtk3::CheckButton->new_with_label('Turn off XON/XOFF handling');
+            $w{chNoStop} = Gtk3::CheckButton->new_with_label(_t('Turn off XON/XOFF handling'));
             $w{hbox2}->pack_start($w{chNoStop}, 0, 1, 0);
-            $w{chNoStop}->set_tooltip_text("[--nostop] : Turn off XON/XOFF handling (it is on by default)");
+            $w{chNoStop}->set_tooltip_text(_t("[--nostop] : Turn off XON/XOFF handling (it is on by default)"));
 
 
     $$self{gui} = \%w;

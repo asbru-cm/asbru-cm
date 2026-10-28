@@ -148,7 +148,7 @@ sub update
             $self->_buildForward($hash);
         }
     }
-    $$self{gui}{lblLocal}->set_markup('Local Port Forwarding (<b>' . (scalar(@{$$self{list}})) . '</b>)');
+    $$self{gui}{lblLocal}->set_markup(sprintf(_t('Local Port Forwarding (<b>%d</b>)'), scalar(@{$$self{list}})));
 
     # Now, add the -new?- remote forward widgets
     if ($$self{gui}{rbOrderLI2}->get_active()) {
@@ -164,7 +164,7 @@ sub update
             $self->_buildRemote($hash);
         }
     }
-    $$self{gui}{lblRemote}->set_markup('Remote Port Forwarding (<b>' . (scalar(@{$$self{listRemote}})) . '</b>)');
+    $$self{gui}{lblRemote}->set_markup(sprintf(_t('Remote Port Forwarding (<b>%d</b>)'), scalar(@{$$self{listRemote}})));
 
     # Now, add the -new?- dynamic socks widgets
     if ($$self{gui}{rbOrderLI3}->get_active()) {
@@ -176,13 +176,13 @@ sub update
             $self->_buildDynamic($hash);
         }
     }
-    $$self{gui}{lblDynamic}->set_markup('Dynamic Socks Proxy (<b>' . (scalar(@{$$self{listDynamic}})) . '</b>)');
+    $$self{gui}{lblDynamic}->set_markup(sprintf(_t('Dynamic Socks Proxy (<b>%d</b>)'), scalar(@{$$self{listDynamic}})));
 
     # Now, add the -new?- dynamic socks widgets
     foreach my $hash (sort {$$a{option} cmp $$b{option}} @{$$options{advancedOption}}) {
         $self->_buildAdvOpt($hash);
     }
-    $$self{gui}{lblAdvOpt}->set_markup('Advanced Options (<b>' . (scalar(@{$$self{listAdvOpt}})) . '</b>)');
+    $$self{gui}{lblAdvOpt}->set_markup(sprintf(_t('Advanced Options (<b>%d</b>)'), scalar(@{$$self{listAdvOpt}})));
 
     return 1;
 }
@@ -229,7 +229,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'localIP'}}{$hash{'localPort'}}){
-            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'localPort'} on Local IP '$hash{'localIP'}' defined in Local Port Forwarding is already in use!");
+            _wMessage($$self{_WINEDIT}, sprintf(_t("CONFIG ERROR: Local Port %s on Local IP '%s' defined in Local Port Forwarding is already in use!"), $hash{'localPort'}, $hash{'localIP'}));
         }
         $lp{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{forwardPort}}, \%hash);
@@ -247,7 +247,7 @@ sub get_cfg
             next;
         }
         if (defined $lpr{$hash{'localIP'}}{$hash{'localPort'}}){
-            _wMessage($$self{_WINEDIT},"WARNING: Same Remote Port $hash{'localPort'} defined more than once!");
+            _wMessage($$self{_WINEDIT}, sprintf(_t('WARNING: Same Remote Port %s defined more than once!'), $hash{'localPort'}));
         }
         $lpr{$hash{'localIP'}}{$hash{'localPort'}} = 1;
         push(@{$options{remotePort}}, \%hash);
@@ -261,7 +261,7 @@ sub get_cfg
             next;
         }
         if (defined $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}}) {
-            _wMessage($$self{_WINEDIT},"CONFIG ERROR: Local Port $hash{'dynamicPort'} on Local IP '$hash{'dynamicIP'}' defined in Dynamic Socks Proxy is already in use!");
+            _wMessage($$self{_WINEDIT}, sprintf(_t("CONFIG ERROR: Local Port %s on Local IP '%s' defined in Dynamic Socks Proxy is already in use!"), $hash{'dynamicPort'}, $hash{'dynamicIP'}));
         }
         $lp{$hash{'dynamicIP'}}{$hash{'dynamicPort'}} = 1;
         push(@{$options{dynamicForward}}, \%hash);
@@ -417,14 +417,14 @@ sub _buildGUI
     $w{help} = Gtk3::LinkButton->new('https://docs.asbru-cm.net/Manual/Connections/SSH/');
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
-    my $lblsshv = Gtk3::Label->new('SSH Version ');
+    my $lblsshv = Gtk3::Label->new(_t('SSH Version '));
     $lblsshv->set_alignment(1, 0.5);
     $hb123->pack_start($lblsshv, 1, 1, 0);
-    $hb123->set_tooltip_text('-(1|2|any) : Use SSH v1, v2 or any  of them');
+    $hb123->set_tooltip_text(_t('-(1|2|any) : Use SSH v1, v2 or any  of them'));
 
     $w{cbSSHVersion} = Gtk3::ComboBoxText->new();
     $hb123->pack_start($w{cbSSHVersion}, 0, 1, 0);
@@ -435,10 +435,10 @@ sub _buildGUI
     my $hb456 = Gtk3::HBox->new(0, 5);
     $w{vboxipv}->pack_start($hb456, 1, 1, 0);
 
-    my $lblipv = Gtk3::Label->new('IP Protocol  ');
+    my $lblipv = Gtk3::Label->new(_t('IP Protocol  '));
     $lblipv->set_alignment(1, 0.5);
     $hb456->pack_start($lblipv, 1, 1, 0);
-    $hb456->set_tooltip_text('-(4|6) : Uses IPv4, IPv6 or no specification (ip based)');
+    $hb456->set_tooltip_text(_t('-(4|6) : Uses IPv4, IPv6 or no specification (ip based)'));
 
     $w{cbSSHProtocol} = Gtk3::ComboBoxText->new();
     $hb456->pack_start($w{cbSSHProtocol}, 0, 1, 0);
@@ -446,7 +446,7 @@ sub _buildGUI
         $w{cbSSHProtocol}->append_text($ip_protocol);
     }
 
-    $w{frSSHOther} = Gtk3::Frame->new(' Other Options  ');
+    $w{frSSHOther} = Gtk3::Frame->new(_t(' Other Options  '));
     $w{hbox1}->pack_start($w{frSSHOther}, 1, 1, 0);
 
     my $vboxother = Gtk3::VBox->new(0, 0);
@@ -458,38 +458,38 @@ sub _buildGUI
     $vboxother->add($hbox1);
     $hbox1->set_border_width(5);
 
-    $w{chForwardX} = Gtk3::CheckButton->new_with_label('Forward X');
+    $w{chForwardX} = Gtk3::CheckButton->new_with_label(_t('Forward X'));
     $hbox1->pack_start($w{chForwardX}, 1, 1, 0);
-    $w{chForwardX}->set_tooltip_text('-(X|x) : Forwards or not the X');
+    $w{chForwardX}->set_tooltip_text(_t('-(X|x) : Forwards or not the X'));
 
-    $w{chUseCompression} = Gtk3::CheckButton->new_with_label('Use Compression');
+    $w{chUseCompression} = Gtk3::CheckButton->new_with_label(_t('Use Compression'));
     $hbox1->pack_start($w{chUseCompression}, 1, 1, 0);
-    $w{chUseCompression}->set_tooltip_text('[-C] : Use or not compression');
+    $w{chUseCompression}->set_tooltip_text(_t('[-C] : Use or not compression'));
 
-    $w{chAllowPortConnect} = Gtk3::CheckButton->new_with_label('Allow Remote Port Connect');
+    $w{chAllowPortConnect} = Gtk3::CheckButton->new_with_label(_t('Allow Remote Port Connect'));
     $hbox1->pack_start($w{chAllowPortConnect}, 1, 1, 0);
-    $w{chAllowPortConnect}->set_tooltip_text('[-g] : Allow or not Remote Port Connections');
+    $w{chAllowPortConnect}->set_tooltip_text(_t('[-g] : Allow or not Remote Port Connections'));
 
-    $w{chForwardAgent} = Gtk3::CheckButton->new_with_label('Forward Agent');
+    $w{chForwardAgent} = Gtk3::CheckButton->new_with_label(_t('Forward Agent'));
     $hbox1->pack_start($w{chForwardAgent}, 1, 1, 0);
-    $w{chForwardAgent}->set_tooltip_text('[-A] : Forward or not the SSH authentication agent');
+    $w{chForwardAgent}->set_tooltip_text(_t('[-A] : Forward or not the SSH authentication agent'));
     $hbox1->pack_start($w{help}, 0, 1, 0);
 
     my $hbox2 = Gtk3::HBox->new(0, 0);
     $vboxother->add($hbox2);
     $hbox2->set_border_width(5);
 
-    $w{chNoRemoteCmd} = Gtk3::CheckButton->new_with_label('Do NOT execute remote command');
+    $w{chNoRemoteCmd} = Gtk3::CheckButton->new_with_label(_t('Do NOT execute remote command'));
     $hbox2->pack_start($w{chNoRemoteCmd}, 1, 1, 0);
-    $w{chNoRemoteCmd}->set_tooltip_text('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)');
+    $w{chNoRemoteCmd}->set_tooltip_text(_t('[-N]: Do NOT execute a remote command.  This is useful for just forwarding ports (protocol version 2 only)'));
 
-    $w{chpseudoTerminal} = Gtk3::CheckButton->new_with_label('Disable pseudo-terminal allocation');
+    $w{chpseudoTerminal} = Gtk3::CheckButton->new_with_label(_t('Disable pseudo-terminal allocation'));
     $hbox2->pack_start($w{chpseudoTerminal}, 1, 1, 0);
-    $w{chpseudoTerminal}->set_tooltip_text('[-T]: Allocate pseudoterminal');
+    $w{chpseudoTerminal}->set_tooltip_text(_t('[-T]: Allocate pseudoterminal'));
 
-    $w{chRandomSocksTunnel} = Gtk3::CheckButton->new_with_label('Create random SOCKS tunnel');
+    $w{chRandomSocksTunnel} = Gtk3::CheckButton->new_with_label(_t('Create random SOCKS tunnel'));
     $hbox2->pack_start($w{chRandomSocksTunnel}, 1, 1, 0);
-    $w{chRandomSocksTunnel}->set_tooltip_text('Creates a SOCKS tunnel on a random port at connection startup.  Variable SOCKS5_PORT will contain the random port.  You can use it to start local commands and launch any other programs.');
+    $w{chRandomSocksTunnel}->set_tooltip_text(_t('Creates a SOCKS tunnel on a random port at connection startup.  Variable SOCKS5_PORT will contain the random port.  You can use it to start local commands and launch any other programs.'));
 
     $w{hbox4} = Gtk3::HBox->new(0, 0);
     $w{vbox}->pack_start($w{hbox4}, 1, 1, 0);
@@ -498,27 +498,27 @@ sub _buildGUI
     $w{hbox4}->pack_start($w{nb}, 1, 1, 0);
 
     $w{vbox2} = Gtk3::VBox->new(0, 0);
-    $w{lblLocal} = Gtk3::Label->new('Local Port Forwarding');
+    $w{lblLocal} = Gtk3::Label->new(_t('Local Port Forwarding'));
     $w{nb}->append_page($w{vbox2}, $w{lblLocal});
-    $w{vbox2}->set_tooltip_markup("<b>-L [bind_address:]port:host:hostport</b>\nForward Local Address:port <i>(bind_address:port)</i> → Remote Address:port <i>(host:hostport)</i>");
+    $w{vbox2}->set_tooltip_markup(_t("<b>-L [bind_address:]port:host:hostport</b>\nForward Local Address:port <i>(bind_address:port)</i> → Remote Address:port <i>(host:hostport)</i>"));
     $w{vbox2}->set_border_width(5);
 
     $w{hboxorder} = Gtk3::HBox->new(0, 0);
     $w{vbox2}->pack_start($w{hboxorder}, 0, 1, 0);
 
-    $w{lblOrder} = Gtk3::Label->new('Show ordered by  ');
+    $w{lblOrder} = Gtk3::Label->new(_t('Show ordered by  '));
     $w{hboxorder}->pack_start($w{lblOrder}, 0, 1, 0);
 
     # Build the "order" radiobuttons
-    $w{rbOrderLI} = Gtk3::RadioButton->new_with_label(undef, 'Local IP, ');
+    $w{rbOrderLI} = Gtk3::RadioButton->new_with_label(undef, _t('Local IP, '));
     $w{hboxorder}->pack_start($w{rbOrderLI}, 0, 1, 0);
     $w{rbOrderLI} ->set('can_focus', 0);
 
-    $w{rbOrderLP} = Gtk3::RadioButton->new_with_label($w{rbOrderLI}, 'Local Port, ');
+    $w{rbOrderLP} = Gtk3::RadioButton->new_with_label($w{rbOrderLI}, _t('Local Port, '));
     $w{hboxorder}->pack_start($w{rbOrderLP}, 0, 1, 0);
     $w{rbOrderLP} ->set('can_focus', 0);
 
-    $w{rbOrderRI} = Gtk3::RadioButton->new_with_label($w{rbOrderLI}, 'Remote IP');
+    $w{rbOrderRI} = Gtk3::RadioButton->new_with_label($w{rbOrderLI}, _t('Remote IP'));
     $w{hboxorder}->pack_start($w{rbOrderRI}, 0, 1, 0);
     $w{rbOrderRI} ->set('can_focus', 0);
 
@@ -543,27 +543,27 @@ sub _buildGUI
     $w{vp}->add($w{vbForward});
 
     $w{vbox3} = Gtk3::VBox->new(0, 0);
-    $w{lblRemote} = Gtk3::Label->new('Remote Port Forwarding');
+    $w{lblRemote} = Gtk3::Label->new(_t('Remote Port Forwarding'));
     $w{nb}->append_page($w{vbox3}, $w{lblRemote});
-    $w{vbox3}->set_tooltip_markup("<b>-R [bind_address:]port:host:hostport</b>\nBring Remote Address:port <i>(bind_address:port)</i> → Local Address:port <i>(host:hostport)</i>");
+    $w{vbox3}->set_tooltip_markup(_t("<b>-R [bind_address:]port:host:hostport</b>\nBring Remote Address:port <i>(bind_address:port)</i> → Local Address:port <i>(host:hostport)</i>"));
     $w{vbox3}->set_border_width(5);
 
     $w{hboxorder2} = Gtk3::HBox->new(0, 0);
     $w{vbox3}->pack_start($w{hboxorder2}, 0, 1, 0);
 
-    $w{lblOrder2} = Gtk3::Label->new('Show ordered by  ');
+    $w{lblOrder2} = Gtk3::Label->new(_t('Show ordered by  '));
     $w{hboxorder2}->pack_start($w{lblOrder2}, 0, 1, 0);
 
     # Build the "order" radiobuttons
-    $w{rbOrderLI2} = Gtk3::RadioButton->new_with_label(undef, 'Local IP, ');
+    $w{rbOrderLI2} = Gtk3::RadioButton->new_with_label(undef, _t('Local IP, '));
     $w{hboxorder2}->pack_start($w{rbOrderLI2}, 0, 1, 0);
     $w{rbOrderLI2} ->set('can_focus', 0);
 
-    $w{rbOrderLP2} = Gtk3::RadioButton->new_with_label($w{rbOrderLI2}, 'Local Port, ');
+    $w{rbOrderLP2} = Gtk3::RadioButton->new_with_label($w{rbOrderLI2}, _t('Local Port, '));
     $w{hboxorder2}->pack_start($w{rbOrderLP2}, 0, 1, 0);
     $w{rbOrderLP2} ->set('can_focus', 0);
 
-    $w{rbOrderRI2} = Gtk3::RadioButton->new_with_label($w{rbOrderLI2}, 'Remote IP');
+    $w{rbOrderRI2} = Gtk3::RadioButton->new_with_label($w{rbOrderLI2}, _t('Remote IP'));
     $w{hboxorder2}->pack_start($w{rbOrderRI2}, 0, 1, 0);
     $w{rbOrderRI2} ->set('can_focus', 0);
 
@@ -588,23 +588,23 @@ sub _buildGUI
     $w{vpRemote}->add($w{vbRemote});
 
     $w{vbox33} = Gtk3::VBox->new(0, 0);
-    $w{lblDynamic} = Gtk3::Label->new('Dynamic Socks Proxy');
+    $w{lblDynamic} = Gtk3::Label->new(_t('Dynamic Socks Proxy'));
     $w{nb}->append_page($w{vbox33}, $w{lblDynamic});
-    $w{vbox33}->set_tooltip_markup("<b>-D [bind_address:]local_port</b>\nCreate a Dynamic Socks proxy at localport");
+    $w{vbox33}->set_tooltip_markup(_t("<b>-D [bind_address:]local_port</b>\nCreate a Dynamic Socks proxy at localport"));
     $w{vbox33}->set_border_width(5);
 
     $w{hboxorder3} = Gtk3::HBox->new(0, 0);
     $w{vbox33}->pack_start($w{hboxorder3}, 0, 1, 0);
 
-    $w{lblOrder3} = Gtk3::Label->new('Show ordered by  ');
+    $w{lblOrder3} = Gtk3::Label->new(_t('Show ordered by  '));
     $w{hboxorder3}->pack_start($w{lblOrder3}, 0, 1, 0);
 
     # Build the "order" radiobuttons
-    $w{rbOrderLI3} = Gtk3::RadioButton->new_with_label(undef, 'Local IP, ');
+    $w{rbOrderLI3} = Gtk3::RadioButton->new_with_label(undef, _t('Local IP, '));
     $w{hboxorder3}->pack_start($w{rbOrderLI3}, 0, 1, 0);
     $w{rbOrderLI3} ->set('can_focus', 0);
 
-    $w{rbOrderLP3} = Gtk3::RadioButton->new_with_label($w{rbOrderLI3}, 'Local Port');
+    $w{rbOrderLP3} = Gtk3::RadioButton->new_with_label($w{rbOrderLI3}, _t('Local Port'));
     $w{hboxorder3}->pack_start($w{rbOrderLP3}, 0, 1, 0);
     $w{rbOrderLP3} ->set('can_focus', 0);
 
@@ -629,9 +629,9 @@ sub _buildGUI
     $w{vpDynamic}->add($w{vbDynamic});
 
     $w{vboxAdvOpt} = Gtk3::VBox->new(0, 0);
-    $w{lblAdvOpt} = Gtk3::Label->new('Advanced Options');
+    $w{lblAdvOpt} = Gtk3::Label->new(_t('Advanced Options'));
     $w{nb}->append_page($w{vboxAdvOpt}, $w{lblAdvOpt});
-    $w{vboxAdvOpt}->set_tooltip_text('[-o "ssh_option=value"]');
+    $w{vboxAdvOpt}->set_tooltip_text(_t('[-o "ssh_option=value"]'));
     $w{vboxAdvOpt}->set_border_width(5);
 
     # Build 'add' button
@@ -743,7 +743,7 @@ sub _buildForward
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Local Address ');
+    $w{frPFLocalIP} = Gtk3::Frame->new(_t('Local Address '));
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -752,7 +752,7 @@ sub _buildForward
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Port ');
+    $w{frPFLocalPort} = Gtk3::Frame->new(_t('Port '));
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -761,7 +761,7 @@ sub _buildForward
     $w{spinPFLocalPort}->set_size_request(30, 20);
     $w{spinPFLocalPort}->set_value($localPort);
 
-    $w{frPFRemoteIP} = Gtk3::Frame->new('Remote Address ');
+    $w{frPFRemoteIP} = Gtk3::Frame->new(_t('Remote Address '));
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -770,7 +770,7 @@ sub _buildForward
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Port ');
+    $w{frPFRemotePort} = Gtk3::Frame->new(_t('Port '));
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -862,7 +862,7 @@ sub _buildRemote
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Remote Address ');
+    $w{frPFLocalIP} = Gtk3::Frame->new(_t('Remote Address '));
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -871,7 +871,7 @@ sub _buildRemote
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Port ');
+    $w{frPFLocalPort} = Gtk3::Frame->new(_t('Port '));
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -880,7 +880,7 @@ sub _buildRemote
     $w{spinPFLocalPort}->set_size_request(30, 20);
     $w{spinPFLocalPort}->set_value($localPort);
 
-    $w{frPFRemoteIP} = Gtk3::Frame->new('Local Address ');
+    $w{frPFRemoteIP} = Gtk3::Frame->new(_t('Local Address '));
     $w{hbox}->pack_start($w{frPFRemoteIP}, 1, 1, 0);
     $w{frPFRemoteIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -889,7 +889,7 @@ sub _buildRemote
     $w{entryPFRemoteIP}->set_size_request(30, 20);
     $w{entryPFRemoteIP}->set_text($remoteIP);
 
-    $w{frPFRemotePort} = Gtk3::Frame->new('Port ');
+    $w{frPFRemotePort} = Gtk3::Frame->new(_t('Port '));
     $w{hbox}->pack_start($w{frPFRemotePort}, 0, 1, 0);
     $w{frPFRemotePort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -982,7 +982,7 @@ sub _buildDynamic
     # Make an HBox to contain local address, local port, remote address, remote port and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frPFLocalIP} = Gtk3::Frame->new('Bind Address ');
+    $w{frPFLocalIP} = Gtk3::Frame->new(_t('Bind Address '));
     $w{hbox}->pack_start($w{frPFLocalIP}, 1, 1, 0);
     $w{frPFLocalIP}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -990,9 +990,9 @@ sub _buildDynamic
     $w{frPFLocalIP}->add($w{entryPFLocalIP});
     $w{entryPFLocalIP}->set_size_request(30, 20);
     $w{entryPFLocalIP}->set_text($localIP);
-    $w{entryPFLocalIP}->set_tooltip_text('Leave blank to bind to any interface');
+    $w{entryPFLocalIP}->set_tooltip_text(_t('Leave blank to bind to any interface'));
 
-    $w{frPFLocalPort} = Gtk3::Frame->new('Local Port ');
+    $w{frPFLocalPort} = Gtk3::Frame->new(_t('Local Port '));
     $w{hbox}->pack_start($w{frPFLocalPort}, 0, 1, 0);
     $w{frPFLocalPort}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -1066,7 +1066,7 @@ sub _buildAdvOpt
     # Make an HBox to contain option, value and delete
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
-    $w{frAdvOptOption} = Gtk3::Frame->new('Option ');
+    $w{frAdvOptOption} = Gtk3::Frame->new(_t('Option '));
     $w{hbox}->pack_start($w{frAdvOptOption}, 1, 1, 0);
     $w{frAdvOptOption}->set_shadow_type('GTK_SHADOW_NONE');
 
@@ -1075,7 +1075,7 @@ sub _buildAdvOpt
     $w{entryAdvOptOption}->set_size_request(30, 20);
     $w{entryAdvOptOption}->set_text($option);
 
-    $w{frAdvOptValue} = Gtk3::Frame->new('Value ');
+    $w{frAdvOptValue} = Gtk3::Frame->new(_t('Value '));
     $w{hbox}->pack_start($w{frAdvOptValue}, 1, 1, 0);
     $w{frAdvOptValue}->set_shadow_type('GTK_SHADOW_NONE');
 
