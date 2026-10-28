@@ -30,7 +30,7 @@ if [ "${PACKAGE}" == "deb" ] && [ "${REPACK_DEB}" == "yes" ] ; then
   mv ${DEBFILE} ${DEBFILE_OLD}
   dpkg-deb -x ${DEBFILE_OLD} tmp
   dpkg-deb -e ${DEBFILE_OLD} tmp/DEBIAN
-  dpkg-deb -b tmp ${DEBFILE}
+  dpkg-deb --root-owner-group -b tmp ${DEBFILE}
   rm -rf tmp
   popd
 fi

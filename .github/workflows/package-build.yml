@@ -171,6 +171,23 @@ jobs:
       - name: Build packages
         run: ci/build_package.sh
 
+      - name: Verify repacked Debian package ownership
+        if: ${{ env.PACKAGE == 'deb' && env.REPACK_DEB == 'yes' }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          packages=(build/*.deb)
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo "No Debian package was produced" >&2
+            exit 1
+          fi
+          for package in "${packages[@]}"; do
+            echo "Checking root ownership in ${package}"
+            dpkg-deb --fsys-tarfile "${package}" |
+              tar -tv --numeric-owner |
+              awk '$2 != "0/0" { print "non-root ownership: " $0; failed=1 } END { exit failed }'
+          done
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
