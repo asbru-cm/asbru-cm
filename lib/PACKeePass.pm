@@ -582,7 +582,7 @@ sub _buildKeePassGUI {
     $$self{frame} = \%w;
 
     # Option to activate KeePass use (or not)
-    $w{cbUseKeePass} = Gtk3::CheckButton->new('Activate use of a KeePass database file');
+    $w{cbUseKeePass} = Gtk3::CheckButton->new(_t('Activate use of a KeePass database file'));
     $w{cbUseKeePass}->set_margin_top(10);
     $w{cbUseKeePass}->set_margin_bottom(5);
     $w{cbUseKeePass}->set_halign('GTK_ALIGN_START');

@@ -216,7 +216,7 @@ sub _buildVar {
     $w{hbox}->pack_start($w{val}, 1, 1, 0);
     $w{val}->set_text($val);
 
-    $w{hide} = Gtk3::CheckButton->new('Hide');
+    $w{hide} = Gtk3::CheckButton->new(_t('Hide'));
     $w{hbox}->pack_start($w{hide}, 0, 1, 0);
     $w{hide}->set_active($hide);
     $w{hide}->signal_connect(toggled => sub {$w{val}->set_visibility(! $w{hide}->get_active);});

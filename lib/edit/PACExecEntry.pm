@@ -288,7 +288,7 @@ sub _buildExec {
     $w{txt}->set_text($txt);
 
     # Build checkbutton
-    $w{intro} = Gtk3::CheckButton->new('send <INTRO>');
+    $w{intro} = Gtk3::CheckButton->new(_t('send <INTRO>'));
     $w{hbox3}->pack_start($w{intro}, 0, 1, 0);
     $w{intro}->set_active($intro);
 

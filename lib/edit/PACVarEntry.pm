@@ -205,7 +205,7 @@ sub _buildVar {
     $w{lbl} = Gtk3::Label->new("<V:$w{position}> (");
     $w{hbox}->pack_start($w{lbl}, 0, 1, 0);
 
-    $w{hide} = Gtk3::CheckButton->new('hide) ');
+    $w{hide} = Gtk3::CheckButton->new(_t('hide) '));
     $w{hbox}->pack_start($w{hide}, 0, 1, 0);
     $w{hide}->set_active($hide // 0);
     $w{hide}->signal_connect(toggled => sub {$w{txt}->set_visibility(! $w{hide}->get_active);});

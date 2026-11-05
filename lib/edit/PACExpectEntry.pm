@@ -274,7 +274,7 @@ sub _buildExpect {
     $w{expect}->set_text($exp);
     $w{expect}->set_icon_from_stock('primary', 'asbru-prompt');
 
-    $w{cbTimeOut} = Gtk3::CheckButton->new('Time out (seconds): ');
+    $w{cbTimeOut} = Gtk3::CheckButton->new(_t('Time out (seconds): '));
     $w{cbTimeOut}->set_active($time_out != -1);
     $w{hboxExpect}->pack_start($w{cbTimeOut}, 0, 1, 0);
     $w{time_out} = Gtk3::SpinButton->new_with_range(1, 65535, 1);
@@ -319,7 +319,7 @@ sub _buildExpect {
     $w{hbox33}->set_tooltip_text(_t('If "Expect" IS matched, the "Send" string will be sent and we will "go to" selected Expect number. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)'));
     $w{vbox33}->pack_start($w{hbox33}, 0, 1, 0);
 
-    $w{cbOnMatch} = Gtk3::CheckButton->new('On MATCH: ');
+    $w{cbOnMatch} = Gtk3::CheckButton->new(_t('On MATCH: '));
     $w{cbOnMatch}->set_active($on_match != -1);
     $w{hbox33}->pack_start($w{cbOnMatch}, 1, 1, 0);
 
@@ -346,7 +346,7 @@ sub _buildExpect {
     $w{hbox34}->set_tooltip_text(_t('If "Expect" IS NOT matched, no string will be sent, and we will "go to" selected Expect. If stop is selected, Expect processing will stop, and control will be returned to user (no disconnect will happen)'));
     $w{vbox33}->pack_start($w{hbox34}, 0, 1, 0);
 
-    $w{cbOnFail} = Gtk3::CheckButton->new('On FAIL: ');
+    $w{cbOnFail} = Gtk3::CheckButton->new(_t('On FAIL: '));
     $w{cbOnFail}->set_active($on_fail != -1);
     $w{hbox34}->pack_start($w{cbOnFail}, 1, 1, 0);
 

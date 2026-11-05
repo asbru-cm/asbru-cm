@@ -4689,7 +4689,7 @@ sub _bulkEdit {
         $w{gui}{"hb$key"} = Gtk3::HBox->new(0, 0);
         $w{gui}{vboxcommon}->pack_start($w{gui}{"hb$key"}, 0, 1, 0);
 
-        $w{gui}{"cb$key"} = Gtk3::CheckButton->new("Set '$key': ");
+        $w{gui}{"cb$key"} = Gtk3::CheckButton->new(sprintf(_t("Set '%s': "), $key));
         $w{gui}{"hb$key"}->pack_start($w{gui}{"cb$key"}, 0, 1, 0);
         $w{gui}{"cb$key"}->set('can_focus', 0);
 
@@ -4709,7 +4709,7 @@ sub _bulkEdit {
         $w{gui}{"hb$key"}->pack_start($w{gui}{"entry$key"}, 1, 1, 0);
         $w{gui}{"entry$key"}->set_activates_default(1);
 
-        $w{gui}{"cbRE$key"} = Gtk3::CheckButton->new('RegExp');
+        $w{gui}{"cbRE$key"} = Gtk3::CheckButton->new(_t('RegExp'));
         $w{gui}{"hb$key"}->pack_start($w{gui}{"cbRE$key"}, 0, 1, 0);
         $w{gui}{"cbRE$key"}->set('can_focus', 0);
         $w{gui}{"cbRE$key"}->set_active(1);
@@ -4811,7 +4811,7 @@ sub _bulkEdit {
         $w{gui}{"hb$key"} = Gtk3::HBox->new(0, 0);
         $w{gui}{vboxexpect}->pack_start($w{gui}{"hb$key"}, 0, 1, 0);
 
-        $w{gui}{"cb$key"} = Gtk3::CheckButton->new("Set '$key': ");
+        $w{gui}{"cb$key"} = Gtk3::CheckButton->new(sprintf(_t("Set '%s': "), $key));
         $w{gui}{"hb$key"}->pack_start($w{gui}{"cb$key"}, 0, 1, 0);
         $w{gui}{"cb$key"}->set('can_focus', 0);
 
@@ -4831,7 +4831,7 @@ sub _bulkEdit {
         $w{gui}{"hb$key"}->pack_start($w{gui}{"entry$key"}, 1, 1, 0);
         $w{gui}{"entry$key"}->set_activates_default(1);
 
-        $w{gui}{"cbRE$key"} = Gtk3::CheckButton->new('RegExp');
+        $w{gui}{"cbRE$key"} = Gtk3::CheckButton->new(_t('RegExp'));
         $w{gui}{"hb$key"}->pack_start($w{gui}{"cbRE$key"}, 0, 1, 0);
         $w{gui}{"cbRE$key"}->set('can_focus', 0);
         $w{gui}{"cbRE$key"}->set_active(1);
@@ -4923,12 +4923,12 @@ sub _bulkEdit {
         });
     }
 
-    $w{gui}{cbDelHidden} = Gtk3::CheckButton->new("Remove strings checked 'Hide' from the 'Expect' configuration");
+    $w{gui}{cbDelHidden} = Gtk3::CheckButton->new(_t("Remove strings checked 'Hide' from the 'Expect' configuration"));
     $w{gui}{vboxexpect}->pack_start($w{gui}{cbDelHidden}, 0, 1, 0);
     $w{gui}{cbDelHidden}->set_tooltip_text(_t("If checked, every field marked as 'hide' (for example, under 'Expect' TAB) will be erased.\nThis overrides any value set for both 'pass' and 'passphrase'"));
 
     if ($cipher) {
-        $w{gui}{cbCipher} = Gtk3::CheckButton->new("Cipher secure strings");
+        $w{gui}{cbCipher} = Gtk3::CheckButton->new(_t("Cipher secure strings"));
         $w{data}->get_content_area->pack_start($w{gui}{cbCipher}, 0, 1, 0);
         $w{gui}{cbCipher}->set_tooltip_text(_t("If checked, every passord-like and field marked as 'hide' (for example, under 'Expect' TAB) will be ciphered.\nThis may cause incompatibilities when importing from a server other than this."));
     }

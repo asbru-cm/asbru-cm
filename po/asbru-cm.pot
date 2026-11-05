@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: asbru-cm 6.5.0\n"
 "Report-Msgid-Bugs-To: https://github.com/asbru-cm/asbru-cm/issues\n"
-"POT-Creation-Date: 2026-11-05 08:18+0100\n"
+"POT-Creation-Date: 2026-11-05 08:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -313,16 +313,16 @@ msgid "User variables..."
 msgstr ""
 
 #: lib/PACConfig.pm:412 lib/PACEdit.pm:462 lib/PACEdit.pm:565
-#: lib/PACMain.pm:4741 lib/PACMain.pm:4865 lib/PACScripts.pm:905
-#: lib/PACTerminal.pm:2239 lib/edit/PACExecEntry.pm:411
+#: lib/PACMain.pm:4741 lib/PACMain.pm:4865 lib/PACPCC.pm:563
+#: lib/PACScripts.pm:905 lib/PACTerminal.pm:2239 lib/edit/PACExecEntry.pm:411
 #: lib/edit/PACExpectEntry.pm:683 lib/edit/PACExpectEntry.pm:761
 #: lib/edit/PACPrePostEntry.pm:294
 msgid "Global variables..."
 msgstr ""
 
 #: lib/PACConfig.pm:432 lib/PACEdit.pm:482 lib/PACEdit.pm:582
-#: lib/PACMain.pm:4761 lib/PACMain.pm:4884 lib/PACScripts.pm:928
-#: lib/PACTerminal.pm:2264 lib/edit/PACExecEntry.pm:429
+#: lib/PACMain.pm:4761 lib/PACMain.pm:4884 lib/PACPCC.pm:585
+#: lib/PACScripts.pm:928 lib/PACTerminal.pm:2264 lib/edit/PACExecEntry.pm:429
 #: lib/edit/PACExpectEntry.pm:777 lib/edit/PACPrePostEntry.pm:310
 msgid "Environment variables..."
 msgstr ""
@@ -337,13 +337,13 @@ msgid ""
 msgstr ""
 
 #: lib/PACConfig.pm:449 lib/PACEdit.pm:599 lib/PACMain.pm:4775
-#: lib/PACMain.pm:4900 lib/PACScripts.pm:942 lib/edit/PACExecEntry.pm:445
-#: lib/edit/PACExpectEntry.pm:795
+#: lib/PACMain.pm:4900 lib/PACPCC.pm:599 lib/PACScripts.pm:942
+#: lib/edit/PACExecEntry.pm:445 lib/edit/PACExpectEntry.pm:795
 msgid "Interactive user choose from list"
 msgstr ""
 
 #: lib/PACConfig.pm:450 lib/PACEdit.pm:600 lib/PACMain.pm:4776
-#: lib/PACMain.pm:4901 lib/edit/PACExecEntry.pm:446
+#: lib/PACMain.pm:4901 lib/PACPCC.pm:600 lib/edit/PACExecEntry.pm:446
 #: lib/edit/PACExpectEntry.pm:796
 msgid ""
 "User will be prompted to choose a value form a user defined list separated "
@@ -351,16 +351,18 @@ msgid ""
 msgstr ""
 
 #: lib/PACConfig.pm:460 lib/PACEdit.pm:488 lib/PACEdit.pm:610
-#: lib/PACMain.pm:4785 lib/PACMain.pm:4911 lib/PACScripts.pm:950
-#: lib/edit/PACExecEntry.pm:456 lib/edit/PACExpectEntry.pm:690
-#: lib/edit/PACExpectEntry.pm:807 lib/edit/PACPrePostEntry.pm:316
+#: lib/PACMain.pm:4785 lib/PACMain.pm:4911 lib/PACPCC.pm:607
+#: lib/PACScripts.pm:950 lib/edit/PACExecEntry.pm:456
+#: lib/edit/PACExpectEntry.pm:690 lib/edit/PACExpectEntry.pm:807
+#: lib/edit/PACPrePostEntry.pm:316
 msgid "Use a command output as value"
 msgstr ""
 
 #: lib/PACConfig.pm:461 lib/PACEdit.pm:489 lib/PACEdit.pm:611
-#: lib/PACMain.pm:4786 lib/PACMain.pm:4912 lib/PACScripts.pm:951
-#: lib/edit/PACExecEntry.pm:457 lib/edit/PACExpectEntry.pm:691
-#: lib/edit/PACExpectEntry.pm:808 lib/edit/PACPrePostEntry.pm:317
+#: lib/PACMain.pm:4786 lib/PACMain.pm:4912 lib/PACPCC.pm:608
+#: lib/PACScripts.pm:951 lib/edit/PACExecEntry.pm:457
+#: lib/edit/PACExpectEntry.pm:691 lib/edit/PACExpectEntry.pm:808
+#: lib/edit/PACPrePostEntry.pm:317
 msgid ""
 "The given command line will be locally executed, and its output (both STDOUT "
 "and STDERR) will be used to replace this value"
@@ -482,8 +484,9 @@ msgid ""
 msgstr ""
 
 #: lib/PACGlobalVarEntry.pm:141 lib/PACKeePass.pm:594 lib/PACKeyBindings.pm:598
-#: lib/edit/PACExecEntry.pm:185 lib/edit/PACPrePostEntry.pm:143
-#: lib/edit/PACVarEntry.pm:134 lib/method/PACMethod_ssh.pm:420
+#: lib/edit/PACExecEntry.pm:185 lib/edit/PACExpectEntry.pm:164
+#: lib/edit/PACPrePostEntry.pm:143 lib/edit/PACVarEntry.pm:134
+#: lib/method/PACMethod_ssh.pm:420
 msgid "Open Online Help"
 msgstr ""
 
@@ -493,6 +496,10 @@ msgstr ""
 
 #: lib/PACGlobalVarEntry.pm:211
 msgid " Value:"
+msgstr ""
+
+#: lib/PACGlobalVarEntry.pm:219 lib/edit/PACExpectEntry.pm:293
+msgid "Hide"
 msgstr ""
 
 #: lib/PACKeePass.pm:161
@@ -521,6 +528,10 @@ msgstr ""
 #: lib/PACKeePass.pm:454
 #, perl-format
 msgid "Add %s KeePassXC"
+msgstr ""
+
+#: lib/PACKeePass.pm:585
+msgid "Activate use of a KeePass database file"
 msgstr ""
 
 #: lib/PACKeePass.pm:607
@@ -1265,6 +1276,11 @@ msgstr ""
 msgid " <b><span foreground=\"orange\">COMMON</span></b> entries: "
 msgstr ""
 
+#: lib/PACMain.pm:4692 lib/PACMain.pm:4814
+#, perl-format
+msgid "Set '%s': "
+msgstr ""
+
 #: lib/PACMain.pm:4699 lib/PACMain.pm:4821
 msgid "change "
 msgstr ""
@@ -1273,8 +1289,12 @@ msgstr ""
 msgid " with "
 msgstr ""
 
-#: lib/PACMain.pm:4766 lib/PACMain.pm:4890 lib/PACScripts.pm:935
-#: lib/edit/PACExecEntry.pm:435
+#: lib/PACMain.pm:4712 lib/PACMain.pm:4834
+msgid "RegExp"
+msgstr ""
+
+#: lib/PACMain.pm:4766 lib/PACMain.pm:4890 lib/PACPCC.pm:592
+#: lib/PACScripts.pm:935 lib/edit/PACExecEntry.pm:435
 msgid "Runtime substitution (<ASK:change_by_number>)"
 msgstr ""
 
@@ -1282,11 +1302,19 @@ msgstr ""
 msgid " <b><span foreground=\"orange\">EXPECT</span></b> entries: "
 msgstr ""
 
+#: lib/PACMain.pm:4926
+msgid "Remove strings checked 'Hide' from the 'Expect' configuration"
+msgstr ""
+
 #: lib/PACMain.pm:4928
 msgid ""
 "If checked, every field marked as 'hide' (for example, under 'Expect' TAB) "
 "will be erased.\n"
 "This overrides any value set for both 'pass' and 'passphrase'"
+msgstr ""
+
+#: lib/PACMain.pm:4931
+msgid "Cipher secure strings"
 msgstr ""
 
 #: lib/PACMain.pm:4933
@@ -1506,6 +1534,41 @@ msgstr ""
 
 #: lib/PACPCC.pm:394
 msgid "Show the window with the locally piped data"
+msgstr ""
+
+#: lib/PACPCC.pm:615
+msgid "Tee remote output to a local file"
+msgstr ""
+
+#: lib/PACPCC.pm:616
+msgid ""
+"The given command line will be executed, and its output will be saved in "
+"provided file (after TEE:...) LOCALLY"
+msgstr ""
+
+#: lib/PACPCC.pm:623
+msgid "Pipe remote output throught local command"
+msgstr ""
+
+#: lib/PACPCC.pm:624
+msgid ""
+"The given command line will be remotely executed, and its output will be "
+"piped throught the provide command (after PIPE:...) LOCALLY"
+msgstr ""
+
+#: lib/PACPCC.pm:631
+msgid "KeePass Extended Query"
+msgstr ""
+
+#: lib/PACPCC.pm:632
+msgid ""
+"This allows you to select the value to be returned, based on another value's "
+"match againt a Perl Regular Expression"
+msgstr ""
+
+#: lib/PACPCC.pm:732
+#, perl-format
+msgid "ERROR: Can not open for reading '%s' (%s)"
 msgstr ""
 
 #: lib/PACPCC.pm:744 lib/PACScripts.pm:1226
@@ -2401,7 +2464,7 @@ msgstr ""
 msgid "Send selected local/global/environment value to terminal"
 msgstr ""
 
-#: lib/PACTerminal.pm:2281
+#: lib/PACTerminal.pm:2281 lib/edit/PACExpectEntry.pm:436
 msgid "Copy"
 msgstr ""
 
@@ -2700,6 +2763,40 @@ msgstr ""
 msgid "STOP SEARCH"
 msgstr ""
 
+#: lib/PACTerminal.pm:4455
+#, perl-format
+msgid ""
+" PLEASE, WAIT. Searching... (%d lines matching '%s' so far in %d processed "
+"lines) "
+msgstr ""
+
+#: lib/PACTerminal.pm:4467
+#, perl-format
+msgid " SEARCH WAS STOPPED WITH %d LINES MATCHING '%s' SO FAR!! "
+msgstr ""
+
+#: lib/PACTerminal.pm:4472
+#, perl-format
+msgid " PLEASE, WAIT. Updating... (%d lines matching '%s') "
+msgstr ""
+
+#: lib/PACTerminal.pm:4482
+#, perl-format
+msgid " %d lines matching '%s': "
+msgstr ""
+
+#: lib/PACTerminal.pm:4483
+msgid "Find"
+msgstr ""
+
+#: lib/PACTerminal.pm:4576
+msgid "Are you sure you want to close <b>other</b> terminals?"
+msgstr ""
+
+#: lib/PACTerminal.pm:4593
+msgid "Are you sure you want to close <b>all</b> terminals?"
+msgstr ""
+
 #: lib/PACTerminal.pm:4658
 msgid "Show _messages"
 msgstr ""
@@ -2881,6 +2978,10 @@ msgstr ""
 msgid "Command"
 msgstr ""
 
+#: lib/edit/PACExecEntry.pm:291
+msgid "send <INTRO>"
+msgstr ""
+
 #: lib/edit/PACExecEntry.pm:303
 msgid ""
 "<i>Group</i><b>:</b><i>Description</i>\n"
@@ -2968,6 +3069,67 @@ msgstr ""
 msgid "Internal variables..."
 msgstr ""
 
+#: lib/edit/PACExpectEntry.pm:231
+#, perl-format
+msgid "Expect #%s"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:269
+msgid "Expect: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:277
+msgid "Time out (seconds): "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:290
+msgid "Send("
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:308
+msgid "Return"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:311
+msgid ""
+"Sends a <RETURN> (\\n) after the string is entered.\\nFor IBM 3270 "
+"connections, sends a \\r\\f (Carriage Return and Line Feed)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:319
+msgid ""
+"If \"Expect\" IS matched, the \"Send\" string will be sent and we will \"go "
+"to\" selected Expect number. If stop is selected, Expect processing will "
+"stop, and control will be returned to user (no disconnect will happen)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:322
+msgid "On MATCH: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:330 lib/edit/PACExpectEntry.pm:357
+msgid "goto "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:339 lib/edit/PACExpectEntry.pm:366
+msgid "stop"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:346
+msgid ""
+"If \"Expect\" IS NOT matched, no string will be sent, and we will \"go to\" "
+"selected Expect. If stop is selected, Expect processing will stop, and "
+"control will be returned to user (no disconnect will happen)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:349
+msgid "On FAIL: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:458
+msgid "Cut"
+msgstr ""
+
 #: lib/edit/PACExpectEntry.pm:507
 msgid "Delete"
 msgstr ""
@@ -3011,16 +3173,16 @@ msgid "Ask: "
 msgstr ""
 
 #: lib/edit/PACPrePostEntry.pm:206 lib/edit/PACPrePostEntry.pm:211
-#: lib/edit/PACPrePostEntry.pm:241
+#: lib/edit/PACPrePostEntry.pm:236 lib/edit/PACPrePostEntry.pm:241
 msgid "NO"
 msgstr ""
 
 #: lib/edit/PACPrePostEntry.pm:206 lib/edit/PACPrePostEntry.pm:211
-#: lib/edit/PACPrePostEntry.pm:241
+#: lib/edit/PACPrePostEntry.pm:236 lib/edit/PACPrePostEntry.pm:241
 msgid "YES"
 msgstr ""
 
-#: lib/edit/PACPrePostEntry.pm:211
+#: lib/edit/PACPrePostEntry.pm:211 lib/edit/PACPrePostEntry.pm:241
 msgid "Default: "
 msgstr ""
 
@@ -3150,6 +3312,10 @@ msgstr ""
 
 #: lib/edit/PACTermOpts.pm:428
 msgid "Reset to DEFAULT values"
+msgstr ""
+
+#: lib/edit/PACVarEntry.pm:208
+msgid "hide) "
 msgstr ""
 
 #: lib/method/PACMethod_3270.pm:210
@@ -3569,6 +3735,10 @@ msgstr ""
 
 #: lib/method/PACMethod_rdesktop.pm:468 lib/method/PACMethod_xfreerdp.pm:554
 msgid "Share Name (8 chars max.!):"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:473 lib/method/PACMethod_xfreerdp.pm:559
+msgid "Select a path to share"
 msgstr ""
 
 #: lib/method/PACMethod_realvnc.pm:228
@@ -5153,10 +5323,6 @@ msgstr ""
 
 #: res/asbru.glade:6356
 msgid "Close  "
-msgstr ""
-
-#: res/asbru.glade:6373
-msgid "Hide"
 msgstr ""
 
 #: res/asbru.glade:6401

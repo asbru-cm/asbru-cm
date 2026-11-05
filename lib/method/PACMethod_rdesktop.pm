@@ -470,7 +470,7 @@ sub _buildRedir {
         $w{hbox}->pack_start($w{entryRedirShare}, 0, 1, 0);
         $w{entryRedirShare}->set_text($redirDiskShare);
 
-        $w{fcForwardPath} = Gtk3::FileChooserButton->new('Select a path to share', 'GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER');
+        $w{fcForwardPath} = Gtk3::FileChooserButton->new(_t('Select a path to share'), 'GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER');
         $redirDiskPath =~ s/(.+)/file:\/\/$1/g;
         $w{fcForwardPath}->set_uri($redirDiskPath);
         $w{hbox}->pack_start($w{fcForwardPath}, 1, 1, 0);
