@@ -153,7 +153,7 @@ sub _loadTreeConfiguration {
     my $tree = shift // $$self{_WINDOWCLUSTER}{treeConnections};
 
     @{$$self{_WINDOWCLUSTER}{treeConnections}{'data'}} = ({
-        value => [$GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__'],
+        value => [$GROUPICON_ROOT, '<b>' . __(_t('My Connections')) . '</b>', '__PAC__ROOT__'],
         children => []
     });
     foreach my $child (keys %{$PACMain::{FUNCS}{_MAIN}{_CFG}{environments}{'__PAC__ROOT__'}{children}}) {
@@ -406,7 +406,7 @@ sub _initGUI {
     $$self{_WINDOWCLUSTER}{treeConnections}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
 
     @{$$self{_WINDOWCLUSTER}{treeConnections}{'data'}} = ({
-        value => [$GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__'],
+        value => [$GROUPICON_ROOT, '<b>' . __(_t('My Connections')) . '</b>', '__PAC__ROOT__'],
         children => []
     });
     my @col = $$self{_WINDOWCLUSTER}{treeConnections}->get_columns;

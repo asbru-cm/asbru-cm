@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: asbru-cm 6.5.0\n"
 "Report-Msgid-Bugs-To: https://github.com/asbru-cm/asbru-cm/issues\n"
-"POT-Creation-Date: 2026-11-05 08:15+0100\n"
+"POT-Creation-Date: 2026-11-05 08:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,11 @@ msgstr ""
 #: lib/PACCluster.pm:118
 #, perl-format
 msgid "Cluster Administration : %s (v%s)"
+msgstr ""
+
+#: lib/PACCluster.pm:156 lib/PACCluster.pm:409 lib/PACMain.pm:618
+#: lib/PACMain.pm:1406 lib/PACMain.pm:3701 lib/PACMain.pm:4563
+msgid "My Connections"
 msgstr ""
 
 #: lib/PACCluster.pm:260

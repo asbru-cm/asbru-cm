@@ -615,7 +615,7 @@ sub _initGUI {
 
     @{$$self{_GUI}{treeConnections}{'data'}}=(
         {
-            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>' . __(_t('My Connections')) . '</b>', '__PAC__ROOT__' ],
             children => []
         }
     );
@@ -1403,7 +1403,7 @@ sub _setupCallbacks {
     $$self{_GUI}{groupAddBtn}->signal_connect('clicked' => sub {
         my @groups = $$self{_GUI}{treeConnections}->_getSelectedUUIDs();
         my $group_uuid = $groups[0];
-        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // 'My Connections';
+        my $parent_name = $$self{_CFG}{'environments'}{$group_uuid}{'name'} // _t('My Connections');
         if (!(($group_uuid eq '__PAC__ROOT__') || $$self{_CFG}{'environments'}{$group_uuid}{'_is_group'})) {
             return 1;
         }
@@ -3698,7 +3698,7 @@ sub _loadTreeConfiguration {
 
     @{ $$self{_GUI}{treeConnections}{'data'} } =
     ({
-        value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
+        value => [ $GROUPICON_ROOT, '<b>' . __(_t('My Connections')) . '</b>', '__PAC__ROOT__' ],
         children => []
     });
     foreach my $child (keys %{ $$self{_CFG}{environments}{'__PAC__ROOT__'}{children} }) {
@@ -4560,7 +4560,7 @@ sub __importNodes {
         Gtk3::main_iteration() while Gtk3::events_pending();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ();
         @{ $$self{_GUI}{treeConnections}{'data'} } = ({
-            value => [ $GROUPICON_ROOT, '<b>My Connections</b>', '__PAC__ROOT__' ],
+            value => [ $GROUPICON_ROOT, '<b>' . __(_t('My Connections')) . '</b>', '__PAC__ROOT__' ],
             children => []
         });
         Gtk3::main_iteration() while Gtk3::events_pending();
