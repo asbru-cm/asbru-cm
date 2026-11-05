@@ -116,7 +116,7 @@ sub add {
     }
 
     if (! _pixBufFromFile($file) ) {
-        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, "File '$file' could not be loaded as a screenshot file");
+        _wMessage($PACMain::FUNCS{_MAIN}{_GUI}{main}, sprintf(_t("File '%s' could not be loaded as a screenshot file"), $file));
         return 0;
     }
 
@@ -167,7 +167,7 @@ sub _buildScreenshotsGUI {
     $w{btnadd}->set('can_focus', 0);
 
     $w{hboxbtnadd}->pack_start(Gtk3::Image->new_from_stock('gtk-add', 'menu'), 0, 1, 5);
-    $w{hboxbtnadd}->pack_start(Gtk3::Label->new("Add\nScreenshot"), 0, 1, 5);
+    $w{hboxbtnadd}->pack_start(Gtk3::Label->new(_t("Add\nScreenshot")), 0, 1, 5);
 
 
     $w{bbox}->add($w{btnadd});
@@ -179,7 +179,7 @@ sub _buildScreenshotsGUI {
     $w{btnopenfolder}->set('can_focus', 0);
 
     $w{hboxbtnopenfolder}->pack_start(Gtk3::Image->new_from_stock('gtk-open', 'menu'), 0, 1, 5);
-    $w{hboxbtnopenfolder}->pack_start(Gtk3::Label->new("Open Folder"), 0, 1, 5);
+    $w{hboxbtnopenfolder}->pack_start(Gtk3::Label->new(_t("Open Folder")), 0, 1, 5);
 
 
     $w{bbox}->add($w{btnopenfolder});
@@ -282,7 +282,7 @@ sub _buildScreenshots {
         } elsif ($event->button eq 3) {
             my @screenshot_menu_items;
             push(@screenshot_menu_items, {
-                label => 'Change Screenshot file...',
+                label => _t('Change Screenshot file...'),
                 stockicon => 'gtk-edit',
                 code => sub {
                     my $file = $self->_chooseScreenshot;
@@ -296,7 +296,7 @@ sub _buildScreenshots {
                 }
             });
             push(@screenshot_menu_items, {
-                label => 'Save picture as...',
+                label => _t('Save picture as...'),
                 sensitive => $w{imageScreenshot}->get_storage_type ne 'stock',
                 stockicon => 'gtk-save',
                 code => sub {
@@ -327,11 +327,11 @@ sub _buildScreenshots {
                 }
             });
             push(@screenshot_menu_items, {
-                label => 'Remove Screenshot',
+                label => _t('Remove Screenshot'),
                 sensitive => $w{imageScreenshot}->get_storage_type ne 'stock',
                 stockicon => 'gtk-delete',
                 code => sub {
-                    return 1 unless _wConfirm(undef, "Remove Screenshot file '$w{file}'?");
+                    return 1 unless _wConfirm(undef, sprintf(_t("Remove Screenshot file '%s'?"), $w{file}));
 
                     splice(@{$$self{list}}, $w{position}, 1);
                     splice(@{$$self{cfg}{screenshots}}, $w{position}, 1);
@@ -378,7 +378,7 @@ sub _chooseScreenshot {
     my $file = '';
 
     # Add a "Show hidden" checkbox
-    my $cbShowHidden = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
+    my $cbShowHidden = Gtk3::CheckButton->new_with_mnemonic(_t('Show _hidden files'));
     $dialog->get_action_area->pack_start($cbShowHidden, 0, 1, 0);
     $cbShowHidden->signal_connect('toggled', sub {$dialog->set_show_hidden($cbShowHidden->get_active);});
 

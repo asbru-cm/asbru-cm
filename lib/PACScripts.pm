@@ -368,7 +368,7 @@ sub show {
         $result =~ s/^\Q$tmpfile\E\s+(.+)$/$1/g;
 
         $$self{_WINDOWSCRIPTS}{gui}{status}->set_markup('<span foreground="' . ($err ? 'red' : '#00D206') . '">' . "<b>" . __("$name: $result") . "</b>" . '</span>');
-        $$self{_WINDOWSCRIPTS}{gui}{status}->set_tooltip_text(' * ' . localtime(time) . " :\n" . ($err ? join('', @lines) : 'syntax ok') );
+        $$self{_WINDOWSCRIPTS}{gui}{status}->set_tooltip_text(' * ' . localtime(time) . " :\n" . ($err ? join('', @lines) : _t('syntax ok')) );
 
         $$self{_SYNTAX_CHANGED} = 0;
         return 1;
@@ -392,7 +392,7 @@ sub _initGUI {
     $$self{_WINDOWSCRIPTS}{main} = Gtk3::Window->new;
 
     # and setup some dialog properties.
-    $$self{_WINDOWSCRIPTS}{main}->set_title("$APPNAME (v$APPVERSION) : Scripts");
+    $$self{_WINDOWSCRIPTS}{main}->set_title("$APPNAME (v$APPVERSION) : " . _t('Scripts'));
     $$self{_WINDOWSCRIPTS}{main}->set_position('center');
     $$self{_WINDOWSCRIPTS}{main}->set_icon_from_file($APPICON);
     $$self{_WINDOWSCRIPTS}{main}->set_default_size(800, 500);
@@ -418,11 +418,11 @@ sub _initGUI {
                     $$self{_WINDOWSCRIPTS}{treeScripts} = Gtk3::SimpleList->new_from_treeview (
                         Gtk3::TreeView->new,
                         'FILE' => 'hidden',
-                        'SCRIPT' => 'text'
+                        _t('SCRIPT') => 'text'
                     );
 
                     $$self{_WINDOWSCRIPTS}{gui}{scroll2}->add($$self{_WINDOWSCRIPTS}{treeScripts});
-                    $$self{_WINDOWSCRIPTS}{treeScripts}->set_tooltip_text('Ásbrú Scripts. You may Drag \'n Drop Perl (.pl) files here to import them.');
+                    $$self{_WINDOWSCRIPTS}{treeScripts}->set_tooltip_text(_t('Ásbrú Scripts. You may Drag \'n Drop Perl (.pl) files here to import them.'));
                     $$self{_WINDOWSCRIPTS}{treeScripts}->set_headers_visible(1);
                     $$self{_WINDOWSCRIPTS}{treeScripts}->get_selection->set_mode('GTK_SELECTION_MULTIPLE');
 
@@ -433,7 +433,7 @@ sub _initGUI {
                     # PAC Script Editor
 
                     my $tablbl = Gtk3::HBox->new(0, 0);
-                    $tablbl->pack_start(Gtk3::Label->new(' Script Editor '), 1, 1, 0);
+                    $tablbl->pack_start(Gtk3::Label->new(_t(' Script Editor ')), 1, 1, 0);
                     $tablbl->pack_start(Gtk3::Image->new_from_stock('asbru-script', 'menu'), 0, 1, 0);
                     $tablbl->show_all;
 
@@ -491,7 +491,7 @@ sub _initGUI {
                             $$self{_WINDOWSCRIPTS}{treeFuncs} = Gtk3::SimpleList->new_from_treeview (
                                 Gtk3::TreeView->new,
                                 'API NAME' => 'hidden',
-                                'API CALL' => 'markup',
+                                _t('API CALL') => 'markup',
                             );
                             $$self{_WINDOWSCRIPTS}{gui}{scrollfunc}->add($$self{_WINDOWSCRIPTS}{treeFuncs});
                             $$self{_WINDOWSCRIPTS}{treeFuncs}->set_headers_visible(1);
@@ -534,7 +534,7 @@ sub _initGUI {
                     # PAC Script Help
 
                     my $tablbl2 = Gtk3::HBox->new(0, 0);
-                    $tablbl2->pack_start(Gtk3::Label->new(' Ásbrú Script Help '), 1, 1, 0);
+                    $tablbl2->pack_start(Gtk3::Label->new(_t(' Ásbrú Script Help ')), 1, 1, 0);
                     $tablbl2->pack_start(Gtk3::Image->new_from_stock('gtk-help', 'menu'), 0, 1, 0);
                     $tablbl2->show_all;
 
@@ -589,7 +589,7 @@ sub _initGUI {
             $$self{_WINDOWSCRIPTS}{gui}{vbox}->pack_start($$self{_WINDOWSCRIPTS}{gui}{btnbox}, 0, 1, 0);
 
                 # Put a 'execute' button
-                $$self{_WINDOWSCRIPTS}{gui}{btnexec} = Gtk3::Button->new('E_xecute');
+                $$self{_WINDOWSCRIPTS}{gui}{btnexec} = Gtk3::Button->new(_t('E_xecute'));
                 $$self{_WINDOWSCRIPTS}{gui}{btnexec}->set_image(Gtk3::Image->new_from_stock('gtk-media-play', 'button') );
                 $$self{_WINDOWSCRIPTS}{gui}{btnexec}->set('can_focus', 0);
                 $$self{_WINDOWSCRIPTS}{gui}{btnbox}->pack_start($$self{_WINDOWSCRIPTS}{gui}{btnexec}, 1, 1, 0);
@@ -600,7 +600,7 @@ sub _initGUI {
                 $$self{_WINDOWSCRIPTS}{gui}{btnbox}->pack_start($$self{_WINDOWSCRIPTS}{gui}{btnadd}, 1, 1, 0);
 
                 # Put a 'import' button
-                $$self{_WINDOWSCRIPTS}{gui}{btnimport} = Gtk3::Button->new('Import...');
+                $$self{_WINDOWSCRIPTS}{gui}{btnimport} = Gtk3::Button->new(_t('Import...'));
                 $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set('can_focus', 0);
                 $$self{_WINDOWSCRIPTS}{gui}{btnimport}->set_image(Gtk3::Image->new_from_stock('gtk-open', 'button') );
                 $$self{_WINDOWSCRIPTS}{gui}{btnbox}->pack_start($$self{_WINDOWSCRIPTS}{gui}{btnimport}, 1, 1, 0);
@@ -646,37 +646,37 @@ sub _setupCallbacks {
         my @comm_menu_items;
         push(@comm_menu_items,
         {
-            label => 'Del ESCape sequences ($COMMON{del_esc}(<text>) )',
-            tooltip => "Remove ESCape sequences (mainly used for removing ANSI colouring output)",
+            label => _t('Del ESCape sequences ($COMMON{del_esc}(<text>) )'),
+            tooltip => _t("Remove ESCape sequences (mainly used for removing ANSI colouring output)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{del_esc}(<text>) ");}
         });
 
         push(@comm_menu_items,
         {
-            label => 'Var substitution ($COMMON{subst}(<text>) )',
-            tooltip => "Substitute given text with internal variables (<ASK:a>, <GV:2>, ...)",
+            label => _t('Var substitution ($COMMON{subst}(<text>) )'),
+            tooltip => _t("Substitute given text with internal variables (<ASK:a>, <GV:2>, ...)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{subst}(<text>) ");}
         });
 
         push(@comm_menu_items,
         {
-            label => 'Get Ásbrú Config ($COMMON{cfg}([0|1]) )',
-            tooltip => "Retrieve a copy (0->default) or a reference (1) to *whole* PAC's configuration
+            label => _t('Get Ásbrú Config ($COMMON{cfg}([0|1]) )'),
+            tooltip => _t("Retrieve a copy (0->default) or a reference (1) to *whole* PAC's configuration
 *ATTENTION* Retrieving a REFERENCE (1) to PAC's config may lead to Ásbrú misconfiguration!!
-NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
+NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{cfg}([0|1]) ");}
         });
 
         push(@comm_menu_items,
         {
-            label => 'Run Config sanity check($COMMON{sanity}(\%cfg) )',
-            tooltip => "Perform a sanity check for given %cfg, which may be empty, in which case it will",
+            label => _t('Run Config sanity check($COMMON{sanity}(\%cfg) )'),
+            tooltip => _t("Perform a sanity check for given %cfg, which may be empty, in which case it will"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{sanity}(\%sanity]) ");}
         });
 
         push(@menu_items,
         {
-            label => 'COMMON methods',
+            label => _t('COMMON methods'),
             stockicon => 'asbru-script',
             submenu => \@comm_menu_items
         });
@@ -685,105 +685,105 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
         my @session_menu_items;
         push(@session_menu_items,
         {
-            label => 'Start session with "UUID"($PAC{start_uuid}(<UUID>[, <cluster>]) )',
-            tooltip => "Start session with 'UUID' (optionally in cluster 'cluster')",
+            label => _t('Start session with "UUID"($PAC{start_uuid}(<UUID>[, <cluster>]) )'),
+            tooltip => _t("Start session with 'UUID' (optionally in cluster 'cluster')"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{start_uuid}(<UUID>[, <cluster>])");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Start session "UUID" with manual login(""PAC{start_uuid_manual}(<UUID>) )',
-            tooltip => "Start session with 'UUID' with manual login (you must write your login code under CONNECTION)",
+            label => _t('Start session "UUID" with manual login(""PAC{start_uuid_manual}(<UUID>) )'),
+            tooltip => _t("Start session with 'UUID' with manual login (you must write your login code under CONNECTION)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{start_uuid_manual}(<UUID>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Start session named "name"($PAC{start}(<name>[, <cluster>]) )',
-            tooltip => "Start session named 'name' (optionally in cluster 'cluster')",
+            label => _t('Start session named "name"($PAC{start}(<name>[, <cluster>]) )'),
+            tooltip => _t("Start session named 'name' (optionally in cluster 'cluster')"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{start}(<name>[, <cluster>])");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Start session "name" with manual login(""PAC{start_manual}(<name>) )',
-            tooltip => "Start session named 'name' with manual login (you must write your login code under CONNECTION)",
+            label => _t('Start session "name" with manual login(""PAC{start_manual}(<name>) )'),
+            tooltip => _t("Start session named 'name' with manual login (you must write your login code under CONNECTION)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{start_manual}(<name>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Select existing session "name"($PAC{select}(<name>) )',
-            tooltip => "Select an existing session named 'name', returning (uuid, \$tmp_uuid) (array)",
+            label => _t('Select existing session "name"($PAC{select}(<name>) )'),
+            tooltip => _t("Select an existing session named 'name', returning (uuid, \$tmp_uuid) (array)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{select}(<name>)");}
         });
 
         push(@session_menu_items,
         {
-            label => "Select ALL open sessions(\$PAC{select}('*ALL*') )",
-            tooltip => "Select ALL open sessions, return (hash ref) the whole list {tmp_uuid => uuid}",
+            label => _t("Select ALL open sessions(\$PAC{select}('*ALL*') )"),
+            tooltip => _t("Select ALL open sessions, return (hash ref) the whole list {tmp_uuid => uuid}"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{select}('*ALL*')");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Stop session $tmp_uuid($PAC{stop}(<$tmp_uuid>) )',
-            tooltip => 'Stop and close session identified by $tmp_uuid',
+            label => _t('Stop session $tmp_uuid($PAC{stop}(<$tmp_uuid>) )'),
+            tooltip => _t('Stop and close session identified by $tmp_uuid'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{stop}(<\$tmp_uuid>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Show/hide a message($PAC{msg}([<message text>[, 0|1]]) )',
-            tooltip => "Show/hide a message window with an OK (1) or not (0 - default) button",
+            label => _t('Show/hide a message($PAC{msg}([<message text>[, 0|1]]) )'),
+            tooltip => _t("Show/hide a message window with an OK (1) or not (0 - default) button"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{msg}([<message text>[, 0|1]])");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Split connections($PAC{split}(<$tmp_uuid1>, <$tmp_uuid2>[, 0|1]) )',
-            tooltip => "Split horizontally (0->default) or vertically (1) given connections",
+            label => _t('Split connections($PAC{split}(<$tmp_uuid1>, <$tmp_uuid2>[, 0|1]) )'),
+            tooltip => _t("Split horizontally (0->default) or vertically (1) given connections"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{split}(<\$tmp_uuid1>, <\$tmp_uuid2>[, 0|1])");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Unsplit($PAC{unsplit}(<$tmp_uuid>) )',
-            tooltip => "Unsplit given connection",
+            label => _t('Unsplit($PAC{unsplit}(<$tmp_uuid>) )'),
+            tooltip => _t("Unsplit given connection"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{unsplit}(<\$tmp_uuid>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Untab($PAC{to_window}(<$tmp_uuid>) )',
-            tooltip => "Untab given connection",
+            label => _t('Untab($PAC{to_window}(<$tmp_uuid>) )'),
+            tooltip => _t("Untab given connection"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{to_window}(<\$tmp_uuid>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Retab($PAC{to_tab}(<$tmp_uuid>) )',
-            tooltip => "Retab given connection",
+            label => _t('Retab($PAC{to_tab}(<$tmp_uuid>) )'),
+            tooltip => _t("Retab given connection"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{to_tab}(<\$tmp_uuid>)");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Save current Ásbrú CFG($PAC{cfg_save}())',
-            tooltip => "Save current Ásbrú cfg to standard Ásbrú config file",
+            label => _t('Save current Ásbrú CFG($PAC{cfg_save}())'),
+            tooltip => _t("Save current Ásbrú cfg to standard Ásbrú config file"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{cfg_save}()");}
         });
 
         push(@session_menu_items,
         {
-            label => 'Export Ásbrú CFG to file($PAC{cfg_export}([file]) )',
-            tooltip => "Save current Ásbrú cfg to given file (or ask for a file through a GUI if no file provided)",
+            label => _t('Export Ásbrú CFG to file($PAC{cfg_export}([file]) )'),
+            tooltip => _t("Save current Ásbrú cfg to given file (or ask for a file through a GUI if no file provided)"),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$PAC{cfg_export}([file])");}
         });
 
         push(@menu_items,
         {
-            label => 'Ásbrú methods',
+            label => _t('Ásbrú methods'),
             stockicon => 'asbru-tab',
             submenu => \@session_menu_items
         });
@@ -792,97 +792,97 @@ NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!",
         my @connection_menu_items;
         push(@connection_menu_items,
         {
-            label => 'Set output log file($TERMINAL{log}([<log file>]) )',
-            tooltip => 'Function to set/remove output log file. Returns the log filehandle applied',
+            label => _t('Set output log file($TERMINAL{log}([<log file>]) )'),
+            tooltip => _t('Function to set/remove output log file. Returns the log filehandle applied'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{log}([<log file>])");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'User input($TERMINAL{ask}(<text>[, 0|1]) )',
-            tooltip => 'Ask user for input, showing (1->default) or not (0)  user input',
+            label => _t('User input($TERMINAL{ask}(<text>[, 0|1]) )'),
+            tooltip => _t('Ask user for input, showing (1->default) or not (0)  user input'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{ask}(<text>[, 0|1])");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Get EXPecxt object($TERMINAL{exp}())',
-            tooltip => 'Returns the Perl Expect object for this connection (*WARNING*, dangerous function! Not recommended!)',
+            label => _t('Get EXPecxt object($TERMINAL{exp}())'),
+            tooltip => _t('Returns the Perl Expect object for this connection (*WARNING*, dangerous function! Not recommended!)'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{exp}()");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Connection name($TERMINAL{name})',
-            tooltip => 'Variable with the Name of the connection',
+            label => _t('Connection name($TERMINAL{name})'),
+            tooltip => _t('Variable with the Name of the connection'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{name}");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Connection UUID($TERMINAL{uuid})',
-            tooltip => 'Variable with the UUID of the connection',
+            label => _t('Connection UUID($TERMINAL{uuid})'),
+            tooltip => _t('Variable with the UUID of the connection'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{uuid}");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Connection TMP_UUID($TERMINAL{tmp_uuid})',
-            tooltip => 'Variable with the Temporal UUID of current executing connection',
+            label => _t('Connection TMP_UUID($TERMINAL{tmp_uuid})'),
+            tooltip => _t('Variable with the Temporal UUID of current executing connection'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{tmp_uuid}");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Latest error($TERMINAL{error})',
-            tooltip => 'Variable with the latest error from the "expect" function',
+            label => _t('Latest error($TERMINAL{error})'),
+            tooltip => _t('Variable with the latest error from the "expect" function'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{error}");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Print MSG on terminal($TERMINAL{msg}(<message>) )',
-            tooltip => 'Function to print a message on the Terminal',
+            label => _t('Print MSG on terminal($TERMINAL{msg}(<message>) )'),
+            tooltip => _t('Function to print a message on the Terminal'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{msg}(<message>)");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Guess connection prompt($TERMINAL{get_prompt}([0|1]) )',
-            tooltip => 'Function retrieve connection prompt and remove (1) or not (0->default) any ESCape sequence. Returns a Quoted string \Qprompt_sting\E valid for RegExp matching',
+            label => _t('Guess connection prompt($TERMINAL{get_prompt}([0|1]) )'),
+            tooltip => _t('Function retrieve connection prompt and remove (1) or not (0->default) any ESCape sequence. Returns a Quoted string \Qprompt_sting\E valid for RegExp matching'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{get_prompt}([0|1])");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Send input to terminal($TERMINAL{send}(<string[\n]>) )',
-            tooltip => 'Function to SEND some string (input) to the connection (\n sends a <INTRO>)',
+            label => _t('Send input to terminal($TERMINAL{send}(<string[\n]>) )'),
+            tooltip => _t('Function to SEND some string (input) to the connection (\n sends a <INTRO>)'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{send}(<string[\n]>)");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Send input to terminal($TERMINAL{send_get}(<string>[, 0]) )',
-            tooltip => 'Function to SEND some string (input) to the connection (\n is automatically appended)',
+            label => _t('Send input to terminal($TERMINAL{send_get}(<string>[, 0]) )'),
+            tooltip => _t('Function to SEND some string (input) to the connection (\n is automatically appended)'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{send_get}(<string>[, 0])");}
         });
 
         push(@connection_menu_items,
         {
-            label => 'Send input to terminal($TERMINAL{expect}(<string>[, <seconds>]) )',
-            tooltip => 'Function to EXPECT for some STRING from the connection for given SECONDS, or indefinetly if undefined
+            label => _t('Send input to terminal($TERMINAL{expect}(<string>[, <seconds>]) )'),
+            tooltip => _t('Function to EXPECT for some STRING from the connection for given SECONDS, or indefinetly if undefined
 Returns, TRUE (1) on STRING found or FALSE (0) otherwise, setting the $TERMINAL{error} variable with
 the error that produced the EXPECT not matching given STRING.
 If STRINGS matches, then other two variables are set:
 $TERMINAL{out1}->contains the output of the latest string SENT UP TO the matched STRING
 $TERMINAL{out2}->contains the output of the latest string SENT FROM the matched STRING onwards
-All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is executed',
+All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is executed'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$TERMINAL{expect}(<string>[, <seconds>])");}
         });
 
         push(@menu_items,
         {
-            label => 'TERMINAL methods',
+            label => _t('TERMINAL methods'),
             stockicon => 'asbru-shell',
             submenu => \@connection_menu_items
         });
@@ -902,7 +902,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         }
         push(@menu_items,
         {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -925,30 +925,30 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         }
         push(@menu_items,
         {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Put an option to ask user for variable substitution
         push(@menu_items,
         {
-            label => 'Runtime substitution (<ASK:change_by_number>)',
+            label => _t('Runtime substitution (<ASK:change_by_number>)'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{subst}('<ASK:change_by_number>')");}
         });
 
         # Populate with <ASK:*|> special string
         push(@menu_items,
         {
-            label => 'Interactive user choose from list',
-            tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes)',
+            label => _t('Interactive user choose from list'),
+            tooltip => _t('User will be prompted to choose a value form a user defined list separated with "|" (pipes)'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$COMMON{subst}('<ASK:descriptive_line|opt1|opt2|...|optN>')");}
         });
 
         # Populate with <CMD:*> special string
         push(@menu_items,
         {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             code => sub {$$self{_WINDOWSCRIPTS}{multiTextBuffer}->insert_at_cursor("\$SUBST('<CMD:command_to_launch>')");}
         });
 
@@ -1029,10 +1029,10 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
 
             my ($filename, $directories, $suffix) = fileparse ($file, '.pl');
             if ($suffix ne '.pl') {
-                _wMessage($$self{_WINDOWSCRIPTS}{main}, "File '$file' does not end with a '.pl' Perl extension", 1);
+                _wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("File '%s' does not end with a '.pl' Perl extension"), $file), 1);
                 next;
             }
-            next if -f "$SCRIPTS_DIR/$filename.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, "File '$filename.pl' already exists. Overwrite it?");
+            next if -f "$SCRIPTS_DIR/$filename.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("File '%s' already exists. Overwrite it?"), "$filename.pl"));
 
             $self->_import($file);
         }
@@ -1065,12 +1065,12 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         return 1;
     });
     $$self{_WINDOWSCRIPTS}{gui}{btnadd}->signal_connect('clicked' => sub {
-        my $name = _wEnterValue($$self{_WINDOWSCRIPTS}{main}, "<b>Creating new Script</b>"  , "Enter a name for the new Ásbrú Script");
+        my $name = _wEnterValue($$self{_WINDOWSCRIPTS}{main}, _t("<b>Creating new Script</b>")  , _t("Enter a name for the new Ásbrú Script"));
         return 1 if ((! defined $name) || ($name =~ /^\s*$/go) );
-        return 1 if -f "$SCRIPTS_DIR/$name.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, "File '$name.pl' already exists. Overwrite it?");
+        return 1 if -f "$SCRIPTS_DIR/$name.pl" && ! _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("File '%s' already exists. Overwrite it?"), "$name.pl"));
 
         if (! open(F,">:utf8","$SCRIPTS_DIR/$name.pl")) {
-            _wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not open file '$name.pl' for writting ($!)");
+            _wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: Can not open file '%s' for writting (%s)"), "$name.pl", $!));
             return 1;
         }
 
@@ -1115,7 +1115,7 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
     $$self{_WINDOWSCRIPTS}{gui}{btnclose}->signal_connect('clicked' => sub {
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            my $out = _wYesNoCancel($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before closing Ásbrú Script window?");
+            my $out = _wYesNoCancel($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before closing Ásbrú Script window?"), $name));
             $out eq 'yes' and $self->_saveFile($$self{_SELECTED});
             $out eq 'cancel' and return 1;
             $out eq 'no' and $self->_loadFile($$self{_SELECTED});
@@ -1132,12 +1132,12 @@ All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is exec
         # Check for changes before removing
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $model->get_value($model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before loading another script?"), $name));
         }
 
         my @sel = _getSelectedRows($selection);
         return 1 unless scalar(@sel);
-        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Are you sure you want to remove ". (scalar(@sel) ) . " Ásbrú Scripts?");        
+        return 1 unless _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t('Are you sure you want to remove %d Ásbrú Scripts?'), scalar(@sel)));        
         
         # Delete selected files
         foreach my $path (@sel) {
@@ -1191,7 +1191,7 @@ sub _saveFile {
     my $file = shift // $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($path), 0);
 
     if (!open(F,">:utf8",$file)) {
-        _wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not open for writting '$file' ($!)");
+        _wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: Can not open for writting '%s' (%s)"), $file, $!));
         return 0;
     }
     print F $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_text($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_start_iter, $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_end_iter, 0);
@@ -1213,7 +1213,7 @@ sub _loadFile {
     # Loading a file should not be undoable.
     my $content = '';
     if (!open(F,"<:utf8",$file)) {
-        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->clicked if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "ERROR: Can not read file '$file' ($!)\nDelete it?");
+        $$self{_WINDOWSCRIPTS}{gui}{btnremove}->clicked if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: Can not read file '%s' (%s)\nDelete it?"), $file, $!));
         return 0;
     }
     while (my $line = <F>) {$content .= $line;}
@@ -1223,7 +1223,7 @@ sub _loadFile {
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->set_text($content);
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_text($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_start_iter, $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_end_iter, 0) eq '') {
-            _wMessage($$self{_WINDOWSCRIPTS}{main}, "WARNING: file '$file' is " . (-z $file ? 'empty' : 'not a valid text file!') );
+            _wMessage($$self{_WINDOWSCRIPTS}{main}, (-z $file ? sprintf(_t("WARNING: file '%s' is empty"), $file) : sprintf(_t("WARNING: file '%s' is not a valid text file!"), $file)) );
         }
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->end_not_undoable_action;
         $$self{_WINDOWSCRIPTS}{multiTextBuffer}->place_cursor($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_start_iter);
@@ -1250,8 +1250,8 @@ sub _import {
     my ($filename, $directories, $suffix) = fileparse ($file, '.pl');
     return 0 unless $suffix eq '.pl';
 
-    if (defined $$self{_SCRIPTS}{$filename})    {_wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: It already exists a file named '$file' in '$SCRIPTS_DIR'");}
-    elsif (! copy($file, $SCRIPTS_DIR) )        {_wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Could not import file '$file' into '$SCRIPTS_DIR' ($!)");}
+    if (defined $$self{_SCRIPTS}{$filename})    {_wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: It already exists a file named '%s' in '%s'"), $file, $SCRIPTS_DIR));}
+    elsif (! copy($file, $SCRIPTS_DIR) )        {_wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: Could not import file '%s' into '%s' (%s)"), $file, $SCRIPTS_DIR, $!));}
     else                                        {return 1;}
     return 0;
 }
@@ -1262,7 +1262,7 @@ sub _reloadDir {
     # Check for changes before reloading
     if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified && $$self{_SELECTED}) {
         my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-        $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
+        $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before loading another script?"), $name));
     }
 
     my $dh;
@@ -1270,7 +1270,7 @@ sub _reloadDir {
 
     # Read file from the directory
     if (! opendir($dh, $SCRIPTS_DIR) ) {
-        _wMessage($$self{_WINDOWSCRIPTS}{main}, "ERROR: Could not open directory '$SCRIPTS_DIR' for reading ($!)");
+        _wMessage($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("ERROR: Could not open directory '%s' for reading (%s)"), $SCRIPTS_DIR, $!));
         return 0;
     }
     delete $$self{_SCRIPTS};
@@ -1312,7 +1312,7 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
     if (! scalar(@sel) ) {
         if ($$self{_SELECTED} && $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before loading another script?"), $name));
         }
 
         $SOURCEVIEW and $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
@@ -1338,7 +1338,7 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
         my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($sel[0]), 0);
 
         if ($$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified && ($sel[0] ne $$self{_SELECTED}) ) {
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before loading another script?"), $name));
         }
         $$self{_SELECTED} = $sel[0];
         $$self{_WINDOWSCRIPTS}{gui}{textScript}->set_sensitive(! $ENV{"ASBRU_IS_READONLY"});
@@ -1353,7 +1353,7 @@ Feel free to send me any Ásbrú Script you may find useful to the community!";
     } elsif (scalar(@sel) > 1) {
         if ($$self{_SELECTED} && $$self{_WINDOWSCRIPTS}{multiTextBuffer}->get_modified) {
             my $name = $$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_value($$self{_WINDOWSCRIPTS}{treeScripts}->get_model->get_iter($$self{_SELECTED}), 0);
-            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, "Ásbrú Script '$name' has changed.\nSave data before loading another script?");
+            $self->_saveFile($$self{_SELECTED}) if _wConfirm($$self{_WINDOWSCRIPTS}{main}, sprintf(_t("Ásbrú Script '%s' has changed.\nSave data before loading another script?"), $name));
         }
 
         $SOURCEVIEW and $$self{_WINDOWSCRIPTS}{multiTextBuffer}->begin_not_undoable_action;
@@ -1566,7 +1566,7 @@ sub _execScript {
 
     defined &SESSION and undef &SESSION;
     if (! open(F,"<:utf8",$file)) {
-        _wMessage($parentWindow, "Could not open Ásbrú Script file '$file' for reading: $!");
+        _wMessage($parentWindow, sprintf(_t("Could not open Ásbrú Script file '%s' for reading: %s"), $file, $!));
         return 1;
     }
     my @lines = <F>;
@@ -1576,7 +1576,7 @@ sub _execScript {
     no warnings ('redefine');
     eval $txt;
     use warnings;
-    if ($@) {_wMessage($parentWindow, "Error parsing Ásbrú Script: $@"); $PAC{msg}(); return 0;}
+    if ($@) {_wMessage($parentWindow, sprintf(_t('Error parsing Ásbrú Script: %s'), $@)); $PAC{msg}(); return 0;}
 
     # SESSION execution (local)
     if (scalar @uuid_tmps) {
@@ -1586,12 +1586,12 @@ sub _execScript {
         }
     } else {
         if (! defined &SESSION) {
-            _wMessage($parentWindow, "Error executing Ásbrú Script:\nNo 'SESSION' function declaration found, and script not being executed directly from any Terminal!");
+            _wMessage($parentWindow, _t("Error executing Ásbrú Script:\nNo 'SESSION' function declaration found, and script not being executed directly from any Terminal!"));
             $PAC{msg}();
             return 0;
         } else {
             eval {&SESSION;};
-            if ($@) {_wMessage($parentWindow, "Error executing Ásbrú Script: $@"); $PAC{msg}(); return 0;}
+            if ($@) {_wMessage($parentWindow, sprintf(_t('Error executing Ásbrú Script: %s'), $@)); $PAC{msg}(); return 0;}
         }
     }
 
@@ -1602,7 +1602,7 @@ sub _execScript {
     foreach my $tmp_uuid (keys %{$PAC{list}}) {
         next unless defined $PACMain::RUNNING{$tmp_uuid};
         if ($PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_STATUS} ne 'STOP') {
-            _wMessage($parentWindow, "ERROR: Can not start a new Ásbrú Script while another one is still running:\nTerminal '$PACMain::RUNNING{$tmp_uuid}{terminal}{_NAME}' is running '$PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_NAME}'", 1) ;
+            _wMessage($parentWindow, sprintf(_t("ERROR: Can not start a new Ásbrú Script while another one is still running:\nTerminal '%s' is running '%s'"), $PACMain::RUNNING{$tmp_uuid}{terminal}{_NAME}, $PACMain::RUNNING{$tmp_uuid}{terminal}{_SCRIPT_NAME}), 1) ;
             next;
         }
 

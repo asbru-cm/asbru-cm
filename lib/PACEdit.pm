@@ -136,15 +136,15 @@ sub show {
 
     my $title;
     if ($$self{_IS_NEW} eq 'quick') {
-        _($self, 'btnSaveEdit')->set_label('_Start Connection');
+        _($self, 'btnSaveEdit')->set_label(_t('_Start Connection'));
         _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('asbru-quick-connect', 'button') );
-        _($self, 'btnCloseEdit')->set_label('_Cancel Quick connect');
+        _($self, 'btnCloseEdit')->set_label(_t('_Cancel Quick connect'));
         _($self, 'btnCloseEdit')->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button') );
         $title = "Quick Connect : $APPNAME (v$APPVERSION)";
     } else {
-        _($self, 'btnSaveEdit')->set_label('_Save and Close');
+        _($self, 'btnSaveEdit')->set_label(_t('_Save and Close'));
         _($self, 'btnSaveEdit')->set_image(Gtk3::Image->new_from_stock('gtk-save', 'button') );
-        _($self, 'btnCloseEdit')->set_label('_Close without saving');
+        _($self, 'btnCloseEdit')->set_label(_t('_Close without saving'));
         _($self, 'btnCloseEdit')->set_image(Gtk3::Image->new_from_stock('gtk-close', 'button') );
         $title = "Editing '$PACMain::FUNCS{_MAIN}{_CFG}{'environments'}{$$self{_UUID}}{'name'}' : $APPNAME (v$APPVERSION)";
     }
@@ -172,7 +172,7 @@ sub _initGUI {
     my $self = shift;
 
     # Load XML Glade file
-    defined $$self{_GLADE} or $$self{_GLADE} = Gtk3::Builder->new_from_file($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
+    defined $$self{_GLADE} or $$self{_GLADE} = _gladeBuilder($GLADE_FILE) or die "ERROR: Could not load GLADE file '$GLADE_FILE' ($!)";
 
     # Save main, about and add windows
     $$self{_WINDOWEDIT} = $$self{_GLADE}->get_object('windowEdit');
@@ -210,10 +210,10 @@ sub _initGUI {
     $$self{_WINDOWEDIT}->set_icon_name('asbru-app-big');
     $$self{_WINDOWEDIT}->set_position('center');
 
-    $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
+    $$self{cbShowHidden} = Gtk3::CheckButton->new_with_mnemonic(_t('Show _hidden files'));
     _($self, 'fileCfgPublicKey')->set_extra_widget($$self{cbShowHidden});
 
-    $$self{cbLogsShowHidden} = Gtk3::CheckButton->new_with_mnemonic('Show _hidden files');
+    $$self{cbLogsShowHidden} = Gtk3::CheckButton->new_with_mnemonic(_t('Show _hidden files'));
     _($self, 'btnEditSaveSessionLogs')->set_extra_widget($$self{cbLogsShowHidden});
 
     _($self, 'btnCheckKPX')->set_image(Gtk3::Image->new_from_stock('asbru-keepass', 'button') );
@@ -237,19 +237,19 @@ sub __checkRBAuth {
         if(_($self, 'rbCfgAuthManual')->get_active()) {
             _($self, 'frameExpect')->set_sensitive(0);
             _($self, 'labelExpect')->set_sensitive(0);
-            _($self, 'labelExpect')->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
-            _($self, 'alignExpect')->set_tooltip_text("Authentication is set to Manual.\nExpect disabled.");
+            _($self, 'labelExpect')->set_tooltip_text(_t("Authentication is set to Manual.\nExpect disabled."));
+            _($self, 'alignExpect')->set_tooltip_text(_t("Authentication is set to Manual.\nExpect disabled."));
         }
         else{
             _($self, 'frameExpect')->set_sensitive(1);
             _($self, 'labelExpect')->set_sensitive(1);
-            _($self, 'labelExpect')->set_tooltip_text("EXPECT remote patterns AND-THEN-EXECUTE remote commands");
+            _($self, 'labelExpect')->set_tooltip_text(_t("EXPECT remote patterns AND-THEN-EXECUTE remote commands"));
             _($self, 'alignExpect')->set_has_tooltip(0);
 
         }
         my $status = _($self, 'rbUseProxyJump')->get_active();
         _($self, 'rbUseProxyJump')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway.");
+        _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a SSH jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway."));
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfgOptions')->set_sensitive($status);
         _($self, 'vboxJumpCfg')->set_visible(1);
@@ -257,7 +257,7 @@ sub __checkRBAuth {
     } elsif (_($self, 'comboMethod')->get_active_text() =~ /RDP|VNC/) {
         _($self, 'rbUseProxyJump')->set_sensitive(1);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
+        _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a SSH tunnel to simulate a jump host for this connection."));
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'entryCfgJumpConnPass')->set_sensitive(0);
@@ -273,7 +273,7 @@ sub __checkRBAuth {
         _($self, 'vboxJumpCfg')->set_visible(0);
         _($self, 'rbUseProxyJump')->set_sensitive(0);
         _($self, 'vboxJumpCfgOptions')->set_sensitive(0);
-        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
+        _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a SSH tunnel to simulate a jump host for this connection."));
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
         _($self, 'vboxCfgManualProxyConn')->set_visible(0);
     }
@@ -444,7 +444,7 @@ sub _setupCallbacks {
             ++$i;
         }
         push(@menu_items, {
-            label => 'User variables...',
+            label => _t('User variables...'),
             sensitive => scalar @{$self->{_VARIABLES}->{cfg}},
             submenu => \@variables_menu
         });
@@ -459,7 +459,7 @@ sub _setupCallbacks {
             });
         }
         push(@menu_items, {
-            label => 'Global variables...',
+            label => _t('Global variables...'),
             sensitive => scalar(@global_variables_menu),
             submenu => \@global_variables_menu
         });
@@ -479,14 +479,14 @@ sub _setupCallbacks {
             });
         }
         push(@menu_items, {
-            label => 'Environment variables...',
+            label => _t('Environment variables...'),
             submenu => \@environment_menu
         });
 
         # Populate with <CMD:*> special string
         push(@menu_items, {
-            label => 'Use a command output as value',
-            tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+            label => _t('Use a command output as value'),
+            tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
             code => sub {
                 my $pos = _($self, "entryEditSendString")->get_property('cursor_position');
                 _($self, "entryEditSendString")->insert_text('<CMD:command to launch>', -1, _($self, "entryEditSendString")->get_position);
@@ -531,7 +531,7 @@ sub _setupCallbacks {
 
             # Populate with <<ASK_PASS>> special string
             push(@menu_items, {
-                label => 'Interactive Password input',
+                label => _t('Interactive Password input'),
                 code => sub {_($self, "entry$w")->delete_text(0, -1); _($self, "entry$w")->insert_text('<<ASK_PASS>>', -1, 0);}
             }) if $w eq 'Password';
 
@@ -547,7 +547,7 @@ sub _setupCallbacks {
                 ++$i;
             }
             push(@menu_items, {
-                label => 'User variables...',
+                label => _t('User variables...'),
                 sensitive => scalar @{$self->{_VARIABLES}->{cfg}},
                 submenu => \@variables_menu
             });
@@ -562,7 +562,7 @@ sub _setupCallbacks {
                 });
             }
             push(@menu_items, {
-                label => 'Global variables...',
+                label => _t('Global variables...'),
                 sensitive => scalar(@global_variables_menu),
                 submenu => \@global_variables_menu
             });
@@ -579,14 +579,14 @@ sub _setupCallbacks {
             }
 
             push(@menu_items, {
-                label => 'Environment variables...',
+                label => _t('Environment variables...'),
                 submenu => \@environment_menu
             });
 
             # Populate with <ASK:#> special string
             push(@menu_items, {
-                label => 'Interactive user input',
-                tooltip => 'User will be prompted to provide a value with a text box (free data type)',
+                label => _t('Interactive user input'),
+                tooltip => _t('User will be prompted to provide a value with a text box (free data type)'),
                 code => sub {
                     my $pos = _($self, "entry$w")->get_property('cursor_position');
                     _($self, "entry$w")->insert_text('<ASK:number>', -1, _($self, "entry$w")->get_position);
@@ -596,8 +596,8 @@ sub _setupCallbacks {
 
             # Populate with <ASK:*|> special string
             push(@menu_items, {
-                label => 'Interactive user choose from list',
-                tooltip => 'User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)',
+                label => _t('Interactive user choose from list'),
+                tooltip => _t('User will be prompted to choose a value form a user defined list separated with "|" (pipes without quotes)'),
                 code => sub {
                     my $pos = _($self, "entry$w")->get_property('cursor_position');
                     _($self, "entry$w")->insert_text('<ASK:descriptive line|opt1|opt2|...|optN>', -1, _($self, "entry$w")->get_position);
@@ -607,8 +607,8 @@ sub _setupCallbacks {
 
             # Populate with <CMD:*> special string
             push(@menu_items, {
-                label => 'Use a command output as value',
-                tooltip => 'The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value',
+                label => _t('Use a command output as value'),
+                tooltip => _t('The given command line will be locally executed, and its output (both STDOUT and STDERR) will be used to replace this value'),
                 code => sub {
                     my $pos = _($self, "entry$w")->get_property('cursor_position');
                     _($self, "entry$w")->insert_text('<CMD:command to launch>', -1, _($self, "entry$w")->get_position);
@@ -807,11 +807,11 @@ sub _updateGUIPreferences {
     if ($$self{_CFG}{'environments'}{$uuid}{'_protected'}) {
         _($self, 'imgProtectedEdit')->set_from_stock('asbru-protected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(0);
-        _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#E60023">PROTECTED</span></b> against changes. You <b>can not</b> save changes.');
+        _($self, 'lblProtectedEdit')->set_markup(_t('Connection is <b><span foreground="#E60023">PROTECTED</span></b> against changes. You <b>can not</b> save changes.'));
     } else {
         _($self, 'imgProtectedEdit')->set_from_stock('asbru-unprotected', 'button');
         _($self, 'btnSaveEdit')->set_sensitive(1);
-        _($self, 'lblProtectedEdit')->set_markup('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.');
+        _($self, 'lblProtectedEdit')->set_markup(_t('Connection is <b><span foreground="#04C100">UNPROTECTED</span></b> against changes. You <b>can</b> save changes.'));
     }
 
     # Show Jump options in network settings (only for SSH method)
@@ -822,10 +822,10 @@ sub _updateGUIPreferences {
         $ssh =~ s/[ \t][ \t]+/ /g;
         if ($ssh =~ /-J /) {
             # Enable Jump Host
-            _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway.");
+            _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a jump host for this connection.\n\nAn alternative to SSH tunneling to access internal machines through gateway."));
         } else {
             # Jump Host cannot be used, will need to create a SSH tunnel to simulate
-            _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
+            _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a SSH tunnel to simulate a jump host for this connection."));
         }
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'rbUseProxyJump')->set_sensitive(1);
@@ -833,7 +833,7 @@ sub _updateGUIPreferences {
     } elsif ($$self{_CFG}{'environments'}{$uuid}{'method'} =~ /VNC|RDP/) {
         _($self, 'vboxJumpCfg')->set_visible(1);
         _($self, 'rbUseProxyJump')->set_sensitive(1);
-        _($self, 'rbUseProxyJump')->set_tooltip_text("If selected, use a SSH tunnel to simulate a jump host for this connection.");
+        _($self, 'rbUseProxyJump')->set_tooltip_text(_t("If selected, use a SSH tunnel to simulate a jump host for this connection."));
         _($self, 'vboxJumpCfgOptions')->set_sensitive(_($self, 'rbUseProxyJump')->get_active());
     } else {
         _($self, 'vboxJumpCfg')->set_visible(0);
@@ -856,13 +856,13 @@ sub _saveConfiguration {
     my @faults = &{$$self{_METHODS}{_($self, 'comboMethod')->get_active_text()}{'checkCFG'}}($$self{_CFG}{'environments'}{$$self{_UUID}});
     $$self{_SPECIFIC}->get_cfg =~ /^CONFIG ERROR: (.+)/go and push(@faults, $1);
     if (scalar(@faults) ) {
-        _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\n" . (join("\n", @faults) ) . "\n\n<b>before saving this connection data!!</b>");
+        _wMessage($$self{_WINDOWEDIT}, _t('<b>Please, check:</b>') . "\n\n" . (join("\n", @faults) ) . "\n\n" . _t('<b>before saving this connection data!!</b>'));
         return 0;
     }
 
     # Check if proxy ip and port are defined in case "force use proxy" is checked
     if ((_($self, 'rbUseProxyAlways')->get_active() == 1) && (!_($self,'entryCfgProxyConnIP')->get_chars(0,-1) || ! _($self, 'entryCfgProxyConnPort')->get_chars(0,-1))) {
-        _wMessage($$self{_WINDOWEDIT}, "<b>Please, check:</b>\n\nSOCKS IP / PORT can't be empty\n\n<b>before saving this connection data!!</b>");
+        _wMessage($$self{_WINDOWEDIT}, _t("<b>Please, check:</b>\n\nSOCKS IP / PORT can't be empty\n\n<b>before saving this connection data!!</b>"));
         return 0;
     }
 

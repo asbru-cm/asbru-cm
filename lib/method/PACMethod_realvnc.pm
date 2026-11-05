@@ -33,6 +33,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -224,13 +225,13 @@ sub _buildGUI {
     $w{hboxReal} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hboxReal}, 0, 1, 5);
     $w{lblClient} = Gtk3::Label->new();
-    $w{lblClient}->set_markup('<b>RealVNC configuration</b>');
+    $w{lblClient}->set_markup(_t('<b>RealVNC configuration</b>'));
     $w{hboxReal}->pack_start($w{lblClient}, 0, 0, 0);
 
 
     $w{hbox1R} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox1R}, 0, 1, 5);
-    $w{frQualityR} = Gtk3::Label->new('Picture quality :');
+    $w{frQualityR} = Gtk3::Label->new(_t('Picture quality :'));
     $w{hbox1R}->pack_start($w{frQualityR}, 0, 0, 0);
     $w{spQualityR} = Gtk3::ComboBoxText->new();
     foreach my $q ('auto','high','medium','low','custom') {$w{spQualityR}->append_text($q);};
@@ -239,7 +240,7 @@ sub _buildGUI {
     # Both
     $w{hbox3} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox3}, 0, 0, 0);
-    $w{frDepth} = Gtk3::Label->new('Colour depth (bpp):');
+    $w{frDepth} = Gtk3::Label->new(_t('Colour depth (bpp):'));
     $w{hbox3}->pack_start($w{frDepth}, 0, 1, 0);
 
     $w{cbDepth} = Gtk3::ComboBoxText->new();
@@ -249,20 +250,20 @@ sub _buildGUI {
     $w{hbox2} = Gtk3::HBox->new(0, 5);
     $w{vbox}->pack_start($w{hbox2}, 0, 1, 5);
 
-    $w{chFullScreen} = Gtk3::RadioButton->new_with_label(undef, 'Fullscreen');
+    $w{chFullScreen} = Gtk3::RadioButton->new_with_label(undef, _t('Fullscreen'));
     $w{hbox2}->pack_start($w{chFullScreen}, 0, 1, 0);
-    $w{chFullScreen}->set_tooltip_text('[-fullscreen] : Fullscreen window');
+    $w{chFullScreen}->set_tooltip_text(_t('[-fullscreen] : Fullscreen window'));
 
-    $w{chNaturalSize} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, 'Natural Size');
+    $w{chNaturalSize} = Gtk3::RadioButton->new_with_label($w{chFullScreen}, _t('Natural Size'));
     $w{hbox2}->pack_start($w{chNaturalSize}, 0, 1, 0);
 
-    $w{chListen} = Gtk3::CheckButton->new_with_label('Listen');
+    $w{chListen} = Gtk3::CheckButton->new_with_label(_t('Listen'));
     $w{hbox2}->pack_start($w{chListen}, 0, 1, 0);
-    $w{chListen}->set_tooltip_text('[-listen] : Listen for incoming connections');
+    $w{chListen}->set_tooltip_text(_t('[-listen] : Listen for incoming connections'));
 
-    $w{chViewOnly} = Gtk3::CheckButton->new_with_label('View Only');
+    $w{chViewOnly} = Gtk3::CheckButton->new_with_label(_t('View Only'));
     $w{hbox2}->pack_start($w{chViewOnly}, 0, 1, 0);
-    $w{chViewOnly}->set_tooltip_text('[-viewonly] : View only mode');
+    $w{chViewOnly}->set_tooltip_text(_t('[-viewonly] : View only mode'));
 
     $w{spQualityR}->signal_connect('changed', sub {
         my $w = shift;

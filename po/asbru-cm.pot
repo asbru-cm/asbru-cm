@@ -1,0 +1,5752 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the asbru-cm package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: asbru-cm 6.5.0\n"
+"Report-Msgid-Bugs-To: https://github.com/asbru-cm/asbru-cm/issues\n"
+"POT-Creation-Date: 2026-11-05 08:25+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/PACCluster.pm:118
+#, perl-format
+msgid "Cluster Administration : %s (v%s)"
+msgstr ""
+
+#: lib/PACCluster.pm:156 lib/PACCluster.pm:409 lib/PACMain.pm:618
+#: lib/PACMain.pm:1406 lib/PACMain.pm:3701 lib/PACMain.pm:4563
+msgid "My Connections"
+msgstr ""
+
+#: lib/PACCluster.pm:260
+msgid "<b>RUNNING CLUSTERS </b>"
+msgstr ""
+
+#: lib/PACCluster.pm:271
+msgid " Unclustered Terminals"
+msgstr ""
+
+#: lib/PACCluster.pm:274
+msgid " <b>Clustered Terminals</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:284
+msgid "Opened Terminal(s):"
+msgstr ""
+
+#: lib/PACCluster.pm:286 lib/PACCluster.pm:365
+msgid "Status"
+msgstr ""
+
+#: lib/PACCluster.pm:290
+msgid "List of available-unclustered connections"
+msgstr ""
+
+#: lib/PACCluster.pm:301 lib/PACCluster.pm:419
+msgid ""
+"Add to\n"
+"Cluster"
+msgstr ""
+
+#: lib/PACCluster.pm:308 lib/PACCluster.pm:426
+msgid ""
+"Del from\n"
+"Cluster"
+msgstr ""
+
+#: lib/PACCluster.pm:319
+msgid " Active Clusters"
+msgstr ""
+
+#: lib/PACCluster.pm:322
+msgid " <b>Active Clusters</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:348 lib/PACCluster.pm:471
+msgid " Terminals"
+msgstr ""
+
+#: lib/PACCluster.pm:351
+msgid " <b>Terminals in selected Cluster</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:363 lib/PACCluster.pm:486
+msgid "Terminal(s) in cluster:"
+msgstr ""
+
+#: lib/PACCluster.pm:369 lib/PACCluster.pm:491
+msgid "List of connections included in the selected cluster above"
+msgstr ""
+
+#: lib/PACCluster.pm:378
+msgid "<b>Saved Clusters </b>"
+msgstr ""
+
+#: lib/PACCluster.pm:437
+msgid " Configured Clusters"
+msgstr ""
+
+#: lib/PACCluster.pm:440
+msgid " <b>Configured Clusters</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:463 lib/PACCluster.pm:519
+msgid "Rename"
+msgstr ""
+
+#: lib/PACCluster.pm:474
+msgid " <b>Terminals in selected cluster</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:498
+msgid "<b>Auto Clusters </b>"
+msgstr ""
+
+#: lib/PACCluster.pm:532
+msgid "AUTOCLUSTER"
+msgstr ""
+
+#: lib/PACCluster.pm:543
+msgid " <b>Auto Matching Properties</b> "
+msgstr ""
+
+#: lib/PACCluster.pm:545
+msgid ""
+"These entries accept Regular Expressions,like:\n"
+"^server\\d+\n"
+"or\n"
+"conn.*\\d{1,3}$\n"
+"or any other Perl RegExp"
+msgstr ""
+
+#: lib/PACCluster.pm:551
+msgid "Name"
+msgstr ""
+
+#: lib/PACCluster.pm:555
+msgid "Title"
+msgstr ""
+
+#: lib/PACCluster.pm:559
+msgid "IP/Host"
+msgstr ""
+
+#: lib/PACCluster.pm:563 lib/edit/PACExecEntry.pm:299
+msgid "Description"
+msgstr ""
+
+#: lib/PACCluster.pm:568
+msgid "Check Auto Cluster conditions"
+msgstr ""
+
+#: lib/PACCluster.pm:572
+msgid "_Power Cluster Controller"
+msgstr ""
+
+#: lib/PACCluster.pm:606 lib/PACCluster.pm:693 lib/PACCluster.pm:993
+msgid ""
+"Before Adding a Terminal to a Cluster, you MUST either:\n"
+" - Select an existing CLUSTER\n"
+"...or...\n"
+" - Create a NEW Cluster"
+msgstr ""
+
+#: lib/PACCluster.pm:776 lib/PACCluster.pm:805 lib/PACCluster.pm:995
+#: lib/PACMain.pm:2776 lib/PACMain.pm:3145 lib/PACTerminal.pm:2010
+#: lib/PACTerminal.pm:3015
+msgid "Enter a name for the <b>New Cluster</b>"
+msgstr ""
+
+#: lib/PACCluster.pm:781 lib/PACCluster.pm:811 lib/PACCluster.pm:1000
+#, perl-format
+msgid "Cluster '%s' already exists!!"
+msgstr ""
+
+#: lib/PACCluster.pm:815 lib/PACCluster.pm:1200 lib/PACCluster.pm:1241
+#, perl-format
+msgid "Auto Cluster name '%s' already exists!!"
+msgstr ""
+
+#: lib/PACCluster.pm:847
+#, perl-format
+msgid "Enter a <b>NEW</b> name for cluster <b>%s</b>"
+msgstr ""
+
+#: lib/PACCluster.pm:853 lib/PACCluster.pm:1205 lib/PACCluster.pm:1237
+#, perl-format
+msgid "Cluster name '%s' already exists!!"
+msgstr ""
+
+#: lib/PACCluster.pm:888 lib/PACCluster.pm:925
+#, perl-format
+msgid "Delete cluster <b>'%s'</b>?"
+msgstr ""
+
+#: lib/PACCluster.pm:952 lib/PACCluster.pm:1276
+#, perl-format
+msgid "Remove running terminals from deleted cluster <b>'%s'</b>?"
+msgstr ""
+
+#: lib/PACCluster.pm:1195
+msgid "Enter new <b>AUTO CLUSTER</b> name"
+msgstr ""
+
+#: lib/PACCluster.pm:1231
+#, perl-format
+msgid "Enter a <b>NEW</b> name for Auto Cluster <b>%s</b>"
+msgstr ""
+
+#: lib/PACCluster.pm:1263
+#, perl-format
+msgid "Are you sure you want to delete Auto Cluster <b>%s</b>?"
+msgstr ""
+
+#: lib/PACCluster.pm:1343
+#, perl-format
+msgid "Terminals matching Auto Cluster <b>%s</b> conditions:"
+msgstr ""
+
+#: lib/PACCluster.pm:1345
+msgid "Auto Cluster matching"
+msgstr ""
+
+#: lib/PACCluster.pm:1356
+msgid "Icon"
+msgstr ""
+
+#: lib/PACCluster.pm:1356
+msgid "Terminal(s) matching"
+msgstr ""
+
+#: lib/PACCluster.pm:1411
+#, perl-format
+msgid "Conditions for Auto Cluster <b>%s</b> match <b>%d</b> connections"
+msgstr ""
+
+#: lib/PACCluster.pm:1470
+#, perl-format
+msgid "In CLUSTER: %s"
+msgstr ""
+
+#: lib/PACCluster.pm:1487 lib/PACTerminal.pm:911
+msgid "Unclustered"
+msgstr ""
+
+#: lib/PACConfig.pm:130
+#, perl-format
+msgid "Default Global Options : %s (v%s)"
+msgstr ""
+
+#: lib/PACConfig.pm:152 lib/PACMain.pm:918
+msgid "Preferences"
+msgstr ""
+
+#: lib/PACConfig.pm:161
+msgid "_Reset to DEFAULT values"
+msgstr ""
+
+#: lib/PACConfig.pm:183
+msgid "Set..."
+msgstr ""
+
+#: lib/PACConfig.pm:185
+msgid "Export config..."
+msgstr ""
+
+#: lib/PACConfig.pm:197 lib/PACEdit.pm:213 lib/PACEdit.pm:216
+#: lib/PACScreenshots.pm:381
+msgid "Show _hidden files"
+msgstr ""
+
+#: lib/PACConfig.pm:212
+msgid ""
+"Tray icon not available, install an extension for tray functionality, <a "
+"href='https://docs.asbru-cm.net/Manual/Preferences/SytemTrayExtensions/'>see "
+"online help for more details</a>."
+msgstr ""
+
+#: lib/PACConfig.pm:218
+msgid "You cannot save the preferences in readonly mode."
+msgstr ""
+
+#: lib/PACConfig.pm:221
+msgid "Save the current configuration."
+msgstr ""
+
+#: lib/PACConfig.pm:321
+msgid "Settings as yml"
+msgstr ""
+
+#: lib/PACConfig.pm:323
+msgid "Anonymized Data for DEBUG"
+msgstr ""
+
+#: lib/PACConfig.pm:348
+msgid "Enter current Ásbrú GUI Password to remove protection..."
+msgstr ""
+
+#: lib/PACConfig.pm:348
+msgid "Ásbrú GUI Password Removal"
+msgstr ""
+
+#: lib/PACConfig.pm:353 lib/PACMain.pm:282 lib/PACMain.pm:2507
+msgid "ERROR: Wrong password!!"
+msgstr ""
+
+#: lib/PACConfig.pm:375 lib/PACEdit.pm:534
+msgid "Interactive Password input"
+msgstr ""
+
+#: lib/PACConfig.pm:396 lib/PACEdit.pm:447 lib/PACEdit.pm:550
+#: lib/PACTerminal.pm:2218 lib/edit/PACExpectEntry.pm:668
+#: lib/edit/PACExpectEntry.pm:746 lib/edit/PACPrePostEntry.pm:279
+msgid "User variables..."
+msgstr ""
+
+#: lib/PACConfig.pm:412 lib/PACEdit.pm:462 lib/PACEdit.pm:565
+#: lib/PACMain.pm:4741 lib/PACMain.pm:4865 lib/PACPCC.pm:563
+#: lib/PACScripts.pm:905 lib/PACTerminal.pm:2239 lib/edit/PACExecEntry.pm:411
+#: lib/edit/PACExpectEntry.pm:683 lib/edit/PACExpectEntry.pm:761
+#: lib/edit/PACPrePostEntry.pm:294
+msgid "Global variables..."
+msgstr ""
+
+#: lib/PACConfig.pm:432 lib/PACEdit.pm:482 lib/PACEdit.pm:582
+#: lib/PACMain.pm:4761 lib/PACMain.pm:4884 lib/PACPCC.pm:585
+#: lib/PACScripts.pm:928 lib/PACTerminal.pm:2264 lib/edit/PACExecEntry.pm:429
+#: lib/edit/PACExpectEntry.pm:777 lib/edit/PACPrePostEntry.pm:310
+msgid "Environment variables..."
+msgstr ""
+
+#: lib/PACConfig.pm:438 lib/PACEdit.pm:588 lib/edit/PACExpectEntry.pm:783
+msgid "Interactive user input"
+msgstr ""
+
+#: lib/PACConfig.pm:439 lib/PACEdit.pm:589 lib/edit/PACExpectEntry.pm:784
+msgid ""
+"User will be prompted to provide a value with a text box (free data type)"
+msgstr ""
+
+#: lib/PACConfig.pm:449 lib/PACEdit.pm:599 lib/PACMain.pm:4775
+#: lib/PACMain.pm:4900 lib/PACPCC.pm:599 lib/PACScripts.pm:942
+#: lib/edit/PACExecEntry.pm:445 lib/edit/PACExpectEntry.pm:795
+msgid "Interactive user choose from list"
+msgstr ""
+
+#: lib/PACConfig.pm:450 lib/PACEdit.pm:600 lib/PACMain.pm:4776
+#: lib/PACMain.pm:4901 lib/PACPCC.pm:600 lib/edit/PACExecEntry.pm:446
+#: lib/edit/PACExpectEntry.pm:796
+msgid ""
+"User will be prompted to choose a value form a user defined list separated "
+"with \"|\" (pipes without quotes)"
+msgstr ""
+
+#: lib/PACConfig.pm:460 lib/PACEdit.pm:488 lib/PACEdit.pm:610
+#: lib/PACMain.pm:4785 lib/PACMain.pm:4911 lib/PACPCC.pm:607
+#: lib/PACScripts.pm:950 lib/edit/PACExecEntry.pm:456
+#: lib/edit/PACExpectEntry.pm:690 lib/edit/PACExpectEntry.pm:807
+#: lib/edit/PACPrePostEntry.pm:316
+msgid "Use a command output as value"
+msgstr ""
+
+#: lib/PACConfig.pm:461 lib/PACEdit.pm:489 lib/PACEdit.pm:611
+#: lib/PACMain.pm:4786 lib/PACMain.pm:4912 lib/PACPCC.pm:608
+#: lib/PACScripts.pm:951 lib/edit/PACExecEntry.pm:457
+#: lib/edit/PACExpectEntry.pm:691 lib/edit/PACExpectEntry.pm:808
+#: lib/edit/PACPrePostEntry.pm:317
+msgid ""
+"The given command line will be locally executed, and its output (both STDOUT "
+"and STDERR) will be used to replace this value"
+msgstr ""
+
+#: lib/PACConfig.pm:608
+msgid ""
+"You are about to create a file containing an anonymized version of your "
+"settings.\n"
+"\n"
+"This file will contain your configuration settings without any sensitive "
+"personal data in it.  It is only useful for debugging purposes only. Do not "
+"use this file for backup purposes.\n"
+"\n"
+"Care has been taken to remove all personal information but no guarantee is "
+"given, you are the only responsible for any disclosed information.\n"
+"Please review the exported data before sharing it with a third party.\n"
+"\n"
+"<b>Do you wish to continue?</b>"
+msgstr ""
+
+#: lib/PACConfig.pm:610
+msgid "Export process has been canceled."
+msgstr ""
+
+#: lib/PACConfig.pm:635
+#, perl-format
+msgid "Please, wait while file '%s' is being created..."
+msgstr ""
+
+#: lib/PACConfig.pm:651
+#, perl-format
+msgid ""
+"'%s' file succesfully saved to:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACConfig.pm:654
+#, perl-format
+msgid ""
+"ERROR: Could not save Ásbrú Config file '%s':\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACEdit.pm:139
+msgid "_Start Connection"
+msgstr ""
+
+#: lib/PACEdit.pm:141
+msgid "_Cancel Quick connect"
+msgstr ""
+
+#: lib/PACEdit.pm:145
+msgid "_Save and Close"
+msgstr ""
+
+#: lib/PACEdit.pm:147
+msgid "_Close without saving"
+msgstr ""
+
+#: lib/PACEdit.pm:240 lib/PACEdit.pm:241
+msgid ""
+"Authentication is set to Manual.\n"
+"Expect disabled."
+msgstr ""
+
+#: lib/PACEdit.pm:246
+msgid "EXPECT remote patterns AND-THEN-EXECUTE remote commands"
+msgstr ""
+
+#: lib/PACEdit.pm:252
+msgid ""
+"If selected, use a SSH jump host for this connection.\n"
+"\n"
+"An alternative to SSH tunneling to access internal machines through gateway."
+msgstr ""
+
+#: lib/PACEdit.pm:260 lib/PACEdit.pm:276 lib/PACEdit.pm:828 lib/PACEdit.pm:836
+msgid ""
+"If selected, use a SSH tunnel to simulate a jump host for this connection."
+msgstr ""
+
+#: lib/PACEdit.pm:810
+msgid ""
+"Connection is <b><span foreground=\"#E60023\">PROTECTED</span></b> against "
+"changes. You <b>can not</b> save changes."
+msgstr ""
+
+#: lib/PACEdit.pm:814
+msgid ""
+"Connection is <b><span foreground=\"#04C100\">UNPROTECTED</span></b> against "
+"changes. You <b>can</b> save changes."
+msgstr ""
+
+#: lib/PACEdit.pm:825
+msgid ""
+"If selected, use a jump host for this connection.\n"
+"\n"
+"An alternative to SSH tunneling to access internal machines through gateway."
+msgstr ""
+
+#: lib/PACEdit.pm:859
+msgid "<b>Please, check:</b>"
+msgstr ""
+
+#: lib/PACEdit.pm:859
+msgid "<b>before saving this connection data!!</b>"
+msgstr ""
+
+#: lib/PACEdit.pm:865
+msgid ""
+"<b>Please, check:</b>\n"
+"\n"
+"SOCKS IP / PORT can't be empty\n"
+"\n"
+"<b>before saving this connection data!!</b>"
+msgstr ""
+
+#: lib/PACGlobalVarEntry.pm:141 lib/PACKeePass.pm:594 lib/PACKeyBindings.pm:598
+#: lib/edit/PACExecEntry.pm:185 lib/edit/PACExpectEntry.pm:164
+#: lib/edit/PACPrePostEntry.pm:143 lib/edit/PACVarEntry.pm:134
+#: lib/method/PACMethod_ssh.pm:420
+msgid "Open Online Help"
+msgstr ""
+
+#: lib/PACGlobalVarEntry.pm:202
+msgid "Variable:"
+msgstr ""
+
+#: lib/PACGlobalVarEntry.pm:211
+msgid " Value:"
+msgstr ""
+
+#: lib/PACGlobalVarEntry.pm:219 lib/edit/PACExpectEntry.pm:293
+msgid "Hide"
+msgstr ""
+
+#: lib/PACKeePass.pm:161
+#, perl-format
+msgid ""
+"Enter your MASTER password to unlock\n"
+"your KeePass file '%s'"
+msgstr ""
+
+#: lib/PACKeePass.pm:161
+msgid "KeePass database"
+msgstr ""
+
+#: lib/PACKeePass.pm:169
+msgid "<b>Error keepassxc-cli message</b>"
+msgstr ""
+
+#: lib/PACKeePass.pm:318
+msgid "KeePassXC was disabled, information was incomplete"
+msgstr ""
+
+#: lib/PACKeePass.pm:372
+msgid "Search database:"
+msgstr ""
+
+#: lib/PACKeePass.pm:454
+#, perl-format
+msgid "Add %s KeePassXC"
+msgstr ""
+
+#: lib/PACKeePass.pm:585
+msgid "Activate use of a KeePass database file"
+msgstr ""
+
+#: lib/PACKeePass.pm:607
+msgid "Database file"
+msgstr ""
+
+#: lib/PACKeePass.pm:616 lib/PACKeePass.pm:635 lib/PACKeePass.pm:653
+msgid "Clear"
+msgstr ""
+
+#: lib/PACKeePass.pm:619
+msgid "Master Password"
+msgstr ""
+
+#: lib/PACKeePass.pm:626
+msgid "Key file"
+msgstr ""
+
+#: lib/PACKeePass.pm:647
+msgid "keepassxc-cli binary"
+msgstr ""
+
+#: lib/PACKeePass.pm:650
+msgid ""
+"Specify the keepassxc-cli binary file to use.\n"
+"If not specified, the system wide keepassxc-cli will be used."
+msgstr ""
+
+#: lib/PACKeePass.pm:662
+msgid "Information about <i>keepassxc-cli</i> currently in use:"
+msgstr ""
+
+#: lib/PACKeePass.pm:805
+msgid ""
+"<b>Error</b>\n"
+"\n"
+"File is not a valid keepassxc-cli binary."
+msgstr ""
+
+#: lib/PACKeyBindings.pm:592
+msgid "Set default values"
+msgstr ""
+
+#: lib/PACKeyBindings.pm:630
+msgid "Reset all keybindings to there default values?"
+msgstr ""
+
+#: lib/PACKeyBindings.pm:680
+#, perl-format
+msgid ""
+"<i>%s</i> already in use by\n"
+"\n"
+"<b>%s</b> : %s"
+msgstr ""
+
+#: lib/PACKeyBindings.pm:707
+#, perl-format
+msgid ""
+"<i>%s</i> used in\n"
+"\n"
+"<b>%s</b> : %s"
+msgstr ""
+
+#: lib/PACMain.pm:273
+msgid "GUI Password Protection"
+msgstr ""
+
+#: lib/PACMain.pm:273
+msgid "Please, enter GUI Password..."
+msgstr ""
+
+#: lib/PACMain.pm:533
+msgid "Add a new group in the selected node"
+msgstr ""
+
+#: lib/PACMain.pm:541
+msgid "Add a new connection in the selected node"
+msgstr ""
+
+#: lib/PACMain.pm:549
+msgid "Edit the currently selected node"
+msgstr ""
+
+#: lib/PACMain.pm:557
+msgid "Rename the currently selected node"
+msgstr ""
+
+#: lib/PACMain.pm:566
+msgid "Delete the selected node(s)"
+msgstr ""
+
+#: lib/PACMain.pm:575
+msgid "Close Window"
+msgstr ""
+
+#: lib/PACMain.pm:593
+msgid "Connection Tree"
+msgstr ""
+
+#: lib/PACMain.pm:638 lib/PACTerminal.pm:1876 lib/PACTray.pm:232
+#: lib/PACTrayUnity.pm:168
+msgid "Favourites"
+msgstr ""
+
+#: lib/PACMain.pm:671
+msgid "Connection History"
+msgstr ""
+
+#: lib/PACMain.pm:695
+msgid " Manage Clusters"
+msgstr ""
+
+#: lib/PACMain.pm:709 lib/PACMain.pm:773 lib/PACTray.pm:231
+#: lib/PACTrayUnity.pm:167
+msgid "Clusters"
+msgstr ""
+
+#: lib/PACMain.pm:742
+msgid "Start interactive search for connections"
+msgstr ""
+
+#: lib/PACMain.pm:745
+msgid "Connect"
+msgstr ""
+
+#: lib/PACMain.pm:749
+msgid "Start selected terminals/groups"
+msgstr ""
+
+#: lib/PACMain.pm:756
+msgid "Start a new connection, without saving it"
+msgstr ""
+
+#: lib/PACMain.pm:763
+msgid "Add to/remove from favourites connections list"
+msgstr ""
+
+#: lib/PACMain.pm:778
+msgid "Open the Clusters Administration Console"
+msgstr ""
+
+#: lib/PACMain.pm:784 lib/PACScripts.pm:395
+msgid "Scripts"
+msgstr ""
+
+#: lib/PACMain.pm:792
+msgid "Open the Scripts Administration Console"
+msgstr ""
+
+#: lib/PACMain.pm:799 lib/PACTray.pm:237 lib/PACTrayUnity.pm:173
+msgid "PCC"
+msgstr ""
+
+#: lib/PACMain.pm:804
+msgid ""
+"Open the Power Clusters Controller:\n"
+"execute commands in every clustered terminal from this single window"
+msgstr ""
+
+#: lib/PACMain.pm:822
+msgid "Info "
+msgstr ""
+
+#: lib/PACMain.pm:849
+msgid "STATISTICS "
+msgstr ""
+
+#: lib/PACMain.pm:853
+msgid "<b>STATISTICS</b> "
+msgstr ""
+
+#: lib/PACMain.pm:863
+msgid "SCREENSHOTS "
+msgstr ""
+
+#: lib/PACMain.pm:867
+msgid "<b>SCREENSHOTS</b> "
+msgstr ""
+
+#: lib/PACMain.pm:885
+msgid "Show/Hide connections tree panel"
+msgstr ""
+
+#: lib/PACMain.pm:889
+msgid "Wake On Lan"
+msgstr ""
+
+#: lib/PACMain.pm:893
+msgid "Start the \"Wake On LAN\" utility window"
+msgstr ""
+
+#: lib/PACMain.pm:901
+msgid "Local shell"
+msgstr ""
+
+#: lib/PACMain.pm:910
+msgid "Launch new local shell"
+msgstr ""
+
+#: lib/PACMain.pm:924
+msgid "Open the general preferences control"
+msgstr ""
+
+#: lib/PACMain.pm:927
+msgid "Save"
+msgstr ""
+
+#: lib/PACMain.pm:932
+msgid ""
+"Save the latest configuration changes, see also the \"Automatically save "
+"every configuration change\" field under \"Preferences\"->\"Main Options\""
+msgstr ""
+
+#: lib/PACMain.pm:935 lib/PACMain.pm:4966
+msgid "READ ONLY INSTANCE"
+msgstr ""
+
+#: lib/PACMain.pm:944
+msgid ""
+"Password [un]lock GUI. In order to use this functionality, check the "
+"\"Protect with password\" field under \"Preferences\"->\"Main Options\""
+msgstr ""
+
+#: lib/PACMain.pm:951
+msgid "Show the *so needed* \"About\" dialog"
+msgstr ""
+
+#: lib/PACMain.pm:960
+msgid "Quit"
+msgstr ""
+
+#: lib/PACMain.pm:966
+msgid "Close all terminals and terminate the application"
+msgstr ""
+
+#: lib/PACMain.pm:969
+msgid " - READ ONLY MODE"
+msgstr ""
+
+#: lib/PACMain.pm:1003
+#, perl-format
+msgid "Terminals Tabbed Window : %s (v%s)"
+msgstr ""
+
+#: lib/PACMain.pm:1169 lib/PACMain.pm:1304
+msgid ""
+"<b>ATTENTION!!</b> You have dropped some group(s)\n"
+"Are you sure you want to start <b>ALL</b> of its child connections?"
+msgstr ""
+
+#: lib/PACMain.pm:1411
+msgid "<b>Creating new group</b>"
+msgstr ""
+
+#: lib/PACMain.pm:1411
+#, perl-format
+msgid "Enter a name for the new group under '%s'"
+msgstr ""
+
+#: lib/PACMain.pm:1457
+msgid ""
+"Cannot rename selection:\n"
+"Selected node is <b>Protected</b>"
+msgstr ""
+
+#: lib/PACMain.pm:1462
+msgid "<b>Renaming Group</b>"
+msgstr ""
+
+#: lib/PACMain.pm:1462
+#, perl-format
+msgid "Enter a new name for Group <b>%s</b>"
+msgstr ""
+
+#: lib/PACMain.pm:1493
+msgid ""
+"Cannot delete selection.\n"
+"\n"
+"There are <b>protected</b> nodes selected."
+msgstr ""
+
+#: lib/PACMain.pm:1497
+#, perl-format
+msgid "Delete <b>%d</b> nodes and ALL of their contents?"
+msgstr ""
+
+#: lib/PACMain.pm:1500
+#, perl-format
+msgid "Delete node <b>%s</b> and ALL of its contents?"
+msgstr ""
+
+#: lib/PACMain.pm:2091
+msgid ""
+"Cannot Bulk Edit selection:\n"
+"There are <b>Protected</b> nodes selected"
+msgstr ""
+
+#: lib/PACMain.pm:2091
+msgid ""
+"Cannot Edit selection:\n"
+"There are <b>Protected</b> nodes selected"
+msgstr ""
+
+#: lib/PACMain.pm:2218
+msgid "Close <b>TABBED TERMINALS</b> Window ?"
+msgstr ""
+
+#: lib/PACMain.pm:2504
+msgid "Enter current GUI Password to remove protection..."
+msgstr ""
+
+#: lib/PACMain.pm:2504
+msgid "GUI Unlock"
+msgstr ""
+
+#: lib/PACMain.pm:2682 lib/PACMain.pm:2902
+msgid "Edit connection"
+msgstr ""
+
+#: lib/PACMain.pm:2684 lib/PACMain.pm:2905
+msgid "Edit this connection's data"
+msgstr ""
+
+#: lib/PACMain.pm:2692 lib/PACMain.pm:2925
+msgid "Bulk Edit connections..."
+msgstr ""
+
+#: lib/PACMain.pm:2694 lib/PACMain.pm:2928
+msgid "Bulk edit some values of selected connection's"
+msgstr ""
+
+#: lib/PACMain.pm:2711 lib/PACMain.pm:2974
+msgid "Enter a NEW value or close to keep this value..."
+msgstr ""
+
+#: lib/PACMain.pm:2725 lib/PACMain.pm:2987
+msgid "Edit Local Variables"
+msgstr ""
+
+#: lib/PACMain.pm:2735 lib/PACMain.pm:3107
+msgid "(can't, PROXY configured!!)"
+msgstr ""
+
+#: lib/PACMain.pm:2735 lib/PACMain.pm:3107
+msgid "Wake On LAN..."
+msgstr ""
+
+#: lib/PACMain.pm:2746 lib/PACMain.pm:3117
+#, perl-format
+msgid "%d instances"
+msgstr ""
+
+#: lib/PACMain.pm:2761 lib/PACMain.pm:3131 lib/PACUtils.pm:1373
+#: lib/PACUtils.pm:1458
+msgid "Start"
+msgstr ""
+
+#: lib/PACMain.pm:2772 lib/PACMain.pm:3141
+msgid "Execute in New Cluster..."
+msgstr ""
+
+#: lib/PACMain.pm:2804 lib/PACMain.pm:3180 lib/PACTerminal.pm:2028
+#: lib/PACTerminal.pm:3033
+#, perl-format
+msgid "%s (%d terminals connected)"
+msgstr ""
+
+#: lib/PACMain.pm:2822 lib/PACMain.pm:3205
+msgid "Execute in existing Cluster"
+msgstr ""
+
+#: lib/PACMain.pm:2858
+msgid "Show Keybindings"
+msgstr ""
+
+#: lib/PACMain.pm:2871
+msgid "Expand all"
+msgstr ""
+
+#: lib/PACMain.pm:2874
+msgid "Expand ALL (including sub-nodes)"
+msgstr ""
+
+#: lib/PACMain.pm:2880
+msgid "Collapse all"
+msgstr ""
+
+#: lib/PACMain.pm:2883
+msgid "Collapse ALL (including sub-nodes)"
+msgstr ""
+
+#: lib/PACMain.pm:2891
+msgid "Protect"
+msgstr ""
+
+#: lib/PACMain.pm:2891
+msgid "Toggle Protected state"
+msgstr ""
+
+#: lib/PACMain.pm:2891
+msgid "Un-Protect"
+msgstr ""
+
+#: lib/PACMain.pm:2894
+msgid ""
+"Protect or not this node, in order to avoid any changes (Edit, Delete, "
+"Rename, ...)"
+msgstr ""
+
+#: lib/PACMain.pm:2902
+msgid "Edit connections"
+msgstr ""
+
+#: lib/PACMain.pm:2913
+msgid "Copy Password"
+msgstr ""
+
+#: lib/PACMain.pm:2935
+msgid "Export ALL connection(s)..."
+msgstr ""
+
+#: lib/PACMain.pm:2935
+msgid "Export SELECTED connection(s)..."
+msgstr ""
+
+#: lib/PACMain.pm:2937
+msgid "Export connection(s) to a YAML file"
+msgstr ""
+
+#: lib/PACMain.pm:2957
+msgid "Import connection(s)..."
+msgstr ""
+
+#: lib/PACMain.pm:2959
+msgid "Import connection(s) from a file"
+msgstr ""
+
+#: lib/PACMain.pm:3000
+msgid "Start Group"
+msgstr ""
+
+#: lib/PACMain.pm:3003
+msgid "Start all connections of this group"
+msgstr ""
+
+#: lib/PACMain.pm:3013
+msgid "Add Connection"
+msgstr ""
+
+#: lib/PACMain.pm:3015
+#, perl-format
+msgid "Create a new connection under '%s'"
+msgstr ""
+
+#: lib/PACMain.pm:3023
+msgid "Add Group"
+msgstr ""
+
+#: lib/PACMain.pm:3025
+#, perl-format
+msgid "Create a new group under '%s'"
+msgstr ""
+
+#: lib/PACMain.pm:3034
+msgid "Rename Connection"
+msgstr ""
+
+#: lib/PACMain.pm:3034
+msgid "Rename Group"
+msgstr ""
+
+#: lib/PACMain.pm:3044
+msgid "Delete..."
+msgstr ""
+
+#: lib/PACMain.pm:3057
+msgid "Clone connection"
+msgstr ""
+
+#: lib/PACMain.pm:3057
+msgid "Clone connections"
+msgstr ""
+
+#: lib/PACMain.pm:3067
+msgid "Copy node"
+msgstr ""
+
+#: lib/PACMain.pm:3067
+msgid "Copy nodes"
+msgstr ""
+
+#: lib/PACMain.pm:3079
+msgid "Cut node"
+msgstr ""
+
+#: lib/PACMain.pm:3079
+msgid "Cut nodes"
+msgstr ""
+
+#: lib/PACMain.pm:3088
+msgid "Paste node"
+msgstr ""
+
+#: lib/PACMain.pm:3088
+msgid "Paste nodes"
+msgstr ""
+
+#: lib/PACMain.pm:3284
+#, perl-format
+msgid "Are you sure you want to start <b>%d terminals from cluster '%s'</b> ?"
+msgstr ""
+
+#: lib/PACMain.pm:3287
+#, perl-format
+msgid "Cluster <b>%s</b> contains no elements"
+msgstr ""
+
+#: lib/PACMain.pm:3364
+#, perl-format
+msgid "Starting <b><big>%d</big></b> terminals..."
+msgstr ""
+
+#: lib/PACMain.pm:3371
+#, perl-format
+msgid ""
+"ERROR: UUID <b>%s</b> does not exist in DDBB\n"
+"Not starting connection!"
+msgstr ""
+
+#: lib/PACMain.pm:3408
+#, perl-format
+msgid ""
+"ERROR: Could not start terminal '%s':\n"
+"%s"
+msgstr ""
+
+#: lib/PACMain.pm:3454
+#, perl-format
+msgid "Are you sure you want to <b>exit</b> %s ?"
+msgstr ""
+
+#: lib/PACMain.pm:3455
+#, perl-format
+msgid "there are %d open terminals"
+msgstr ""
+
+#: lib/PACMain.pm:3455
+#, perl-format
+msgid "there is %d open terminal"
+msgstr ""
+
+#: lib/PACMain.pm:3462
+msgid ""
+"<b>Configuration has changed.</b>\n"
+"\n"
+"Save changes?"
+msgstr ""
+
+#: lib/PACMain.pm:3545
+#, perl-format
+msgid ""
+"ERROR: Could not save config file '%s':\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACMain.pm:3547
+#, perl-format
+msgid ""
+"ERROR: Could not save config file '%s':\n"
+"\n"
+"%s\n"
+"\n"
+"Local copy saved at '%s'"
+msgstr ""
+
+#: lib/PACMain.pm:3895
+#, perl-format
+msgid ""
+"\n"
+"\n"
+" * Welcome to %s version %s *\n"
+"\n"
+" - To create a New GROUP of Connections:\n"
+"\n"
+"   1- 'click' over 'My Connections' (to create it at root) or any other "
+"GROUP\n"
+"   2- 'click' on the most left icon over the connections tree (or right-"
+"click over selected GROUP)\n"
+"   3- Follow instructions\n"
+"\n"
+" - To create a New CONNECTION in a selected Group or at root:\n"
+"\n"
+"   1- Select the container group to create the new connection into (or 'My "
+"Connections' to create it at root)\n"
+"   2- 'click' on the second most left icon over the connections tree (or "
+"right-click over selected GROUP)\n"
+"   3- Follow instructions\n"
+"\n"
+" - For the latest news, check the project website (https://asbru-cm.net/).\n"
+"\n"
+msgstr ""
+
+#: lib/PACMain.pm:3967
+msgid " Connections"
+msgstr ""
+
+#: lib/PACMain.pm:4008
+msgid " Favourites"
+msgstr ""
+
+#: lib/PACMain.pm:4043
+msgid " History"
+msgstr ""
+
+#: lib/PACMain.pm:4075
+msgid " Clusters"
+msgstr ""
+
+#: lib/PACMain.pm:4287
+msgid ""
+"Cannot cut selection.\n"
+"\n"
+"There are <b>protected</b> nodes selected."
+msgstr ""
+
+#: lib/PACMain.pm:4293
+#, perl-format
+msgid ""
+"Cannot cut a protected folder:\n"
+"\n"
+"\t<b>%s</b>"
+msgstr ""
+
+#: lib/PACMain.pm:4301
+#, perl-format
+msgid ""
+"Cannot cut from a protected folder:\n"
+"\n"
+"\t<b>%s</b>"
+msgstr ""
+
+#: lib/PACMain.pm:4341
+#, perl-format
+msgid ""
+"Cannot paste into a protected folder:\n"
+"\n"
+"\t<b>%s</b>"
+msgstr ""
+
+#: lib/PACMain.pm:4434
+#, perl-format
+msgid ""
+"Cannot duplicate into a protected folder:\n"
+"\n"
+"\t<b>%s</b>"
+msgstr ""
+
+#: lib/PACMain.pm:4434
+msgid "Cannot duplicate the root folder."
+msgstr ""
+
+#: lib/PACMain.pm:4475
+#, perl-format
+msgid "Please, wait while file <b>%s</b> is being exported..."
+msgstr ""
+
+#: lib/PACMain.pm:4500
+#, perl-format
+msgid ""
+"Connection(s) succesfully exported to:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACMain.pm:4503
+#, perl-format
+msgid ""
+"ERROR: Could not export connection(s) to file <b>%s</b>:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACMain.pm:4538
+#, perl-format
+msgid "Please, wait while file <b>%s</b> is being imported..."
+msgstr ""
+
+#: lib/PACMain.pm:4546
+#, perl-format
+msgid ""
+"ERROR: Could not import connection from file <b>%s</b>:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: lib/PACMain.pm:4554
+msgid ""
+"Selected config file is a <b>FULL</b> backup.\n"
+"Importing it will result in all current data being <b>substituted</b> by the "
+"new one.\n"
+"<b>Plus, it REQUIRES restarting the application</b>.\n"
+"Replace current configuration?"
+msgstr ""
+
+#: lib/PACMain.pm:4577
+#, perl-format
+msgid ""
+"File <b>%s</b> succesfully imported.\n"
+" now <b>restarting</b>!"
+msgstr ""
+
+#: lib/PACMain.pm:4592
+#, perl-format
+msgid "File <b>%s</b> does not look like a valid exported connection!"
+msgstr ""
+
+#: lib/PACMain.pm:4605
+#, perl-format
+msgid ""
+"File <b>%s</b> succesfully imported:\n"
+"<b>%d</b> element(s) added"
+msgstr ""
+
+#: lib/PACMain.pm:4662
+msgid " There are <b>GROUP(S)</b> in the selection. Apply to: "
+msgstr ""
+
+#: lib/PACMain.pm:4669
+msgid "1st level children"
+msgstr ""
+
+#: lib/PACMain.pm:4669
+msgid "level affected"
+msgstr ""
+
+#: lib/PACMain.pm:4671
+msgid "ALL sub-levels children"
+msgstr ""
+
+#: lib/PACMain.pm:4680
+msgid " <b><span foreground=\"orange\">COMMON</span></b> entries: "
+msgstr ""
+
+#: lib/PACMain.pm:4692 lib/PACMain.pm:4814
+#, perl-format
+msgid "Set '%s': "
+msgstr ""
+
+#: lib/PACMain.pm:4699 lib/PACMain.pm:4821
+msgid "change "
+msgstr ""
+
+#: lib/PACMain.pm:4706 lib/PACMain.pm:4828
+msgid " with "
+msgstr ""
+
+#: lib/PACMain.pm:4712 lib/PACMain.pm:4834
+msgid "RegExp"
+msgstr ""
+
+#: lib/PACMain.pm:4766 lib/PACMain.pm:4890 lib/PACPCC.pm:592
+#: lib/PACScripts.pm:935 lib/edit/PACExecEntry.pm:435
+msgid "Runtime substitution (<ASK:change_by_number>)"
+msgstr ""
+
+#: lib/PACMain.pm:4802
+msgid " <b><span foreground=\"orange\">EXPECT</span></b> entries: "
+msgstr ""
+
+#: lib/PACMain.pm:4926
+msgid "Remove strings checked 'Hide' from the 'Expect' configuration"
+msgstr ""
+
+#: lib/PACMain.pm:4928
+msgid ""
+"If checked, every field marked as 'hide' (for example, under 'Expect' TAB) "
+"will be erased.\n"
+"This overrides any value set for both 'pass' and 'passphrase'"
+msgstr ""
+
+#: lib/PACMain.pm:4931
+msgid "Cipher secure strings"
+msgstr ""
+
+#: lib/PACMain.pm:4933
+msgid ""
+"If checked, every passord-like and field marked as 'hide' (for example, "
+"under 'Expect' TAB) will be ciphered.\n"
+"This may cause incompatibilities when importing from a server other than "
+"this."
+msgstr ""
+
+#: lib/PACMain.pm:4969
+msgid "Auto saving ACTIVE"
+msgstr ""
+
+#: lib/PACMain.pm:4970
+msgid ""
+"Every configuration change will be saved automatically.  You can disable "
+"this feature in Preferences > Main Options."
+msgstr ""
+
+#: lib/PACMain.pm:4976
+msgid "_Save"
+msgstr ""
+
+#: lib/PACMain.pm:4977
+msgid "Save your configuration"
+msgstr ""
+
+#: lib/PACPCC.pm:158 lib/PACTerminal.pm:2059
+msgid "Power Cluster Controller"
+msgstr ""
+
+#: lib/PACPCC.pm:201
+msgid "Send to Cluster: "
+msgstr ""
+
+#: lib/PACPCC.pm:207
+msgid ""
+"Selected cluster will be the one used to send the keystrokes and for both "
+"the \"Explode\" and \"Close ALL\" buttons"
+msgstr ""
+
+#: lib/PACPCC.pm:209
+msgid "Send to ALL terminals"
+msgstr ""
+
+#: lib/PACPCC.pm:213
+msgid ""
+"If checked, commands will be sent to *EVERY* terminal opened, either "
+"clustered or unclustered"
+msgstr ""
+
+#: lib/PACPCC.pm:215
+msgid "_Restart all"
+msgstr ""
+
+#: lib/PACPCC.pm:217
+msgid "Restart (stop->start) *every* terminal in selected cluster"
+msgstr ""
+
+#: lib/PACPCC.pm:221
+msgid "Close _ALL"
+msgstr ""
+
+#: lib/PACPCC.pm:223
+msgid "Close *every* terminal in selected cluster"
+msgstr ""
+
+#: lib/PACPCC.pm:232
+msgid "Prevent single window keys broadcast"
+msgstr ""
+
+#: lib/PACPCC.pm:236
+msgid ""
+"If checked, any kestroke over a single connection will not be propagated to "
+"the rest of the elements of the selected cluster"
+msgstr ""
+
+#: lib/PACPCC.pm:238
+msgid "PCC Window Always on top"
+msgstr ""
+
+#: lib/PACPCC.pm:242
+msgid ""
+"If checked, this window will always stay on top (over) the rest of windows"
+msgstr ""
+
+#: lib/PACPCC.pm:244
+msgid "Use Multi-Line Text Entry"
+msgstr ""
+
+#: lib/PACPCC.pm:248
+msgid ""
+"If checked, you will have a bigger text entry to write your commands, ready "
+"to be sent to the selected cluster all at once when clicking on any of the "
+"buttons below"
+msgstr ""
+
+#: lib/PACPCC.pm:255
+msgid "Type commands here: "
+msgstr ""
+
+#: lib/PACPCC.pm:263
+msgid "Send on <INTRO>"
+msgstr ""
+
+#: lib/PACPCC.pm:267
+msgid ""
+"If checked, keypresses will appear here, and will be sent on <INTRO> "
+"keypress\n"
+"Other else, they will not be echoed out, but sent each of them instantly"
+msgstr ""
+
+#: lib/PACPCC.pm:277
+msgid "_Open"
+msgstr ""
+
+#: lib/PACPCC.pm:278
+msgid "Load a text file"
+msgstr ""
+
+#: lib/PACPCC.pm:283
+msgid "_Save as..."
+msgstr ""
+
+#: lib/PACPCC.pm:284
+msgid "Save as a text file"
+msgstr ""
+
+#: lib/PACPCC.pm:289
+msgid "Auto save/load..."
+msgstr ""
+
+#: lib/PACPCC.pm:290
+msgid "Automatically save/load current text"
+msgstr ""
+
+#: lib/PACPCC.pm:297
+msgid "Syntax highlight: "
+msgstr ""
+
+#: lib/PACPCC.pm:301
+msgid "Force selected language for syntax highlighting"
+msgstr ""
+
+#: lib/PACPCC.pm:311
+msgid "Clea_r"
+msgstr ""
+
+#: lib/PACPCC.pm:312
+msgid "Clear out all the data from the edit box"
+msgstr ""
+
+#: lib/PACPCC.pm:346
+msgid " Execute: "
+msgstr ""
+
+#: lib/PACPCC.pm:353
+msgid "A_ll"
+msgstr ""
+
+#: lib/PACPCC.pm:354
+msgid "Send the *all* the text to cluster (<Ctrl><INTRO>)"
+msgstr ""
+
+#: lib/PACPCC.pm:358
+msgid "_Block"
+msgstr ""
+
+#: lib/PACPCC.pm:359
+msgid ""
+"Send current *block* text (that separated with blank lines up and down from "
+"the cursor position) to cluster (<Alt><INTRO>)"
+msgstr ""
+
+#: lib/PACPCC.pm:363
+msgid "_Selection"
+msgstr ""
+
+#: lib/PACPCC.pm:364
+msgid "Send the *selected* text to cluster"
+msgstr ""
+
+#: lib/PACPCC.pm:368
+msgid "Use Ásbrú variables"
+msgstr ""
+
+#: lib/PACPCC.pm:369
+msgid ""
+"Allow Ásbrú to replace standard known variables (ie: <GV:var_name>, "
+"<CMD:command>, ...)"
+msgstr ""
+
+#: lib/PACPCC.pm:381
+msgid "Cl_usters"
+msgstr ""
+
+#: lib/PACPCC.pm:384
+msgid "_Explode"
+msgstr ""
+
+#: lib/PACPCC.pm:386
+msgid "Separate and resize clustered windows to fit screen"
+msgstr ""
+
+#: lib/PACPCC.pm:388
+msgid "Re_Tab"
+msgstr ""
+
+#: lib/PACPCC.pm:390
+msgid "Put every independent connection window in PAC's main TAB"
+msgstr ""
+
+#: lib/PACPCC.pm:392
+msgid "_Piped Output"
+msgstr ""
+
+#: lib/PACPCC.pm:394
+msgid "Show the window with the locally piped data"
+msgstr ""
+
+#: lib/PACPCC.pm:615
+msgid "Tee remote output to a local file"
+msgstr ""
+
+#: lib/PACPCC.pm:616
+msgid ""
+"The given command line will be executed, and its output will be saved in "
+"provided file (after TEE:...) LOCALLY"
+msgstr ""
+
+#: lib/PACPCC.pm:623
+msgid "Pipe remote output throught local command"
+msgstr ""
+
+#: lib/PACPCC.pm:624
+msgid ""
+"The given command line will be remotely executed, and its output will be "
+"piped throught the provide command (after PIPE:...) LOCALLY"
+msgstr ""
+
+#: lib/PACPCC.pm:631
+msgid "KeePass Extended Query"
+msgstr ""
+
+#: lib/PACPCC.pm:632
+msgid ""
+"This allows you to select the value to be returned, based on another value's "
+"match againt a Perl Regular Expression"
+msgstr ""
+
+#: lib/PACPCC.pm:732
+#, perl-format
+msgid "ERROR: Can not open for reading '%s' (%s)"
+msgstr ""
+
+#: lib/PACPCC.pm:744 lib/PACScripts.pm:1226
+#, perl-format
+msgid "WARNING: file '%s' is empty"
+msgstr ""
+
+#: lib/PACPCC.pm:744 lib/PACScripts.pm:1226
+#, perl-format
+msgid "WARNING: file '%s' is not a valid text file!"
+msgstr ""
+
+#: lib/PACPCC.pm:782 lib/PACScripts.pm:1194
+#, perl-format
+msgid "ERROR: Can not open for writting '%s' (%s)"
+msgstr ""
+
+#: lib/PACPCC.pm:796
+#, perl-format
+msgid "Correctly saved file '%s'"
+msgstr ""
+
+#: lib/PACPCC.pm:819
+#, perl-format
+msgid "Are you sure you want to RESTART <b>every</b> terminal in cluster '%s'?"
+msgstr ""
+
+#: lib/PACPCC.pm:819
+msgid "Are you sure you want to RESTART <b>every</b> terminal?"
+msgstr ""
+
+#: lib/PACPCC.pm:900
+#, perl-format
+msgid "Are you sure you want to CLOSE <b>every</b> terminal in cluster '%s'?"
+msgstr ""
+
+#: lib/PACPCC.pm:900
+msgid "Are you sure you want to CLOSE <b>every</b> terminal?"
+msgstr ""
+
+#: lib/PACPipe.pm:112
+msgid "Pipe output"
+msgstr ""
+
+#: lib/PACPipe.pm:130
+msgid " <b>Terminals:</b> "
+msgstr ""
+
+#: lib/PACPipe.pm:143 lib/edit/PACExecEntry.pm:476
+#: lib/edit/PACExpectEntry.pm:711 lib/edit/PACExpectEntry.pm:828
+#: lib/edit/PACPrePostEntry.pm:337
+msgid "NAME"
+msgstr ""
+
+#: lib/PACPipe.pm:144 lib/edit/PACExecEntry.pm:477
+#: lib/edit/PACExpectEntry.pm:712 lib/edit/PACExpectEntry.pm:829
+#: lib/edit/PACPrePostEntry.pm:338
+msgid "TITLE"
+msgstr ""
+
+#: lib/PACPipe.pm:148
+msgid "List of Terminals where the locally PIPEd command was executed"
+msgstr ""
+
+#: lib/PACPipe.pm:163
+msgid " <b>Expanded command:</b> "
+msgstr ""
+
+#: lib/PACPipe.pm:182
+msgid " <b>Final output (locally piped):</b> "
+msgstr ""
+
+#: lib/PACPipe.pm:202
+msgid "Always On Top"
+msgstr ""
+
+#: lib/PACScreenshots.pm:119
+#, perl-format
+msgid "File '%s' could not be loaded as a screenshot file"
+msgstr ""
+
+#: lib/PACScreenshots.pm:170
+msgid ""
+"Add\n"
+"Screenshot"
+msgstr ""
+
+#: lib/PACScreenshots.pm:182
+msgid "Open Folder"
+msgstr ""
+
+#: lib/PACScreenshots.pm:285
+msgid "Change Screenshot file..."
+msgstr ""
+
+#: lib/PACScreenshots.pm:299
+msgid "Save picture as..."
+msgstr ""
+
+#: lib/PACScreenshots.pm:330
+msgid "Remove Screenshot"
+msgstr ""
+
+#: lib/PACScreenshots.pm:334
+#, perl-format
+msgid "Remove Screenshot file '%s'?"
+msgstr ""
+
+#: lib/PACScripts.pm:371
+msgid "syntax ok"
+msgstr ""
+
+#: lib/PACScripts.pm:421
+msgid "SCRIPT"
+msgstr ""
+
+#: lib/PACScripts.pm:425
+msgid ""
+"Ásbrú Scripts. You may Drag 'n Drop Perl (.pl) files here to import them."
+msgstr ""
+
+#: lib/PACScripts.pm:436
+msgid " Script Editor "
+msgstr ""
+
+#: lib/PACScripts.pm:494
+msgid "API CALL"
+msgstr ""
+
+#: lib/PACScripts.pm:537
+msgid " Ásbrú Script Help "
+msgstr ""
+
+#: lib/PACScripts.pm:592
+msgid "E_xecute"
+msgstr ""
+
+#: lib/PACScripts.pm:603
+msgid "Import..."
+msgstr ""
+
+#: lib/PACScripts.pm:649
+#, perl-brace-format
+msgid "Del ESCape sequences ($COMMON{del_esc}(<text>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:650
+msgid ""
+"Remove ESCape sequences (mainly used for removing ANSI colouring output)"
+msgstr ""
+
+#: lib/PACScripts.pm:656
+#, perl-brace-format
+msgid "Var substitution ($COMMON{subst}(<text>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:657
+msgid "Substitute given text with internal variables (<ASK:a>, <GV:2>, ...)"
+msgstr ""
+
+#: lib/PACScripts.pm:663
+#, perl-brace-format
+msgid "Get Ásbrú Config ($COMMON{cfg}([0|1]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:664
+msgid ""
+"Retrieve a copy (0->default) or a reference (1) to *whole* PAC's "
+"configuration\n"
+"*ATTENTION* Retrieving a REFERENCE (1) to PAC's config may lead to Ásbrú "
+"misconfiguration!!\n"
+"NOT RECOMMENDED!! USE AT YOUR VERY OWN RISK!!!!!!"
+msgstr ""
+
+#: lib/PACScripts.pm:672
+#, perl-format, perl-brace-format
+msgid "Run Config sanity check($COMMON{sanity}(\\%cfg) )"
+msgstr ""
+
+#: lib/PACScripts.pm:673
+#, perl-format
+msgid ""
+"Perform a sanity check for given %cfg, which may be empty, in which case it "
+"will"
+msgstr ""
+
+#: lib/PACScripts.pm:679
+msgid "COMMON methods"
+msgstr ""
+
+#: lib/PACScripts.pm:688
+#, perl-brace-format
+msgid "Start session with \"UUID\"($PAC{start_uuid}(<UUID>[, <cluster>]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:689
+msgid "Start session with 'UUID' (optionally in cluster 'cluster')"
+msgstr ""
+
+#: lib/PACScripts.pm:695
+#, perl-brace-format
+msgid ""
+"Start session \"UUID\" with manual login(\"\"PAC{start_uuid_manual}(<UUID>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:696
+msgid ""
+"Start session with 'UUID' with manual login (you must write your login code "
+"under CONNECTION)"
+msgstr ""
+
+#: lib/PACScripts.pm:702
+#, perl-brace-format
+msgid "Start session named \"name\"($PAC{start}(<name>[, <cluster>]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:703
+msgid "Start session named 'name' (optionally in cluster 'cluster')"
+msgstr ""
+
+#: lib/PACScripts.pm:709
+#, perl-brace-format
+msgid ""
+"Start session \"name\" with manual login(\"\"PAC{start_manual}(<name>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:710
+msgid ""
+"Start session named 'name' with manual login (you must write your login code "
+"under CONNECTION)"
+msgstr ""
+
+#: lib/PACScripts.pm:716
+#, perl-brace-format
+msgid "Select existing session \"name\"($PAC{select}(<name>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:717
+msgid ""
+"Select an existing session named 'name', returning (uuid, $tmp_uuid) (array)"
+msgstr ""
+
+#: lib/PACScripts.pm:723
+#, perl-brace-format
+msgid "Select ALL open sessions($PAC{select}('*ALL*') )"
+msgstr ""
+
+#: lib/PACScripts.pm:724
+msgid ""
+"Select ALL open sessions, return (hash ref) the whole list {tmp_uuid => uuid}"
+msgstr ""
+
+#: lib/PACScripts.pm:730
+#, perl-brace-format
+msgid "Stop session $tmp_uuid($PAC{stop}(<$tmp_uuid>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:731
+msgid "Stop and close session identified by $tmp_uuid"
+msgstr ""
+
+#: lib/PACScripts.pm:737
+#, perl-brace-format
+msgid "Show/hide a message($PAC{msg}([<message text>[, 0|1]]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:738
+msgid "Show/hide a message window with an OK (1) or not (0 - default) button"
+msgstr ""
+
+#: lib/PACScripts.pm:744
+#, perl-brace-format
+msgid "Split connections($PAC{split}(<$tmp_uuid1>, <$tmp_uuid2>[, 0|1]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:745
+msgid "Split horizontally (0->default) or vertically (1) given connections"
+msgstr ""
+
+#: lib/PACScripts.pm:751
+#, perl-brace-format
+msgid "Unsplit($PAC{unsplit}(<$tmp_uuid>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:752
+msgid "Unsplit given connection"
+msgstr ""
+
+#: lib/PACScripts.pm:758
+#, perl-brace-format
+msgid "Untab($PAC{to_window}(<$tmp_uuid>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:759
+msgid "Untab given connection"
+msgstr ""
+
+#: lib/PACScripts.pm:765
+#, perl-brace-format
+msgid "Retab($PAC{to_tab}(<$tmp_uuid>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:766
+msgid "Retab given connection"
+msgstr ""
+
+#: lib/PACScripts.pm:772
+#, perl-brace-format
+msgid "Save current Ásbrú CFG($PAC{cfg_save}())"
+msgstr ""
+
+#: lib/PACScripts.pm:773
+msgid "Save current Ásbrú cfg to standard Ásbrú config file"
+msgstr ""
+
+#: lib/PACScripts.pm:779
+#, perl-brace-format
+msgid "Export Ásbrú CFG to file($PAC{cfg_export}([file]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:780
+msgid ""
+"Save current Ásbrú cfg to given file (or ask for a file through a GUI if no "
+"file provided)"
+msgstr ""
+
+#: lib/PACScripts.pm:786
+msgid "Ásbrú methods"
+msgstr ""
+
+#: lib/PACScripts.pm:795
+#, perl-brace-format
+msgid "Set output log file($TERMINAL{log}([<log file>]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:796
+msgid ""
+"Function to set/remove output log file. Returns the log filehandle applied"
+msgstr ""
+
+#: lib/PACScripts.pm:802
+#, perl-brace-format
+msgid "User input($TERMINAL{ask}(<text>[, 0|1]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:803
+msgid "Ask user for input, showing (1->default) or not (0)  user input"
+msgstr ""
+
+#: lib/PACScripts.pm:809
+#, perl-brace-format
+msgid "Get EXPecxt object($TERMINAL{exp}())"
+msgstr ""
+
+#: lib/PACScripts.pm:810
+msgid ""
+"Returns the Perl Expect object for this connection (*WARNING*, dangerous "
+"function! Not recommended!)"
+msgstr ""
+
+#: lib/PACScripts.pm:816
+#, perl-brace-format
+msgid "Connection name($TERMINAL{name})"
+msgstr ""
+
+#: lib/PACScripts.pm:817
+msgid "Variable with the Name of the connection"
+msgstr ""
+
+#: lib/PACScripts.pm:823
+#, perl-brace-format
+msgid "Connection UUID($TERMINAL{uuid})"
+msgstr ""
+
+#: lib/PACScripts.pm:824
+msgid "Variable with the UUID of the connection"
+msgstr ""
+
+#: lib/PACScripts.pm:830
+#, perl-brace-format
+msgid "Connection TMP_UUID($TERMINAL{tmp_uuid})"
+msgstr ""
+
+#: lib/PACScripts.pm:831
+msgid "Variable with the Temporal UUID of current executing connection"
+msgstr ""
+
+#: lib/PACScripts.pm:837
+#, perl-brace-format
+msgid "Latest error($TERMINAL{error})"
+msgstr ""
+
+#: lib/PACScripts.pm:838
+msgid "Variable with the latest error from the \"expect\" function"
+msgstr ""
+
+#: lib/PACScripts.pm:844
+#, perl-brace-format
+msgid "Print MSG on terminal($TERMINAL{msg}(<message>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:845
+msgid "Function to print a message on the Terminal"
+msgstr ""
+
+#: lib/PACScripts.pm:851
+#, perl-brace-format
+msgid "Guess connection prompt($TERMINAL{get_prompt}([0|1]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:852
+msgid ""
+"Function retrieve connection prompt and remove (1) or not (0->default) any "
+"ESCape sequence. Returns a Quoted string \\Qprompt_sting\\E valid for RegExp "
+"matching"
+msgstr ""
+
+#: lib/PACScripts.pm:858
+#, perl-brace-format
+msgid "Send input to terminal($TERMINAL{send}(<string[\\n]>) )"
+msgstr ""
+
+#: lib/PACScripts.pm:859
+msgid ""
+"Function to SEND some string (input) to the connection (\\n sends a <INTRO>)"
+msgstr ""
+
+#: lib/PACScripts.pm:865
+#, perl-brace-format
+msgid "Send input to terminal($TERMINAL{send_get}(<string>[, 0]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:866
+msgid ""
+"Function to SEND some string (input) to the connection (\\n is automatically "
+"appended)"
+msgstr ""
+
+#: lib/PACScripts.pm:872
+#, perl-brace-format
+msgid "Send input to terminal($TERMINAL{expect}(<string>[, <seconds>]) )"
+msgstr ""
+
+#: lib/PACScripts.pm:873
+#, perl-brace-format
+msgid ""
+"Function to EXPECT for some STRING from the connection for given SECONDS, or "
+"indefinetly if undefined\n"
+"Returns, TRUE (1) on STRING found or FALSE (0) otherwise, setting the "
+"$TERMINAL{error} variable with\n"
+"the error that produced the EXPECT not matching given STRING.\n"
+"If STRINGS matches, then other two variables are set:\n"
+"$TERMINAL{out1}->contains the output of the latest string SENT UP TO the "
+"matched STRING\n"
+"$TERMINAL{out2}->contains the output of the latest string SENT FROM the "
+"matched STRING onwards\n"
+"All $CONNECTIONS{error|out1|out2} are resetted every time a SEND command is "
+"executed"
+msgstr ""
+
+#: lib/PACScripts.pm:885
+msgid "TERMINAL methods"
+msgstr ""
+
+#: lib/PACScripts.pm:943
+msgid ""
+"User will be prompted to choose a value form a user defined list separated "
+"with \"|\" (pipes)"
+msgstr ""
+
+#: lib/PACScripts.pm:1032
+#, perl-format
+msgid "File '%s' does not end with a '.pl' Perl extension"
+msgstr ""
+
+#: lib/PACScripts.pm:1035 lib/PACScripts.pm:1070
+#, perl-format
+msgid "File '%s' already exists. Overwrite it?"
+msgstr ""
+
+#: lib/PACScripts.pm:1068
+msgid "<b>Creating new Script</b>"
+msgstr ""
+
+#: lib/PACScripts.pm:1068
+msgid "Enter a name for the new Ásbrú Script"
+msgstr ""
+
+#: lib/PACScripts.pm:1073
+#, perl-format
+msgid "ERROR: Can not open file '%s' for writting (%s)"
+msgstr ""
+
+#: lib/PACScripts.pm:1118
+#, perl-format
+msgid ""
+"Ásbrú Script '%s' has changed.\n"
+"Save data before closing Ásbrú Script window?"
+msgstr ""
+
+#: lib/PACScripts.pm:1135 lib/PACScripts.pm:1265 lib/PACScripts.pm:1315
+#: lib/PACScripts.pm:1341 lib/PACScripts.pm:1356
+#, perl-format
+msgid ""
+"Ásbrú Script '%s' has changed.\n"
+"Save data before loading another script?"
+msgstr ""
+
+#: lib/PACScripts.pm:1140
+#, perl-format
+msgid "Are you sure you want to remove %d Ásbrú Scripts?"
+msgstr ""
+
+#: lib/PACScripts.pm:1216
+#, perl-format
+msgid ""
+"ERROR: Can not read file '%s' (%s)\n"
+"Delete it?"
+msgstr ""
+
+#: lib/PACScripts.pm:1253
+#, perl-format
+msgid "ERROR: It already exists a file named '%s' in '%s'"
+msgstr ""
+
+#: lib/PACScripts.pm:1254
+#, perl-format
+msgid "ERROR: Could not import file '%s' into '%s' (%s)"
+msgstr ""
+
+#: lib/PACScripts.pm:1273
+#, perl-format
+msgid "ERROR: Could not open directory '%s' for reading (%s)"
+msgstr ""
+
+#: lib/PACScripts.pm:1569
+#, perl-format
+msgid "Could not open Ásbrú Script file '%s' for reading: %s"
+msgstr ""
+
+#: lib/PACScripts.pm:1579
+#, perl-format
+msgid "Error parsing Ásbrú Script: %s"
+msgstr ""
+
+#: lib/PACScripts.pm:1589
+msgid ""
+"Error executing Ásbrú Script:\n"
+"No 'SESSION' function declaration found, and script not being executed "
+"directly from any Terminal!"
+msgstr ""
+
+#: lib/PACScripts.pm:1594
+#, perl-format
+msgid "Error executing Ásbrú Script: %s"
+msgstr ""
+
+#: lib/PACScripts.pm:1605
+#, perl-format
+msgid ""
+"ERROR: Can not start a new Ásbrú Script while another one is still running:\n"
+"Terminal '%s' is running '%s'"
+msgstr ""
+
+#: lib/PACStatistics.pm:85
+#, perl-format
+msgid "%d days, %d hours, %d minutes, %d seconds"
+msgstr ""
+
+#: lib/PACStatistics.pm:137
+msgid "All connections"
+msgstr ""
+
+#: lib/PACStatistics.pm:138
+msgid "Total groups:"
+msgstr ""
+
+#: lib/PACStatistics.pm:139
+msgid "Total nodes:"
+msgstr ""
+
+#: lib/PACStatistics.pm:140 lib/PACStatistics.pm:171 lib/PACStatistics.pm:206
+msgid "Total connections established:"
+msgstr ""
+
+#: lib/PACStatistics.pm:141 lib/PACStatistics.pm:172 lib/PACStatistics.pm:208
+msgid "Total time connected:"
+msgstr ""
+
+#: lib/PACStatistics.pm:168
+#, perl-format
+msgid "Group: %s"
+msgstr ""
+
+#: lib/PACStatistics.pm:169
+msgid "Total sub-groups:"
+msgstr ""
+
+#: lib/PACStatistics.pm:170
+msgid "Total contained nodes:"
+msgstr ""
+
+#: lib/PACStatistics.pm:198 lib/PACStatistics.pm:199
+msgid "NO DATA AVAILABLE"
+msgstr ""
+
+#: lib/PACStatistics.pm:205
+#, perl-format
+msgid "Connection: %s"
+msgstr ""
+
+#: lib/PACStatistics.pm:207
+msgid "Last connection:"
+msgstr ""
+
+#: lib/PACStatistics.pm:275
+msgid ""
+"Reset\n"
+"Statistics"
+msgstr ""
+
+#: lib/PACStatistics.pm:320
+msgid ""
+"Are you sure you want to reset <b>all Ásbrú</b> statistics?\n"
+"\n"
+"This action can not be undone!"
+msgstr ""
+
+#: lib/PACStatistics.pm:332
+#, perl-format
+msgid ""
+"Are you sure you want to reset statistics for group:\n"
+"\n"
+"<b>%s</b>\n"
+"\n"
+"This action can not be undone!"
+msgstr ""
+
+#: lib/PACStatistics.pm:341
+#, perl-format
+msgid ""
+"Are you sure you want to reset statistics for connection:\n"
+"\n"
+"<b>%s</b>\n"
+"\n"
+"This action can not be undone!"
+msgstr ""
+
+#: lib/PACTerminal.pm:262
+#, perl-format
+msgid "Master socket at port %s was closed !!"
+msgstr ""
+
+#: lib/PACTerminal.pm:573
+#, perl-format
+msgid "Are you sure you want to close '%s'?"
+msgstr ""
+
+#: lib/PACTerminal.pm:573
+msgid "this split tab"
+msgstr ""
+
+#: lib/PACTerminal.pm:801
+msgid "_Local"
+msgstr ""
+
+#: lib/PACTerminal.pm:819
+msgid "Sending THIS: "
+msgstr ""
+
+#: lib/PACTerminal.pm:837
+msgid "_Remote"
+msgstr ""
+
+#: lib/PACTerminal.pm:872
+msgid "Show/Hide button bar"
+msgstr ""
+
+#: lib/PACTerminal.pm:882 lib/PACTerminal.pm:4676
+msgid "Hide _messages"
+msgstr ""
+
+#: lib/PACTerminal.pm:888 lib/PACTerminal.pm:2730
+msgid "Set _keyboard focus"
+msgstr ""
+
+#: lib/PACTerminal.pm:901 lib/PACTerminal.pm:906 lib/PACTerminal.pm:1459
+msgid "Disconnected"
+msgstr ""
+
+#: lib/PACTerminal.pm:1218 lib/PACTerminal.pm:2334
+msgid ""
+"Enter the String/RegExp of text to be *deleted* when pasting.\n"
+"Useful for, for example, deleting 'carriage return' from the text before "
+"pasting it."
+msgstr ""
+
+#: lib/PACTerminal.pm:1219 lib/PACTerminal.pm:2335
+msgid "Use string or Perl RegExps (ex: \\n means \"carriage return\")"
+msgstr ""
+
+#: lib/PACTerminal.pm:1382
+msgid ""
+"This terminal is <b>DISCONNECTED</b>.\n"
+"Please, start the connection before trying to <b>chain</b>."
+msgstr ""
+
+#: lib/PACTerminal.pm:1385
+msgid ""
+"Please, <b>WAIT for current chain to finish</b> before starting a new one."
+msgstr ""
+
+#: lib/PACTerminal.pm:1392
+#, perl-format
+msgid ""
+"No '<b>Expect/Send</b>' data available in:\n"
+"<b>%s (%s)</b>\n"
+"So, there are <b>no commands to chain</b>"
+msgstr ""
+
+#: lib/PACTerminal.pm:1571
+msgid "Connected"
+msgstr ""
+
+#: lib/PACTerminal.pm:1684
+#, perl-format
+msgid "Expect / Execute: %s / %s"
+msgstr ""
+
+#: lib/PACTerminal.pm:1699
+#, perl-format
+msgid ""
+"ERROR: Could not retrieve output from command execution:\n"
+"%s"
+msgstr ""
+
+#: lib/PACTerminal.pm:1734
+#, perl-format
+msgid "Expecting '%s'"
+msgstr ""
+
+#: lib/PACTerminal.pm:1845
+msgid "Show Terminal Keybindings"
+msgstr ""
+
+#: lib/PACTerminal.pm:1856 lib/PACTerminal.pm:2906
+#, perl-format
+msgid "Stop script '%s'"
+msgstr ""
+
+#: lib/PACTerminal.pm:1871
+msgid "Connection"
+msgstr ""
+
+#: lib/PACTerminal.pm:1881
+msgid "All"
+msgstr ""
+
+#: lib/PACTerminal.pm:1886 lib/PACTray.pm:229 lib/PACTrayUnity.pm:165
+msgid "Local Shell"
+msgstr ""
+
+#: lib/PACTerminal.pm:1916
+#, perl-format
+msgid ""
+"Arrange both connections (%s) and (%s) into the same vertically split window."
+msgstr ""
+
+#: lib/PACTerminal.pm:1924
+#, perl-format
+msgid ""
+"Arrange both connections (%s) and (%s) into the same horizontally split "
+"window."
+msgstr ""
+
+#: lib/PACTerminal.pm:1936
+msgid "Detach tab to a new Window"
+msgstr ""
+
+#: lib/PACTerminal.pm:1939
+msgid ""
+"Separate this connection window from the tabbed view, and put it in a "
+"separate window"
+msgstr ""
+
+#: lib/PACTerminal.pm:1948 lib/PACTerminal.pm:2960
+msgid "Unsplit"
+msgstr ""
+
+#: lib/PACTerminal.pm:1950
+msgid "Remove the split view and put each connection into its own tab"
+msgstr ""
+
+#: lib/PACTerminal.pm:1957 lib/PACTerminal.pm:2968
+msgid "Equally resize terminals"
+msgstr ""
+
+#: lib/PACTerminal.pm:1959
+msgid "Resize terminals equally"
+msgstr ""
+
+#: lib/PACTerminal.pm:1967 lib/PACTerminal.pm:2977
+msgid "Split"
+msgstr ""
+
+#: lib/PACTerminal.pm:1973
+msgid "Vertically"
+msgstr ""
+
+#: lib/PACTerminal.pm:1979 lib/PACTerminal.pm:2989
+msgid "Horizontally"
+msgstr ""
+
+#: lib/PACTerminal.pm:1991
+msgid "Attach Window to main tab bar"
+msgstr ""
+
+#: lib/PACTerminal.pm:1993
+msgid "Put this connection window into main tabbed window"
+msgstr ""
+
+#: lib/PACTerminal.pm:2006 lib/PACTerminal.pm:3012
+msgid "New Cluster..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2008
+msgid "Create a new cluster and put this connection in it"
+msgstr ""
+
+#: lib/PACTerminal.pm:2029
+msgid "Add to selected cluster, with connections:\n"
+msgstr ""
+
+#: lib/PACTerminal.pm:2039 lib/PACTerminal.pm:3043
+msgid "Add to Cluster"
+msgstr ""
+
+#: lib/PACTerminal.pm:2039 lib/PACTerminal.pm:3043
+msgid "Change to Cluster"
+msgstr ""
+
+#: lib/PACTerminal.pm:2047 lib/PACTerminal.pm:3050
+msgid "Remove from Cluster"
+msgstr ""
+
+#: lib/PACTerminal.pm:2050
+#, perl-format
+msgid "Remove this connection from cluster '%s'"
+msgstr ""
+
+#: lib/PACTerminal.pm:2062
+msgid "Bring up the Power Cluster Controller GUI"
+msgstr ""
+
+#: lib/PACTerminal.pm:2079
+#, perl-format
+msgid "Exec the CONNECTIONS part of '%s' in this connection"
+msgstr ""
+
+#: lib/PACTerminal.pm:2087
+msgid "Execute Script"
+msgstr ""
+
+#: lib/PACTerminal.pm:2089
+msgid "Execute selected Ásbrú Script in this connection"
+msgstr ""
+
+#: lib/PACTerminal.pm:2145
+msgid "Remote commands"
+msgstr ""
+
+#: lib/PACTerminal.pm:2147
+msgid "Send to this connection the selected command (keypresses)"
+msgstr ""
+
+#: lib/PACTerminal.pm:2162 lib/PACTerminal.pm:2179
+msgid "CONFIRM: "
+msgstr ""
+
+#: lib/PACTerminal.pm:2190
+msgid "Local commands"
+msgstr ""
+
+#: lib/PACTerminal.pm:2192
+msgid "Execute LOCALLY (in YOUR computer) the selected command"
+msgstr ""
+
+#: lib/PACTerminal.pm:2270
+msgid "Insert value"
+msgstr ""
+
+#: lib/PACTerminal.pm:2272
+msgid "Send selected local/global/environment value to terminal"
+msgstr ""
+
+#: lib/PACTerminal.pm:2281 lib/edit/PACExpectEntry.pm:436
+msgid "Copy"
+msgstr ""
+
+#: lib/PACTerminal.pm:2291
+msgid "Copy connection password"
+msgstr ""
+
+#: lib/PACTerminal.pm:2302 lib/edit/PACExpectEntry.pm:484
+msgid "Paste"
+msgstr ""
+
+#: lib/PACTerminal.pm:2314
+msgid "Paste Connection Password"
+msgstr ""
+
+#: lib/PACTerminal.pm:2325
+msgid "Paste and delete..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2328
+msgid ""
+"Paste clipboard contents, but remove any Perl RegExp matching string from "
+"the appearing prompt GUI"
+msgstr ""
+
+#: lib/PACTerminal.pm:2345 lib/PACTerminal.pm:3068
+msgid "Find..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2353 lib/PACTerminal.pm:3074
+msgid "Save session log..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2358 lib/PACTerminal.pm:3079
+msgid "Edit session..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2363 lib/PACTerminal.pm:3084
+msgid "Temporary tab name change..."
+msgstr ""
+
+#: lib/PACTerminal.pm:2371
+msgid "Set title with guessed hostname"
+msgstr ""
+
+#: lib/PACTerminal.pm:2376
+msgid "Open file manager on current dir"
+msgstr ""
+
+#: lib/PACTerminal.pm:2381
+msgid "Take Screenshot"
+msgstr ""
+
+#: lib/PACTerminal.pm:2398
+msgid "Open new SFTP window"
+msgstr ""
+
+#: lib/PACTerminal.pm:2411
+msgid "Terminal"
+msgstr ""
+
+#: lib/PACTerminal.pm:2417
+msgid "Reset"
+msgstr ""
+
+#: lib/PACTerminal.pm:2426
+msgid "Reset and clear"
+msgstr ""
+
+#: lib/PACTerminal.pm:2440
+msgid "Session"
+msgstr ""
+
+#: lib/PACTerminal.pm:2447
+msgid "Start programatically string sending"
+msgstr ""
+
+#: lib/PACTerminal.pm:2447
+msgid "Stop programatically string sending"
+msgstr ""
+
+#: lib/PACTerminal.pm:2448
+#, perl-format
+msgid "Every: %s seconds"
+msgstr ""
+
+#: lib/PACTerminal.pm:2462 lib/PACTerminal.pm:3096
+msgid "Duplicate connection"
+msgstr ""
+
+#: lib/PACTerminal.pm:2470 lib/PACTerminal.pm:3106
+msgid "Restart session"
+msgstr ""
+
+#: lib/PACTerminal.pm:2479
+msgid "Disconnect"
+msgstr ""
+
+#: lib/PACTerminal.pm:2489
+msgid "Disconnect and restart session"
+msgstr ""
+
+#: lib/PACTerminal.pm:2499 lib/PACTerminal.pm:3109
+msgid "Close terminal"
+msgstr ""
+
+#: lib/PACTerminal.pm:2508
+msgid "Close Other Terminals"
+msgstr ""
+
+#: lib/PACTerminal.pm:2518 lib/PACTerminal.pm:3115
+msgid "Close all terminals"
+msgstr ""
+
+#: lib/PACTerminal.pm:2528
+msgid "Close disconnected terminals"
+msgstr ""
+
+#: lib/PACTerminal.pm:2896
+msgid "Goto TAB"
+msgstr ""
+
+#: lib/PACTerminal.pm:2952
+msgid "Detach tab to a new window"
+msgstr ""
+
+#: lib/PACTerminal.pm:2983
+msgid "Vertically "
+msgstr ""
+
+#: lib/PACTerminal.pm:2999
+msgid "Attach Window to main TAB bar"
+msgstr ""
+
+#: lib/PACTerminal.pm:3059
+msgid "Cluster Admin..."
+msgstr ""
+
+#: lib/PACTerminal.pm:3093
+msgid "New connection"
+msgstr ""
+
+#: lib/PACTerminal.pm:3103
+msgid "Disconnect session"
+msgstr ""
+
+#: lib/PACTerminal.pm:3112
+msgid "Close other terminals"
+msgstr ""
+
+#: lib/PACTerminal.pm:3371
+msgid "Enter the new temporal label:"
+msgstr ""
+
+#: lib/PACTerminal.pm:3390
+msgid "You have disabled logging"
+msgstr ""
+
+#: lib/PACTerminal.pm:3434
+msgid "Do you want to remove escape sequences from the saved log?"
+msgstr ""
+
+#: lib/PACTerminal.pm:3438
+#, perl-format
+msgid "ERROR: Could not open file '%s' for reading!! (%s)"
+msgstr ""
+
+#: lib/PACTerminal.pm:3445
+#, perl-format
+msgid "ERROR: Could not open file '%s' for writting!! (%s)"
+msgstr ""
+
+#: lib/PACTerminal.pm:3468 lib/edit/PACExecEntry.pm:358
+#, perl-format
+msgid "Execute <b>'%s'</b> LOCALLY"
+msgstr ""
+
+#: lib/PACTerminal.pm:3468
+#, perl-format
+msgid "Execute <b>'%s'</b> REMOTELY"
+msgstr ""
+
+#: lib/PACTerminal.pm:3474
+#, perl-format
+msgid "Canceled '<b>%s</b>' execution of '<b>%s</b>'"
+msgstr ""
+
+#: lib/PACTerminal.pm:3489
+#, perl-format
+msgid ""
+"Please, wait at least <b>%s</b> seconds between Remote Commands Executions"
+msgstr ""
+
+#: lib/PACTerminal.pm:3495 lib/PACTerminal.pm:3785 lib/PACTerminal.pm:3796
+#, perl-format
+msgid ""
+"ERROR: Could not signal process '%s'\n"
+"Inconsistent state!\n"
+"Please, restart PAC!!"
+msgstr ""
+
+#: lib/PACTerminal.pm:3615
+msgid "Executing: "
+msgstr ""
+
+#: lib/PACTerminal.pm:3652
+msgid "Select local command(s) to execute:"
+msgstr ""
+
+#: lib/PACTerminal.pm:3665
+msgid " EXECUTE?"
+msgstr ""
+
+#: lib/PACTerminal.pm:3666
+msgid " LOCAL COMMAND"
+msgstr ""
+
+#: lib/PACTerminal.pm:3838
+#, perl-format
+msgid " Select 'expect/command' pairs from '%s' to be executed into '%s': "
+msgstr ""
+
+#: lib/PACTerminal.pm:3852
+msgid " ACTIVE "
+msgstr ""
+
+#: lib/PACTerminal.pm:3853
+msgid " PATTERN "
+msgstr ""
+
+#: lib/PACTerminal.pm:3854
+msgid " COMMAND "
+msgstr ""
+
+#: lib/PACTerminal.pm:3855
+msgid " RETURN "
+msgstr ""
+
+#: lib/PACTerminal.pm:3856
+msgid " ON MATCH "
+msgstr ""
+
+#: lib/PACTerminal.pm:3857
+msgid " ON FAIL "
+msgstr ""
+
+#: lib/PACTerminal.pm:3858
+msgid " TIME OUT "
+msgstr ""
+
+#: lib/PACTerminal.pm:3865
+msgid "Select All/None"
+msgstr ""
+
+#: lib/PACTerminal.pm:3872
+msgid "Change TAB/Window title to: "
+msgstr ""
+
+#: lib/PACTerminal.pm:3880
+msgid "Send Chain to all connections in cluster"
+msgstr ""
+
+#: lib/PACTerminal.pm:4241
+msgid "Find in Terminal"
+msgstr ""
+
+#: lib/PACTerminal.pm:4260
+msgid " Enter Regular Expression to look for: "
+msgstr ""
+
+#: lib/PACTerminal.pm:4278
+msgid "Case sensitive"
+msgstr ""
+
+#: lib/PACTerminal.pm:4300
+msgid " Lines matching string: "
+msgstr ""
+
+#: lib/PACTerminal.pm:4313
+msgid " Line # "
+msgstr ""
+
+#: lib/PACTerminal.pm:4314
+msgid " Line contents "
+msgstr ""
+
+#: lib/PACTerminal.pm:4367
+msgid " Contents of current log: "
+msgstr ""
+
+#: lib/PACTerminal.pm:4435
+msgid " PLEASE, WAIT. SEARCHING... "
+msgstr ""
+
+#: lib/PACTerminal.pm:4436
+msgid "STOP SEARCH"
+msgstr ""
+
+#: lib/PACTerminal.pm:4455
+#, perl-format
+msgid ""
+" PLEASE, WAIT. Searching... (%d lines matching '%s' so far in %d processed "
+"lines) "
+msgstr ""
+
+#: lib/PACTerminal.pm:4467
+#, perl-format
+msgid " SEARCH WAS STOPPED WITH %d LINES MATCHING '%s' SO FAR!! "
+msgstr ""
+
+#: lib/PACTerminal.pm:4472
+#, perl-format
+msgid " PLEASE, WAIT. Updating... (%d lines matching '%s') "
+msgstr ""
+
+#: lib/PACTerminal.pm:4482
+#, perl-format
+msgid " %d lines matching '%s': "
+msgstr ""
+
+#: lib/PACTerminal.pm:4483
+msgid "Find"
+msgstr ""
+
+#: lib/PACTerminal.pm:4576
+msgid "Are you sure you want to close <b>other</b> terminals?"
+msgstr ""
+
+#: lib/PACTerminal.pm:4593
+msgid "Are you sure you want to close <b>all</b> terminals?"
+msgstr ""
+
+#: lib/PACTerminal.pm:4658
+msgid "Show _messages"
+msgstr ""
+
+#: lib/PACTray.pm:233 lib/PACTrayUnity.pm:169
+msgid "Connect to"
+msgstr ""
+
+#: lib/PACTray.pm:235 lib/PACTrayUnity.pm:171
+msgid "Preferences..."
+msgstr ""
+
+#: lib/PACTray.pm:236 lib/PACTrayUnity.pm:172
+msgid "Clusters..."
+msgstr ""
+
+#: lib/PACTray.pm:238 lib/PACTrayUnity.pm:174
+msgid "Show Window"
+msgstr ""
+
+#: lib/PACTray.pm:240 lib/PACTrayUnity.pm:189
+msgid "About"
+msgstr ""
+
+#: lib/PACTray.pm:241 lib/PACTrayUnity.pm:190
+msgid "Exit"
+msgstr ""
+
+#: lib/PACUtils.pm:450 lib/PACUtils.pm:521 lib/PACUtils.pm:589
+#: lib/PACUtils.pm:764 lib/PACUtils.pm:821 lib/PACUtils.pm:885
+#: lib/PACUtils.pm:950 lib/PACUtils.pm:1017 lib/PACUtils.pm:1088
+#: lib/PACUtils.pm:1154 lib/PACUtils.pm:3159
+msgid "Host: "
+msgstr ""
+
+#: lib/PACUtils.pm:477 lib/PACUtils.pm:548 lib/PACUtils.pm:616
+#: lib/PACUtils.pm:666 lib/PACUtils.pm:733 lib/PACUtils.pm:780
+#: lib/PACUtils.pm:847 lib/PACUtils.pm:912 lib/PACUtils.pm:977
+#: lib/PACUtils.pm:1044 lib/PACUtils.pm:1115 lib/PACUtils.pm:1180
+#: lib/PACUtils.pm:1230
+#, perl-format
+msgid " <b>%s</b> command line options"
+msgstr ""
+
+#: lib/PACUtils.pm:644
+msgid "System / Phone / \"dir\": "
+msgstr ""
+
+#: lib/PACUtils.pm:707
+msgid "TTY Socket: "
+msgstr ""
+
+#: lib/PACUtils.pm:1207
+msgid "Full command line: "
+msgstr ""
+
+#: lib/PACUtils.pm:1379 lib/PACUtils.pm:1464
+#, perl-format
+msgid "Chain with '%s'"
+msgstr ""
+
+#: lib/PACUtils.pm:1674
+msgid "Enter new NAME "
+msgstr ""
+
+#: lib/PACUtils.pm:1694
+msgid "Enter new TITLE "
+msgstr ""
+
+#: lib/PACUtils.pm:1875
+msgid "Message"
+msgstr ""
+
+#: lib/PACUtils.pm:1951
+msgid "<b>Please, wait...</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:1994 lib/PACUtils.pm:2024
+msgid "Confirm action"
+msgstr ""
+
+#: lib/PACUtils.pm:2039
+msgid "GUI Password Change"
+msgstr ""
+
+#: lib/PACUtils.pm:2039
+msgid "Please, enter <b>OLD</b> GUI Password..."
+msgstr ""
+
+#: lib/PACUtils.pm:2045
+msgid "ERROR: Wrong <b>OLD</b> password!!"
+msgstr ""
+
+#: lib/PACUtils.pm:2051 lib/PACUtils.pm:2057
+msgid "<b>GUI Password Change</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:2051
+msgid "Please, enter <b>NEW</b> GUI Password..."
+msgstr ""
+
+#: lib/PACUtils.pm:2057
+msgid "Please, <b>confirm NEW</b> GUI Password..."
+msgstr ""
+
+#: lib/PACUtils.pm:2063
+msgid ""
+"<b>ERROR</b>: Provided <b>NEW</b> passwords <span color=\"red\"><b>DO NOT "
+"MATCH</b></span>!!!"
+msgstr ""
+
+#: lib/PACUtils.pm:2989
+#, perl-format
+msgid "<b>Variable substitution '%s'</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:2999
+msgid "<b>Choose variable value:</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:3007
+msgid "<b>Variable substitution</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:3007
+#, perl-format
+msgid "Please, enter a value for:'%s'"
+msgstr ""
+
+#: lib/PACUtils.pm:3133
+msgid "<b>Enter the following data and press 'OK' to send Magic Packet:</b>"
+msgstr ""
+
+#: lib/PACUtils.pm:3143
+msgid "MAC Address: "
+msgstr ""
+
+#: lib/PACUtils.pm:3175
+msgid "Port Number: "
+msgstr ""
+
+#: lib/PACUtils.pm:3184
+msgid "Send to broadcast"
+msgstr ""
+
+#: lib/PACUtils.pm:3197
+#, perl-format
+msgid "Checking MAC for '%s' ..."
+msgstr ""
+
+#: lib/PACUtils.pm:3251
+msgid "No IP/hostname to test reachability"
+msgstr ""
+
+#: lib/PACUtils.pm:3255
+msgid "Selected saved MAC"
+msgstr ""
+
+#: lib/PACUtils.pm:3301
+#, perl-format
+msgid ""
+"ERROR: Sending magic packet to %s (MAC: %s) failed:\n"
+"%s"
+msgstr ""
+
+#: lib/PACUtils.pm:3318
+#, perl-format
+msgid ""
+"Wake On Lan 'Magic Packet'\n"
+"CORRECTLY sent to %s\n"
+"(MAC: %s)"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:261
+msgid "Confirm"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:279
+msgid "Command"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:291
+msgid "send <INTRO>"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:303
+msgid ""
+"<i>Group</i><b>:</b><i>Description</i>\n"
+"<b>Group:</b> This value will group all commands with the same name in the "
+"menu.\n"
+"\n"
+"Example <b>Mysql</b>:<i>Show tables</i>"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:317
+msgid "Set Keybinding"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:394
+msgid "User Local variables..."
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:467 lib/edit/PACExpectEntry.pm:702
+#: lib/edit/PACExpectEntry.pm:819 lib/edit/PACPrePostEntry.pm:328
+msgid "UUID"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:468 lib/edit/PACExpectEntry.pm:703
+#: lib/edit/PACExpectEntry.pm:820 lib/edit/PACPrePostEntry.pm:329
+msgid "SOCKS5_PORT"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:469 lib/edit/PACExpectEntry.pm:704
+#: lib/edit/PACExpectEntry.pm:821 lib/edit/PACPrePostEntry.pm:330
+msgid "TIMESTAMP"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:470 lib/edit/PACExpectEntry.pm:705
+#: lib/edit/PACExpectEntry.pm:822 lib/edit/PACPrePostEntry.pm:331
+msgid "DATE_Y"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:471 lib/edit/PACExpectEntry.pm:706
+#: lib/edit/PACExpectEntry.pm:823 lib/edit/PACPrePostEntry.pm:332
+msgid "DATE_M"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:472 lib/edit/PACExpectEntry.pm:707
+#: lib/edit/PACExpectEntry.pm:824 lib/edit/PACPrePostEntry.pm:333
+msgid "DATE_D"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:473 lib/edit/PACExpectEntry.pm:708
+#: lib/edit/PACExpectEntry.pm:825 lib/edit/PACPrePostEntry.pm:334
+msgid "TIME_H"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:474 lib/edit/PACExpectEntry.pm:709
+#: lib/edit/PACExpectEntry.pm:826 lib/edit/PACPrePostEntry.pm:335
+msgid "TIME_M"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:475 lib/edit/PACExpectEntry.pm:710
+#: lib/edit/PACExpectEntry.pm:827 lib/edit/PACPrePostEntry.pm:336
+msgid "TIME_S"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:478 lib/edit/PACExpectEntry.pm:713
+#: lib/edit/PACExpectEntry.pm:830 lib/edit/PACPrePostEntry.pm:339
+msgid "IP"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:479 lib/edit/PACExpectEntry.pm:714
+#: lib/edit/PACExpectEntry.pm:831 lib/edit/PACPrePostEntry.pm:341
+msgid "USER"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:480 lib/edit/PACExpectEntry.pm:715
+#: lib/edit/PACPrePostEntry.pm:340
+msgid "PORT"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:481 lib/edit/PACExpectEntry.pm:716
+#: lib/edit/PACExpectEntry.pm:832 lib/edit/PACPrePostEntry.pm:342
+msgid "PASS"
+msgstr ""
+
+#: lib/edit/PACExecEntry.pm:482 lib/edit/PACExpectEntry.pm:717
+#: lib/edit/PACExpectEntry.pm:833 lib/edit/PACPrePostEntry.pm:343
+msgid "Internal variables..."
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:231
+#, perl-format
+msgid "Expect #%s"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:269
+msgid "Expect: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:277
+msgid "Time out (seconds): "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:290
+msgid "Send("
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:308
+msgid "Return"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:311
+msgid ""
+"Sends a <RETURN> (\\n) after the string is entered.\\nFor IBM 3270 "
+"connections, sends a \\r\\f (Carriage Return and Line Feed)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:319
+msgid ""
+"If \"Expect\" IS matched, the \"Send\" string will be sent and we will \"go "
+"to\" selected Expect number. If stop is selected, Expect processing will "
+"stop, and control will be returned to user (no disconnect will happen)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:322
+msgid "On MATCH: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:330 lib/edit/PACExpectEntry.pm:357
+msgid "goto "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:339 lib/edit/PACExpectEntry.pm:366
+msgid "stop"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:346
+msgid ""
+"If \"Expect\" IS NOT matched, no string will be sent, and we will \"go to\" "
+"selected Expect. If stop is selected, Expect processing will stop, and "
+"control will be returned to user (no disconnect will happen)"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:349
+msgid "On FAIL: "
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:458
+msgid "Cut"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:507
+msgid "Delete"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:650
+msgid "<command prompt>"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:651
+msgid ""
+"Expect for a sting matching a COMMAND PROMPT (as defined under "
+"\"Preferences\")"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:838
+msgid "Add Username KeePassXC"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:839
+msgid "KeePassXC Username"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:849
+msgid "Add Password KeePassXC"
+msgstr ""
+
+#: lib/edit/PACExpectEntry.pm:850
+msgid "KeePassXC Password"
+msgstr ""
+
+#: lib/edit/PACMethod.pm:156
+#, perl-format
+msgid ""
+"Sorry, but connection <b>'%s'</b> of type <b>'%s'</b>, which is not "
+"supported in your actual system state.\n"
+"Please, try installing the proper package providing that functionality."
+msgstr ""
+
+#: lib/edit/PACPrePostEntry.pm:206 lib/edit/PACPrePostEntry.pm:236
+msgid "Ask: "
+msgstr ""
+
+#: lib/edit/PACPrePostEntry.pm:206 lib/edit/PACPrePostEntry.pm:211
+#: lib/edit/PACPrePostEntry.pm:236 lib/edit/PACPrePostEntry.pm:241
+msgid "NO"
+msgstr ""
+
+#: lib/edit/PACPrePostEntry.pm:206 lib/edit/PACPrePostEntry.pm:211
+#: lib/edit/PACPrePostEntry.pm:236 lib/edit/PACPrePostEntry.pm:241
+msgid "YES"
+msgstr ""
+
+#: lib/edit/PACPrePostEntry.pm:211 lib/edit/PACPrePostEntry.pm:241
+msgid "Default: "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:132
+msgid ""
+"Transparency has been disabled globally.  See your global preferences to "
+"activate transparency."
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:214
+msgid " Use these personal options  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:225
+msgid " Prompt RegExp  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:233
+msgid " Username RegExp  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:240
+msgid " Password RegExp  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:247
+msgid " Terminal UI  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:258
+msgid "Text color:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:265
+msgid "Back color:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:276
+msgid " Bold color like Text color  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:282
+msgid "Font:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:293
+msgid " Use this Tab background color  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:303
+msgid "Cursor Shape:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:311
+msgid "Scrollback lines:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:316
+msgid ""
+"If positive, sets the length of the scrollback buffer used by the terminal.\n"
+"If 0, disables the scrollback buffer.\n"
+"If -1, means an \"infinitive scrollback\".\n"
+"If -2, uses the value set in global preferences."
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:319
+msgid "Transparency:"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:327
+msgid " Select Word CHARS  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:337
+msgid " Time outs (seconds)  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:345
+msgid " Connection "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:348
+msgid "Set to 0 (zero) to wait forever until connection is established"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:353
+msgid " Expect Cmd exec  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:356
+msgid ""
+"Set to 0 (zero) to wait forever for Expect and equivalentes commands to "
+"complete"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:361
+msgid " Open NEW connection on  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:368
+msgid "Tab"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:374
+msgid "Window"
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:380
+msgid " Width  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:384
+msgid " Height  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:388
+msgid " Backspace binding  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:398
+msgid " Character Encoding  "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:408
+msgid " Terminal Emulation "
+msgstr ""
+
+#: lib/edit/PACTermOpts.pm:428
+msgid "Reset to DEFAULT values"
+msgstr ""
+
+#: lib/edit/PACVarEntry.pm:208
+msgid "hide) "
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:210
+msgid " Select display model: "
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:211
+msgid ""
+"[-model (3278|3279)-(2|3|4|5)] : Selects a display model(3278 BW , 3279 "
+"Colour, with different number of rows and columns"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:243
+msgid " Connect method: "
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:249
+msgid "Standard"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:251
+msgid ""
+"Do not prepend any character [P|S|N|L] to the host. That is, do a standard "
+"connection."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:253
+msgid "Telnet-passthru"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:255
+msgid ""
+"[P:] : causes the connection to go through the telnet-passthru service "
+"rather than directly to the host."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:257
+msgid "NO Extended Data Stream"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:259
+msgid ""
+"[S:] : Removes the \"extended data stream\" option reported to the host."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:261
+msgid "NO TN3270E support"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:263
+msgid "[N:] : Turns off TN3270E support for the session."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:265
+msgid "Use SSL Tunnel"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:267
+msgid ""
+"[L:] : Causes c3270 to first create an SSL tunnel to the host, and then "
+"create a TN3270 session inside the tunnel."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:274
+msgid "ALL characters in bold"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:276
+msgid "[-allbold] : Forces all characters to be displayed in bold."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:278
+msgid "Use cbreak mode"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:280
+msgid ""
+"[-cbreak] : Causes c3270 to operate in cbreak mode, instead of raw mode."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:282
+msgid "Disable command-prompt mode"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:284
+msgid "[-noprompt] : Disables command-prompt mode."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:286
+msgid "Force Monochrome"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:288
+msgid ""
+"[-mono] : Prevents c3270 from using color, ignoring any color capabilities "
+"reported by the terminal."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:295
+msgid "EBCDIC character set:"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:299
+msgid "[-charset <name>] : Specifies an EBCDIC host character set."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:302
+msgid " Input Method:"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:306
+msgid ""
+"[-im <method>] : Specifies the name of the input method to use for multi-"
+"byte input."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:312
+msgid "Keyboard Map:"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:316
+msgid ""
+"[-keymap <name>] : Specifies a keyboard map to be found in the resource "
+"c3270.keymap.name or the file name."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:319
+msgid " Printer LU:"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:323
+msgid ""
+"[-printerlu <luname>] : Causes c3270 to automatically start a pr3287 printer "
+"session."
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:329
+msgid "Terminal Name:"
+msgstr ""
+
+#: lib/method/PACMethod_3270.pm:333
+msgid ""
+"[-tn <name>] : Specifies  the terminal name to be transmitted over the "
+"telnet connection.  The default name is IBM-model_name-E."
+msgstr ""
+
+#: lib/method/PACMethod_cadaver.pm:159
+msgid "Tolerant mode"
+msgstr ""
+
+#: lib/method/PACMethod_cadaver.pm:161
+msgid ""
+"[-t] : Allow cd/open into non-WebDAV enabled collection; use if the server "
+"or proxy server has WebDAV compliance problems."
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:187
+msgid "Line: "
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:190
+msgid "[-l|--line] : Line to use to connect. Ex: /dev/ttyUSB0"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:192
+msgid " Speed: "
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:195
+msgid "[-s|--speed] : Speed to use to connect. Ex: 9660"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:198
+msgid " Port: "
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:201
+msgid "[-p|--port] : Port to connect"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:203
+msgid " Parity: "
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:205
+msgid "-(e|o|none) : Use 'even', 'odd' or 'no' parity"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:212
+msgid "Half Duplex"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:214
+msgid "[-h] : Echo characters locally (half-duplex mode)"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:216
+msgid "Turn off XON/XOFF handling"
+msgstr ""
+
+#: lib/method/PACMethod_cu.pm:218
+msgid "[--nostop] : Turn off XON/XOFF handling (it is on by default)"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:169
+msgid "Passive mode data transfers"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:171
+msgid "[-p] : Use passive mode for data transfers"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:173
+msgid "Turn off interactive prompt for multiple file transfers"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:175
+msgid "[-i] : Turns off interactive prompting during multiple file transfers"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:177
+msgid "Verbose connection"
+msgstr ""
+
+#: lib/method/PACMethod_ftp.pm:179
+msgid ""
+"[-v] : Show all responses from the remote server, as well as report on data "
+"transfer statistics"
+msgstr ""
+
+#: lib/method/PACMethod_generic.pm:143
+msgid "No option to configure here."
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:187
+msgid " Select speculative local echo (predictions) model: "
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:188
+msgid ""
+"[-(a|n)] : Controls use of speculative local echo (defaults to \"adaptive\")"
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:195
+msgid "Adaptive"
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:198
+msgid "Always"
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:201
+msgid "Never"
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:211
+msgid "Server-side UDP Port Start: "
+msgstr ""
+
+#: lib/method/PACMethod_mosh.pm:215
+msgid "Server-side UDP Port End: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:273
+msgid "RDP Version:"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:276
+msgid "-(4|5) : Use RDP v4 or v5 (default)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:282 lib/method/PACMethod_xfreerdp.pm:321
+msgid "BPP:"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:285
+msgid "[-a] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:297 lib/method/PACMethod_xfreerdp.pm:332
+msgid "Attach to console"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:299
+msgid ""
+"[-0] : Attach to console of server (requires Windows Server 2003 or newer)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:301
+msgid "Bitmap Cache"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:303
+msgid "[-P] : Enable caching of bitmaps to disk (persistent bitmap caching)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:305 lib/method/PACMethod_xfreerdp.pm:336
+msgid "Compression"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:307
+msgid "[-z] : Enable compression of the RDP datastream"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:309
+msgid "Use SmartCard"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:311
+msgid "[-r scard] : Enable SmartCard usage"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:316
+msgid "Clipboard forwarding"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:317
+msgid "[-r clipboard:PRIMARYCLIPBOARD] : Enable clipboard forwarding"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:320
+msgid "Enable SeamlessRDP "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:321
+msgid "[-A] : Enable SeamlessRDP"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:324
+msgid "Keep WM key bindings"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:325
+msgid "[-K] : keep window manager key bindings"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:333 lib/method/PACMethod_xfreerdp.pm:404
+msgid "Startup shell: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:337
+msgid ""
+"[-s 'startupshell command'] : start given startupshell/command instead of "
+"explorer"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:343 lib/method/PACMethod_xfreerdp.pm:414
+msgid "Other options: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:347
+msgid ""
+"Insert other options not implemented in Asbru (launch 'rdesktop --help' to "
+"see them all)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:353 lib/method/PACMethod_xfreerdp.pm:424
+msgid " RDP Window size: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:355
+msgid "[-g] : Amount of screen to use"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:363 lib/method/PACMethod_realvnc.pm:253
+#: lib/method/PACMethod_tigervnc.pm:222 lib/method/PACMethod_vncviewer.pm:211
+#: lib/method/PACMethod_xfreerdp.pm:434
+msgid "Fullscreen"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:365
+msgid ""
+"[-f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:367
+msgid "Embed in TAB"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:369
+msgid "Embed terminal window in Asbru TAB, using Asbru's GUI size"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:374 lib/method/PACMethod_xfreerdp.pm:447
+msgid "Width x Height:"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:375
+msgid "[-g WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:387 lib/method/PACMethod_xfreerdp.pm:471
+msgid "Keyboard layout:"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:389
+msgid "[-k] : Keyboard layout"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:397 lib/method/PACMethod_xfreerdp.pm:482
+msgid "Windows Domain: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:401
+msgid "Sound redirect: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:406 lib/method/PACMethod_xfreerdp.pm:492
+msgid " Disk redirects: "
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:408
+msgid ""
+"[-r disk:<8_chars_sharename>=<path>] : Redirects a <path> to the share "
+"\\tsclient\\<8_chars_sharename> on the server"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:468 lib/method/PACMethod_xfreerdp.pm:554
+msgid "Share Name (8 chars max.!):"
+msgstr ""
+
+#: lib/method/PACMethod_rdesktop.pm:473 lib/method/PACMethod_xfreerdp.pm:559
+msgid "Select a path to share"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:228
+msgid "<b>RealVNC configuration</b>"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:234
+msgid "Picture quality :"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:243 lib/method/PACMethod_vncviewer.pm:226
+msgid "Colour depth (bpp):"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:255 lib/method/PACMethod_vncviewer.pm:213
+msgid "[-fullscreen] : Fullscreen window"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:257 lib/method/PACMethod_vncviewer.pm:215
+msgid "Natural Size"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:260 lib/method/PACMethod_tigervnc.pm:226
+#: lib/method/PACMethod_vncviewer.pm:218
+msgid "Listen"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:262 lib/method/PACMethod_tigervnc.pm:228
+#: lib/method/PACMethod_vncviewer.pm:220
+msgid "[-listen] : Listen for incoming connections"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:264 lib/method/PACMethod_tigervnc.pm:230
+#: lib/method/PACMethod_vncviewer.pm:222
+msgid "View Only"
+msgstr ""
+
+#: lib/method/PACMethod_realvnc.pm:266 lib/method/PACMethod_vncviewer.pm:224
+msgid "[-viewonly] : View only mode"
+msgstr ""
+
+#: lib/method/PACMethod_remote_tty.pm:164
+msgid "Set restricted mode"
+msgstr ""
+
+#: lib/method/PACMethod_remote_tty.pm:166
+msgid ""
+"[-r] : Don't allow changing of logging status, suspending of remote-tty or "
+"setting of line options"
+msgstr ""
+
+#: lib/method/PACMethod_remote_tty.pm:168
+msgid "Set 7bit mode"
+msgstr ""
+
+#: lib/method/PACMethod_remote_tty.pm:170
+msgid "[-7] : Set 7bit connection mode"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:112 lib/method/PACMethod_ssh.pm:185
+#, perl-format
+msgid "Advanced Options (<b>%d</b>)"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:223
+msgid "SSH Version:"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:226
+msgid "-(1|any) : Use SSH v1 or let negotiate any of them"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:232 lib/method/PACMethod_ssh.pm:465
+msgid "Use Compression"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:234 lib/method/PACMethod_ssh.pm:467
+msgid "[-C] : Use or not compression"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:238
+msgid "Advanced Options:"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:242 lib/method/PACMethod_ssh.pm:632
+msgid "Advanced Options"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:243 lib/method/PACMethod_ssh.pm:634
+msgid "[-o \"ssh_option=value\"]"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:299
+msgid "Option:"
+msgstr ""
+
+#: lib/method/PACMethod_sftp.pm:308
+msgid "Value:"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:151
+#, perl-format
+msgid "Local Port Forwarding (<b>%d</b>)"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:167
+#, perl-format
+msgid "Remote Port Forwarding (<b>%d</b>)"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:179
+#, perl-format
+msgid "Dynamic Socks Proxy (<b>%d</b>)"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:232
+#, perl-format
+msgid ""
+"CONFIG ERROR: Local Port %s on Local IP '%s' defined in Local Port "
+"Forwarding is already in use!"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:250
+#, perl-format
+msgid "WARNING: Same Remote Port %s defined more than once!"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:264
+#, perl-format
+msgid ""
+"CONFIG ERROR: Local Port %s on Local IP '%s' defined in Dynamic Socks Proxy "
+"is already in use!"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:424
+msgid "SSH Version "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:427
+msgid "-(1|2|any) : Use SSH v1, v2 or any  of them"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:438
+msgid "IP Protocol  "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:441
+msgid "-(4|6) : Uses IPv4, IPv6 or no specification (ip based)"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:449
+msgid " Other Options  "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:461
+msgid "Forward X"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:463
+msgid "-(X|x) : Forwards or not the X"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:469
+msgid "Allow Remote Port Connect"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:471
+msgid "[-g] : Allow or not Remote Port Connections"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:473
+msgid "Forward Agent"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:475
+msgid "[-A] : Forward or not the SSH authentication agent"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:482
+msgid "Do NOT execute remote command"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:484
+msgid ""
+"[-N]: Do NOT execute a remote command.  This is useful for just forwarding "
+"ports (protocol version 2 only)"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:486
+msgid "Disable pseudo-terminal allocation"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:488
+msgid "[-T]: Allocate pseudoterminal"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:490
+msgid "Create random SOCKS tunnel"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:492
+msgid ""
+"Creates a SOCKS tunnel on a random port at connection startup.  Variable "
+"SOCKS5_PORT will contain the random port.  You can use it to start local "
+"commands and launch any other programs."
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:501
+msgid "Local Port Forwarding"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:503
+msgid ""
+"<b>-L [bind_address:]port:host:hostport</b>\n"
+"Forward Local Address:port <i>(bind_address:port)</i> → Remote Address:port "
+"<i>(host:hostport)</i>"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:509 lib/method/PACMethod_ssh.pm:554
+#: lib/method/PACMethod_ssh.pm:599
+msgid "Show ordered by  "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:513 lib/method/PACMethod_ssh.pm:558
+#: lib/method/PACMethod_ssh.pm:603
+msgid "Local IP, "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:517 lib/method/PACMethod_ssh.pm:562
+msgid "Local Port, "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:521 lib/method/PACMethod_ssh.pm:566
+msgid "Remote IP"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:546
+msgid "Remote Port Forwarding"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:548
+msgid ""
+"<b>-R [bind_address:]port:host:hostport</b>\n"
+"Bring Remote Address:port <i>(bind_address:port)</i> → Local Address:port "
+"<i>(host:hostport)</i>"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:591
+msgid "Dynamic Socks Proxy"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:593
+msgid ""
+"<b>-D [bind_address:]local_port</b>\n"
+"Create a Dynamic Socks proxy at localport"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:607
+msgid "Local Port"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:746 lib/method/PACMethod_ssh.pm:883
+msgid "Local Address "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:755 lib/method/PACMethod_ssh.pm:773
+#: lib/method/PACMethod_ssh.pm:874 lib/method/PACMethod_ssh.pm:892
+msgid "Port "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:764 lib/method/PACMethod_ssh.pm:865
+msgid "Remote Address "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:985
+msgid "Bind Address "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:993
+msgid "Leave blank to bind to any interface"
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:995
+msgid "Local Port "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:1069
+msgid "Option "
+msgstr ""
+
+#: lib/method/PACMethod_ssh.pm:1078
+msgid "Value "
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:173
+msgid "IP Protocol:"
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:176
+msgid "-(4|6) : Uses IPv4, IPv6 or any of them"
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:182
+msgid "Bind Address:"
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:186
+msgid ""
+"[-b ip] : Bind outgoing connection to given ip (leave blank to bind to any "
+"interface)"
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:188
+msgid "Escape Character:"
+msgstr ""
+
+#: lib/method/PACMethod_telnet.pm:192
+msgid ""
+"[-e [escape_character]] : Use given string (or an empty one to disable) as "
+"\"Escape Character\""
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:191
+msgid "<b>TigerVNC configuration</b>"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:197 lib/method/PACMethod_vncviewer.pm:194
+msgid "Compression level (1: min, 10: max) :"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:199 lib/method/PACMethod_tigervnc.pm:206
+#: lib/method/PACMethod_vncviewer.pm:196 lib/method/PACMethod_vncviewer.pm:203
+msgid "[-g] : Percentage of the whole screen to use"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:204 lib/method/PACMethod_vncviewer.pm:201
+msgid "Picture quality (1: min, 10: max) :"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:211
+msgid "Colour Level:"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:213
+msgid "Select the reduced colour level, or leave as automatic"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:224
+msgid "[-FullScreen] : Fullscreen window"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:232
+msgid "[-ViewOnly] : View only mode"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:234
+msgid "Show dot as cursor"
+msgstr ""
+
+#: lib/method/PACMethod_tigervnc.pm:236
+msgid ""
+"[-DotWhenNoCursor] : Show the dot cursor when the server sends an invisible "
+"cursor"
+msgstr ""
+
+#: lib/method/PACMethod_vncviewer.pm:188
+msgid "<b>VNC configuration</b>"
+msgstr ""
+
+#: lib/method/PACMethod_vncviewer.pm:229
+msgid ""
+"[-depth bits_per_pixel] : Attempt to use the specified colour depth (in bits "
+"per pixel)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:324
+msgid ""
+"[/bpp:] : Sets the colour depth for the connection (8, 15, 16, 24 or 32)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:334
+msgid ""
+"[/admin] : Attach to admin console of server (requires Windows Server 2003 "
+"or newer)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:338
+msgid "[+compression] : Enable compression of the RDP datastream"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:340
+msgid "Ignore verification of logon certificate"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:342
+msgid "/cert-ignore: ignore verification of logon certificate"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:344
+msgid "Font Smooth"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:346
+msgid "+fonts: enable font smoothing"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:348
+msgid "Do not grab keyboard"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:350
+msgid "-grab-keyboard: do not grab keyboard"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:355
+msgid "No Authentication"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:357
+msgid "-authentication: disable authentication"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:359
+msgid "No Fast Path"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:361
+msgid "-fast-path: disable fast-path"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:363
+msgid "Enable RemoteFX"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:365
+msgid "/rfx: enable RemoteFX"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:367
+msgid "Enable NSCodec"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:369
+msgid "/nsc: enable NSCodec (experimental)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:371
+msgid "Enable dynamic resolution"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:373
+msgid ""
+"/dynamic-resolution: Send resolution updates when the window is resized)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:378
+msgid "Disable RDP encryption"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:380
+msgid "-sec-rdp: disable Standard RDP encryption"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:382
+msgid "Disable TLS encryption"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:384
+msgid "-sec-tls: disable TLS encryption"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:386
+msgid "Disable Network Level Authentication"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:388
+msgid "-sec-nla: disable network level authentication"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:390
+msgid "TLS Security Level:"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:393
+msgid "[/tls-seclevel:] : set the TLS security level (0, 1, 2, 3, 4 or 5)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:408
+msgid ""
+"[/shell:'startupshell command'] : start given startupshell/command instead "
+"of explorer"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:418
+msgid ""
+"Insert other options not implemented in Asbru (launch 'xfreerdp --help' to "
+"see them all)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:426
+msgid "[/size] : Amount of screen to use"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:436
+msgid ""
+"[/f] : Enable fullscreen mode (toggled at any time using Ctrl-Alt-Enter)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:438
+msgid "Embed in TAB(*)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:440
+msgid ""
+"[-X:xid] : Embed RDP window in an Asbru TAB\n"
+"*WARNING*: if embedded windows doesn't fit perfect install Perl module "
+"X11::GUITest"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:448
+msgid "[/size:WIDTHxHEIGHT] : Define a fixed WIDTH x HEIGHT geometry window"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:463
+msgid "Screen percentage:"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:464
+msgid "[/size:percentage%] : Amount of screen to use"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:473
+msgid "[/kbd] : Keyboard layout"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:476
+msgid "List keyboard layouts launching 'xfreerdp /kbd-list' (0x00000...)"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:486
+msgid "Clipboard redirect"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:489
+msgid "Sound redirect"
+msgstr ""
+
+#: lib/method/PACMethod_xfreerdp.pm:494
+msgid ""
+"[/drive:<8_chars_sharename>:<path>] : Redirects a <path> to the share "
+"\\tsclient\\<8_chars_sharename> on the server"
+msgstr ""
+
+#: res/asbru.glade:109
+msgid "Edit Connection"
+msgstr ""
+
+#: res/asbru.glade:170
+msgid "<b> Host</b>"
+msgstr ""
+
+#: res/asbru.glade:181 res/asbru.glade:2059 res/asbru.glade:3600
+#: res/asbru.glade:4196 res/asbru.glade:5264 res/asbru.glade:5847
+#: res/asbru.glade:6610 res/asbru.glade:8049 res/asbru.glade:8446
+#: res/asbru.glade:8764
+msgid "Help"
+msgstr ""
+
+#: res/asbru.glade:200 res/asbru.glade:2078 res/asbru.glade:8783
+msgid "KeePass"
+msgstr ""
+
+#: res/asbru.glade:205 res/asbru.glade:2083 res/asbru.glade:8788
+msgid "Search KeePass database"
+msgstr ""
+
+#: res/asbru.glade:252
+msgid "Method: "
+msgstr ""
+
+#: res/asbru.glade:304
+msgid ""
+"If checked, 'sudo' command will be prepended to the connection method, along "
+"with the \"-p <selected_prompt>\" command line option configured in "
+"\"Preferences -> Main Options -> Advanced\", and the also selected password "
+"will be used when that prompt is found"
+msgstr ""
+
+#: res/asbru.glade:307 res/asbru.glade:348 res/asbru.glade:571
+#: res/asbru.glade:7537
+msgid " "
+msgstr ""
+
+#: res/asbru.glade:325
+msgid "Run with <span foreground=\"red\"><b>sudo</b></span>"
+msgstr ""
+
+#: res/asbru.glade:366
+msgid "Use <i>autossh</i>"
+msgstr ""
+
+#: res/asbru.glade:413
+msgid "Host "
+msgstr ""
+
+#: res/asbru.glade:427
+msgid "IP or Hostname of the machine to connect to"
+msgstr ""
+
+#: res/asbru.glade:454
+msgid " Port "
+msgstr ""
+
+#: res/asbru.glade:468
+msgid ""
+"Port number to connect to.\n"
+"\n"
+"For some connection types that support it, port can be left empty or set to "
+"0.  In that case, no port will be explicitely specified and the default port "
+"will be used.  This can be useful if you have your SSH details defined in "
+"your ~/.ssh/config, as an example."
+msgstr ""
+
+#: res/asbru.glade:475 res/asbru.glade:2203 res/asbru.glade:2411
+#: res/asbru.glade:9101
+msgid "22"
+msgstr ""
+
+#: res/asbru.glade:512
+msgid "TAB / Window Title: "
+msgstr ""
+
+#: res/asbru.glade:526
+msgid "TAB/Window title to use with this connection"
+msgstr ""
+
+#: res/asbru.glade:577
+msgid "If checked, this session will be executed upon startup"
+msgstr ""
+
+#: res/asbru.glade:591
+msgid "Launch at startup"
+msgstr ""
+
+#: res/asbru.glade:609
+msgid "Reconnect on disconnection"
+msgstr ""
+
+#: res/asbru.glade:615
+msgid ""
+"If checked, reconnect this session when disconnection happens with exit "
+"status <> 0"
+msgstr ""
+
+#: res/asbru.glade:630
+msgid "Wait "
+msgstr ""
+
+#: res/asbru.glade:643
+msgid ""
+"Wait this amount of milliseconds ( from 0-default to 2000 ) before sending "
+"next keypress.\n"
+"Applies to automated actions:\n"
+"- Autologin (user/pass)\n"
+"- Expect / Execute\n"
+"- Remote command send (macros)\n"
+"- Connections chaining\n"
+"- Paste from clipboard"
+msgstr ""
+
+#: res/asbru.glade:652
+msgid "1"
+msgstr ""
+
+#: res/asbru.glade:670
+msgid " millisecs for automated char sending"
+msgstr ""
+
+#: res/asbru.glade:729
+msgid " <b>Authentication</b> "
+msgstr ""
+
+#: res/asbru.glade:765
+msgid "User / Password "
+msgstr ""
+
+#: res/asbru.glade:770
+msgid "Use a user name and a password to authenticate to the target server."
+msgstr ""
+
+#: res/asbru.glade:783
+msgid "Manual"
+msgstr ""
+
+#: res/asbru.glade:788
+msgid ""
+"Do not auto-login nor check for EXPECT.\n"
+"\n"
+"If left blank, the current user name will be used to login on the remote "
+"machine."
+msgstr ""
+
+#: res/asbru.glade:831 res/asbru.glade:1058
+msgid "User "
+msgstr ""
+
+#: res/asbru.glade:844
+msgid ""
+"The user to log in as on the remote machine.\n"
+"\n"
+"Can be left blank to use the currenlty connected user name."
+msgstr ""
+
+#: res/asbru.glade:874
+msgid "  Password "
+msgstr ""
+
+#: res/asbru.glade:887
+msgid ""
+"Password for provided user name\n"
+"Use <<ASK_PASS>> to use ask user for password on every connection )"
+msgstr ""
+
+#: res/asbru.glade:907 res/asbru.glade:1125
+msgid "Show"
+msgstr ""
+
+#: res/asbru.glade:913 res/asbru.glade:1131
+msgid "Show/hide password"
+msgstr ""
+
+#: res/asbru.glade:998 res/asbru.glade:9215
+msgid "Private key file "
+msgstr ""
+
+#: res/asbru.glade:1012
+msgid ""
+"The SSH private key to use.  If must be a valid existing file.\n"
+"\n"
+"If not specified or invalid, the default SSH private key of your system will "
+"be used.  Typically ~/.ssh/id_rsa."
+msgstr ""
+
+#: res/asbru.glade:1018 res/asbru.glade:2547 res/asbru.glade:9233
+msgid "Select an OpenSSH Private Key"
+msgstr ""
+
+#: res/asbru.glade:1072
+msgid "Username to use for connecting"
+msgstr ""
+
+#: res/asbru.glade:1096
+msgid "  Passphrase "
+msgstr ""
+
+#: res/asbru.glade:1110
+msgid "Enter here the passphrase (if needed) for the given public key"
+msgstr ""
+
+#: res/asbru.glade:1154
+msgid "Private Key "
+msgstr ""
+
+#: res/asbru.glade:1159
+msgid "Use an SSH private to authenticate on the target server."
+msgstr ""
+
+#: res/asbru.glade:1187
+msgid ""
+"Use selected auth method exclusively (no fallback nor \"Advanced Options\" "
+"auth bypass)"
+msgstr ""
+
+#: res/asbru.glade:1193
+msgid ""
+"Checking this may improve login speed on some systems, but may break "
+"compatibility with SSH agent, Seahorse, ..."
+msgstr ""
+
+#: res/asbru.glade:1243
+msgid "<b> Connection Details</b>"
+msgstr ""
+
+#: res/asbru.glade:1271
+msgid ""
+"Allows you to send a Perl RegEx string to the connected terminal every given "
+"amount of seconds"
+msgstr ""
+
+#: res/asbru.glade:1274
+msgid "Programatically send string"
+msgstr ""
+
+#: res/asbru.glade:1310
+msgid "With <RETURN> "
+msgstr ""
+
+#: res/asbru.glade:1316
+msgid "Append a \"Return/Intro\" at the end of the given string to be sent"
+msgstr ""
+
+#: res/asbru.glade:1331
+msgid "Every (secs):"
+msgstr ""
+
+#: res/asbru.glade:1346 res/asbru.glade:1665 res/asbru.glade:6091
+#: res/asbru.glade:7494
+msgid "0"
+msgstr ""
+
+#: res/asbru.glade:1361
+msgid "Idle Only"
+msgstr ""
+
+#: res/asbru.glade:1366
+msgid ""
+"Restart the timer each time the terminal is updated or focused, effectively "
+"preventing the string from being sent unless the terminal has been idle for "
+"the configured period."
+msgstr ""
+
+#: res/asbru.glade:1399
+msgid ""
+"Prepend this command before the string to be launched\n"
+"eg.: putting 'tsocks' in an SSH connection, results in executing:\n"
+"tsocks ssh -l user@10.10.10.10\n"
+"Or(manual): LD_PATH=/my/favourite/path\n"
+"Or(Global Variable): DISPLAY=<GV:DISPLAY>"
+msgstr ""
+
+#: res/asbru.glade:1406
+msgid "Prepend command "
+msgstr ""
+
+#: res/asbru.glade:1438 res/asbru.glade:1516
+msgid "Surround connection command with quotes"
+msgstr ""
+
+#: res/asbru.glade:1444 res/asbru.glade:1522
+msgid ""
+"If cheked, the resulting connectino command (eg: ssh -L "
+"10123:localhost:10456 -l user1 10.10.10.1) will be surrounded with double "
+"quotes (\"), in order to provide some more compatibility to the \"Prepend "
+"command\"  (eg: gksudo requires the given command to be quoted)"
+msgstr ""
+
+#: res/asbru.glade:1479
+msgid ""
+"Postpend this command after the string to be launched\n"
+"eg.: putting '| tc' in an SSH connection, results in executing:\n"
+"ssh -l user@10.10.10.10 | ct"
+msgstr ""
+
+#: res/asbru.glade:1484
+msgid "Postpend command "
+msgstr ""
+
+#: res/asbru.glade:1553
+msgid "Start next script when connection is launched "
+msgstr ""
+
+#: res/asbru.glade:1610 res/asbru.glade:6038
+msgid "Remove CONTROL characters. "
+msgstr ""
+
+#: res/asbru.glade:1627 res/asbru.glade:6054
+msgid "Add timestamp"
+msgstr ""
+
+#: res/asbru.glade:1648 res/asbru.glade:1663 res/asbru.glade:6074
+#: res/asbru.glade:6089
+msgid "0 to keep all session logs"
+msgstr ""
+
+#: res/asbru.glade:1649
+msgid " Files to save (0=infinite): "
+msgstr ""
+
+#: res/asbru.glade:1697
+msgid "Save in"
+msgstr ""
+
+#: res/asbru.glade:1712 res/asbru.glade:6135
+msgid "Choose a folder for saving log files"
+msgstr ""
+
+#: res/asbru.glade:1746
+msgid " Open folder"
+msgstr ""
+
+#: res/asbru.glade:1780 res/asbru.glade:6202
+msgid "Logfile name pattern: "
+msgstr ""
+
+#: res/asbru.glade:1793 res/asbru.glade:6215
+msgid ""
+"Logfile pattern:\n"
+"\n"
+"<UUID> -> UUID for this connection\n"
+"<SOCKS5_PORT> -> Socks5 tunnel port\n"
+"<TIMESTAMP> -> time since epoc\n"
+"<DATE_Y> -> Year(4 digits)\n"
+"<DATE_M> -> Month(2 digits)\n"
+"<DATE_D> -> Day(2 digits)\n"
+"<TIME_H> -> Hour (24h, 2 digits)\n"
+"<TIME_M> -> Minute(2 digits)\n"
+"<TIME_S> -> Seconds(2 digits)\n"
+"<NAME> -> Connection's name\n"
+"<TITLE> -> Connections's title\n"
+"<IP> -> IP/host for first jump\n"
+"<USER> -> Username for first jump\n"
+msgstr ""
+
+#: res/asbru.glade:1810 res/asbru.glade:6232
+msgid "<UUID>_<SOCKS5_PORT>_<NAME>_<DATE_Y><DATE_M><DATE_D>_<TIME_H><TIME_M><TIME_S>.txt"
+msgstr ""
+
+#: res/asbru.glade:1834 res/asbru.glade:6256
+msgid "Auto save Session logs"
+msgstr ""
+
+#: res/asbru.glade:1863
+msgid "Enable MFA prompt detection"
+msgstr ""
+
+#: res/asbru.glade:1894
+msgid "  MFA Prompt:"
+msgstr ""
+
+#: res/asbru.glade:1906
+msgid ""
+"Enter the text pattern to expect for MFA prompt (e.g., \"verification code\")"
+msgstr ""
+
+#: res/asbru.glade:1940
+msgid "Connection UUID: "
+msgstr ""
+
+#: res/asbru.glade:1973
+msgid "Get Command line"
+msgstr ""
+
+#: res/asbru.glade:2010
+msgid "<b> Advanced Parameters</b>"
+msgstr ""
+
+#: res/asbru.glade:2041
+msgid "Use global proxy options"
+msgstr ""
+
+#: res/asbru.glade:2045
+msgid ""
+"If selected, use settings defined in the Preferences > Network Settings."
+msgstr ""
+
+#: res/asbru.glade:2104
+msgid "Use a direct connection"
+msgstr ""
+
+#: res/asbru.glade:2108
+msgid ""
+"If selected, ignore any settings defined in the Preferences > Network "
+"Settings and do not use any intermediate proxy or jump host to connect to "
+"the destination."
+msgstr ""
+
+#: res/asbru.glade:2127
+msgid "Use a SOCKS proxy"
+msgstr ""
+
+#: res/asbru.glade:2131
+msgid ""
+"SOCKS is an Internet protocol that exchanges network packets between a "
+"client and server through a proxy server."
+msgstr ""
+
+#: res/asbru.glade:2163 res/asbru.glade:8856
+msgid "Host name or IP address of the SOCKS proxy"
+msgstr ""
+
+#: res/asbru.glade:2175 res/asbru.glade:2384 res/asbru.glade:8868
+#: res/asbru.glade:9074
+msgid "IP / Host"
+msgstr ""
+
+#: res/asbru.glade:2220 res/asbru.glade:2427 res/asbru.glade:8908
+#: res/asbru.glade:9114
+msgid "Port"
+msgstr ""
+
+#: res/asbru.glade:2244 res/asbru.glade:8932
+msgid "Proxy user name"
+msgstr ""
+
+#: res/asbru.glade:2258 res/asbru.glade:2464 res/asbru.glade:8945
+#: res/asbru.glade:9151
+msgid "User"
+msgstr ""
+
+#: res/asbru.glade:2282 res/asbru.glade:8969 res/asbru.glade:9175
+msgid "Proxy password"
+msgstr ""
+
+#: res/asbru.glade:2297 res/asbru.glade:2502 res/asbru.glade:8983
+#: res/asbru.glade:9189
+msgid "Password"
+msgstr ""
+
+#: res/asbru.glade:2328
+msgid "Use a Jump Host"
+msgstr ""
+
+#: res/asbru.glade:2372
+msgid "Host name or IP address of the jump host"
+msgstr ""
+
+#: res/asbru.glade:2451 res/asbru.glade:2488 res/asbru.glade:9138
+msgid "Host server user"
+msgstr ""
+
+#: res/asbru.glade:2529
+msgid "Private key file: "
+msgstr ""
+
+#: res/asbru.glade:2543 res/asbru.glade:9229
+msgid "SSH private key to use to connect to the jump server"
+msgstr ""
+
+#: res/asbru.glade:2561 res/asbru.glade:9247
+msgid "Remove any selected private key"
+msgstr ""
+
+#: res/asbru.glade:2571
+msgid "Pseudo jump server"
+msgstr ""
+
+#: res/asbru.glade:2575
+msgid ""
+"Do not use -J option\n"
+"Connect to server and open a new local connection instead"
+msgstr ""
+
+#: res/asbru.glade:2631
+msgid "<b>Network Settings</b>"
+msgstr ""
+
+#: res/asbru.glade:2674
+msgid "<b>Connection</b>"
+msgstr ""
+
+#: res/asbru.glade:2709
+msgid " Connection specific options"
+msgstr ""
+
+#: res/asbru.glade:2741 res/asbru.glade:2754
+msgid "Execute local commands AFTER disconnected"
+msgstr ""
+
+#: res/asbru.glade:2755
+msgid "Options"
+msgstr ""
+
+#: res/asbru.glade:2790
+msgid " Pre-connections execute"
+msgstr ""
+
+#: res/asbru.glade:2823
+msgid "Execute commands LOCALLY BEFORE the connections is launched"
+msgstr ""
+
+#: res/asbru.glade:2824
+msgid "Pre Exec"
+msgstr ""
+
+#: res/asbru.glade:2859
+msgid " Post-connections execute"
+msgstr ""
+
+#: res/asbru.glade:2891
+msgid "Execute commands LOCALLY AFTER disconnection"
+msgstr ""
+
+#: res/asbru.glade:2892
+msgid "Post Exec"
+msgstr ""
+
+#: res/asbru.glade:2927
+msgid " Expect and Execute"
+msgstr ""
+
+#: res/asbru.glade:2959
+msgid "Expect"
+msgstr ""
+
+#: res/asbru.glade:2994
+msgid " Remote commands list"
+msgstr ""
+
+#: res/asbru.glade:3027
+msgid "Remote Macros"
+msgstr ""
+
+#: res/asbru.glade:3062
+msgid " Local commands list"
+msgstr ""
+
+#: res/asbru.glade:3095
+msgid "Local Macros"
+msgstr ""
+
+#: res/asbru.glade:3130
+msgid " User defined Variables"
+msgstr ""
+
+#: res/asbru.glade:3161
+msgid "User Variables"
+msgstr ""
+
+#: res/asbru.glade:3210
+msgid " <b>Terminal Options</b>"
+msgstr ""
+
+#: res/asbru.glade:3241 res/asbru.glade:8395
+msgid "Terminal Options"
+msgstr ""
+
+#: res/asbru.glade:3282
+msgid "label"
+msgstr ""
+
+#: res/asbru.glade:3356 res/asbru.glade:9798
+msgid "Save current config"
+msgstr ""
+
+#: res/asbru.glade:3538
+msgid "<b>Main Window Layout (*)</b>"
+msgstr ""
+
+#: res/asbru.glade:3569
+msgid "<b>Icons Theme (*)</b>"
+msgstr ""
+
+#: res/asbru.glade:3660
+msgid "Maximized"
+msgstr ""
+
+#: res/asbru.glade:3677
+msgid "With last size"
+msgstr ""
+
+#: res/asbru.glade:3694
+msgid "Iconified in 'systray'"
+msgstr ""
+
+#: res/asbru.glade:3710
+msgid "Start at session startup"
+msgstr ""
+
+#: res/asbru.glade:3732
+msgid "<b>At start</b> "
+msgstr ""
+
+#: res/asbru.glade:3760
+msgid "Hide to tray instead of closing"
+msgstr ""
+
+#: res/asbru.glade:3777
+msgid "Confirm exit"
+msgstr ""
+
+#: res/asbru.glade:3783
+msgid "If checked, always ask confirmation before quiting the application."
+msgstr ""
+
+#: res/asbru.glade:3795
+msgid "Auto save on exit"
+msgstr ""
+
+#: res/asbru.glade:3801
+msgid ""
+"If checked, any configuration changes will be automatically saved before "
+"stopping the application.\n"
+"\n"
+"If you have the option \"Automatically save every configuration change\" "
+"checked, this option is not relevant."
+msgstr ""
+
+#: res/asbru.glade:3815
+msgid "Automatically save every configuration change"
+msgstr ""
+
+#: res/asbru.glade:3839
+msgid "<b>At exit</b>"
+msgstr ""
+
+#: res/asbru.glade:3875
+msgid "Protect with password"
+msgstr ""
+
+#: res/asbru.glade:3909
+msgid "Ask to restore from Tray"
+msgstr ""
+
+#: res/asbru.glade:3939
+msgid "Force split tabs to 50%"
+msgstr ""
+
+#: res/asbru.glade:3956
+msgid "Hide on connection"
+msgstr ""
+
+#: res/asbru.glade:3977
+msgid "Auto-accept or delete unknown or offending SSH keys"
+msgstr ""
+
+#: res/asbru.glade:3996
+msgid ""
+"  (see <b>Host-key</b> and <b>Remote host key</b> on TAB '<i>Advanced</i>')"
+msgstr ""
+
+#: res/asbru.glade:4015
+msgid "Automatically  append group name to title for new connections"
+msgstr ""
+
+#: res/asbru.glade:4033
+msgid "Show favourites connections on Unity's Launcher  right-click menu"
+msgstr ""
+
+#: res/asbru.glade:4052 res/asbru.glade:5195 res/asbru.glade:7931
+msgid "<i>(*) Requires restart to take effect</i>"
+msgstr ""
+
+#: res/asbru.glade:4084 res/asbru.glade:6562 res/asbru.glade:8618
+msgid "<b> Behaviour</b>"
+msgstr ""
+
+#: res/asbru.glade:4115
+msgid "<b>Start on</b>"
+msgstr ""
+
+#: res/asbru.glade:4128
+msgid "Connections"
+msgstr ""
+
+#: res/asbru.glade:4162
+msgid "History"
+msgstr ""
+
+#: res/asbru.glade:4241
+msgid "Show screenshots"
+msgstr ""
+
+#: res/asbru.glade:4258
+msgid "Show statistics"
+msgstr ""
+
+#: res/asbru.glade:4287
+msgid "Always show Tray icon"
+msgstr ""
+
+#: res/asbru.glade:4309
+msgid "Use Black & White tray icon (*) "
+msgstr ""
+
+#: res/asbru.glade:4357
+msgid "Mouse selection copies content to global clipboard"
+msgstr ""
+
+#: res/asbru.glade:4362
+msgid "not just primary clipboard"
+msgstr ""
+
+#: res/asbru.glade:4376
+msgid "Allow more than one instance to run at the same time"
+msgstr ""
+
+#: res/asbru.glade:4422
+msgid "Show connections on (*) "
+msgstr ""
+
+#: res/asbru.glade:4453 res/asbru.glade:7120
+msgid " Left"
+msgstr ""
+
+#: res/asbru.glade:4501
+msgid " Right "
+msgstr ""
+
+#: res/asbru.glade:4543
+msgid "Show connections tooltips"
+msgstr ""
+
+#: res/asbru.glade:4560
+msgid "Show  lines in connections tree"
+msgstr ""
+
+#: res/asbru.glade:4589
+msgid "Enable overlay scrolling for connections tree"
+msgstr ""
+
+#: res/asbru.glade:4594
+msgid ""
+"If enabled, the scrollbars are only added as traditional widgets when a "
+"mouse is present. Otherwise, they are overlayed on top of the content, as "
+"narrow indicators."
+msgstr ""
+
+#: res/asbru.glade:4608
+msgid "Show tree titles"
+msgstr ""
+
+#: res/asbru.glade:4613
+msgid ""
+"If enabled, the title of the currently shown tree (Connections, History, "
+"Clusters, ...) will be shown.\n"
+"\n"
+"Otherwise, only the icon will be shown and save screen space."
+msgstr ""
+
+#: res/asbru.glade:4657
+msgid "Font for "
+msgstr ""
+
+#: res/asbru.glade:4674
+msgid "Info tab"
+msgstr ""
+
+#: res/asbru.glade:4690 res/asbru.glade:4721
+msgid "Pick a Font for the Connections Tree"
+msgstr ""
+
+#: res/asbru.glade:4705
+msgid "Connection list"
+msgstr ""
+
+#: res/asbru.glade:4746
+msgid "Color for "
+msgstr ""
+
+#: res/asbru.glade:4766 res/asbru.glade:4866
+msgid "Select the fore/background color of Protected tree nodes"
+msgstr ""
+
+#: res/asbru.glade:4788 res/asbru.glade:4888
+msgid "Foreground"
+msgstr ""
+
+#: res/asbru.glade:4805 res/asbru.glade:4905
+msgid "Background"
+msgstr ""
+
+#: res/asbru.glade:4849
+msgid "Unprotected nodes (*)"
+msgstr ""
+
+#: res/asbru.glade:4949
+msgid "Protected nodes (*)"
+msgstr ""
+
+#: res/asbru.glade:5004
+msgid "Hide connections list (on terminal open)"
+msgstr ""
+
+#: res/asbru.glade:5010
+msgid ""
+"If checked, the connections list will be hidden when a new terminal is "
+"open.  This can be useful to increase the space usable for the tabbed "
+"terminals."
+msgstr ""
+
+#: res/asbru.glade:5023
+msgid "Auto hide main button bar (on terminal open)"
+msgstr ""
+
+#: res/asbru.glade:5029
+msgid ""
+"If checked, this option will hide the the button bar when on a terminal tab "
+"(increasing the vertical space usable for the terminal)"
+msgstr ""
+
+#: res/asbru.glade:5049
+msgid "Auto show/hide when entering/leaving connections list"
+msgstr ""
+
+#: res/asbru.glade:5055
+msgid ""
+"If checked, the connections list will be shown/hidden when the mouse enters/"
+"leaves the connections list area."
+msgstr ""
+
+#: res/asbru.glade:5072
+msgid "Put Terminal TABS in Main Window (*)"
+msgstr ""
+
+#: res/asbru.glade:5078
+msgid ""
+"If unchecked, every terminal will be opened by default in a separate window"
+msgstr ""
+
+#: res/asbru.glade:5126
+msgid ""
+"Use full names (Local Forwarding, Remote Forwarding, Dynamic Forwarding)"
+msgstr ""
+
+#: res/asbru.glade:5143
+msgid "Use abreviatures (-L, -R, -D)"
+msgstr ""
+
+#: res/asbru.glade:5171
+msgid "Show port forwarding information in status bar"
+msgstr ""
+
+#: res/asbru.glade:5177
+msgid ""
+"If checked, show port forwarding information in status bar when connected"
+msgstr ""
+
+#: res/asbru.glade:5230 res/asbru.glade:7965 res/asbru.glade:8664
+msgid "<b> Look and Feel</b>"
+msgstr ""
+
+#: res/asbru.glade:5302
+msgid ""
+"Example:\n"
+"\"Are you sure you want continue connecting (yes/no)? \"\n"
+"Separate in parenthesis both the \"yes\" and \"no\" answers, so that\n"
+"the first parenthesis refers to \"yes\" and second to \"no\""
+msgstr ""
+
+#: res/asbru.glade:5337
+msgid ""
+"Example:\n"
+"\"WARNING: Offending key in /home/user/.ssh/known_hosts:57\"\n"
+"Separate in parenthesis both the \"filename\" and \"linenumber\" fields, so "
+"that\n"
+"the first parenthesis refers to \"filename\" and second to \"linenumber\""
+msgstr ""
+
+#: res/asbru.glade:5370
+msgid ""
+"Example:\n"
+"\"Press any key to continue\"\n"
+msgstr ""
+
+#: res/asbru.glade:5414
+msgid "PASSWORD prompt "
+msgstr ""
+
+#: res/asbru.glade:5428
+msgid "USERNAME prompt "
+msgstr ""
+
+#: res/asbru.glade:5441
+msgid "Command prompt "
+msgstr ""
+
+#: res/asbru.glade:5454
+msgid "Remote host key changed "
+msgstr ""
+
+#: res/asbru.glade:5467
+msgid "Select-by-word characters "
+msgstr ""
+
+#: res/asbru.glade:5480
+msgid "Host-key verification string "
+msgstr ""
+
+#: res/asbru.glade:5493
+msgid "Press any key to continue "
+msgstr ""
+
+#: res/asbru.glade:5541
+msgid "<b>sudo</b> password prompt "
+msgstr ""
+
+#: res/asbru.glade:5558
+msgid ""
+"Prompt to expect when using 'sudo' with connection, like in:\n"
+"sudo -p sudo_prompt_string ..."
+msgstr ""
+
+#: res/asbru.glade:5561
+msgid "__PAC__SUDO__PROMPT__"
+msgstr ""
+
+#: res/asbru.glade:5576
+msgid " , <b>sudo</b> password "
+msgstr ""
+
+#: res/asbru.glade:5592
+msgid "'sudo' password for this user"
+msgstr ""
+
+#: res/asbru.glade:5595
+msgid "<<ASK_PASS>>"
+msgstr ""
+
+#: res/asbru.glade:5608
+msgid "show"
+msgstr ""
+
+#: res/asbru.glade:5650
+msgid "Internal viewer"
+msgstr ""
+
+#: res/asbru.glade:5671
+msgid ""
+"The screenshot's file name will be appended at the end of the given command"
+msgstr ""
+
+#: res/asbru.glade:5674
+msgid "External viewer"
+msgstr ""
+
+#: res/asbru.glade:5695
+msgid "/usr/bin/xdg-open"
+msgstr ""
+
+#: res/asbru.glade:5721
+msgid "When opening screenshots, use "
+msgstr ""
+
+#: res/asbru.glade:5757 res/asbru.glade:8353
+msgid "<b> Advanced</b>"
+msgstr ""
+
+#: res/asbru.glade:5795
+msgid "Main Options"
+msgstr ""
+
+#: res/asbru.glade:5827
+msgid ""
+"Close Terminal on disconnection: close container (TAB or Window) when "
+"connection is closed"
+msgstr ""
+
+#: res/asbru.glade:5833
+msgid ""
+"If checked, any disconnected terminal TAB/Window will be automatically closed"
+msgstr ""
+
+#: res/asbru.glade:5873
+msgid ""
+"Auto unsplit disconnected Terminals: unsplit disconnected terminal if "
+"already splitted"
+msgstr ""
+
+#: res/asbru.glade:5879 res/asbru.glade:6642
+msgid ""
+"If checked, any disconnected terminal in a splitted window will be directly "
+"unsplitted to its own TAB/Window"
+msgstr ""
+
+#: res/asbru.glade:5912
+msgid "Time to connect "
+msgstr ""
+
+#: res/asbru.glade:5948
+msgid " Expect Cmd exec "
+msgstr ""
+
+#: res/asbru.glade:5989
+msgid "<b>Timeouts (seconds)</b>"
+msgstr ""
+
+#: res/asbru.glade:6076
+msgid " Files to save "
+msgstr ""
+
+#: res/asbru.glade:6121
+msgid "Save in "
+msgstr ""
+
+#: res/asbru.glade:6328
+msgid "When closing last TAB "
+msgstr ""
+
+#: res/asbru.glade:6339
+msgid "Do nothing  "
+msgstr ""
+
+#: res/asbru.glade:6356
+msgid "Close  "
+msgstr ""
+
+#: res/asbru.glade:6401
+msgid "Tabs"
+msgstr ""
+
+#: res/asbru.glade:6424
+msgid "Windows"
+msgstr ""
+
+#: res/asbru.glade:6445
+msgid "Size in Pixels"
+msgstr ""
+
+#: res/asbru.glade:6451
+msgid "Width "
+msgstr ""
+
+#: res/asbru.glade:6465
+msgid "600"
+msgstr ""
+
+#: res/asbru.glade:6481
+msgid "  Height "
+msgstr ""
+
+#: res/asbru.glade:6495
+msgid "400"
+msgstr ""
+
+#: res/asbru.glade:6529
+msgid "<b>Open NEW connections on</b>"
+msgstr ""
+
+#: res/asbru.glade:6591
+msgid "Start Terminals maximized: maximize either TABBED or OWN window"
+msgstr ""
+
+#: res/asbru.glade:6597
+msgid "If checked, Terminals will be maximized on connect"
+msgstr ""
+
+#: res/asbru.glade:6636
+msgid "Show status bar on every terminal"
+msgstr ""
+
+#: res/asbru.glade:6655
+msgid "Change main window title with terminal title"
+msgstr ""
+
+#: res/asbru.glade:6661
+msgid "If checked, main window title takes terminal title"
+msgstr ""
+
+#: res/asbru.glade:6677
+msgid ""
+"Requires restarting every opened connection (closing and starting)\n"
+"Changes apply to next opened connections, not current"
+msgstr ""
+
+#: res/asbru.glade:6683
+msgid "Show MACROS: "
+msgstr ""
+
+#: res/asbru.glade:6693
+msgid "Never  "
+msgstr ""
+
+#: res/asbru.glade:6710
+msgid "In combo box  "
+msgstr ""
+
+#: res/asbru.glade:6727
+msgid "As buttons  "
+msgstr ""
+
+#: res/asbru.glade:6744
+msgid "Show GLOBAL commands in terminals"
+msgstr ""
+
+#: res/asbru.glade:6809
+msgid "Connected color"
+msgstr ""
+
+#: res/asbru.glade:6828 res/asbru.glade:7236
+msgid "Pick a FOREGROUND Color"
+msgstr ""
+
+#: res/asbru.glade:6852
+msgid "Disconnected color"
+msgstr ""
+
+#: res/asbru.glade:6871 res/asbru.glade:6914 res/asbru.glade:7266
+msgid "Pick a BACKGROUND Color"
+msgstr ""
+
+#: res/asbru.glade:6895
+msgid "New data color"
+msgstr ""
+
+#: res/asbru.glade:6980
+msgid " Right"
+msgstr ""
+
+#: res/asbru.glade:7027
+msgid " Top"
+msgstr ""
+
+#: res/asbru.glade:7073
+msgid " Bottom"
+msgstr ""
+
+#: res/asbru.glade:7161
+msgid "Tabs position"
+msgstr ""
+
+#: res/asbru.glade:7180
+msgid "<b>Tabs</b>"
+msgstr ""
+
+#: res/asbru.glade:7218
+msgid "Text color"
+msgstr ""
+
+#: res/asbru.glade:7249
+msgid "Back color"
+msgstr ""
+
+#: res/asbru.glade:7279
+msgid "Bold Color"
+msgstr ""
+
+#: res/asbru.glade:7296
+msgid "Pick a BOLD Color"
+msgstr ""
+
+#: res/asbru.glade:7320
+msgid "Bold is"
+msgstr ""
+
+#: res/asbru.glade:7333
+msgid "also bright"
+msgstr ""
+
+#: res/asbru.glade:7351
+msgid "same as text"
+msgstr ""
+
+#: res/asbru.glade:7381
+msgid "Font"
+msgstr ""
+
+#: res/asbru.glade:7402
+msgid "Pick a Font for the Terminal"
+msgstr ""
+
+#: res/asbru.glade:7427
+msgid "Cursor shape"
+msgstr ""
+
+#: res/asbru.glade:7473
+msgid "Scrollback lines"
+msgstr ""
+
+#: res/asbru.glade:7489
+msgid ""
+"If positive, sets the length of the scrollback buffer used by the terminal.\n"
+"If 0, disables the scrollback buffer.\n"
+"If -1, means an \"infinitive scrollback\"."
+msgstr ""
+
+#: res/asbru.glade:7524
+msgid "Transparency (*)"
+msgstr ""
+
+#: res/asbru.glade:7541
+msgid ""
+"If checked, transparency is supported for any terminals and you can specify "
+"here the default transparency level.\n"
+"\n"
+"When checked for the first time, a restart of the application is required to "
+"take effect.\n"
+"\n"
+"If unchecked, transparency is not supported.\n"
+"\n"
+"If you don't use transparency, leave ths option unchecked as it will "
+"slightly improve rendering performances."
+msgstr ""
+
+#: res/asbru.glade:7590
+msgid "Colors"
+msgstr ""
+
+#: res/asbru.glade:7909
+msgid "<b>Terminal UI</b>"
+msgstr ""
+
+#: res/asbru.glade:7999
+msgid "Character encoding"
+msgstr ""
+
+#: res/asbru.glade:8038
+msgid "encoding description"
+msgstr ""
+
+#: res/asbru.glade:8082
+msgid "Backspace"
+msgstr ""
+
+#: res/asbru.glade:8124
+msgid "Expect DEBUG"
+msgstr ""
+
+#: res/asbru.glade:8130
+msgid ""
+"If checked, lots of debug info will be output on every terminal. It will "
+"also save a .yml (YAML) config faile is \"Save\" button is clicked. BEWARE!! "
+"This option will make appear plain text passwords!!"
+msgstr ""
+
+#: res/asbru.glade:8146
+msgid ""
+"<span color=\"#888888\"><i>make Expect object show information on what's "
+"going on, in order to aid in debugging</i></span>"
+msgstr ""
+
+#: res/asbru.glade:8168
+msgid "Hide Connections submenu"
+msgstr ""
+
+#: res/asbru.glade:8174
+msgid ""
+"This options allows you (if unchecked) to prevent the Connections submenu "
+"from appearing when right-click on any terminal. That will speed up showing "
+"the right-click submenu"
+msgstr ""
+
+#: res/asbru.glade:8190
+msgid ""
+"<span color=\"#888888\"><i>if <b>unchecked</b>, there may be big delays to "
+"show right-click submenu</i></span>"
+msgstr ""
+
+#: res/asbru.glade:8208
+msgid "Audible Bell"
+msgstr ""
+
+#: res/asbru.glade:8225
+msgid "Confirm Chains selection / execution"
+msgstr ""
+
+#: res/asbru.glade:8231
+msgid "If checked, a confirmation window will popup when chaining executions"
+msgstr ""
+
+#: res/asbru.glade:8248
+msgid "Skip first Chain expect"
+msgstr ""
+
+#: res/asbru.glade:8254
+msgid ""
+"If checked, first expect in the chain will be skipped (ie: skip any command "
+"prompt not matching the actual one)"
+msgstr ""
+
+#: res/asbru.glade:8270
+msgid ""
+"<span color=\"#888888\"><i>which uses to be a <b>command prompt</b> expect "
+"command</i></span>"
+msgstr ""
+
+#: res/asbru.glade:8292
+msgid "Use login shell to start connections"
+msgstr ""
+
+#: res/asbru.glade:8312
+msgid ""
+"<span color=\"#888888\"><i>if checked, it may resolve some problems with "
+"<b>ENV</b>ironment varibles</i></span>"
+msgstr ""
+
+#: res/asbru.glade:8429
+msgid "Start a shell upon startup"
+msgstr ""
+
+#: res/asbru.glade:8479
+msgid "Shell Binary"
+msgstr ""
+
+#: res/asbru.glade:8494
+msgid "/bin/bash"
+msgstr ""
+
+#: res/asbru.glade:8521
+msgid "Initial Directory"
+msgstr ""
+
+#: res/asbru.glade:8536
+msgid "$HOME"
+msgstr ""
+
+#: res/asbru.glade:8563
+msgid "Shell Options"
+msgstr ""
+
+#: res/asbru.glade:8578
+msgid "-login"
+msgstr ""
+
+#: res/asbru.glade:8706
+msgid "Local Shell Options"
+msgstr ""
+
+#: res/asbru.glade:8743
+msgid "Do not use proxy"
+msgstr ""
+
+#: res/asbru.glade:8747
+msgid ""
+"If selected, do not use any intermediate proxy or jump host to connect to "
+"the destination.\n"
+"                            \n"
+"For each connection, it is still possible to define a particular proxy or "
+"jump host.\n"
+msgstr ""
+
+#: res/asbru.glade:8814
+msgid "SOCKS proxy"
+msgstr ""
+
+#: res/asbru.glade:8819
+msgid ""
+"If selected, use a SOCKS proxy for all connections.\n"
+"\n"
+"SOCKS is an Internet protocol that exchanges network packets between a "
+"client and server through a proxy server.\n"
+"\n"
+"For all other types of connection, this setting will be ignored.\n"
+msgstr ""
+
+#: res/asbru.glade:8895
+msgid "5000"
+msgstr ""
+
+#: res/asbru.glade:9015
+msgid "Use Jump Server"
+msgstr ""
+
+#: res/asbru.glade:9019
+msgid ""
+"If selected, use a jump host for all SSH connections.\n"
+"\n"
+"Jump host is an alternative to SSH tunneling to access internal machines "
+"through gateway.\n"
+"\n"
+"For all other types of connection, this setting will be ignored.\n"
+msgstr ""
+
+#: res/asbru.glade:9062
+msgid "Host name or IP address of the jump server"
+msgstr ""
+
+#: res/asbru.glade:9285
+msgid "<b>Global Network Settings</b>"
+msgstr ""
+
+#: res/asbru.glade:9318
+msgid "Network Settings"
+msgstr ""
+
+#: res/asbru.glade:9347
+msgid "Use <GV:variable name> anywhere to refer to the given value"
+msgstr ""
+
+#: res/asbru.glade:9357
+msgid "<b>User defined Global Variables</b>"
+msgstr ""
+
+#: res/asbru.glade:9389
+msgid "Global Variables"
+msgstr ""
+
+#: res/asbru.glade:9427
+msgid "<b>Global common local commands list</b>"
+msgstr ""
+
+#: res/asbru.glade:9459
+msgid "Local Commands"
+msgstr ""
+
+#: res/asbru.glade:9497
+msgid "<b>Global common remote commands list</b>"
+msgstr ""
+
+#: res/asbru.glade:9529
+msgid "Remote Commands"
+msgstr ""
+
+#: res/asbru.glade:9568
+msgid ""
+"<b>Integration of a KeePass database file</b>\n"
+"<small>\n"
+"Ásbrú is using the command line interface of <a href=\"https://"
+"keepassxc.org\">KeePassXC</a>\n"
+"to read any KeePass database file and use any entry to automate connection "
+"inside Ásbrú.</small>"
+msgstr ""
+
+#: res/asbru.glade:9602
+msgid "KeePass Integration"
+msgstr ""
+
+#: res/asbru.glade:9635
+msgid "<b>Keybindings</b>"
+msgstr ""
+
+#: res/asbru.glade:9665
+msgid "Keybindings"
+msgstr ""
+
+#: res/asbru.glade:9709
+msgid "Undo"
+msgstr ""
+
+#: res/asbru.glade:9723
+msgid "Save As"
+msgstr ""

@@ -138,7 +138,7 @@ sub _buildVarGUI {
 
     $w{help}->set_halign('GTK_ALIGN_END');
     $w{help}->set_label('');
-    $w{help}->set_tooltip_text('Open Online Help');
+    $w{help}->set_tooltip_text(_t('Open Online Help'));
     $w{help}->set_always_show_image(1);
     $w{help}->set_image(Gtk3::Image->new_from_stock('asbru-help', 'button'));
 
@@ -199,7 +199,7 @@ sub _buildVar {
     $w{hbox} = Gtk3::HBox->new(0, 0);
 
     # Build label
-    $w{lbl1} = Gtk3::Label->new('Variable:');
+    $w{lbl1} = Gtk3::Label->new(_t('Variable:'));
     $w{hbox}->pack_start($w{lbl1}, 0, 1, 0);
 
     # Build entry
@@ -208,7 +208,7 @@ sub _buildVar {
     $w{var}->set_text($var);
 
     # Build label
-    $w{lbl2} = Gtk3::Label->new(' Value:');
+    $w{lbl2} = Gtk3::Label->new(_t(' Value:'));
     $w{hbox}->pack_start($w{lbl2}, 0, 1, 0);
 
     # Build entry
@@ -216,7 +216,7 @@ sub _buildVar {
     $w{hbox}->pack_start($w{val}, 1, 1, 0);
     $w{val}->set_text($val);
 
-    $w{hide} = Gtk3::CheckButton->new('Hide');
+    $w{hide} = Gtk3::CheckButton->new(_t('Hide'));
     $w{hbox}->pack_start($w{hide}, 0, 1, 0);
     $w{hide}->set_active($hide);
     $w{hide}->signal_connect(toggled => sub {$w{val}->set_visibility(! $w{hide}->get_active);});

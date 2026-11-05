@@ -30,6 +30,7 @@ $|++;
 use strict;
 use warnings;
 use FindBin qw ($RealBin $Bin $Script);
+use PACUtils qw (_t);
 
 # GTK
 use Gtk3 '-init';
@@ -165,17 +166,17 @@ sub _buildGUI
 
     $w{vbox} = $container;
 
-        $w{chPassive} = Gtk3::CheckButton->new_with_label('Passive mode data transfers');
+        $w{chPassive} = Gtk3::CheckButton->new_with_label(_t('Passive mode data transfers'));
         $w{vbox}->pack_start($w{chPassive}, 0, 1, 0);
-        $w{chPassive}->set_tooltip_text('[-p] : Use passive mode for data transfers');
+        $w{chPassive}->set_tooltip_text(_t('[-p] : Use passive mode for data transfers'));
 
-        $w{chNoInteractive} = Gtk3::CheckButton->new_with_label('Turn off interactive prompt for multiple file transfers');
+        $w{chNoInteractive} = Gtk3::CheckButton->new_with_label(_t('Turn off interactive prompt for multiple file transfers'));
         $w{vbox}->pack_start($w{chNoInteractive}, 0, 1, 0);
-        $w{chNoInteractive}->set_tooltip_text('[-i] : Turns off interactive prompting during multiple file transfers');
+        $w{chNoInteractive}->set_tooltip_text(_t('[-i] : Turns off interactive prompting during multiple file transfers'));
 
-        $w{chVerbose} = Gtk3::CheckButton->new_with_label('Verbose connection');
+        $w{chVerbose} = Gtk3::CheckButton->new_with_label(_t('Verbose connection'));
         $w{vbox}->pack_start($w{chVerbose}, 0, 1, 0);
-        $w{chVerbose}->set_tooltip_text('[-v] : Show all responses from the remote server, as well as report on data transfer statistics');
+        $w{chVerbose}->set_tooltip_text(_t('[-v] : Show all responses from the remote server, as well as report on data transfer statistics'));
 
     $$self{gui} = \%w;
 
