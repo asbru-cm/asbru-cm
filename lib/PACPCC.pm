@@ -444,7 +444,7 @@ sub _setupCallbacks {
     $$self{_WINDOWPCC}{cbApplyOnIntro}->signal_connect('toggled' => sub {$$self{_WINDOWPCC}{entryData}->set_text('') unless $$self{_WINDOWPCC}{cbApplyOnIntro}->get_active;});
 
     $$self{_WINDOWPCC}{comboTerminals}->signal_connect('changed' => sub {
-        ($$self{_WINDOWPCC}{cbShowMultiText}->get_active ? $$self{_WINDOWPCC}{multiTextView} : $$self{_WINDOWPCC}{entryData})->grab_focus;
+        ($$self{_WINDOWPCC}{cbShowMultiText}->get_active() ? $$self{_WINDOWPCC}{multiTextView} : $$self{_WINDOWPCC}{entryData})->grab_focus;
     }) ;
 
     # Capture every 'key press' and send it to every terminal in the cluster
@@ -815,7 +815,7 @@ sub _setupCallbacks {
 
     $$self{_WINDOWPCC}{btnRestartAll}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
-        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
+        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         return 1 unless scalar(@list) && _wConfirm($$self{_WINDOWPCC}{main}, ($cluster ne '' ? sprintf(_t("Are you sure you want to RESTART <b>every</b> terminal in cluster '%s'?"), $cluster) : _t('Are you sure you want to RESTART <b>every</b> terminal?')));
         foreach my $uuid (@list) {
             kill(15, $$self{_RUNNING}{$uuid}{'terminal'}{_PID}) if ($$self{_RUNNING}{$uuid}{'terminal'}{_PID} // 0);
@@ -877,7 +877,7 @@ sub _setupCallbacks {
     # Capture 'ReTab' button clicked
     $$self{_WINDOWPCC}{btnReTab}->signal_connect('clicked' => sub {
         my $cluster = $$self{_WINDOWPCC}{comboTerminals}->get_active_text // '';
-        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
+        my @list = keys %{$$self{_WINDOWPCC}{cbSendToAll}->get_active() ? $$self{_RUNNING} : $$self{_CLUSTERS}{$cluster}};
         foreach my $uuid (@list) {
             # Check that these are valid terminals
             if (!defined($$self{_RUNNING}{$uuid}{terminal})) {

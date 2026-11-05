@@ -4444,7 +4444,7 @@ sub _wFindInTerminal {
         my %found;
         my $i = 0;
         my $l = 0;
-        my $regexp = $w{window}{gui}{cbCaseSensitive}->get_active ? qr/$val/m : qr/$val/im;
+        my $regexp = $w{window}{gui}{cbCaseSensitive}->get_active() ? qr/(?m)$val/ : qr/$val/im;
         foreach my $line (@{$$self{_TEXT}}) {
             ++$l;
             if ($stop) {

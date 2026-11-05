@@ -114,17 +114,17 @@ sub get_cfg {
         $hash{return} = $$w{return}->get_active || '0';
 
         if ($$w{cbOnMatch}->get_active) {
-            $hash{on_match} = $$w{rbOnMatchGoto}->get_active ? $$w{on_match}->get_chars(0, -1) : -2;
+            $hash{on_match} = $$w{rbOnMatchGoto}->get_active() ? $$w{on_match}->get_chars(0, -1) : -2;
         } else {
             $hash{on_match} = -1;
         }
         if ($$w{cbOnFail}->get_active) {
-            $hash{on_fail} = $$w{rbOnFailGoto}->get_active ? $$w{on_fail}->get_chars(0, -1) : -2;
+            $hash{on_fail} = $$w{rbOnFailGoto}->get_active() ? $$w{on_fail}->get_chars(0, -1) : -2;
         } else {
             $hash{on_fail} = -1;
         }
 
-        $hash{time_out} = $$w{cbTimeOut}->get_active ? $$w{time_out}->get_chars(0, -1) : -1;
+        $hash{time_out} = $$w{cbTimeOut}->get_active() ? $$w{time_out}->get_chars(0, -1) : -1;
         push(@cfg, \%hash);
     }
 
